@@ -1,0 +1,21 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="android:editTextBackground">@drawable/rn_edit_text_material</item>
+        <item name="android:windowDisablePreview">true</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:navigationBarColor">#131825</item>
+    </style>
+
+
+    <style name="SplashTheme" parent="SplashScreen_SplashTheme" >
+        <item name="android:statusBarColor" tools:targetApi="m">@color/bootsplash_background</item>
+        <item name="android:colorPrimaryDark">@color/bootsplash_background</item>
+        <item name="android:windowDisablePreview">true</item>
+        <item name="android:windowIsTranslucent">true</item>
+    </style>
+
+</resources>
