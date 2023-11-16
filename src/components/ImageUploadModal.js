@@ -52,7 +52,9 @@ const ImageUploadModal = ({
             onImagePicked({
               uri: image.sourceURL,
               name: image.filename,
-              type: image.mime
+              type: image.mime,
+              height: image.height,
+              width: image.width,
             });
 
 
@@ -85,19 +87,23 @@ const ImageUploadModal = ({
       maxFiles: 20
     })
       .then(image => {
-
+        console.log(image, "image")
         if (!multiple) {
           onImagePicked({
             uri: image.sourceURL,
             name: image.filename,
-            type: image.mime
+            type: image.mime,
+            height: image.height,
+            width: image.width,
           });
         } else {
           let images = image.map((x) => {
             return {
               uri: x.sourceURL,
               name: x.filename,
-              type: x.mime
+              type: x.mime,
+              height: x.height,
+              width: x.width,
             }
           });
           onImagePicked(images)

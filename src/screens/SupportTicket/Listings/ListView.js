@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, FlatList, Image, SafeAreaView, TouchableHighlight } from 'react-native'
+import React, { useEffect, useState } from 'react';
+import { View, FlatList, Image, SafeAreaView, TouchableHighlight, Pressable } from 'react-native'
 import { colors } from '../../../utilities/colors';
 import MyText from '../../../components/MyText';
 import MyInputs from '../../../components/MyInputs';
@@ -7,10 +7,18 @@ import { icons } from '../../../utilities/icons';
 import Modal from 'react-native-modal'
 import routes from '../../../navigation/routes';
 import { useNavigation } from '@react-navigation/native';
+import { SUPPORT_TCIKETS_LIST_BY_TYPE } from '../../../DAL';
+import MyLoader from '../../../components/MyLoader';
+import { useSelector } from 'react-redux';
+import { selectUser } from '../../../redux/reducers/userSlice';
+import { S3_URL } from '../../../utilities/constants';
+import moment from 'moment';
+import EmptyView from '../../../components/EmptyView';
 
-const ListView = (props) => {
+const ListView = ({ isLoading, list, active, }) => {
   const [isOptionModalShown, setIsOptionModalShown] = useState(false)
-  const navigation = useNavigation()
+  const navigation = useNavigation();
+
 
   const optionsModal = () => {
     return (
@@ -42,6 +50,42 @@ const ListView = (props) => {
         </SafeAreaView>
       </Modal>)
   }
+  
+  const renderList = ({ item, index }) => {
+    return (
+      <Pressable
+        underlayColor={colors.secondary}
+        onLongPress={() => setIsOptionModalShown(true)}
+        onPress={() => {
+          console.log(navigation.getParent(), "parent")
+          navigation.navigate(routes.supportTicketDeatail, {
+            ticket: item
+          })
+        }
+        }
+
+        style={{ padding: 20, flexDirection: "row" }} >
+        <>
+          <View style={{ width: 35, height: 35, borderRadius: 35 / 2, overflow: "hidden" }}>
+            <Image
+              source={!!item?.member?.profile_image ? { uri: S3_URL + item?.member?.profile_image } : icons.dummyUser}
+              style={{ height: '100%', width: "100%" }} />
+          </View>
+          <View style={{ flex: 1, marginHorizontal: 10, }}>
+            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+              <MyText fontSize={14} type='medium' >{item?.member?.first_name + " " + item?.member?.last_name}</MyText>
+              <MyText fontSize={10} type='light' >{
+                moment(item.last_action_date).fromNow().includes("days") ?
+                  moment(item.last_action_date).format("DD MMM YY") :
+                  moment(item.last_action_date).fromNow()}
+              </MyText>
+            </View>
+            <MyText style={{ marginTop: 3 }} fontSize={12} >{item?.subject}</MyText>
+            <MyText style={{ marginTop: 3 }} numberOfLines={1} color={colors.lightText} fontSize={12} >{item?.description}</MyText>
+          </View>
+        </>
+      </Pressable>)
+  }
 
   return (
     <>
@@ -49,37 +93,14 @@ const ListView = (props) => {
       <View style={{ flex: 1, marginHorizontal: -10, borderRadius: 20 }}>
 
         <FlatList
-          data={data}
+          data={list}
           indicatorStyle="white"
-          renderItem={({ item, index }) => {
-            return (
-              <TouchableHighlight
-                underlayColor={colors.secondary}
-                onLongPress={() => setIsOptionModalShown(true)}
-                onPress={() =>
-                  navigation.navigate(routes.supportTicketDeatail, {
-                    ticket: item
-                  })}
-                style={{ padding: 20, flexDirection: "row" }} >
-                <>
-                  <View style={{ width: 35, height: 35, borderRadius: 35 / 2, overflow: "hidden" }}>
-                    <Image
-                      source={!!item?.image ? { uri: item?.image } : icons.dummyUser}
-                      style={{ height: '100%', width: "100%" }} />
-                  </View>
-                  <View style={{ flex: 1, marginHorizontal: 10, }}>
-                    <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-                      <MyText fontSize={14} type='medium' >{item.name}</MyText>
-                      <MyText fontSize={10} type='light' >{item.responded}</MyText>
-                    </View>
-                    <MyText style={{ marginTop: 3 }} fontSize={12} >{item.subject}</MyText>
-                    <MyText style={{ marginTop: 3 }} numberOfLines={1} color={colors.lightText} fontSize={12} >{item.describtion}</MyText>
-                  </View>
-                </>
-              </TouchableHighlight>)
-          }}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={renderList}
+          ListEmptyComponent={!isLoading && active && <EmptyView />}
         />
       </View>
+      <MyLoader enable={isLoading} />
     </>
   );
 };

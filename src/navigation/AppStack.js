@@ -8,12 +8,10 @@ import OPTscreen from '../screens/Auth/OPT';
 import ForgotPassword from '../screens/Auth/ForgotPassword';
 import SideDrawer from './SideDrawer';
 import Splash from '../screens/Auth/Splash';
+import TicketDetail from '../screens/SupportTicket/Detail.js';
 
 const Stack = createNativeStackNavigator();
-
 const AppStack = () => {
- 
-
   return (
 
     <Stack.Navigator
@@ -30,6 +28,8 @@ const AppStack = () => {
 
       {/* Drawer */}
       <Stack.Screen name={routes.mainScreen} component={SideDrawer} />
+
+      {/* <Stack.Screen name={routes.supportTicketDeatail} component={TicketDetail} /> */}
 
 
     </Stack.Navigator>

@@ -7,13 +7,21 @@ import { icons } from '../../utilities/icons';
 import { drawerMenuList } from './List';
 
 const index = (props) => {
-  const { navigation } = props;
+  const { navigation, state } = props;
+  console.log(props, "props")
 
 
   const changeSideBarScreen = async (screen) => {
+    console.log(state, "routes")
+    console.log(screen, "screen")
     navigation.closeDrawer()
+
     setTimeout(() => {
-      navigation.popToTop()
+      navigation.jumpTo(screen)
+      // navigation.reset({
+      //   index: 0,
+      //   routes: [{ name: screen }]
+      // })
     }, 200);
   }
   return (

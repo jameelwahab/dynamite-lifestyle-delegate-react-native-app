@@ -1,4 +1,4 @@
-import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native'
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, Keyboard } from 'react-native'
 import React, { useCallback, useMemo, useState } from 'react'
 import RootView from '../../components/RootView'
 import MyText from '../../components/MyText'
@@ -11,44 +11,144 @@ import { KeyboardAwareFlatList } from 'react-native-keyboard-aware-scroll-view'
 import MyTouchableInput from '../../components/MyTouchableInput'
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { icons } from '../../utilities/icons'
+import moment from 'moment'
+import breakReference from '../../functions/breakReference'
+import { MyButton } from '../../components/MyButton'
+import ImagUploadView from '../../components/ImagUploadView'
+import ImageUploadModal from '../../components/ImageUploadModal'
+import { UPDATE_REMINDER_MESSAGES, UPLOAD_FILE_TO_S3 } from '../../DAL'
+import showToast from '../../functions/showToast'
+import invokeApi from '../../functions/invokeAPI'
+import MyLoader from '../../components/MyLoader'
 
 const ReminderSettings = ({ navigation }) => {
-  const { user } = useSelector(selectUser);
-  const [list, setList] = useState([...user?.welcome_reminder_setting]);
-  const [datePicker, setDatePicker] = useState({ isVisible: false, index: -1 });
-
+  const { user, token } = useSelector(selectUser);
+  const [loader, setLoader] = useState(false)
+  const [list, setList] = useState(JSON.parse(JSON.stringify(user?.welcome_reminder_setting)));
+  const [datePicker, setDatePicker] = useState({ isVisible: false, index: -1, time: "" });
+  const [image, setImage] = useState({ isVisible: false, index: -1, file: "" });
+  const list_length = list.length
 
   const hideDatePicker = () => {
-    setDatePicker({ index: -1, isVisible: false });
+    setDatePicker({ index: -1, isVisible: false, time: "" });
   };
-  const openDatePicker = (index) => {
-    setDatePicker({ index: index, isVisible: true });
+  const openDatePicker = (index, time) => {
+    Keyboard.dismiss()
+    setDatePicker({ index: index, isVisible: true, time });
   };
 
   const handleConfirm = (date) => {
-    console.warn("A date has been picked: ", date);
+    itemHander({ type: "notify_time", value: moment(date).format("HH:mm"), index: datePicker.index })
     hideDatePicker();
   };
 
   const itemHander = ({ type, value, index }) => {
-    list[index][type] = value;
-    console.log(list[index])
+    list[index] = { ...list[index], [type]: value };
     setList([...list])
   }
 
+  const removeOrAddReminder = (type, index) => {
+    if (type == "remove") {
+      list.splice(index, 1)
+    } else if (type == "add") {
+      list.push(breakReference(reminderObj))
+    }
+    setList([...list])
+  }
 
-  const renderReminders = ({ item, index }) => {
+  const selectImage = (index) => {
+
+  }
+
+  const onPicked = async (selectedImage) => {
+
+    let formData = new FormData();
+    formData.append("image", selectedImage);
+    formData.append("height", selectedImage?.height);
+    formData.append("width", selectedImage?.width);
+    let res = await UPLOAD_FILE_TO_S3({
+      body: formData,
+      navigation, token,
+    });
+    if (res.code == 200) {
+      itemHander({ type: "image", value: res?.image_path, index: image.index })
+    } else {
+      showToast({ title: "Image Uploding Failed", type: "error" })
+    }
+
+  }
+
+  const btn_update = async () => {
+
+    for (let i = 0; i < list_length; i++) {
+      let x = list[i];
+      if (x?.reminder_days == "") {
+        showToast({ body: `Please enter After Days of Reminder # ${i + 1}`, type: "info" })
+        return
+      } else if (x?.message_type == "image" && !!x?.image == false) {
+        showToast({ body: `Please upload Image of Reminder # ${i + 1}`, type: "info" })
+        return
+      } else if (x?.message_type == "video" && !!x?.embed_code == false) {
+        showToast({ body: `Please enter the embed code of Reminder # ${i + 1} video`, type: "info" })
+        return
+      }
+    }
+    setLoader(true)
+    let res = await UPDATE_REMINDER_MESSAGES({ body: list, token, navigation });
+    setLoader(false)
+    if (res.code == 200) {
+      showToast({ title: "Updated Successfully", body: res.message, type: "success" });
+      navigation.goBack()
+    } else {
+      showToast({ title: res.message, type: "error" });
+    }
+
+  }
+
+  const UpdateButton = () => {
+    return (
+
+      <View style={{ paddingHorizontal: 10 }}>
+        <MyButton
+          title='Update'
+          onPress={btn_update}
+        />
+      </View>
+    )
+  }
+
+  const renderReminders = useCallback(({ item, index }) => {
     return (
       <View style={__styles.itemRoot}>
+
+        <View style={__styles.buttonRow}>
+
+          {list_length > 1 &&
+            <TouchableOpacity
+              onPress={() => removeOrAddReminder("remove", index)}
+              style={__styles.button}>
+              {icons.minusCircle()}
+            </TouchableOpacity>}
+
+
+          <TouchableOpacity
+            onPress={() => removeOrAddReminder("add", -1)}
+            style={__styles.button}>
+            {icons.plusCircle()}
+          </TouchableOpacity>
+
+        </View>
+
         <MyInputs
           label='After Days*'
-          value={item.reminder_days}
+          value={item?.reminder_days.toString()}
           onChangeText={(text) => itemHander({ type: "reminder_days", value: text, index })}
           keyboardType='number-pad'
         />
         <MyTouchableInput
-          onPress={() => openDatePicker(index)}
+          onPress={() => openDatePicker(index, item.notify_time)}
           label='Notify Time'
+          value={moment(item?.notify_time, "HH:mm").format("hh:mm A")}
           icon={icons.clock}
 
         />
@@ -69,30 +169,65 @@ const ReminderSettings = ({ navigation }) => {
           ))}
         </View>
 
+        {item.message_type == "image" &&
+          <ImagUploadView
+            onPress={() => setImage({ isVisible: true, index, file: "" })}
+            viewStyle={__styles.imageView}
+            alreadyUploaded={item?.image}
+            label={"Image* (150 X 22)"}
+          />
+        }
+
+        {item.message_type == "video" &&
+          <MyInputs
+
+            label='Embeded Code*'
+            multiline={true}
+            value={item?.embed_code}
+            onChangeText={(text) => itemHander({ type: "embed_code", value: text, index })}
+          />
+        }
+
 
 
         <Editor
+          label='Reminder Message'
           height={200}
           backgroundColor={"#232c43"}
+          initialValue={item.reminder_message}
+          onChange={(text) => itemHander({ type: "reminder_message", value: text, index })}
 
         />
       </View>
     )
-  }
+  }, [JSON.stringify(list)])
 
   return (
     <RootView title='Welcome Reminder Setting'>
-      <KeyboardAwareFlatList
-        data={list}
-        renderItem={renderReminders}
-      />
-
+      <View style={{ flex: 1 }}>
+        <FlatList
+          showsVerticalScrollIndicator={false}
+          automaticallyAdjustKeyboardInsets={true}
+          keyboardShouldPersistTaps={'always'}
+          data={list}
+          renderItem={renderReminders}
+          ListFooterComponent={UpdateButton}
+          contentContainerStyle={{paddingBottom:30}}
+        />
+      </View>
       <DateTimePickerModal
         isVisible={datePicker.isVisible}
         mode="time"
+        date={moment(datePicker.time, "HH:mm").toDate()}
         onConfirm={handleConfirm}
         onCancel={hideDatePicker}
       />
+      <ImageUploadModal
+        isVisible={image.isVisible}
+        onImagePicked={onPicked}
+        closeModal={() => setImage({ isVisible: false, index: -1 })}
+      />
+      <MyLoader enable={loader} />
     </RootView>
   )
 }
@@ -100,9 +235,11 @@ const ReminderSettings = ({ navigation }) => {
 export default ReminderSettings;
 const type = ["general", "image", "video"]
 const reminderObj = {
-  reminder_days: 0,
-  notify_time: "12:00 AM",
-  message_type: "",
+  reminder_days: "0",
+  notify_time: "00:00",
+  message_type: "general",
+  embed_code: "",
+  image: "",
   reminder_message: "",
   title: ""
 }
@@ -136,11 +273,23 @@ const __styles = StyleSheet.create({
     borderColor: colors.lightText2,
     overflow: "hidden",
     borderRadius: 5,
-    height: 40
+    height: 40,
+    marginBottom: 15
   },
   sepeartor: {
     height: '100%',
     width: 1,
     backgroundColor: colors.lightText2,
+  },
+  buttonRow: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+  },
+  button: {
+    padding: 5,
+  },
+  imageView: {
+
+    borderColor: colors.lightText2
   }
 })

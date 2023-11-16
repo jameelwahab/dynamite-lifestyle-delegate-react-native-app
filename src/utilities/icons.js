@@ -22,6 +22,7 @@ export const icons = {
   refresh: require('../assets/icons/reload.png'),
   send: require('../assets/icons/send.png'),
   tick: require('../assets/icons/tick.png'),
+  emptyBox:require('../assets/icons/empty-box.png'),
 
   user: () => { return (<FontAwesome6 name="user-large" color={colors.primary} size={17} />) },
   copy: () => { return (<Ionicons name="copy" color={colors.primary} size={17} />) },
@@ -43,6 +44,8 @@ export const icons = {
   reply: () => { return (<Octicons name="reply" color={colors.primary} size={17} />) },
   upload: () => { return (<FontAwesome name="cloud-upload" color={colors.primary} size={25} />) },
   clock: () => { return (<Octicons name="clock" color={colors.primary} size={17} />) },
+  minusCircle: () => { return (<Feather name="minus-circle" color={colors.primary} size={25} />) },
+  plusCircle: () => { return (<Feather name="plus-circle" color={colors.primary} size={25} />) },
 
 
 }

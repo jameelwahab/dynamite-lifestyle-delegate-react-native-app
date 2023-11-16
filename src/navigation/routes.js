@@ -15,7 +15,9 @@ const routes = {
   editProfile: "EDIT_PROFILE_SCREEN",
   changePassword: "CHANGE_PASSWORD_SCREEN",
   reminderSettings: "REMINDER_SETTINGS_SCREEN",
-  zoomSettings: "ZOOM_SETTINGS_SCREEN"
+  zoomSettings: "ZOOM_SETTINGS_SCREEN",
+  chat: "CHAT_SETTINGS_SCREEN",
+  chatNavigator: "CHAT_NAVIGATOR"
 }
 
 export default routes;

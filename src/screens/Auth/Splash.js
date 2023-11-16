@@ -1,4 +1,4 @@
-import { View, Text, Image, SafeAreaView, Alert } from 'react-native'
+import { View, Text, Image, SafeAreaView, Alert, StatusBar } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -92,7 +92,7 @@ const Splash = ({ navigation }) => {
   return (
 
     <SafeAreaView style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: colors.secondary }}>
-
+      <StatusBar backgroundColor={colors.secondary} barStyle={"light-content"} />
       <Image source={icons.logo} style={{ height: 200, width: 200 }} />
       <View style={{ position: "absolute", top: (utilities.screenHeight() / 2) + 120 }}>
         <View style={{ height: 40, width: 40, backgroundColor: colors.lightPrimary3, borderRadius: 40 / 2 }}>

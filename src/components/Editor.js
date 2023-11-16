@@ -23,7 +23,8 @@ const Editor = ({
   initialValue = "",
   onChange,
   height = 300,
-  backgroundColor = colors.secondary
+  backgroundColor = colors.secondary,
+  label = ""
 }) => {
 
   const RichText = useRef();
@@ -174,136 +175,139 @@ const Editor = ({
   return (
     <View>
       {colorModal()}
-      <View style={{ backgroundColor: backgroundColor, borderRadius: 10, overflow: "hidden", marginTop: 20 }}>
-        {LinkDialog()}
+      <View style={{  }}>
+        {!!label ? <MyText isLabel>{label}</MyText> : null}
+        <View style={{ backgroundColor: backgroundColor, borderRadius: 10, overflow: "hidden", }}>
+          {LinkDialog()}
 
-        <View style={{ height: height }}>
-          <ScrollView
-            bounces={false}
-            ref={scrollViewRef}
-            onContentSizeChange={(contentWidth, contentHeight) => {
-              scrollViewRef?.current?.scrollToEnd({ animated: false });
-            }}>
-            <RichEditor
-              ref={RichText}
-              style={{ backgroundColor: colors.backgorund2 }}
-              initialHeight={height}
-              editorStyle={{
-                backgroundColor: backgroundColor,
-                color: colors.lightText2,
-                caretColor: colors.white,
-                contentCSSText: `font-family: Verdana`,
-                placeholderColor: colors.placeholder
+          <View style={{ height: height }}>
+            <ScrollView
+              bounces={false}
+              ref={scrollViewRef}
+              onContentSizeChange={(contentWidth, contentHeight) => {
+                scrollViewRef?.current?.scrollToEnd({ animated: false });
+              }}>
+              <RichEditor
+                ref={RichText}
+                style={{ backgroundColor: colors.backgorund2 }}
+                initialHeight={height}
+                editorStyle={{
+                  backgroundColor: backgroundColor,
+                  color: colors.lightText2,
+                  caretColor: colors.white,
+                  contentCSSText: `font-family: Verdana`,
+                  placeholderColor: colors.placeholder
 
-              }}
-              selectedIconTint={colors.primary}
-              iconTint={colors.primary}
-              initialContentHTML={initialValue}
-              useContainer={true}
-              placeholder={'Type a message...'}
-              onChange={text => onChange(text)}
-              androidLayerType="software"
-              androidHardwareAccelerationDisabled
-            />
-          </ScrollView>
+                }}
+                selectedIconTint={colors.primary}
+                iconTint={colors.primary}
+                initialContentHTML={initialValue}
+                useContainer={true}
+                placeholder={'Type a message...'}
+                onChange={text => onChange(text)}
+                androidLayerType="software"
+                androidHardwareAccelerationDisabled
+              />
+            </ScrollView>
+
+
+          </View>
+          <RichToolbar
+            editor={RichText}
+            onInsertLink={openDialogue}
+            selectedIconTint={colors.primary}
+            // editor={this[`TextEditor`]}
+            actions={[
+              actions.keyboard,
+              actions.undo,
+              actions.redo,
+              actions.setBold,
+              actions.setItalic,
+              actions.setUnderline,
+              actions.removeFormat,
+              // actions.foreColor,
+              // actions.hiliteColor,
+              actions.insertLink,
+              actions.setSubscript,
+              actions.setSuperscript,
+              actions.setStrikethrough,
+              actions.insertBulletsList,
+              actions.insertOrderedList,
+              actions.setParagraph,
+              actions.heading1,
+              actions.heading2,
+              actions.heading3,
+              actions.heading4,
+              actions.heading5,
+              actions.heading6,
+              actions.line,
+              actions.alignLeft,
+              actions.alignCenter,
+              actions.alignRight,
+              actions.alignFull,
+              actions.outdent,
+              actions.indent,
+              actions.blockquote,
+            ]}
+
+            iconMap={{
+              [actions.foreColor]: ({ tintColor }) => (
+                <TouchableOpacity
+                  onPress={() => openModal("forecolor")}
+                  style={{ alignItems: "center" }}>
+                  <Image source={ic_A} style={{ height: 20, width: 20, tintColor: tintColor }} />
+                  <View style={{ height: 2, width: 15, backgroundColor: foreColor }} />
+                </TouchableOpacity>
+              ),
+              [actions.hiliteColor]: ({ tintColor }) => (
+                <TouchableOpacity
+                  onPress={() => openModal("backcolor")}
+                  style={{ alignItems: "center", marginBottom: -1 }}>
+                  <Image source={ic_bucket} style={{ height: 15, width: 15, tintColor: tintColor }} />
+                  <View style={{ height: 2, width: 17, backgroundColor: backColor, marginTop: 2 }} />
+                </TouchableOpacity>
+              ),
+              [actions.heading1]: ({ tintColor }) => (
+                <Text style={{ color: tintColor, fontWeight: '700' }}>
+                  H1
+                </Text>
+              ),
+              [actions.heading2]: ({ tintColor }) => (
+                <Text style={{ color: tintColor, fontWeight: '700' }}>
+                  H2
+                </Text>
+              ),
+              [actions.heading3]: ({ tintColor }) => (
+                <Text style={{ color: tintColor, fontWeight: '700' }}>
+                  H3
+                </Text>
+              ),
+              [actions.heading4]: ({ tintColor }) => (
+                <Text style={{ color: tintColor, fontWeight: '700' }}>
+                  H4
+                </Text>
+              ),
+              [actions.heading5]: ({ tintColor }) => (
+                <Text style={{ color: tintColor, fontWeight: '700' }}>
+                  H5
+                </Text>
+              ),
+              [actions.heading6]: ({ tintColor }) => (
+                <Text style={{ color: tintColor, fontWeight: '700' }}>
+                  H6
+                </Text>
+              ),
+              [actions.setParagraph]: ({ tintColor }) => (
+                <Text style={{ color: tintColor, fontWeight: '700' }}>
+                  P
+                </Text>
+              ),
+            }}
+            style={{ backgroundColor: colors.backgorund2 }}
+          />
 
 
         </View>
-        <RichToolbar
-          editor={RichText}
-          onInsertLink={openDialogue}
-          selectedIconTint={colors.primary}
-          // editor={this[`TextEditor`]}
-          actions={[
-            actions.keyboard,
-            actions.undo,
-            actions.redo,
-            actions.setBold,
-            actions.setItalic,
-            actions.setUnderline,
-            actions.removeFormat,
-            // actions.foreColor,
-            // actions.hiliteColor,
-            actions.insertLink,
-            actions.setSubscript,
-            actions.setSuperscript,
-            actions.setStrikethrough,
-            actions.insertBulletsList,
-            actions.insertOrderedList,
-            actions.setParagraph,
-            actions.heading1,
-            actions.heading2,
-            actions.heading3,
-            actions.heading4,
-            actions.heading5,
-            actions.heading6,
-            actions.line,
-            actions.alignLeft,
-            actions.alignCenter,
-            actions.alignRight,
-            actions.alignFull,
-            actions.outdent,
-            actions.indent,
-            actions.blockquote,
-          ]}
-
-          iconMap={{
-            [actions.foreColor]: ({ tintColor }) => (
-              <TouchableOpacity
-                onPress={() => openModal("forecolor")}
-                style={{ alignItems: "center" }}>
-                <Image source={ic_A} style={{ height: 20, width: 20, tintColor: tintColor }} />
-                <View style={{ height: 2, width: 15, backgroundColor: foreColor }} />
-              </TouchableOpacity>
-            ),
-            [actions.hiliteColor]: ({ tintColor }) => (
-              <TouchableOpacity
-                onPress={() => openModal("backcolor")}
-                style={{ alignItems: "center", marginBottom: -1 }}>
-                <Image source={ic_bucket} style={{ height: 15, width: 15, tintColor: tintColor }} />
-                <View style={{ height: 2, width: 17, backgroundColor: backColor, marginTop: 2 }} />
-              </TouchableOpacity>
-            ),
-            [actions.heading1]: ({ tintColor }) => (
-              <Text style={{ color: tintColor, fontWeight: '700' }}>
-                H1
-              </Text>
-            ),
-            [actions.heading2]: ({ tintColor }) => (
-              <Text style={{ color: tintColor, fontWeight: '700' }}>
-                H2
-              </Text>
-            ),
-            [actions.heading3]: ({ tintColor }) => (
-              <Text style={{ color: tintColor, fontWeight: '700' }}>
-                H3
-              </Text>
-            ),
-            [actions.heading4]: ({ tintColor }) => (
-              <Text style={{ color: tintColor, fontWeight: '700' }}>
-                H4
-              </Text>
-            ),
-            [actions.heading5]: ({ tintColor }) => (
-              <Text style={{ color: tintColor, fontWeight: '700' }}>
-                H5
-              </Text>
-            ),
-            [actions.heading6]: ({ tintColor }) => (
-              <Text style={{ color: tintColor, fontWeight: '700' }}>
-                H6
-              </Text>
-            ),
-            [actions.setParagraph]: ({ tintColor }) => (
-              <Text style={{ color: tintColor, fontWeight: '700' }}>
-                P
-              </Text>
-            ),
-          }}
-          style={{ backgroundColor: colors.backgorund2 }}
-        />
-
-
       </View>
     </View>
   )
