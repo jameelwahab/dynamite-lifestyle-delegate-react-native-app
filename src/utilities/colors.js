@@ -17,4 +17,5 @@ export const colors = {
   lightText2: "#bec6da",
   placeholder: "#637381",
   delete: "#ff3333",
+  transparent:"#FFFFFF00"
 }

@@ -10,3 +10,70 @@ export const SUPPORT_TCIKETS_LIST_BY_TYPE =
       navigation,
     })
   }
+
+export const SUPPORT_TCIKET_DETAIL = ({ token, navigation, ticketId }) => {
+  return invokeApi({
+    path: `api/support_ticket/detail_support_ticket/${ticketId}`,
+    method: "GET",
+    token,
+    navigation,
+  })
+}
+
+export const SUPPORT_TCIKET_NOTES_LIST = ({ token, navigation, ticketId }) => {
+  return invokeApi({
+    path: `api/support_ticket/list_intenal_note/${ticketId}`,
+    method: "GET",
+    token,
+    navigation,
+  })
+}
+
+
+export const LIST_OF_DEPARTMENTS = ({ token, navigation, }) => {
+  return invokeApi({
+    path: `api/department/list_department/client/tickets`,
+    method: "GET",
+    token,
+    navigation,
+  })
+}
+
+export const CHANGE_DEPARTMENT_OF_TICKET = ({ token, body, navigation, ticketId }) => {
+  return invokeApi({
+    path: `api/support_ticket/edit_department_by_delegate/${ticketId}`,
+    method: "PUT",
+    postData: body,
+    token,
+    navigation,
+  })
+}
+
+
+export const MOVE_TICKET = ({ token, body: {
+  status_to_move, support_ticket
+}, navigation, ticketId }) => {
+  return invokeApi({
+    path: `api/support_ticket/move_support_ticket_status/${ticketId}`,
+    method: "POST",
+    postData: {
+      status_to_move, support_ticket
+    },
+    token,
+    navigation,
+  })
+}
+
+
+export const MARK_RESOLVE_TICKET = ({ token, body: {
+  close_note, reason_to_solve, support_ticket
+}, navigation, }) => {
+  return invokeApi({
+    path: `api/support_ticket/mark_resolve`,
+    method: "POST",
+    postData: { close_note, reason_to_solve, support_ticket },
+    token,
+    navigation,
+  })
+}
+

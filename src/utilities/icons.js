@@ -33,6 +33,8 @@ export const icons = {
   images: () => { return (<Ionicons name="images" color={colors.primary} size={20} />) },
   camera: () => { return (<Fontisto name="camera" color={colors.primary} size={17} />) },
   crosssWithCircle: () => { return (<MaterialIcons name="cancel" color={colors.white} size={30} />) },
+  crosssWithCircle_20: () => { return (<MaterialIcons name="cancel" color={colors.white} size={20} />) },
+  noIcon: () => { return (<MaterialIcons name="cancel" color={colors.transparent} size={20} />) },
   crosss: () => { return (<Ionicons name="close" color={colors.white} size={20} />) },
   search: () => { return (<Feather name="search" color={colors.white} size={17} />) },
   down: () => { return (<Ionicons name="caret-down" color={colors.white} size={17} />) },

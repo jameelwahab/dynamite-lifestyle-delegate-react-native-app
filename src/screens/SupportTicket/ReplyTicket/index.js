@@ -20,7 +20,7 @@ const TicketReply = () => {
   const [content, setContent] = useState("");
   const [images, setImages] = useState([{ type: "button" }]);
   const [isImageModalVisible, setIsImageModalVisible] = useState(false)
-  
+
 
 
   // console.log(color, "intial color")
@@ -61,7 +61,7 @@ const TicketReply = () => {
   }
 
   return (
-    <RootView title='Your Reply'>
+    <RootView title='Your Reply' >
       <View style={{ flex: 1 }}>
         <KeyboardAwareFlatList
           ListHeaderComponent={HeaderView()}

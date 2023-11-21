@@ -122,6 +122,7 @@ const TicketDetail = ({ navigation, route }) => {
     )
   }
 
+
   return (
     <RootView titleView={topView}  >
       <View style={{ flex: 1 }}>
@@ -134,7 +135,7 @@ const TicketDetail = ({ navigation, route }) => {
           ListHeaderComponent={headerView}
           ListFooterComponent={footerView}
           StickyHeaderComponent={footerView}
-          // ItemSeparatorComponent={<View style={{ height: 0.1, backgroundColor: colors.lightText2 }} />}
+        // ItemSeparatorComponent={<View style={{ height: 0.1, backgroundColor: colors.lightText2 }} />}
         />
       </View>
 

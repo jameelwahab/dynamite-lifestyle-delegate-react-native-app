@@ -65,6 +65,10 @@ const ProfileDropDown = ({ isVisible = false, closeModal = () => { }, user }) =>
   }
 
 
+  const copyTheText = (text1, text2) => {
+    copyText(text1, text2);
+    closeModal()
+  }
 
 
   return (
@@ -96,8 +100,8 @@ const ProfileDropDown = ({ isVisible = false, closeModal = () => { }, user }) =>
         <View style={{ marginTop: 10 }}>
 
           {optionsView(icons.user, "Edit Profile", () => navigateTo(routes.editProfile))}
-          {optionsView(icons.copy, "Copy Refferal Id", () => copyText(user?.affiliate_url_name, "Refferal Id Copied"))}
-          {optionsView(icons.copy, "Copy App Refferal Id", () => copyText(user?.affiliate_link, "App Refferal Id Copied"))}
+          {optionsView(icons.copy, "Copy Refferal Id", () => copyTheText(user?.affiliate_url_name, "Refferal Id Copied"))}
+          {optionsView(icons.copy, "Copy App Refferal Id", () => copyTheText(user?.affiliate_link, "App Refferal Id Copied"))}
           {optionsView(icons.gear, "Settings", () => navigateTo(routes.otherSettings))}
 
           <TouchableOpacity

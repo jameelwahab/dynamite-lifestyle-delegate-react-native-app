@@ -17,7 +17,9 @@ const MyInputs = ({
   isPassword = false,
   multiline = false,
   maxLength = isPassword ? 24 : !!maxLength ? maxLength : undefined,
+  leftIcon = null,
   rightIcon = null,
+  rightIconOnPress = () => { },
 }) => {
   const [isFocused, setFocused] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
@@ -25,7 +27,7 @@ const MyInputs = ({
     <View style={{ marginBottom: 15 }}>
       <Text style={[__MyInputStyles.labelText, isFocused ? __MyInputStyles.focusedLabelText : undefined]}>{label}</Text>
       <View style={[__MyInputStyles.inputView, multiline ? __MyInputStyles.multilineView : undefined, isFocused ? __MyInputStyles.focusedView : undefined]}>
-        {!!rightIcon && <View style={__MyInputStyles.eyeButton} >{rightIcon()}</View>}
+        {!!leftIcon && <View style={[__MyInputStyles.leftButton]} >{leftIcon()}</View>}
         <TextInput
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
@@ -45,12 +47,18 @@ const MyInputs = ({
           textAlignVertical={multiline ? "top" : "center"}
           autoCapitalize="none"
         />
-        {isPassword &&
+        {isPassword ?
           <TouchableHighlight
             onPress={() => setShowPassword(!showPassword)}
             style={__MyInputStyles.eyeButton}>
             <Ionicons name={showPassword ? "eye" : "eye-off"} color={colors.primary} size={25} />
             {/* <Image style={__MyInputStyles.eyeIcon} source={showPassword ? openEye : closeEye} /> */}
+          </TouchableHighlight> :
+          rightIcon &&
+          <TouchableHighlight
+            onPress={rightIconOnPress}
+            style={[__MyInputStyles.rightButton, { marginRight: 0 }]}>
+            {rightIcon()}
           </TouchableHighlight>
         }
       </View>
@@ -99,12 +107,34 @@ const __MyInputStyles = StyleSheet.create({
   eyeButton: {
     height: 40,
     width: 40,
-    borderRadius: 45 / 2,
+    borderRadius: 40 / 2,
     alignItems: "center",
     justifyContent: "center",
     alignSelf: "center",
     marginRight: 5
   },
+
+  leftButton: {
+    height: 30,
+    width: 30,
+    borderRadius: 30 / 2,
+    alignItems: "center",
+    justifyContent: "center",
+    marginLeft: 5,
+    // marginRight: -5
+    // backgroundColor:"pink"
+  },
+  rightButton: {
+    height: 30,
+    width: 30,
+    borderRadius: 30 / 2,
+    alignItems: "center",
+    justifyContent: "center",
+    // marginLeft: 5,
+    marginRight: -5
+    // backgroundColor:"pink"
+  },
+
   eyeIcon: {
     height: 25,
     width: 25,

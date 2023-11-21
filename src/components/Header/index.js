@@ -44,7 +44,7 @@ const Header = ({
 
 
 
-  
+
 
   return (
     <View>
@@ -84,13 +84,14 @@ const Header = ({
 
 
           {!hideProfile &&
-            <TouchableOpacity onPress={() => setIsUserModalVisible(!isUserModalVisible)}>
+            <TouchableOpacity
+              onPress={() => setIsUserModalVisible(!isUserModalVisible)}>
               <MyImage source={
                 !!user?.image?.thumbnail_1 ?
                   { uri: S3_URL + user?.image?.thumbnail_1 }
                   : icons.dummyUser}
                 style={{ height: 35, width: 35 }}
-                imageStyle={{ borderRadius: 35 / 2 }}
+                imageStyle={{ borderRadius: 35 / 2, borderWidth: 1 / 2, borderColor: colors.white }}
               />
             </TouchableOpacity>
           }
