@@ -140,7 +140,7 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
           </View>
           <View style={{ flex: 1, marginHorizontal: 10, }}>
             <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-              <MyText fontSize={14} type='medium' >{item?.member?.first_name + " " + item?.member?.last_name}</MyText>
+              <MyText fontSize={14} type='medium' >{!!item?.member?.first_name ? item?.member?.first_name + " " + item?.member?.last_name : "N/A"}</MyText>
               <MyText fontSize={10} type='light' >{moment(item.last_action_date).fromNow()}
               </MyText>
             </View>

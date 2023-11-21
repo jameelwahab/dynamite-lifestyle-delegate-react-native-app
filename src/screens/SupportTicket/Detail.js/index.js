@@ -1,5 +1,5 @@
 import { View, Text, FlatList, Image, Pressable, TouchableHighlight } from 'react-native'
-import React, { useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import RootView from '../../../components/RootView'
 import MyText from '../../../components/MyText'
 import { icons } from '../../../utilities/icons'
@@ -11,26 +11,55 @@ import { MyButton } from '../../../components/MyButton'
 import routes from '../../../navigation/routes'
 import Collapsible from 'react-native-collapsible';
 import { fonts } from '../../../utilities/fonts'
+import { useSelector } from 'react-redux'
+import { selectUser } from '../../../redux/reducers/userSlice'
+import MyLoader from '../../../components/MyLoader'
+import { SUPPORT_TCIKET_DETAIL } from '../../../DAL'
+import UserImage from '../../../components/UserImage'
+import moment from 'moment'
+import MyWebview, { MyWebView4 } from '../../../components/MyWebview'
+import { S3_URL } from '../../../utilities/constants'
 
 
 const TicketDetail = ({ navigation, route }) => {
-  const { ticket } = route?.params
+  const { _id } = route?.params?.ticket;
+  const [ticket, setTicket] = useState(null)
+  const { token } = useSelector(selectUser);
+  const [loader, setLoader] = useState(true)
   const [isMsgOptionModalVisible, setIsMsgOptionModalVisible] = useState(false)
   const [isOptionModalVisible, setIsOptionModalVisible] = useState(false)
 
 
-  const renderMsg = ({ item, index }) => {
+
+  const api_ticketDetail = async () => {
+    let res = await SUPPORT_TCIKET_DETAIL({
+      token, navigation,
+      ticketId: _id
+    });
+    if (res.code == 200) {
+      setLoader(false)
+      setTicket(res?.support_ticket)
+    } else {
+      setLoader(false)
+    }
+  }
+
+  useEffect(() => {
+    api_ticketDetail()
+  }, []);
+
+
+  const renderMsg = useCallback(({ item, index }) => {
     return (
       <View style={{ padding: 10, marginBottom: 10, marginTop: 10 }}>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <View style={{ height: 40, width: 40, borderRadius: 40 / 2, overflow: "hidden", borderWidth: 1 / 4, borderColor: colors.primary }}>
-            <Image
-              source={typeof (item.image) == "number" ? item.image : { uri: item.image }}
-              style={{ height: "100%", width: '100%' }} />
-          </View>
+          <UserImage
+            image={item?.action_user_info?.profile_image}
+            name={item?.action_user_info?.action_name}
+          />
           <View style={{ marginLeft: 10, flex: 1 }}>
-            <MyText type='medium'  >{item.name}</MyText>
-            <MyText fontSize={10} color={colors.lightText} type='medium' >{item.createdAt}</MyText>
+            <MyText type='medium'  >{item?.action_user_info?.action_name}</MyText>
+            <MyText fontSize={10} color={colors.lightText} type='medium' >{moment(item.action_date).fromNow()}</MyText>
           </View>
           <TouchableHighlight
             underlayColor={colors.secondary}
@@ -41,13 +70,16 @@ const TicketDetail = ({ navigation, route }) => {
         </View>
 
         <View style={{ marginTop: 10 }}>
-          <MyText fontSize={12} color={colors.lightText2} >{item?.message}</MyText>
+          {/* <MyText fontSize={12} color={colors.lightText2} >{item?.message}</MyText> */}
+          <MyWebview
+            html={item?.message}
+          />
         </View>
 
         <View style={{ marginTop: 10 }}>
-          {!!item?.images && item?.images.map((x, i) => (
+          {!!item?.comment_image && item?.comment_image.map((x, i) => (
             <View style={{ backgroundColor: colors.secondaryVariant, height: 200, borderRadius: 10, overflow: "hidden", marginBottom: 15 }}>
-              <Image source={{ uri: x }} style={{ height: 150, width: "100%" }} />
+              <Image source={{ uri: S3_URL + x?.thumbnail_1 }} style={{ height: 150, width: "100%" }} />
               <View style={{ flex: 1, flexDirection: "row", justifyContent: "space-between" }}>
                 <View style={{ height: "100%", aspectRatio: 1, alignItems: "center", justifyContent: "center" }}>
                   <Image opacity={0.7} source={icons.photo} style={{ height: 25, width: 25 }} />
@@ -65,29 +97,38 @@ const TicketDetail = ({ navigation, route }) => {
       </View>
     )
 
-  }
+  }, [JSON.stringify(ticket?.comment)])
 
   const footerView = () => {
     return (
       <View>
         <View style={{ marginBottom: 10 }}>
-          <MyButton textStyle={{ fontFamily: fonts.regular, textTransform: "capitalize" }} invert title={"Internal Notes"} />
+          <MyButton
+            invert
+            textStyle={{ fontFamily: fonts.regular, textTransform: "capitalize" }}
+            title={"Internal Notes"} />
         </View>
+
         <View style={{ marginBottom: 10, backgroundColor: colors.secondary, padding: 10, borderRadius: 10 }}>
-          <MyText type='medium' fontSize={18} color={colors.primary}>
-            {ticket?.subject}
-          </MyText>
-          <View style={{ marginTop: 5 }}>
-            <MyText type='medium' fontSize={12} color={colors.lightText2}>
-              {ticket?.describtion}
-            </MyText>
-          </View>
+
+          {!!ticket?.subject &&
+            <MyText type='medium' fontSize={18} color={colors.primary}>
+              {ticket?.subject}
+            </MyText>}
+
+          {!!ticket?.description &&
+            <View style={{ marginTop: 5 }}>
+              <MyText type='medium' fontSize={12} color={colors.lightText2}>
+                {ticket?.description}
+              </MyText>
+            </View>}
+
           <View style={{ marginTop: 5 }}>
             <MyText fontSize={12} color={colors.primary}>
-              {"Created Date :"}  <Text style={{ color: colors.lightText2 }} > {" 24-07-2023 06:34 AM"}</Text>
+              {"Created Date : "}<Text style={{ color: colors.lightText2 }} > {moment(ticket?.createdAt).format("DD-MM-YYYY hh:mm A")}</Text>
             </MyText>
             <MyText fontSize={12} color={colors.primary}>
-              {"Responded Time :"}  <Text style={{ color: colors.lightText2 }}> {" 24-07-2023 06:34 AM"}</Text>
+              {"Responded Time : "}<Text style={{ color: colors.lightText2 }}>  {moment(ticket?.updatedAt).format("DD-MM-YYYY hh:mm A")}</Text>
             </MyText>
           </View>
         </View>
@@ -110,34 +151,45 @@ const TicketDetail = ({ navigation, route }) => {
   }
 
   const topView = () => {
-    return (
-      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 10 }}>
-        <MyText>{"Ammar Yousaf (y.amm4r@gmail.com)"}</MyText>
-        <TouchableOpacity
-          onPress={() => setIsOptionModalVisible(true)}
-          style={{ height: 30, width: 30, borderRadius: 30 / 2, backgroundColor: colors.lightPrimary3, alignItems: "center", justifyContent: "center" }}>
-          {icons.threeDots()}
-        </TouchableOpacity>
-      </View>
-    )
+    if (!!ticket) {
+      return (
+        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 10 }}>
+          <View style={{ flex: 1 }}>
+            <MyText>{`${ticket?.member?.first_name} ${ticket?.member?.last_name} (${ticket?.member?.email})`}</MyText>
+          </View>
+          <TouchableOpacity
+            onPress={() => setIsOptionModalVisible(true)}
+            style={{ height: 30, width: 30, borderRadius: 30 / 2, backgroundColor: colors.lightPrimary3, alignItems: "center", justifyContent: "center" }}>
+            {icons.threeDots()}
+          </TouchableOpacity>
+        </View>
+      )
+    }
   }
+
+
 
 
   return (
     <RootView titleView={topView}  >
       <View style={{ flex: 1 }}>
-        <FlatList
-          contentContainerStyle={{ paddingVertical: 20 }}
-          inverted={true}
-          data={list}
-          renderItem={renderMsg}
-          showsVerticalScrollIndicator={false}
-          ListHeaderComponent={headerView}
-          ListFooterComponent={footerView}
-          StickyHeaderComponent={footerView}
-        // ItemSeparatorComponent={<View style={{ height: 0.1, backgroundColor: colors.lightText2 }} />}
-        />
+        {!!ticket && footerView()}
+        <View style={{ flex: 1 }}>
+          <FlatList
+            contentContainerStyle={{ paddingVertical: 20 }}
+            inverted={true}
+            data={ticket?.comment}
+            renderItem={renderMsg}
+            // stickyHeaderIndices={[0]}
+            // stickyHeaderHiddenOnScroll={true}
+            showsVerticalScrollIndicator={false}
+            ListHeaderComponent={!!ticket && headerView}
+          // ListFooterComponent={!!ticket && footerView}
+          // ItemSeparatorComponent={<View style={{ height: 0.1, backgroundColor: colors.lightText2 }} />}
+          />
+        </View>
       </View>
+      <MyLoader enable={loader} />
 
       <OptionModal
         optionList={msgOptionList}
