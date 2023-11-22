@@ -1,7 +1,8 @@
-import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native'
+import { View, Text, TouchableOpacity, StyleSheet, TouchableHighlight } from 'react-native'
 import React from 'react'
 import { colors } from '../utilities/colors'
 import { fonts } from '../utilities/fonts'
+
 
 const MyButton = ({
   title = "",
@@ -29,7 +30,25 @@ const MyButton = ({
   )
 }
 
-export { MyButton }
+
+const TransparentButton = ({
+  title = "",
+  onPress = () => { },
+
+}) => {
+  return (
+    <TouchableHighlight
+    style={{borderRadius: 10}}
+      underlayColor={colors.lightPrimary2}
+      onPress={onPress}>
+      <View style={__tarsparentButtonStyle.root} >
+        <Text style={__tarsparentButtonStyle.text} >{title}</Text>
+      </View>
+    </TouchableHighlight>
+  )
+}
+
+export { MyButton, TransparentButton }
 
 const __MyButtonStyles = StyleSheet.create({
   rootView: {
@@ -37,8 +56,8 @@ const __MyButtonStyles = StyleSheet.create({
     backgroundColor: colors.primary,
     borderRadius: 10,
     alignItems: "center",
-    flexDirection:"row",
-    justifyContent:"center"
+    flexDirection: "row",
+    justifyContent: "center"
   },
   iconView: {
     height: 50, aspectRatio: 1, alignItems: "center", justifyContent: "center",
@@ -57,8 +76,8 @@ const __MyButtonStyles = StyleSheet.create({
     borderColor: colors.primary,
     borderRadius: 10,
     alignItems: "center",
-    flexDirection:"row",
-    justifyContent:"center"
+    flexDirection: "row",
+    justifyContent: "center"
   },
   invertTitleText: {
     color: colors.primary,
@@ -66,5 +85,19 @@ const __MyButtonStyles = StyleSheet.create({
     includeFontPadding: false,
     fontSize: 16,
     textTransform: "uppercase"
+  }
+})
+
+const __tarsparentButtonStyle = StyleSheet.create({
+  root: {
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    
+  },
+  text: {
+    color: colors.primary,
+    fontSize: 15,
+    fontFamily: fonts.regular,
+    includeFontPadding: false
   }
 })

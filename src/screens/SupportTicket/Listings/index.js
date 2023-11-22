@@ -69,14 +69,14 @@ const TicketsList = ({ navigation }) => {
       setLoader(-1)
       setList(res?.support_ticket);
       setbadges({
-        waiting: res?.waiting_ticket_count,
-        answered: res?.answered_ticket_count,
-        need_fixes: res?.need_fixes_count,
-        needs_to_attention: res?.need_to_attention_count,
-        reminder: res?.reminder_ticket_count,
-        ready_to_close: res?.ready_to_close_count,
-        solved: res?.solved_ticket_count,
-        trash: res?.trash_ticket_count,
+        waiting: !!res?.waiting_ticket_count ? res?.waiting_ticket_count : 0,
+        answered: !!res?.answered_ticket_count ? res?.answered_ticket_count : 0,
+        need_fixes: !!res?.need_fixes_count ? res?.need_fixes_count : 0,
+        needs_to_attention: !!res?.need_to_attention_count ? res?.need_to_attention_count : 0,
+        reminder: !!res?.reminder_ticket_count ? res?.reminder_ticket_count : 0,
+        ready_to_close: !!res?.ready_to_close_count ? res?.ready_to_close_count : 0,
+        solved: !!res?.solved_ticket_count ? res?.solved_ticket_count : 0,
+        trash: !!res?.trash_ticket_count ? res?.trash_ticket_count : 0,
       })
     } else {
       setLoader(-1)
@@ -154,6 +154,7 @@ const TicketsList = ({ navigation }) => {
       list={index == route.index ? list : []}
       departmentList={depList}
       isLoading={loader == route.index}
+      setLoader={setLoader}
       active={index == route.index} />
   }
 

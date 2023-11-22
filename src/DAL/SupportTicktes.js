@@ -50,15 +50,11 @@ export const CHANGE_DEPARTMENT_OF_TICKET = ({ token, body, navigation, ticketId 
 }
 
 
-export const MOVE_TICKET = ({ token, body: {
-  status_to_move, support_ticket
-}, navigation, ticketId }) => {
+export const MOVE_TICKET = ({ token, body, navigation, ticketId="" }) => {
   return invokeApi({
     path: `api/support_ticket/move_support_ticket_status/${ticketId}`,
     method: "POST",
-    postData: {
-      status_to_move, support_ticket
-    },
+    postData: body,
     token,
     navigation,
   })

@@ -4,7 +4,7 @@ import RootView from '../../../components/RootView'
 import MyText from '../../../components/MyText'
 import { icons } from '../../../utilities/icons'
 import { colors } from '../../../utilities/colors'
-import { TouchableOpacity } from 'react-native-gesture-handler'
+import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler'
 import OptionModal from '../../../components/OptionModal'
 import { CALLBACK_TYPE } from 'react-native-gesture-handler/lib/typescript/handlers/gestures/gesture'
 import { MyButton } from '../../../components/MyButton'
@@ -22,6 +22,7 @@ import { S3_URL } from '../../../utilities/constants'
 import downloadImage from '../../../functions/downloadImage'
 import ImageZoomer from '../../../components/ImageZoomer'
 import showToast from '../../../functions/showToast'
+import MyImage from '../../../components/MyImage'
 
 let autoMessages = [];
 const TicketDetail = ({ navigation, route }) => {
@@ -195,7 +196,20 @@ const TicketDetail = ({ navigation, route }) => {
                 {ticket?.description}
               </MyText>
             </View>}
-
+          <View style={{ flexDirection: "row", flexWrap: "wrap", height: 100 }}>
+            <ScrollView horizontal >
+              {ticket?.ticket_images.map((x, i) => (
+                <View style={{ height: 100, aspectRatio: 1, }}>
+                  <View style={{ margin: 5, borderRadius: 10, overflow: "hidden" }}>
+                    <MyImage
+                      source={{ uri: S3_URL + x.thumbnail_1 }}
+                      style={{ height: "100%", width: "100%" }}
+                    />
+                  </View>
+                </View>
+              ))}
+            </ScrollView>
+          </View>
           <View style={{ marginTop: 5 }}>
             <MyText fontSize={12} color={colors.primary}>
               {"Created Date : "}<Text style={{ color: colors.lightText2 }} > {moment(ticket?.createdAt).format("DD-MM-YYYY hh:mm A")}</Text>
@@ -251,22 +265,18 @@ const TicketDetail = ({ navigation, route }) => {
   return (
     <RootView titleView={topView}  >
       <View style={{ flex: 1 }}>
-        {!!ticket && footerView()}
+        {!!ticket && comments.length == 0 && footerView()}
         <View style={{ flex: 1 }}>
           <FlatList
             ref={flatlistRef}
             contentContainerStyle={{ paddingVertical: 20 }}
             inverted={true}
             data={comments}
-
             renderItem={renderMsg}
             keyExtractor={(item) => item._id}
-            // stickyHeaderIndices={[0]}
-            // stickyHeaderHiddenOnScroll={true}
             showsVerticalScrollIndicator={false}
             ListHeaderComponent={!!ticket && headerView}
-          // ListFooterComponent={!!ticket && footerView}
-          // ItemSeparatorComponent={<View style={{ height: 0.1, backgroundColor: colors.lightText2 }} />}
+            ListFooterComponent={!!ticket && comments.length > 0 && footerView}
           />
         </View>
       </View>

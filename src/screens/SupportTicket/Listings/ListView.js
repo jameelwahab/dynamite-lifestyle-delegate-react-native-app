@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, FlatList, Image, SafeAreaView, TouchableHighlight, Pressable, Dimensions, Platform, Text } from 'react-native'
+import { View, FlatList, Image, SafeAreaView, TouchableHighlight, Pressable, Dimensions, Platform, Text, TouchableOpacity } from 'react-native'
 import { colors } from '../../../utilities/colors';
 import MyText from '../../../components/MyText';
 import MyInputs from '../../../components/MyInputs';
@@ -7,7 +7,7 @@ import { icons } from '../../../utilities/icons';
 import Modal from 'react-native-modal'
 import routes from '../../../navigation/routes';
 import { useNavigation } from '@react-navigation/native';
-import { CHANGE_DEPARTMENT_OF_TICKET, SUPPORT_TCIKETS_LIST_BY_TYPE } from '../../../DAL';
+import { CHANGE_DEPARTMENT_OF_TICKET, MARK_RESOLVE_TICKET, MOVE_TICKET, SUPPORT_TCIKETS_LIST_BY_TYPE } from '../../../DAL';
 import MyLoader from '../../../components/MyLoader';
 import { useSelector } from 'react-redux';
 import { selectUser } from '../../../redux/reducers/userSlice';
@@ -15,27 +15,138 @@ import { S3_URL } from '../../../utilities/constants';
 import moment from 'moment';
 import EmptyView from '../../../components/EmptyView';
 import MyImage from '../../../components/MyImage';
-import ImageZoomer from '../../../components/ImageZoomer';
+import { Calendar } from 'react-native-calendars';
+import { fonts } from '../../../utilities/fonts';
+import { TransparentButton } from '../../../components/MyButton';
+import Toast from 'react-native-toast-message';
+import showToast from '../../../functions/showToast';
 
-const ListView = ({ isLoading, list, active, route, departmentList, token, refresh, user }) => {
+
+const ListView = ({ isLoading, list, active, route, departmentList, token, refresh, user, setLoader }) => {
   const [isOptionModalShown, setIsOptionModal] = useState({ isVisible: false, for: "" })
   const [isDepartmentModalShown, setIsDepartmentModalShown] = useState(false);
+  const [isCalendarModalVisible, setCalendarModalVisiblity] = useState(false);
+  const [confirmationModal, setConfirmationModal] = useState({
+    isVisible: false,
+    title: "",
+    for: ""
+  })
+  const [isMarkResolveModalVisible, setMarkResolveModalVisiblity] = useState(false)
+  const [date, setDate] = useState(moment().format("YYYY-MM-DD"))
   const navigation = useNavigation();
 
   //? Actions functions
 
   const ticketActions = (option) => {
     console.log(option, "option")
+
+
+
     if (option?.key == "change-department") {
       console.log(isOptionModalShown, "isOptionModalShown")
       setIsOptionModal({ ...isOptionModalShown, isVisible: false, })
       setTimeout(() => {
         setIsDepartmentModalShown(true)
       }, 1000);
-    } else {
+    }
+
+
+    else if (option.key == "detail") {
+      navigation.navigate(routes.supportTicketDeatail, {
+        ticket: isOptionModalShown.for
+      })
+      setIsOptionModal({ isVisible: false, for: "" })
+    }
+
+
+
+    else if (option.key == "move_to_needs_fixes-resolve") {
+      setIsOptionModal({ ...isOptionModalShown, isVisible: false, })
+      setDate(moment().format("YYYY-MM-DD"))
+      setTimeout(() => {
+        setCalendarModalVisiblity(true)
+      }, 1000);
+    }
+
+    else if (option.key == "needs_to_attention") {
+      setIsOptionModal({ ...isOptionModalShown, isVisible: false, })
+
+      setTimeout(() => {
+        setConfirmationModal({
+          isVisible: true,
+          title: "Are you sure you want to move this ticket to need attention?",
+          for: "needs_to_attention"
+        })
+      }, 1000);
+    }
+
+    else if (option.key == "fixed") {
+      setIsOptionModal({ ...isOptionModalShown, isVisible: false, })
+      setTimeout(() => {
+        setConfirmationModal({
+          isVisible: true,
+          title: "Are you sure you want to move this ticket to fixed?",
+          for: "fixed"
+        })
+      }, 1000);
+    }
+    else if (option.key == "attended") {
+      setIsOptionModal({ ...isOptionModalShown, isVisible: false, })
+      setTimeout(() => {
+        setConfirmationModal({
+          isVisible: true,
+          title: "Are you sure you want to move this ticket to attended?",
+          for: "attended"
+        })
+      }, 1000);
+    }
+
+    else if (option.key == "mark-resolve") {
+      setIsOptionModal({ ...isOptionModalShown, isVisible: false, })
+      setTimeout(() => {
+        setMarkResolveModalVisiblity(true)
+      }, 1000);
+    }
+
+    else {
       setIsOptionModal({ isVisible: false, for: "" })
     }
   }
+
+  const updateStatusOfTicket = async (obj) => {
+    setLoader(true)
+    let res = await MOVE_TICKET({ token, navigation, body: obj });
+    if (res.code === 200) {
+      showToast({ title: "Moved Successfully", body: res.message, type: "success" })
+      refresh()
+    } else {
+      setLoader(false)
+    }
+
+  }
+
+  const moveToNeedFixes = () => {
+    let obj = {
+      issue_fix_date: date,
+      status_to_move: "fixes",
+      support_ticket: isOptionModalShown.for?._id
+    }
+    updateStatusOfTicket(obj)
+    setCalendarModalVisiblity(false);
+    setIsOptionModal({ isVisible: false, for: "" });
+  }
+
+  const movetoNeedAttention = () => {
+    let obj = {
+      status_to_move: confirmationModal.for,
+      support_ticket: isOptionModalShown.for?._id
+    }
+    updateStatusOfTicket(obj)
+    closeConfirmationModal()
+    setIsOptionModal({ isVisible: false, for: "" });
+  }
+
+
 
   const updateDepartment = async (department) => {
     setIsDepartmentModalShown(false)
@@ -48,9 +159,35 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
     });
     setIsOptionModal({ ...isOptionModalShown, for: "" })
     if (res.code == 200) {
+      showToast({ title: res.message, type: "success" })
       refresh?.()
     }
   }
+
+
+  const moveToMarkResolve = async (reason, note) => {
+    let obj = {
+      support_ticket: isOptionModalShown.for?._id,
+      close_note: note,
+      reason_to_solve: reason
+    }
+    setMarkResolveModalVisiblity(false);
+    setLoader(true)
+    setIsOptionModal({ isVisible: false, for: "" });
+
+    let res = await MARK_RESOLVE_TICKET({
+      token, navigation,
+      body: obj,
+    });
+    if (res.code == 200) {
+      showToast({ title: "Marked resolved successfully ", body: res.message, type: "success" })
+      refresh()
+    } else {
+      setLoader(false)
+    }
+  }
+
+
 
   //? Modals
 
@@ -120,6 +257,185 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
       </Modal>)
   }
 
+  const CalendarModal = () => {
+    return (
+      <Modal
+        isVisible={isCalendarModalVisible}
+        onBackdropPress={() => setCalendarModalVisiblity(false)}
+        onBackButtonPress={() => setCalendarModalVisiblity(false)}
+        useNativeDriverForBackdrop={true}
+        animationIn='zoomIn'
+        animationOut='zoomOut'
+        style={{ margin: 10 }}>
+        <SafeAreaView style={{ backgroundColor: colors.secondaryVariant, borderRadius: 10, }} >
+          <View style={{ margin: 10 }}>
+            <View style={{ margin: 10 }}>
+              <MyText fontSize={18} type='medium' color={colors.primary}>Are you sure you want to move this ticket to needs fixes?</MyText>
+            </View>
+            <View style={{ backgroundColor: colors.secondaryVariant, borderRadius: 10, overflow: "hidden" }}>
+              <Calendar
+                current={date}
+
+                // date={date}
+                markedDates={{
+                  [date]: { selected: true }
+                }}
+                theme={{
+                  backgroundColor: colors.secondaryVariant,
+                  calendarBackground: colors.secondaryVariant,
+                  textSectionTitleColor: colors.primary,
+                  textSectionTitleDisabledColor: colors.primary,
+                  selectedDayBackgroundColor: colors.primary,
+                  selectedDayTextColor: colors.black,
+                  todayTextColor: 'white',
+                  // todayBackgroundColor: colors.,
+                  dayTextColor: colors.white,
+                  textDisabledColor: colors.placeholder,
+                  dotColor: colors.blue,
+                  selectedDotColor: 'blue',
+                  arrowColor: colors.primary,
+                  disabledArrowColor: colors.primary,
+                  monthTextColor: 'white',
+                  textDayFontSize: 14,
+                  // textMonthFontSize: 16,
+                  textDayHeaderFontSize: 12,
+                  textDayFontFamily: fonts.regular,
+                  textDayHeaderFontFamily: fonts.regular,
+                  textMonthFontFamily: fonts.medium,
+
+                }}
+                onDayPress={(day) => {
+                  console.log(day, "onDayPress")
+                  setDate(day.dateString)
+                }}
+              />
+            </View>
+
+            <View style={{ flexDirection: "row", justifyContent: "flex-end", marginTop: 10 }}>
+              <TransparentButton title='CANCEL' onPress={() => setCalendarModalVisiblity(false)} />
+              <TransparentButton title='AGREE' onPress={moveToNeedFixes} />
+            </View>
+
+          </View>
+        </SafeAreaView>
+      </Modal>)
+  }
+
+  const ConfirmationModal = () => {
+    return (
+      <Modal
+        isVisible={confirmationModal.isVisible}
+        onBackdropPress={closeConfirmationModal}
+        onBackButtonPress={closeConfirmationModal}
+        useNativeDriverForBackdrop={true}
+        animationIn='zoomIn'
+        animationOut='zoomOut'
+        style={{ margin: 10 }}>
+        <SafeAreaView style={{ backgroundColor: colors.secondaryVariant, borderRadius: 10, }} >
+          <View style={{ margin: 10 }}>
+            <View style={{ margin: 10 }}>
+              <MyText fontSize={18} type='medium' color={colors.primary}>
+                {confirmationModal.title}
+              </MyText>
+            </View>
+
+
+            <View style={{ flexDirection: "row", justifyContent: "flex-end", marginTop: 10 }}>
+              <TransparentButton title='CANCEL' onPress={closeConfirmationModal} />
+              <TransparentButton title='AGREE' onPress={movetoNeedAttention} />
+            </View>
+
+          </View>
+        </SafeAreaView>
+      </Modal>)
+  }
+
+
+  const closeConfirmationModal = () => {
+    setConfirmationModal({
+      isVisible: false,
+      title: "",
+      for: ""
+    })
+  }
+
+  const MarkResolveModal = () => {
+    const [reson, setReson] = useState("Answered");
+    const [note, setNote] = useState("");
+
+    const btn_resolve = () => {
+      if (reson == "") {
+        showToast({ body: "Please select reason", type: "info" })
+      } else if (note.trim() == "") {
+        showToast({ body: "Please write note", type: "info" })
+      } else {
+        moveToMarkResolve(reson.toLowerCase(), note.trim())
+        setReson("")
+        setNote("")
+      }
+    }
+
+    const optionView = (text) => {
+      return (
+        <TouchableOpacity
+          onPress={() => setReson(text)}
+          style={{ flexDirection: "row", paddingVertical: 5 }}
+        >
+          <View style={{ height: 20, width: 20, borderColor: reson == text ? colors.primary : colors.white, borderWidth: 1, borderRadius: 20 / 2, alignItems: "center", justifyContent: "center" }}>
+            {reson == text &&
+              <View style={{ height: 12, width: 12, borderRadius: 18 / 2, backgroundColor: colors.primary }} />}
+          </View>
+          <View style={{ marginLeft: 10 }}>
+            <MyText fontSize={16} >{text}</MyText>
+          </View>
+        </TouchableOpacity>
+      )
+    }
+    return (
+      <Modal
+        isVisible={isMarkResolveModalVisible}
+        onBackdropPress={() => setMarkResolveModalVisiblity(false)}
+        onBackButtonPress={() => setMarkResolveModalVisiblity(false)}
+        useNativeDriverForBackdrop={true}
+        avoidKeyboard={true}
+        animationIn='zoomIn'
+        animationOut='zoomOut'
+        style={{ margin: 10 }}>
+        <SafeAreaView style={{ backgroundColor: colors.secondaryVariant, borderRadius: 10, }} >
+          <View style={{ margin: 10 }}>
+            <View style={{ margin: 10 }}>
+              <MyText fontSize={18} color={colors.primary} type='medium'>Mark Resolve</MyText>
+
+            </View>
+            <View style={{ margin: 10 }}>
+              <MyText isLabel>Reson TO Solve*</MyText>
+              <View>
+                {optionView("Answered")}
+                {optionView("Solved")}
+                {optionView("Auto-Closure")}
+              </View>
+            </View>
+            <View style={{ margin: 10 }}>
+              <MyInputs
+                multiline={true}
+                value={note}
+                label='Resolve Note*'
+                onChangeText={(text) => setNote(text)}
+              />
+            </View>
+
+
+            <View style={{ flexDirection: "row", justifyContent: "flex-end", marginTop: 10 }}>
+              <TransparentButton title='CANCEL' onPress={() => setMarkResolveModalVisiblity(false)} />
+              <TransparentButton title='RESOLVE' onPress={btn_resolve} />
+            </View>
+
+          </View>
+        </SafeAreaView>
+        {isMarkResolveModalVisible && <Toast />}
+      </Modal>)
+  }
+
   //? list
 
   const renderList = ({ item, index }) => {
@@ -157,11 +473,13 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
   }
 
   //? main
-
   return (
     <View style={{ flex: 1 }}>
+      {MarkResolveModal()}
       {optionsModal()}
       {departmentModal()}
+      {CalendarModal()}
+      {ConfirmationModal()}
       <View style={{ flex: 1, marginHorizontal: -10, borderRadius: 20 }}>
         <FlatList
           data={list}
@@ -180,6 +498,7 @@ export default ListView;
 
 const options = [{
   title: "Detail",
+  key: "detail",
   icon: icons.threeLinesMenu,
   routes: {
     waiting: true,
@@ -194,6 +513,7 @@ const options = [{
 },
 {
   title: "Internal Notes",
+  key: "internal-notes",
   icon: icons.threeLinesMenu,
   routes: {
     waiting: true,
@@ -208,6 +528,7 @@ const options = [{
 },
 {
   title: "Mark Resolve",
+  key: "mark-resolve",
   icon: icons.tick,
   routes: {
     waiting: true,
@@ -222,6 +543,7 @@ const options = [{
 },
 {
   title: "Attended",
+  key: "attended",
   icon: icons.refresh,
   routes: {
     waiting: false,
@@ -236,6 +558,7 @@ const options = [{
 },
 {
   title: "Fixed",
+  key: "fixed",
   icon: icons.refresh,
   routes: {
     waiting: false,
@@ -265,6 +588,7 @@ const options = [{
 },
 {
   title: "Move To Needs Fixes",
+  key: "move_to_needs_fixes",
   icon: icons.refresh,
   routes: {
     waiting: true,
@@ -279,6 +603,7 @@ const options = [{
 },
 {
   title: "Move to Needs Attention",
+  key: "needs_to_attention",
   icon: icons.refresh,
   routes: {
     waiting: true,
@@ -293,6 +618,7 @@ const options = [{
 },
 {
   title: "Send Reminder",
+  key: "send_reminder",
   icon: icons.send,
   routes: {
     waiting: false,
