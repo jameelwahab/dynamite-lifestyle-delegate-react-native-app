@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, ScrollView, FlatList, Pressable, Image } from 'react-native'
-import React, { useCallback, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import RootView from '../../../components/RootView'
 import MyText from '../../../components/MyText'
 import { actions, RichEditor, RichToolbar } from 'react-native-pell-rich-editor';
@@ -11,33 +11,45 @@ import { KeyboardAwareFlatList } from 'react-native-keyboard-aware-scroll-view';
 import ImageUploadModal from '../../../components/ImageUploadModal';
 import { MyButton } from '../../../components/MyButton';
 import Editor from '../../../components/Editor';
+import { useSelector } from 'react-redux';
+import { selectUser } from '../../../redux/reducers/userSlice';
+import { ADD_TICKET_COMMENT, EDIT_TICKET_COMMENT, UPLOAD_TICKET_IMAGE } from '../../../DAL';
+import showToast from '../../../functions/showToast';
+import MyLoader from '../../../components/MyLoader';
+import { S3_URL } from '../../../utilities/constants';
+import MyImage from '../../../components/MyImage';
 
 
 
 const oneFourthOfScreen = (utilities.windowWidth() - 20) / 4;
 
-const TicketReply = () => {
-  const [content, setContent] = useState("");
+const TicketReply = ({ navigation, route }) => {
+  const { token } = useSelector(selectUser)
+  const { msg } = route?.params;
+  const [content, setContent] = useState(!!msg ? msg?.message : "");
   const [images, setImages] = useState([{ type: "button" }]);
+  const [msgImages, setMsgImages] = useState([]);
   const [isImageModalVisible, setIsImageModalVisible] = useState(false)
-
-
-
-  // console.log(color, "intial color")
+  const [loader, setLoader] = useState(false)
+  const [showEditor, setShowEditor] = useState(false)
   const removeImage = (index) => {
     images.splice(index, 1);
     setImages([...images]);
   }
 
-  // const updateColor = (h) => {
-  //   console.log(color, "color")
-  //   console.log({ ...color, h }, "Ammar")
-  //   setColor({ ...color, h })
-  // }
+  useEffect(() => {
+    if (!!msg) {
+      setImages([...images, ...msg?.comment_image]);
+    }
+    setShowEditor(true)
+  }, [])
+
+
 
   const EditorView = useCallback(() => {
     return (
       <Editor
+        autoResonderMsgs={route?.params?.autoResonderMsgs}
         initialValue={content}
         onChange={(text) => setContent(text)}
       />
@@ -45,12 +57,81 @@ const TicketReply = () => {
   }, [content])
 
 
+  const btn_send = async () => {
+    if (content.trim() == "") {
+      showToast({ body: "message is not allowed to be empty", title: "Alert", type: "info" });
+      return
+    }
+    setLoader(true);
+    let imagesToUpload = [];
+    let msgImages = [];
+    images.forEach((image, index) => {
+      if (index != 0) {
+        if (!!image?.thumbnail_1) {
+          msgImages.push(image);
+        } else {
+          let body = new FormData();
+          body.append("image", image)
+          imagesToUpload.push(UPLOAD_TICKET_IMAGE({
+            token, navigation, body
+          }));
+        }
+      }
+    })
+    let uploadedImages = [];
+    let imagesLink = [];
+    if (imagesToUpload.length > 0) {
+      uploadedImages = await Promise.all(imagesToUpload);
+      for (let i = 0; i < uploadedImages.length; i++) {
+        if (uploadedImages[i].code == 200) {
+          imagesLink.push(uploadedImages[i].image_path);
+        } else {
+          showToast({ title: "Image Upload Failed", body: uploadedImages[i].message, type: "error" });
+          setLoader(false)
+          return
+        }
+      }
+    }
+    let res;
+    console.log(!!msg, "!!msg")
+    if (!!msg) {
+      res = await EDIT_TICKET_COMMENT({
+        token, navigation,
+        commentId: msg._id,
+        body: {
+          comment_image: [...msgImages, ...imagesLink],
+          message: content
+        },
+      });
+    } else {
+      res = await ADD_TICKET_COMMENT({
+        token, navigation, body: {
+          comment_image: [...msgImages, ...imagesLink],
+          support_ticket: route?.params?.ticketId,
+          message: content,
+        }
+      });
+    }
+    if (res?.code == 200) {
+      showToast({ title: res.message, type: "success" })
+      setLoader(false);
+      route.params?.addMessage?.(res?.support_ticket_comment)
+      route.params?.updateMsg?.(res?.support_ticket_comemnt)
+      navigation.goBack()
+    } else {
+      setLoader(false);
+    }
+
+
+  }
+
+
 
 
   const HeaderView = () => {
     return (
       <View>
-        {EditorView()}
+        {showEditor && EditorView()}
         <View style={{ paddingVertical: 10 }}>
           <MyText color={colors.primary} fontSize={16} type='medium' >Upload Images
             <MyText color={colors.primary} fontSize={12}> (1000x670)</MyText>
@@ -86,8 +167,15 @@ const TicketReply = () => {
                 <View
                   style={{ width: oneFourthOfScreen, height: oneFourthOfScreen }}>
                   <View style={{ margin: 5, flex: 1, borderRadius: 10, alignItems: "center", justifyContent: "center", }}>
-                    <Image
-                      source={{ uri: item.uri }} style={{ height: "100%", width: '100%', borderRadius: 10, }} />
+                    <MyImage
+                      source={{
+                        uri: !!item?.thumbnail_1 ?
+                          S3_URL + item?.thumbnail_1 :
+                          item.uri
+                      }}
+                      style={{ height: "100%", width: '100%', }}
+                      imageStyle={{ borderRadius: 10, }}
+                    />
 
                     <Pressable
                       onPress={() => removeImage(index)}
@@ -104,9 +192,11 @@ const TicketReply = () => {
         />
       </View>
       <View style={{ marginLeft: "70%", position: "absolute", bottom: 0, right: 15 }}>
-        <MyButton title='Send' invert />
+        <MyButton title={!!msg ? "Update" : 'Send'} invert onPress={btn_send} />
       </View>
 
+
+      <MyLoader enable={loader} />
 
       <ImageUploadModal
         isVisible={isImageModalVisible}

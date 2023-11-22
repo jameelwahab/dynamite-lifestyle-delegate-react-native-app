@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, FlatList, Image, SafeAreaView, TouchableHighlight, Pressable, Dimensions } from 'react-native'
+import { View, FlatList, Image, SafeAreaView, TouchableHighlight, Pressable, Dimensions, Platform, Text } from 'react-native'
 import { colors } from '../../../utilities/colors';
 import MyText from '../../../components/MyText';
 import MyInputs from '../../../components/MyInputs';
@@ -15,10 +15,11 @@ import { S3_URL } from '../../../utilities/constants';
 import moment from 'moment';
 import EmptyView from '../../../components/EmptyView';
 import MyImage from '../../../components/MyImage';
+import ImageZoomer from '../../../components/ImageZoomer';
 
-const ListView = ({ isLoading, list, active, route, departmentList, token, refresh }) => {
+const ListView = ({ isLoading, list, active, route, departmentList, token, refresh, user }) => {
   const [isOptionModalShown, setIsOptionModal] = useState({ isVisible: false, for: "" })
-  const [isDepartmentModalShown, setIsDepartmentModalShown] = useState(false)
+  const [isDepartmentModalShown, setIsDepartmentModalShown] = useState(false);
   const navigation = useNavigation();
 
   //? Actions functions
@@ -125,6 +126,7 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
     return (
       <Pressable
         underlayColor={colors.secondary}
+        delayLongPress={Platform.OS == "android" ? 1500 : undefined}
         onLongPress={() => setIsOptionModal({ isVisible: true, for: item })}
         onPress={() => {
           navigation.navigate(routes.supportTicketDeatail, {
@@ -141,8 +143,9 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
           <View style={{ flex: 1, marginHorizontal: 10, }}>
             <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
               <MyText fontSize={14} type='medium' >{!!item?.member?.first_name ? item?.member?.first_name + " " + item?.member?.last_name : "N/A"}</MyText>
-              <MyText fontSize={10} type='light' >{moment(item.last_action_date).fromNow()}
+              <MyText fontSize={10} type='light'>{moment(item.last_action_date).fromNow()}
               </MyText>
+
             </View>
             <MyText style={{ marginTop: 3 }} fontSize={12} >{item?.subject}</MyText>
             <MyText style={{ marginTop: 3 }} numberOfLines={1} color={colors.lightText} fontSize={12} >

@@ -24,7 +24,8 @@ const Editor = ({
   onChange,
   height = 300,
   backgroundColor = colors.secondary,
-  label = ""
+  label = "",
+  autoResonderMsgs = []
 }) => {
 
   const RichText = useRef();
@@ -54,81 +55,81 @@ const Editor = ({
   }
 
 
-  const colorModal = () => {
-    const [palletColor, setPalletColor] = useState(tinycolor('#FFFFFF').toHsl())
-    const updateHue = (h) => setPalletColor({ ...palletColor, h })
-    const updateSaturation = (s) => setPalletColor({ ...palletColor, s })
+  // const colorModal = () => {
+  //   const [palletColor, setPalletColor] = useState(tinycolor('#FFFFFF').toHsl())
+  //   const updateHue = (h) => setPalletColor({ ...palletColor, h })
+  //   const updateSaturation = (s) => setPalletColor({ ...palletColor, s })
 
-    const pickColor = () => {
-      if (colorModaal.for == "backcolor") {
+  //   const pickColor = () => {
+  //     if (colorModaal.for == "backcolor") {
 
-      } else if (colorModaal.for == "forecolor") {
+  //     } else if (colorModaal.for == "forecolor") {
 
-      }
-    }
-
-
-    return (
-      <Modal
-        isVisible={colorModaal.isVisible}
-        useNativeDriverForBackdrop={true}
-        style={{ margin: 0 }}>
-
-        <View style={{ backgroundColor: colors.secondary, marginHorizontal: 10, borderRadius: 10, paddingHorizontal: 20, paddingTop: 15, paddingBottom: 30 }}>
-
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <View style={{ height: 30, width: 30, }} />
-            <View style={{ flex: 1, alignItems: "center" }} >
-              <MyText fontSize={20}>Pick Color</MyText>
-            </View>
-            <Pressable
-              onPress={closeModal}
-              style={{ height: 30, width: 30, alignItems: "center", justifyContent: "center", }} >
-              {icons.crosss()}
-            </Pressable>
-          </View>
-
-          <View style={{}}>
+  //     }
+  //   }
 
 
-            <View style={{ marginTop: 20 }}>
-              <HueSlider
-                gradientSteps={40}
-                value={palletColor.h}
-                onValueChange={updateHue}
-              />
-            </View>
+  //   return (
+  //     <Modal
+  //       isVisible={colorModaal.isVisible}
+  //       useNativeDriverForBackdrop={true}
+  //       style={{ margin: 0 }}>
 
-            <View style={{ marginTop: 20 }}>
-              <SaturationSlider
-                gradientSteps={20}
-                value={palletColor.s}
-                color={palletColor}
-                onValueChange={updateSaturation}
-              />
-            </View>
+  //       <View style={{ backgroundColor: colors.secondary, marginHorizontal: 10, borderRadius: 10, paddingHorizontal: 20, paddingTop: 15, paddingBottom: 30 }}>
 
-            {/* <View style={{ marginTop: 20 }}>
-              <LightnessSlider
-                gradientSteps={20}
-                value={palletColor.l}
-                color={palletColor}
-                onValueChange={updateLightness}
-              />
-            </View> */}
+  //         <View style={{ flexDirection: "row", alignItems: "center" }}>
+  //           <View style={{ height: 30, width: 30, }} />
+  //           <View style={{ flex: 1, alignItems: "center" }} >
+  //             <MyText fontSize={20}>Pick Color</MyText>
+  //           </View>
+  //           <Pressable
+  //             onPress={closeModal}
+  //             style={{ height: 30, width: 30, alignItems: "center", justifyContent: "center", }} >
+  //             {icons.crosss()}
+  //           </Pressable>
+  //         </View>
+
+  //         <View style={{}}>
 
 
-          </View >
+  //           <View style={{ marginTop: 20 }}>
+  //             <HueSlider
+  //               gradientSteps={40}
+  //               value={palletColor.h}
+  //               onValueChange={updateHue}
+  //             />
+  //           </View>
 
-          <View style={{ marginTop: 30 }}>
-            <MyButton title='Select' invert onPress={pickColor} />
-          </View>
+  //           <View style={{ marginTop: 20 }}>
+  //             <SaturationSlider
+  //               gradientSteps={20}
+  //               value={palletColor.s}
+  //               color={palletColor}
+  //               onValueChange={updateSaturation}
+  //             />
+  //           </View>
 
-        </View>
+  //           {/* <View style={{ marginTop: 20 }}>
+  //             <LightnessSlider
+  //               gradientSteps={20}
+  //               value={palletColor.l}
+  //               color={palletColor}
+  //               onValueChange={updateLightness}
+  //             />
+  //           </View> */}
 
-      </Modal>
-    )
-  }
+
+  //         </View >
+
+  //         <View style={{ marginTop: 30 }}>
+  //           <MyButton title='Select' invert onPress={pickColor} />
+  //         </View>
+
+  //       </View>
+
+  //     </Modal>
+  //   )
+  // }
 
 
   //? Link Dialog
@@ -174,8 +175,8 @@ const Editor = ({
   // console.log(RichText, "console.log(RichText")
   return (
     <View>
-      {colorModal()}
-      <View style={{  }}>
+      {/* {colorModal()} */}
+      <View style={{}}>
         {!!label ? <MyText isLabel>{label}</MyText> : null}
         <View style={{ backgroundColor: backgroundColor, borderRadius: 10, overflow: "hidden", }}>
           {LinkDialog()}
@@ -307,6 +308,24 @@ const Editor = ({
           />
 
 
+        </View>
+
+
+        <View style={{ flexDirection: "row", marginTop: 10 }}>
+          <ScrollView horizontal>
+            {autoResonderMsgs.map((x, i) => (
+              <TouchableOpacity
+                key={x._id}
+                style={{ backgroundColor: colors.secondaryVariant, paddingVertical: 10, paddingHorizontal: 15, borderRadius: 20, marginRight: 5, }}
+                onPress={() => {
+                  onChange(initialValue + " " + x.message);
+                  RichText?.current?.setContentHTML(initialValue + " " + x.message)
+                }}
+              >
+                <MyText>{x?.title}</MyText>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
         </View>
       </View>
     </View>

@@ -22,7 +22,7 @@ import debounce from '../../../functions/debounce';
 
 const TicketsList = ({ navigation }) => {
   const layout = useWindowDimensions();
-  const { token } = useSelector(selectUser)
+  const { token, user } = useSelector(selectUser)
   const [index, setIndex] = React.useState(0);
   const [loader, setLoader] = React.useState(0);
   const [list, setList] = useState([])
@@ -147,6 +147,7 @@ const TicketsList = ({ navigation }) => {
 
   const renderScene = ({ route, ...props }) => {
     return <ListView
+      user={user}
       refresh={getSupportTickets}
       token={token}
       route={route.key}

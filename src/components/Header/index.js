@@ -129,7 +129,7 @@ const __header = StyleSheet.create({
     alignItems: "center"
   },
   secondView: {
-    height: 40,
+    height: 50,
     width: "100%",
     // backgroundColor: colors.darkSecondary,
     // backgroundColor: "green",

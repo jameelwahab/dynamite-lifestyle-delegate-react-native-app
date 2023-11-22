@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Pressable, Image, SafeAreaView } from 'react-native'
+import { View, Text, StyleSheet, Pressable, Image, SafeAreaView, PermissionsAndroid } from 'react-native'
 import React from 'react'
 import Modal from 'react-native-modal'
 import { colors } from '../utilities/colors'

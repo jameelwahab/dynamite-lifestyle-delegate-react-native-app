@@ -8,12 +8,12 @@ import { drawerMenuList } from './List';
 
 const index = (props) => {
   const { navigation, state } = props;
-  console.log(props, "props")
+  // console.log(props, "props")
 
 
   const changeSideBarScreen = async (screen) => {
-    console.log(state, "routes")
-    console.log(screen, "screen")
+    // console.log(state, "routes")
+    // console.log(screen, "screen")
     navigation.closeDrawer()
 
     setTimeout(() => {

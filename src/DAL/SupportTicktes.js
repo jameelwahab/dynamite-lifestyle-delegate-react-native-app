@@ -77,3 +77,53 @@ export const MARK_RESOLVE_TICKET = ({ token, body: {
   })
 }
 
+export const UPLOAD_TICKET_IMAGE = ({ token, body, navigation, }) => {
+  return invokeApi({
+    path: `api/support_ticket/upload_support_ticket_comment_images`,
+    method: "POST",
+    postData: body,
+    headers: {
+      "content-type": "multipart/form-data"
+    },
+    token,
+    navigation,
+  })
+}
+
+export const ADD_TICKET_COMMENT = ({ token,
+  body: {
+    support_ticket, message, comment_image
+  },
+  navigation, }) => {
+  return invokeApi({
+    path: `api/support_ticket/add_support_ticket_comment/`,
+    method: "POST",
+    postData: { support_ticket, message, comment_image },
+    token,
+    navigation,
+  })
+}
+
+export const DELETE_TICKET_COMMENT = ({ token, navigation, commentId }) => {
+  return invokeApi({
+    path: `api/support_ticket/delete_support_ticket_comment/${commentId}`,
+    method: "DELETE",
+    token,
+    navigation,
+  })
+}
+
+export const EDIT_TICKET_COMMENT = ({ token,
+  body: {
+    message, comment_image
+  },
+  navigation, commentId }) => {
+  return invokeApi({
+    path: `api/support_ticket/edit_support_ticket_comment/${commentId}`,
+    method: "PUT",
+    postData: { message, comment_image },
+    token,
+    navigation,
+  })
+}
+

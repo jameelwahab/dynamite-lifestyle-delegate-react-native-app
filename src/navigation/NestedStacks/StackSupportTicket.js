@@ -16,7 +16,7 @@ const SupportTicketStack = createNativeStackNavigator()
 
 const StackSupportTicket = () => {
   return (
-    <View style={{ flex: 1, backgroundColor: colors.secondary }}>
+    <View style={{ flex: 1, backgroundColor: colors.darkSecondary }}>
       <SupportTicketStack.Navigator
         initialRouteName={routes.supportTicketList}
         screenOptions={{ headerShown: false }}>
