@@ -15,7 +15,7 @@ import { colors } from '../utilities/colors';
 const ImageZoomer = ({
   visible,
   closeModal,
-  color="",
+  color = "",
   list,
   index = 0,
   url,
@@ -54,7 +54,7 @@ const ImageZoomer = ({
               height: 40,
               width: 40,
               borderRadius: 50,
-              backgroundColor:colors.black,
+              backgroundColor: colors.black,
               justifyContent: 'center',
               alignItems: 'center',
               shadowColor: '#000',
@@ -84,9 +84,11 @@ const ImageZoomer = ({
                 <ActivityIndicator color={colors.golden} size={'large'} />
               )}
               saveToLocalByLongPress={false}
-              imageUrls={!!list ? list : [
-                { url: noUrl ? url : S3_URL + url },
-              ]}
+              imageUrls={!!list ?
+                list.map(x => ({ url: S3_URL + x?.thumbnail_1 })) :
+                [
+                  { url: noUrl ? url : S3_URL + url },
+                ]}
               index={!!index ? index : 0}
               useNativeDriver={true}
               renderIndicator={() => <></>}

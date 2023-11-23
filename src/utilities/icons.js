@@ -22,7 +22,7 @@ export const icons = {
   refresh: require('../assets/icons/reload.png'),
   send: require('../assets/icons/send.png'),
   tick: require('../assets/icons/tick.png'),
-  emptyBox:require('../assets/icons/empty-box.png'),
+  emptyBox: require('../assets/icons/empty-box.png'),
 
   user: () => { return (<FontAwesome6 name="user-large" color={colors.primary} size={17} />) },
   copy: () => { return (<Ionicons name="copy" color={colors.primary} size={17} />) },
@@ -35,7 +35,8 @@ export const icons = {
   crosssWithCircle: () => { return (<MaterialIcons name="cancel" color={colors.white} size={30} />) },
   crosssWithCircle_20: () => { return (<MaterialIcons name="cancel" color={colors.white} size={20} />) },
   noIcon: () => { return (<MaterialIcons name="cancel" color={colors.transparent} size={20} />) },
-  crosss: () => { return (<Ionicons name="close" color={colors.white} size={20} />) },
+  crosss: (color = colors.white, size = 20) => { return (<Ionicons name="close" color={color} size={size} />) },
+  plus: (color = colors.white, size = 20) => { return (<Octicons name="plus" color={color} size={size} />) },
   search: () => { return (<Feather name="search" color={colors.white} size={17} />) },
   down: () => { return (<Ionicons name="caret-down" color={colors.white} size={17} />) },
   threeDots: () => { return (<Entypo name="dots-three-vertical" color={colors.primary} size={12} />) },
@@ -48,6 +49,6 @@ export const icons = {
   clock: () => { return (<Octicons name="clock" color={colors.primary} size={17} />) },
   minusCircle: () => { return (<Feather name="minus-circle" color={colors.primary} size={25} />) },
   plusCircle: () => { return (<Feather name="plus-circle" color={colors.primary} size={25} />) },
-
+  back: (color = colors.white, size = 20) => { return (<MaterialIcons name="arrow-back" color={color} size={size} />) },
 
 }

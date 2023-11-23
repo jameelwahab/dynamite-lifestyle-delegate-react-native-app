@@ -18,6 +18,7 @@ import showToast from '../../../functions/showToast';
 import MyLoader from '../../../components/MyLoader';
 import { S3_URL } from '../../../utilities/constants';
 import MyImage from '../../../components/MyImage';
+import ImageZoomer from '../../../components/ImageZoomer';
 
 
 
@@ -31,7 +32,8 @@ const TicketReply = ({ navigation, route }) => {
   const [msgImages, setMsgImages] = useState([]);
   const [isImageModalVisible, setIsImageModalVisible] = useState(false)
   const [loader, setLoader] = useState(false)
-  const [showEditor, setShowEditor] = useState(false)
+  const [showEditor, setShowEditor] = useState(false);
+  const [modalImage, setModalImage] = useState({ uri: "", noUrl: false });
   const removeImage = (index) => {
     images.splice(index, 1);
     setImages([...images]);
@@ -167,15 +169,25 @@ const TicketReply = ({ navigation, route }) => {
                 <View
                   style={{ width: oneFourthOfScreen, height: oneFourthOfScreen }}>
                   <View style={{ margin: 5, flex: 1, borderRadius: 10, alignItems: "center", justifyContent: "center", }}>
-                    <MyImage
-                      source={{
-                        uri: !!item?.thumbnail_1 ?
-                          S3_URL + item?.thumbnail_1 :
-                          item.uri
-                      }}
+                    <Pressable onPress={() => {
+                      if (!!item?.thumbnail_1) {
+                        setModalImage({ uri: item?.thumbnail_1, noUrl: false });
+                      } else {
+                        setModalImage({ uri: item.uri, noUrl: true });
+                      }
+                    }}
                       style={{ height: "100%", width: '100%', }}
-                      imageStyle={{ borderRadius: 10, }}
-                    />
+                    >
+                      <MyImage
+                        source={{
+                          uri: !!item?.thumbnail_1 ?
+                            S3_URL + item?.thumbnail_1 :
+                            item.uri
+                        }}
+                        style={{ height: "100%", width: '100%', }}
+                        imageStyle={{ borderRadius: 10, }}
+                      />
+                    </Pressable>
 
                     <Pressable
                       onPress={() => removeImage(index)}
@@ -203,6 +215,12 @@ const TicketReply = ({ navigation, route }) => {
         onImagePicked={(image) => setImages([...images, ...image])}
         closeModal={() => setIsImageModalVisible(false)}
         multiple={true}
+      />
+      <ImageZoomer
+        closeModal={() => setModalImage({ isUrl: false, uri: "" })}
+        visible={!!modalImage.uri}
+        url={modalImage.uri}
+        noUrl={modalImage.noUrl}
       />
     </RootView>
   )

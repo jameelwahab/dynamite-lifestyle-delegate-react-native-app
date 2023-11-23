@@ -5,14 +5,14 @@ import React from 'react'
 import { plus } from '../utilities/icons'
 import { colors } from '../utilities/colors'
 
-const FAB = ({ onPress }) => {
+const FAB = ({ onPress,icon }) => {
   return (
     <TouchableHighlight
 
       underlayColor={colors.lightPrimary2}
       onPress={onPress}
       style={__style.rootView}>
-      <Image source={plus} style={__style.icon} />
+      {icon()}
     </TouchableHighlight>
   )
 }
@@ -23,7 +23,7 @@ const __style = StyleSheet.create({
   rootView: {
     height: 45,
     width: 45,
-    borderRadius: 15,
+    borderRadius: 45/2,
     backgroundColor: colors.primary,
     alignItems: "center",
     justifyContent: "center",

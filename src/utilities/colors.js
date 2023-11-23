@@ -12,10 +12,11 @@ export const colors = {
   selection: Platform.select({ android: "#3D4250", ios: "#FFFFFF" }),
   text: "#FFFFFF",
   white: "#FFFFFF",
-  black:"#000000",
+  black: "#000000",
   lightText: "#8c9aa6",
   lightText2: "#bec6da",
   placeholder: "#637381",
   delete: "#ff3333",
-  transparent:"#FFFFFF00"
+  transparent: "#FFFFFF00",
+  grey: "#696969"
 }

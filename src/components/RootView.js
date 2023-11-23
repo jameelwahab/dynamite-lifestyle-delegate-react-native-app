@@ -15,11 +15,12 @@ const RootView = ({
   hideNotificaitonIcon = false,
   hideProfile = false,
   hideChatIcon = false,
+  backgroundColor,
   titleView,
   children
 }) => {
   return (
-    <SafeAreaView style={__RootView.root}>
+    <SafeAreaView style={[__RootView.root, !!backgroundColor && { backgroundColor }]}>
       <StatusBar backgroundColor={colors.darkSecondary} barStyle={"light-content"} />
       {!hideHeader &&
         <Header

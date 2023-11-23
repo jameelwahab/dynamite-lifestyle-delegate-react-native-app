@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, FlatList, Image, SafeAreaView, TouchableHighlight, Pressable, Dimensions, Platform, Text, TouchableOpacity } from 'react-native'
+import { View, FlatList, Image, SafeAreaView, TouchableHighlight, Pressable, Dimensions, Platform, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { colors } from '../../../utilities/colors';
 import MyText from '../../../components/MyText';
 import MyInputs from '../../../components/MyInputs';
@@ -20,6 +20,7 @@ import { fonts } from '../../../utilities/fonts';
 import { TransparentButton } from '../../../components/MyButton';
 import Toast from 'react-native-toast-message';
 import showToast from '../../../functions/showToast';
+import UserImage from '../../../components/UserImage';
 
 
 const ListView = ({ isLoading, list, active, route, departmentList, token, refresh, user, setLoader }) => {
@@ -60,7 +61,7 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
 
 
 
-    else if (option.key == "move_to_needs_fixes-resolve") {
+    else if (option.key == "move_to_needs_fixes") {
       setIsOptionModal({ ...isOptionModalShown, isVisible: false, })
       setDate(moment().format("YYYY-MM-DD"))
       setTimeout(() => {
@@ -107,6 +108,20 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
         setMarkResolveModalVisiblity(true)
       }, 1000);
     }
+    else if (option.key == "send_reminder") {
+      navigation.navigate(routes.sendReminderScreen, {
+        ticketId: isOptionModalShown?.for?._id,
+      })
+      setIsOptionModal({ isVisible: false, for: "" })
+    }
+
+    else if (option.key == "internal_notes") {
+      // navigation.navigate(routes.notesListing, {
+      //   ticketId: isOptionModalShown?.for?._id,
+
+      // });
+      // setIsOptionModal({ isVisible: false, for: "" })
+    }
 
     else {
       setIsOptionModal({ isVisible: false, for: "" })
@@ -146,8 +161,6 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
     setIsOptionModal({ isVisible: false, for: "" });
   }
 
-
-
   const updateDepartment = async (department) => {
     setIsDepartmentModalShown(false)
     let res = await CHANGE_DEPARTMENT_OF_TICKET({
@@ -163,7 +176,6 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
       refresh?.()
     }
   }
-
 
   const moveToMarkResolve = async (reason, note) => {
     let obj = {
@@ -350,7 +362,6 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
       </Modal>)
   }
 
-
   const closeConfirmationModal = () => {
     setConfirmationModal({
       isVisible: false,
@@ -446,15 +457,19 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
         onLongPress={() => setIsOptionModal({ isVisible: true, for: item })}
         onPress={() => {
           navigation.navigate(routes.supportTicketDeatail, {
-            ticket: item
+            ticket: item,
+            refreshList: refresh
           })
         }}
         style={{ padding: 20, flexDirection: "row" }} >
         <>
-          <View style={{ width: 35, height: 35, borderRadius: 35 / 2, overflow: "hidden", borderWidth: 1 / 2, borderColor: colors.white }}>
-            <MyImage
-              source={!!item?.member?.profile_image ? { uri: S3_URL + item?.member?.profile_image } : icons.dummyUser}
-              style={{ height: '100%', width: "100%" }} />
+          <View style={{}}>
+            <UserImage
+              image={item?.member?.profile_image}
+              name={!!item?.member?.first_name ? item?.member?.first_name : "N/A"}
+              size={35}
+            />
+
           </View>
           <View style={{ flex: 1, marginHorizontal: 10, }}>
             <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
@@ -465,8 +480,10 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
             </View>
             <MyText style={{ marginTop: 3 }} fontSize={12} >{item?.subject}</MyText>
             <MyText style={{ marginTop: 3 }} numberOfLines={1} color={colors.lightText} fontSize={12} >
-              {item?.description.slice(0, 30)}
+              {item?.description.slice(0, 60)}
             </MyText>
+            {route == "need_fixes" && moment(item.issue_fix_date).diff(moment(), 'days') < 2 &&
+              <View style={__styles.badges} />}
           </View>
         </>
       </Pressable>)
@@ -496,6 +513,19 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
 
 export default ListView;
 
+const __styles = StyleSheet.create({
+  badges: {
+    height: 7,
+    width: 7,
+    borderRadius: 5,
+    backgroundColor: colors.delete,
+    position: "absolute",
+    top: -10,
+    right: -10
+  }
+})
+
+
 const options = [{
   title: "Detail",
   key: "detail",
@@ -513,7 +543,7 @@ const options = [{
 },
 {
   title: "Internal Notes",
-  key: "internal-notes",
+  key: "internal_notes",
   icon: icons.threeLinesMenu,
   routes: {
     waiting: true,

@@ -1,4 +1,4 @@
-import { View, Text, FlatList, Image, Pressable, TouchableHighlight, Alert } from 'react-native'
+import { View, Text, FlatList, Image, Pressable, TouchableHighlight, Alert, SafeAreaView } from 'react-native'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import RootView from '../../../components/RootView'
 import MyText from '../../../components/MyText'
@@ -7,14 +7,14 @@ import { colors } from '../../../utilities/colors'
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler'
 import OptionModal from '../../../components/OptionModal'
 import { CALLBACK_TYPE } from 'react-native-gesture-handler/lib/typescript/handlers/gestures/gesture'
-import { MyButton } from '../../../components/MyButton'
+import { MyButton, TransparentButton } from '../../../components/MyButton'
 import routes from '../../../navigation/routes'
 import Collapsible from 'react-native-collapsible';
 import { fonts } from '../../../utilities/fonts'
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../../redux/reducers/userSlice'
 import MyLoader from '../../../components/MyLoader'
-import { DELETE_TICKET_COMMENT, SUPPORT_TCIKET_DETAIL } from '../../../DAL'
+import { DELETE_TICKET_COMMENT, MARK_RESOLVE_TICKET, SUPPORT_TCIKET_DETAIL } from '../../../DAL'
 import UserImage from '../../../components/UserImage'
 import moment from 'moment'
 import MyWebview, { MyWebView4 } from '../../../components/MyWebview'
@@ -23,6 +23,9 @@ import downloadImage from '../../../functions/downloadImage'
 import ImageZoomer from '../../../components/ImageZoomer'
 import showToast from '../../../functions/showToast'
 import MyImage from '../../../components/MyImage'
+import Modal from 'react-native-modal'
+import MyInputs from '../../../components/MyInputs'
+import Toast from 'react-native-toast-message'
 
 let autoMessages = [];
 const TicketDetail = ({ navigation, route }) => {
@@ -32,11 +35,12 @@ const TicketDetail = ({ navigation, route }) => {
   const [comments, setComments] = useState([]);
   const { token, user } = useSelector(selectUser);
   const [loader, setLoader] = useState(true);
-
-
   const [msgOptionModal, setMsgOptionModal] = useState({ isVisible: false, selectedItem: null })
   const [isOptionModalVisible, setIsOptionModalVisible] = useState(false)
   const [modalImage, setModalImage] = useState("")
+  const [isMarkResolveModalVisible, setMarkResolveModalVisiblity] = useState(false);
+  const [modalListImages, setModalListImages] = useState({ index: -1, list: [] });
+
 
 
   const api_ticketDetail = async () => {
@@ -106,12 +110,131 @@ const TicketDetail = ({ navigation, route }) => {
 
   }
 
+  const onNotesScreen = () => {
+    navigation.navigate(routes.notesListing, {
+      ticketId: ticket?._id,
+      user: {
+        name: ticket?.member?.first_name + " " + ticket?.member?.last_name,
+        email: ticket?.member?.email
+      }
+    })
+  }
+
+  const ticketAction = (item) => {
+    if (item.key == "mark_resolve") {
+      setIsOptionModalVisible(false)
+      setTimeout(() => {
+        setMarkResolveModalVisiblity(true)
+      }, 1000);
+    }
+  }
+
   useEffect(() => {
     autoMessages = [];
     api_ticketDetail()
   }, []);
 
 
+
+
+  const moveToMarkResolve = async (reason, note) => {
+    let obj = {
+      support_ticket: ticket?._id,
+      close_note: note,
+      reason_to_solve: reason
+    }
+    setMarkResolveModalVisiblity(false);
+    setLoader(true)
+
+    let res = await MARK_RESOLVE_TICKET({
+      token, navigation,
+      body: obj,
+    });
+    setLoader(false)
+    if (res.code == 200) {
+      showToast({ title: "Marked resolved successfully ", body: res.message, type: "success" })
+      route?.params?.refreshList?.()
+    } else {
+
+    }
+  }
+
+  const MarkResolveModal = () => {
+    const [reson, setReson] = useState("Answered");
+    const [note, setNote] = useState("");
+
+    const btn_resolve = () => {
+      if (reson == "") {
+        showToast({ body: "Please select reason", type: "info" })
+      } else if (note.trim() == "") {
+        showToast({ body: "Please write note", type: "info" })
+      } else {
+        moveToMarkResolve(reson.toLowerCase(), note.trim())
+        setReson("")
+        setNote("")
+      }
+    }
+
+    const optionView = (text) => {
+      return (
+        <TouchableOpacity
+          onPress={() => setReson(text)}
+          style={{ flexDirection: "row", paddingVertical: 5 }}
+        >
+          <View style={{ height: 20, width: 20, borderColor: reson == text ? colors.primary : colors.white, borderWidth: 1, borderRadius: 20 / 2, alignItems: "center", justifyContent: "center" }}>
+            {reson == text &&
+              <View style={{ height: 12, width: 12, borderRadius: 18 / 2, backgroundColor: colors.primary }} />}
+          </View>
+          <View style={{ marginLeft: 10 }}>
+            <MyText fontSize={16} >{text}</MyText>
+          </View>
+        </TouchableOpacity>
+      )
+    }
+    return (
+      <Modal
+        isVisible={isMarkResolveModalVisible}
+        onBackdropPress={() => setMarkResolveModalVisiblity(false)}
+        onBackButtonPress={() => setMarkResolveModalVisiblity(false)}
+        useNativeDriverForBackdrop={true}
+        avoidKeyboard={true}
+        animationIn='zoomIn'
+        animationOut='zoomOut'
+        style={{ margin: 10 }}>
+        <SafeAreaView style={{ backgroundColor: colors.secondaryVariant, borderRadius: 10, }} >
+          <View style={{ margin: 10 }}>
+            <View style={{ margin: 10 }}>
+              <MyText fontSize={18} color={colors.primary} type='medium'>Mark Resolve</MyText>
+
+            </View>
+            <View style={{ margin: 10 }}>
+              <MyText isLabel>Reson TO Solve*</MyText>
+              <View>
+                {optionView("Answered")}
+                {optionView("Solved")}
+                {optionView("Auto-Closure")}
+              </View>
+            </View>
+            <View style={{ margin: 10 }}>
+              <MyInputs
+                multiline={true}
+                value={note}
+                label='Resolve Note*'
+                onChangeText={(text) => setNote(text)}
+              />
+            </View>
+
+
+            <View style={{ flexDirection: "row", justifyContent: "flex-end", marginTop: 10 }}>
+              <TransparentButton title='CANCEL' onPress={() => setMarkResolveModalVisiblity(false)} />
+              <TransparentButton title='RESOLVE' onPress={btn_resolve} />
+            </View>
+
+          </View>
+        </SafeAreaView>
+        {isMarkResolveModalVisible && <Toast />}
+      </Modal>)
+  }
 
 
 
@@ -180,7 +303,8 @@ const TicketDetail = ({ navigation, route }) => {
           <MyButton
             invert
             textStyle={{ fontFamily: fonts.regular, textTransform: "capitalize" }}
-            title={"Internal Notes"} />
+            onPress={onNotesScreen}
+            title={`Internal Notes${ticket?.internal_note?.length > 0 ? " (" + ticket?.internal_note?.length + ")" : ""}`} />
         </View>
 
         <View style={{ marginBottom: 10, backgroundColor: colors.secondary, padding: 10, borderRadius: 10 }}>
@@ -196,20 +320,24 @@ const TicketDetail = ({ navigation, route }) => {
                 {ticket?.description}
               </MyText>
             </View>}
-          <View style={{ flexDirection: "row", flexWrap: "wrap", height: 100 }}>
-            <ScrollView horizontal >
-              {ticket?.ticket_images.map((x, i) => (
-                <View style={{ height: 100, aspectRatio: 1, }}>
-                  <View style={{ margin: 5, borderRadius: 10, overflow: "hidden" }}>
-                    <MyImage
-                      source={{ uri: S3_URL + x.thumbnail_1 }}
-                      style={{ height: "100%", width: "100%" }}
-                    />
+          {!!ticket?.ticket_images && ticket?.ticket_images.length > 0 &&
+            <View style={{ flexDirection: "row", flexWrap: "wrap", height: 100 }}>
+              <ScrollView horizontal >
+                {ticket?.ticket_images.map((x, i) => (
+                  <View style={{ height: 100, aspectRatio: 1, }}>
+                    <Pressable
+                      onPress={() => setModalListImages({ list: ticket?.ticket_images, index: i })}
+                      style={{ margin: 5, borderRadius: 10, overflow: "hidden" }}>
+                      <MyImage
+                        source={{ uri: S3_URL + x.thumbnail_1 }}
+                        style={{ height: "100%", width: "100%" }}
+                      />
+                    </Pressable>
                   </View>
-                </View>
-              ))}
-            </ScrollView>
-          </View>
+                ))}
+              </ScrollView>
+            </View>
+          }
           <View style={{ marginTop: 5 }}>
             <MyText fontSize={12} color={colors.primary}>
               {"Created Date : "}<Text style={{ color: colors.lightText2 }} > {moment(ticket?.createdAt).format("DD-MM-YYYY hh:mm A")}</Text>
@@ -291,7 +419,7 @@ const TicketDetail = ({ navigation, route }) => {
       <OptionModal
         optionList={OptionList}
         closeModal={() => setIsOptionModalVisible(false)}
-        onSelected={() => setIsOptionModalVisible(false)}
+        onSelected={ticketAction}
         isVisible={isOptionModalVisible} />
 
       <ImageZoomer
@@ -300,6 +428,13 @@ const TicketDetail = ({ navigation, route }) => {
         url={modalImage}
 
       />
+      <ImageZoomer
+        closeModal={() => setModalListImages({ index: -1, list: [] })}
+        visible={modalListImages.list.length > 0}
+        list={modalListImages.list}
+        index={modalListImages.index}
+      />
+      {MarkResolveModal()}
     </RootView>
   )
 }
@@ -320,10 +455,12 @@ const msgOptionList = [{
 
 const OptionList = [{
   icon: icons.tick,
-  title: "Mark Resolve"
+  title: "Mark Resolve",
+  key: "mark_resolve"
 },
-{
-  icon: icons.copy,
-  title: "Copy Password"
-}]
+  // {
+  //   icon: icons.copy,
+  //   title: "Copy Password"
+  // }
+]
 

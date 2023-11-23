@@ -38,7 +38,7 @@ const TransparentButton = ({
 }) => {
   return (
     <TouchableHighlight
-    style={{borderRadius: 10}}
+      style={{ borderRadius: 10 }}
       underlayColor={colors.lightPrimary2}
       onPress={onPress}>
       <View style={__tarsparentButtonStyle.root} >
@@ -52,7 +52,7 @@ export { MyButton, TransparentButton }
 
 const __MyButtonStyles = StyleSheet.create({
   rootView: {
-    height: 50,
+    height: 45,
     backgroundColor: colors.primary,
     borderRadius: 10,
     alignItems: "center",
@@ -70,7 +70,7 @@ const __MyButtonStyles = StyleSheet.create({
     textTransform: "uppercase"
   },
   rootInvertView: {
-    height: 50,
+    height: 45,
     backgroundColor: colors.darkSecondary,
     borderWidth: 1,
     borderColor: colors.primary,
@@ -92,7 +92,7 @@ const __tarsparentButtonStyle = StyleSheet.create({
   root: {
     paddingHorizontal: 15,
     paddingVertical: 10,
-    
+
   },
   text: {
     color: colors.primary,

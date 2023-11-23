@@ -32,11 +32,13 @@ const TicketsList = ({ navigation }) => {
     waiting: 0,
     answered: 0,
     need_fixes: 0,
+    need_to_fixed_dot: 0,
     needs_to_attention: 0,
     reminder: 0,
     ready_to_close: 0,
     closed: 0,
     trash: 0,
+
   })
   const [routes] = React.useState([
     { key: 'waiting', title: 'WAITING', index: 0 },
@@ -72,6 +74,7 @@ const TicketsList = ({ navigation }) => {
         waiting: !!res?.waiting_ticket_count ? res?.waiting_ticket_count : 0,
         answered: !!res?.answered_ticket_count ? res?.answered_ticket_count : 0,
         need_fixes: !!res?.need_fixes_count ? res?.need_fixes_count : 0,
+        need_to_fixed_dot: !!res?.need_to_fix_reminder_count ? res?.need_to_fix_reminder_count : 0,
         needs_to_attention: !!res?.need_to_attention_count ? res?.need_to_attention_count : 0,
         reminder: !!res?.reminder_ticket_count ? res?.reminder_ticket_count : 0,
         ready_to_close: !!res?.ready_to_close_count ? res?.ready_to_close_count : 0,
@@ -118,7 +121,8 @@ const TicketsList = ({ navigation }) => {
           <MyText color={focused ? colors.primary : colors.lightText} type='medium' >
             {route.title + " (" + badges[route?.key] + ")"}
           </MyText>
-          {route?.key == 'need_fixes' && badges['need_fixes'] > 0 &&
+          {((route?.key == 'need_fixes' && badges['need_to_fixed_dot'] > 0) ||
+            user?.notify_tab == route?.key) &&
             <View style={__styles.badges} />
           }
         </>

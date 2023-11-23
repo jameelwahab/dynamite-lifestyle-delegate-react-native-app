@@ -11,7 +11,10 @@ import TicketDetail from '../../screens/SupportTicket/Detail.js/index.js'
 import TicketReply from '../../screens/SupportTicket/ReplyTicket'
 import Notes from '../../screens/SupportTicket/Notes'
 import ChatScreen from '../../screens/Chat/ChatScreen'
+import SendReminderScreen from '../../screens/SupportTicket/SendReminder'
 import { colors } from '../../utilities/colors'
+import AddNote from '../../screens/Notes/AddNote'
+import NotesList from '../../screens/Notes/List'
 const SupportTicketStack = createNativeStackNavigator()
 
 const StackSupportTicket = () => {
@@ -33,6 +36,9 @@ const StackSupportTicket = () => {
           name={routes.supportTicketReply} component={TicketReply} />
         <SupportTicketStack.Screen name={routes.supportTicketNotes} component={Notes} />
         <SupportTicketStack.Screen name={routes.chat} component={ChatScreen} />
+        <SupportTicketStack.Screen name={routes.sendReminderScreen} component={SendReminderScreen} />
+        <SupportTicketStack.Screen name={routes.addNote} component={AddNote} />
+        <SupportTicketStack.Screen name={routes.notesListing} component={NotesList} />
       </SupportTicketStack.Navigator>
     </View>
   )

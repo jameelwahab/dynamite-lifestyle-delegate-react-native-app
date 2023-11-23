@@ -11,13 +11,16 @@ const routes = {
   supportTicketReply: "SUPPORT_TICKET_REPLY_SCREEN",
   supportTicketNavigator: "SUPPORT_TICKET_NAVIGATION",
   supportTicketNotes: "SUPPORT_TICKET_NOTES_SCREEN",
+  sendReminderScreen: "SEND_REMINDER_SCREEN",
   otherSettings: "OTHER_SETTINGS_SCREEN",
   editProfile: "EDIT_PROFILE_SCREEN",
   changePassword: "CHANGE_PASSWORD_SCREEN",
   reminderSettings: "REMINDER_SETTINGS_SCREEN",
   zoomSettings: "ZOOM_SETTINGS_SCREEN",
   chat: "CHAT_SETTINGS_SCREEN",
-  chatNavigator: "CHAT_NAVIGATOR"
+  chatNavigator: "CHAT_NAVIGATOR",
+  addNote: "ADD_NOTE",
+  notesListing: "NOTES_LISTING"
 }
 
 export default routes;

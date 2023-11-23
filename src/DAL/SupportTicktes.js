@@ -50,7 +50,7 @@ export const CHANGE_DEPARTMENT_OF_TICKET = ({ token, body, navigation, ticketId 
 }
 
 
-export const MOVE_TICKET = ({ token, body, navigation, ticketId="" }) => {
+export const MOVE_TICKET = ({ token, body, navigation, ticketId = "" }) => {
   return invokeApi({
     path: `api/support_ticket/move_support_ticket_status/${ticketId}`,
     method: "POST",
@@ -118,6 +118,17 @@ export const EDIT_TICKET_COMMENT = ({ token,
     path: `api/support_ticket/edit_support_ticket_comment/${commentId}`,
     method: "PUT",
     postData: { message, comment_image },
+    token,
+    navigation,
+  })
+}
+
+
+export const SEND_TICKET_REMINDER = ({ token, body: { message, support_ticket }, navigation, }) => {
+  return invokeApi({
+    path: `api/support_ticket/send_reminder`,
+    method: "POST",
+    postData: { message, support_ticket },
     token,
     navigation,
   })
