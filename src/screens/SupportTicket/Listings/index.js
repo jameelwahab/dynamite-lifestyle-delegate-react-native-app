@@ -18,6 +18,9 @@ import debounce from '../../../functions/debounce';
 
 
 
+let page = 1;
+let totalPage = 0;
+let canLoadMore = false;
 
 
 const TicketsList = ({ navigation }) => {
@@ -25,6 +28,7 @@ const TicketsList = ({ navigation }) => {
   const { token, user } = useSelector(selectUser)
   const [index, setIndex] = React.useState(0);
   const [loader, setLoader] = React.useState(0);
+  const [footerLoader, setFooterLoader] = React.useState(-1);
   const [list, setList] = useState([])
   const [depList, setDepList] = useState([])
   const [searchText, setSearchText] = useState("")
@@ -52,13 +56,26 @@ const TicketsList = ({ navigation }) => {
   ]);
 
 
-  const getSupportTickets = async (loading = true) => {
-    if (loading) {
+  const loadMore = () => {
+    console.log("loadMore", canLoadMore)
+    if (canLoadMore) {
+      canLoadMore = false;
+      getSupportTickets(false, true);
+    }
+  }
+
+  const getSupportTickets = async (loading = true, isLoadingMore = false) => {
+    if (isLoadingMore) {
+      setFooterLoader(index)
+    }
+    else if (loading) {
       setLoader(index)
     }
-    setList([])
+    if (!isLoadingMore) {
+      setList([])
+    }
     let res = await SUPPORT_TCIKETS_LIST_BY_TYPE({
-      page: 0,
+      page: page - 1,
       body: {
         filter_by: routes[index].key
       },
@@ -68,8 +85,21 @@ const TicketsList = ({ navigation }) => {
     })
 
     if (res.code == 200) {
+      page++;
+      console.log(page >= res?.total_pages, page, res?.total_pages, "CHECK")
+      if (page > res?.total_pages) {
+        canLoadMore = false
+      } else {
+        canLoadMore = true
+      }
+      console.log(canLoadMore, "canLoadMore")
       setLoader(-1)
-      setList(res?.support_ticket);
+      setFooterLoader(-1)
+      if (isLoadingMore) {
+        setList([...list, ...res?.support_ticket]);
+      } else {
+        setList(res?.support_ticket);
+      }
       setbadges({
         waiting: !!res?.waiting_ticket_count ? res?.waiting_ticket_count : 0,
         answered: !!res?.answered_ticket_count ? res?.answered_ticket_count : 0,
@@ -82,9 +112,13 @@ const TicketsList = ({ navigation }) => {
         trash: !!res?.trash_ticket_count ? res?.trash_ticket_count : 0,
       })
     } else {
+      setFooterLoader(-1)
       setLoader(-1)
     }
   }
+
+
+
 
   const listOfDepartments = async () => {
     let res = await LIST_OF_DEPARTMENTS({
@@ -96,18 +130,28 @@ const TicketsList = ({ navigation }) => {
     }
   }
 
+
+
   useEffect(() => {
     listOfDepartments()
   }, [])
 
+  const refresh = () => {
+    page = 1;
+    setList([])
+    setLoader(index)
+    debounce(() => getSupportTickets(false, false))
+  }
 
   useEffect(() => {
-    getSupportTickets()
-  }, [index])
-
-  useEffect(() => {
-    debounce(() => getSupportTickets(false))
-  }, [searchText])
+    debounce(() => {
+      page = 1;
+      canLoadMore = false;
+      setList([])
+      setLoader(index)
+      getSupportTickets(false, false)
+    })
+  }, [searchText, index])
 
   const renderTabBar = props => (
     <TabBar
@@ -149,17 +193,20 @@ const TicketsList = ({ navigation }) => {
   }, [searchText])
 
 
-  const renderScene = ({ route, ...props }) => {
+  const renderScene = ({ route }) => {
     return <ListView
       user={user}
-      refresh={getSupportTickets}
+      refresh={refresh}
       token={token}
-      route={route.key}
+      route={route?.key}
       list={index == route.index ? list : []}
       departmentList={depList}
       isLoading={loader == route.index}
       setLoader={setLoader}
-      active={index == route.index} />
+      active={index == route.index}
+      isLoadingMore={footerLoader == route.index}
+      loadMore={loadMore}
+    />
   }
 
 
@@ -178,7 +225,13 @@ const TicketsList = ({ navigation }) => {
         renderTabBar={renderTabBar}
         navigationState={{ index, routes }}
         renderScene={renderScene}
-        onIndexChange={(index) => setIndex(index)}
+        onIndexChange={(index) => {
+          canLoadMore = false
+          page = 0;
+          setIndex(index);
+          setList([])
+          setLoader(index)
+        }}
         initialLayout={{ width: layout.width }}
       />
 

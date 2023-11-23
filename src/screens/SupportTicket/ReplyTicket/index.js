@@ -133,11 +133,20 @@ const TicketReply = ({ navigation, route }) => {
   const HeaderView = () => {
     return (
       <View>
-        {showEditor && EditorView()}
-        <View style={{ paddingVertical: 10 }}>
-          <MyText color={colors.primary} fontSize={16} type='medium' >Upload Images
-            <MyText color={colors.primary} fontSize={12}> (1000x670)</MyText>
-          </MyText>
+        <View style={{
+          marginLeft: "70%",
+          marginBottom: 10
+          //  position: "absolute", bottom: 0, right: 15 
+        }}>
+          <MyButton title={!!msg ? "Update" : 'Send'} invert onPress={btn_send} />
+        </View>
+        <View>
+          {showEditor && EditorView()}
+          <View style={{ paddingVertical: 10 }}>
+            <MyText color={colors.primary} fontSize={16} type='medium' >Upload Images
+              <MyText color={colors.primary} fontSize={12}> (1000x670)</MyText>
+            </MyText>
+          </View>
         </View>
       </View>
     )
@@ -145,6 +154,7 @@ const TicketReply = ({ navigation, route }) => {
 
   return (
     <RootView title='Your Reply' >
+
       <View style={{ flex: 1 }}>
         <KeyboardAwareFlatList
           ListHeaderComponent={HeaderView()}
@@ -203,9 +213,7 @@ const TicketReply = ({ navigation, route }) => {
 
         />
       </View>
-      <View style={{ marginLeft: "70%", position: "absolute", bottom: 0, right: 15 }}>
-        <MyButton title={!!msg ? "Update" : 'Send'} invert onPress={btn_send} />
-      </View>
+
 
 
       <MyLoader enable={loader} />

@@ -118,6 +118,8 @@ const List = ({ navigation, route }) => {
         <FlatList
           data={list}
           renderItem={renderList}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 40 }}
         />
       </View>
 
@@ -168,7 +170,8 @@ const myOptions = [{
 
 const __styles = StyleSheet.create({
   headerView: {
-    flexDirection: "row"
+    flexDirection: "row",
+    marginTop: 10
   },
   closeBtnView: {
     height: 40,

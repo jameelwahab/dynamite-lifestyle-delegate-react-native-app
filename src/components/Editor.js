@@ -198,7 +198,6 @@ const Editor = ({
                   caretColor: colors.white,
                   contentCSSText: `font-family: Verdana`,
                   placeholderColor: colors.placeholder
-
                 }}
                 selectedIconTint={colors.primary}
                 iconTint={colors.primary}

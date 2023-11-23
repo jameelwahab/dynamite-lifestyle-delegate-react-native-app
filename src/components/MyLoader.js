@@ -45,4 +45,19 @@ const MyLoader = ({
   }
 };
 
+const SimpleLoader = () => {
+  return (
+    <LottieView
+      source={require("../assets/animations/loader1.json")}
+      style={{
+        height: 30,
+        width: 30,
+      }}
+      autoPlay
+      loop
+    />
+  )
+}
+
 export default MyLoader;
+export { SimpleLoader }

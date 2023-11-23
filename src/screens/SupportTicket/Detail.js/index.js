@@ -393,7 +393,7 @@ const TicketDetail = ({ navigation, route }) => {
   return (
     <RootView titleView={topView}  >
       <View style={{ flex: 1 }}>
-        {!!ticket && comments.length == 0 && footerView()}
+        {!!ticket && comments.length <= 5 && footerView()}
         <View style={{ flex: 1 }}>
           <FlatList
             ref={flatlistRef}
@@ -404,7 +404,7 @@ const TicketDetail = ({ navigation, route }) => {
             keyExtractor={(item) => item._id}
             showsVerticalScrollIndicator={false}
             ListHeaderComponent={!!ticket && headerView}
-            ListFooterComponent={!!ticket && comments.length > 0 && footerView}
+            ListFooterComponent={!!ticket && comments.length > 5 && footerView}
           />
         </View>
       </View>

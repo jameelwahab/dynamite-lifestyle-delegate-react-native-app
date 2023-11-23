@@ -8,7 +8,7 @@ import Modal from 'react-native-modal'
 import routes from '../../../navigation/routes';
 import { useNavigation } from '@react-navigation/native';
 import { CHANGE_DEPARTMENT_OF_TICKET, MARK_RESOLVE_TICKET, MOVE_TICKET, SUPPORT_TCIKETS_LIST_BY_TYPE } from '../../../DAL';
-import MyLoader from '../../../components/MyLoader';
+import MyLoader, { SimpleLoader } from '../../../components/MyLoader';
 import { useSelector } from 'react-redux';
 import { selectUser } from '../../../redux/reducers/userSlice';
 import { S3_URL } from '../../../utilities/constants';
@@ -23,7 +23,7 @@ import showToast from '../../../functions/showToast';
 import UserImage from '../../../components/UserImage';
 
 
-const ListView = ({ isLoading, list, active, route, departmentList, token, refresh, user, setLoader }) => {
+const ListView = ({ isLoading, list, active, route, departmentList, token, refresh, user, setLoader, isLoadingMore, loadMore, }) => {
   const [isOptionModalShown, setIsOptionModal] = useState({ isVisible: false, for: "" })
   const [isDepartmentModalShown, setIsDepartmentModalShown] = useState(false);
   const [isCalendarModalVisible, setCalendarModalVisiblity] = useState(false);
@@ -32,7 +32,8 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
     title: "",
     for: ""
   })
-  const [isMarkResolveModalVisible, setMarkResolveModalVisiblity] = useState(false)
+  const [isMarkResolveModalVisible, setMarkResolveModalVisiblity] = useState(false);
+  const [resolveNoteModal, setResolveNoteModal] = useState({ isVisible: false, note: "", })
   const [date, setDate] = useState(moment().format("YYYY-MM-DD"))
   const navigation = useNavigation();
 
@@ -121,6 +122,13 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
 
       // });
       // setIsOptionModal({ isVisible: false, for: "" })
+    }
+    else if (option.key == "resolve_note") {
+      setIsOptionModal({ ...isOptionModalShown, isVisible: false, })
+      setTimeout(() => {
+        setResolveNoteModal({ isVisible: true, note: isOptionModalShown?.for?.close_note })
+        setIsOptionModal({ for: "", isVisible: false, })
+      }, 1000);
     }
 
     else {
@@ -447,6 +455,41 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
       </Modal>)
   }
 
+  const ResolveNoteModal = () => {
+    return (
+      <Modal
+        isVisible={resolveNoteModal?.isVisible}
+        onBackdropPress={() => setResolveNoteModal({ isVisible: false, note: "" })}
+        onBackButtonPress={() => setResolveNoteModal({ isVisible: false, note: "" })}
+        useNativeDriverForBackdrop={true}
+        animationIn='zoomIn'
+        animationOut='zoomOut'
+        style={{ margin: 10 }}>
+        <SafeAreaView style={{ backgroundColor: colors.secondaryVariant, borderRadius: 10, }} >
+          <View style={{ margin: 20 }}>
+
+            <View style={{ borderBottomWidth: 1 / 4, borderBottomColor: colors.lightText, paddingBottom: 5 }}>
+              <MyText fontSize={20} type='medium' color={colors.primary}>
+                Note
+              </MyText>
+            </View>
+            <View style={{ marginVertical: 10 }}>
+              <MyText fontSize={14} color={colors.text}>
+                {resolveNoteModal?.note}
+              </MyText>
+            </View>
+
+
+
+            <View style={{ flexDirection: "row", justifyContent: "flex-end", marginTop: 10 }}>
+              <TransparentButton title='CLOSE' onPress={() => setResolveNoteModal({ isVisible: false, note: "" })} />
+            </View>
+
+          </View>
+        </SafeAreaView>
+      </Modal>)
+  }
+
   //? list
 
   const renderList = ({ item, index }) => {
@@ -492,6 +535,7 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
   //? main
   return (
     <View style={{ flex: 1 }}>
+      {ResolveNoteModal()}
       {MarkResolveModal()}
       {optionsModal()}
       {departmentModal()}
@@ -504,6 +548,15 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
           keyExtractor={(item, index) => index.toString()}
           renderItem={renderList}
           ListEmptyComponent={!isLoading && active && <EmptyView />}
+          onEndReached={loadMore}
+          automaticallyAdjustKeyboardInsets={true}
+          ListFooterComponent={() => {
+            return (
+              <View style={{ height: 50, alignItems: "center", justifyContent: "center" }}>
+                {isLoadingMore && <SimpleLoader />}
+              </View>
+            )
+          }}
         />
       </View>
       <MyLoader enable={isLoading} />
@@ -660,5 +713,21 @@ const options = [{
     solved: false,
     trash: false,
   }
-}]
+},
+{
+  title: "Note",
+  key: "resolve_note",
+  icon: icons.threeLinesMenu,
+  routes: {
+    waiting: false,
+    answered: false,
+    need_fixes: false,
+    needs_to_attention: false,
+    reminder: false,
+    ready_to_close: false,
+    solved: true,
+    trash: false,
+  }
+}
+]
 

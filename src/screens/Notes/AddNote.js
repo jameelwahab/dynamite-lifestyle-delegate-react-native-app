@@ -10,6 +10,7 @@ import showToast from '../../functions/showToast'
 import { ADD_NOTES, EDIT_NOTES } from '../../DAL'
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../redux/reducers/userSlice'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 const AddNote = ({ navigation, route }) => {
   const { token } = useSelector(selectUser)
@@ -54,37 +55,38 @@ const AddNote = ({ navigation, route }) => {
 
   return (
     <RootView hideHeader backgroundColor={colors.secondaryVariant}>
-
-      <TouchableOpacity
-        onPress={() => navigation.goBack()}
-        style={__styles.closeBtnView}>
-        {icons.back(colors.primary, 25)}
-      </TouchableOpacity>
-
-
-      <View style={{ flex: 1, marginTop: 15 }}>
-        <Editor
-          initialValue={note}
-          onChange={(text) => setNote(text)}
-        />
-
-        <View style={{ flexDirection: "row", justifyContent: "flex-end", marginTop: 10 }}>
-
-          <MyButton
+      <KeyboardAwareScrollView>
+        <View>
+          <TouchableOpacity
             onPress={() => navigation.goBack()}
-            invert
-            title='Cancel'
-            style={{ paddingHorizontal: 10, marginRight: 10 }} />
+            style={__styles.closeBtnView}>
+            {icons.back(colors.primary, 25)}
+          </TouchableOpacity>
 
-          <MyButton
-            invert
-            title={!!oldNote ? "Update" : 'Save'}
-            onPress={btn_save}
-            style={{ paddingHorizontal: 10, }} />
+
+          <View style={{ flex: 1, marginTop: 15 }}>
+            <Editor
+              initialValue={note}
+              onChange={(text) => setNote(text)}
+            />
+
+            <View style={{ flexDirection: "row", justifyContent: "flex-end", marginTop: 10 }}>
+
+              <MyButton
+                onPress={() => navigation.goBack()}
+                invert
+                title='Cancel'
+                style={{ paddingHorizontal: 10, marginRight: 10 }} />
+
+              <MyButton
+                invert
+                title={!!oldNote ? "Update" : 'Save'}
+                onPress={btn_save}
+                style={{ paddingHorizontal: 10, }} />
+            </View>
+          </View>
         </View>
-      </View>
-
-
+      </KeyboardAwareScrollView>
       <MyLoader enable={loader} />
     </RootView>
   )
@@ -102,6 +104,7 @@ const __styles = StyleSheet.create({
     backgroundColor: colors.lightPrimary2,
     borderRadius: 40 / 2,
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
+    marginTop: 10
   }
 })
