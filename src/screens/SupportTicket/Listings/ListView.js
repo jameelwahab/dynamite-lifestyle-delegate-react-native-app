@@ -494,16 +494,17 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
 
   const renderList = ({ item, index }) => {
     return (
-      <Pressable
+      <TouchableHighlight
         underlayColor={colors.secondary}
-        delayLongPress={Platform.OS == "android" ? 1500 : undefined}
-        onLongPress={() => setIsOptionModal({ isVisible: true, for: item })}
+        delayLongPress={400}
         onPress={() => {
           navigation.navigate(routes.supportTicketDeatail, {
             ticket: item,
             refreshList: refresh
           })
         }}
+        onLongPress={() => setIsOptionModal({ isVisible: true, for: item })}
+
         style={{ padding: 20, flexDirection: "row" }} >
         <>
           <View style={{}}>
@@ -529,7 +530,7 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
               <View style={__styles.badges} />}
           </View>
         </>
-      </Pressable>)
+      </TouchableHighlight>)
   }
 
   //? main

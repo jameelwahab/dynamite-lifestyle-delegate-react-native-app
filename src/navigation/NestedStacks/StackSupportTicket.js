@@ -32,13 +32,13 @@ const StackSupportTicket = () => {
         {/*//? Default Screens End */}
         <SupportTicketStack.Screen name={routes.supportTicketList} component={TicketsList} />
         <SupportTicketStack.Screen name={routes.supportTicketDeatail} component={TicketDetail} />
-        <SupportTicketStack.Screen  name={routes.supportTicketReply} component={TicketReply} />
+        <SupportTicketStack.Screen name={routes.supportTicketReply} component={TicketReply} />
         <SupportTicketStack.Screen name={routes.supportTicketNotes} component={Notes} />
         <SupportTicketStack.Screen name={routes.chat} component={ChatScreen} />
         <SupportTicketStack.Screen name={routes.sendReminderScreen} component={SendReminderScreen} />
 
 
-        <SupportTicketStack.Group screenOptions={{ presentation: "modal" }} >
+        <SupportTicketStack.Group screenOptions={{ presentation: "modal", animation: "slide_from_bottom" }} >
           <SupportTicketStack.Screen name={routes.addNote} component={AddNote} />
           <SupportTicketStack.Screen name={routes.notesListing} component={NotesList} />
         </SupportTicketStack.Group>

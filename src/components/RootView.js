@@ -21,7 +21,7 @@ const RootView = ({
 }) => {
   return (
     <SafeAreaView style={[__RootView.root, !!backgroundColor && { backgroundColor }]}>
-      <StatusBar backgroundColor={colors.darkSecondary} barStyle={"light-content"} />
+      <StatusBar backgroundColor={!!backgroundColor ? backgroundColor : colors.darkSecondary} barStyle={"light-content"} />
       {!hideHeader &&
         <Header
           title={title}
