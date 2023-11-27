@@ -51,6 +51,7 @@ const TicketReply = ({ navigation, route }) => {
   const EditorView = useCallback(() => {
     return (
       <Editor
+        height={150}
         autoResonderMsgs={route?.params?.autoResonderMsgs}
         initialValue={content}
         onChange={(text) => setContent(text)}
@@ -154,7 +155,6 @@ const TicketReply = ({ navigation, route }) => {
 
   return (
     <RootView title='Your Reply' >
-
       <View style={{ flex: 1 }}>
         <KeyboardAwareFlatList
           ListHeaderComponent={HeaderView()}

@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>Mission&#x0020;Control&#x0020;100</string>
+	<string>Mission&#x2002;Control&#x2002;100</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -41,9 +41,9 @@
 	<string></string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Delegate want to access to your microphone</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Delegate want to access to your photos</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Delegate want to access to your photos</string>
+	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Delegate want to access to your photos</string>
 	<key>UIAppFonts</key>
 	<array>

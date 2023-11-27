@@ -11,8 +11,8 @@ import { ADD_NOTES, EDIT_NOTES } from '../../DAL'
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../redux/reducers/userSlice'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-
 const AddNote = ({ navigation, route }) => {
+  
   const { token } = useSelector(selectUser)
   const oldNote = route?.params?.note;
   const [note, setNote] = useState(!!oldNote ? oldNote?.internal_note : "");
@@ -54,7 +54,7 @@ const AddNote = ({ navigation, route }) => {
 
 
   return (
-    <RootView hideHeader backgroundColor={colors.secondaryVariant}>
+    <RootView hideHeader>
       <KeyboardAwareScrollView>
         <View>
           <TouchableOpacity
@@ -67,6 +67,7 @@ const AddNote = ({ navigation, route }) => {
           <View style={{ flex: 1, marginTop: 15 }}>
             <Editor
               initialValue={note}
+              height={150}
               onChange={(text) => setNote(text)}
             />
 

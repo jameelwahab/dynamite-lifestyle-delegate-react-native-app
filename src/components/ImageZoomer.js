@@ -4,13 +4,20 @@ import {
   Image,
   Dimensions,
   ActivityIndicator,
+  Text,
+  SafeAreaView,
+  Platform,
+  StyleSheet,
 } from 'react-native';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import Modal from 'react-native-modal';
 import { S3_URL } from '../utilities/constants';
 import { icons } from '../utilities/icons';
 import { colors } from '../utilities/colors';
+import { SimpleLoader } from './MyLoader';
+import List from '../screens/Notes/List';
+import MyText from './MyText';
 
 const ImageZoomer = ({
   visible,
@@ -21,6 +28,12 @@ const ImageZoomer = ({
   url,
   noUrl = false,
 }) => {
+  const [curIndex, setIndex] = useState(0);
+  useEffect(() => {
+    setIndex(index)
+  }, [index])
+
+
   return (
     <Modal
       isVisible={visible}
@@ -38,51 +51,42 @@ const ImageZoomer = ({
           flex: 1,
           alignItems: 'center',
           backgroundColor: !!color ? color : colors.secondary,
-          // backgroundColor:"#000000DD",
           justifyContent: 'center',
+
         }}>
-        <Pressable
-          onPress={() => closeModal()}
-          style={{
-            top: Platform.OS == 'ios' ? 50 : 10,
-            right: Platform.OS == 'ios' ? 10 : 10,
-            position: 'absolute',
-            zIndex: 999,
-          }}>
-          <View
-            style={{
-              height: 40,
-              width: 40,
-              borderRadius: 50,
-              backgroundColor: colors.black,
-              justifyContent: 'center',
-              alignItems: 'center',
-              shadowColor: '#000',
-              shadowOffset: {
-                width: 0,
-                height: 2,
-              },
-              shadowOpacity: 0.25,
-              shadowRadius: 3.84,
-              elevation: 5,
-            }}>
-            {icons.crosssWithCircle()}
-          </View>
-        </Pressable>
+        <View style={__styles.buttonRootView} >
+          <View/>
+          {/* <Pressable
+            onPress={() => closeModal()}>
+            <View style={__styles.buttonView}>
+              {icons.download(colors.white, 20)}
+            </View>
+          </Pressable> */}
+          <Pressable
+            onPress={() => closeModal()}>
+            <View style={__styles.buttonView}>
+              {icons.crosssWithCircle()}
+            </View>
+          </Pressable>
+        </View>
         {!!visible && (
-          <View style={{ flex: 1, justifyContent: 'center' }}>
+          <View style={{ flex: 1 }}>
+            {!!List &&
+              <View style={{ position: "absolute", bottom: Platform.OS == "ios" ? 30 : 0, alignItems: "center", left: 0, right: 0 }}>
+                <MyText fontSize={18} color={colors.white} >{(curIndex + 1) + "/" + list.length}</MyText>
+              </View>
+            }
             <ImageViewer
               style={{
                 width: Dimensions.get('screen').width,
-                // width:200,
-                // height:200
-                // aspectRatio: 1,
               }}
               // doubleClickInterval={1}
               backgroundColor={'transparent'}
               loadingRender={() => (
-                <ActivityIndicator color={colors.golden} size={'large'} />
+                // <ActivityIndicator color={colors.golden} size={'large'} />
+                <SimpleLoader />
               )}
+              onChange={(index) => setIndex(index)}
               saveToLocalByLongPress={false}
               imageUrls={!!list ?
                 list.map(x => ({ url: S3_URL + x?.thumbnail_1 })) :
@@ -92,6 +96,8 @@ const ImageZoomer = ({
               index={!!index ? index : 0}
               useNativeDriver={true}
               renderIndicator={() => <></>}
+            // renderArrowLeft={(!!list && curIndex != 0) ? () => icons.backwardArrow(30, colors.white) : undefined}
+            // renderArrowRight={(!!list && curIndex != list.length - 1) ? () => icons.forwardArrow(30, colors.white) : undefined}
             />
 
             {/* <CustomImage
@@ -107,3 +113,35 @@ const ImageZoomer = ({
 };
 
 export default ImageZoomer;
+
+
+const __styles = StyleSheet.create({
+  buttonRootView: {
+    top: Platform.OS == 'ios' ? 50 : 10,
+    left: 10,
+    right: 10,
+    // right: Platform.OS == 'ios' ? 10 : 10,
+    position: 'absolute',
+    zIndex: 999,
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "space-between"
+
+  },
+  buttonView: {
+    height: 40,
+    width: 40,
+    borderRadius: 40/2,
+    backgroundColor: colors.black,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  }
+})

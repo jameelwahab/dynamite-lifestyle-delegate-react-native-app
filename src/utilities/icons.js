@@ -28,7 +28,8 @@ export const icons = {
   copy: () => { return (<Ionicons name="copy" color={colors.primary} size={17} />) },
   lock: () => { return (<Fontisto name="locked" color={colors.primary} size={17} />) },
   gear: () => { return (<Ionicons name="settings" color={colors.primary} size={17} />) },
-  forwardArrow: () => { return (<Ionicons name="chevron-forward" color={colors.primary} size={20} />) },
+  forwardArrow: (size = 20, color = colors.primary) => { return (<Ionicons name="chevron-forward" color={color} size={size} />) },
+  backwardArrow: (size = 20, color = colors.primary) => { return (<Ionicons name="chevron-back" color={color} size={size} />) },
   image: () => { return (<Ionicons name="image" color={colors.primary} size={25} />) },
   images: () => { return (<Ionicons name="images" color={colors.primary} size={20} />) },
   camera: () => { return (<Fontisto name="camera" color={colors.primary} size={17} />) },
@@ -40,7 +41,7 @@ export const icons = {
   search: () => { return (<Feather name="search" color={colors.white} size={17} />) },
   down: () => { return (<Ionicons name="caret-down" color={colors.white} size={17} />) },
   threeDots: () => { return (<Entypo name="dots-three-vertical" color={colors.primary} size={12} />) },
-  download: () => { return (<Feather name="download" color={colors.primary} size={17} />) },
+  download: (color = colors.primary, size = 17) => { return (<Feather name="download" color={color} size={size} />) },
   edit: () => { return (<Feather name="edit" color={colors.primary} size={17} />) },
   trash: () => { return (<Feather name="trash" color={colors.primary} size={17} />) },
   trashFilled: () => { return (<Fontisto name="trash" color={colors.primary} size={17} />) },
@@ -50,5 +51,8 @@ export const icons = {
   minusCircle: () => { return (<Feather name="minus-circle" color={colors.primary} size={25} />) },
   plusCircle: () => { return (<Feather name="plus-circle" color={colors.primary} size={25} />) },
   back: (color = colors.white, size = 20) => { return (<MaterialIcons name="arrow-back" color={color} size={size} />) },
+  info: (color = colors.white, size = 20) => { return (<FontAwesome6 name="info" color={color} size={size} />) },
+  upward: (color = colors.white, size = 20) => { return (<Ionicons name="caret-up" color={color} size={size} />) },
+  downward: (color = colors.white, size = 20) => { return (<Ionicons name="caret-down" color={color} size={size} />) },
 
 }

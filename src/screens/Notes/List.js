@@ -15,18 +15,19 @@ import UserImage from '../../components/UserImage'
 import moment from 'moment'
 import OptionModal from '../../components/OptionModal'
 import ConfirmationModal from '../../components/ConfirmationModal'
-
-const List = ({ navigation, route }) => {
-  const { ticketId, user } = route?.params;
+import { useNavigation } from '@react-navigation/native'
+const List = ({ ticket, user, }) => {
+  const navigation = useNavigation()
   const { token } = useSelector(selectUser);
-  const [loader, setLoader] = useState(true)
+  const [loader, setLoader] = useState(false)
+
   const [list, setList] = useState([])
   const [optionModal, setOptionModal] = useState({ isVisible: false, for: "" })
   const [confirmationModal, setConfirmationModal] = useState({ isVisible: false, title: "" })
 
 
   const getNotesList = async () => {
-    let res = await LIST_OF_NOTES({ token, navigation, id: ticketId });
+    let res = await LIST_OF_NOTES({ token, navigation, id: ticket?._id });
     setLoader(false)
     if (res.code == 200) {
       setList(res?.support_ticket?.internal_note)
@@ -36,7 +37,7 @@ const List = ({ navigation, route }) => {
   const optionsAction = (opt) => {
     if (opt.type == "edit") {
       navigation.navigate(routes.addNote, {
-        ticketId,
+        ticketId: ticket?._id,
         refresh: getNotesList,
         note: optionModal?.for
       });
@@ -51,7 +52,7 @@ const List = ({ navigation, route }) => {
 
   const deleteNote = async (noteId) => {
     setLoader(true);
-    let res = await DELETE_NOTES({ token, navigation, ticketId, noteId });
+    let res = await DELETE_NOTES({ token, navigation, ticketId: ticket?._id, noteId });
     if (res.code == 200) {
       getNotesList()
     } else {
@@ -61,8 +62,11 @@ const List = ({ navigation, route }) => {
   }
 
   useEffect(() => {
-    getNotesList()
-  }, [])
+    if (!!ticket) {
+      setList(ticket?.internal_note)
+    }
+    // getNotesList()
+  }, [ticket])
 
   const renderList = ({ item, index }) => {
     return (
@@ -99,8 +103,9 @@ const List = ({ navigation, route }) => {
   }
 
   return (
-    <RootView hideHeader backgroundColor={colors.secondaryVariant}>
-      <View style={__styles.headerView}>
+    <RootView hideHeader >
+      <View style={{ flex: 1, marginHorizontal: -10 }}>
+        {/* <View style={__styles.headerView}>
         <TouchableOpacity
           onPress={() => navigation.goBack()}
           style={__styles.closeBtnView}>
@@ -112,44 +117,45 @@ const List = ({ navigation, route }) => {
             {`${user?.name} (${user?.email})`}
           </MyText>
         </View>
-      </View>
+      </View> */}
 
-      <View style={{ flex: 1, marginTop: 10 }}>
-        <FlatList
-          data={list}
-          renderItem={renderList}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 40 }}
+        <View style={{ flex: 1, marginTop: 10, }}>
+          <FlatList
+            data={list}
+            renderItem={renderList}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 70 }}
+          />
+        </View>
+
+
+
+        <MyLoader enable={loader} />
+        <FAB
+          onPress={() =>
+            navigation.navigate(routes.addNote, {
+              ticketId: ticket?._id,
+              refresh: getNotesList
+            })}
+          icon={() => icons.plus(colors.black, 20)}
+        />
+        <OptionModal
+          closeModal={() => setOptionModal({ isVisible: false, for: "" })}
+          isVisible={optionModal?.isVisible}
+          optionList={myOptions}
+          onSelected={optionsAction}
+        />
+        <ConfirmationModal
+          isVisible={confirmationModal.isVisible}
+          title={confirmationModal.title}
+          closeModal={() => setConfirmationModal({ isVisible: false, title: "" })}
+          onAgree={() => {
+            setConfirmationModal({ isVisible: false, title: "" })
+            deleteNote(optionModal.for?._id);
+            setOptionModal({ isVisible: false, for: "" })
+          }}
         />
       </View>
-
-
-
-      <MyLoader enable={loader} />
-      <FAB
-        onPress={() =>
-          navigation.navigate(routes.addNote, {
-            ticketId,
-            refresh: getNotesList
-          })}
-        icon={() => icons.plus(colors.black, 20)}
-      />
-      <OptionModal
-        closeModal={() => setOptionModal({ isVisible: false, for: "" })}
-        isVisible={optionModal?.isVisible}
-        optionList={myOptions}
-        onSelected={optionsAction}
-      />
-      <ConfirmationModal
-        isVisible={confirmationModal.isVisible}
-        title={confirmationModal.title}
-        closeModal={() => setConfirmationModal({ isVisible: false, title: "" })}
-        onAgree={() => {
-          setConfirmationModal({ isVisible: false, title: "" })
-          deleteNote(optionModal.for?._id);
-          setOptionModal({ isVisible: false, for: "" })
-        }}
-      />
     </RootView>
   )
 }
@@ -182,8 +188,9 @@ const __styles = StyleSheet.create({
     justifyContent: "center"
   },
   itemRootView: {
-    borderColor: colors.primary,
-    borderWidth: 1 / 3,
+    // borderColor: colors.primary,
+    // borderWidth: 1 / 3,
+    backgroundColor: colors.secondary,
     borderRadius: 10,
     padding: 10,
     marginBottom: 10

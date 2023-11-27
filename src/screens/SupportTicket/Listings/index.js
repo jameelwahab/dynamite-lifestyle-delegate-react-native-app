@@ -1,4 +1,4 @@
-import { Text, View, useWindowDimensions, StyleSheet } from 'react-native'
+import { Text, View, useWindowDimensions, StyleSheet, Keyboard } from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react'
 import RootView from '../../../components/RootView'
 import { icons } from '../../../utilities/icons'
@@ -25,7 +25,7 @@ let canLoadMore = false;
 
 const TicketsList = ({ navigation }) => {
   const layout = useWindowDimensions();
-  const { token, user } = useSelector(selectUser)
+  const { token, user } = useSelector(selectUser);
   const [index, setIndex] = React.useState(0);
   const [loader, setLoader] = React.useState(0);
   const [footerLoader, setFooterLoader] = React.useState(-1);
@@ -153,6 +153,30 @@ const TicketsList = ({ navigation }) => {
     })
   }, [searchText, index])
 
+
+
+
+  const searchView = useCallback(() => {
+    return (
+      <View style={{ marginHorizontal: 10, backgroundColor: colors.darkSecondary }}>
+        <MyInputs
+
+          leftIcon={icons.search}
+          placeholder='Search...'
+          value={searchText}
+          onChangeText={(text) => setSearchText(text)}
+          rightIcon={!!searchText.trim() ? icons.crosssWithCircle_20 : icons.noIcon}
+          rightIconOnPress={() => {
+            Keyboard.dismiss()
+            setSearchText("")
+          }}
+        />
+      </View>
+    )
+  }, [searchText])
+
+
+
   const renderTabBar = props => (
     <TabBar
       {...props}
@@ -174,24 +198,6 @@ const TicketsList = ({ navigation }) => {
       gap={10}
     />
   );
-
-
-  const searchView = useCallback(() => {
-    return (
-      <View style={{ marginHorizontal: 10, backgroundColor: colors.darkSecondary }}>
-        <MyInputs
-
-          leftIcon={icons.search}
-          placeholder='Search...'
-          value={searchText}
-          onChangeText={(text) => setSearchText(text)}
-          rightIcon={!!searchText.trim() ? icons.crosssWithCircle_20 : icons.noIcon}
-          rightIconOnPress={() => setSearchText("")}
-        />
-      </View>
-    )
-  }, [searchText])
-
 
   const renderScene = ({ route }) => {
     return <ListView

@@ -519,11 +519,11 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = ZMHT686M4P;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = delegateApp/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Mission Control";
+				INFOPLIST_KEY_CFBundleDisplayName = "Mission&#x2007;Control&#x2007;100";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -556,10 +556,10 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = ZMHT686M4P;
 				INFOPLIST_FILE = delegateApp/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Mission Control";
+				INFOPLIST_KEY_CFBundleDisplayName = "Mission&#x2007;Control&#x2007;100";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

@@ -1,140 +1,50 @@
-import { View, Text, FlatList, Image, Pressable, TouchableHighlight, Alert, SafeAreaView } from 'react-native'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { View, Text, useWindowDimensions, SafeAreaView, TouchableOpacity, StyleSheet, TouchableHighlight } from 'react-native'
+import React, { useState, useEffect } from 'react'
 import RootView from '../../../components/RootView'
-import MyText from '../../../components/MyText'
-import { icons } from '../../../utilities/icons'
-import { colors } from '../../../utilities/colors'
-import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler'
-import OptionModal from '../../../components/OptionModal'
-import { CALLBACK_TYPE } from 'react-native-gesture-handler/lib/typescript/handlers/gestures/gesture'
-import { MyButton, TransparentButton } from '../../../components/MyButton'
-import routes from '../../../navigation/routes'
-import Collapsible from 'react-native-collapsible';
-import { fonts } from '../../../utilities/fonts'
-import { useSelector } from 'react-redux'
-import { selectUser } from '../../../redux/reducers/userSlice'
-import MyLoader from '../../../components/MyLoader'
-import { DELETE_TICKET_COMMENT, MARK_RESOLVE_TICKET, SUPPORT_TCIKET_DETAIL } from '../../../DAL'
-import UserImage from '../../../components/UserImage'
-import moment from 'moment'
-import MyWebview, { MyWebView4 } from '../../../components/MyWebview'
-import { S3_URL } from '../../../utilities/constants'
-import downloadImage from '../../../functions/downloadImage'
-import ImageZoomer from '../../../components/ImageZoomer'
-import showToast from '../../../functions/showToast'
-import MyImage from '../../../components/MyImage'
+import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
+import { colors } from '../../../utilities/colors';
+import MyText from '../../../components/MyText';
+import Comments from './Comments';
+import InformationsCard from './InformationsCard';
+import { MARK_RESOLVE_TICKET, SUPPORT_TCIKET_DETAIL } from '../../../DAL';
+import { useSelector } from 'react-redux';
+import { selectUser } from '../../../redux/reducers/userSlice';
+import MyLoader from '../../../components/MyLoader';
+import AddNote from '../../Notes/AddNote';
+import Notes from '../Notes';
+import List from '../../Notes/List';
 import Modal from 'react-native-modal'
-import MyInputs from '../../../components/MyInputs'
-import Toast from 'react-native-toast-message'
+import MyInputs from '../../../components/MyInputs';
+import { TransparentButton } from '../../../components/MyButton';
+import Toast from 'react-native-toast-message';
+import showToast from '../../../functions/showToast';
+import UserImage from '../../../components/UserImage';
+import moment from 'moment';
+import Collapsible from 'react-native-collapsible';
+import { icons } from '../../../utilities/icons';
 
 let autoMessages = [];
-const TicketDetail = ({ navigation, route }) => {
-  const flatlistRef = useRef();
+const Detail = ({ navigation, route }) => {
+  const { token, user } = useSelector(selectUser);
+  const layout = useWindowDimensions();
+  const [index, setIndex] = useState(0);
+  const [loader, setLoader] = useState(true);
+  const [comments, setComments] = useState([]);
   const { _id } = route?.params?.ticket;
   const [ticket, setTicket] = useState(null);
-  const [comments, setComments] = useState([]);
-  const { token, user } = useSelector(selectUser);
-  const [loader, setLoader] = useState(true);
-  const [msgOptionModal, setMsgOptionModal] = useState({ isVisible: false, selectedItem: null })
-  const [isOptionModalVisible, setIsOptionModalVisible] = useState(false)
-  const [modalImage, setModalImage] = useState("")
   const [isMarkResolveModalVisible, setMarkResolveModalVisiblity] = useState(false);
-  const [modalListImages, setModalListImages] = useState({ index: -1, list: [] });
+  const [isInfoViewCollaspsed, setIsInfoViewCollaspsed] = useState(false)
+  const [routes] = React.useState([
+    { key: 'ticket', title: 'Ticket', index: 0 },
+    { key: 'comments', title: 'Comments', index: 1 },
+    { key: 'notes', title: 'Internal Notes', index: 2 },
+  ]);
 
-
-
-  const api_ticketDetail = async () => {
-    let res = await SUPPORT_TCIKET_DETAIL({
-      token, navigation,
-      ticketId: _id
-    });
-    if (res.code == 200) {
-      autoMessages = res.auto_responder_message;
-      setLoader(false)
-      setTicket(res?.support_ticket)
-      setComments(res?.support_ticket?.comment.reverse())
-    } else {
-      setLoader(false)
-    }
-  }
-
-  const addMessage = (msg) => {
-    comments.unshift(msg);
-    setComments([...comments]);
-    // flatlistRef?.current?.scrollToIndex({ index: 0, animated: true })
-  }
-
-  const updateMsg = (msg) => {
-    console.log(msg, "updateMsg")
-    let index = comments.findIndex(x => x._id === msg._id);
-    if (index > -1) {
-      comments.splice(index, 1);
-      setComments([...comments]);
-    }
-  }
-
-  const actionOfMsgOptions = (selectedOpt) => {
-    if (selectedOpt.type == "delete") {
-      deleteMessage(msgOptionModal.selectedItem);
-      setMsgOptionModal({ isVisible: false, selectedItem: null })
-    } else if (selectedOpt.type == "edit") {
-      navigation.navigate(routes.supportTicketReply, {
-        autoResonderMsgs: autoMessages,
-        ticketId: ticket?._id,
-        msg: msgOptionModal.selectedItem,
-
-        updateMsg
-      });
-      setMsgOptionModal({ isVisible: false, selectedItem: null })
-    }
-  }
-
-  const deleteMessage = (msg) => {
-    const api_deleteMessage = async () => {
-      let res = await DELETE_TICKET_COMMENT({ token, navigation, commentId: msg._id });
-      if (res.code == 200) {
-        showToast({ title: res.message, type: "success" })
-        let index = comments.findIndex(x => x._id === msg._id);
-        if (index > -1) {
-          comments.splice(index, 1);
-          setComments([...comments]);
-        }
-      }
-    }
-
-    Alert.alert("Are you sure you want to delete this message?", "", [
-      { text: "No" },
-      { text: "Yes", onPress: api_deleteMessage }
-    ]);
-
-
-  }
-
-  const onNotesScreen = () => {
-    navigation.navigate(routes.notesListing, {
-      ticketId: ticket?._id,
-      user: {
-        name: ticket?.member?.first_name + " " + ticket?.member?.last_name,
-        email: ticket?.member?.email
-      }
-    })
-  }
-
-  const ticketAction = (item) => {
-    if (item.key == "mark_resolve") {
-      setIsOptionModalVisible(false)
-      setTimeout(() => {
-        setMarkResolveModalVisiblity(true)
-      }, 1000);
-    }
-  }
 
   useEffect(() => {
     autoMessages = [];
     api_ticketDetail()
   }, []);
-
-
 
 
   const moveToMarkResolve = async (reason, note) => {
@@ -236,231 +146,190 @@ const TicketDetail = ({ navigation, route }) => {
       </Modal>)
   }
 
-
-
-  const renderMsg = useCallback(({ item, index }) => {
-    return (
-      <View style={{ padding: 10, marginBottom: 10, }}>
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <UserImage
-            image={item?.action_user_info?.profile_image}
-            name={item?.action_user_info?.action_name}
-          />
-          <View style={{ marginLeft: 10, flex: 1 }}>
-            <MyText type='medium'  >{item?.action_user_info?.action_name}</MyText>
-            <MyText fontSize={10} color={colors.lightText} type='medium' >{moment(item.updatedAt).fromNow()}</MyText>
-          </View>
-          {item?.action_user_info?.action_id == user?._id &&
-            <TouchableHighlight
-              underlayColor={colors.secondary}
-              onPress={() => setMsgOptionModal({ isVisible: true, selectedItem: item })}
-              style={{ height: 35, width: 35, alignItems: "center", justifyContent: "center", borderRadius: 35 / 2 }}>
-              {icons.threeDots()}
-            </TouchableHighlight>}
-        </View>
-
-        <View style={{ marginTop: 10 }}>
-          <MyWebview
-            html={item?.message}
-          />
-        </View>
-
-
-        <View style={{ marginTop: 10 }}>
-          {!!item?.comment_image && item?.comment_image.map((x, i) => (
-            <View
-
-              key={x?.thumbnail_1}
-              style={{ backgroundColor: colors.secondaryVariant, height: 200, borderRadius: 10, overflow: "hidden", marginBottom: 15 }}>
-              <Pressable onPress={() => setModalImage(x?.thumbnail_1)}>
-                <Image source={{ uri: S3_URL + x?.thumbnail_1 }} style={{ height: 150, width: "100%" }} />
-              </Pressable>
-              <View style={{ flex: 1, flexDirection: "row", justifyContent: "space-between" }}>
-                <View style={{ height: "100%", aspectRatio: 1, alignItems: "center", justifyContent: "center" }}>
-                  <Image opacity={0.7} source={icons.photo} style={{ height: 25, width: 25 }} />
-                </View>
-
-                <View style={{ height: "100%", aspectRatio: 1, alignItems: "center", justifyContent: "center" }}>
-                  <TouchableOpacity
-                    onPress={() => downloadImage(S3_URL + x?.thumbnail_1)}
-                    style={{ height: 35, width: 35, alignItems: "center", justifyContent: "center", backgroundColor: colors.lightPrimary3, borderRadius: 35 / 2 }}>
-                    {icons.download()}
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </View>
-          ))}
-        </View>
-      </View>
-    )
-
-  }, [JSON.stringify(comments)])
-
-  const footerView = () => {
-    return (
-      <View>
-        <View style={{ marginBottom: 10 }}>
-          <MyButton
-            invert
-            textStyle={{ fontFamily: fonts.regular, textTransform: "capitalize" }}
-            onPress={onNotesScreen}
-            title={`Internal Notes${ticket?.internal_note?.length > 0 ? " (" + ticket?.internal_note?.length + ")" : ""}`} />
-        </View>
-
-        <View style={{ marginBottom: 10, backgroundColor: colors.secondary, padding: 10, borderRadius: 10 }}>
-
-          {!!ticket?.subject &&
-            <MyText type='medium' fontSize={18} color={colors.primary}>
-              {ticket?.subject}
-            </MyText>}
-
-          {!!ticket?.description &&
-            <View style={{ marginTop: 5 }}>
-              <MyText type='medium' fontSize={12} color={colors.lightText2}>
-                {ticket?.description}
-              </MyText>
-            </View>}
-          {!!ticket?.ticket_images && ticket?.ticket_images.length > 0 &&
-            <View style={{ flexDirection: "row", flexWrap: "wrap", height: 100 }}>
-              <ScrollView horizontal >
-                {ticket?.ticket_images.map((x, i) => (
-                  <View style={{ height: 100, aspectRatio: 1, }}>
-                    <Pressable
-                      onPress={() => setModalListImages({ list: ticket?.ticket_images, index: i })}
-                      style={{ margin: 5, borderRadius: 10, overflow: "hidden" }}>
-                      <MyImage
-                        source={{ uri: S3_URL + x.thumbnail_1 }}
-                        style={{ height: "100%", width: "100%" }}
-                      />
-                    </Pressable>
-                  </View>
-                ))}
-              </ScrollView>
-            </View>
-          }
-          <View style={{ marginTop: 5 }}>
-            <MyText fontSize={12} color={colors.primary}>
-              {"Created Date : "}<Text style={{ color: colors.lightText2 }} > {moment(ticket?.createdAt).format("DD-MM-YYYY hh:mm A")}</Text>
-            </MyText>
-            <MyText fontSize={12} color={colors.primary}>
-              {"Responded Time : "}<Text style={{ color: colors.lightText2 }}>  {moment(ticket?.updatedAt).format("DD-MM-YYYY hh:mm A")}</Text>
-            </MyText>
-          </View>
-        </View>
-      </View>
-    )
+  const openMarkResolveModal = () => {
+    setMarkResolveModalVisiblity(true)
   }
 
-  const headerView = () => {
-    return (
-      <View style={{ marginHorizontal: 50 }}>
-        <MyButton
-          onPress={() =>
-            navigation.navigate(routes.supportTicketReply, {
-              autoResonderMsgs: autoMessages,
-              ticketId: ticket?._id,
-              addMessage
-            })}
-          style={{ borderRadius: 100 }}
-          textStyle={{}}
-          leftIcon={icons.reply}
-          title='Reply'
-          invert={true} />
-      </View>
-    )
+
+  const addMessage = (msg) => {
+    comments.unshift(msg);
+    setComments([...comments]);
+    // flatlistRef?.current?.scrollToIndex({ index: 0, animated: true })
   }
 
-  const topView = () => {
+  const api_ticketDetail = async () => {
+    let res = await SUPPORT_TCIKET_DETAIL({
+      token, navigation,
+      ticketId: _id
+    });
+    if (res.code == 200) {
+      autoMessages = res.auto_responder_message;
+      setLoader(false)
+      setTicket(res?.support_ticket)
+      setComments(res?.support_ticket?.comment.reverse())
+    } else {
+      setLoader(false)
+    }
+  }
+
+  const renderTabBar = props => (
+    <TabBar
+      {...props}
+      indicatorStyle={{ backgroundColor: colors.primary }}
+      style={{
+        backgroundColor: colors.darkSecondary,
+        shadowColor: colors.lightText2,
+        shadowOffset: {
+          width: 0,
+          height: 1,
+        },
+        shadowOpacity: 0.20,
+        shadowRadius: 1.41,
+      }}
+      renderLabel={({ route, focused, color }) => (
+        <>
+          <MyText color={focused ? colors.primary : colors.lightText} type='medium' >
+            {route.title
+              // + " (" + badges[route?.key] + ")"
+            }
+          </MyText>
+          {/* {((route?.key == 'need_fixes' && badges['need_to_fixed_dot'] > 0) ||
+            user?.notify_tab == route?.key) &&
+            <View style={__styles.badges} />
+          } */}
+        </>
+      )}
+    />
+  );
+
+  const renderScene = ({ route }) => {
+    switch (route.key) {
+      case 'ticket':
+        return <InformationsCard
+          moveToMarkResolve={openMarkResolveModal}
+          ticket={ticket}
+          user={user} />
+
+      case 'comments':
+        return <Comments
+          commentsList={comments}
+          ticket={ticket}
+          user={user}
+          autoMessages={autoMessages}
+          addMessage={addMessage} />
+
+      case 'notes':
+        return <List ticket={ticket} user={user} />
+
+    }
+  }
+
+
+  const renderTopView = () => {
     if (!!ticket) {
       return (
-        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 10 }}>
-          <View style={{ flex: 1 }}>
-            <MyText>{`${ticket?.member?.first_name} ${ticket?.member?.last_name} (${ticket?.member?.email})`}</MyText>
+        <View
+          style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 10, marginTop: 10, position: "absolute", top: -65, left: 25, right: -10, zIndex: 2 }}>
+          <UserImage
+            image={ticket?.member?.profile_image}
+            name={ticket?.member?.first_name}
+            size={35}
+          />
+          <View style={{ flex: 1, marginLeft: 10 }}>
+            <MyText fontSize={16} >{`${ticket?.member?.first_name} ${ticket?.member?.last_name}`}</MyText>
+            <MyText fontSize={12}>{ticket?.member?.email}</MyText>
           </View>
-          <TouchableOpacity
-            onPress={() => setIsOptionModalVisible(true)}
-            style={{ height: 30, width: 30, borderRadius: 30 / 2, backgroundColor: colors.lightPrimary3, alignItems: "center", justifyContent: "center" }}>
-            {icons.threeDots()}
-          </TouchableOpacity>
+
+
+          <TouchableHighlight
+            onPress={() => setIsInfoViewCollaspsed(!isInfoViewCollaspsed)}
+            underlayColor={colors.lightPrimary2}
+            style={{ width: 35, height: 35, borderRadius: 35 / 2, backgroundColor: colors.secondaryVariant, alignItems: "center", justifyContent: "center", paddingBottom: 5, paddingLeft: 5 }}
+          >
+            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", }}>
+              <View style={{ alignItems: "center" }}>
+                {icons.info(colors.white, 15)}
+              </View>
+              <View style={{ marginLeft: 2, marginTop: 3 }}>
+                {isInfoViewCollaspsed ? icons.downward(colors.white, 10) : icons.upward(colors.white, 10)}
+              </View>
+            </View>
+          </TouchableHighlight>
         </View>
       )
     }
   }
 
+  const infoView = () => {
+    if (!!ticket) {
+      return (
+        <Collapsible
+          collapsed={isInfoViewCollaspsed}
+          style={__styles.cardView}>
+          <View style={__styles.cardItemView}>
+            <MyText fontSize={12}>Department</MyText>
+            <MyText fontSize={12}>{ticket?.department_info?.title}</MyText>
+          </View>
 
+          <View style={__styles.cardItemView}>
+            <MyText fontSize={12}>Created at :</MyText>
+            <MyText fontSize={12}>{moment(ticket?.createdAt).format("DD MMM YYYY [at] hh:mm A")}</MyText>
+          </View>
+          <View style={__styles.cardItemView}>
+            <MyText fontSize={12}>Responded on:</MyText>
+            <MyText fontSize={12}>{moment(ticket?.updatedAt).format("DD MMM YYYY [at] hh:mm A")}</MyText>
+          </View>
 
+        </Collapsible >
+      )
+    }
+  }
 
   return (
-    <RootView titleView={topView}  >
+    <RootView  >
+
       <View style={{ flex: 1 }}>
-        {!!ticket && comments.length <= 5 && footerView()}
+        {renderTopView()}
+        {infoView()}
         <View style={{ flex: 1 }}>
-          <FlatList
-            ref={flatlistRef}
-            contentContainerStyle={{ paddingVertical: 20 }}
-            inverted={true}
-            data={comments}
-            renderItem={renderMsg}
-            keyExtractor={(item) => item._id}
-            showsVerticalScrollIndicator={false}
-            ListHeaderComponent={!!ticket && headerView}
-            ListFooterComponent={!!ticket && comments.length > 5 && footerView}
-          />
+
+          {!!ticket &&
+
+            <TabView
+              renderTabBar={renderTabBar}
+              navigationState={{ index, routes }}
+              renderScene={renderScene}
+              onIndexChange={(index) => {
+                setIndex(index);
+              }}
+              initialLayout={{ width: layout.width }}
+            />}
         </View>
       </View>
       <MyLoader enable={loader} />
-
-      <OptionModal
-        optionList={msgOptionList}
-        closeModal={() => setMsgOptionModal({ isVisible: false, selectedItem: null })}
-        onSelected={(opt) => actionOfMsgOptions(opt)}
-        isVisible={msgOptionModal?.isVisible} />
-
-      <OptionModal
-        optionList={OptionList}
-        closeModal={() => setIsOptionModalVisible(false)}
-        onSelected={ticketAction}
-        isVisible={isOptionModalVisible} />
-
-      <ImageZoomer
-        closeModal={() => setModalImage("")}
-        visible={modalImage}
-        url={modalImage}
-
-      />
-      <ImageZoomer
-        closeModal={() => setModalListImages({ index: -1, list: [] })}
-        visible={modalListImages.list.length > 0}
-        list={modalListImages.list}
-        index={modalListImages.index}
-      />
       {MarkResolveModal()}
     </RootView>
   )
 }
 
-export default TicketDetail;
+export default Detail;
 
-const msgOptionList = [{
-  icon: icons.edit,
-  title: "Edit",
-  type: "edit"
-
-},
-{
-  icon: icons.trash,
-  title: "Delete",
-  type: "delete"
-}]
-
-const OptionList = [{
-  icon: icons.tick,
-  title: "Mark Resolve",
-  key: "mark_resolve"
-},
-  // {
-  //   icon: icons.copy,
-  //   title: "Copy Password"
-  // }
-]
-
+const __styles = StyleSheet.create({
+  cardView: {
+    backgroundColor: colors.secondary,
+    minHeight: 100,
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingBottom: 10,
+    marginTop: 10
+  },
+  cardItemView: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderBottomWidth: 1 / 4,
+    borderBottomColor: colors.lightText2,
+    paddingBottom: 5,
+    marginTop: 10
+  }
+})
