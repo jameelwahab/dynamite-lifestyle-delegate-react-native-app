@@ -20,11 +20,12 @@ const MyInputs = ({
   leftIcon = null,
   rightIcon = null,
   rightIconOnPress = () => { },
+  noSpace = false,
 }) => {
   const [isFocused, setFocused] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   return (
-    <View style={{ marginBottom: 15 }}>
+    <View style={{ marginBottom: noSpace ? 0 : 15 }}>
       <Text style={[__MyInputStyles.labelText, isFocused ? __MyInputStyles.focusedLabelText : undefined]}>{label}</Text>
       <View style={[__MyInputStyles.inputView, multiline ? __MyInputStyles.multilineView : undefined, isFocused ? __MyInputStyles.focusedView : undefined]}>
         {!!leftIcon && <View style={[__MyInputStyles.leftButton]} >{leftIcon()}</View>}

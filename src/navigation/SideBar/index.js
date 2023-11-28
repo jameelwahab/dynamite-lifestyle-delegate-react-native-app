@@ -16,6 +16,7 @@ const index = (props) => {
     navigation.closeDrawer()
 
     setTimeout(() => {
+      console.log(navigation,"navigation")
       navigation.jumpTo(screen)
 
     }, 200);

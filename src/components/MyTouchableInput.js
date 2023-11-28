@@ -9,13 +9,14 @@ const MyTouchableInput = ({
   placeholder = "",
   value,
   onPress,
-  icon=icons.down
+  icon = icons.down,
+  noSpace = false
 }) => {
   const [isFocused, setFocused] = useState(false)
   return (
     <Pressable
       onPress={onPress}
-      style={{ marginBottom: 15 }}>
+      style={{ marginBottom: noSpace ? 0 : 15 }}>
       <Text pointerEvents="none" style={[__MyInputStyles.labelText, isFocused ? __MyInputStyles.focusedLabelText : undefined]}>{label}</Text>
       <View pointerEvents="none" style={[__MyInputStyles.inputView, isFocused ? __MyInputStyles.focusedView : undefined]}>
         <TextInput
@@ -32,7 +33,7 @@ const MyTouchableInput = ({
           textAlignVertical={"center"}
           editable={false}
         />
-        <View style={{paddingHorizontal:10}}>
+        <View style={{ paddingHorizontal: 10 }}>
           {icon()}
         </View>
       </View>

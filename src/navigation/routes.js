@@ -24,10 +24,16 @@ const routes = {
   changePassword: "CHANGE_PASSWORD_SCREEN",
   reminderSettings: "REMINDER_SETTINGS_SCREEN",
   zoomSettings: "ZOOM_SETTINGS_SCREEN",
-  chat: "CHAT_SETTINGS_SCREEN",
+
 
   addNote: "ADD_NOTE",
-  notesListing: "NOTES_LISTING"
+  notesListing: "NOTES_LISTING",
+
+  //? chat
+  chat: "CHAT_SETTINGS_SCREEN",
+  chatList: "CHAT_LIST_SCREEN",
+  chatMessageList: "CHAT_MESSAGE_LIST_SCREEN",
+  startNewChat: "START_NEW_CHAT_SCREEN",
 }
 
 export default routes;

@@ -8,6 +8,7 @@ export const colors = {
   secondary: "#1F2536",
   darkSecondary: "#131825",
   secondaryVariant: '#252d41',
+  secondarySelect:"#2f3851",
   border: "#43464A",
   selection: Platform.select({ android: "#3D4250", ios: "#FFFFFF" }),
   text: "#FFFFFF",

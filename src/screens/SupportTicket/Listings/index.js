@@ -172,7 +172,6 @@ const TicketsList = ({ navigation, route }) => {
     return (
       <View style={{ marginHorizontal: 10, backgroundColor: colors.darkSecondary }}>
         <MyInputs
-
           leftIcon={icons.search}
           placeholder='Search...'
           value={searchText}

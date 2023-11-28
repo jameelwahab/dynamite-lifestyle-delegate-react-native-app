@@ -32,7 +32,7 @@ export const icons = {
   backwardArrow: (size = 20, color = colors.primary) => { return (<Ionicons name="chevron-back" color={color} size={size} />) },
   image: () => { return (<Ionicons name="image" color={colors.primary} size={25} />) },
   images: () => { return (<Ionicons name="images" color={colors.primary} size={20} />) },
-  camera: () => { return (<Fontisto name="camera" color={colors.primary} size={17} />) },
+  camera: (color = colors.primary, size = 20) => { return (<Fontisto name="camera" color={color} size={size} />) },
   crosssWithCircle: () => { return (<MaterialIcons name="cancel" color={colors.white} size={30} />) },
   crosssWithCircle_20: () => { return (<MaterialIcons name="cancel" color={colors.white} size={20} />) },
   noIcon: () => { return (<MaterialIcons name="cancel" color={colors.transparent} size={20} />) },
@@ -54,5 +54,7 @@ export const icons = {
   info: (color = colors.white, size = 20) => { return (<FontAwesome6 name="info" color={color} size={size} />) },
   upward: (color = colors.white, size = 20) => { return (<Ionicons name="caret-up" color={color} size={size} />) },
   downward: (color = colors.white, size = 20) => { return (<Ionicons name="caret-down" color={color} size={size} />) },
+  mic: (color = colors.white, size = 20) => { return (<Ionicons name="mic" color={color} size={size} />) },
+  playCircle: (color = colors.white, size = 20) => { return (<Ionicons name="play-circle" color={color} size={size} />) },
 
 }
