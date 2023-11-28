@@ -42,8 +42,8 @@ const ResetPassword = ({ navigation, route }) => {
     <RootView hideHeader>
       <AuthHeader />
       <View style={{ flex: 1 }}>
-        <KeyboardAwareScrollView keyboardShouldPersistTaps="always">
-          <View style={{ marginHorizontal: 10, marginTop: 10 }}>
+        <KeyboardAwareScrollView keyboardShouldPersistTaps="handled">
+          <View style={{ marginHorizontal: 10, marginTop: "45%" }}>
             <MyText fontSize={28} type='medium'>Reset Password</MyText>
 
             <View style={{ marginTop: 30 }}>

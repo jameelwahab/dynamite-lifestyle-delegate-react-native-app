@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Pressable, Image, SafeAreaView, PermissionsAndroid } from 'react-native'
+import { View, Text, StyleSheet, Pressable, Image, SafeAreaView, PermissionsAndroid, Platform } from 'react-native'
 import React from 'react'
 import Modal from 'react-native-modal'
 import { colors } from '../utilities/colors'
@@ -50,7 +50,7 @@ const ImageUploadModal = ({
         })
           .then(image => {
             onImagePicked({
-              uri: image.sourceURL,
+              uri: Platform.OS == "ios" ? image.sourceURL : image.path,
               name: image.filename,
               type: image.mime,
               height: image.height,
@@ -90,7 +90,7 @@ const ImageUploadModal = ({
         console.log(image, "image")
         if (!multiple) {
           onImagePicked({
-            uri: image.sourceURL,
+            uri: Platform.OS == "ios" ? image.sourceURL : image.path,
             name: image.filename,
             type: image.mime,
             height: image.height,
@@ -99,7 +99,7 @@ const ImageUploadModal = ({
         } else {
           let images = image.map((x) => {
             return {
-              uri: x.sourceURL,
+              uri: Platform.OS == "ios" ? x.sourceURL : x.path,
               name: x.filename,
               type: x.mime,
               height: x.height,

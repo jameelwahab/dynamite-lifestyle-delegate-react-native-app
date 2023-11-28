@@ -19,6 +19,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setUserAndToken } from '../../redux/reducers/userSlice';
 import { selectSettings, setSettings } from '../../redux/reducers/settingSlice';
 import MyInputs from '../../components/MyInputs';
+import FastImage from 'react-native-fast-image';
+import MyImage2 from '../../components/MyImage2';
 
 
 
@@ -80,15 +82,28 @@ const Login = ({ navigation }) => {
 
   return (
     <RootView hideHeader>
-      <KeyboardAwareScrollView keyboardShouldPersistTaps="always" >
+      <KeyboardAwareScrollView keyboardShouldPersistTaps="handled" >
         <View style={__styles.view1}>
           <View style={{ alignItems: "center", marginBottom: 30 }}>
             <MyText fontSize={20} style={{ textTransform: "uppercase" }} type={"medium"} >Welcome To</MyText>
           </View>
-          <ScalableImage
+          {/* <ScalableImage
             width={Dimensions.get('screen').width - 100}
             source={{ uri: S3_URL + settings?.brand_logo }}
+          /> */}
+          <MyImage2
+            uri={S3_URL + settings?.brand_logo}
+            width={Dimensions.get('screen').width - 100}
           />
+
+
+          {/* <FastImage
+            source={{ uri: S3_URL + settings?.brand_logo }}
+            style={{ width: Dimensions.get('screen').width - 100, aspectRatio:4.36 }}
+            // onLoad={(res) => console.log("onLoadStart", res.nativeEvent?.width,)}
+            // onLoadEnd={(res) => console.log("onLoadEnd", res.nativeEvent,)}
+            // onProgress={e => console.log(e.nativeEvent.loaded / e.nativeEvent.total, "onProgress")}
+          /> */}
         </View>
         <View style={__styles.view2}>
           <MyText color='#637381' >Enter your details below.</MyText>

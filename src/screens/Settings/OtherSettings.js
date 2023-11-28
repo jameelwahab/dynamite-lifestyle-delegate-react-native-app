@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView } from 'react-native'
+import { View, Text, StyleSheet, ScrollView, Pressable, Alert } from 'react-native'
 import React from 'react'
 import RootView from '../../components/RootView'
 import MyText from '../../components/MyText'
@@ -25,7 +25,8 @@ const OtherSettings = ({ navigation }) => {
             </TouchableOpacity>
           ))}
         </ScrollView>
-        <View style={{ alignItems: "center" }}>
+        <View
+          style={{ alignItems: "center" }}>
           <MyText type='light'>Version:<MyText fontSize={18} type='medium' > 1.0.0</MyText></MyText>
         </View>
       </View>

@@ -9,7 +9,7 @@ import ListView from './ListView';
 import { fonts } from '../../../utilities/fonts';
 import MyInputs from '../../../components/MyInputs';
 import Modal from 'react-native-modal'
-import { LIST_OF_DEPARTMENTS, SUPPORT_TCIKETS_LIST_BY_TYPE } from '../../../DAL';
+import { INETRNAL_TCIKETS_LIST_BY_TYPE, LIST_OF_DEPARTMENTS, SUPPORT_TCIKETS_LIST_BY_TYPE } from '../../../DAL';
 import { useSelector } from 'react-redux';
 import { selectUser } from '../../../redux/reducers/userSlice';
 import debounce from '../../../functions/debounce';
@@ -18,12 +18,13 @@ import debounce from '../../../functions/debounce';
 
 
 
-let page = 1;
+let page = 0;
 let totalPage = 0;
 let canLoadMore = false;
 
 
-const TicketsList = ({ navigation }) => {
+const TicketsList = ({ navigation, route }) => {
+  const { type } = route?.params
   const layout = useWindowDimensions();
   const { token, user } = useSelector(selectUser);
   const [index, setIndex] = React.useState(0);
@@ -44,16 +45,7 @@ const TicketsList = ({ navigation }) => {
     trash: 0,
 
   })
-  const [routes] = React.useState([
-    { key: 'waiting', title: 'WAITING', index: 0 },
-    { key: 'answered', title: 'ANSWERED', index: 1 },
-    { key: 'need_fixes', title: 'NEEDS FIXES', index: 2 },
-    { key: 'needs_to_attention', title: 'NEEDS ATTENTION', index: 3 },
-    { key: 'reminder', title: 'REMINDERS', index: 4 },
-    { key: 'ready_to_close', title: 'READY TO CLOSE', index: 5 },
-    { key: 'solved', title: 'CLOSE', index: 6 },
-    { key: 'trash', title: 'TRASH', index: 7 },
-  ]);
+  const [routes] = React.useState(tabs[type]);
 
 
   const loadMore = () => {
@@ -74,24 +66,42 @@ const TicketsList = ({ navigation }) => {
     if (!isLoadingMore) {
       setList([])
     }
-    let res = await SUPPORT_TCIKETS_LIST_BY_TYPE({
-      page: page - 1,
-      body: {
-        filter_by: routes[index].key
-      },
-      searchText: searchText.trim(),
-      token,
-      navigation
-    })
 
-    if (res.code == 200) {
+    let res;
+    if (type == "support_ticket") {
+      res = await SUPPORT_TCIKETS_LIST_BY_TYPE({
+        page: page,
+        body: {
+          filter_by: routes[index].key
+        },
+        searchText: searchText.trim(),
+        token,
+        navigation
+      })
+    } else if (type == "internal_ticket") {
+      res = await INETRNAL_TCIKETS_LIST_BY_TYPE({
+        page: page,
+        body: {
+          filter_by: routes[index].key
+        },
+        searchText: searchText.trim(),
+        token,
+        navigation
+      })
+    }
+
+
+    if (res?.code == 200) {
+      console.log(page, "page1")
       page++;
-      console.log(page >= res?.total_pages, page, res?.total_pages, "CHECK")
-      if (page > res?.total_pages) {
+      console.log(page, "page2")
+      console.log((page > (res?.total_pages - 1)), page, res?.total_pages, "CHECK")
+      if (page > (res?.total_pages - 1)) {
         canLoadMore = false
       } else {
         canLoadMore = true
       }
+      console.log(page, "page3")
       console.log(canLoadMore, "canLoadMore")
       setLoader(-1)
       setFooterLoader(-1)
@@ -133,11 +143,13 @@ const TicketsList = ({ navigation }) => {
 
 
   useEffect(() => {
-    listOfDepartments()
+    if (type == "support_ticket") {
+      listOfDepartments()
+    }
   }, [])
 
   const refresh = () => {
-    page = 1;
+    page = 0;
     setList([])
     setLoader(index)
     debounce(() => getSupportTickets(false, false))
@@ -145,7 +157,7 @@ const TicketsList = ({ navigation }) => {
 
   useEffect(() => {
     debounce(() => {
-      page = 1;
+      page = 0;
       canLoadMore = false;
       setList([])
       setLoader(index)
@@ -212,6 +224,7 @@ const TicketsList = ({ navigation }) => {
       active={index == route.index}
       isLoadingMore={footerLoader == route.index}
       loadMore={loadMore}
+      type={type}
     />
   }
 
@@ -224,7 +237,7 @@ const TicketsList = ({ navigation }) => {
     <RootView
       rightButtonIcon={icons.handPromise}
       hideBackBottomButton={true}
-      title='Support Tickets'
+      title={type == "support_ticket" ? 'Support Tickets' : type == "internal_ticket" ? "Internal Ticktets" : ""}
     >
       {searchView()}
       <TabView
@@ -246,7 +259,26 @@ const TicketsList = ({ navigation }) => {
 
 }
 
-export default TicketsList
+export default TicketsList;
+
+const tabs = {
+  support_ticket: [
+    { key: 'waiting', title: 'WAITING', index: 0 },
+    { key: 'answered', title: 'ANSWERED', index: 1 },
+    { key: 'need_fixes', title: 'NEEDS FIXES', index: 2 },
+    { key: 'needs_to_attention', title: 'NEEDS ATTENTION', index: 3 },
+    { key: 'reminder', title: 'REMINDERS', index: 4 },
+    { key: 'ready_to_close', title: 'READY TO CLOSE', index: 5 },
+    { key: 'solved', title: 'CLOSE', index: 6 },
+    { key: 'trash', title: 'TRASH', index: 7 },
+  ],
+  internal_ticket: [
+    { key: 'waiting', title: 'WAITING', index: 0 },
+    { key: 'answered', title: 'ANSWERED', index: 1 },
+    { key: 'needs_to_attention', title: 'NEEDS ATTENTION', index: 2 },
+    { key: 'solved', title: 'SOLVED', index: 3 },
+  ]
+}
 
 const __styles = StyleSheet.create({
   badges: {

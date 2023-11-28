@@ -75,10 +75,12 @@ const EditProfile = ({ navigation }) => {
 
   return (
 
-    <RootView style={__styles.rootView}>
+    <RootView style={__styles.rootView}
+      title='Edit Profile'
+    >
       <KeyboardAwareScrollView
         extraScrollHeight={100}
-        keyboardShouldPersistTaps="always"
+        keyboardShouldPersistTaps="handled"
         contentContainerStyle={__styles.scrollContainer}
         showsVerticalScrollIndicator={false}>
         <View style={__styles.scrollInnerContainer}>
@@ -109,7 +111,7 @@ const EditProfile = ({ navigation }) => {
             />
 
             <MyInputs
-              label='Last Name*'
+              label='Last Name'
               value={userData?.last_name}
               onChangeText={(text) => setUser({ last_name: text })}
             />
@@ -122,7 +124,7 @@ const EditProfile = ({ navigation }) => {
             />
 
             <MyInputs
-              label='Contact Number*'
+              label='Contact Number'
               keyboardType='phone-pad'
               value={userData?.contact}
               onChangeText={(text) => setUser({ contact: text })}
@@ -157,7 +159,7 @@ const EditProfile = ({ navigation }) => {
 
 
             <MyInputs
-              label='Biography*'
+              label='Biography'
               placeholder='Maximun limit 500 chracters'
               multiline={true}
               maxLength={500}

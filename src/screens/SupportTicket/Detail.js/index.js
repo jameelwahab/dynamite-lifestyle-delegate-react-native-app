@@ -25,9 +25,10 @@ import { icons } from '../../../utilities/icons';
 
 let autoMessages = [];
 const Detail = ({ navigation, route }) => {
+  const { route: listRoute, refreshList, tab } = route?.params
   const { token, user } = useSelector(selectUser);
   const layout = useWindowDimensions();
-  const [index, setIndex] = useState(0);
+  const [index, setIndex] = useState(!!tab ? tab : 0);
   const [loader, setLoader] = useState(true);
   const [comments, setComments] = useState([]);
   const { _id } = route?.params?.ticket;
@@ -40,6 +41,7 @@ const Detail = ({ navigation, route }) => {
     { key: 'notes', title: 'Internal Notes', index: 2 },
   ]);
 
+  console.log(route, "route")
 
   useEffect(() => {
     autoMessages = [];
@@ -154,6 +156,9 @@ const Detail = ({ navigation, route }) => {
   const addMessage = (msg) => {
     comments.unshift(msg);
     setComments([...comments]);
+    if (listRoute == 'waiting') {
+      refreshList?.()
+    }
     // flatlistRef?.current?.scrollToIndex({ index: 0, animated: true })
   }
 

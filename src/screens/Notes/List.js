@@ -16,11 +16,11 @@ import moment from 'moment'
 import OptionModal from '../../components/OptionModal'
 import ConfirmationModal from '../../components/ConfirmationModal'
 import { useNavigation } from '@react-navigation/native'
+import EmptyView from '../../components/EmptyView'
 const List = ({ ticket, user, }) => {
   const navigation = useNavigation()
   const { token } = useSelector(selectUser);
   const [loader, setLoader] = useState(false)
-
   const [list, setList] = useState([])
   const [optionModal, setOptionModal] = useState({ isVisible: false, for: "" })
   const [confirmationModal, setConfirmationModal] = useState({ isVisible: false, title: "" })
@@ -65,7 +65,6 @@ const List = ({ ticket, user, }) => {
     if (!!ticket) {
       setList(ticket?.internal_note)
     }
-    // getNotesList()
   }, [ticket])
 
   const renderList = ({ item, index }) => {
@@ -105,19 +104,7 @@ const List = ({ ticket, user, }) => {
   return (
     <RootView hideHeader >
       <View style={{ flex: 1, marginHorizontal: -10 }}>
-        {/* <View style={__styles.headerView}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={__styles.closeBtnView}>
-          {icons.crosss(colors.primary, 25)}
-        </TouchableOpacity>
-
-        <View style={{ marginLeft: 10, justifyContent: "center" }}>
-          <MyText fontSize={16} color={colors.primary} >
-            {`${user?.name} (${user?.email})`}
-          </MyText>
-        </View>
-      </View> */}
+       
 
         <View style={{ flex: 1, marginTop: 10, }}>
           <FlatList
@@ -125,6 +112,9 @@ const List = ({ ticket, user, }) => {
             renderItem={renderList}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: 70 }}
+            ListEmptyComponent={() =>
+              <EmptyView label={"No notes"} />
+            }
           />
         </View>
 

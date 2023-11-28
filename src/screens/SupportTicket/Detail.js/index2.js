@@ -63,6 +63,7 @@ const TicketDetail = ({ navigation, route }) => {
   const addMessage = (msg) => {
     comments.unshift(msg);
     setComments([...comments]);
+
     // flatlistRef?.current?.scrollToIndex({ index: 0, animated: true })
   }
 

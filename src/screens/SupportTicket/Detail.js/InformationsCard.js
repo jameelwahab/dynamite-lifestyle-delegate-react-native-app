@@ -76,7 +76,8 @@ const InformationsCard = ({ ticket, user, moveToMarkResolve }) => {
                 <View style={__styles.cardItemView}>
                   <MyText style={__styles.cardItemText}>Responded on:</MyText>
                   <MyText style={__styles.cardItemText}>{moment(ticket?.updatedAt).format("DD MMM YYYY [at] hh:mm A")}</MyText>
-                </View>
+                </View> */}
+              <View>
 
                 {!!ticket?.ticket_images && ticket?.ticket_images.length > 0 &&
                   <View style={{ marginTop: 20 }}>
@@ -102,7 +103,7 @@ const InformationsCard = ({ ticket, user, moveToMarkResolve }) => {
 
 
 
-              </View> */}
+              </View>
 
 
             </View>
@@ -149,6 +150,6 @@ const __styles = StyleSheet.create({
   },
   cardItemText: {
     fontSize: 12,
-    color:colors.lightText2
+    color: colors.lightText2
   }
 })

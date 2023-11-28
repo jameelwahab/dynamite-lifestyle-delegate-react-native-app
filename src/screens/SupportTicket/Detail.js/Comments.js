@@ -21,7 +21,8 @@ import { selectUser } from '../../../redux/reducers/userSlice'
 import ConfirmationModal from '../../../components/ConfirmationModal'
 import showToast from '../../../functions/showToast'
 import ImageZoomer from '../../../components/ImageZoomer'
-const Comments = ({ commentsList, ticket, user, autoMessages, addMessage }) => {
+import EmptyView from '../../../components/EmptyView'
+const Comments = ({ commentsList, ticket, user, autoMessages, addMessage, }) => {
   const { token } = useSelector(selectUser)
   const navigation = useNavigation()
   const [modalImage, setModalImage] = useState("")
@@ -178,11 +179,14 @@ const Comments = ({ commentsList, ticket, user, autoMessages, addMessage }) => {
       <View style={{ flex: 1 }}>
         <FlatList
           contentContainerStyle={{ paddingVertical: 20 }}
-          inverted={true}
+          inverted={comments.length == 0 ? false : true}
           data={comments}
           renderItem={renderMsg}
           keyExtractor={(item) => item._id}
           showsVerticalScrollIndicator={false}
+          ListEmptyComponent={() =>
+            <EmptyView label={"No comments"} />
+          }
         // ListHeaderComponent={!!ticket && headerView}
 
         />

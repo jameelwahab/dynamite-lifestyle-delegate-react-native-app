@@ -6,7 +6,7 @@ import Login from '../screens/Auth/Login';
 import ResetPassword from '../screens/Auth/ResetPassword';
 import OPTscreen from '../screens/Auth/OPT';
 import ForgotPassword from '../screens/Auth/ForgotPassword';
-import SideDrawer from './SideDrawer';
+import SideDrawer from './SideBar/SideDrawer';
 import Splash from '../screens/Auth/Splash';
 import TicketDetail from '../screens/SupportTicket/Detail.js';
 

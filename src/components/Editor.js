@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, ScrollView, FlatList, Pressable, Image } from 'react-native'
+import { View, Text, TouchableOpacity, ScrollView, FlatList, Pressable, Image, SafeAreaView } from 'react-native'
 import React, { useMemo, useRef, useState } from 'react'
 
 import { actions, RichEditor, RichToolbar } from 'react-native-pell-rich-editor';
@@ -15,7 +15,8 @@ import Collapsible from 'react-native-collapsible';
 import Modal from 'react-native-modal';
 import MyText from './MyText';
 import { icons } from '../utilities/icons';
-import { MyButton } from './MyButton';
+import { MyButton, TransparentButton } from './MyButton';
+import MyInputs from './MyInputs';
 
 const ic_A = require('../assets/icons/A-alphabet.png');
 const ic_bucket = require('../assets/icons/paint.png');
@@ -30,7 +31,7 @@ const Editor = ({
 
   const RichText = useRef();
   const scrollViewRef = useRef();
-  const [link, setLink] = useState({ value: "", showDialog: false })
+  const [link, setLink] = useState({ value: "", showDialog: false, title: "" })
   const [foreColor, setForeColor] = useState(colors.lightText2)
   const [backColor, setBackColor] = useState(undefined)
   const [colorModaal, setColorModaal] = useState({ value: "", isVisible: false, for: "" })
@@ -134,15 +135,56 @@ const Editor = ({
 
   //? Link Dialog
 
-  openDialogue = (type) => {
-    setLink({ value: "", showDialog: true })
+  const openDialogue = () => {
+    setLink({ value: "", showDialog: true, title: "" })
   };
 
-  closeDialogue = () => {
-    setLink({ ...link, showDialog: false, for: "" })
+  const closeDialogue = () => {
+    setLink({ ...link, showDialog: false, })
   };
+
+  const addLink = () => {
+    RichText.current.insertLink(link.title, link.value);
+    closeDialogue();
+  }
 
   LinkDialog = () => {
+
+    return (
+      <Modal
+        isVisible={link.showDialog}
+        onBackButtonPress={() => closeDialogue()}
+        onBackdropPress={() => closeDialogue()}
+        useNativeDriverForBackdrop={true}
+        avoidKeyboard={true}
+      >
+        <SafeAreaView>
+          <View style={{ backgroundColor: colors.secondary, padding: 20, borderRadius: 10 }}>
+            <View style={{ marginVertical: 10 }}>
+              <MyText align='center' type="medium" fontSize={18} color={colors.primary} >Enter your link</MyText>
+            </View>
+            <View style={{ marginTop: 10 }}>
+              <MyInputs
+                label='Title'
+                value={link.title}
+                onChangeText={title => setLink({ ...link, title })}
+              />
+
+              <MyInputs
+                label='Link'
+                value={link.value}
+                onChangeText={Weblink => setLink({ ...link, value: Weblink })}
+              />
+            </View>
+
+            <View style={{ flexDirection: "row", justifyContent: "flex-end", marginTop: 10 }}>
+              <TransparentButton title='CANCEL' onPress={closeDialogue} />
+              <TransparentButton title='ADD' onPress={addLink} />
+            </View>
+          </View>
+        </SafeAreaView>
+      </Modal>
+    )
     return (
       <View>
         <Dialog.Container
@@ -151,6 +193,8 @@ const Editor = ({
           <Dialog.Title style={{ color: colors.taskText, }}>
             Insert Link
           </Dialog.Title>
+
+
           <Dialog.Description
             style={{ color: colors.taskText, }}>
             Please enter the link
@@ -159,9 +203,13 @@ const Editor = ({
             style={{ color: colors.taskText, }}
             onChangeText={Weblink => setLink({ ...link, value: Weblink })}
           />
-          <Dialog.Button label="Cancel" onPress={closeDialogue} />
+          <Dialog.Button
+            color={colors.primary}
+            label="Cancel"
+            onPress={closeDialogue} />
           <Dialog.Button
             label="Add"
+            color={colors.primary}
             onPress={() => {
               console.log(RichText, link.value, "RichText")
               RichText.current.insertLink(null, link.value);
@@ -183,6 +231,7 @@ const Editor = ({
 
           <View style={{ height: height }}>
             <ScrollView
+              nestedScrollEnabled={true}
               bounces={false}
               ref={scrollViewRef}
               onContentSizeChange={(contentWidth, contentHeight) => {

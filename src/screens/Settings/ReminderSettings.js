@@ -2,8 +2,8 @@ import { View, Text, FlatList, StyleSheet, TouchableOpacity, KeyboardAvoidingVie
 import React, { useCallback, useMemo, useState } from 'react'
 import RootView from '../../components/RootView'
 import MyText from '../../components/MyText'
-import { useSelector } from 'react-redux'
-import { selectUser } from '../../redux/reducers/userSlice'
+import { useDispatch, useSelector } from 'react-redux'
+import { selectUser, setConsultant } from '../../redux/reducers/userSlice'
 import { colors } from '../../utilities/colors'
 import MyInputs from '../../components/MyInputs'
 import Editor from '../../components/Editor'
@@ -22,9 +22,13 @@ import invokeApi from '../../functions/invokeAPI'
 import MyLoader from '../../components/MyLoader'
 
 const ReminderSettings = ({ navigation }) => {
+  const dispatch = useDispatch()
   const { user, token } = useSelector(selectUser);
-  const [loader, setLoader] = useState(false)
-  const [list, setList] = useState(JSON.parse(JSON.stringify(user?.welcome_reminder_setting)));
+  const [loader, setLoader] = useState(false);
+  console.log(user, "user")
+  const [list, setList] = useState(user?.welcome_reminder_setting.length == 0 ? [{
+    ...reminderObj
+  }] : JSON.parse(JSON.stringify(user?.welcome_reminder_setting)));
   const [datePicker, setDatePicker] = useState({ isVisible: false, index: -1, time: "" });
   const [image, setImage] = useState({ isVisible: false, index: -1, file: "" });
   const list_length = list.length
@@ -94,10 +98,11 @@ const ReminderSettings = ({ navigation }) => {
       }
     }
     setLoader(true)
-    let res = await UPDATE_REMINDER_MESSAGES({ body: list, token, navigation });
+    let res = await UPDATE_REMINDER_MESSAGES({ body: { welcome_reminder_setting: list }, token, navigation });
     setLoader(false)
     if (res.code == 200) {
       showToast({ title: "Updated Successfully", body: res.message, type: "success" });
+      dispatch(setConsultant(res?.consultant))
       navigation.goBack()
     } else {
       showToast({ title: res.message, type: "error" });
@@ -212,7 +217,7 @@ const ReminderSettings = ({ navigation }) => {
           data={list}
           renderItem={renderReminders}
           ListFooterComponent={UpdateButton}
-          contentContainerStyle={{paddingBottom:30}}
+          contentContainerStyle={{ paddingBottom: 30 }}
         />
       </View>
       <DateTimePickerModal

@@ -20,6 +20,10 @@ const ForgotPassword = ({ navigation }) => {
 
 
   onOPTScreen = async () => {
+    navigation.navigate(routes.optScreen, {
+      email: email
+    });
+    return;
     if (email.trim() == "") {
       showToast({ body: "Please enter your email address!" })
     }
@@ -44,17 +48,18 @@ const ForgotPassword = ({ navigation }) => {
     <RootView hideHeader>
       <AuthHeader />
       <View style={{ flex: 1 }}>
-        <KeyboardAwareScrollView keyboardShouldPersistTaps="always">
-          <View style={{ marginHorizontal: 10, marginTop: 10 }}>
+        <KeyboardAwareScrollView keyboardShouldPersistTaps="handled">
+          <View style={{ marginHorizontal: 10, marginTop: "45%" }}>
             <MyText fontSize={28} type='medium'>Forget Password</MyText>
-            <View style={{ marginTop: 20, }}>
+            <View style={{ marginTop: 0, }}>
 
-              <View style={{ marginTop: 20, }}>
+              <View style={{ marginVertical: 20, }}>
                 <MyInputs
                   label='Email Address*'
                   value={email}
                   keyboardType='email-address'
                   onChangeText={(text) => setEmail(text)}
+                  
                 />
               </View>
 

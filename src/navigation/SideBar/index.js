@@ -1,4 +1,4 @@
-import { View, Text, Pressable, Image, StyleSheet } from 'react-native'
+import { View, Text, Pressable, Image, StyleSheet, Platform } from 'react-native'
 import React from 'react'
 import { DrawerContentScrollView } from '@react-navigation/drawer';
 import MyText from '../../components/MyText';
@@ -12,16 +12,12 @@ const index = (props) => {
 
 
   const changeSideBarScreen = async (screen) => {
-    // console.log(state, "routes")
-    // console.log(screen, "screen")
+
     navigation.closeDrawer()
 
     setTimeout(() => {
       navigation.jumpTo(screen)
-      // navigation.reset({
-      //   index: 0,
-      //   routes: [{ name: screen }]
-      // })
+
     }, 200);
   }
   return (
@@ -55,7 +51,8 @@ export default index;
 
 const __styles = StyleSheet.create({
   logoView: {
-    width: "80%", height: 50, alignSelf: "center", marginBottom: 10
+    width: "80%", height: 50, alignSelf: "center", marginBottom: 10,
+    marginTop: Platform.OS == "android" ? 10 : 0
   },
   logo: {
     height: "100%",

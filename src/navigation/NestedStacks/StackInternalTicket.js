@@ -17,27 +17,31 @@ import AddNote from '../../screens/Notes/AddNote'
 import NotesList from '../../screens/Notes/List'
 
 
-const SupportTicketStack = createNativeStackNavigator()
-const StackInner = ({route}) => {
+const InternalTicketStack = createNativeStackNavigator()
+
+const StackInternalTickets = ({ route }) => {
   return (
     <View style={{ flex: 1, backgroundColor: colors.darkSecondary }}>
-      <SupportTicketStack.Navigator
+      <InternalTicketStack.Navigator
         initialRouteName={routes.supportTicketList}
-        screenOptions={{ headerShown: false }}>
+        screenOptions={{ headerShown: false, }}>
         {/*//? Default Screens Start */}
         {defaultScreens.map((x, i) => (
-          <SupportTicketStack.Screen key={x.name} name={x.name} component={x.component} />
+          <InternalTicketStack.Screen key={x.name} name={x.name} component={x.component} />
         ))}
+
+
         {/*//? Default Screens End */}
+        <InternalTicketStack.Screen initialParams={route.params} name={routes.supportTicketList} component={TicketsList} />
+        <InternalTicketStack.Screen initialParams={route.params} name={routes.supportTicketDeatail} component={TicketDetail} />
+        <InternalTicketStack.Screen initialParams={route.params} name={routes.supportTicketReply} component={TicketReply} />
 
-        <SupportTicketStack.Screen initialParams={route.params} name={routes.supportTicketList} component={TicketsList} />
-        <SupportTicketStack.Screen initialParams={route.params} name={routes.supportTicketDeatail} component={TicketDetail} />
-        <SupportTicketStack.Screen initialParams={route.params} name={routes.supportTicketReply} component={TicketReply} />
-        <SupportTicketStack.Screen initialParams={route.params} name={routes.sendReminderScreen} component={SendReminderScreen} />
-        <SupportTicketStack.Screen initialParams={route.params} name={routes.addNote} component={AddNote} />
+        <InternalTicketStack.Screen initialParams={route.params} name={routes.sendReminderScreen} component={SendReminderScreen} />
+        <InternalTicketStack.Screen initialParams={route.params} name={routes.addNote} component={AddNote} />
 
-      </SupportTicketStack.Navigator>
+
+      </InternalTicketStack.Navigator>
     </View>
   )
 }
-export default StackInner
+export default StackInternalTickets

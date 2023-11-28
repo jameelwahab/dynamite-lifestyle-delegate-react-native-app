@@ -23,7 +23,8 @@ import showToast from '../../../functions/showToast';
 import UserImage from '../../../components/UserImage';
 
 
-const ListView = ({ isLoading, list, active, route, departmentList, token, refresh, user, setLoader, isLoadingMore, loadMore, }) => {
+const ListView = ({ isLoading, list, active, route, departmentList, token, refresh, user, setLoader, isLoadingMore, loadMore, type }) => {
+  console.log(type)
   const [isOptionModalShown, setIsOptionModal] = useState({ isVisible: false, for: "" })
   const [isDepartmentModalShown, setIsDepartmentModalShown] = useState(false);
   const [isCalendarModalVisible, setCalendarModalVisiblity] = useState(false);
@@ -117,11 +118,13 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
     }
 
     else if (option.key == "internal_notes") {
-      // navigation.navigate(routes.notesListing, {
-      //   ticketId: isOptionModalShown?.for?._id,
-
-      // });
-      // setIsOptionModal({ isVisible: false, for: "" })
+      navigation.navigate(routes.supportTicketDeatail, {
+        ticket: isOptionModalShown?.for,
+        refreshList: refresh,
+        route: route,
+        tab: 2
+      });
+      setIsOptionModal({ isVisible: false, for: "" })
     }
     else if (option.key == "resolve_note") {
       setIsOptionModal({ ...isOptionModalShown, isVisible: false, })
@@ -225,7 +228,7 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
             scrollEnabled={false}
             contentContainerStyle={{ paddingVertical: 10 }}
             renderItem={({ item, index }) => {
-              if (item.routes[route]) {
+              if (item.routes[type][route]) {
                 return (
                   <TouchableHighlight
                     onPress={() => ticketActions(item)}
@@ -500,7 +503,8 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
         onPress={() => {
           navigation.navigate(routes.supportTicketDeatail, {
             ticket: item,
-            refreshList: refresh
+            refreshList: refresh,
+            route: route
           })
         }}
         onLongPress={() => setIsOptionModal({ isVisible: true, for: item })}
@@ -585,14 +589,22 @@ const options = [{
   key: "detail",
   icon: icons.threeLinesMenu,
   routes: {
-    waiting: true,
-    answered: true,
-    need_fixes: true,
-    needs_to_attention: true,
-    reminder: true,
-    ready_to_close: true,
-    solved: true,
-    trash: true,
+    support_ticket: {
+      waiting: true,
+      answered: true,
+      need_fixes: true,
+      needs_to_attention: true,
+      reminder: true,
+      ready_to_close: true,
+      solved: true,
+      trash: true,
+    },
+    internal_ticket: {
+      waiting: true,
+      answered: true,
+      needs_to_attention: true,
+      solved: true,
+    }
   }
 },
 {
@@ -600,29 +612,46 @@ const options = [{
   key: "internal_notes",
   icon: icons.threeLinesMenu,
   routes: {
-    waiting: true,
-    answered: true,
-    need_fixes: true,
-    needs_to_attention: true,
-    reminder: true,
-    ready_to_close: true,
-    solved: false,
-    trash: false,
+    support_ticket: {
+      waiting: true,
+      answered: true,
+      need_fixes: true,
+      needs_to_attention: true,
+      reminder: true,
+      ready_to_close: true,
+      solved: false,
+      trash: false,
+    },
+    internal_ticket: {
+      waiting: true,
+      answered: true,
+      needs_to_attention: true,
+      solved: false,
+    }
   }
+
 },
 {
   title: "Mark Resolve",
   key: "mark-resolve",
   icon: icons.tick,
   routes: {
-    waiting: true,
-    answered: true,
-    need_fixes: false,
-    needs_to_attention: false,
-    reminder: false,
-    ready_to_close: true,
-    solved: false,
-    trash: false,
+    support_ticket: {
+      waiting: true,
+      answered: true,
+      need_fixes: false,
+      needs_to_attention: false,
+      reminder: false,
+      ready_to_close: true,
+      solved: false,
+      trash: false,
+    },
+    internal_ticket: {
+      waiting: true,
+      answered: true,
+      needs_to_attention: false,
+      solved: false,
+    }
   }
 },
 {
@@ -630,14 +659,22 @@ const options = [{
   key: "attended",
   icon: icons.refresh,
   routes: {
-    waiting: false,
-    answered: false,
-    need_fixes: false,
-    needs_to_attention: true,
-    reminder: false,
-    ready_to_close: false,
-    solved: false,
-    trash: false,
+    support_ticket: {
+      waiting: false,
+      answered: false,
+      need_fixes: false,
+      needs_to_attention: true,
+      reminder: false,
+      ready_to_close: false,
+      solved: false,
+      trash: false,
+    },
+    internal_ticket: {
+      waiting: false,
+      answered: false,
+      needs_to_attention: true,
+      solved: false,
+    }
   }
 },
 {
@@ -645,14 +682,22 @@ const options = [{
   key: "fixed",
   icon: icons.refresh,
   routes: {
-    waiting: false,
-    answered: false,
-    need_fixes: true,
-    needs_to_attention: false,
-    reminder: false,
-    ready_to_close: false,
-    solved: false,
-    trash: false,
+    support_ticket: {
+      waiting: false,
+      answered: false,
+      need_fixes: true,
+      needs_to_attention: false,
+      reminder: false,
+      ready_to_close: false,
+      solved: false,
+      trash: false,
+    },
+    internal_ticket: {
+      waiting: false,
+      answered: false,
+      needs_to_attention: false,
+      solved: false,
+    }
   }
 },
 {
@@ -660,14 +705,22 @@ const options = [{
   key: "change-department",
   icon: icons.refresh,
   routes: {
-    waiting: true,
-    answered: true,
-    need_fixes: true,
-    needs_to_attention: true,
-    reminder: false,
-    ready_to_close: false,
-    solved: false,
-    trash: false,
+    support_ticket: {
+      waiting: true,
+      answered: true,
+      need_fixes: true,
+      needs_to_attention: true,
+      reminder: false,
+      ready_to_close: false,
+      solved: false,
+      trash: false,
+    },
+    internal_ticket: {
+      waiting: false,
+      answered: false,
+      needs_to_attention: false,
+      solved: false,
+    }
   }
 },
 {
@@ -675,14 +728,22 @@ const options = [{
   key: "move_to_needs_fixes",
   icon: icons.refresh,
   routes: {
-    waiting: true,
-    answered: true,
-    need_fixes: false,
-    needs_to_attention: false,
-    reminder: false,
-    ready_to_close: false,
-    solved: false,
-    trash: false,
+    support_ticket: {
+      waiting: true,
+      answered: true,
+      need_fixes: false,
+      needs_to_attention: false,
+      reminder: false,
+      ready_to_close: false,
+      solved: false,
+      trash: false,
+    },
+    internal_ticket: {
+      waiting: false,
+      answered: false,
+      needs_to_attention: false,
+      solved: false,
+    }
   }
 },
 {
@@ -690,14 +751,22 @@ const options = [{
   key: "needs_to_attention",
   icon: icons.refresh,
   routes: {
-    waiting: true,
-    answered: true,
-    need_fixes: false,
-    needs_to_attention: false,
-    reminder: false,
-    ready_to_close: false,
-    solved: false,
-    trash: false,
+    support_ticket: {
+      waiting: true,
+      answered: true,
+      need_fixes: false,
+      needs_to_attention: false,
+      reminder: false,
+      ready_to_close: false,
+      solved: false,
+      trash: false,
+    },
+    internal_ticket: {
+      waiting: true,
+      answered: true,
+      needs_to_attention: false,
+      solved: false,
+    }
   }
 },
 {
@@ -705,14 +774,22 @@ const options = [{
   key: "send_reminder",
   icon: icons.send,
   routes: {
-    waiting: false,
-    answered: false,
-    need_fixes: false,
-    needs_to_attention: false,
-    reminder: true,
-    ready_to_close: false,
-    solved: false,
-    trash: false,
+    support_ticket: {
+      waiting: false,
+      answered: false,
+      need_fixes: false,
+      needs_to_attention: false,
+      reminder: true,
+      ready_to_close: false,
+      solved: false,
+      trash: false,
+    },
+    internal_ticket: {
+      waiting: false,
+      answered: false,
+      needs_to_attention: false,
+      solved: false,
+    }
   }
 },
 {
@@ -720,14 +797,22 @@ const options = [{
   key: "resolve_note",
   icon: icons.threeLinesMenu,
   routes: {
-    waiting: false,
-    answered: false,
-    need_fixes: false,
-    needs_to_attention: false,
-    reminder: false,
-    ready_to_close: false,
-    solved: true,
-    trash: false,
+    support_ticket: {
+      waiting: false,
+      answered: false,
+      need_fixes: false,
+      needs_to_attention: false,
+      reminder: false,
+      ready_to_close: false,
+      solved: true,
+      trash: false,
+    },
+    internal_ticket: {
+      waiting: false,
+      answered: false,
+      needs_to_attention: false,
+      solved: false,
+    }
   }
 }
 ]

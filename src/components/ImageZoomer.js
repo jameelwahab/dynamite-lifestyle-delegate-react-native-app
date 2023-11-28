@@ -71,7 +71,7 @@ const ImageZoomer = ({
         </View>
         {!!visible && (
           <View style={{ flex: 1 }}>
-            {!!List &&
+            {!!list &&
               <View style={{ position: "absolute", bottom: Platform.OS == "ios" ? 30 : 0, alignItems: "center", left: 0, right: 0 }}>
                 <MyText fontSize={18} color={colors.white} >{(curIndex + 1) + "/" + list.length}</MyText>
               </View>

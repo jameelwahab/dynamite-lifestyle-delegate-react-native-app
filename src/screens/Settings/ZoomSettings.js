@@ -11,7 +11,7 @@ import { selectUser, setConsultant } from '../../redux/reducers/userSlice'
 import showToast from '../../functions/showToast'
 
 const ZoomSettings = ({ navigation }) => {
-  const { token,user } = useSelector(selectUser);
+  const { token, user } = useSelector(selectUser);
   const dispatch = useDispatch()
   const [loader, setLoader] = useState(false);
   const [publicKey, setPublicKey] = useState(user?.zoom_api_key)
@@ -40,7 +40,7 @@ const ZoomSettings = ({ navigation }) => {
 
   return (
     <RootView title='Zoom Setting'>
-      <View style={{ flex: 1, marginTop: 30, marginHorizontal: 20 }}>
+      <View style={{ flex: 1, marginTop: 30, marginHorizontal: 10 }}>
 
         <MyInputs
           label='Zoom Api Public Key'

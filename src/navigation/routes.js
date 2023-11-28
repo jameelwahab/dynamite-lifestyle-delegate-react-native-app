@@ -1,5 +1,12 @@
 const routes = {
 
+  //? Navigators
+  supportTicketNavigator: "SUPPORT_TICKET_NAVIGATOR",
+  internalTicketNavigator: "INTERNAL_TICKET_NAVIGATOR",
+  chatNavigator: "CHAT_NAVIGATOR",
+
+
+  //? Screens
   login: "LOGIN_SCREEN",
   splash: "SPLASH_SCREEN",
   forgotPassword: "FORGOT_PASSWORD_SCREEN",
@@ -9,7 +16,7 @@ const routes = {
   supportTicketList: "SUPPORT_TICKET_LIST_SCREEN",
   supportTicketDeatail: "SUPPORT_TICKET_DETAIL_SCREEN",
   supportTicketReply: "SUPPORT_TICKET_REPLY_SCREEN",
-  supportTicketNavigator: "SUPPORT_TICKET_NAVIGATION",
+
   supportTicketNotes: "SUPPORT_TICKET_NOTES_SCREEN",
   sendReminderScreen: "SEND_REMINDER_SCREEN",
   otherSettings: "OTHER_SETTINGS_SCREEN",
@@ -18,7 +25,7 @@ const routes = {
   reminderSettings: "REMINDER_SETTINGS_SCREEN",
   zoomSettings: "ZOOM_SETTINGS_SCREEN",
   chat: "CHAT_SETTINGS_SCREEN",
-  chatNavigator: "CHAT_NAVIGATOR",
+
   addNote: "ADD_NOTE",
   notesListing: "NOTES_LISTING"
 }

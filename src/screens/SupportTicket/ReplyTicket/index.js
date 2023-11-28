@@ -157,6 +157,7 @@ const TicketReply = ({ navigation, route }) => {
     <RootView title='Your Reply' >
       <View style={{ flex: 1 }}>
         <KeyboardAwareFlatList
+          // nestedScrollEnabled={true}
           ListHeaderComponent={HeaderView()}
           contentContainerStyle={{ paddingBottom: 80 }}
           showsVerticalScrollIndicator={false}
