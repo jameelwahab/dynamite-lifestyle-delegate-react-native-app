@@ -17,7 +17,8 @@ import OptionModal from '../../components/OptionModal'
 import ConfirmationModal from '../../components/ConfirmationModal'
 import { useNavigation } from '@react-navigation/native'
 import EmptyView from '../../components/EmptyView'
-const List = ({ ticket, user, }) => {
+import { convertTimezone } from '../../functions/convertTime'
+const List = ({ ticket, user, timezone }) => {
   const navigation = useNavigation()
   const { token } = useSelector(selectUser);
   const [loader, setLoader] = useState(false)
@@ -45,7 +46,7 @@ const List = ({ ticket, user, }) => {
     } else if (opt.type == "delete") {
       setTimeout(() => {
         setConfirmationModal({ isVisible: true, title: "Are you sure you want to delete this note?" });
-      }, 320);
+      }, 400);
       setOptionModal({ ...optionModal, isVisible: false, })
     }
   }
@@ -83,7 +84,7 @@ const List = ({ ticket, user, }) => {
                 {item?.action_user_info?.action_name}
               </MyText>
             </View>
-            <MyText fontSize={10} >{moment(item?.note_date_time).format("YYYY-MM-DD hh:mm A")}</MyText>
+            <MyText fontSize={10} >{convertTimezone(item?.note_date_time, timezone).format("YYYY-MM-DD hh:mm A")}</MyText>
 
             <TouchableOpacity
               onPress={() => setOptionModal({ isVisible: true, for: item })}
@@ -104,7 +105,7 @@ const List = ({ ticket, user, }) => {
   return (
     <RootView hideHeader >
       <View style={{ flex: 1, marginHorizontal: -10 }}>
-       
+
 
         <View style={{ flex: 1, marginTop: 10, }}>
           <FlatList

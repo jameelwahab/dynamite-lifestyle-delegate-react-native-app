@@ -21,6 +21,7 @@ import { selectSettings, setSettings } from '../../redux/reducers/settingSlice';
 import MyInputs from '../../components/MyInputs';
 import FastImage from 'react-native-fast-image';
 import MyImage2 from '../../components/MyImage2';
+import { setTimeZone } from '../../redux/reducers/timezoneSlice';
 
 
 
@@ -33,11 +34,11 @@ const Login = ({ navigation }) => {
   const [loader, setLoader] = useState(false)
 
 
-  onForgotPasswordScreen = () => {
+  const onForgotPasswordScreen = () => {
     navigation.navigate(routes.forgotPassword);
   }
 
-  onMainScreen = async () => {
+  const onMainScreen = async () => {
     if (email.trim() == "") {
       showToast({ body: "Please enter your email" });
     } else if (!isEmailValid(email.trim())) {
@@ -69,6 +70,7 @@ const Login = ({ navigation }) => {
       await AsyncStorage.setItem("@token", resp?.token);
       dispatch(setSettings(res?.consultant_setting));
       dispatch(setUserAndToken({ user: res?.consultant, token: resp?.token }));
+      dispatch(setTimeZone({ user: res?.consultant?.time_zone, admin: res?.time_zone }))
       navigation.reset({
         index: 0,
         routes: [{ name: routes.mainScreen }]

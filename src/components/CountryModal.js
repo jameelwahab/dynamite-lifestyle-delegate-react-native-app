@@ -20,7 +20,7 @@ import MyText from './MyText';
 import { fonts } from '../utilities/fonts';
 
 
-export default function CountryModal({ selectCountry=()=>{}, isVisible, closeModal }) {
+export default function CountryModal({ selectCountry = () => { }, isVisible, closeModal }) {
   const [searchText, setSearchText] = useState('');
   const [listData, setListData] = useState([])
 
@@ -77,14 +77,24 @@ export default function CountryModal({ selectCountry=()=>{}, isVisible, closeMod
       animationInTiming={300}
       animationOutTiming={300}
     >
-      <SafeAreaView style={{borderTopLeftRadius:10,borderTopRightRadius:10, flex: 0.9, marginTop: "auto", backgroundColor: colors.secondary }}>
+      <SafeAreaView style={{ borderTopLeftRadius: 10, borderTopRightRadius: 10, flex: 0.9, marginTop: "auto", backgroundColor: colors.secondary }}>
 
         <View style={ModalStyle.container}>
-          <View>
-            <Pressable onPress={closeModal} style={{ alignSelf: "flex-end", marginRight: 10, marginBottom: 10 }}>
+
+          <View style={{ flexDirection: "row", justifyContent: "space-between", padding: 15, borderBottomWidth: 1 / 3, borderBottomColor: colors.lightText }}>
+            <View>
+              <MyText fontSize={18} type='medium' >Countries</MyText>
+              <MyText color={colors.lightText} fontSize={12}>Select your country from list below</MyText>
+            </View>
+            <Pressable onPress={closeModal}>
               {icons.crosssWithCircle()}
             </Pressable>
           </View>
+          {/* <View>
+            <Pressable onPress={closeModal} style={{ alignSelf: "flex-end", marginRight: 10, marginBottom: 10 }}>
+              {icons.crosssWithCircle()}
+            </Pressable>
+          </View> */}
           <View style={ModalStyle.searchView}>
             <View>
               {icons.search()}
@@ -187,7 +197,9 @@ const ModalStyle = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 10,
     borderRadius: 10,
-    marginHorizontal: 10
+    marginHorizontal: 10,
+    marginTop: 10,
+    marginBottom:10
   },
   flatlistItemText: {
     fontSize: 16,

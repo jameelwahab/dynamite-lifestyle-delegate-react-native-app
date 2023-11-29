@@ -49,15 +49,7 @@ const ImageUploadModal = ({
 
         })
           .then(image => {
-            onImagePicked({
-              uri: Platform.OS == "ios" ? image.sourceURL : image.path,
-              name: image.filename,
-              type: image.mime,
-              height: image.height,
-              width: image.width,
-            });
-
-
+            onImagePicked(makeImageObject(image));
             setTimeout(() =>
               closeModal(), 500)
           })
@@ -89,22 +81,10 @@ const ImageUploadModal = ({
       .then(image => {
         console.log(image, "image")
         if (!multiple) {
-          onImagePicked({
-            uri: Platform.OS == "ios" ? image.sourceURL : image.path,
-            name: image.filename,
-            type: image.mime,
-            height: image.height,
-            width: image.width,
-          });
+          onImagePicked(makeImageObject(image));
         } else {
           let images = image.map((x) => {
-            return {
-              uri: Platform.OS == "ios" ? x.sourceURL : x.path,
-              name: x.filename,
-              type: x.mime,
-              height: x.height,
-              width: x.width,
-            }
+            return makeImageObject(x);
           });
           onImagePicked(images)
         }
@@ -124,7 +104,20 @@ const ImageUploadModal = ({
       });
 
   }
-
+  const makeImageObject = (image) => {
+    let obj = {
+      uri: Platform.OS == "ios" ? image.sourceURL : image.path,
+      name: !!image.filename ?
+        image.filename :
+        Platform.OS == "ios" ?
+          image.sourceURL.split("/").pop() :
+          image.path.split("/").pop(),
+      type: image.mime,
+      height: image.height,
+      width: image.width,
+    }
+    return obj
+  }
   return (
     <Modal
       isVisible={isVisible}

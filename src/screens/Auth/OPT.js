@@ -21,10 +21,6 @@ const OPTscreen = ({ navigation, route }) => {
   const codeInput = useRef()
 
   onResetPasswordScreen = async () => {
-    navigation.navigate(routes.resetPassword, {
-      email: route.params?.email
-    })
-    return
     if (code.length < 6) {
       showToast({ body: "Please enter your 6 digit code!" })
     } else {

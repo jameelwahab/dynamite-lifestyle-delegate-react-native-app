@@ -22,10 +22,12 @@ import Toast from 'react-native-toast-message';
 import showToast from '../../../functions/showToast';
 import UserImage from '../../../components/UserImage';
 import utilities from '../../../utilities';
+import { convertTimezone } from '../../../functions/convertTime';
+import { selectTimeZone } from '../../../redux/reducers/timezoneSlice';
 
 
 const ListView = ({ isLoading, list, active, route, departmentList, token, refresh, user, setLoader, isLoadingMore, loadMore, type }) => {
-  console.log(type)
+  const timezone = useSelector(selectTimeZone);
   const [isOptionModalShown, setIsOptionModal] = useState({ isVisible: false, for: "" })
   const [isDepartmentModalShown, setIsDepartmentModalShown] = useState(false);
   const [isCalendarModalVisible, setCalendarModalVisiblity] = useState(false);
@@ -51,7 +53,7 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
       setIsOptionModal({ ...isOptionModalShown, isVisible: false, })
       setTimeout(() => {
         setIsDepartmentModalShown(true)
-      }, 320);
+      }, 400);
     }
 
 
@@ -69,7 +71,7 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
       setDate(moment().format("YYYY-MM-DD"))
       setTimeout(() => {
         setCalendarModalVisiblity(true)
-      }, 320);
+      }, 400);
     }
 
     else if (option.key == "needs_to_attention") {
@@ -81,7 +83,7 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
           title: "Are you sure you want to move this ticket to need attention?",
           for: "needs_to_attention"
         })
-      }, 320);
+      }, 400);
     }
 
     else if (option.key == "fixed") {
@@ -92,7 +94,7 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
           title: "Are you sure you want to move this ticket to fixed?",
           for: "fixed"
         })
-      }, 320);
+      }, 400);
     }
     else if (option.key == "attended") {
       setIsOptionModal({ ...isOptionModalShown, isVisible: false, })
@@ -102,14 +104,14 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
           title: "Are you sure you want to move this ticket to attended?",
           for: "attended"
         })
-      }, 320);
+      }, 400);
     }
 
     else if (option.key == "mark-resolve") {
       setIsOptionModal({ ...isOptionModalShown, isVisible: false, })
       setTimeout(() => {
         setMarkResolveModalVisiblity(true)
-      }, 320);
+      }, 400);
     }
     else if (option.key == "send_reminder") {
       navigation.navigate(routes.sendReminderScreen, {
@@ -132,7 +134,7 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
       setTimeout(() => {
         setResolveNoteModal({ isVisible: true, note: isOptionModalShown?.for?.close_note })
         setIsOptionModal({ for: "", isVisible: false, })
-      }, 320);
+      }, 400);
     }
 
     else {
@@ -550,7 +552,7 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
           <View style={{ flex: 1, marginHorizontal: 10, }}>
             <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
               <MyText fontSize={14} type='medium' >{!!item?.member?.first_name ? item?.member?.first_name + " " + item?.member?.last_name : "N/A"}</MyText>
-              <MyText fontSize={10} type='light'>{moment(item.last_action_date).fromNow()}
+              <MyText fontSize={10} type='light'>{convertTimezone(item.last_action_date, timezone).fromNow()}
               </MyText>
 
             </View>
@@ -562,7 +564,7 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
               <View style={__styles.badges} />}
           </View>
         </>
-      </TouchableHighlight>)
+      </TouchableHighlight >)
   }
 
   //? main

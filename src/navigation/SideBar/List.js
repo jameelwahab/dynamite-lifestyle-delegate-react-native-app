@@ -3,6 +3,7 @@ import { icons } from "../../utilities/icons";
 import StackSupportTicket from "../NestedStacks/StackSupportTicket";
 import StackChat from "../NestedStacks/StackChat";
 import StackInternalTickets from "../NestedStacks/StackInternalTicket";
+import StackContactSupport from "../NestedStacks/StackContactSupport";
 
 export const drawerMenuList = [
   {
@@ -23,11 +24,18 @@ export const drawerMenuList = [
       type: "internal_ticket"
     }
   },
-  {
-    name: 'Chat',
-    key: routes.chatNavigator,
-    component: StackChat,
-    icon: icons.handPromise,
-    params: {}
-  },
+  // {
+  //   name: 'Chat',
+  //   key: routes.chatNavigator,
+  //   component: StackChat,
+  //   icon: icons.handPromise,
+  //   params: {}
+  // },
+  // {
+  //   name: 'Contact Support',
+  //   key: routes.contactSupportNavigator,
+  //   component: StackContactSupport,
+  //   icon: icons.handPromise,
+  //   params: {}
+  // },
 ];

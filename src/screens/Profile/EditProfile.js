@@ -21,6 +21,7 @@ import TimeZoneModal from '../../components/TimeZoneModal'
 import { EDIT_PROFILE } from '../../DAL'
 import MyLoader from '../../components/MyLoader'
 import showToast from '../../functions/showToast'
+import { setUserTimeZone } from '../../redux/reducers/timezoneSlice'
 
 const EditProfile = ({ navigation }) => {
   const [isCountryModalVisible, setIsCountryModalVisible] = useState(false);
@@ -65,7 +66,8 @@ const EditProfile = ({ navigation }) => {
 
     let res = await EDIT_PROFILE({ navigation, token, body: fd, params: user?._id });
     if (res.code == 200) {
-      dispatch(setConsultant(res?.consultant))
+      dispatch(setConsultant(res?.consultant));
+      dispatch(setUserTimeZone(res?.consultant?.time_zone));
       showToast({ type: 'success', title: res.message, });
       navigation.goBack()
     }

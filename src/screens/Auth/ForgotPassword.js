@@ -20,10 +20,6 @@ const ForgotPassword = ({ navigation }) => {
 
 
   onOPTScreen = async () => {
-    navigation.navigate(routes.optScreen, {
-      email: email
-    });
-    return;
     if (email.trim() == "") {
       showToast({ body: "Please enter your email address!" })
     }

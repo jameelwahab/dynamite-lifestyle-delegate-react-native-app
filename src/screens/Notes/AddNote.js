@@ -11,8 +11,10 @@ import { ADD_NOTES, EDIT_NOTES } from '../../DAL'
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../redux/reducers/userSlice'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import MyText from '../../components/MyText'
+import Header from '../../components/Header'
 const AddNote = ({ navigation, route }) => {
-  
+
   const { token } = useSelector(selectUser)
   const oldNote = route?.params?.note;
   const [note, setNote] = useState(!!oldNote ? oldNote?.internal_note : "");
@@ -57,11 +59,15 @@ const AddNote = ({ navigation, route }) => {
     <RootView hideHeader>
       <KeyboardAwareScrollView>
         <View>
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={__styles.closeBtnView}>
-            {icons.back(colors.primary, 25)}
-          </TouchableOpacity>
+          <View style={{ flexDirection: "row", alignItems: "center", marginTop: 10 }}>
+
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={__styles.closeBtnView}>
+              {icons.back(colors.primary, 25)}
+            </TouchableOpacity>
+            <MyText fontSize={18} color={colors.primary} type='bold'> {!!oldNote ? "Edit Note" : "Add Note"} </MyText>
+          </View>
 
 
           <View style={{ flex: 1, marginTop: 15 }}>
@@ -106,6 +112,6 @@ const __styles = StyleSheet.create({
     borderRadius: 40 / 2,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 10
+    marginRight: 10
   }
 })

@@ -14,6 +14,7 @@ import { INIT_WITHOUT_TOKEN, INIT_WITH_TOKEN } from '../../DAL'
 import { setSettings } from '../../redux/reducers/settingSlice'
 import routes from '../../navigation/routes'
 import { setUserAndToken } from '../../redux/reducers/userSlice'
+import { setTimeZone } from '../../redux/reducers/timezoneSlice'
 
 
 const Splash = ({ navigation }) => {
@@ -43,6 +44,7 @@ const Splash = ({ navigation }) => {
     if (res.code == 200) {
       dispatch(setSettings(res?.consultant_setting));
       dispatch(setUserAndToken({ user: res?.consultant, token: token }));
+      dispatch(setTimeZone({ user: res?.consultant?.time_zone, admin: res?.time_zone }))
       moveTo(routes.mainScreen)
     } else if (res.code == 401) {
       try {

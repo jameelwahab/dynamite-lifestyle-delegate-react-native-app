@@ -22,7 +22,8 @@ import ConfirmationModal from '../../../components/ConfirmationModal'
 import showToast from '../../../functions/showToast'
 import ImageZoomer from '../../../components/ImageZoomer'
 import EmptyView from '../../../components/EmptyView'
-const Comments = ({ commentsList, ticket, user, autoMessages, addMessage, }) => {
+import { convertTimezone } from '../../../functions/convertTime'
+const Comments = ({ commentsList, ticket, user, autoMessages, addMessage, listRoute, timezone }) => {
   const { token } = useSelector(selectUser)
   const navigation = useNavigation()
   const [modalImage, setModalImage] = useState("")
@@ -38,7 +39,7 @@ const Comments = ({ commentsList, ticket, user, autoMessages, addMessage, }) => 
       setMsgOptionModal({ ...msgOptionModal, isVisible: false })
       setTimeout(() => {
         setConfirmationModalVisibility(true)
-      }, 320);
+      }, 400);
     } else if (selectedOpt.type == "edit") {
       navigation.navigate(routes.supportTicketReply, {
         autoResonderMsgs: autoMessages,
@@ -97,7 +98,7 @@ const Comments = ({ commentsList, ticket, user, autoMessages, addMessage, }) => 
           />
           <View style={{ marginLeft: 10, flex: 1 }}>
             <MyText type='medium'  >{item?.action_user_info?.action_name}</MyText>
-            <MyText fontSize={10} color={colors.lightText} type='medium' >{moment(item.updatedAt).fromNow()}</MyText>
+            <MyText fontSize={10} color={colors.lightText} type='medium' >{convertTimezone(item.updatedAt, timezone).fromNow()}</MyText>
           </View>
           {item?.action_user_info?.action_id == user?._id &&
             <TouchableHighlight
@@ -192,7 +193,7 @@ const Comments = ({ commentsList, ticket, user, autoMessages, addMessage, }) => 
         />
       </View>
       <View >
-        {!!ticket && headerView()}
+        {!!ticket && (listRoute != 'solved' && listRoute != "trash") && headerView()}
       </View>
 
       <OptionModal

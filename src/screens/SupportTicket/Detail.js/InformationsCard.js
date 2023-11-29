@@ -10,7 +10,8 @@ import { S3_URL } from '../../../utilities/constants'
 import { MyButton, TransparentButton } from '../../../components/MyButton'
 import ImageZoomer from '../../../components/ImageZoomer'
 
-const InformationsCard = ({ ticket, user, moveToMarkResolve }) => {
+const InformationsCard = ({ ticket, user, moveToMarkResolve, listRoute }) => {
+
   const [modalListImages, setModalListImages] = useState({ index: -1, list: [] });
 
 
@@ -108,9 +109,10 @@ const InformationsCard = ({ ticket, user, moveToMarkResolve }) => {
 
             </View>
 
-            <View style={{ marginTop: 20, marginLeft: "60%" }}>
-              <MyButton title='Mark Resolve' onPress={moveToMarkResolve} textStyle={{ color: colors.black }} />
-            </View>
+            {(listRoute != 'solved' && listRoute != "trash") &&
+              <View style={{ marginTop: 20, marginLeft: "60%" }}>
+                <MyButton title='Mark Resolve' onPress={moveToMarkResolve} textStyle={{ color: colors.black }} />
+              </View>}
 
 
 

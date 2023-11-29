@@ -22,11 +22,15 @@ import UserImage from '../../../components/UserImage';
 import moment from 'moment';
 import Collapsible from 'react-native-collapsible';
 import { icons } from '../../../utilities/icons';
+import { convertTimezone } from '../../../functions/convertTime';
+import { selectTimeZone } from '../../../redux/reducers/timezoneSlice';
 
 let autoMessages = [];
 const Detail = ({ navigation, route }) => {
   const { route: listRoute, refreshList, tab } = route?.params
   const { token, user } = useSelector(selectUser);
+  const timezone = useSelector(selectTimeZone);
+
   const layout = useWindowDimensions();
   const [index, setIndex] = useState(!!tab ? tab : 0);
   const [loader, setLoader] = useState(true);
@@ -41,7 +45,6 @@ const Detail = ({ navigation, route }) => {
     { key: 'notes', title: 'Internal Notes', index: 2 },
   ]);
 
-  console.log(route, "route")
 
   useEffect(() => {
     autoMessages = [];
@@ -122,7 +125,7 @@ const Detail = ({ navigation, route }) => {
 
             </View>
             <View style={{ margin: 10 }}>
-              <MyText isLabel>Reson TO Solve*</MyText>
+              <MyText isLabel>Reson to Solve*</MyText>
               <View>
                 {optionView("Answered")}
                 {optionView("Solved")}
@@ -215,18 +218,25 @@ const Detail = ({ navigation, route }) => {
         return <InformationsCard
           moveToMarkResolve={openMarkResolveModal}
           ticket={ticket}
+          listRoute={listRoute}
           user={user} />
 
       case 'comments':
         return <Comments
           commentsList={comments}
           ticket={ticket}
+          listRoute={listRoute}
           user={user}
           autoMessages={autoMessages}
-          addMessage={addMessage} />
+          addMessage={addMessage}
+          timezone={timezone}
+        />
 
       case 'notes':
-        return <List ticket={ticket} user={user} />
+        return <List
+          ticket={ticket}
+          user={user}
+          timezone={timezone} />
 
     }
   }
@@ -280,11 +290,11 @@ const Detail = ({ navigation, route }) => {
 
           <View style={__styles.cardItemView}>
             <MyText fontSize={12}>Created at :</MyText>
-            <MyText fontSize={12}>{moment(ticket?.createdAt).format("DD MMM YYYY [at] hh:mm A")}</MyText>
+            <MyText fontSize={12}>{convertTimezone(ticket?.createdAt, timezone).format("DD MMM YYYY [at] hh:mm A")}</MyText>
           </View>
           <View style={__styles.cardItemView}>
             <MyText fontSize={12}>Responded on:</MyText>
-            <MyText fontSize={12}>{moment(ticket?.updatedAt).format("DD MMM YYYY [at] hh:mm A")}</MyText>
+            <MyText fontSize={12}>{convertTimezone(ticket?.updatedAt, timezone).format("DD MMM YYYY [at] hh:mm A")}</MyText>
           </View>
 
         </Collapsible >
