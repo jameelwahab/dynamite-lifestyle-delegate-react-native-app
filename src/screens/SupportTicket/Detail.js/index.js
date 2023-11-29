@@ -27,7 +27,8 @@ import { selectTimeZone } from '../../../redux/reducers/timezoneSlice';
 
 let autoMessages = [];
 const Detail = ({ navigation, route }) => {
-  const { route: listRoute, refreshList, tab } = route?.params
+  const { route: listRoute, refreshList, tab, isMine } = route?.params;
+  console.log(listRoute)
   const { token, user } = useSelector(selectUser);
   const timezone = useSelector(selectTimeZone);
 
@@ -39,11 +40,7 @@ const Detail = ({ navigation, route }) => {
   const [ticket, setTicket] = useState(null);
   const [isMarkResolveModalVisible, setMarkResolveModalVisiblity] = useState(false);
   const [isInfoViewCollaspsed, setIsInfoViewCollaspsed] = useState(false)
-  const [routes] = React.useState([
-    { key: 'ticket', title: 'Ticket', index: 0 },
-    { key: 'comments', title: 'Comments', index: 1 },
-    { key: 'notes', title: 'Internal Notes', index: 2 },
-  ]);
+  const [routes] = React.useState(!!isMine ? tabs.filter(x => x.index != 2) : tabs);
 
 
   useEffect(() => {
@@ -302,12 +299,25 @@ const Detail = ({ navigation, route }) => {
     }
   }
 
+  const solvedView = () => {
+    return (
+      <View style={{
+        marginTop: 10, width: 75, backgroundColor: "#53A551", alignItems: "center", paddingVertical: 3, borderRadius: 20,
+        position: "absolute", top: -45, left: 40, right: -10, zIndex: 2
+      }}>
+        <MyText fontSize={12} style={{ textTransform: "capitalize" }}>{"solved"}</MyText>
+      </View>
+
+    )
+  }
+
   return (
     <RootView  >
 
       <View style={{ flex: 1 }}>
-        {renderTopView()}
-        {infoView()}
+        {isMine == false && renderTopView()}
+        {isMine == false && infoView()}
+        {isMine == true && listRoute == "solved" && solvedView()}
         <View style={{ flex: 1 }}>
 
           {!!ticket &&
@@ -330,6 +340,14 @@ const Detail = ({ navigation, route }) => {
 }
 
 export default Detail;
+
+const tabs = [
+  { key: 'ticket', title: 'Ticket', index: 0 },
+  { key: 'comments', title: 'Comments', index: 1 },
+  { key: 'notes', title: 'Internal Notes', index: 2 },
+];
+
+
 
 const __styles = StyleSheet.create({
   cardView: {

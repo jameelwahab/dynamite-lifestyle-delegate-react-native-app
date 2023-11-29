@@ -31,11 +31,11 @@ export const drawerMenuList = [
   //   icon: icons.handPromise,
   //   params: {}
   // },
-  // {
-  //   name: 'Contact Support',
-  //   key: routes.contactSupportNavigator,
-  //   component: StackContactSupport,
-  //   icon: icons.handPromise,
-  //   params: {}
-  // },
+  {
+    name: 'Contact Support',
+    key: routes.contactSupportNavigator,
+    component: StackContactSupport,
+    icon: icons.handPromise,
+    params: {}
+  },
 ];

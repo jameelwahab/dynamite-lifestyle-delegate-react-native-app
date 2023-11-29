@@ -3,7 +3,6 @@ import moment from "moment-timezone";
 
 
 export const convertTimezone = (dateTime, timezone) => {
-  console.log(dateTime, timezone, "dateTime, timezone")
   if (!(!!dateTime)) {
     return moment();
   }
