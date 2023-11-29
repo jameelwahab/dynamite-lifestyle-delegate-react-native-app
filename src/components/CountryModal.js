@@ -74,6 +74,8 @@ export default function CountryModal({ selectCountry=()=>{}, isVisible, closeMod
       useNativeDriverForBackdrop={true}
       onModalHide={() => setSearchText("")}
       style={{ margin: 0 }}
+      animationInTiming={300}
+      animationOutTiming={300}
     >
       <SafeAreaView style={{borderTopLeftRadius:10,borderTopRightRadius:10, flex: 0.9, marginTop: "auto", backgroundColor: colors.secondary }}>
 

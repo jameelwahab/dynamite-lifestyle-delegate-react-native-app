@@ -45,7 +45,7 @@ const List = ({ ticket, user, }) => {
     } else if (opt.type == "delete") {
       setTimeout(() => {
         setConfirmationModal({ isVisible: true, title: "Are you sure you want to delete this note?" });
-      }, 1000);
+      }, 320);
       setOptionModal({ ...optionModal, isVisible: false, })
     }
   }

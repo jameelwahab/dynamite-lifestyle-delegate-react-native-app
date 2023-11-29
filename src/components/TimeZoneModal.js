@@ -72,6 +72,8 @@ export default function TimeZoneModal({ selectTimeZone = () => { }, isVisible, c
       onBackdropPress={closeModal}
       useNativeDriverForBackdrop={true}
       onModalHide={() => setSearchText("")}
+      animationInTiming={300}
+      animationOutTiming={300}
       style={{ margin: 0 }}
     >
       <SafeAreaView style={{ borderTopLeftRadius: 10, borderTopRightRadius: 10, flex: 0.9, marginTop: "auto", backgroundColor: colors.secondary }}>

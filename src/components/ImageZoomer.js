@@ -43,6 +43,8 @@ const ImageZoomer = ({
       backdropOpacity={0}
       animationIn="zoomIn"
       animationOut={'zoomOut'}
+      animationInTiming={300}
+      animationOutTiming={300}
       style={{
         margin: 0,
       }}>

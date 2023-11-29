@@ -79,6 +79,8 @@ const ProfileDropDown = ({ isVisible = false, closeModal = () => { }, user }) =>
       onBackdropPress={closeModal}
       onBackButtonPress={closeModal}
       backdropOpacity={0}
+      animationInTiming={300}
+      animationOutTiming={300}
       useNativeDriverForBackdrop={true}
       hideModalContentWhileAnimating={true}
       style={__styles.modal}>

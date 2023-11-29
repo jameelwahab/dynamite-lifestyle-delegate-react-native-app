@@ -65,6 +65,8 @@ const ChatList = ({ navigation }) => {
         onBackdropPress={() => setPortalModalVisiblity(false)}
         useNativeDriverForBackdrop={true}
         style={{ margin: 0 }}
+        animationInTiming={300}
+        animationOutTiming={300}
       >
         <SafeAreaView style={{ marginTop: "auto", backgroundColor: colors.secondary, borderTopLeftRadius: 10, borderTopRightRadius: 10 }}>
           <View style={{ height: utilities.screenHeight() * 0.8, }}>

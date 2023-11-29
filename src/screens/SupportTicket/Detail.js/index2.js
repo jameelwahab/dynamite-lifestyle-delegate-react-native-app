@@ -130,7 +130,7 @@ const TicketDetail = ({ navigation, route }) => {
       setIsOptionModalVisible(false)
       setTimeout(() => {
         setMarkResolveModalVisiblity(true)
-      }, 1000);
+      }, 320);
     }
   }
 
@@ -205,6 +205,8 @@ const TicketDetail = ({ navigation, route }) => {
         avoidKeyboard={true}
         animationIn='zoomIn'
         animationOut='zoomOut'
+        animationInTiming={300}
+        animationOutTiming={300}
         style={{ margin: 10 }}>
         <SafeAreaView style={{ backgroundColor: colors.secondaryVariant, borderRadius: 10, }} >
           <View style={{ margin: 10 }}>

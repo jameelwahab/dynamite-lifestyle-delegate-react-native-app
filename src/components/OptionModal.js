@@ -17,6 +17,8 @@ const OptionModal = ({
       onBackdropPress={closeModal}
       onBackButtonPress={closeModal}
       useNativeDriverForBackdrop={true}
+      animationInTiming={300}
+      animationOutTiming={300}
       style={{ margin: 0 }}>
       <SafeAreaView style={{ backgroundColor: colors.secondaryVariant, marginTop: "auto", borderTopLeftRadius: 10, borderTopRightRadius: 10, }} >
         <FlatList

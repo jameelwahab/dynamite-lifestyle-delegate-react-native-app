@@ -21,6 +21,7 @@ import { TransparentButton } from '../../../components/MyButton';
 import Toast from 'react-native-toast-message';
 import showToast from '../../../functions/showToast';
 import UserImage from '../../../components/UserImage';
+import utilities from '../../../utilities';
 
 
 const ListView = ({ isLoading, list, active, route, departmentList, token, refresh, user, setLoader, isLoadingMore, loadMore, type }) => {
@@ -50,7 +51,7 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
       setIsOptionModal({ ...isOptionModalShown, isVisible: false, })
       setTimeout(() => {
         setIsDepartmentModalShown(true)
-      }, 1000);
+      }, 320);
     }
 
 
@@ -68,7 +69,7 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
       setDate(moment().format("YYYY-MM-DD"))
       setTimeout(() => {
         setCalendarModalVisiblity(true)
-      }, 1000);
+      }, 320);
     }
 
     else if (option.key == "needs_to_attention") {
@@ -80,7 +81,7 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
           title: "Are you sure you want to move this ticket to need attention?",
           for: "needs_to_attention"
         })
-      }, 1000);
+      }, 320);
     }
 
     else if (option.key == "fixed") {
@@ -91,7 +92,7 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
           title: "Are you sure you want to move this ticket to fixed?",
           for: "fixed"
         })
-      }, 1000);
+      }, 320);
     }
     else if (option.key == "attended") {
       setIsOptionModal({ ...isOptionModalShown, isVisible: false, })
@@ -101,14 +102,14 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
           title: "Are you sure you want to move this ticket to attended?",
           for: "attended"
         })
-      }, 1000);
+      }, 320);
     }
 
     else if (option.key == "mark-resolve") {
       setIsOptionModal({ ...isOptionModalShown, isVisible: false, })
       setTimeout(() => {
         setMarkResolveModalVisiblity(true)
-      }, 1000);
+      }, 320);
     }
     else if (option.key == "send_reminder") {
       navigation.navigate(routes.sendReminderScreen, {
@@ -131,7 +132,7 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
       setTimeout(() => {
         setResolveNoteModal({ isVisible: true, note: isOptionModalShown?.for?.close_note })
         setIsOptionModal({ for: "", isVisible: false, })
-      }, 1000);
+      }, 320);
     }
 
     else {
@@ -220,6 +221,8 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
         isVisible={isOptionModalShown.isVisible}
         onBackdropPress={() => setIsOptionModal({ isVisible: false, for: "" })}
         onBackButtonPress={() => setIsOptionModal({ isVisible: false, for: "" })}
+        animationInTiming={300}
+        animationOutTiming={300}
         useNativeDriverForBackdrop={true}
         style={{ margin: 0 }}>
         <SafeAreaView style={{ backgroundColor: colors.secondaryVariant, marginTop: "auto", borderTopLeftRadius: 10, borderTopRightRadius: 10, }} >
@@ -257,25 +260,42 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
         onBackdropPress={() => setIsDepartmentModalShown(false)}
         onBackButtonPress={() => setIsDepartmentModalShown(false)}
         useNativeDriverForBackdrop={true}
+        animationInTiming={300}
+        animationOutTiming={300}
         style={{ margin: 0 }}>
-        <SafeAreaView style={{ backgroundColor: colors.secondaryVariant, marginTop: "auto", borderTopLeftRadius: 10, borderTopRightRadius: 10, maxHeight: 500 }} >
-          <FlatList
-            data={departmentList}
-            contentContainerStyle={{ paddingVertical: 10 }}
-            indicatorStyle='white'
-            renderItem={({ item, index }) => {
-              return (
-                <TouchableHighlight
-                  onPress={() => updateDepartment(item)}
-                  underlayColor={colors.secondary} >
-                  <View style={{ paddingVertical: 10, paddingLeft: 20, backgroundColor: isOptionModalShown.for?.department?._id == item?._id ? "#FFFFFF11" : colors.transparent }}>
-                    <MyText fontSize={16} >{item?.title}</MyText>
-                  </View>
-                </TouchableHighlight>
-              )
-            }
-            }
-          />
+        <SafeAreaView style={{ backgroundColor: colors.secondaryVariant, marginTop: "auto", borderTopLeftRadius: 10, borderTopRightRadius: 10, }} >
+          <View style={{ height: utilities.screenHeight() * 0.7, }}>
+            <View style={{ flexDirection: "row", justifyContent: "space-between", padding: 15, borderBottomWidth: 1 / 3, borderBottomColor: colors.lightText }}>
+              <View>
+                <MyText fontSize={18} type='medium' >Departments</MyText>
+                <MyText color={colors.lightText} fontSize={12}>Select your department from list below</MyText>
+              </View>
+              <Pressable
+                onPress={() => setIsDepartmentModalShown(false)}
+              >
+                {icons.crosssWithCircle()}
+              </Pressable>
+            </View>
+            <View style={{ flex: 1 }}>
+              <FlatList
+                data={departmentList}
+                contentContainerStyle={{ paddingVertical: 10 }}
+                indicatorStyle='white'
+                renderItem={({ item, index }) => {
+                  return (
+                    <TouchableHighlight
+                      onPress={() => updateDepartment(item)}
+                      underlayColor={colors.secondary} >
+                      <View style={{ paddingVertical: 10, paddingLeft: 20, backgroundColor: isOptionModalShown.for?.department?._id == item?._id ? "#FFFFFF11" : colors.transparent }}>
+                        <MyText fontSize={16} >{item?.title}</MyText>
+                      </View>
+                    </TouchableHighlight>
+                  )
+                }
+                }
+              />
+            </View>
+          </View>
         </SafeAreaView>
       </Modal>)
   }
@@ -289,6 +309,8 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
         useNativeDriverForBackdrop={true}
         animationIn='zoomIn'
         animationOut='zoomOut'
+        animationInTiming={300}
+        animationOutTiming={300}
         style={{ margin: 10 }}>
         <SafeAreaView style={{ backgroundColor: colors.secondaryVariant, borderRadius: 10, }} >
           <View style={{ margin: 10 }}>
@@ -353,6 +375,8 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
         useNativeDriverForBackdrop={true}
         animationIn='zoomIn'
         animationOut='zoomOut'
+        animationInTiming={300}
+        animationOutTiming={300}
         style={{ margin: 10 }}>
         <SafeAreaView style={{ backgroundColor: colors.secondaryVariant, borderRadius: 10, }} >
           <View style={{ margin: 10 }}>
@@ -422,6 +446,8 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
         avoidKeyboard={true}
         animationIn='zoomIn'
         animationOut='zoomOut'
+        animationInTiming={300}
+        animationOutTiming={300}
         style={{ margin: 10 }}>
         <SafeAreaView style={{ backgroundColor: colors.secondaryVariant, borderRadius: 10, }} >
           <View style={{ margin: 10 }}>
@@ -467,6 +493,8 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
         useNativeDriverForBackdrop={true}
         animationIn='zoomIn'
         animationOut='zoomOut'
+        animationInTiming={300}
+        animationOutTiming={300}
         style={{ margin: 10 }}>
         <SafeAreaView style={{ backgroundColor: colors.secondaryVariant, borderRadius: 10, }} >
           <View style={{ margin: 20 }}>

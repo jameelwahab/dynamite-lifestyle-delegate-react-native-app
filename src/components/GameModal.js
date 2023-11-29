@@ -92,6 +92,8 @@ const GameModal = ({ isVisible, closeModal, selectGame, value, multiple = false 
       onBackdropPress={closeSportModal}
       useNativeDriverForBackdrop={true}
       style={{ margin: 0 }}
+      animationInTiming={300}
+      animationOutTiming={300}
     >
       <SafeAreaView style={{ flex: 0.9, marginTop: "auto" }} >
         <View style={{ flex: 1, backgroundColor: colors.modalBackgroud }}>

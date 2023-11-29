@@ -132,6 +132,8 @@ const ImageUploadModal = ({
       onBackdropPress={closeModal}
       useNativeDriverForBackdrop={true}
       style={{ margin: 0 }}
+      animationInTiming={300}
+      animationOutTiming={300}
     >
       <SafeAreaView style={__modalStyle.root}>
         <View style={__modalStyle.innerView}>

@@ -38,7 +38,7 @@ const Comments = ({ commentsList, ticket, user, autoMessages, addMessage, }) => 
       setMsgOptionModal({ ...msgOptionModal, isVisible: false })
       setTimeout(() => {
         setConfirmationModalVisibility(true)
-      }, 1000);
+      }, 320);
     } else if (selectedOpt.type == "edit") {
       navigation.navigate(routes.supportTicketReply, {
         autoResonderMsgs: autoMessages,
