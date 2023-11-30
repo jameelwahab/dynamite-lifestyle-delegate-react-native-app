@@ -34,6 +34,7 @@ const TicketReply = ({ navigation, route }) => {
   const [loader, setLoader] = useState(false)
   const [showEditor, setShowEditor] = useState(false);
   const [modalImage, setModalImage] = useState({ uri: "", noUrl: false });
+  
   const removeImage = (index) => {
     images.splice(index, 1);
     setImages([...images]);

@@ -56,5 +56,6 @@ export const icons = {
   downward: (color = colors.white, size = 20) => { return (<Ionicons name="caret-down" color={color} size={size} />) },
   mic: (color = colors.white, size = 20) => { return (<Ionicons name="mic" color={color} size={size} />) },
   playCircle: (color = colors.white, size = 20) => { return (<Ionicons name="play-circle" color={color} size={size} />) },
+  filterCircle: (color = colors.white, size = 20) => { return (<Ionicons name="filter-circle" color={color} size={size} />) },
 
 }
