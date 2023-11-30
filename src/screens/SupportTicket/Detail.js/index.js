@@ -299,17 +299,6 @@ const Detail = ({ navigation, route }) => {
     }
   }
 
-  const solvedView = () => {
-    return (
-      <View style={{
-        marginTop: 10, width: 75, backgroundColor: "#53A551", alignItems: "center", paddingVertical: 3, borderRadius: 20,
-        position: "absolute", top: -45, left: 40, right: -10, zIndex: 2
-      }}>
-        <MyText fontSize={12} style={{ textTransform: "capitalize" }}>{"solved"}</MyText>
-      </View>
-
-    )
-  }
 
   return (
     <RootView  >
@@ -317,7 +306,6 @@ const Detail = ({ navigation, route }) => {
       <View style={{ flex: 1 }}>
         {isMine == false && renderTopView()}
         {isMine == false && infoView()}
-        {isMine == true && listRoute == "solved" && solvedView()}
         <View style={{ flex: 1 }}>
 
           {!!ticket &&

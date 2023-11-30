@@ -227,6 +227,68 @@ const List = ({ navigation }) => {
     </Modal>)
   }
 
+  const renderTicketList1 = ({ item, index }) => {
+    return (
+      <TouchableHighlight
+        onPress={() => onTicketDetail(item)}
+        onLongPress={() => setOptions({ isModalVisible: true, selected: item })}
+        delayLongPress={400}
+        style={{ marginTop: 10, borderRadius: 20 }}>
+
+        <View style={{ padding: 15, backgroundColor: colors.secondaryVariant, borderRadius: 20 }}>
+
+          <View style={{ paddingRight: 10 }}>
+            <MyText numberOfLines={2} fontSize={16} type='medium' style={{ flex: 1 }} >{item?.subject}</MyText>
+
+            <MyText fontSize={10} >
+              {convertTimezone(item.createdAt, timezone).fromNow()}
+            </MyText>
+          </View>
+
+
+          <View style={{ flexDirection: "row", marginTop: 10 }} >
+            <View style={{ width: 70, borderWidth: 1 / 3, borderColor: colors.white, borderTopLeftRadius: 10, borderBottomLeftRadius: 10 }}>
+              <View style={{ padding: 10 }}>
+                <MyText align='center' color={colors.lightText} fontSize={12}>ID</MyText>
+              </View>
+              <View style={{ padding: 10, borderTopColor: colors.white, borderTopWidth: 1 / 3 }}>
+                <MyText type='medium' align='center' fontSize={14}>{item?.reference_number}</MyText>
+              </View>
+            </View>
+
+
+            <View style={{ flex: 1, borderTopWidth: 1 / 3, borderBottomWidth: 1 / 3, borderColor: colors.white, }}>
+              <View style={{ padding: 10 }}>
+                <MyText align='center' fontSize={12} color={colors.lightText} >Department</MyText>
+              </View>
+              <View style={{ padding: 10, borderTopColor: colors.white, borderTopWidth: 1 / 3 }}>
+                <MyText type='medium' align='center' fontSize={14}>{!!item?.department ? item?.department?.title : "N/A"}</MyText>
+              </View>
+            </View>
+
+            <View style={{ width: 100, borderWidth: 1 / 3, borderColor: colors.white, borderTopRightRadius: 10, borderBottomRightRadius: 10, }}>
+              <View style={{ padding: 10 }}>
+                <MyText align='center' fontSize={12} color={colors.lightText} >Status</MyText>
+              </View>
+              <View style={{
+                borderBottomRightRadius: 10, padding: 10, borderTopColor: colors.white, borderTopWidth: 1 / 3,
+                //  backgroundColor: getStatusOfTicket(item).color,
+              }}>
+                <MyText type='medium' style={{ textTransform: "capitalize" }} align='center' color={getStatusOfTicket(item).color} fontSize={14}  >{getStatusOfTicket(item).title}</MyText>
+              </View>
+            </View>
+          </View>
+
+
+
+
+
+
+        </View>
+
+      </TouchableHighlight>
+    )
+  }
   const renderTicketList = ({ item, index }) => {
     return (
       <TouchableHighlight
@@ -235,26 +297,46 @@ const List = ({ navigation }) => {
         delayLongPress={400}
         style={{ marginTop: 10, borderRadius: 20 }}>
 
-        <View style={{ flexDirection: "row", padding: 15, backgroundColor: colors.secondaryVariant, borderRadius: 20 }}>
+        <View style={{ padding: 15, backgroundColor: colors.secondaryVariant, borderRadius: 20 }}>
 
-          <View style={{ flex: 1, paddingRight: 10 }}>
-            <MyText numberOfLines={2} fontSize={16} type='medium' >{item?.subject}</MyText>
-
-            <MyText style={{ marginTop: 5 }} fontSize={12} numberOfLines={1} >{!!item?.department?.title ? item?.department?.title : "N/A"}</MyText>
-            <MyText style={{ marginTop: 5 }} fontSize={12} color={colors.primary}  >{"ID: " + item?.reference_number}</MyText>
-          </View>
-
-          <View style={{ alignItems: "flex-end" }}>
+          <View style={{ paddingRight: 10, flexDirection: "row", }}>
+            <View style={{ flex: 1 }}>
+              <MyText numberOfLines={2} fontSize={16} type='medium' style={{ flex: 1 }} >{item?.subject}</MyText>
+            </View>
             <MyText fontSize={10} >
               {convertTimezone(item.createdAt, timezone).fromNow()}
             </MyText>
-
-            <View style={{ marginTop: 10, width: 75, backgroundColor: getStatusOfTicket(item).color, alignItems: "center", paddingVertical: 3, borderRadius: 20 }}>
-              <MyText fontSize={12} style={{ textTransform: "capitalize" }}>{getStatusOfTicket(item).title}</MyText>
-            </View>
           </View>
 
 
+
+          <View style={{ flexDirection: "row", marginTop: 20, borderBottomWidth: 1 / 3, borderBottomColor: colors.lightText, paddingBottom: 5 }}>
+            <View style={{ flex: 0.7 }}>
+              <MyText color={colors.lightText2}>ID :</MyText>
+            </View>
+            <View style={{ flex: 1 }}>
+              <MyText type='medium' >{item.reference_number}</MyText>
+            </View>
+          </View>
+
+          <View style={{ flexDirection: "row", marginTop: 10, borderBottomWidth: 1 / 3, borderBottomColor: colors.lightText, paddingBottom: 5 }}>
+            <View style={{ flex: 0.7 }}>
+              <MyText color={colors.lightText2}>Department :</MyText>
+            </View>
+            <View style={{ flex: 1 }}>
+              <MyText type='medium'>{!!item.department ? item.department?.title : "N/A"}</MyText>
+            </View>
+          </View>
+
+          <View style={{ flexDirection: "row", marginTop: 10, borderBottomWidth: 1 / 3, borderBottomColor: colors.lightText, paddingBottom: 5 }}>
+            <View style={{ flex: 0.7 }}>
+              <MyText color={colors.lightText2}>Status :</MyText>
+            </View>
+            <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
+              {/* <View style={{ height: 10, width: 10, borderRadius: 10 / 2, backgroundColor: getStatusOfTicket(item).color, marginRight: 10 }} /> */}
+              <MyText style={{ textTransform: "capitalize" }} color={getStatusOfTicket(item).color} type='medium'>{getStatusOfTicket(item).title}</MyText>
+            </View>
+          </View>
 
 
         </View>
