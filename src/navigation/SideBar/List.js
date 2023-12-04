@@ -7,35 +7,49 @@ import StackContactSupport from "../NestedStacks/StackContactSupport";
 
 export const drawerMenuList = [
   {
-    name: 'Support Tickets',
+    value: "support_ticket",
     key: routes.supportTicketNavigator,
+    collapsible: false,
     component: StackSupportTicket,
-    icon: icons.handPromise,
+    icon: icons.sidebar.handPromise,
     params: {
       type: "support_ticket"
     }
   },
   {
-    name: 'Internal Tickets',
+    value: "internal-tickets",
+    collapsible: false,
     key: routes.internalTicketNavigator,
     component: StackInternalTickets,
-    icon: icons.handPromise,
+    icon: icons.sidebar.handPromise,
     params: {
       type: "internal_ticket"
     }
   },
+
   // {
-  //   name: 'Chat',
+  //   value: "chat",
+  //   collapsible: false,
   //   key: routes.chatNavigator,
   //   component: StackChat,
-  //   icon: icons.handPromise,
-  //   params: {}
+  //   icon: icons.sidebar.handPromise,
+  //   params: {
+  //   }
   // },
   {
-    name: 'Contact Support',
-    key: routes.contactSupportNavigator,
-    component: StackContactSupport,
-    icon: icons.handPromise,
-    params: {}
+    value: "support",
+    collapsible: true,
+    key: null,
+    icon: icons.sidebar.help,
+    nestedmenu: [
+      {
+        value: "contact_support",
+        key: routes.contactSupportNavigator,
+        component: StackContactSupport,
+        icon: icons.sidebar.handPromise,
+        params: {}
+      },
+    ]
   },
+
 ];

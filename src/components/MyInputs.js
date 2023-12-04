@@ -82,6 +82,7 @@ const __MyInputStyles = StyleSheet.create({
   },
   multilineView: {
     height: 100,
+    
   },
   labelText: {
     fontFamily: fonts.regular,

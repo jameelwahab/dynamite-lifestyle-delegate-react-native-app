@@ -42,6 +42,18 @@ export const MESSAGE_LIST_BY_CHAT_ID = ({ token, navigation, chatId, page }) => 
   })
 }
 
+export const MEMBERS_LIST = ({ token, navigation, data: { event_id, search_text } }) => {
+  return invokeApi({
+    path: `api/member/consultant_member_list_delegate/search`,
+    method: "POST",
+    postData: {
+      event_id, search_text
+    },
+    token: token,
+    navigation: navigation,
+  })
+}
+
 
 export const IS_CHAT_EXIST = ({ token, navigation, memberId, }) => {
   return invokeApi({

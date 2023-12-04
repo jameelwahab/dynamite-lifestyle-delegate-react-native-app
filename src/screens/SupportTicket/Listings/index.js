@@ -193,19 +193,33 @@ const TicketsList = ({ navigation, route }) => {
       {...props}
       scrollEnabled={true}
       indicatorStyle={{ backgroundColor: colors.primary }}
-      style={{ backgroundColor: colors.darkSecondary, }}
+      style={{
+        backgroundColor: colors.darkSecondary,
+        shadowColor: colors.lightText2,
+        shadowOffset: {
+          width: 0,
+          height: 1,
+        },
+        shadowOpacity: 0.20,
+        shadowRadius: 1.41,
+
+      }}
       tabStyle={{ width: "auto", }}
-      renderLabel={({ route, focused, color }) => (
-        <>
-          <MyText color={focused ? colors.primary : colors.lightText} type='medium' >
-            {route.title + " (" + badges[route?.key] + ")"}
-          </MyText>
-          {((route?.key == 'need_fixes' && badges['need_to_fixed_dot'] > 0) ||
-            user?.notify_tab == route?.key) &&
-            <View style={__styles.badges} />
-          }
-        </>
-      )}
+
+      renderLabel={({ route, focused, color }) => {
+        return (
+          <>
+            <MyText color={focused ? colors.primary : colors.lightText} type='medium' >
+              {route.title + " (" + badges[route?.key] + ")"}
+            </MyText>
+            {((route?.key == 'need_fixes' && badges['need_to_fixed_dot'] > 0) ||
+              user?.notify_tab == 'need_to_attention' && route?.key == "needs_to_attention" ||
+              user?.notify_tab == route?.key) &&
+              <View style={__styles.badges} />
+            }
+          </>
+        )
+      }}
       gap={10}
     />
   );
@@ -236,23 +250,24 @@ const TicketsList = ({ navigation, route }) => {
     <RootView
       rightButtonIcon={icons.handPromise}
       hideBackBottomButton={true}
-      title={type == "support_ticket" ? 'Support Tickets' : type == "internal_ticket" ? "Internal Ticktets" : ""}
+      title={type == "support_ticket" ? 'Support Tickets' : type == "internal_ticket" ? "Internal Tickets" : ""}
     >
       {searchView()}
-      <TabView
-        renderTabBar={renderTabBar}
-        navigationState={{ index, routes }}
-        renderScene={renderScene}
-        onIndexChange={(index) => {
-          canLoadMore = false
-          page = 0;
-          setIndex(index);
-          setList([])
-          setLoader(index)
-        }}
-        initialLayout={{ width: layout.width }}
-      />
-
+      <View style={{ flex: 1, marginHorizontal: -10 }}>
+        <TabView
+          renderTabBar={renderTabBar}
+          navigationState={{ index, routes }}
+          renderScene={renderScene}
+          onIndexChange={(index) => {
+            canLoadMore = false
+            page = 0;
+            setIndex(index);
+            setList([])
+            setLoader(index)
+          }}
+          initialLayout={{ width: layout.width }}
+        />
+      </View>
     </RootView>
   )
 

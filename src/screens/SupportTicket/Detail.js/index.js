@@ -28,7 +28,6 @@ import { selectTimeZone } from '../../../redux/reducers/timezoneSlice';
 let autoMessages = [];
 const Detail = ({ navigation, route }) => {
   const { route: listRoute, refreshList, tab, isMine } = route?.params;
-  console.log(listRoute)
   const { token, user } = useSelector(selectUser);
   const timezone = useSelector(selectTimeZone);
 
@@ -227,6 +226,7 @@ const Detail = ({ navigation, route }) => {
           autoMessages={autoMessages}
           addMessage={addMessage}
           timezone={timezone}
+          isMine={isMine}
         />
 
       case 'notes':

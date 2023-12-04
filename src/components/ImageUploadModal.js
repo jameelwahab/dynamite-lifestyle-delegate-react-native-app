@@ -49,14 +49,17 @@ const ImageUploadModal = ({
 
         })
           .then(image => {
-            onImagePicked(makeImageObject(image));
+            console.log(image, "image")
+            let resp = makeImageObject(image);
+            onImagePicked(multiple ? [resp] : resp);
             setTimeout(() =>
               closeModal(), 500)
           })
           .catch(e => {
             closeModal()
+            console.log(e, "error")
             if (e?.code == 'E_NO_CAMERA_PERMISSION') {
-              showToast(e.message, 'Permission not granted');
+              showToast({ body: e.message, title: 'Permission not granted' });
             }
             console.log('Error', JSON.stringify(e));
           });
@@ -96,9 +99,10 @@ const ImageUploadModal = ({
         console.log('HI', JSON.stringify(e));
         closeModal()
         if (e.code == 'E_NO_LIBRARY_PERMISSION') {
-          showToast(
-            'Please allow permssion in settings first',
-            'Permission denied',
+          showToast({
+            body: 'Please allow permssion in settings first',
+            title: 'Permission denied'
+          }
           );
         }
       });

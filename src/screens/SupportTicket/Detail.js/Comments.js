@@ -23,9 +23,10 @@ import showToast from '../../../functions/showToast'
 import ImageZoomer from '../../../components/ImageZoomer'
 import EmptyView from '../../../components/EmptyView'
 import { convertTimezone } from '../../../functions/convertTime'
-const Comments = ({ commentsList, ticket, user, autoMessages, addMessage, listRoute, timezone }) => {
+const Comments = ({ commentsList, ticket, user, autoMessages, addMessage, listRoute, timezone, isMine }) => {
   const { token } = useSelector(selectUser)
   const navigation = useNavigation()
+  console.log(listRoute, "listRoute")
   const [modalImage, setModalImage] = useState("")
   const [comments, setComments] = useState(commentsList)
   const [msgOptionModal, setMsgOptionModal] = useState({ isVisible: false, selectedItem: null })
@@ -45,6 +46,7 @@ const Comments = ({ commentsList, ticket, user, autoMessages, addMessage, listRo
         autoResonderMsgs: autoMessages,
         ticketId: ticket?._id,
         msg: msgOptionModal.selectedItem,
+        isMine,
         updateMsg
       });
       setMsgOptionModal({ isVisible: false, selectedItem: null })
@@ -100,7 +102,7 @@ const Comments = ({ commentsList, ticket, user, autoMessages, addMessage, listRo
             <MyText type='medium'  >{item?.action_user_info?.action_name}</MyText>
             <MyText fontSize={10} color={colors.lightText} type='medium' >{convertTimezone(item.updatedAt, timezone).fromNow()}</MyText>
           </View>
-          {item?.action_user_info?.action_id == user?._id &&
+          {((item?.action_user_info?.action_id == user?._id) || isMine) &&
             <TouchableHighlight
               underlayColor={colors.secondary}
               onPress={() => setMsgOptionModal({ isVisible: true, selectedItem: item })}
@@ -120,9 +122,21 @@ const Comments = ({ commentsList, ticket, user, autoMessages, addMessage, listRo
           {!!item?.comment_image && item?.comment_image.map((x, i) => (
             <View
               key={x?.thumbnail_1}
-              style={{ backgroundColor: colors.secondaryVariant, height: 200, borderRadius: 10, overflow: "hidden", marginBottom: 15 }}>
+              style={{
+                backgroundColor: colors.secondaryVariant, height: 200, borderRadius: 10, marginBottom: 15,
+                shadowColor: "#FFF",
+                shadowOffset: {
+                  width: 0,
+                  height: 1,
+                },
+                shadowOpacity: 0.20,
+                shadowRadius: 1.41,
+
+                elevation: 2,
+              }}>
               <Pressable onPress={() => setModalImage(x?.thumbnail_1)}>
-                <MyImage source={{ uri: S3_URL + x?.thumbnail_1 }} style={{ height: 150, width: "100%" }} />
+                <MyImage source={{ uri: S3_URL + x?.thumbnail_1 }} style={{ height: 150, width: "100%" }}
+                  imageStyle={{ borderTopLeftRadius: 10, borderTopRightRadius: 10, }} />
               </Pressable>
               <View style={{ flex: 1, flexDirection: "row", justifyContent: "space-between" }}>
                 <View style={{ height: "100%", aspectRatio: 1, alignItems: "center", justifyContent: "center" }}>
@@ -154,6 +168,7 @@ const Comments = ({ commentsList, ticket, user, autoMessages, addMessage, listRo
             navigation.navigate(routes.supportTicketReply, {
               autoResonderMsgs: autoMessages,
               ticketId: ticket?._id,
+              isMine,
               addMessage
             })}
           style={{ borderRadius: 100 }}
@@ -173,6 +188,20 @@ const Comments = ({ commentsList, ticket, user, autoMessages, addMessage, listRo
     )
   }
 
+  const filterTheOptions = (options) => {
+    if (listRoute == "solved" || listRoute == "trash") {
+      if (!!isMine) {
+        return options.slice().filter(x => x.type != "edit");
+      } else {
+        if (msgOptionModal?.selectedItem?.action_user_info?.action_id == user?._id) {
+          return options.slice().filter(x => x.type != "edit");
+        }
+
+      }
+    }
+    else return options
+
+  }
 
 
   return (
@@ -197,7 +226,7 @@ const Comments = ({ commentsList, ticket, user, autoMessages, addMessage, listRo
       </View>
 
       <OptionModal
-        optionList={msgOptionList}
+        optionList={filterTheOptions(msgOptionList)}
         closeModal={() => setMsgOptionModal({ isVisible: false, selectedItem: null })}
         onSelected={(opt) => actionOfMsgOptions(opt)}
         isVisible={msgOptionModal?.isVisible} />

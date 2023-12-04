@@ -14,7 +14,6 @@ import Octicons from 'react-native-vector-icons/Octicons';
 export const icons = {
   logo: require("../assets/logo/dd-consultant-logo.png"),
   missionControl: require("../assets/logo/mission-control.jpeg"),
-  handPromise: require("../assets/icons/Support.webp"),
   dummyUser: require("../assets/icons/dummy-user.png"),
   dummyUser2: require("../assets/icons/dummy-user-2.png"),
   threeLinesMenu: require("../assets/icons/threeBarsMenu.png"),
@@ -24,12 +23,21 @@ export const icons = {
   tick: require('../assets/icons/tick.png'),
   emptyBox: require('../assets/icons/empty-box.png'),
 
+  //todo:   sideBar Icons
+
+  sidebar: {
+    handPromise: require("../assets/sidebarIcons/Support.webp"),
+    help: require("../assets/sidebarIcons/help.png"),
+  },
+
   user: () => { return (<FontAwesome6 name="user-large" color={colors.primary} size={17} />) },
   copy: () => { return (<Ionicons name="copy" color={colors.primary} size={17} />) },
   lock: () => { return (<Fontisto name="locked" color={colors.primary} size={17} />) },
   gear: () => { return (<Ionicons name="settings" color={colors.primary} size={17} />) },
   forwardArrow: (size = 20, color = colors.primary) => { return (<Ionicons name="chevron-forward" color={color} size={size} />) },
   backwardArrow: (size = 20, color = colors.primary) => { return (<Ionicons name="chevron-back" color={color} size={size} />) },
+  upwardArrow: (size = 20, color = colors.primary) => { return (<Ionicons name="chevron-up" color={color} size={size} />) },
+  downwardArrow: (size = 20, color = colors.primary) => { return (<Ionicons name="chevron-down" color={color} size={size} />) },
   image: () => { return (<Ionicons name="image" color={colors.primary} size={25} />) },
   images: () => { return (<Ionicons name="images" color={colors.primary} size={20} />) },
   camera: (color = colors.primary, size = 20) => { return (<Fontisto name="camera" color={color} size={size} />) },

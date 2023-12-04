@@ -19,5 +19,6 @@ export const colors = {
   placeholder: "#637381",
   delete: "#ff3333",
   transparent: "#FFFFFF00",
-  grey: "#696969"
+  grey: "#696969",
+  online:"#337447",
 }

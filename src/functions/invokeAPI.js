@@ -52,7 +52,7 @@ export default async function invokeApi({
     console.log(`<===Api-Error===>\t %c${path} \n`, 'background:#F00; color: #FFF', error);
     if (error.code == 'ERR_NETWORK') {
       if (!noAlerts) {
-        showToast("No Internet Connection", "Network Error");
+        showToast({ body: "No Internet Connection", title: "Network Error" });
       }
       return {
         code: 'ERR_NETWORK',
@@ -60,7 +60,7 @@ export default async function invokeApi({
       };
     } else if (error?.response?.data?.code === 401 && checkAuth == true && alertShown == false) {
       if (!noAlerts) {
-        showToast("Please login again", "Authentication failed");
+        showToast({ body: "Please login again", title: "Authentication failed" });
       }
       await AsyncStorage.multiRemove(["token"]);
       navigation.reset({

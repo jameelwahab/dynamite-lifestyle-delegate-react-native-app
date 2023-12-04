@@ -25,6 +25,7 @@ import ImageZoomer from '../../../components/ImageZoomer';
 const oneFourthOfScreen = (utilities.windowWidth() - 20) / 4;
 
 const TicketReply = ({ navigation, route }) => {
+  const { isMine } = route?.params;
   const { token } = useSelector(selectUser)
   const { msg } = route?.params;
   const [content, setContent] = useState(!!msg ? msg?.message : "");
@@ -34,7 +35,7 @@ const TicketReply = ({ navigation, route }) => {
   const [loader, setLoader] = useState(false)
   const [showEditor, setShowEditor] = useState(false);
   const [modalImage, setModalImage] = useState({ uri: "", noUrl: false });
-  
+
   const removeImage = (index) => {
     images.splice(index, 1);
     setImages([...images]);
@@ -53,7 +54,7 @@ const TicketReply = ({ navigation, route }) => {
     return (
       <Editor
         height={150}
-        autoResonderMsgs={route?.params?.autoResonderMsgs}
+        autoResonderMsgs={!!isMine ? [] : route?.params?.autoResonderMsgs}
         initialValue={content}
         onChange={(text) => setContent(text)}
       />

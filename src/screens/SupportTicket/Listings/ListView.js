@@ -576,7 +576,7 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
       {departmentModal()}
       {CalendarModal()}
       {ConfirmationModal()}
-      <View style={{ flex: 1, marginHorizontal: -10, borderRadius: 20 }}>
+      <View style={{ flex: 1,  borderRadius: 20 }}>
         <FlatList
           data={list}
           indicatorStyle="white"

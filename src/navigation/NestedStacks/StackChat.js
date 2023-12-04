@@ -3,8 +3,6 @@ import { View, Text } from 'react-native'
 import React from 'react'
 import { createNativeStackNavigator, } from '@react-navigation/native-stack'
 import routes from '../routes'
-
-import Chat from '../../screens/Chat/ChatScreen'
 import { defaultScreens } from './defaultScreens'
 import { colors } from '../../utilities/colors'
 import ChatList from '../../screens/Chat/Chatlist.js'

@@ -15,6 +15,8 @@ import { setSettings } from '../../redux/reducers/settingSlice'
 import routes from '../../navigation/routes'
 import { setUserAndToken } from '../../redux/reducers/userSlice'
 import { setTimeZone } from '../../redux/reducers/timezoneSlice'
+import { setNavbar } from '../../redux/reducers/navbarSlice'
+import { drawerMenuList } from '../../navigation/SideBar/List'
 
 
 const Splash = ({ navigation }) => {
@@ -39,12 +41,50 @@ const Splash = ({ navigation }) => {
 
   }
 
+  const makeArrayOfSidebar = (list) => {
+    let newArray = [];
+
+    drawerMenuList.forEach((item) => {
+
+      let index = list.findIndex(x => x.option_value == item.value)
+      if (index > -1) {
+
+        if (!item.collapsible) {
+
+          newArray.push({ ...item, title: list[index].option_label });
+
+        } else {
+
+          let nestedArray = [];
+
+          item?.nestedmenu.forEach((z) => {
+            let nestedIndex = list.findIndex(x => x.option_value == z.value);
+            if (nestedIndex > -1) {
+              nestedArray.push({ ...z, title: list[nestedIndex].option_label });
+            }
+          })
+
+          newArray.push({ ...item, title: list[index].option_label, nestedmenu: nestedArray });
+
+        }
+
+      }
+    });
+
+    return newArray;
+
+  }
+
   const with_Auth = async (token) => {
     let res = await INIT_WITH_TOKEN({ token });
     if (res.code == 200) {
+
+      let sideBarList = makeArrayOfSidebar(res?.nav_items);
+
       dispatch(setSettings(res?.consultant_setting));
       dispatch(setUserAndToken({ user: res?.consultant, token: token }));
-      dispatch(setTimeZone({ user: res?.consultant?.time_zone, admin: res?.time_zone }))
+      dispatch(setTimeZone({ user: res?.consultant?.time_zone, admin: res?.time_zone }));
+      dispatch(setNavbar(sideBarList));
       moveTo(routes.mainScreen)
     } else if (res.code == 401) {
       try {

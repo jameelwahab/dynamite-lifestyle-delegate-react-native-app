@@ -227,68 +227,7 @@ const List = ({ navigation }) => {
     </Modal>)
   }
 
-  const renderTicketList1 = ({ item, index }) => {
-    return (
-      <TouchableHighlight
-        onPress={() => onTicketDetail(item)}
-        onLongPress={() => setOptions({ isModalVisible: true, selected: item })}
-        delayLongPress={400}
-        style={{ marginTop: 10, borderRadius: 20 }}>
 
-        <View style={{ padding: 15, backgroundColor: colors.secondaryVariant, borderRadius: 20 }}>
-
-          <View style={{ paddingRight: 10 }}>
-            <MyText numberOfLines={2} fontSize={16} type='medium' style={{ flex: 1 }} >{item?.subject}</MyText>
-
-            <MyText fontSize={10} >
-              {convertTimezone(item.createdAt, timezone).fromNow()}
-            </MyText>
-          </View>
-
-
-          <View style={{ flexDirection: "row", marginTop: 10 }} >
-            <View style={{ width: 70, borderWidth: 1 / 3, borderColor: colors.white, borderTopLeftRadius: 10, borderBottomLeftRadius: 10 }}>
-              <View style={{ padding: 10 }}>
-                <MyText align='center' color={colors.lightText} fontSize={12}>ID</MyText>
-              </View>
-              <View style={{ padding: 10, borderTopColor: colors.white, borderTopWidth: 1 / 3 }}>
-                <MyText type='medium' align='center' fontSize={14}>{item?.reference_number}</MyText>
-              </View>
-            </View>
-
-
-            <View style={{ flex: 1, borderTopWidth: 1 / 3, borderBottomWidth: 1 / 3, borderColor: colors.white, }}>
-              <View style={{ padding: 10 }}>
-                <MyText align='center' fontSize={12} color={colors.lightText} >Department</MyText>
-              </View>
-              <View style={{ padding: 10, borderTopColor: colors.white, borderTopWidth: 1 / 3 }}>
-                <MyText type='medium' align='center' fontSize={14}>{!!item?.department ? item?.department?.title : "N/A"}</MyText>
-              </View>
-            </View>
-
-            <View style={{ width: 100, borderWidth: 1 / 3, borderColor: colors.white, borderTopRightRadius: 10, borderBottomRightRadius: 10, }}>
-              <View style={{ padding: 10 }}>
-                <MyText align='center' fontSize={12} color={colors.lightText} >Status</MyText>
-              </View>
-              <View style={{
-                borderBottomRightRadius: 10, padding: 10, borderTopColor: colors.white, borderTopWidth: 1 / 3,
-                //  backgroundColor: getStatusOfTicket(item).color,
-              }}>
-                <MyText type='medium' style={{ textTransform: "capitalize" }} align='center' color={getStatusOfTicket(item).color} fontSize={14}  >{getStatusOfTicket(item).title}</MyText>
-              </View>
-            </View>
-          </View>
-
-
-
-
-
-
-        </View>
-
-      </TouchableHighlight>
-    )
-  }
   const renderTicketList = ({ item, index }) => {
     return (
       <TouchableHighlight

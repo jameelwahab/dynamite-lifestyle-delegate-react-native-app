@@ -19,6 +19,7 @@ import MyInputs from '../../../components/MyInputs'
 import debounce from '../../../functions/debounce'
 import Modal from 'react-native-modal'
 import utilities from '../../../utilities'
+import routes from '../../../navigation/routes'
 
 const ChatList = ({ navigation }) => {
   const { token, user } = useSelector(selectUser);
@@ -29,6 +30,16 @@ const ChatList = ({ navigation }) => {
   const [eventId, setEventId] = useState({ ...noneObj })
   const [isPortalModalVisible, setPortalModalVisiblity] = useState(false)
 
+
+  const onChatScreen = (member, item) => {
+    navigation.navigate(routes.chatMessageList, {
+      isOnline: member?._id?.is_online,
+      _id: member?._id?._id,
+      first_name: member?.first_name,
+      last_name: member?.last_name,
+      lastseen: member?._id?.last_login_activity
+    })
+  }
 
   const api_ChatList = async () => {
     setLoader(true)
@@ -70,7 +81,7 @@ const ChatList = ({ navigation }) => {
       >
         <SafeAreaView style={{ marginTop: "auto", backgroundColor: colors.secondary, borderTopLeftRadius: 10, borderTopRightRadius: 10 }}>
           <View style={{ height: utilities.screenHeight() * 0.8, }}>
-            <View style={{ flexDirection: "row", justifyContent: "space-between", padding: 15,borderBottomWidth:1/3,borderBottomColor:colors.lightText }}>
+            <View style={{ flexDirection: "row", justifyContent: "space-between", padding: 15, borderBottomWidth: 1 / 3, borderBottomColor: colors.lightText }}>
               <View>
                 <MyText fontSize={18} type='medium' >Portal Events</MyText>
                 <MyText color={colors.lightText} fontSize={12}>Select your event from list below</MyText>
@@ -93,7 +104,7 @@ const ChatList = ({ navigation }) => {
                         setEventId(item);
                         setPortalModalVisiblity(false)
                       }}
-                      style={[{ paddingVertical:12, justifyContent: "center", paddingHorizontal: 10 }, {
+                      style={[{ paddingVertical: 12, justifyContent: "center", paddingHorizontal: 10 }, {
                         backgroundColor: eventId?._id == item._id ? colors.secondarySelect : undefined
                       }]} >
 
@@ -137,14 +148,19 @@ const ChatList = ({ navigation }) => {
     let member = item.member.find(x => x?._id?._id != user._id);
     return (
       <TouchableHighlight
-        onPress={() => { }}
+        onPress={() => onChatScreen(member, item)}
         underlayColor={colors.secondary}
       >
         <View style={__style.itemRootView}>
-          <UserImage
-            image={member?.profile_image}
-            name={member?.first_name}
-          />
+          <View>
+            <UserImage
+              image={member?.profile_image}
+              name={member?.first_name}
+            />
+            <View style={[__style.status, {
+              backgroundColor: member?._id?.is_online ? colors.online : colors.primary2
+            }]} />
+          </View>
 
           <View style={__style.seondViewRow}>
             <View style={__style.headerView}>
@@ -196,6 +212,7 @@ const ChatList = ({ navigation }) => {
 
       {portalModal()}
       <FAB
+        onPress={() => navigation.navigate(routes.startNewChat)}
         icon={() => icons.plus(colors.black, 20)}
       />
 
@@ -224,7 +241,9 @@ const __style = StyleSheet.create({
   },
   seondViewRow: {
     flex: 1,
-    marginHorizontal: 10
+    marginHorizontal: 10,
+    marginLeft: 13
+
   },
   nameAndMsgView: {
 
@@ -233,5 +252,13 @@ const __style = StyleSheet.create({
   separotor: {
     height: 1 / 3,
     backgroundColor: colors.lightText,
-  }
+  },
+  status: {
+    height: 10,
+    width: 10,
+    borderRadius: 10 / 2,
+    position: "absolute",
+    right: -5,
+    bottom: 0
+  },
 })

@@ -22,6 +22,8 @@ import MyInputs from '../../components/MyInputs';
 import FastImage from 'react-native-fast-image';
 import MyImage2 from '../../components/MyImage2';
 import { setTimeZone } from '../../redux/reducers/timezoneSlice';
+import { setNavbar } from '../../redux/reducers/navbarSlice';
+import { drawerMenuList } from '../../navigation/SideBar/List';
 
 
 
@@ -68,8 +70,10 @@ const Login = ({ navigation }) => {
     let res = await INIT_WITH_TOKEN({ token: resp?.token });
     if (res.code == 200) {
       await AsyncStorage.setItem("@token", resp?.token);
+      let sideBarList = makeArrayOfSidebar(res?.nav_items);
       dispatch(setSettings(res?.consultant_setting));
       dispatch(setUserAndToken({ user: res?.consultant, token: resp?.token }));
+      dispatch(setNavbar(sideBarList));
       dispatch(setTimeZone({ user: res?.consultant?.time_zone, admin: res?.time_zone }))
       navigation.reset({
         index: 0,
@@ -79,6 +83,41 @@ const Login = ({ navigation }) => {
       showToast({ title: "Something went wrong", body: res?.message })
       setLoader(false);
     }
+
+  }
+
+
+  const makeArrayOfSidebar = (list) => {
+    let newArray = [];
+
+    drawerMenuList.forEach((item) => {
+
+      let index = list.findIndex(x => x.option_value == item.value)
+      if (index > -1) {
+
+        if (!item.collapsible) {
+
+          newArray.push({ ...item, title: list[index].option_label });
+
+        } else {
+
+          let nestedArray = [];
+
+          item?.nestedmenu.forEach((z) => {
+            let nestedIndex = list.findIndex(x => x.option_value == z.value);
+            if (nestedIndex > -1) {
+              nestedArray.push({ ...z, title: list[nestedIndex].option_label });
+            }
+          })
+
+          newArray.push({ ...item, title: list[index].option_label, nestedmenu: nestedArray });
+
+        }
+
+      }
+    });
+
+    return newArray;
 
   }
 

@@ -25,13 +25,23 @@ const SideDrawer = () => {
 
     >
       {drawerMenuList.map((x) => {
-        // console.log(x, "navigators")
-        return <Drawer.Screen
-          key={x.key}
-          name={x.key}
-          component={x.component}
-          initialParams={x.params}
-        />
+        if (!!x?.collapsible == false) {
+          return <Drawer.Screen
+            key={x.key}
+            name={x.key}
+            component={x.component}
+            initialParams={x.params}
+          />
+        } else {
+          return x?.nestedmenu.map((y) => {
+            return <Drawer.Screen
+              key={y.key}
+              name={y.key}
+              component={y.component}
+              initialParams={y.params}
+            />
+          })
+        }
       }
       )}
 
