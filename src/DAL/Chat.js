@@ -35,7 +35,7 @@ export const CHAT_MEMBERS_LIST = ({ token, navigation, body: { search_text, even
 
 export const MESSAGE_LIST_BY_CHAT_ID = ({ token, navigation, chatId, page }) => {
   return invokeApi({
-    path: `api/chat/list_message/${chatId}?page=${page}&limit=10`,
+    path: `api/chat/list_message/${chatId}?page=${page}&limit=20`,
     method: "GET",
     token: token,
     navigation: navigation,

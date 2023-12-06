@@ -1,0 +1,35 @@
+import { View, Text, Image } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import FastImage from 'react-native-fast-image';
+import utilities from '../utilities';
+const screenWidth = utilities.windowWidth() * 0.8;
+
+const MyImage2 = ({ uri, style, width }) => {
+  const [size, setSize] = useState({ height: 0, width: 0 });
+  const [loader, setLoader] = useState(false);
+
+  useEffect(() => {
+    Image.getSize(uri, (width, height) => {
+      setSize({ width, height })
+    })
+  }, [])
+
+  if (size.width != 0) {
+    return (
+      <FastImage
+        source={{ uri: uri }}
+        style={[
+          size.width <= screenWidth ?
+            { width: size.width, height: size.height, } :
+            { width: screenWidth - 10, aspectRatio: size.width / size.height }
+        ]}
+        onLoad={(res) => {
+          console.log("onload")
+          console.log(res.nativeEvent?.width, res.nativeEvent?.height, "width,height")
+        }}
+      />
+    )
+  } else return null;
+}
+
+export default MyImage2

@@ -27,15 +27,15 @@ export const drawerMenuList = [
     }
   },
 
-  // {
-  //   value: "chat",
-  //   collapsible: false,
-  //   key: routes.chatNavigator,
-  //   component: StackChat,
-  //   icon: icons.sidebar.handPromise,
-  //   params: {
-  //   }
-  // },
+  {
+    value: "chat",
+    collapsible: false,
+    key: routes.chatNavigator,
+    component: StackChat,
+    icon: icons.sidebar.handPromise,
+    params: {
+    }
+  },
   {
     value: "support",
     collapsible: true,

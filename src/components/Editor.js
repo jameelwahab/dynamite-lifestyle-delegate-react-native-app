@@ -148,7 +148,7 @@ const Editor = ({
     closeDialogue();
   }
 
-  LinkDialog = () => {
+  const LinkDialog = () => {
 
     return (
       <Modal
@@ -185,40 +185,6 @@ const Editor = ({
         </SafeAreaView>
       </Modal>
     )
-    return (
-      <View>
-        <Dialog.Container
-          visible={link.showDialog}
-          onBackdropPress={closeDialogue}>
-          <Dialog.Title style={{ color: colors.taskText, }}>
-            Insert Link
-          </Dialog.Title>
-
-
-          <Dialog.Description
-            style={{ color: colors.taskText, }}>
-            Please enter the link
-          </Dialog.Description>
-          <Dialog.Input
-            style={{ color: colors.taskText, }}
-            onChangeText={Weblink => setLink({ ...link, value: Weblink })}
-          />
-          <Dialog.Button
-            color={colors.primary}
-            label="Cancel"
-            onPress={closeDialogue} />
-          <Dialog.Button
-            label="Add"
-            color={colors.primary}
-            onPress={() => {
-              console.log(RichText, link.value, "RichText")
-              RichText.current.insertLink(null, link.value);
-              closeDialogue();
-            }}
-          />
-        </Dialog.Container>
-      </View>
-    );
   };
   // console.log(RichText, "console.log(RichText")
   return (

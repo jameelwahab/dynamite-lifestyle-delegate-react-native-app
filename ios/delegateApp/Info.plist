@@ -35,16 +35,18 @@
 			</dict>
 		</dict>
 	</dict>
+  <key>NSMicrophoneUsageDescription</key>
+  <string>Give $(PRODUCT_NAME) permission to use your microphone. Your record wont be shared without your permission.</string>
 	<key>NSCameraUsageDescription</key>
-	<string>Delegate want to access to your camera</string>
+	<string>$(PRODUCT_NAME want to access to your camera</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Delegate want to access to your microphone</string>
+	<string>$(PRODUCT_NAME want to access to your microphone</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Delegate want to access to your photos</string>
+	<string>$(PRODUCT_NAME want to access to your photos</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Delegate want to access to your photos</string>
+	<string>$(PRODUCT_NAME want to access to your photos</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>MaterialIcons.ttf</string>

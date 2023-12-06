@@ -61,7 +61,7 @@ const ImageUploadModal = ({
             if (e?.code == 'E_NO_CAMERA_PERMISSION') {
               showToast({ body: e.message, title: 'Permission not granted' });
             }
-            console.log('Error', JSON.stringify(e));
+            console.log('Error', e);
           });
       }, 500);
     } else {
@@ -96,7 +96,7 @@ const ImageUploadModal = ({
           500)
       })
       .catch(e => {
-        console.log('HI', JSON.stringify(e));
+        console.log('HI', e);
         closeModal()
         if (e.code == 'E_NO_LIBRARY_PERMISSION') {
           showToast({

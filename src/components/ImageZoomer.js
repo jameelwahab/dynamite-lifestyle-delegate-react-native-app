@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   Platform,
   StyleSheet,
+  TouchableOpacity,
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import ImageViewer from 'react-native-image-zoom-viewer';
@@ -18,6 +19,8 @@ import { colors } from '../utilities/colors';
 import { SimpleLoader } from './MyLoader';
 import List from '../screens/Notes/List';
 import MyText from './MyText';
+import downloadImage from '../functions/downloadImage';
+import Toast from 'react-native-toast-message';
 
 const ImageZoomer = ({
   visible,
@@ -57,19 +60,19 @@ const ImageZoomer = ({
 
         }}>
         <View style={__styles.buttonRootView} >
-          <View/>
-          {/* <Pressable
+          {!!url && !!noUrl == false ?
+            <TouchableOpacity
+              onPress={() => downloadImage(S3_URL + url)}>
+              <View style={__styles.buttonView}>
+                {icons.download(colors.black, 20)}
+              </View>
+            </TouchableOpacity> : <View />}
+          <TouchableOpacity
             onPress={() => closeModal()}>
             <View style={__styles.buttonView}>
-              {icons.download(colors.white, 20)}
+              {icons.crosss(colors.black, 20)}
             </View>
-          </Pressable> */}
-          <Pressable
-            onPress={() => closeModal()}>
-            <View style={__styles.buttonView}>
-              {icons.crosssWithCircle()}
-            </View>
-          </Pressable>
+          </TouchableOpacity>
         </View>
         {!!visible && (
           <View style={{ flex: 1 }}>
@@ -110,6 +113,7 @@ const ImageZoomer = ({
           </View>
         )}
       </View>
+      {visible && <Toast />}
     </Modal>
   );
 };
@@ -130,11 +134,13 @@ const __styles = StyleSheet.create({
     justifyContent: "space-between"
 
   },
+
+
   buttonView: {
-    height: 40,
-    width: 40,
-    borderRadius: 40/2,
-    backgroundColor: colors.black,
+    height: 30,
+    width: 30,
+    borderRadius: 30 / 2,
+    backgroundColor: colors.white,
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',

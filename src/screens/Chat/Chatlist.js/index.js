@@ -1,4 +1,4 @@
-import { View, Text, FlatList, StyleSheet, TouchableHighlight, Keyboard, SafeAreaView, Pressable, TouchableOpacity } from 'react-native'
+import { View, Text, FlatList, StyleSheet, TouchableHighlight, Keyboard, SafeAreaView, Pressable, TouchableOpacity, Platform } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import RootView from '../../../components/RootView'
 import MyLoader from '../../../components/MyLoader'
@@ -20,6 +20,10 @@ import debounce from '../../../functions/debounce'
 import Modal from 'react-native-modal'
 import utilities from '../../../utilities'
 import routes from '../../../navigation/routes'
+import { decode, decodeEntity } from 'html-entities';
+import { isHtml } from '../../../functions/regex'
+import Markdown from '@ronradtke/react-native-markdown-display'
+import { fonts } from '../../../utilities/fonts'
 
 const ChatList = ({ navigation }) => {
   const { token, user } = useSelector(selectUser);
@@ -34,10 +38,12 @@ const ChatList = ({ navigation }) => {
   const onChatScreen = (member, item) => {
     navigation.navigate(routes.chatMessageList, {
       isOnline: member?._id?.is_online,
-      _id: member?._id?._id,
-      first_name: member?.first_name,
-      last_name: member?.last_name,
-      lastseen: member?._id?.last_login_activity
+      memberId: member?._id?._id,
+      firstName: member?.first_name,
+      lastName: member?.last_name,
+      lastSeen: member?._id?.last_login_activity,
+      profileImage: member?.profile_image,
+      chatId: item._id
     })
   }
 
@@ -180,7 +186,11 @@ const ChatList = ({ navigation }) => {
 
               <MyText fontSize={12} type='light' numberOfLines={1}>
                 {!!item?.last_message ?
-                  (item.last_message.replace(/<[^>]+>/g, '').replace(/\*/g, "").replace(/[\])}[{(]/g, " ").slice(0, 70)) :
+                  isHtml(item?.last_message) ?
+                    decode(item.last_message.replace(/<[^>]+>/g, '').replace(/\*/g, "").replace(/[\])}[{(]/g, " ").slice(0, 70), { level: "html5" }) :
+                    <Markdown style={markdownStyleOther}>
+                      {item?.last_message.slice(0, 70)}
+                    </Markdown> :
                   item.message_type == "image" ? "Photo" :
                     item.message_type == 'audio' ? "Audio" :
                       item.message_type == 'video' ? "Video" : ""}
@@ -200,7 +210,7 @@ const ChatList = ({ navigation }) => {
         <FlatList
           data={chatList}
           renderItem={renderChatList}
-          ItemSeparatorComponent={<View style={__style.separotor} />}
+          // ItemSeparatorComponent={<View style={__style.separotor} />}
           ListEmptyComponent={!loader && <EmptyView label={"No Chat"} />}
           ListHeaderComponent={headerView()}
           stickyHeaderIndices={[0]}
@@ -227,10 +237,32 @@ let noneObj = {
   title: "None"
 }
 
+const markdownStyleOther = {
+  body: {
+    fontFamily: fonts.light,
+    color: colors.white,
+    margin: 0
+  },
+  link: {
+    textDecorationLine: '',
+    color: colors.white,
+    fontWeight: '400',
+
+  },
+  strong: {
+    fontFamily: fonts.regular
+  },
+  paragraph: {
+    marginTop: 5,
+    marginBottom: 0,
+    fontSize: 12
+  }
+}
+
 const __style = StyleSheet.create({
   itemRootView: {
     flexDirection: "row",
-    paddingVertical: 15,
+    paddingVertical: 20,
     paddingHorizontal: 10,
 
   },
@@ -250,7 +282,7 @@ const __style = StyleSheet.create({
   },
 
   separotor: {
-    height: 1 / 3,
+    // height: Platform.OS == "android" ? 1 / 2 : 1 / 3,
     backgroundColor: colors.lightText,
   },
   status: {

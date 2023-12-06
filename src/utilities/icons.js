@@ -22,6 +22,8 @@ export const icons = {
   send: require('../assets/icons/send.png'),
   tick: require('../assets/icons/tick.png'),
   emptyBox: require('../assets/icons/empty-box.png'),
+  textEdit: require('../assets/icons/textEdit.png'),
+  addImage: require('../assets/icons/addImage.png'),
 
   //todo:   sideBar Icons
 
@@ -32,6 +34,7 @@ export const icons = {
 
   user: () => { return (<FontAwesome6 name="user-large" color={colors.primary} size={17} />) },
   copy: () => { return (<Ionicons name="copy" color={colors.primary} size={17} />) },
+  copyOulined: (size = 20, color = colors.primary) => { return (<Ionicons name="copy-outline" color={color} size={size} />) },
   lock: () => { return (<Fontisto name="locked" color={colors.primary} size={17} />) },
   gear: () => { return (<Ionicons name="settings" color={colors.primary} size={17} />) },
   forwardArrow: (size = 20, color = colors.primary) => { return (<Ionicons name="chevron-forward" color={color} size={size} />) },
@@ -42,7 +45,7 @@ export const icons = {
   images: () => { return (<Ionicons name="images" color={colors.primary} size={20} />) },
   camera: (color = colors.primary, size = 20) => { return (<Fontisto name="camera" color={color} size={size} />) },
   crosssWithCircle: () => { return (<MaterialIcons name="cancel" color={colors.white} size={30} />) },
-  crosssWithCircle_20: () => { return (<MaterialIcons name="cancel" color={colors.white} size={20} />) },
+  crosssWithCircle_20: (color = colors.white, size = 20) => { return (<MaterialIcons name="cancel" color={color} size={size} />) },
   noIcon: () => { return (<MaterialIcons name="cancel" color={colors.transparent} size={20} />) },
   crosss: (color = colors.white, size = 20) => { return (<Ionicons name="close" color={color} size={size} />) },
   plus: (color = colors.white, size = 20) => { return (<Octicons name="plus" color={color} size={size} />) },
@@ -65,5 +68,8 @@ export const icons = {
   mic: (color = colors.white, size = 20) => { return (<Ionicons name="mic" color={color} size={size} />) },
   playCircle: (color = colors.white, size = 20) => { return (<Ionicons name="play-circle" color={color} size={size} />) },
   filterCircle: (color = colors.white, size = 20) => { return (<Ionicons name="filter-circle" color={color} size={size} />) },
+  bold: (color = colors.white, size = 20) => { return (<Octicons name="bold" color={color} size={size} />) },
+  italic: (color = colors.white, size = 20) => { return (<Octicons name="italic" color={color} size={size} />) },
+  link: (color = colors.white, size = 20) => { return (<Ionicons name="link" color={color} size={size} />) },
 
 }

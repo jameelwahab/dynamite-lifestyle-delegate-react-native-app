@@ -45,13 +45,13 @@ const MyLoader = ({
   }
 };
 
-const SimpleLoader = () => {
+const SimpleLoader = ({ size = 30 }) => {
   return (
     <LottieView
       source={require("../assets/animations/loader1.json")}
       style={{
-        height: 30,
-        width: 30,
+        height: size,
+        width: size,
       }}
       autoPlay
       loop
