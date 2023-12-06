@@ -12,9 +12,17 @@ import Toast from 'react-native-toast-message'
 import MyImage from '../../../components/MyImage'
 import ImageUploadModal from '../../../components/ImageUploadModal'
 import ImageZoomer from '../../../components/ImageZoomer'
+import { fonts } from '../../../utilities/fonts'
+import { useSelector } from 'react-redux'
+import { selectSocket } from '../../../redux/reducers/socketSlice'
+import { selectUser } from '../../../redux/reducers/userSlice'
+import { UPLOAD_FILE_FOR_CHAT } from '../../../DAL'
+import { S3_URL } from '../../../utilities/constants'
 let selection;
 
-const SendMsgView = ({ }) => {
+const SendMsgView = ({ receiver, navigation, edit, clearEdit }) => {
+  const { socket } = useSelector(selectSocket);
+  const { user, token } = useSelector(selectUser);
   const [isEditorVisible, setEditorVisiblity] = useState(true);
   const [imageZommer, setImageZommer] = useState("")
   const [isImageModalShown, setImageModalVisiblity] = useState(false);
@@ -26,8 +34,86 @@ const SendMsgView = ({ }) => {
 
 
   useEffect(() => {
+    if (!!edit?.id) {
+      setMsg({
+        image: edit?.image,
+        text: edit?.msg,
+      })
+    }
+  }, [edit])
+
+  useEffect(() => {
+    console.log(msg, "msg useEffect");
+
+  }, [msg])
+
+
+
+
+  useEffect(() => {
     selection = null;
   }, [])
+
+  const uplaodFileOnS3 = async () => {
+    let formData = new FormData();
+    formData.append("image", msg.image);
+    let resp = await UPLOAD_FILE_FOR_CHAT({ token, navigation, file: formData });
+    if (resp.code == 200) {
+      return resp
+    }
+
+  }
+
+
+
+  const sendMsgButton = async () => {
+    if (msg.text.trim() == "") {
+      showToast({ title: "Please write something" })
+    } else {
+      let imagePath = '';
+      if (!!msg.image?.uri) {
+        imagePath = await uplaodFileOnS3().then((res) => res.image_path);
+        if (!!imagePath == false) {
+          return
+        }
+      }
+
+
+      if (!!edit?.id) {
+
+        const postData = {
+          message: msg.text.trim(),
+          message_id: edit?.id,
+          image: imagePath
+        };
+        console.log('update_chat_message', postData)
+        socket.emit('update_chat_message', postData)
+        setMsg({ text: "", image: "" })
+        clearEdit?.()
+      } else {
+
+        let isAudio = false;
+        let postData = {
+          receiver_id: receiver?.memberId,
+          receiver_type: "member_user",
+          message: msg.text.trim(),
+          image: isAudio ? "" : imagePath,
+          x_sh_auth: token,
+        }
+        if (isAudio) {
+          postData['audio_duration'] = time;
+          postData['audio_url'] = imagePath;
+        }
+
+
+        console.log('send_chat_message', postData)
+        socket.emit('send_chat_message', postData)
+        setMsg({ text: "", image: "" })
+
+      }
+
+    }
+  }
 
 
   const modifyText = (type, linkTitle = "", url = "") => {
@@ -110,14 +196,16 @@ const SendMsgView = ({ }) => {
     )
   };
 
+
+  let displayImage = !!msg.image?.uri ? msg?.image?.uri : !!msg?.image ? S3_URL + msg?.image : "";
   return (
     <View>
       {!!msg.image &&
         <Pressable
-          onPress={() => setImageZommer(msg.image?.uri)}
-          style={{ alignSelf: "flex-start" }}>
+          onPress={() => setImageZommer(displayImage)}
+          style={{ alignSelf: "flex-start", marginTop: 15 }}>
           <MyImage
-            source={{ uri: msg.image?.uri }}
+            source={{ uri: displayImage }}
             style={{ height: 60, width: 60 }}
             imageStyle={{ borderRadius: 10, borderWidth: 1 / 2, borderColor: colors.white }}
           />
@@ -185,8 +273,10 @@ const SendMsgView = ({ }) => {
           </Collapsible>
         </View>
 
-        <TouchableOpacity style={__style.sendButtonView}>
-          {icons.mic(colors.black, 20)}
+        <TouchableOpacity
+          onPress={sendMsgButton}
+          style={__style.sendButtonView}>
+          {icons.send(colors.primary, 18)}
         </TouchableOpacity>
       </View>
       {modalLink()}
@@ -213,7 +303,7 @@ const __style = StyleSheet.create({
     marginLeft: 5,
     height: 38,
     width: 38,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.lightPrimary2,
     borderRadius: 38 / 2,
     alignItems: "center",
     justifyContent: "center"

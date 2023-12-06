@@ -17,6 +17,9 @@ import { setUserAndToken } from '../../redux/reducers/userSlice'
 import { setTimeZone } from '../../redux/reducers/timezoneSlice'
 import { setNavbar } from '../../redux/reducers/navbarSlice'
 import { drawerMenuList } from '../../navigation/SideBar/List'
+import { setSocket } from '../../redux/reducers/socketSlice'
+import { io } from 'socket.io-client'
+import { socketUrl } from '../../utilities/constants'
 
 
 const Splash = ({ navigation }) => {
@@ -85,6 +88,13 @@ const Splash = ({ navigation }) => {
       dispatch(setUserAndToken({ user: res?.consultant, token: token }));
       dispatch(setTimeZone({ user: res?.consultant?.time_zone, admin: res?.time_zone }));
       dispatch(setNavbar(sideBarList));
+      console.log(socketUrl + "?user_id=" + res?.consultant?._id, "scoketUrl")
+      dispatch(setSocket(io(socketUrl, {
+        query: {
+          user_id: res?.consultant?._id,
+          role: "delegate"
+        }
+      })))
       moveTo(routes.mainScreen)
     } else if (res.code == 401) {
       try {

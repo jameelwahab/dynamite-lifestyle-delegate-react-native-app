@@ -11,11 +11,14 @@ import routes from '../../navigation/routes'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { LOGOUT } from '../../DAL'
 import copyText from '../../functions/copyText'
+import { useDispatch, useSelector } from 'react-redux'
+import { clearSocket, selectSocket } from '../../redux/reducers/socketSlice'
 
 
 const ProfileDropDown = ({ isVisible = false, closeModal = () => { }, user }) => {
   const navigation = useNavigation();
-
+  const { socket } = useSelector(selectSocket);
+  const dispatch = useDispatch()
 
   const logoutBtn = async () => {
     try {
@@ -27,7 +30,8 @@ const ProfileDropDown = ({ isVisible = false, closeModal = () => { }, user }) =>
     }
 
     closeModal()
-
+    socket.disconnect();
+    dispatch(clearSocket())
     setTimeout(() => {
       navigation.reset({
         index: 0,

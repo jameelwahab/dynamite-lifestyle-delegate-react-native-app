@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, Pressable } from 'react-native'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import utilities from '../../../utilities'
 import MyText from '../../../components/MyText'
 import { convertTimezone } from '../../../functions/convertTime'
@@ -11,12 +11,58 @@ import MyWebview from '../../../components/MyWebview'
 import copyText from '../../../functions/copyText'
 import Markdown from '@ronradtke/react-native-markdown-display';
 import { fonts } from '../../../utilities/fonts'
+import AudioChatView from './AudioChatView'
+import TrackPlayer from 'react-native-track-player'
 
 const MsgView = ({ item, index, user, timezone, onMsgLongPress, openImageZommer }) => {
 
+  const [state, updateState] = useState({
+    selected_audio: null,
+    isPlaying: ""
+  });
+  const setState = (updation) => updateState({ ...state, ...updation });
   const isOtherMember = (id) => {
     return id == user?._id;
   }
+
+
+  const playIconClick = async (audio, id) => {
+    if (audio !== state.selected_audio) {
+      setState({ selected_audio: audio, isPlaying: id })
+      await TrackPlayer.pause();
+      await TrackPlayer.reset()
+      await TrackPlayer.add({
+        id: id,
+        url: S3_URL + audio,
+        // url:sampleUrl,
+        title: "",
+        artist: "",
+        album: '',
+        genre: '',
+        artwork: "",
+      });
+      await TrackPlayer.play()
+
+    }
+    else {
+      let playerState = await TrackPlayer.getState();
+      // console.log(await TrackPlayer.getActiveTrack(), 'state')
+      if (playerState === TrackPlayer.STATE_PAUSED || playerState === "ready" || playerState == "paused") {
+        await TrackPlayer.play();
+        setState({ isPlaying: id });
+      }
+      else {
+        await TrackPlayer.pause();
+        setState({ isPlaying: "" })
+      }
+    }
+  }
+
+  const stopPlayer = async () => {
+    await TrackPlayer.reset()
+    setState({ isPlaying: "", selected_audio: null })
+  }
+
   return (
     <TouchableOpacity
       onLongPress={onMsgLongPress}
@@ -35,17 +81,37 @@ const MsgView = ({ item, index, user, timezone, onMsgLongPress, openImageZommer 
         }}>
         <View>
 
+          {/*//?   Image View  */}
 
           {item.message_type == 'image' && !!item.image &&
             <TouchableOpacity
               onLongPress={onMsgLongPress}
               onPress={() => openImageZommer(item.image)}
-              style={{ alignItems: 'center' }}>
+              style={{ padding:2 }}>
               <ResponsiveImage
                 uri={S3_URL + item?.image}
                 source={{ uri: S3_URL + item?.image }}
               />
             </TouchableOpacity>}
+
+          {/*//?   Audio View  */}
+
+          {item?.message_type == 'audio' && !!item?.audio_url &&
+            <AudioChatView
+              currentPlaying={state.isPlaying}
+              currentTrack={state.selected_audio}
+              thisTrack={item._id}
+              onPress={() => playIconClick(item.audio_url, item._id)}
+              stopPlayer={stopPlayer}
+              totalDuration={item?.audio_duration}
+              url={item?.audio_url}
+            />
+          }
+
+
+
+          {/*//?   Message View  */}
+
           <View style={{ paddingHorizontal: 5 }}>
             {isHtml(item?.message) ?
               <MyWebview

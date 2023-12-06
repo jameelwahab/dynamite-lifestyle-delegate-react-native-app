@@ -71,5 +71,8 @@ export const icons = {
   bold: (color = colors.white, size = 20) => { return (<Octicons name="bold" color={color} size={size} />) },
   italic: (color = colors.white, size = 20) => { return (<Octicons name="italic" color={color} size={size} />) },
   link: (color = colors.white, size = 20) => { return (<Ionicons name="link" color={color} size={size} />) },
+  pause: (color = colors.white, size = 20) => { return (<FontAwesome6 name="pause" color={color} size={size} />) },
+  play: (color = colors.white, size = 20) => { return (<FontAwesome6 name="play" color={color} size={size} />) },
+  send: (color = colors.white, size = 20) => { return (<Ionicons name="send" color={color} size={size} />) },
 
 }

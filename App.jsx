@@ -10,6 +10,7 @@ import Toast, {
 } from 'react-native-toast-message';
 import {Provider} from 'react-redux';
 import {store} from './src/redux';
+import TrackPlayer, { Capability } from 'react-native-track-player';
 
 const toastConfig = {
   success: props => <SuccessToast {...props} text2NumberOfLines={2} />,
@@ -17,7 +18,27 @@ const toastConfig = {
 };
 
 const App = () => {
+
+  const setupPlayer = ()=>{
+    TrackPlayer.setupPlayer({ waitForBuffer: true, }).then(() => {
+      TrackPlayer.updateOptions({
+        stopWithApp: true,
+        notificationCapabilities: [
+          Capability.Play,
+          Capability.Pause,
+          Capability.SeekTo,
+        ],
+        capabilities: [
+          Capability.Play,
+          Capability.Pause,
+          Capability.SeekTo,
+        ],
+        compactCapabilities: [Capability.Play, Capability.Pause],
+      })
+    })
+  }
   useEffect(() => {
+    setupPlayer();
     LogBox.ignoreLogs([
       `You seem to update the renderers prop(s) of the "RenderHTML" component in short periods of time`,
     ]);

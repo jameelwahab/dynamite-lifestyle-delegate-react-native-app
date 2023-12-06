@@ -23,10 +23,6 @@ const MyImage2 = ({ uri, style, width }) => {
             { width: size.width, height: size.height, } :
             { width: screenWidth - 10, aspectRatio: size.width / size.height }
         ]}
-        onLoad={(res) => {
-          console.log("onload")
-          console.log(res.nativeEvent?.width, res.nativeEvent?.height, "width,height")
-        }}
       />
     )
   } else return null;

@@ -2,6 +2,7 @@ import { displayName } from '../../app.json';
 
 
 export const domain = "https://apidev.dynamitelifestyle.com/";
+export const socketUrl = "https://apidev.dynamitelifestyle.com";
 export const S3_URL = "https://dynamite-lifestyle-dev-app-bucket.s3.amazonaws.com/";
 export const appName = displayName;
 

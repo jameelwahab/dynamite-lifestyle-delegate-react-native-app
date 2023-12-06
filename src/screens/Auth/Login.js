@@ -14,7 +14,7 @@ import { INIT_WITH_TOKEN, LOGIN } from '../../DAL';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import MyLoader from '../../components/MyLoader';
-import { S3_URL } from '../../utilities/constants';
+import { S3_URL, socketUrl } from '../../utilities/constants';
 import { useDispatch, useSelector } from 'react-redux';
 import { setUserAndToken } from '../../redux/reducers/userSlice';
 import { selectSettings, setSettings } from '../../redux/reducers/settingSlice';
@@ -24,6 +24,8 @@ import MyImage2 from '../../components/MyImage2';
 import { setTimeZone } from '../../redux/reducers/timezoneSlice';
 import { setNavbar } from '../../redux/reducers/navbarSlice';
 import { drawerMenuList } from '../../navigation/SideBar/List';
+import { setSocket } from '../../redux/reducers/socketSlice';
+import { io } from 'socket.io-client';
 
 
 
@@ -75,6 +77,12 @@ const Login = ({ navigation }) => {
       dispatch(setUserAndToken({ user: res?.consultant, token: resp?.token }));
       dispatch(setNavbar(sideBarList));
       dispatch(setTimeZone({ user: res?.consultant?.time_zone, admin: res?.time_zone }))
+      dispatch(setSocket(io(socketUrl, {
+        query: {
+          user_id: res?.consultant?._id,
+          role: "delegate"
+        }
+      })))
       navigation.reset({
         index: 0,
         routes: [{ name: routes.mainScreen }]

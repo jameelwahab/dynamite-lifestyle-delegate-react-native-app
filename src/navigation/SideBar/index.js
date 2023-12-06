@@ -66,7 +66,7 @@ const index = (props) => {
 
   const nestedOptionView = (item, index, parentItem) => {
     return (
-      <Collapsible collapsed={findCollapsed(parentItem)}>
+      <Collapsible key={item.value} collapsed={findCollapsed(parentItem)}>
         <Pressable
           key={item.value}
           onPress={() => changeSideBarScreen(item)}
@@ -92,7 +92,7 @@ const index = (props) => {
       {navbar.map((x, i) => {
         if (!!x.icon)
           return (
-            <View>
+            <View key={x.value}>
               {optionView(x, i)}
               {!!x?.nestedmenu && x?.nestedmenu.map((y, j) => nestedOptionView(y, i, x))}
             </View >

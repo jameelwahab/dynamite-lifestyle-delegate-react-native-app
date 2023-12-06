@@ -63,3 +63,24 @@ export const IS_CHAT_EXIST = ({ token, navigation, memberId, }) => {
     navigation: navigation,
   })
 }
+
+export const READ_ALL_MESSAGES = ({ token, navigation, chatId, }) => {
+  return invokeApi({
+    path: `api/chat/read_message/${chatId}`,
+    method: "GET",
+    token: token,
+    navigation: navigation,
+  })
+}
+
+
+export const UPLOAD_FILE_FOR_CHAT = ({ token, navigation, file, }) => {
+  return invokeApi({
+    path: `app/update_image_on_s3_for_chat/`,
+    method: "POST",
+    headers: { "Content-Type": 'Multipart/form-data' },
+    postData: file,
+    token: token,
+    navigation: navigation,
+  })
+}

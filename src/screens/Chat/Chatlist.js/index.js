@@ -24,15 +24,17 @@ import { decode, decodeEntity } from 'html-entities';
 import { isHtml } from '../../../functions/regex'
 import Markdown from '@ronradtke/react-native-markdown-display'
 import { fonts } from '../../../utilities/fonts'
+import { selectSocket } from '../../../redux/reducers/socketSlice'
 
 const ChatList = ({ navigation }) => {
   const { token, user } = useSelector(selectUser);
+  const { socket } = useSelector(selectSocket);
   const [loader, setLoader] = useState(true);
   const [chatList, setChatList] = useState([]);
   const [portalList, setPortalList] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [eventId, setEventId] = useState({ ...noneObj })
-  const [isPortalModalVisible, setPortalModalVisiblity] = useState(false)
+  const [isPortalModalVisible, setPortalModalVisiblity] = useState(false);
 
 
   const onChatScreen = (member, item) => {
@@ -71,7 +73,181 @@ const ChatList = ({ navigation }) => {
 
   useEffect(() => {
     api_portalList()
+    socketEvents();
+
+    return () => {
+      removeSocketEvents()
+    }
   }, [])
+
+
+  const socketEvents = () => {
+    socket.on("send_chat_message_event_for_sender", newMsgReceive);
+    socket.on("send_chat_message_receiver", newMsgReceive);
+    socket.on("update_chat_message_event_for_sender", editMessageReceiver);
+    socket.on("update_chat_message_receiver", editMessageReceiver);
+    socket.on("delete_chat_message_event_for_sender", deleteMessageReceiver);
+    socket.on("delete_chat_message_receiver", deleteMessageReceiver);
+    socket.on("member_online", memberOnlineSignal);
+    socket.on("member_offline", memberOfflineSignal);
+    socket.on("consultant_offline", memberOfflineSignal);
+  }
+
+  const removeSocketEvents = () => {
+    socket.off("send_chat_message_event_for_sender", newMsgReceive);
+    socket.off("send_chat_message_receiver", newMsgReceive);
+    socket.off("update_chat_message_event_for_sender", editMessageReceiver);
+    socket.off("update_chat_message_receiver", editMessageReceiver);
+    socket.off("delete_chat_message_event_for_sender", deleteMessageReceiver);
+    socket.off("delete_chat_message_receiver", deleteMessageReceiver);
+    socket.off("member_online", memberOnlineSignal);
+    socket.off("member_offline", memberOfflineSignal);
+    socket.off("consultant_offline", memberOfflineSignal);
+  }
+
+  const newMsgReceive = (data) => {
+    console.log(data, "sendMessageReceiver")
+    if (data.code == 200) {
+      setChatList((chatList) => {
+        console.log(chatList, "chatList")
+        let index = chatList.findIndex(x => x._id == data?.chat_obj?.chat?._id);
+        console.log(index, "index")
+        if (index > -1) {
+          let chatobj = { ...chatList[index] };
+          let newChatObj = data?.chat_obj?.chat;
+          chatobj = {
+            ...chatobj,
+            image: newChatObj.image,
+            last_message: newChatObj.last_message,
+            last_message_date_time: newChatObj.last_message_date_time,
+            message_id: newChatObj.message_id,
+            updatedAt: newChatObj.updatedAt,
+            message_type: newChatObj.message_type,
+            member: data?.chat_obj?.member
+          }
+          chatList.splice(index, 1, chatobj);
+          return [...chatList]
+        }
+        return [...chatList]
+      })
+    }
+  }
+
+
+
+  const editMessageReceiver = (data) => {
+    console.log(data, "editMessageReceiver")
+    if (data.code == 200) {
+      setChatList((chatList) => {
+        let index = chatList.findIndex(x => x?._id == data?.message_obj?.chat_id);
+        if (index > -1) {
+          let chatobj = { ...chatList[index] };
+          let newChatObj = data?.message_obj;
+          if (chatobj?.message_id == newChatObj?._id) {
+            chatobj = {
+              ...chatobj,
+              image: newChatObj.image,
+              last_message: newChatObj.message,
+              last_message_date_time: newChatObj.message_date_time,
+              message_id: newChatObj._id,
+              updatedAt: newChatObj.updatedAt,
+              message_type: newChatObj.message_type,
+            }
+            chatList.splice(index, 1, chatobj);
+            return [...chatList]
+          }
+          return chatList;
+        }
+      })
+    }
+
+  }
+
+
+
+  const deleteMessageReceiver = (data) => {
+    console.log(data, "deleteMessageReceiver")
+    if (data.code == 200) {
+      if (data.is_last_message) {
+        setChatList((chatList) => {
+          let index = chatList.findIndex(x => x?._id == data?.chat_id);
+          if (index > -1) {
+            let chatobj = { ...chatList[index] };
+            let newChatObj = data?.message_obj;
+            chatobj = {
+              ...chatobj,
+              image: newChatObj.image,
+              last_message: newChatObj.message,
+              last_message_date_time: newChatObj.message_date_time,
+              message_id: newChatObj._id,
+              updatedAt: newChatObj.updatedAt,
+              message_type: newChatObj.message_type,
+            }
+            chatList.splice(index, 1, chatobj);
+            return [...chatList]
+          }
+        })
+      }
+    }
+  }
+
+
+  const memberOnlineSignal = (data) => {
+    console.log(data, "memberOnlineSignal")
+    setChatList((chatList) => {
+      let chatLength = chatList.length;
+      console.log(chatLength, "chatLength")
+      for (let i = 0; i < chatLength; i++) {
+        console.log(chatList[i], "Chat")
+        if (data.user_id == chatList[i].member[0]._id._id) {
+          chatList[i].member[0]._id.is_online = true;
+          return [...chatList]
+        }
+        else if (data.user_id == chatList[i].member[1]._id._id) {
+          chatList[i].member[1]._id.is_online = true
+          return [...chatList]
+        }
+      }
+      console.log(chatList)
+      return [...chatList]
+    })
+  }
+
+  const memberOfflineSignal = (data) => {
+    console.log(data, "memberOfflineSignal")
+    setChatList((chatList) => {
+      let chatLength = chatList.length;
+      console.log(chatLength, "chatLength")
+      for (let i = 0; i < chatLength; i++) {
+        console.log(chatList[i], "Chat")
+        if (data.user_id == chatList[i].member[0]._id._id) {
+          chatList[i].member[0]._id.is_online = false;
+          return [...chatList]
+        }
+        else if (data.user_id == chatList[i].member[1]._id._id) {
+          chatList[i].member[1]._id.is_online = false
+          return [...chatList]
+        }
+      }
+      console.log(chatList)
+      return [...chatList]
+    })
+
+  }
+
+
+  const resetCountToZero = (chatId) => {
+    let index = chatList.findIndex(x => x._id == chatId);
+    if (index > -1) {
+
+      let chatobj = { ...chatList[index] };
+
+
+    }
+  }
+
+
+
 
 
   const portalModal = () => {
@@ -151,7 +327,16 @@ const ChatList = ({ navigation }) => {
   }
 
   const renderChatList = ({ item, index }) => {
-    let member = item.member.find(x => x?._id?._id != user._id);
+    let memberIndex = item?.member.findIndex(x => x?._id?._id != user._id);
+    let member, otherUser;
+    if (memberIndex == 0) {
+      member = item?.member[0];
+      otherUser = item?.member[1];
+    } else {
+      member = item?.member[1];
+      otherUser = item?.member[0];
+    }
+
     return (
       <TouchableHighlight
         onPress={() => onChatScreen(member, item)}
@@ -184,18 +369,25 @@ const ChatList = ({ navigation }) => {
                 </View>
               }
 
-              <MyText fontSize={12} type='light' numberOfLines={1}>
-                {!!item?.last_message ?
-                  isHtml(item?.last_message) ?
-                    decode(item.last_message.replace(/<[^>]+>/g, '').replace(/\*/g, "").replace(/[\])}[{(]/g, " ").slice(0, 70), { level: "html5" }) :
-                    <Markdown style={markdownStyleOther}>
-                      {item?.last_message.slice(0, 70)}
-                    </Markdown> :
-                  item.message_type == "image" ? "Photo" :
-                    item.message_type == 'audio' ? "Audio" :
-                      item.message_type == 'video' ? "Video" : ""}
+              <View style={{ flexDirection: "row" }}>
+                <MyText fontSize={12} type='light' numberOfLines={1} style={{ marginTop: 3, flex: 1 }}>
+                  {!!item?.last_message ?
+                    isHtml(item?.last_message) ?
+                      decode(item.last_message.replace(/<[^>]+>/g, '').replace(/\*/g, "").replace(/[\])}[{(]/g, " ").slice(0, 70), { level: "html5" }) :
+                      <Markdown style={markdownStyleOther}>
+                        {item?.last_message.slice(0, 70)}
+                      </Markdown> :
+                    item.message_type == "image" ? "Photo" :
+                      item.message_type == 'audio' ? "Audio" :
+                        item.message_type == 'video' ? "Video" : ""}
 
-              </MyText>
+                </MyText>
+                {otherUser?.unread_message_count > 0 &&
+                  <View style={__style.badge}>
+                    <MyText fontSize={12} color={colors.black} >
+                      {otherUser?.unread_message_count > 99 ? "99+" : otherUser?.unread_message_count}</MyText>
+                  </View>}
+              </View>
             </View>
           </View>
         </View>
@@ -210,7 +402,6 @@ const ChatList = ({ navigation }) => {
         <FlatList
           data={chatList}
           renderItem={renderChatList}
-          // ItemSeparatorComponent={<View style={__style.separotor} />}
           ListEmptyComponent={!loader && <EmptyView label={"No Chat"} />}
           ListHeaderComponent={headerView()}
           stickyHeaderIndices={[0]}
@@ -253,7 +444,7 @@ const markdownStyleOther = {
     fontFamily: fonts.regular
   },
   paragraph: {
-    marginTop: 5,
+    marginTop: 0,
     marginBottom: 0,
     fontSize: 12
   }
@@ -293,4 +484,11 @@ const __style = StyleSheet.create({
     right: -5,
     bottom: 0
   },
+  badge: {
+    height: 20,
+    width: 20,
+    alignItems: "center",
+    justifyContent: "center", backgroundColor: colors.primary2, borderRadius: 20 / 2,
+    marginLeft: 5
+  }
 })
