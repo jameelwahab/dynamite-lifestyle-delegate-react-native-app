@@ -12,62 +12,18 @@ import copyText from '../../../functions/copyText'
 import Markdown from '@ronradtke/react-native-markdown-display';
 import { fonts } from '../../../utilities/fonts'
 import AudioChatView from './AudioChatView'
-import TrackPlayer from 'react-native-track-player'
 
-const MsgView = ({ item, index, user, timezone, onMsgLongPress, openImageZommer }) => {
 
-  const [state, updateState] = useState({
-    selected_audio: null,
-    isPlaying: ""
-  });
-  const setState = (updation) => updateState({ ...state, ...updation });
+const MsgView = ({ item, index, user, timezone, onMsgLongPress, openImageZommer, playIconClick, stopPlayer, state, setState }) => {
+  console.log(playIconClick, stopPlayer, "checl")
+
   const isOtherMember = (id) => {
     return id == user?._id;
   }
-
-
-  const playIconClick = async (audio, id) => {
-    if (audio !== state.selected_audio) {
-      setState({ selected_audio: audio, isPlaying: id })
-      await TrackPlayer.pause();
-      await TrackPlayer.reset()
-      await TrackPlayer.add({
-        id: id,
-        url: S3_URL + audio,
-        // url:sampleUrl,
-        title: "",
-        artist: "",
-        album: '',
-        genre: '',
-        artwork: "",
-      });
-      await TrackPlayer.play()
-
-    }
-    else {
-      let playerState = await TrackPlayer.getState();
-      // console.log(await TrackPlayer.getActiveTrack(), 'state')
-      if (playerState === TrackPlayer.STATE_PAUSED || playerState === "ready" || playerState == "paused") {
-        await TrackPlayer.play();
-        setState({ isPlaying: id });
-      }
-      else {
-        await TrackPlayer.pause();
-        setState({ isPlaying: "" })
-      }
-    }
-  }
-
-  const stopPlayer = async () => {
-    await TrackPlayer.reset()
-    setState({ isPlaying: "", selected_audio: null })
-  }
-
   return (
     <TouchableOpacity
       onLongPress={onMsgLongPress}
-      style={{ alignSelf: isOtherMember(item.receiver_id) ? "flex-start" : "flex-end", }}
-    >
+      style={{ alignSelf: isOtherMember(item.receiver_id) ? "flex-start" : "flex-end", }}>
       <View
         style={{
           borderBottomRightRadius: isOtherMember(item.receiver_id) ? 10 : 0,
@@ -87,7 +43,7 @@ const MsgView = ({ item, index, user, timezone, onMsgLongPress, openImageZommer 
             <TouchableOpacity
               onLongPress={onMsgLongPress}
               onPress={() => openImageZommer(item.image)}
-              style={{ padding:2 }}>
+              style={{ padding: 2 }}>
               <ResponsiveImage
                 uri={S3_URL + item?.image}
                 source={{ uri: S3_URL + item?.image }}

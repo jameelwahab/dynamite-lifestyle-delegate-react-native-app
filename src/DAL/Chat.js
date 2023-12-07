@@ -4,7 +4,7 @@ import invokeApi from "../functions/invokeAPI"
 
 export const CHAT_LIST = ({ token, navigation, body: { event_id, search_text }, page }) => {
   return invokeApi({
-    path: `api/chat/list_chat_with_event_delegate/list/v1?page=${page}&limit=50`,
+    path: `api/chat/list_chat_with_event_delegate/list/v1?page=${page}&limit=20`,
     method: "POST",
     token: token,
     navigation: navigation,
@@ -68,6 +68,17 @@ export const READ_ALL_MESSAGES = ({ token, navigation, chatId, }) => {
   return invokeApi({
     path: `api/chat/read_message/${chatId}`,
     method: "GET",
+    token: token,
+    navigation: navigation,
+  })
+}
+
+
+export const ADD_AS_NOTE = ({ token, navigation, body: { member_id, message_id } }) => {
+  return invokeApi({
+    path: `api/member/add_note/from_chat`,
+    method: "POST",
+    postData: { member_id, message_id },
     token: token,
     navigation: navigation,
   })

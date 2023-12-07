@@ -1,14 +1,15 @@
 import { View, Text, Image } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { memo, useEffect, useState } from 'react'
 import FastImage from 'react-native-fast-image';
 import utilities from '../utilities';
 const screenWidth = utilities.windowWidth() * 0.8;
 
-const MyImage2 = ({ uri, style, width }) => {
+const ResponsiveImage = memo(({ uri, style, width }) => {
   const [size, setSize] = useState({ height: 0, width: 0 });
   const [loader, setLoader] = useState(false);
 
   useEffect(() => {
+    console.log(uri,"uri")
     Image.getSize(uri, (width, height) => {
       setSize({ width, height })
     })
@@ -26,6 +27,6 @@ const MyImage2 = ({ uri, style, width }) => {
       />
     )
   } else return null;
-}
+});
 
-export default MyImage2
+export default ResponsiveImage

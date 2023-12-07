@@ -16,8 +16,10 @@ import Memberlist from './Memberlist'
 import debounce from '../../../functions/debounce'
 import MyLoader from '../../../components/MyLoader'
 import showToast from '../../../functions/showToast'
+import EmptyView from '../../../components/EmptyView'
 
-const StartNewChat = ({ navigation }) => {
+const StartNewChat = ({ navigation, route }) => {
+  const { resetCountToZero, refresh } = route?.params;
   const { token, user } = useSelector(selectUser);
   const [portalList, setPortalList] = useState([]);
   const [loader, setLoader] = useState(true);
@@ -162,26 +164,24 @@ const StartNewChat = ({ navigation }) => {
   );
 
   const renderScene = ({ route }) => {
-    switch (route.key) {
-      case 'online':
-        return <Memberlist
+
+    return (
+      <View style={{flex:1}}>
+        <Memberlist
           key={route.key}
-          list={members?.online}
+          list={route.key == 'online' ? members?.online : members?.offline}
           loader={loader}
-          statusColor={colors.online}
+          statusColor={route.key == 'online' ? colors.online : colors.primary2}
+          navigation={navigation}
+          token={token}
+          resetCountToZero={resetCountToZero}
+          refresh={refresh}
         />
-
-      case 'offline':
-        return <Memberlist
-          key={route.key}
-          list={members?.offline}
-          loader={loader}
-          statusColor={colors.primary2}
-        />
-
-
-    }
+      </View>)
   }
+
+
+
 
 
   return (

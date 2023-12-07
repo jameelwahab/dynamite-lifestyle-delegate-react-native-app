@@ -27,7 +27,6 @@ export default function CountryModal({ selectCountry = () => { }, isVisible, clo
   const searchInList = text => {
     setSearchText(text);
     if (text.trim() == '') {
-      console.log("Check", "emprty")
       setListData(contriesList);
     } else {
       let filteredData = contriesList.filter(item => {

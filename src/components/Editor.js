@@ -186,7 +186,8 @@ const Editor = ({
       </Modal>
     )
   };
-  // console.log(RichText, "console.log(RichText")
+
+  
   return (
     <View>
       {/* {colorModal()} */}

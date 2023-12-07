@@ -1,7 +1,7 @@
 import { View, Text, FlatList, StyleSheet, TouchableHighlight, Keyboard, SafeAreaView, Pressable, TouchableOpacity, Platform } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import RootView from '../../../components/RootView'
-import MyLoader from '../../../components/MyLoader'
+import MyLoader, { SimpleLoader } from '../../../components/MyLoader'
 import MyText from '../../../components/MyText'
 import { CHAT_LIST, PORTAL_LIST } from '../../../DAL'
 import { useSelector } from 'react-redux'
@@ -26,10 +26,17 @@ import Markdown from '@ronradtke/react-native-markdown-display'
 import { fonts } from '../../../utilities/fonts'
 import { selectSocket } from '../../../redux/reducers/socketSlice'
 
+
+let page = 0;
+let canLoadMore = false;
+let firstTime = true;
+let isNewChat = false;
+
 const ChatList = ({ navigation }) => {
   const { token, user } = useSelector(selectUser);
   const { socket } = useSelector(selectSocket);
   const [loader, setLoader] = useState(true);
+  const [footerLoader, setFooterLoader] = useState(false);
   const [chatList, setChatList] = useState([]);
   const [portalList, setPortalList] = useState([]);
   const [searchText, setSearchText] = useState("");
@@ -45,19 +52,44 @@ const ChatList = ({ navigation }) => {
       lastName: member?.last_name,
       lastSeen: member?._id?.last_login_activity,
       profileImage: member?.profile_image,
-      chatId: item._id
+      chatId: item._id,
+      resetCountToZero,
+      refresh
     })
   }
 
-  const api_ChatList = async () => {
-    setLoader(true)
-    let res = await CHAT_LIST({ navigation, body: { event_id: eventId?._id, search_text: searchText }, token, page: 0 })
+  const api_ChatList = async (newArray = false) => {
+    let res = await CHAT_LIST({ navigation, body: { event_id: eventId?._id, search_text: searchText }, token, page })
     if (res.code == 200) {
+      if ((chatList.length + res?.chat.length) < res?.total_chat_count) {
+        page++;
+        canLoadMore = true;
+      } else {
+        canLoadMore = false;
+      }
       setLoader(false);
-      setChatList(res?.chat);
+      setFooterLoader(false);
+      setChatList(newArray ? res?.chat : [...chatList, ...res?.chat]);
+      firstTime = false;
     } else {
       setLoader(false)
+      setFooterLoader(false);
     }
+  }
+
+  const refresh = () => {
+    page = 0;
+    canLoadMore = false;
+    api_ChatList()
+  }
+
+  const loadmore = () => {
+    if (canLoadMore) {
+      canLoadMore = false;
+      setFooterLoader(true);
+      api_ChatList()
+    }
+
   }
 
   const api_portalList = async () => {
@@ -68,14 +100,27 @@ const ChatList = ({ navigation }) => {
   }
 
   useEffect(() => {
-    debounce(api_ChatList)
+    if (!firstTime) {
+      console.log("HI")
+      page = 0;
+      canLoadMore = false;
+      debounce(() => api_ChatList(true))
+    }
   }, [searchText, JSON.stringify(eventId)])
 
+
   useEffect(() => {
+    firstTime = true;
+    page = 0;
+    canLoadMore = false;
+    api_ChatList()
     api_portalList()
     socketEvents();
 
     return () => {
+      page = 0;
+      canLoadMore = false;
+      isNewChat = false;
       removeSocketEvents()
     }
   }, [])
@@ -109,8 +154,7 @@ const ChatList = ({ navigation }) => {
     console.log(data, "sendMessageReceiver")
     if (data.code == 200) {
       setChatList((chatList) => {
-        console.log(chatList, "chatList")
-        let index = chatList.findIndex(x => x._id == data?.chat_obj?.chat?._id);
+        let index = chatList.findIndex(x => x?._id == data?.chat_obj?.chat?._id);
         console.log(index, "index")
         if (index > -1) {
           let chatobj = { ...chatList[index] };
@@ -126,9 +170,17 @@ const ChatList = ({ navigation }) => {
             member: data?.chat_obj?.member
           }
           chatList.splice(index, 1, chatobj);
-          return [...chatList]
+        } else {
+          let newChatObj = data?.chat_obj?.chat;
+          let chatobj = {
+            ...newChatObj,
+            member: data?.chat_obj?.member
+          }
+          chatList.unshift(chatobj);
+console.log(chatList,"chatList")
         }
         return [...chatList]
+
       })
     }
   }
@@ -196,9 +248,7 @@ const ChatList = ({ navigation }) => {
     console.log(data, "memberOnlineSignal")
     setChatList((chatList) => {
       let chatLength = chatList.length;
-      console.log(chatLength, "chatLength")
       for (let i = 0; i < chatLength; i++) {
-        console.log(chatList[i], "Chat")
         if (data.user_id == chatList[i].member[0]._id._id) {
           chatList[i].member[0]._id.is_online = true;
           return [...chatList]
@@ -208,18 +258,14 @@ const ChatList = ({ navigation }) => {
           return [...chatList]
         }
       }
-      console.log(chatList)
       return [...chatList]
     })
   }
 
   const memberOfflineSignal = (data) => {
-    console.log(data, "memberOfflineSignal")
     setChatList((chatList) => {
       let chatLength = chatList.length;
-      console.log(chatLength, "chatLength")
       for (let i = 0; i < chatLength; i++) {
-        console.log(chatList[i], "Chat")
         if (data.user_id == chatList[i].member[0]._id._id) {
           chatList[i].member[0]._id.is_online = false;
           return [...chatList]
@@ -229,7 +275,6 @@ const ChatList = ({ navigation }) => {
           return [...chatList]
         }
       }
-      console.log(chatList)
       return [...chatList]
     })
 
@@ -237,12 +282,18 @@ const ChatList = ({ navigation }) => {
 
 
   const resetCountToZero = (chatId) => {
+    console.log("resetCountToZero",)
     let index = chatList.findIndex(x => x._id == chatId);
+    console.log(index, "index")
     if (index > -1) {
-
       let chatobj = { ...chatList[index] };
-
-
+      let memberIndex = chatobj.member.findIndex(x => x._id?._id == user?._id);
+      console.log(memberIndex, "memberIndex")
+      if (memberIndex > -1) {
+        chatobj.member[memberIndex].unread_message_count = 0;
+        chatList.splice(index, 1, chatobj);
+        setChatList([...chatList])
+      }
     }
   }
 
@@ -340,8 +391,7 @@ const ChatList = ({ navigation }) => {
     return (
       <TouchableHighlight
         onPress={() => onChatScreen(member, item)}
-        underlayColor={colors.secondary}
-      >
+        underlayColor={colors.secondary}>
         <View style={__style.itemRootView}>
           <View>
             <UserImage
@@ -395,8 +445,13 @@ const ChatList = ({ navigation }) => {
     )
   }
 
+
+
   return (
-    <RootView hideBackBottomButton title='Messages'>
+    <RootView
+      hideBackBottomButton
+      title='Messages'
+    >
 
       <View style={{ flex: 1 }}>
         <FlatList
@@ -406,14 +461,22 @@ const ChatList = ({ navigation }) => {
           ListHeaderComponent={headerView()}
           stickyHeaderIndices={[0]}
           stickyHeaderHiddenOnScroll={true}
-          contentContainerStyle={{ paddingBottom: 70 }}
+          contentContainerStyle={{ paddingBottom: 40 }}
           showsVerticalScrollIndicator={false}
+          onEndReached={loadmore}
+          ListFooterComponent={
+            <View style={{ height: 50, alignItems: "center", justifyContent: 'center' }}>
+              {footerLoader && <SimpleLoader />}
+            </View>}
         />
       </View>
 
       {portalModal()}
       <FAB
-        onPress={() => navigation.navigate(routes.startNewChat)}
+        onPress={() => navigation.navigate(routes.startNewChat, {
+          resetCountToZero,
+          refresh
+        })}
         icon={() => icons.plus(colors.black, 20)}
       />
 

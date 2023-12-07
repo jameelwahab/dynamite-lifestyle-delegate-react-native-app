@@ -17,7 +17,8 @@ const RootView = ({
   hideChatIcon = false,
   backgroundColor,
   titleView,
-  children
+  children,
+  customBackPress
 }) => {
   return (
     <SafeAreaView style={[__RootView.root, !!backgroundColor && { backgroundColor }]}>
@@ -34,7 +35,7 @@ const RootView = ({
           hideChatIcon={hideChatIcon}
           hideProfile={hideProfile}
           titleView={titleView}
-
+          customBackPress={customBackPress}
         />}
       <View style={{ flex: 1, paddingHorizontal: 10 }}>
         {children}

@@ -7,7 +7,7 @@ import { convertTimezone } from '../../../functions/convertTime';
 import { selectTimeZone } from '../../../redux/reducers/timezoneSlice';
 import { useSelector } from 'react-redux';
 import { colors } from '../../../utilities/colors';
-import { MESSAGE_LIST_BY_CHAT_ID, READ_ALL_MESSAGES } from '../../../DAL';
+import { ADD_AS_NOTE, MESSAGE_LIST_BY_CHAT_ID, READ_ALL_MESSAGES } from '../../../DAL';
 import { selectUser } from '../../../redux/reducers/userSlice';
 import MyLoader, { SimpleLoader } from '../../../components/MyLoader';
 import utilities from '../../../utilities';
@@ -29,18 +29,22 @@ import UserView from './UserView';
 import { selectSocket } from '../../../redux/reducers/socketSlice';
 import ConfirmationModal from '../../../components/ConfirmationModal';
 import copyText from '../../../functions/copyText';
+import TrackPlayer from 'react-native-track-player'
+import routes from '../../../navigation/routes';
+import showToast from '../../../functions/showToast';
 
 let page = 0;
 let canLoadMore = false;
-
+let isNewChat = false;
 const MessageList = ({ navigation, route }) => {
-  const member = route?.params;
+  console.log(route?.params)
+  const [member, setMember] = useState(route?.params);
   const insets = useSafeAreaInsets();
   const timezone = useSelector(selectTimeZone);
   const { socket } = useSelector(selectSocket);
   const { token, user } = useSelector(selectUser);
   const [chat, setChat] = useState([]);
-  const [loader, setLoader] = useState(true);
+  const [loader, setLoader] = useState(false);
   const [footLoader, setFooterLoader] = useState(false);
   const [opitonModal, setOptionModal] = useState({ isVisible: false, opt: "", item: null, optionList: [] });
   const [confirmation, setConfirmation] = useState({ isVisible: false, item: null, title: "", type: "" })
@@ -50,15 +54,25 @@ const MessageList = ({ navigation, route }) => {
 
 
   useEffect(() => {
+    isNewChat = false
     page = 0;
     canLoadMore = false;
-    getMemberList();
-
+    if (!!member?.chatId) {
+      setLoader(true)
+      getMemberList();
+    }
     socketEvents()
     return () => {
-      console.log("return")
-      setChat([])
-      removeSocketEvents();
+      try {
+        console.log("return")
+        setChat([])
+        isNewChat = false
+        removeSocketEvents();
+        TrackPlayer.pause()
+        TrackPlayer.reset()
+      } catch (e) {
+        console.log(e, "error")
+      }
     }
   }, [])
 
@@ -83,6 +97,7 @@ const MessageList = ({ navigation, route }) => {
   const sendMessageReceiverForSender = (data) => {
     console.log(data, "sendMessageReceiverForSender")
     setChat((chat) => [data?.message_obj, ...chat])
+    setMember((member) => { return { ...member, chatId: data?.chat_obj?._id, } })
   }
 
   const sendMessageReceiver = (data) => {
@@ -144,12 +159,7 @@ const MessageList = ({ navigation, route }) => {
   }
 
 
-
-
-
-
-
-
+  //! //////// APIS
   const loadMore = () => {
     if (canLoadMore) {
       console.log("onEndRech")
@@ -158,9 +168,6 @@ const MessageList = ({ navigation, route }) => {
       getMemberList()
     }
   }
-
-
-
 
   const getMemberList = async () => {
     let res = await MESSAGE_LIST_BY_CHAT_ID({ navigation, token, chatId: member?.chatId, page })
@@ -187,9 +194,25 @@ const MessageList = ({ navigation, route }) => {
     }
   }
 
+  const api_addAdNote = async (msgId) => {
+    let res = await ADD_AS_NOTE({
+      token, navigation, body: {
+        member_id: member?.memberId,
+        message_id: msgId,
+      }
+    })
+    if (res.code == 200) {
+      showToast({ title: res?.message, type: "success" })
+    }
+  }
+
+
+  //? /////// ACTIONS
+
   const optionAction = (opt) => {
     console.log(opt, "msgAction")
     let item = opitonModal.item
+    console.log(item, "msgAction")
     setOptionModal({ ...opitonModal, opt: opt.type, item: null, isVisible: false, })
 
 
@@ -207,6 +230,8 @@ const MessageList = ({ navigation, route }) => {
         image: item.image,
         id: item._id
       })
+    } else if (opt.type == 'note') {
+      api_addAdNote(item?._id);
     }
   }
 
@@ -241,6 +266,8 @@ const MessageList = ({ navigation, route }) => {
         if (!!item?.message == false) {
           options = options.slice().filter(x => x.type != 'copy');
         }
+      } else if (item.message_type == "audio") {
+        return
       } else {
         options = msgOptionList.slice().filter(x => x.type == 'note' || x.type == 'copy');
       }
@@ -253,28 +280,90 @@ const MessageList = ({ navigation, route }) => {
       } else if (item.message_type == "general") {
         options = msgOptionList.slice().filter(x => x.type != 'download');
       }
+      else if (item.message_type == "audio") {
+        options = msgOptionList.slice().filter(x => x.type == 'delete');
+      }
     }
     setOptionModal({ isVisible: true, item: item, opt: "", optionList: options })
   }
 
 
+  //! AudioMsg
+  const [state, updateState] = useState({
+    selected_audio: null,
+    isPlaying: ""
+  });
+
+  const setState = (updation) => updateState({ ...state, ...updation });
+
+
+
+  const playIconClick = async (audio, id) => {
+    if (audio !== state.selected_audio) {
+      await TrackPlayer.pause();
+      await TrackPlayer.reset()
+      setState({ selected_audio: audio, isPlaying: id })
+      await TrackPlayer.add({
+        id: id,
+        url: S3_URL + audio,
+        // url:sampleUrl,
+        title: "",
+        artist: "",
+        album: '',
+        genre: '',
+        artwork: "",
+      });
+      await TrackPlayer.play()
+
+    }
+    else {
+      let playerState = await TrackPlayer.getState();
+      // console.log(await TrackPlayer.getActiveTrack(), 'state')
+      if (playerState === TrackPlayer.STATE_PAUSED || playerState === "ready" || playerState == "paused") {
+        await TrackPlayer.play();
+        setState({ isPlaying: id });
+      }
+      else {
+        await TrackPlayer.pause();
+        setState({ isPlaying: "" })
+      }
+    }
+  }
+
+  const stopPlayer = async () => {
+    await TrackPlayer.reset()
+    setState({ isPlaying: "", selected_audio: null })
+  }
+
+
+
   const renderMessages = ({ item, index }) => {
     return (
       <MsgView
+        state={state}
+        setState={setState}
         user={user}
         item={item}
         index={index}
         timezone={timezone}
         onMsgLongPress={() => openOptionModal(item)}
         openImageZommer={() => { if (!!item?.image) { setImageZommerVisiblity(item?.image) } }}
+        playIconClick={playIconClick}
+        stopPlayer={stopPlayer}
       />
     )
   }
 
+  const onBackPress = () => {
+    navigation.navigate(routes.chatList, {
+      refresh: isNewChat
+    })
+  }
 
   return (
     <RootView
       titleView={() => <UserView member={member} timezone={timezone} />}
+      customBackPress={onBackPress}
     >
       <KeyboardAvoidingView
         style={{ flex: 1, }}
@@ -288,7 +377,7 @@ const MessageList = ({ navigation, route }) => {
               showsVerticalScrollIndicator={false}
               onEndReachedThreshold={0}
               inverted={chat.length == 0 ? false : true}
-              // inverted
+              keyExtractor={(item) => item?._id}
               contentContainerStyle={[chat.length == 0 && { flex: 1, alignItems: 'center', justifyContent: "center" }]}
               data={chat}
               renderItem={renderMessages}

@@ -1,8 +1,10 @@
 import { Dimensions } from "react-native";
 import RenderHTML, { HTMLContentModel, HTMLElementModel, defaultSystemFonts } from "react-native-render-html";
+import IframeRenderer, { iframeModel } from '@native-html/iframe-plugin';
 import { colors } from "../utilities/colors";
 import { fonts } from "../utilities/fonts";
 import { Component } from "react";
+import WebView from "react-native-webview";
 
 
 
@@ -12,7 +14,11 @@ export class MyWebview extends Component {
   }
 
 
-  fontElementModel = {
+  renderers = {
+    "iframe": IframeRenderer
+  };
+  customHTMLElementModels = {
+    "iframe": iframeModel,
     "font": HTMLElementModel.fromCustomModel({
       tagName: 'font',
       contentModel: HTMLContentModel.mixed,
@@ -36,13 +42,19 @@ export class MyWebview extends Component {
     }),
 
   }
+
+
+
+
   render() {
     let { html, style } = this.props;
     return (
       <RenderHTML
+        WebView={WebView}
         contentWidth={Dimensions.get("window").width / 1.5}
         source={{ html: "<div>" + html + "</div>" }}
-        customHTMLElementModels={this.fontElementModel}
+        customHTMLElementModels={this.customHTMLElementModels}
+        renderers={this.renderers}
         enableExperimentalMarginCollapsing={true}
         enableExperimentalBRCollapsing={true}
         tagsStyles={{
@@ -59,6 +71,14 @@ export class MyWebview extends Component {
           ...style
         }}
         systemFonts={[...defaultSystemFonts, ...Object.values(fonts)]}
+        renderersProps={{
+          iframe: {
+            // scalesPageToFit: true,
+            webViewProps: {
+              /* Any prop you want to pass to iframe WebViews */
+            }
+          }
+        }}
       />
     )
   }

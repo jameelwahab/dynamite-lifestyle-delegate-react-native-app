@@ -25,7 +25,9 @@ const Header = ({
   hideHambugerMenu = false,
   hideBackBottomButton = false,
   titleView,
-  hideProfile = false }) => {
+  hideProfile = false,
+  customBackPress
+}) => {
 
   const { user, token } = useSelector(selectUser)
   const navigation = useNavigation()
@@ -33,12 +35,15 @@ const Header = ({
 
 
   onBackButtonPress = () => {
-    navigation.goBack()
+    if (!!customBackPress) {
+      customBackPress()
+    } else {
+      navigation.goBack()
+    }
   }
 
 
   toggleSideMenu = () => {
-    console.log(navigation, "navigation")
     navigation.toggleDrawer();
   }
 

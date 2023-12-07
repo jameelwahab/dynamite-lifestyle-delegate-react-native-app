@@ -17,7 +17,6 @@ const AudioChatView = ({ url, onPress, totalDuration, currentPlaying, currentTra
   const { state: playState } = usePlaybackState();
 
   useEffect(() => {
-
     if (currentPlaying == thisTrack && progress.duration != 0) {
       setDuration(progress.duration);
       setPosition(progress.position + 0.5);
@@ -38,7 +37,7 @@ const AudioChatView = ({ url, onPress, totalDuration, currentPlaying, currentTra
         stopPlayer();
       }
       else if (playState == "ended") {
-        setPosition(duration)
+        setPosition(position)
         stopPlayer();
       }
     }

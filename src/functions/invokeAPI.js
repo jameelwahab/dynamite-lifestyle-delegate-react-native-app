@@ -66,7 +66,7 @@ export default async function invokeApi({
       navigation.reset({
         index: 0,
         routes: [{
-          name: routes.welcome
+          name: routes.login
         }]
       })
     } else {
