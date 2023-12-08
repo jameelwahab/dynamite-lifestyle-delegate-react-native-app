@@ -219,7 +219,7 @@ const MessageList = ({ navigation, route }) => {
     if (opt.type == 'delete') {
       setTimeout(() => {
         setConfirmation({ isVisible: true, title: "Are you sure you want to delete this message?", item, type: "delete_msg" });
-      }, 400);
+      }, 500);
     }
     else if (opt.type == 'copy') {
       copyText(item.message)
@@ -277,11 +277,11 @@ const MessageList = ({ navigation, route }) => {
         if (!!item?.message == false) {
           options = options.slice().filter(x => x.type != 'copy');
         }
-      } else if (item.message_type == "general") {
-        options = msgOptionList.slice().filter(x => x.type != 'download');
       }
       else if (item.message_type == "audio") {
         options = msgOptionList.slice().filter(x => x.type == 'delete');
+      } else {
+        options = msgOptionList.slice().filter(x => x.type != 'download');
       }
     }
     setOptionModal({ isVisible: true, item: item, opt: "", optionList: options })

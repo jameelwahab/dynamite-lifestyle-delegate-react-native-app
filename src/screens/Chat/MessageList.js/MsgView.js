@@ -25,6 +25,7 @@ const MsgView = ({ item, index, user, timezone, onMsgLongPress, openImageZommer,
       onLongPress={onMsgLongPress}
       style={{ alignSelf: isOtherMember(item.receiver_id) ? "flex-start" : "flex-end", }}>
       <View
+      
         style={{
           borderBottomRightRadius: isOtherMember(item.receiver_id) ? 10 : 0,
           borderBottomLeftRadius: isOtherMember(item.receiver_id) ? 0 : 10,
@@ -41,6 +42,7 @@ const MsgView = ({ item, index, user, timezone, onMsgLongPress, openImageZommer,
 
           {item.message_type == 'image' && !!item.image &&
             <TouchableOpacity
+            pointerEvents='box-only'
               onLongPress={onMsgLongPress}
               onPress={() => openImageZommer(item.image)}
               style={{ padding: 2 }}>
