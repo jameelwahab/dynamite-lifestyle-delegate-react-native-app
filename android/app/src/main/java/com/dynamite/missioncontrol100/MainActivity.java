@@ -1,4 +1,4 @@
-package com.delegateapp;
+package com.dynamite.missioncontrol100;
 
 import android.os.Bundle;
 

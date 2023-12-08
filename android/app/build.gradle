@@ -96,13 +96,18 @@ android {
 
     compileSdkVersion rootProject.ext.compileSdkVersion
 
-    namespace "com.delegateapp"
+    namespace "com.dynamite.missioncontrol100"
     defaultConfig {
-        applicationId "com.delegateapp"
+        applicationId "com.dynamite.missioncontrol100"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+         packagingOptions {
+            jniLibs {
+                useLegacyPackaging true 
+            }
+        }
     }
 
     splits {

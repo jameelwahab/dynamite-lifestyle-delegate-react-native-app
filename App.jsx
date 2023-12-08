@@ -23,7 +23,7 @@ const App = () => {
     TrackPlayer.setupPlayer({ waitForBuffer: true, }).then(() => {
       TrackPlayer.updateOptions({
         android:{
-          appKilledPlaybackBehavior:AppKilledPlaybackBehavior.PausePlayback
+          appKilledPlaybackBehavior:AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification
         },
         stopWithApp: true,
         notificationCapabilities: [

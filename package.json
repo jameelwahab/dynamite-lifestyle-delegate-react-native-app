@@ -10,7 +10,7 @@
     "test": "jest",
     "pod": "npx pod-install ios",
     "apk": "cd android && ./gradlew assembleRelease && cd ..",
-    "uni": "adb uninstall com.delegateapp",
+    "uni": "adb uninstall com.dynamite.missioncontrol100",
     "postinstall": "patch-package"
   },
   "dependencies": {

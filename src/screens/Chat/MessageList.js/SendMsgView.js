@@ -17,7 +17,7 @@ import { useSelector } from 'react-redux'
 import { selectSocket } from '../../../redux/reducers/socketSlice'
 import { selectUser } from '../../../redux/reducers/userSlice'
 import { UPLOAD_FILE_FOR_CHAT } from '../../../DAL'
-import { S3_URL } from '../../../utilities/constants'
+import { S3_URL, appName } from '../../../utilities/constants'
 import { ProgressBar } from 'react-native-paper'
 import AudioRecorderPlayer, {
   AudioEncoderAndroidType,
@@ -29,7 +29,7 @@ import AudioRecorderPlayer, {
 } from 'react-native-audio-recorder-player';
 import ReactNativeBlobUtil from 'react-native-blob-util'
 import moment from 'moment'
-import { PERMISSIONS, requestMultiple } from 'react-native-permissions'
+import { PERMISSIONS, request, requestMultiple } from 'react-native-permissions'
 let selection;
 
 const SendMsgView = ({ receiver, navigation, edit, clearEdit }) => {
@@ -102,7 +102,14 @@ const SendMsgView = ({ receiver, navigation, edit, clearEdit }) => {
         return;
       }
     } else {
-      return true
+      let granted = await request(PERMISSIONS.IOS.MICROPHONE);
+      console.log(granted,"granted")
+      if (granted == 'granted') {
+        return true
+      } else {
+        return false
+      }
+
     }
   }
 
@@ -112,7 +119,7 @@ const SendMsgView = ({ receiver, navigation, edit, clearEdit }) => {
       setRecording(true)
       startRecording()
     } else {
-      showToast({ body: "Permission denied", title: "Error" })
+      showToast({ body: `Please allow mircophone permission from app settings`, title: "Microphone permission denied" })
     }
   }
 
@@ -137,7 +144,7 @@ const SendMsgView = ({ receiver, navigation, edit, clearEdit }) => {
       };
       const meteringEnabled = false;
 
-      // Start the recording and get the audio URI
+
       const uri = await audioRecorderPlayer?.startRecorder(
         path,
         audioSet,
@@ -158,25 +165,33 @@ const SendMsgView = ({ receiver, navigation, edit, clearEdit }) => {
           });
         }
       });
-
       console.log(uri, "uri")
+
+
+
 
 
     } catch (error) {
       console.log('Uh-oh! Failed to start recording:', error);
+      showToast({ body: error.message, title: "Error" })
+      setRecording(false)
     }
   };
 
   const stopReorder = async () => {
-    let miliis = recorderTime.recordTimeInMillis;
-    setRecorderTime({ recordTime: "00:00", recordTimeInMillis: 0, });
-    setRecording(false)
-    audioRecorderPlayer?.removeRecordBackListener();
-    const result = await audioRecorderPlayer?.stopRecorder();
-    return {
-      uri: result,
-      time: miliis
-    };
+    try {
+      let miliis = recorderTime.recordTimeInMillis;
+      setRecorderTime({ recordTime: "00:00", recordTimeInMillis: 0, });
+      setRecording(false)
+      audioRecorderPlayer?.removeRecordBackListener();
+      const result = await audioRecorderPlayer?.stopRecorder();
+      return {
+        uri: result,
+        time: miliis
+      };
+    } catch (e) {
+      console.log(e, "erro on stop")
+    }
   }
 
   const sendAudioMsg = async () => {

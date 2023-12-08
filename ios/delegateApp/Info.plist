@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>Mission&#x2002;Control&#x2002;100</string>
+	<string>Mission Control 100</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -35,18 +35,16 @@
 			</dict>
 		</dict>
 	</dict>
-  <key>NSMicrophoneUsageDescription</key>
-  <string>Give $(PRODUCT_NAME) permission to use your microphone. Your record wont be shared without your permission.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Mission Control 100 want to access to your microphone</string>
 	<key>NSCameraUsageDescription</key>
-	<string>$(PRODUCT_NAME want to access to your camera</string>
+	<string>Mission Control 100 want to access to your camera</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>$(PRODUCT_NAME want to access to your microphone</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>$(PRODUCT_NAME want to access to your photos</string>
+	<string>Mission Control 100 want to access to your photos</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>$(PRODUCT_NAME want to access to your photos</string>
+	<string>Mission Control 100 want to access to your photos</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>MaterialIcons.ttf</string>
