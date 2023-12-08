@@ -39,7 +39,10 @@ const ZoomSettings = ({ navigation }) => {
 
 
   return (
-    <RootView title='Zoom Setting'>
+    <RootView
+      hideChatIcon
+      hideProfile
+      title='Zoom Setting'>
       <View style={{ flex: 1, marginTop: 30, marginHorizontal: 10 }}>
 
         <MyInputs

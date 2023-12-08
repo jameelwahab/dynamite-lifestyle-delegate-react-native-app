@@ -70,7 +70,7 @@ const Memberlist = ({ list, loader, statusColor, navigation, token, refresh, res
     <View style={{ flex: 1 }}>
       <View style={{ flex: 1 }}>
         <FlatList
-          contentContainerStyle={{ marginTop: 10, marginHorizontal: 10, }}
+          contentContainerStyle={{ paddingVertical: 10, paddingHorizontal: 10, }}
           data={list}
           renderItem={rednerMemberView}
           ListEmptyComponent={!loader && <EmptyView label={"No Members"} />}

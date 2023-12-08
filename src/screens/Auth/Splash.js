@@ -44,7 +44,7 @@ const Splash = ({ navigation }) => {
 
   }
 
-  const makeArrayOfSidebar = (list) => {
+  const makeArrayOfSidebar = (list, user) => {
     let newArray = [];
 
     drawerMenuList.forEach((item) => {
@@ -53,9 +53,12 @@ const Splash = ({ navigation }) => {
       if (index > -1) {
 
         if (!item.collapsible) {
+         
+          if (item?.value == "chat" && !user?.is_chat_allow) {
 
-          newArray.push({ ...item, title: list[index].option_label });
-
+          } else {
+            newArray.push({ ...item, title: list[index].option_label });
+          }
         } else {
 
           let nestedArray = [];
@@ -82,7 +85,7 @@ const Splash = ({ navigation }) => {
     let res = await INIT_WITH_TOKEN({ token });
     if (res.code == 200) {
 
-      let sideBarList = makeArrayOfSidebar(res?.nav_items);
+      let sideBarList = makeArrayOfSidebar(res?.nav_items, res?.consultant);
 
       dispatch(setSettings(res?.consultant_setting));
       dispatch(setUserAndToken({ user: res?.consultant, token: token }));

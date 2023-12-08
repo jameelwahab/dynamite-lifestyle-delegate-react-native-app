@@ -9,14 +9,18 @@ import utilities from '../../../utilities';
 import TrackPlayer, { useProgress, usePlaybackState } from 'react-native-track-player';
 import { SimpleLoader } from '../../../components/MyLoader';
 
-const AudioChatView = ({ url, onPress, totalDuration, currentPlaying, currentTrack, thisTrack, stopPlayer, }) => {
+const AudioChatView = ({ url, onPress, totalDuration, currentPlaying, currentTrack, thisTrack, stopPlayer, isMine }) => {
   const [duration, setDuration] = useState(0);
   const [position, setPosition] = useState(0);
 
   const progress = useProgress();
   const { state: playState } = usePlaybackState();
 
+  const getTrack = async () => {
+    console.log(await TrackPlayer.getActiveTrack(), "state")
+  }
   useEffect(() => {
+    getTrack()
     if (currentPlaying == thisTrack && progress.duration != 0) {
       setDuration(progress.duration);
       setPosition(progress.position + 0.5);
@@ -33,9 +37,9 @@ const AudioChatView = ({ url, onPress, totalDuration, currentPlaying, currentTra
         } else {
         }
       }
-      else if (playState == "stopped" && Platform.OS == "android") {
-        stopPlayer();
-      }
+      // else if (playState == "stopped" && Platform.OS == "android") {
+      //   stopPlayer();
+      // }
       else if (playState == "ended") {
         setPosition(position)
         stopPlayer();
@@ -53,36 +57,42 @@ const AudioChatView = ({ url, onPress, totalDuration, currentPlaying, currentTra
     }
     return false
   }
-
+  // "#836e46"
 
   return (
-    <View style={{ paddingTop: 5 }}>
+    <View style={{}}>
       <View style={{
         flexDirection: "row",
         alignItems: "center",
         height: 45,
         width: utilities.windowWidth() * 0.7,
-        backgroundColor: "#836e46",
+        // backgroundColor: isMine ? colors.lightText2 : "#69a4d3",
         borderRadius: 25,
         paddingHorizontal: 5,
-        marginBottom: 10
+        // marginBottom: 5
       }} >
         <TouchableOpacity
           onPress={onPress}
           disabled={isLoading()}
-          style={{ height: 35, width: 35, backgroundColor: colors.secondarySelect, borderRadius: 35 / 2, alignItems: "center", justifyContent: "center" }} >
-          {isLoading() ? <SimpleLoader size={20} /> :
-            thisTrack == currentPlaying ? icons.pause(colors.white, 15) : icons.play(colors.white, 15)
+          style={{
+            height: 35, width: 35,
+            // backgroundColor: isMine?"": "#69a4d3",
+            borderRadius: 35 / 2, alignItems: "center", justifyContent: "center"
+          }} >
+          {isLoading() ? <ActivityIndicator color={isMine ? colors.white : colors.secondary} /> :
+            thisTrack == currentPlaying ?
+              icons.pause(isMine ? colors.white : colors.secondary, 18) :
+              icons.play(isMine ? colors.white : colors.secondary, 18)
           }
         </TouchableOpacity>
         <View style={{ flex: 1, paddingHorizontal: 10, height: "100%", justifyContent: "flex-end", marginBottom: 10 }}>
           <ProgressBar
             progress={duration != 0 ? position / duration : 0}
-            color={colors.secondarySelect}
+            color={isMine ? colors.primary : colors.secondarySelect}
           />
           <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 5 }}>
-            <MyText style={{ fontSize: 10 }} >{moment.utc((position * 1000)).format("mm:ss")}</MyText>
-            <MyText style={{ fontSize: 10 }}>{moment.utc(totalDuration).format("mm:ss")}</MyText>
+            <MyText color={isMine ? colors.white : colors.secondary} style={{ fontSize: 10 }} >{moment.utc((position * 1000)).format("mm:ss")}</MyText>
+            <MyText color={isMine ? colors.white : colors.secondary} style={{ fontSize: 10 }}>{moment.utc(totalDuration).format("mm:ss")}</MyText>
           </View>
         </View>
       </View>

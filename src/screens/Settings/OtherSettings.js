@@ -9,7 +9,11 @@ import routes from '../../navigation/routes'
 
 const OtherSettings = ({ navigation }) => {
   return (
-    <RootView title='Settings' >
+    <RootView
+      hideChatIcon
+      hideProfile
+      title='Settings'
+    >
       <View style={{ paddingHorizontal: 10, flex: 1 }}>
         <ScrollView>
           {SettingsList.map((x, i) => (

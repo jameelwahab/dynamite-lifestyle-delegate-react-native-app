@@ -177,7 +177,7 @@ const ChatList = ({ navigation }) => {
             member: data?.chat_obj?.member
           }
           chatList.unshift(chatobj);
-console.log(chatList,"chatList")
+          console.log(chatList, "chatList")
         }
         return [...chatList]
 
@@ -451,6 +451,7 @@ console.log(chatList,"chatList")
     <RootView
       hideBackBottomButton
       title='Messages'
+      hideChatIcon
     >
 
       <View style={{ flex: 1 }}>
@@ -472,14 +473,15 @@ console.log(chatList,"chatList")
       </View>
 
       {portalModal()}
-      <FAB
-        onPress={() => navigation.navigate(routes.startNewChat, {
-          resetCountToZero,
-          refresh
-        })}
-        icon={() => icons.plus(colors.black, 20)}
-      />
-
+      {user?.is_chat_allow &&
+        <FAB
+          onPress={() => navigation.navigate(routes.startNewChat, {
+            resetCountToZero,
+            refresh
+          })}
+          icon={() => icons.plus(colors.black, 20)}
+        />
+      }
       <MyLoader enable={loader} />
     </RootView>
   )

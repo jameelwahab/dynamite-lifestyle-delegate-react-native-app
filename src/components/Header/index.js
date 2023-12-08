@@ -14,6 +14,7 @@ import { S3_URL } from '../../utilities/constants'
 import MyImage from '../MyImage'
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../redux/reducers/userSlice'
+import routes from '../../navigation/routes'
 
 
 
@@ -28,7 +29,6 @@ const Header = ({
   hideProfile = false,
   customBackPress
 }) => {
-
   const { user, token } = useSelector(selectUser)
   const navigation = useNavigation()
   const [isUserModalVisible, setIsUserModalVisible] = useState(false)
@@ -48,7 +48,9 @@ const Header = ({
   }
 
 
-
+  const navigateToChatScreen = () => {
+    navigation.jumpTo(routes.chatNavigator)
+  }
 
 
   return (
@@ -75,12 +77,13 @@ const Header = ({
         <View style={{ flex: 1, justifyContent: "flex-end", alignItems: "center", flexDirection: "row", paddingRight: 10 }}>
 
 
-          {/* {!hideChatIcon &&
+          {!hideChatIcon && user?.is_chat_allow &&
             <TouchableOpacity
+              onPress={() => navigateToChatScreen()}
               style={__header.RightButtonView}>
               <Ionicons name="chatbox-ellipses" color={colors.primary} size={17} />
             </TouchableOpacity>}
-
+          {/* 
           {!hideNotificaitonIcon &&
             <TouchableOpacity
               style={__header.RightButtonView}>

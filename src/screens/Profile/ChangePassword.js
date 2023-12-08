@@ -43,7 +43,10 @@ const ChangePassword = ({ navigation }) => {
 
 
   return (
-    <RootView title='Change Password' >
+    <RootView
+      hideChatIcon
+      hideProfile
+      title='Change Password' >
       <View style={{ flex: 1 }}>
         <KeyboardAwareScrollView keyboardShouldPersistTaps="handled" >
           <View style={{ flex: 1, marginTop: 30, marginHorizontal: 10 }}>

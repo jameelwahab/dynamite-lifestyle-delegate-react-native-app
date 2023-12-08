@@ -1,4 +1,4 @@
-import { View, Text, TouchableHighlight, Image, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Pressable } from 'react-native'
+import { View, Text, TouchableHighlight, Image, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Pressable, Platform } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { colors } from '../../../utilities/colors'
 import Collapsible from 'react-native-collapsible'
@@ -29,6 +29,7 @@ import AudioRecorderPlayer, {
 } from 'react-native-audio-recorder-player';
 import ReactNativeBlobUtil from 'react-native-blob-util'
 import moment from 'moment'
+import { PERMISSIONS, requestMultiple } from 'react-native-permissions'
 let selection;
 
 const SendMsgView = ({ receiver, navigation, edit, clearEdit }) => {
@@ -76,7 +77,30 @@ const SendMsgView = ({ receiver, navigation, edit, clearEdit }) => {
 
   const getPermissions = async () => {
     if (Platform.OS === 'android') {
+      try {
+        let grants;
+        if (Platform.Version >= 33) {
+          grants = await requestMultiple([
+            PERMISSIONS.ANDROID.RECORD_AUDIO,
+          ]);
+        } else {
+          grants = await requestMultiple([
+            PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE,
+            PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
+            PERMISSIONS.ANDROID.RECORD_AUDIO,
+          ]);
+        }
 
+        if (Object.values(grants).every(x => x == 'granted')) {
+          return true;
+        } else {
+          Alert.alert("Permission Denied")
+          return false
+        }
+      } catch (err) {
+        console.warn(err);
+        return;
+      }
     } else {
       return true
     }
@@ -376,7 +400,7 @@ const SendMsgView = ({ receiver, navigation, edit, clearEdit }) => {
           <View style={{ paddingTop: 10, flexDirection: "row", alignItems: "flex-end" }}>
 
             <View style={__style.sendMsgInputView}>
-              <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
+              <View style={__style.inputRootView}>
                 <TouchableHighlight
                   underlayColor={colors.secondarySelect}
                   onPress={() => setImageModalVisiblity(true)}
@@ -391,7 +415,8 @@ const SendMsgView = ({ receiver, navigation, edit, clearEdit }) => {
                   placeholderTextColor={colors.lightText}
                   selectionColor={colors.selection}
                   multiline={true}
-                  verticalAlign='top'
+                  // textAlignVertical='top'
+                  cursorColor={colors.selection}
                   keyboardAppearance='dark'
                   autoCorrect={false}
                   autoCapitalize='none'
@@ -477,7 +502,9 @@ const __style = StyleSheet.create({
     backgroundColor: colors.lightPrimary2,
     borderRadius: 38 / 2,
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
+    marginBottom: Platform.OS == "android" ? 10 : 0
+
   },
   sendMsgInputView: {
     flex: 1,
@@ -486,6 +513,14 @@ const __style = StyleSheet.create({
     backgroundColor: colors.secondaryVariant,
     borderRadius: 15,
     paddingVertical: 5,
+    marginBottom: Platform.OS == "android" ? 10 : 0
+  },
+  inputRootView: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    // marginBottom: Platform.OS == "android" ? 10 : 0
+
+
   },
   sendMsgInput: {
     flex: 1,
@@ -494,6 +529,7 @@ const __style = StyleSheet.create({
     color: colors.white,
     fontFamily: fonts.regular,
     includeFontPadding: false,
+    paddingVertical: 0,
   },
 
   textinputIcon: {

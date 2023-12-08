@@ -79,6 +79,8 @@ const EditProfile = ({ navigation }) => {
 
     <RootView style={__styles.rootView}
       title='Edit Profile'
+      hideChatIcon
+      hideProfile
     >
       <KeyboardAwareScrollView
         extraScrollHeight={100}

@@ -1,8 +1,9 @@
-import { View, Text, SafeAreaView, FlatList, Image, TouchableHighlight } from 'react-native'
+import { View, Text, SafeAreaView, FlatList, Image, TouchableHighlight, StatusBar } from 'react-native'
 import React from 'react'
 import Modal from 'react-native-modal'
 import { colors } from '../utilities/colors'
 import MyText from './MyText'
+import utilities from '../utilities'
 
 
 const OptionModal = ({
@@ -30,7 +31,7 @@ const OptionModal = ({
               onPress={() => onSelected?.(item)}
               underlayColor={colors.secondary} >
               <View style={{ paddingVertical: 12, flexDirection: "row", alignItems: "center", paddingLeft: 20 }}>
-                <View style={{ height: 25, width: 25 ,justifyContent:"center",alignItems:"center"}}>
+                <View style={{ height: 25, width: 25, justifyContent: "center", alignItems: "center" }}>
                   {typeof (item.icon) == "function" ? item.icon() :
                     <Image source={item.icon} style={{ height: 25, width: 25, tintColor: colors.primary }} />}
                 </View>

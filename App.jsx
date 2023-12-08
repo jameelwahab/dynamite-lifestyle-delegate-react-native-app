@@ -10,7 +10,7 @@ import Toast, {
 } from 'react-native-toast-message';
 import {Provider} from 'react-redux';
 import {store} from './src/redux';
-import TrackPlayer, { Capability } from 'react-native-track-player';
+import TrackPlayer, { AppKilledPlaybackBehavior, Capability } from 'react-native-track-player';
 
 const toastConfig = {
   success: props => <SuccessToast {...props} text2NumberOfLines={2} />,
@@ -22,6 +22,9 @@ const App = () => {
   const setupPlayer = ()=>{
     TrackPlayer.setupPlayer({ waitForBuffer: true, }).then(() => {
       TrackPlayer.updateOptions({
+        android:{
+          appKilledPlaybackBehavior:AppKilledPlaybackBehavior.PausePlayback
+        },
         stopWithApp: true,
         notificationCapabilities: [
           Capability.Play,

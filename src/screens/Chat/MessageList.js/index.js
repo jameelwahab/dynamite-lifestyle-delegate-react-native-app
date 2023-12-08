@@ -298,20 +298,17 @@ const MessageList = ({ navigation, route }) => {
 
 
 
-  const playIconClick = async (audio, id) => {
+  const playIconClick = async (audio, id, isMe) => {
+
+
     if (audio !== state.selected_audio) {
       await TrackPlayer.pause();
       await TrackPlayer.reset()
-      setState({ selected_audio: audio, isPlaying: id })
+      setState({ selected_audio: audio, isPlaying: id });
+      console.log(S3_URL + audio, "audio")
       await TrackPlayer.add({
         id: id,
         url: S3_URL + audio,
-        // url:sampleUrl,
-        title: "",
-        artist: "",
-        album: '',
-        genre: '',
-        artwork: "",
       });
       await TrackPlayer.play()
 
@@ -331,7 +328,12 @@ const MessageList = ({ navigation, route }) => {
   }
 
   const stopPlayer = async () => {
-    await TrackPlayer.reset()
+    try {
+      await TrackPlayer.reset()
+    }
+    catch (err) {
+      console.log(err, "err")
+    }
     setState({ isPlaying: "", selected_audio: null })
   }
 
@@ -364,6 +366,7 @@ const MessageList = ({ navigation, route }) => {
     <RootView
       titleView={() => <UserView member={member} timezone={timezone} />}
       customBackPress={onBackPress}
+      hideChatIcon
     >
       <KeyboardAvoidingView
         style={{ flex: 1, }}

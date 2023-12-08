@@ -208,7 +208,9 @@ const ReminderSettings = ({ navigation }) => {
   }, [JSON.stringify(list)])
 
   return (
-    <RootView title='Welcome Reminder Setting'>
+    <RootView
+      hideChatIcon
+      hideProfile title='Welcome Reminder Setting'>
       <View style={{ flex: 1 }}>
         <FlatList
           showsVerticalScrollIndicator={false}

@@ -54,10 +54,11 @@ const MsgView = ({ item, index, user, timezone, onMsgLongPress, openImageZommer,
 
           {item?.message_type == 'audio' && !!item?.audio_url &&
             <AudioChatView
+              isMine={!isOtherMember(item.receiver_id)}
               currentPlaying={state.isPlaying}
               currentTrack={state.selected_audio}
               thisTrack={item._id}
-              onPress={() => playIconClick(item.audio_url, item._id)}
+              onPress={() => playIconClick(item.audio_url, item._id, isOtherMember(item.receiver_id))}
               stopPlayer={stopPlayer}
               totalDuration={item?.audio_duration}
               url={item?.audio_url}

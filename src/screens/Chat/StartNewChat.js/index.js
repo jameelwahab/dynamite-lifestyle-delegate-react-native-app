@@ -166,18 +166,16 @@ const StartNewChat = ({ navigation, route }) => {
   const renderScene = ({ route }) => {
 
     return (
-      <View style={{flex:1}}>
-        <Memberlist
-          key={route.key}
-          list={route.key == 'online' ? members?.online : members?.offline}
-          loader={loader}
-          statusColor={route.key == 'online' ? colors.online : colors.primary2}
-          navigation={navigation}
-          token={token}
-          resetCountToZero={resetCountToZero}
-          refresh={refresh}
-        />
-      </View>)
+      <Memberlist
+        key={route.key}
+        list={route.key == 'online' ? members?.online : members?.offline}
+        loader={loader}
+        statusColor={route.key == 'online' ? colors.online : colors.primary2}
+        navigation={navigation}
+        token={token}
+        resetCountToZero={resetCountToZero}
+        refresh={refresh}
+      />)
   }
 
 
@@ -185,7 +183,9 @@ const StartNewChat = ({ navigation, route }) => {
 
 
   return (
-    <RootView title='New Message'>
+    <RootView
+      hideChatIcon
+      title='New Message'>
       {headerView()}
       {portalModal()}
       <View style={{ flex: 1 }}>

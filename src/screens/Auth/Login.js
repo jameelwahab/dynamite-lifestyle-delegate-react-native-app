@@ -72,7 +72,7 @@ const Login = ({ navigation }) => {
     let res = await INIT_WITH_TOKEN({ token: resp?.token });
     if (res.code == 200) {
       await AsyncStorage.setItem("@token", resp?.token);
-      let sideBarList = makeArrayOfSidebar(res?.nav_items);
+      let sideBarList = makeArrayOfSidebar(res?.nav_items, res?.consultant);
       dispatch(setSettings(res?.consultant_setting));
       dispatch(setUserAndToken({ user: res?.consultant, token: resp?.token }));
       dispatch(setNavbar(sideBarList));
@@ -95,7 +95,7 @@ const Login = ({ navigation }) => {
   }
 
 
-  const makeArrayOfSidebar = (list) => {
+  const makeArrayOfSidebar = (list, user) => {
     let newArray = [];
 
     drawerMenuList.forEach((item) => {
@@ -104,9 +104,11 @@ const Login = ({ navigation }) => {
       if (index > -1) {
 
         if (!item.collapsible) {
+          if (item?.value == "chat" && !user?.is_chat_allow) {
 
-          newArray.push({ ...item, title: list[index].option_label });
-
+          } else {
+            newArray.push({ ...item, title: list[index].option_label });
+          }
         } else {
 
           let nestedArray = [];
