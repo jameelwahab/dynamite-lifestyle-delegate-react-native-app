@@ -18,3 +18,14 @@ export function isHtml(str) {
   let reg_isHtml = /<([A-Za-z][A-Za-z0-9]*)\b[^>]*>(.*?)<\/\1>/
   return reg_isHtml.test(str);
 }
+
+export function isUrlWithHttps(urlToTest) {
+  let reg_isHtml = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
+  return reg_isHtml.test(urlToTest);
+}
+
+
+export function isUrl(urlToTest) {
+  let reg_isHtml = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
+  return reg_isHtml.test(urlToTest);
+}

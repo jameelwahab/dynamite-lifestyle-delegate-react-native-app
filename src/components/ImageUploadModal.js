@@ -110,10 +110,13 @@ const ImageUploadModal = ({
   }
   const makeImageObject = (image) => {
     let obj = {
-      uri: Platform.OS == "ios" ? image.sourceURL : image.path,
+      uri:
+        Platform.OS == "ios" && !!image?.sourceURL ?
+          image.sourceURL :
+          image.path,
       name: !!image.filename ?
         image.filename :
-        Platform.OS == "ios" ?
+        Platform.OS == "ios" && !!image?.sourceURL ?
           image.sourceURL.split("/").pop() :
           image.path.split("/").pop(),
       type: image.mime,

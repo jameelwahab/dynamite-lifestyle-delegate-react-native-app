@@ -12,6 +12,7 @@ import copyText from '../../../functions/copyText'
 import Markdown from '@ronradtke/react-native-markdown-display';
 import { fonts } from '../../../utilities/fonts'
 import AudioChatView from './AudioChatView'
+import openUrl from '../../../functions/openUrl';
 
 
 const MsgView = ({ item, index, user, timezone, onMsgLongPress, openImageZommer, playIconClick, stopPlayer, state, setState }) => {
@@ -25,7 +26,7 @@ const MsgView = ({ item, index, user, timezone, onMsgLongPress, openImageZommer,
       onLongPress={onMsgLongPress}
       style={{ alignSelf: isOtherMember(item.receiver_id) ? "flex-start" : "flex-end", }}>
       <View
-      
+
         style={{
           borderBottomRightRadius: isOtherMember(item.receiver_id) ? 10 : 0,
           borderBottomLeftRadius: isOtherMember(item.receiver_id) ? 0 : 10,
@@ -42,7 +43,8 @@ const MsgView = ({ item, index, user, timezone, onMsgLongPress, openImageZommer,
 
           {item.message_type == 'image' && !!item.image &&
             <TouchableOpacity
-            pointerEvents='box-only'
+              activeOpacity={0.5}
+              pointerEvents='box-only'
               onLongPress={onMsgLongPress}
               onPress={() => openImageZommer(item.image)}
               style={{ padding: 2 }}>
@@ -76,13 +78,18 @@ const MsgView = ({ item, index, user, timezone, onMsgLongPress, openImageZommer,
               <MyWebview
                 style={isOtherMember(item.receiver_id) ? WebviewStyleOther : WebviewStyleMine}
                 html={item?.message}
+                
               /> :
 
               <Markdown
                 style={isOtherMember(item.receiver_id) ? markdownStyleOther : markdownStyleMine}
-                onLink={(url) => Linking.openURL(url)}>
+                onLinkPress={(url) => {
+                  openUrl(url);
+                  return false
+                }}>
                 {item.message}
-              </Markdown>}
+              </Markdown>
+            }
           </View>
 
           <View style={{ marginTop: 5, alignSelf: "flex-end" }}>

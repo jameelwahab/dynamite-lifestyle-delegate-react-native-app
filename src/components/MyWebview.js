@@ -63,10 +63,33 @@ export class MyWebview extends Component {
             textDecorationColor: colors.white,
             fontFamily: this.props.html.includes("<b>") ? undefined : fonts.regular,
             fontSize: 16,
+            margin:0,
           },
           div: {
             color: colors.white,
             fontFamily: this.props.html.includes("<b>") ? undefined : fonts.regular,
+            margin:0,
+          },
+          p: {
+            margin: 0
+          },
+          h1: {
+            margin: 0
+          },
+          h2: {
+            margin: 0
+          },
+          h3: {
+            margin: 0
+          },
+          h4: {
+            margin: 0
+          },
+          h5: {
+            margin: 0
+          },
+          h6: {
+            margin: 0
           },
           ...style
         }}

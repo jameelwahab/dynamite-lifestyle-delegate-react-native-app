@@ -30,6 +30,8 @@ import AudioRecorderPlayer, {
 import ReactNativeBlobUtil from 'react-native-blob-util'
 import moment from 'moment'
 import { PERMISSIONS, request, requestMultiple } from 'react-native-permissions'
+import { SimpleLoader } from '../../../components/MyLoader'
+import { isUrl } from '../../../functions/regex'
 let selection;
 
 const SendMsgView = ({ receiver, navigation, edit, clearEdit }) => {
@@ -42,6 +44,7 @@ const SendMsgView = ({ receiver, navigation, edit, clearEdit }) => {
     recordTimeInMillis: 0,
     recordTime: "00:00",
   });
+  const [fileLoader, setFileLoader] = useState(false)
   const [isImageModalShown, setImageModalVisiblity] = useState(false);
   const [linkModal, setLinkModal] = useState({ isVisible: false, link: "", title: "" });
   const [isRecording, setRecording] = useState(false);
@@ -103,7 +106,7 @@ const SendMsgView = ({ receiver, navigation, edit, clearEdit }) => {
       }
     } else {
       let granted = await request(PERMISSIONS.IOS.MICROPHONE);
-      console.log(granted,"granted")
+      console.log(granted, "granted")
       if (granted == 'granted') {
         return true
       } else {
@@ -209,10 +212,12 @@ const SendMsgView = ({ receiver, navigation, edit, clearEdit }) => {
 
 
   const uplaodFileOnS3 = async (file, type) => {
+    setFileLoader(true);
     let formData = new FormData();
     formData.append("image", file);
     let resp = await UPLOAD_FILE_FOR_CHAT({ token, navigation, file: formData });
     if (resp.code == 200) {
+      setFileLoader(false);
       return resp
     }
 
@@ -222,7 +227,7 @@ const SendMsgView = ({ receiver, navigation, edit, clearEdit }) => {
     if (msg.text.trim() == "" && !!msg.image == false && !!audioObj == false) {
       showToast({ title: "Please write something" })
     } else {
-      let imagePath = '';
+      let imagePath = msg.image;
       let audioPath = '';
       if (!!msg.image?.uri) {
         imagePath = await uplaodFileOnS3(msg.image, 'image').then((res) => res.image_path);
@@ -293,8 +298,6 @@ const SendMsgView = ({ receiver, navigation, edit, clearEdit }) => {
       setMsg({ ...msg, text: message })
     }
 
-    setEditorVisiblity(true)
-
   }
 
 
@@ -344,6 +347,8 @@ const SendMsgView = ({ receiver, navigation, edit, clearEdit }) => {
       showToast({ body: "Please enter title", });
     } else if (linkModal?.link?.trim() == "") {
       showToast({ body: "Please enter link", });
+    } else if (!isUrl(linkModal?.link?.trim())) {
+      showToast({ body: "Link not valid", });
     } else {
       modifyText("link", linkModal?.title.trim(), linkModal?.link.trim())
       closeLinkModal();
@@ -431,7 +436,6 @@ const SendMsgView = ({ receiver, navigation, edit, clearEdit }) => {
                   selectionColor={colors.selection}
                   multiline={true}
                   // textAlignVertical='top'
-                  cursorColor={colors.selection}
                   keyboardAppearance='dark'
                   autoCorrect={false}
                   autoCapitalize='none'
@@ -472,10 +476,13 @@ const SendMsgView = ({ receiver, navigation, edit, clearEdit }) => {
 
             <TouchableOpacity
               onPress={!!msg.text.trim() || !!msg.image ? sendMsgButton : recordBtn}
+              disabled={fileLoader}
               style={__style.sendButtonView}>
-              {!!msg.text.trim() || !!msg.image ?
-                icons.send(colors.primary, 18) :
-                icons.mic(colors.primary, 18)
+              {fileLoader ?
+                (<SimpleLoader />) :
+                !!msg.text.trim() || !!msg.image ?
+                  icons.send(colors.primary, 18) :
+                  icons.mic(colors.primary, 18)
               }
             </TouchableOpacity>
             {!!edit?.id &&
@@ -524,7 +531,7 @@ const __style = StyleSheet.create({
   sendMsgInputView: {
     flex: 1,
     minHeight: 40,
-    maxHeight: 100,
+    maxHeight: Platform.OS == "android" ? 120 : 100,
     backgroundColor: colors.secondaryVariant,
     borderRadius: 15,
     paddingVertical: 5,
@@ -564,16 +571,17 @@ const __style = StyleSheet.create({
   },
 
   editorView: {
-    height: 30,
+    height: Platform.OS == "android" ? 40 : 30,
     // backgroundColor:colors.darkSecondary,
     borderTopColor: colors.lightText,
     borderTopWidth: 1 / 3,
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-end",
     paddingTop: 3,
     marginTop: 5
   },
   editorBotton: {
+    // marginTop:10,
     padding: 5,
     marginLeft: 10
   },
