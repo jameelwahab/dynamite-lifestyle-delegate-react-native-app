@@ -46,14 +46,14 @@ const Splash = ({ navigation }) => {
 
   const makeArrayOfSidebar = (list, user) => {
     let newArray = [];
-
+    newArray.push({ ...drawerMenuList[0], title: "Mission Control" });
     drawerMenuList.forEach((item) => {
 
       let index = list.findIndex(x => x.option_value == item.value)
       if (index > -1) {
 
         if (!item.collapsible) {
-         
+
           if (item?.value == "chat" && !user?.is_chat_allow) {
 
           } else {
@@ -76,6 +76,8 @@ const Splash = ({ navigation }) => {
 
       }
     });
+
+    
 
     return newArray;
 

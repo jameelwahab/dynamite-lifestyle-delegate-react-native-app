@@ -4,8 +4,18 @@ import StackSupportTicket from "../NestedStacks/StackSupportTicket";
 import StackChat from "../NestedStacks/StackChat";
 import StackInternalTickets from "../NestedStacks/StackInternalTicket";
 import StackContactSupport from "../NestedStacks/StackContactSupport";
+import StackMissionControl from "../NestedStacks/SackMisisonControl";
 
 export const drawerMenuList = [
+  {
+    value: "",
+    key: routes.dasboardNavigator,
+    collapsible: false,
+    component: StackMissionControl,
+    icon: icons.sidebar.dashboard,
+    params: {
+    }
+  },
   {
     value: "support_ticket",
     key: routes.supportTicketNavigator,

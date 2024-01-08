@@ -5,6 +5,7 @@ const routes = {
   internalTicketNavigator: "INTERNAL_TICKET_NAVIGATOR",
   chatNavigator: "CHAT_NAVIGATOR",
   contactSupportNavigator: "CONTACT_SUPPORT_NAVIGATOR",
+  dasboardNavigator: "MISSION_CONTROL_NAVIGATOR",
 
 
   //! ///    Screens'
@@ -43,6 +44,10 @@ const routes = {
   chatList: "CHAT_LIST_SCREEN",
   chatMessageList: "CHAT_MESSAGE_LIST_SCREEN",
   startNewChat: "START_NEW_CHAT_SCREEN",
+
+
+  //? Mission Control
+  missionControlScreen: "MISSION_CONTROL_SCREEN",
 }
 
 export default routes;

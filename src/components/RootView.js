@@ -15,6 +15,7 @@ const RootView = ({
   hideNotificaitonIcon = false,
   hideProfile = false,
   hideChatIcon = false,
+  hideSubHeader=false,
   backgroundColor,
   titleView,
   children,
@@ -36,6 +37,7 @@ const RootView = ({
           hideProfile={hideProfile}
           titleView={titleView}
           customBackPress={customBackPress}
+          hideSubHeader={hideSubHeader}
         />}
       <View style={{ flex: 1, paddingHorizontal: 10 }}>
         {children}

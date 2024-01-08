@@ -13,6 +13,7 @@ import Markdown from '@ronradtke/react-native-markdown-display';
 import { fonts } from '../../../utilities/fonts'
 import AudioChatView from './AudioChatView'
 import openUrl from '../../../functions/openUrl';
+import { icons } from '../../../utilities/icons'
 
 
 const MsgView = ({ item, index, user, timezone, onMsgLongPress, openImageZommer, playIconClick, stopPlayer, state, setState }) => {
@@ -78,7 +79,7 @@ const MsgView = ({ item, index, user, timezone, onMsgLongPress, openImageZommer,
               <MyWebview
                 style={isOtherMember(item.receiver_id) ? WebviewStyleOther : WebviewStyleMine}
                 html={item?.message}
-                
+
               /> :
 
               <Markdown
@@ -92,7 +93,11 @@ const MsgView = ({ item, index, user, timezone, onMsgLongPress, openImageZommer,
             }
           </View>
 
-          <View style={{ marginTop: 5, alignSelf: "flex-end" }}>
+          <View style={{ marginTop: 5, alignSelf: "flex-end", flexDirection: "row",alignItems:"center" }}>
+            {!isOtherMember(item.receiver_id) &&
+              <View style={{ marginRight: 5 }}>
+                {icons.seen(item?.status == "read" ? colors.primary : colors.white, 18)}
+              </View>}
             <MyText
               fontSize={10}
               color={isOtherMember(item.receiver_id) ? colors.black : undefined}>

@@ -42,6 +42,7 @@ const ChatList = ({ navigation }) => {
   const [searchText, setSearchText] = useState("");
   const [eventId, setEventId] = useState({ ...noneObj })
   const [isPortalModalVisible, setPortalModalVisiblity] = useState(false);
+  const [tab, setTab] = useState('all')
 
 
   const onChatScreen = (member, item) => {
@@ -59,7 +60,13 @@ const ChatList = ({ navigation }) => {
   }
 
   const api_ChatList = async (newArray = false) => {
-    let res = await CHAT_LIST({ navigation, body: { event_id: eventId?._id, search_text: searchText }, token, page })
+    let res = await CHAT_LIST({
+      navigation, body: {
+        event_id: eventId?._id,
+        search_text: searchText,
+        chat_type: tab
+      }, token, page
+    })
     if (res.code == 200) {
       if ((chatList.length + res?.chat.length) < res?.total_chat_count) {
         page++;
@@ -108,6 +115,16 @@ const ChatList = ({ navigation }) => {
     }
   }, [searchText, JSON.stringify(eventId)])
 
+  useEffect(() => {
+    if (!firstTime) {
+      page = 0;
+      canLoadMore = false;
+      setLoader(true);
+      setChatList([])
+      debounce(() => api_ChatList(true))
+    }
+  }, [tab])
+
 
   useEffect(() => {
     firstTime = true;
@@ -136,6 +153,7 @@ const ChatList = ({ navigation }) => {
     socket.on("member_online", memberOnlineSignal);
     socket.on("member_offline", memberOfflineSignal);
     socket.on("consultant_offline", memberOfflineSignal);
+    socket.on("chat_message_status", readMsgSingnal);
   }
 
   const removeSocketEvents = () => {
@@ -148,6 +166,26 @@ const ChatList = ({ navigation }) => {
     socket.off("member_online", memberOnlineSignal);
     socket.off("member_offline", memberOfflineSignal);
     socket.off("consultant_offline", memberOfflineSignal);
+    socket.off("chat_message_status", readMsgSingnal);
+  }
+
+  const readMsgSingnal = (data) => {
+    console.log("chat_message_status", data);
+    if (data.status == "read") {
+      setChatList((chatList) => {
+        let index = chatList.findIndex(chat => chat._id == data.chat_id);
+        if (index > -1) {
+          console.log(chatList[index], "chatObj")
+          if (chatList[index].last_message_sender == user?._id) {
+            chatList[index].last_message_status = "read";
+
+            console.log(chatList, "read 2")
+          }
+        }
+        return [...chatList]
+      })
+    }
+
   }
 
   const newMsgReceive = (data) => {
@@ -167,8 +205,11 @@ const ChatList = ({ navigation }) => {
             message_id: newChatObj.message_id,
             updatedAt: newChatObj.updatedAt,
             message_type: newChatObj.message_type,
-            member: data?.chat_obj?.member
-          }
+            member: data?.chat_obj?.member,
+            last_message_sender: data?.message_obj?.sender_id,
+            last_message_status: data?.message_obj?.status,
+          };
+          console.log(chatobj, "newchatobj")
           chatList.splice(index, 1, chatobj);
         } else {
           let newChatObj = data?.chat_obj?.chat;
@@ -358,6 +399,20 @@ const ChatList = ({ navigation }) => {
   const headerView = () => {
     return (
       <View style={{ backgroundColor: colors.darkSecondary }}>
+        <View style={__style.tabsView}>
+          <TouchableOpacity
+            onPress={() => setTab("all")}
+            style={[__style.tabView, tab == "all" && __style.tabSelectedView]}>
+            <MyText color={tab == "all" ? colors.primary : undefined}>All</MyText>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => setTab("unread")}
+            style={[__style.tabView, tab == "unread" && __style.tabSelectedView]}>
+            <MyText color={tab == "unread" ? colors.primary : undefined} >Unread</MyText>
+          </TouchableOpacity>
+        </View>
+
         <MyTouchableInput
           onPress={() => setPortalModalVisiblity(true)}
           noSpace={true}
@@ -411,6 +466,12 @@ const ChatList = ({ navigation }) => {
               <MyText fontSize={10} color={colors.lightText} >{moment(item?.last_message_date_time).format("DD-MM-YYYY hh:mm A")}</MyText>
             </View>
             <View style={{ marginTop: 3, flexDirection: "row", alignItems: "center" }}>
+
+              {item?.last_message_sender == user?._id &&
+                <View style={{ marginRight: 5 }}>
+                  {icons.seen(item?.last_message_status == "read" ? colors.primary : colors.white, 20)}
+                </View>}
+
               {item.message_type != "general" &&
                 <View style={{ marginRight: 5 }}>
                   {item.message_type == "image" ? icons.camera(colors.white, 12) :
@@ -418,8 +479,7 @@ const ChatList = ({ navigation }) => {
                       item.message_type == "video" ? icons.playCircle(colors.white, 18) : ""}
                 </View>
               }
-
-              <View style={{ flexDirection: "row" }}>
+              <View style={{ flexDirection: "row",flex:1 }}>
                 <MyText fontSize={12} type='light' numberOfLines={1} style={{ marginTop: 3, flex: 1 }}>
                   {!!item?.last_message ?
                     isHtml(item?.last_message) ?
@@ -536,6 +596,26 @@ const __style = StyleSheet.create({
   nameAndMsgView: {
 
   },
+  tabsView: {
+    flexDirection: "row",
+    marginBottom: 10
+  },
+  tabSelectedView: {
+    borderColor: colors.primary,
+    backgroundColor: colors.lightPrimary3,
+
+  },
+
+  tabView: {
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: colors.lightPrimary2,
+    paddingVertical: 5,
+    paddingHorizontal: 20,
+    marginRight: 10
+  },
+
+
 
   separotor: {
     // height: Platform.OS == "android" ? 1 / 2 : 1 / 3,

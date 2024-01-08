@@ -83,6 +83,7 @@ const MessageList = ({ navigation, route }) => {
     socket.on("send_chat_message_receiver", sendMessageReceiver);
     socket.on("update_chat_message_receiver", editMessageReceiver);
     socket.on("delete_chat_message_receiver", deleteMessageReceiver);
+    socket.on("chat_message_status", readMsgSingnal);
   }
 
   const removeSocketEvents = () => {
@@ -92,6 +93,19 @@ const MessageList = ({ navigation, route }) => {
     socket.off("send_chat_message_receiver", sendMessageReceiver);
     socket.off("update_chat_message_receiver", editMessageReceiver);
     socket.off("delete_chat_message_receiver", deleteMessageReceiver);
+    socket.off("chat_message_status", readMsgSingnal);
+  }
+
+
+  const readMsgSingnal = (data) => {
+    console.log("chat_message_status", data);
+    if (data.status == "read") {
+      setChat((chatList) => {
+        chatList.map((chat) => chat.status = "read");
+        return [...chatList]
+      })
+    }
+
   }
 
   const sendMessageReceiverForSender = (data) => {

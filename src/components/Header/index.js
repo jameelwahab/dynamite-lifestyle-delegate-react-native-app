@@ -27,7 +27,8 @@ const Header = ({
   hideBackBottomButton = false,
   titleView,
   hideProfile = false,
-  customBackPress
+  customBackPress,
+  hideSubHeader = false
 }) => {
   const { user, token } = useSelector(selectUser)
   const navigation = useNavigation()
@@ -105,22 +106,24 @@ const Header = ({
           }
         </View>
       </View>
-      <View style={__header.secondView}>
-        {!hideBackBottomButton &&
-          <Pressable onPress={onBackButtonPress} style={__header.leftButtonView}>
-            <Ionicons name="arrow-back-outline" color={colors.primary} size={25} />
-          </Pressable>}
-        {!!title ?
-          <View style={__header.titleView}>
-            <Text style={__header.titleText}>{title}</Text>
-          </View>
+      {hideSubHeader == false &&
+        <View style={__header.secondView}>
+          {!hideBackBottomButton &&
+            <Pressable onPress={onBackButtonPress} style={__header.leftButtonView}>
+              <Ionicons name="arrow-back-outline" color={colors.primary} size={25} />
+            </Pressable>}
+          {!!title ?
+            <View style={__header.titleView}>
+              <Text style={__header.titleText}>{title}</Text>
+            </View>
 
-          :
-          <View style={{ flex: 1 }}>
-            {titleView?.()}
-          </View>
-        }
-      </View>
+            :
+            <View style={{ flex: 1 }}>
+              {titleView?.()}
+            </View>
+          }
+        </View>
+      }
     </View>
   )
 }

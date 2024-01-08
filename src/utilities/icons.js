@@ -30,6 +30,7 @@ export const icons = {
   sidebar: {
     handPromise: require("../assets/sidebarIcons/Support.webp"),
     help: require("../assets/sidebarIcons/help.png"),
+    dashboard: require("../assets/sidebarIcons/dashbaord.webp"),
   },
 
   user: () => { return (<FontAwesome6 name="user-large" color={colors.primary} size={17} />) },
@@ -74,5 +75,7 @@ export const icons = {
   pause: (color = colors.white, size = 20) => { return (<Feather name="pause" color={color} size={size} />) },
   play: (color = colors.white, size = 20) => { return (<Feather name="play" color={color} size={size} />) },
   send: (color = colors.white, size = 20) => { return (<Ionicons name="send" color={color} size={size} />) },
+  seen: (color = colors.white, size = 20) => { return (<Ionicons name="checkmark-done" color={color} size={size} />) },
+  pound: (color = colors.white, size = 20) => { return (<MaterialIcons name="currency-pound" color={color} size={size} />) },
 
 }

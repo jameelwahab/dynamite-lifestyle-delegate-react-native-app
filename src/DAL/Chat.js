@@ -2,13 +2,13 @@ import invokeApi from "../functions/invokeAPI"
 
 
 
-export const CHAT_LIST = ({ token, navigation, body: { event_id, search_text }, page }) => {
+export const CHAT_LIST = ({ token, navigation, body: { event_id, search_text, chat_type }, page }) => {
   return invokeApi({
     path: `api/chat/list_chat_with_event_delegate/list/v1?page=${page}&limit=20`,
     method: "POST",
     token: token,
     navigation: navigation,
-    postData: { event_id, search_text }
+    postData: { event_id, search_text, chat_type }
   })
 }
 
