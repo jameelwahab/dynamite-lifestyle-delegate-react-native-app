@@ -19,11 +19,11 @@ const CounterBox = ({
         colors={[color + "55", color]}
         style={__style.gradientBox}
       >
-       {icons.pound(colors.primary)}
+        {icons.pound(colors.primary)}
       </LinearGradient>
 
-      <MyText style={{ marginTop: 10 }} fontSize={20} type='medium' >{"£" + numFormatter(count,1)}</MyText>
-      <MyText fontSize={12} style={{ marginTop: 2 }}>{subTitle}</MyText>
+      <MyText style={{ marginTop: 10, textAlign: "center" }} fontSize={20} type='medium' >{"£" + numFormatter(count, 1)}</MyText>
+      <MyText fontSize={12} style={{ marginTop: 2, textAlign: "center",paddingHorizontal:3 }}>{subTitle}</MyText>
     </View>
   )
 }

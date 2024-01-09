@@ -77,5 +77,6 @@ export const icons = {
   send: (color = colors.white, size = 20) => { return (<Ionicons name="send" color={color} size={size} />) },
   seen: (color = colors.white, size = 20) => { return (<Ionicons name="checkmark-done" color={color} size={size} />) },
   pound: (color = colors.white, size = 20) => { return (<MaterialIcons name="currency-pound" color={color} size={size} />) },
+  calendar: (color = colors.white, size = 20) => { return (<Ionicons name="calendar-outline" color={color} size={size} />) },
 
 }

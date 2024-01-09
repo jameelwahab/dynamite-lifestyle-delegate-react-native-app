@@ -6226,6 +6226,11 @@ react-native-confirmation-code-field@^7.3.2:
   resolved "https://registry.yarnpkg.com/react-native-confirmation-code-field/-/react-native-confirmation-code-field-7.3.2.tgz#f0ee9e72f632aa2ae4dade4a1664a7a484885ea8"
   integrity sha512-uuJKxR+pQrXSx8lmRpekA+Hlle/nkoQKppS8jH7ApqY00+c11nCJg9kuFM0++vdbXg1rKm2P6jPZoSEJK2EaKw==
 
+react-native-date-picker@^4.3.5:
+  version "4.3.5"
+  resolved "https://registry.yarnpkg.com/react-native-date-picker/-/react-native-date-picker-4.3.5.tgz#81797f874a34a75ce2ff57d2bb1519ee2ac062dd"
+  integrity sha512-jKOGCM2AUkRJb+tXYiwFHLfbB1Jh7OWXH4TxhLsuh7DWMXpWgUN3cGlFr3vl7G4wy45raAyPqmsZNSqmMr/98g==
+
 react-native-dialog@^9.3.0:
   version "9.3.0"
   resolved "https://registry.yarnpkg.com/react-native-dialog/-/react-native-dialog-9.3.0.tgz#9d745cc51653a1e2ae08076b46f11d99723c47f6"

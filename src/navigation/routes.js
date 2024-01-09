@@ -48,6 +48,7 @@ const routes = {
 
   //? Mission Control
   missionControlScreen: "MISSION_CONTROL_SCREEN",
+  missionControlfilterScreen: "MISSION_CONTROL_FILTER_SCREEN",
 }
 
 export default routes;

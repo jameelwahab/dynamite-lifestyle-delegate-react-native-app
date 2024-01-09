@@ -41,6 +41,7 @@
     "react-native-collapsible": "^1.6.1",
     "react-native-color": "^0.0.10",
     "react-native-confirmation-code-field": "^7.3.2",
+    "react-native-date-picker": "^4.3.5",
     "react-native-dialog": "^9.3.0",
     "react-native-dropdown-picker": "^5.4.6",
     "react-native-fast-image": "^8.6.3",

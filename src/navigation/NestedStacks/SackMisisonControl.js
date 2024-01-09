@@ -7,6 +7,7 @@ import { defaultScreens } from './defaultScreens'
 import { colors } from '../../utilities/colors'
 
 import Dasboard from '../../screens/Dashboard'
+import FilterScreen from '../../screens/Dashboard/FilterScreen'
 
 
 
@@ -24,6 +25,7 @@ const StackMissionControl = ({ route }) => {
         ))}
         {/*//? Default Screens End */}
         <DashboardStack.Screen name={routes.missionControlScreen} component={Dasboard} />
+        <DashboardStack.Screen name={routes.missionControlfilterScreen} component={FilterScreen} />
 
 
       </DashboardStack.Navigator>
