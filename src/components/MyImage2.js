@@ -18,7 +18,6 @@ const MyImage2 = ({ uri, style, width }) => {
       <FastImage
         source={{ uri: uri }}
         style={[{ width: width, aspectRatio: 4.36 }]}
-
       />
     )
   } else return null;

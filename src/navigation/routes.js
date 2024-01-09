@@ -6,6 +6,7 @@ const routes = {
   chatNavigator: "CHAT_NAVIGATOR",
   contactSupportNavigator: "CONTACT_SUPPORT_NAVIGATOR",
   dasboardNavigator: "MISSION_CONTROL_NAVIGATOR",
+  feedNavigator: "FEED_NAVIGATOR",
 
 
   //! ///    Screens'
@@ -49,6 +50,9 @@ const routes = {
   //? Mission Control
   missionControlScreen: "MISSION_CONTROL_SCREEN",
   missionControlfilterScreen: "MISSION_CONTROL_FILTER_SCREEN",
+
+  //? Feed 
+  feedScreen: "FEED_SCREEN"
 }
 
 export default routes;

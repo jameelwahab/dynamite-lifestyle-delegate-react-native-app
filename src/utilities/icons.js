@@ -9,6 +9,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Feather from 'react-native-vector-icons/Feather';
 import Entypo from 'react-native-vector-icons/Entypo';
 import Octicons from 'react-native-vector-icons/Octicons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 
 export const icons = {
@@ -31,6 +32,7 @@ export const icons = {
     handPromise: require("../assets/sidebarIcons/Support.webp"),
     help: require("../assets/sidebarIcons/help.png"),
     dashboard: require("../assets/sidebarIcons/dashbaord.webp"),
+    cosmos: require("../assets/sidebarIcons/cosmos.webp"),
   },
 
   user: () => { return (<FontAwesome6 name="user-large" color={colors.primary} size={17} />) },
@@ -52,7 +54,7 @@ export const icons = {
   plus: (color = colors.white, size = 20) => { return (<Octicons name="plus" color={color} size={size} />) },
   search: () => { return (<Feather name="search" color={colors.white} size={17} />) },
   down: () => { return (<Ionicons name="caret-down" color={colors.white} size={17} />) },
-  threeDots: () => { return (<Entypo name="dots-three-vertical" color={colors.primary} size={12} />) },
+  threeDots: (color = colors.primary, size = 12) => { return (<Entypo name="dots-three-vertical" color={color} size={size} />) },
   download: (color = colors.primary, size = 17) => { return (<Feather name="download" color={color} size={size} />) },
   edit: () => { return (<Feather name="edit" color={colors.primary} size={17} />) },
   trash: () => { return (<Feather name="trash" color={colors.primary} size={17} />) },
@@ -78,5 +80,8 @@ export const icons = {
   seen: (color = colors.white, size = 20) => { return (<Ionicons name="checkmark-done" color={color} size={size} />) },
   pound: (color = colors.white, size = 20) => { return (<MaterialIcons name="currency-pound" color={color} size={size} />) },
   calendar: (color = colors.white, size = 20) => { return (<Ionicons name="calendar-outline" color={color} size={size} />) },
+  heartUnfilled: (color = colors.white, size = 20) => { return (<MaterialCommunityIcons name="heart-outline" color={color} size={size} />) },
+  heartFilled: (color = colors.white, size = 20) => { return (<MaterialCommunityIcons name="heart" color={color} size={size} />) },
+  comment: (color = colors.white, size = 20) => { return (<MaterialCommunityIcons name="message-outline" color={color} size={size} />) },
 
 }

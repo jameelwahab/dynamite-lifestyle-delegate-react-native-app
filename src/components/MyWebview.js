@@ -51,7 +51,7 @@ export class MyWebview extends Component {
     return (
       <RenderHTML
         WebView={WebView}
-        contentWidth={Dimensions.get("window").width / 1.5}
+        contentWidth={this.props.fullWidth ? Dimensions.get("window").width - 40 : Dimensions.get("window").width / 1.5}
         source={{ html: "<div>" + html + "</div>" }}
         customHTMLElementModels={this.customHTMLElementModels}
         renderers={this.renderers}
@@ -63,12 +63,12 @@ export class MyWebview extends Component {
             textDecorationColor: colors.white,
             fontFamily: this.props.html.includes("<b>") ? undefined : fonts.regular,
             fontSize: 16,
-            margin:0,
+            margin: 0,
           },
           div: {
             color: colors.white,
             fontFamily: this.props.html.includes("<b>") ? undefined : fonts.regular,
-            margin:0,
+            margin: 0,
           },
           p: {
             margin: 0
@@ -98,7 +98,13 @@ export class MyWebview extends Component {
           iframe: {
             // scalesPageToFit: true,
             webViewProps: {
-              /* Any prop you want to pass to iframe WebViews */
+              cacheEnabled: false,
+              startInLoadingState: true,
+              scrollEnabled: false,
+              allowsAirPlayForMediaPlayback: true,
+              allowsInlineMediaPlayback: true,
+              mediaPlaybackRequiresUserAction: true,
+              allowsFullscreenVideo: true,
             }
           }
         }}

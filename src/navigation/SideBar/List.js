@@ -5,6 +5,7 @@ import StackChat from "../NestedStacks/StackChat";
 import StackInternalTickets from "../NestedStacks/StackInternalTicket";
 import StackContactSupport from "../NestedStacks/StackContactSupport";
 import StackMissionControl from "../NestedStacks/SackMisisonControl";
+import StackFeed from "../NestedStacks/StackFeed";
 
 export const drawerMenuList = [
   {
@@ -13,6 +14,15 @@ export const drawerMenuList = [
     collapsible: false,
     component: StackMissionControl,
     icon: icons.sidebar.dashboard,
+    params: {
+    }
+  },
+  {
+    value: "the_cosmos",
+    key: routes.feedNavigator,
+    collapsible: false,
+    component: StackFeed,
+    icon: icons.sidebar.cosmos,
     params: {
     }
   },

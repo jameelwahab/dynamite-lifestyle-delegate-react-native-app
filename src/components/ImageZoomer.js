@@ -60,9 +60,9 @@ const ImageZoomer = ({
 
         }}>
         <View style={__styles.buttonRootView} >
-          {!!url && !!noUrl == false ?
+          {!!noUrl == false ?
             <TouchableOpacity
-              onPress={() => downloadImage(S3_URL + url)}>
+              onPress={() => downloadImage(!!list ? S3_URL + list[index]?.thumbnail_1 : S3_URL + url)}>
               <View style={__styles.buttonView}>
                 {icons.download(colors.black, 20)}
               </View>
