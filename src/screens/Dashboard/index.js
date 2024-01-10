@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView, SectionList, Pressable } from 'react-native'
+import { View, Text, StyleSheet, ScrollView, SectionList, Pressable, FlatList, TouchableOpacity } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import RootView from '../../components/RootView'
 import MyText from '../../components/MyText'
@@ -9,21 +9,31 @@ import { useSelector } from 'react-redux'
 import CounterBox from './CounterBox'
 import { colors } from '../../utilities/colors'
 import UserImage from '../../components/UserImage'
-import { convertTimezone } from '../../functions/convertTime'
+import { convertTimezone, convertTimezoneFrom } from '../../functions/convertTime'
 import moment from 'moment'
 import EmptyView from '../../components/EmptyView'
 import { icons } from '../../utilities/icons'
 import routes from '../../navigation/routes'
+import { selectSettings } from '../../redux/reducers/settingSlice'
+import MyWebview from '../../components/MyWebview'
+import ResponsiveImage from '../../components/ResponsiveImage'
+import utilities from '../../utilities'
+import { S3_URL } from '../../utilities/constants'
+import ResponsiveImage2 from '../../components/ResponsiveImage2'
+import { selectTimeZone } from '../../redux/reducers/timezoneSlice'
 
 const Dasboard = ({ navigation }) => {
   const { token } = useSelector(selectUser);
+  const { settings } = useSelector(selectSettings);
+  const timezone = useSelector(selectTimeZone);
   const [data, setData] = useState(null);
   const [loader, setLoader] = useState(true);
   const [filter, setFilter] = useState({});
+  const [bookingTab, setBookingTab] = useState(1);
 
 
   const getDashboarddata = async () => {
-    let res = await DASHBAORD({ navigation, token, body: filter });
+    let res = await DASHBAORD({ navigation, token, body: filter, filter: Object.keys(filter).length > 0 });
     if (res.code == 200) {
       setData(res);
       setLoader(false)
@@ -52,7 +62,7 @@ const Dasboard = ({ navigation }) => {
   const onFilterScreen = () => {
     navigation.navigate(routes.missionControlfilterScreen, { filterTheData, filter })
   }
-
+  console.log(settings, "settings")
 
   //? //////// Views
 
@@ -60,7 +70,21 @@ const Dasboard = ({ navigation }) => {
     return (
 
       <View style={{ marginTop: 10 }}>
-        <View style={{ marginBottom: 5 }}>
+        {!!settings?.brand_logo_2 &&
+          <View style={{ alignItems: "center" }}>
+            <ResponsiveImage2
+              width={utilities.screenWidth() * 0.6}
+              uri={S3_URL + settings?.brand_logo_2}
+            />
+          </View>}
+
+        {!!settings?.dashboard_content &&
+          <View style={{ marginTop: 10 }}>
+            <MyWebview html={settings?.dashboard_content} />
+          </View>}
+
+
+        <View style={{ marginBottom: 5, marginTop: 15 }}>
           {topView()}
         </View>
         <View style={__style.countersView}>
@@ -88,6 +112,27 @@ const Dasboard = ({ navigation }) => {
             subTitle={"Total Commission Attracted"}
             color={"#3A2737"} />
         </View>
+
+
+        <View style={__style.tabsView}>
+          <TouchableOpacity
+            onPress={() => setBookingTab(1)}
+            style={[__style.tabView, bookingTab == 1 && __style.tabSelectedView]}>
+            <MyText color={bookingTab == 1 ? colors.primary : undefined} type={bookingTab == 1 ? "medium" : undefined}>
+              Latest Bookings
+            </MyText>
+            <View style={[__style.selectline, { backgroundColor: bookingTab == 1 ? colors.primary : colors.transparent }]} />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => setBookingTab(2)}
+            style={[__style.tabView, bookingTab == 2 && __style.tabSelectedView]}>
+            <MyText color={bookingTab == 2 ? colors.primary : undefined} type={bookingTab == 2 ? "medium" : undefined} >
+              Upcoming Bookings
+            </MyText>
+            <View style={[__style.selectline, { backgroundColor: bookingTab == 2 ? colors.primary : colors.transparent }]} />
+          </TouchableOpacity>
+        </View>
       </View>
     )
   }
@@ -107,7 +152,7 @@ const Dasboard = ({ navigation }) => {
           </View>
         </View>
         {itemView("Booking page", item?.page?.sale_page_title)}
-        {itemView("Date", moment(item?.start_date_time).format("DD-MM-YYYY") + " (" + moment(item?.start_date_time).format("hh:mm A") + " - " + moment(item?.end_date_time).format("hh:mm A") + ")")}
+        {itemView("Date", moment(item?.start_date_time).format("DD-MM-YYYY") + " (" + moment(item?.time,"hh:mm A").format("hh:mm A") + " - " + moment(item?.time,"hh:mm A").add({ minutes: item?.slot_duration }).format("hh:mm A") + ")")}
         {itemView("Booking Status", item?.booking_status_info?.title, item?.booking_status_info?.background_color)}
 
       </View>
@@ -136,7 +181,7 @@ const Dasboard = ({ navigation }) => {
   }
 
   const sectionFooter = ({ section }) => {
-    if (section.data.length == 0) {
+    if (!loader) {
       return (
         <View style={{ marginVertical: 10 }}>
           <EmptyView label={"No Data Exist"} />
@@ -145,16 +190,7 @@ const Dasboard = ({ navigation }) => {
     } else return null;
   }
 
-  const sections = [
-    {
-      title: "Latest Bookings",
-      data: data?.latest_booking_list,
-    },
-    {
-      title: "Upcoming Bookings",
-      data: data?.upcomming_booking_list,
-    }
-  ]
+
 
 
 
@@ -162,7 +198,8 @@ const Dasboard = ({ navigation }) => {
     return (
       <View style={__style.topView}>
         <Pressable onPress={onFilterScreen} style={__style.filterButton} >
-          {icons.filterCircle(colors.primary, 25)}
+          {icons.filter(colors.primary, 15)}
+          <MyText color={colors.primary} style={{ marginLeft: 5 }} >Filter</MyText>
         </Pressable>
       </View>
     )
@@ -171,14 +208,20 @@ const Dasboard = ({ navigation }) => {
   return (
     <RootView hideSubHeader >
       <View style={{ flex: 1 }}>
-        <SectionList
+        <FlatList
           contentContainerStyle={{ paddingBottom: 50 }}
-          stickySectionHeadersEnabled={false}
+          data={!!data ?
+            bookingTab == 1 ?
+              data?.latest_booking_list :
+              bookingTab == 2 ?
+                data?.upcomming_booking_list :
+                [] :
+            []
+          }
           ListHeaderComponent={!!data && view_commissionCounters}
-          sections={!!data ? sections : []}
           renderItem={bookingView}
           renderSectionHeader={sectionHeader}
-          renderSectionFooter={sectionFooter}
+          ListEmptyComponent={sectionFooter}
           showsVerticalScrollIndicator={false}
         />
       </View>
@@ -195,6 +238,53 @@ const __style = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between"
   },
-  filterButton: { height: "100%", justifyContent: "center", width: 50, alignItems: "center" },
-  topView: { flex: 1, flexDirection: "row", justifyContent: "flex-end" }
+  filterButton: {
+    height: "100%",
+    justifyContent: "center",
+    // width: 50,
+    alignItems: "center",
+    flexDirection: "row",
+    borderWidth: 1,
+    borderColor: colors.primary,
+    borderRadius: 10,
+    paddingHorizontal: 15,
+    paddingVertical: 8
+  },
+  topView: { flex: 1, flexDirection: "row", justifyContent: "flex-end" },
+  tabsView: {
+    flexDirection: "row",
+    marginBottom: 10,
+    // borderWidth: 1,
+    // borderColor: colors.white,
+    padding: 5,
+    height: 45,
+    borderRadius: 10,
+    marginTop: 10,
+
+  },
+  tabSelectedView: {
+    // borderColor: colors.primary,
+    // backgroundColor: colors.primary2,
+
+
+  },
+
+  tabView: {
+    // flex: 1,
+    borderRadius: 5,
+    // borderBottomWidth: 1,
+    // borderBottomColor: colors.lightPrimary2,
+    paddingVertical: 5,
+    // paddingHorizontal: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingRight: 20
+  },
+  selectline: {
+    height: 2,
+    width: "100%",
+
+    borderRadius: 20,
+    marginTop: 3
+  }
 })

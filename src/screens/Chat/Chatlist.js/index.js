@@ -7,7 +7,7 @@ import { CHAT_LIST, PORTAL_LIST } from '../../../DAL'
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../../redux/reducers/userSlice'
 import UserImage from '../../../components/UserImage'
-import { S3_URL } from '../../../utilities/constants'
+import { S3_URL, dateTimeFormat } from '../../../utilities/constants'
 import MyWebview from '../../../components/MyWebview'
 import { colors } from '../../../utilities/colors'
 import { icons } from '../../../utilities/icons'
@@ -25,6 +25,8 @@ import { isHtml } from '../../../functions/regex'
 import Markdown from '@ronradtke/react-native-markdown-display'
 import { fonts } from '../../../utilities/fonts'
 import { selectSocket } from '../../../redux/reducers/socketSlice'
+import { convertTimezone } from '../../../functions/convertTime'
+import { selectTimeZone } from '../../../redux/reducers/timezoneSlice'
 
 
 let page = 0;
@@ -35,6 +37,7 @@ let isNewChat = false;
 const ChatList = ({ navigation }) => {
   const { token, user } = useSelector(selectUser);
   const { socket } = useSelector(selectSocket);
+  const timezone = useSelector(selectTimeZone);
   const [loader, setLoader] = useState(true);
   const [footerLoader, setFooterLoader] = useState(false);
   const [chatList, setChatList] = useState([]);
@@ -87,7 +90,7 @@ const ChatList = ({ navigation }) => {
   const refresh = () => {
     page = 0;
     canLoadMore = false;
-    api_ChatList()
+    api_ChatList(true);
   }
 
   const loadmore = () => {
@@ -292,10 +295,12 @@ const ChatList = ({ navigation }) => {
       for (let i = 0; i < chatLength; i++) {
         if (data.user_id == chatList[i].member[0]._id._id) {
           chatList[i].member[0]._id.is_online = true;
+          chatList[i].last_message_status = "delivered";
           return [...chatList]
         }
         else if (data.user_id == chatList[i].member[1]._id._id) {
-          chatList[i].member[1]._id.is_online = true
+          chatList[i].member[1]._id.is_online = true;
+          chatList[i].last_message_status = "delivered";
           return [...chatList]
         }
       }
@@ -463,13 +468,15 @@ const ChatList = ({ navigation }) => {
               <View style={{ flex: 1 }}>
                 <MyText fontSize={14} type='medium' >{member?.first_name + " " + member?.last_name}</MyText>
               </View>
-              <MyText fontSize={10} color={colors.lightText} >{moment(item?.last_message_date_time).format("DD-MM-YYYY hh:mm A")}</MyText>
+              <MyText fontSize={10} color={colors.lightText} >{convertTimezone(item?.last_message_date_time, timezone).format(dateTimeFormat.dateTime)}</MyText>
             </View>
             <View style={{ marginTop: 3, flexDirection: "row", alignItems: "center" }}>
 
               {item?.last_message_sender == user?._id &&
                 <View style={{ marginRight: 5 }}>
-                  {icons.seen(item?.last_message_status == "read" ? colors.primary : colors.white, 20)}
+                  {!!item?.last_message_status == false || item?.last_message_status == "sent"
+                    ? icons.sent(colors.white, 20) :
+                    icons.seen(item?.last_message_status == "read" ? colors.primary : colors.white, 20)}
                 </View>}
 
               {item.message_type != "general" &&
@@ -479,7 +486,7 @@ const ChatList = ({ navigation }) => {
                       item.message_type == "video" ? icons.playCircle(colors.white, 18) : ""}
                 </View>
               }
-              <View style={{ flexDirection: "row",flex:1 }}>
+              <View style={{ flexDirection: "row", flex: 1 }}>
                 <MyText fontSize={12} type='light' numberOfLines={1} style={{ marginTop: 3, flex: 1 }}>
                   {!!item?.last_message ?
                     isHtml(item?.last_message) ?

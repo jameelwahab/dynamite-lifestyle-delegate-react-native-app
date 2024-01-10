@@ -40,7 +40,7 @@ const FeedScreen = ({ navigation }) => {
     }
   }
 
-  const openComments = (id,focus) => {
+  const openComments = (id, focus) => {
     setComments({
       list: [],
       modalVisibility: true,
@@ -74,6 +74,7 @@ const FeedScreen = ({ navigation }) => {
         <FlatList
           data={feed}
           showsVerticalScrollIndicator={false}
+          keyExtractor={(item) => item?._id}
           renderItem={({ item, index }) =>
             <FeedView
               item={item}

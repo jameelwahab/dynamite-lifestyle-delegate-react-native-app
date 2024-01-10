@@ -25,8 +25,7 @@ const CommentModal = ({
 
   const commentView = (item, index, isChild) => {
     return (
-      <View>
-
+      <View key={item?._id}>
         <View style={[__style.commentView, { marginLeft: isChild ? "10%" : undefined }]}>
           <View style={__style.profiletView}>
             <UserImage
@@ -107,6 +106,7 @@ const CommentModal = ({
           <View style={{ flex: 1 }}>
             <FlatList
               data={comments}
+              keyExtractor={(item) => item?._id}
               renderItem={({ item, index }) => commentView(item, index, false)}
               ListEmptyComponent={!loader && <EmptyView label={"No comment exist"} />}
               showsVerticalScrollIndicator={false}

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import utilities from '../../../utilities'
 import MyText from '../../../components/MyText'
 import { convertTimezone } from '../../../functions/convertTime'
-import { S3_URL } from '../../../utilities/constants'
+import { S3_URL, dateTimeFormat } from '../../../utilities/constants'
 import { colors } from '../../../utilities/colors'
 import ResponsiveImage from '../../../components/ResponsiveImage';
 import { isHtml } from '../../../functions/regex'
@@ -96,12 +96,14 @@ const MsgView = ({ item, index, user, timezone, onMsgLongPress, openImageZommer,
           <View style={{ marginTop: 5, alignSelf: "flex-end", flexDirection: "row",alignItems:"center" }}>
             {!isOtherMember(item.receiver_id) &&
               <View style={{ marginRight: 5 }}>
-                {icons.seen(item?.status == "read" ? colors.primary : colors.white, 18)}
+                {!!item?.status == false || item?.status == "sent"
+                    ? icons.sent(colors.white, 18) :
+                icons.seen(item?.status == "read" ? colors.primary : colors.white, 18)}
               </View>}
             <MyText
               fontSize={10}
               color={isOtherMember(item.receiver_id) ? colors.black : undefined}>
-              {convertTimezone(item?.createdAt, timezone).format("DD-MM-YYYY hh:mm A")}
+              {convertTimezone(item?.createdAt, timezone).format(dateTimeFormat.dateTime)}
             </MyText>
           </View>
         </View>

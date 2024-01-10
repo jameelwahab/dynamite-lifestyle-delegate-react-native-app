@@ -81,7 +81,7 @@ const __MyButtonStyles = StyleSheet.create({
   },
   invertTitleText: {
     color: colors.primary,
-    fontFamily: fonts.bold,
+    fontFamily: fonts.medium,
     includeFontPadding: false,
     fontSize: 16,
     textTransform: "uppercase"

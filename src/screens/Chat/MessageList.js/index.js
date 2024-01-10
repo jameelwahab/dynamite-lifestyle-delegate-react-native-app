@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, FlatList, KeyboardAvoidingView, StatusBar, Platform, TextInput, Image, TouchableHighlight, Pressable, TouchableOpacity, SafeAreaView } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { memo, useEffect, useState } from 'react'
 import RootView from '../../../components/RootView'
 import UserImage from '../../../components/UserImage';
 import MyText from '../../../components/MyText';
@@ -52,7 +52,6 @@ const MessageList = ({ navigation, route }) => {
   const [edit, setEdit] = useState({ msg: "", image: "", id: "", })
 
 
-
   useEffect(() => {
     isNewChat = false
     page = 0;
@@ -84,6 +83,7 @@ const MessageList = ({ navigation, route }) => {
     socket.on("update_chat_message_receiver", editMessageReceiver);
     socket.on("delete_chat_message_receiver", deleteMessageReceiver);
     socket.on("chat_message_status", readMsgSingnal);
+    socket.on("member_online", memberOnlineSignal);
   }
 
   const removeSocketEvents = () => {
@@ -94,6 +94,7 @@ const MessageList = ({ navigation, route }) => {
     socket.off("update_chat_message_receiver", editMessageReceiver);
     socket.off("delete_chat_message_receiver", deleteMessageReceiver);
     socket.off("chat_message_status", readMsgSingnal);
+    socket.off("member_online", memberOnlineSignal);
   }
 
 
@@ -106,6 +107,21 @@ const MessageList = ({ navigation, route }) => {
       })
     }
 
+  }
+
+  const memberOnlineSignal = (data) => {
+    console.log("member_online", data);
+    setMember((member) => {
+      if (data?.user_id == member?.memberId) {
+        member.isOnline = true;
+        setChat((chatList) => {
+          chatList.map((chat) => !!chat.status == false || chat.status == "sent" ? chat.status = "delivered" : chat.status);
+          return [...chatList]
+        });
+      }
+
+      return { ...member }
+    })
   }
 
   const sendMessageReceiverForSender = (data) => {
@@ -204,7 +220,8 @@ const MessageList = ({ navigation, route }) => {
   const readAllMessagesAPI = async () => {
     let res = await READ_ALL_MESSAGES({ token, navigation, chatId: member?.chatId });
     if (res.code == 200) {
-      route?.params?.resetCountToZero?.(member?.chatId)
+      route?.params?.resetCountToZero?.(member?.chatId);
+      route?.params?.refresh?.();
     }
   }
 

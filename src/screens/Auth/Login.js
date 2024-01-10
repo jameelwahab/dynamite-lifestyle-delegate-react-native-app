@@ -98,6 +98,7 @@ const Login = ({ navigation }) => {
   const makeArrayOfSidebar = (list, user) => {
     let newArray = [];
 
+    newArray.push({ ...drawerMenuList[0], title: "Mission Control" });
     drawerMenuList.forEach((item) => {
 
       let index = list.findIndex(x => x.option_value == item.value)

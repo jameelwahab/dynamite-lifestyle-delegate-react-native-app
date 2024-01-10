@@ -7,6 +7,17 @@ export const S3_URL = "https://dynamite-lifestyle-dev-app-bucket.s3.amazonaws.co
 export const appName = displayName;
 
 
+
+
+
+
+export const dateTimeFormat = {
+  date: "DD-MM-YYYY",
+  time: "HH:mm A",
+  dateTime: "DD-MM-YYYY hh:mm A",
+  dateTimeWithText: (text) => `DD-MM-YYYY [${text}] hh:mm A`
+}
+
 export const TimeZones = [
   "Europe/Andorra",
   "Asia/Dubai",

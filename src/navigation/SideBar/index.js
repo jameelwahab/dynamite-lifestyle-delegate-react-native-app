@@ -1,4 +1,4 @@
-import { View, Text, Pressable, Image, StyleSheet, Platform } from 'react-native'
+import { View, Text, Pressable, Image, StyleSheet, Platform, Dimensions } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { DrawerContentScrollView } from '@react-navigation/drawer';
 import MyText from '../../components/MyText';
@@ -8,10 +8,16 @@ import { drawerMenuList } from './List';
 import Collapsible from 'react-native-collapsible';
 import { selectNavbar } from '../../redux/reducers/navbarSlice';
 import { useSelector } from 'react-redux';
+import { S3_URL } from '../../utilities/constants';
+import { selectSettings } from '../../redux/reducers/settingSlice';
+import MyImage2 from '../../components/MyImage2';
+import ResponsiveImage2 from '../../components/ResponsiveImage2';
+import utilities from '../../utilities';
 
 const index = (props) => {
   const { navigation, state } = props;
   const { navbar } = useSelector(selectNavbar);
+  const { settings } = useSelector(selectSettings);
   const [isCollapsed, setCollapsed] = useState([]);
 
 
@@ -80,14 +86,18 @@ const index = (props) => {
       </Collapsible>
     )
   }
-
+  console.log(settings?.brand_logo, "settings?.brand_logo")
   return (
     <DrawerContentScrollView
       style={{ backgroundColor: colors.secondary }}
       {...props}>
-      <View style={__styles.logoView}>
-        <Image source={icons.missionControl} style={__styles.logo} />
-      </View>
+      {!!settings?.brand_logo &&
+        <View style={__styles.logoView}>
+          <ResponsiveImage2
+            width={200}
+            uri={S3_URL + settings?.brand_logo}
+            style={__styles.logo} />
+        </View>}
 
       {navbar.map((x, i) => {
         if (!!x.icon)
@@ -106,7 +116,7 @@ export default index;
 
 const __styles = StyleSheet.create({
   logoView: {
-    width: "80%", height: 50, alignSelf: "center", marginBottom: 10,
+    width: 200,alignSelf: "center", marginBottom: 10,
     marginTop: Platform.OS == "android" ? 10 : 0
   },
   logo: {

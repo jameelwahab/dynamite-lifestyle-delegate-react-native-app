@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, SafeAreaView } from 'react-native'
+import { View, Text, ScrollView, SafeAreaView, Pressable } from 'react-native'
 import React, { useState } from 'react'
 import RootView from '../../components/RootView'
 import MyText from '../../components/MyText'
@@ -11,6 +11,8 @@ import moment from 'moment'
 import Modal from 'react-native-modal'
 import { Calendar } from 'react-native-calendars'
 import { fonts } from '../../utilities/fonts'
+import showToast from '../../functions/showToast'
+import { dateTimeFormat } from '../../utilities/constants'
 
 const FilterScreen = ({ navigation, route }) => {
   const { filter, filterTheData } = route?.params;
@@ -24,6 +26,10 @@ const FilterScreen = ({ navigation, route }) => {
   });
 
   const filterAction = () => {
+    if (!!filterDates.from == false || !!filterDates.to == false) {
+      showToast({ body: "Please select start & end date" });
+      return
+    }
     filterTheData?.({
       start_date: filterDates.from,
       end_date: filterDates.to,
@@ -31,15 +37,19 @@ const FilterScreen = ({ navigation, route }) => {
     navigation.goBack()
   }
 
+  const clearfilterAction = () => {
+    filterTheData?.({});
+    navigation.goBack()
+  }
 
 
-  const onAgreeClick = () => {
+  const onAgreeClick = (dateString) => {
     if (calendarFor == "from") {
-      setFilterDates({ ...filterDates, from: date });
+      setFilterDates({ ...filterDates, from: dateString });
       setCalendarFor("");
       setCalendarModalVisiblity(false);
     } else if (calendarFor == "to") {
-      setFilterDates({ ...filterDates, to: date })
+      setFilterDates({ ...filterDates, to: dateString })
       setCalendarFor("");
       setCalendarModalVisiblity(false);
     }
@@ -59,9 +69,15 @@ const FilterScreen = ({ navigation, route }) => {
         style={{ margin: 10 }}>
         <SafeAreaView style={{ backgroundColor: colors.secondaryVariant, borderRadius: 10, }} >
           <View style={{ margin: 10 }}>
-            {/* <View style={{ margin: 10 }}>
-              <MyText fontSize={18} type='medium' color={colors.primary}>Are you sure you want to move this ticket to needs fixes?</MyText>
-            </View> */}
+            <Pressable
+              onPress={() => {
+                setCalendarModalVisiblity(false)
+                setCalendarFor("")
+              }}
+              style={{ padding: 5, alignSelf: "flex-end" }}>
+              {icons.crosss()}
+              {/* <MyText fontSize={18} type='medium' color={colors.primary}>Are you sure you want to move this ticket to needs fixes?</MyText> */}
+            </Pressable>
             <View style={{ backgroundColor: colors.secondaryVariant, borderRadius: 10, overflow: "hidden" }}>
               <Calendar
                 current={date}
@@ -77,8 +93,11 @@ const FilterScreen = ({ navigation, route }) => {
                   textSectionTitleDisabledColor: colors.primary,
                   selectedDayBackgroundColor: colors.primary,
                   selectedDayTextColor: colors.black,
-                  todayTextColor: 'white',
-                  // todayBackgroundColor: colors.,
+                  todayTextColor: colors.primary,
+                  // todayBackgroundColor: colors.lightPrimary,
+                  // todayBackgroundColor: colors.lightPrimary,
+                  // todayButtonFontFamily:fonts.bold,
+
                   dayTextColor: colors.white,
                   textDisabledColor: colors.placeholder,
                   dotColor: colors.blue,
@@ -95,16 +114,16 @@ const FilterScreen = ({ navigation, route }) => {
 
                 }}
                 onDayPress={(day) => {
-                  console.log(day, "onDayPress")
-                  setDate(day.dateString)
+                  setDate(day.dateString);
+                  onAgreeClick(day.dateString);
                 }}
               />
             </View>
 
-            <View style={{ flexDirection: "row", justifyContent: "flex-end", marginTop: 10 }}>
+            {/* <View style={{ flexDirection: "row", justifyContent: "flex-end", marginTop: 10 }}>
               <TransparentButton title='CANCEL' onPress={() => setCalendarModalVisiblity(false)} />
               <TransparentButton title='AGREE' onPress={onAgreeClick} />
-            </View>
+            </View> */}
 
           </View>
         </SafeAreaView>
@@ -119,9 +138,9 @@ const FilterScreen = ({ navigation, route }) => {
         <ScrollView contentContainerStyle={{ paddingTop: 20, paddingHorizontal: 10 }}>
           <MyTouchableInput
             label='From*'
-            placeholder='YYYY-MM-DD'
+            placeholder={dateTimeFormat.date}
             icon={() => icons.calendar(colors.primary, 20)}
-            value={filterDates.from}
+            value={!!filterDates.from ? moment(filterDates.from).format(dateTimeFormat.date) : ""}
             onPress={() => {
               if (!!filterDates.from) {
                 setDate(filterDates.from);
@@ -135,8 +154,8 @@ const FilterScreen = ({ navigation, route }) => {
 
           <MyTouchableInput
             label='To*'
-            placeholder='YYYY-MM-DD'
-            value={filterDates.to}
+            placeholder={dateTimeFormat.date}
+            value={!!filterDates.to ? moment(filterDates.to).format(dateTimeFormat.date) : ""}
             icon={() => icons.calendar(colors.primary, 20)}
             onPress={() => {
               if (!!filterDates.to) {
@@ -149,8 +168,16 @@ const FilterScreen = ({ navigation, route }) => {
 
           <View style={{ marginTop: 10 }}>
             <MyButton
-              title='Filter'
+              title='Submit'
               onPress={filterAction}
+            />
+          </View>
+
+          <View style={{ marginTop: 15 }}>
+            <MyButton
+              invert
+              title='Clear Filter'
+              onPress={clearfilterAction}
             />
           </View>
         </ScrollView>
