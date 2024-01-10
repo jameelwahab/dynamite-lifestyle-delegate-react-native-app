@@ -1,0 +1,114 @@
+import { View, Text, StyleSheet, SafeAreaView, FlatList, Pressable } from 'react-native'
+import React from 'react'
+import EmptyView from '../../../components/EmptyView';
+import MyLoader from '../../../components/MyLoader';
+import Modal from 'react-native-modal';
+import utilities from '../../../utilities';
+import { colors } from '../../../utilities/colors';
+import MyText from '../../../components/MyText';
+import { icons } from '../../../utilities/icons';
+import UserImage from '../../../components/UserImage';
+import { S3_URL, dateTimeFormat } from '../../../utilities/constants';
+import { convertTimezone } from '../../../functions/convertTime';
+import FooterLoader from '../../../components/FooterLoader';
+
+
+const LikeModal = ({
+  isVisible,
+  closeModal,
+  likes = [],
+  timezone,
+  user,
+  loader,
+  onEndReached,
+  footerLoader
+}) => {
+
+  const userLikeView = ({ item, index }) => {
+    return (
+      <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 10, paddingVertical: 5, marginTop: 5 }}>
+        <View>
+          <UserImage
+            image={item?.user_info_action_by?.profile_image}
+            name={item?.user_info_action_by?.name}
+            size={35}
+          />
+          <View style={{ position: "absolute", bottom: 0, right: -5 }}>
+            {icons.heartFilled(colors.heart, 15)}
+          </View>
+        </View>
+        <View style={{ marginLeft: 10 }}>
+          <MyText fontSize={13} type='bold' >{item?.user_info_action_by?.name}</MyText>
+          <MyText style={{ marginTop: 3 }} fontSize={10} color={colors.lightText2} >{convertTimezone(item?.createdAt, timezone).format(dateTimeFormat.dateTimeWithText("at"))}</MyText>
+        </View>
+
+      </View>
+    )
+  }
+
+  const modalLike = () => {
+    return (
+      <Modal
+        isVisible={isVisible}
+        onBackdropPress={closeModal}
+        onBackButtonPress={closeModal}
+        useNativeDriverForBackdrop={true}
+        animationIn="zoomIn"
+        animationOut="zoomOut"
+        animationInTiming={400}
+        animationOutTiming={400}
+        avoidKeyboard={true}
+        style={{ margin: 0, marginHorizontal: 5 }}>
+        <SafeAreaView style={{ flex: 1 }} >
+          <View style={__style.rootView}>
+            <View style={__style.headingView}>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                {icons.heartFilled(colors.heart, 25)}
+                <View style={{ marginLeft: 5 }}>
+                  <MyText fontSize={18} type='medium' >Likes</MyText>
+                </View>
+                {/* <MyText color={colors.lightText} fontSize={12}>Select your country from list below</MyText> */}
+              </View>
+              <Pressable onPress={closeModal}>
+                {icons.crosssWithCircle()}
+              </Pressable>
+            </View>
+            <View style={{ flex: 1 }}>
+              <FlatList
+                data={likes}
+                showsVerticalScrollIndicator={false}
+                renderItem={userLikeView}
+                onEndReached={onEndReached}
+                // ListEmptyComponent={!loader && <EmptyView label={"No Likes Exist"} />}
+                ListFooterComponent={<FooterLoader enable={footerLoader} />}
+              />
+            </View>
+
+            <MyLoader enable={loader} />
+          </View>
+        </SafeAreaView>
+      </Modal>)
+  }
+
+  return (
+    <View>
+      {modalLike()}
+    </View>
+  )
+}
+
+export default LikeModal;
+
+const __style = StyleSheet.create({
+  rootView: {
+    // flex: 1,
+    borderRadius: 20,
+    backgroundColor: colors.secondaryVariant,
+    height: utilities.screenHeight() / 2,
+    marginTop: "auto",
+    marginBottom: "auto"
+  },
+  headingView: {
+    flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 15, borderBottomWidth: 1 / 3, borderBottomColor: colors.lightText
+  },
+})

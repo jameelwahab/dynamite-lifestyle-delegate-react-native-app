@@ -19,7 +19,7 @@ export const colors = {
   lightText2: "#bec6da",
   placeholder: "#637381",
   delete: "#ff3333",
-  heart: "#e31b23",
+  heart: "#CA5040",
   transparent: "#FFFFFF00",
   grey: "#696969",
   online: "#337447",

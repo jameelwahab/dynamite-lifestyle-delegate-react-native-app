@@ -11,6 +11,8 @@ import { icons } from '../../../utilities/icons';
 import { fonts } from '../../../utilities/fonts';
 import EmptyView from '../../../components/EmptyView';
 import MyLoader from '../../../components/MyLoader';
+import Toast from 'react-native-toast-message';
+import FooterLoader from '../../../components/FooterLoader';
 
 const CommentModal = ({
   isVisible,
@@ -19,7 +21,10 @@ const CommentModal = ({
   timezone,
   user,
   loader,
-  focus
+  focus,
+  showLikesOfComments,
+  onEndReached,
+  footerLoader
 }) => {
   console.log(comments, "comments")
 
@@ -62,14 +67,16 @@ const CommentModal = ({
                 </TouchableOpacity>}
             </View>
             {item?.like_count > 0 &&
-              <View style={__style.commentActionView}>
+              <Pressable
+                onPress={() => showLikesOfComments(item?._id)}
+                style={__style.commentActionView}>
                 <View style={__style.likeView}>
                   {icons.heartFilled(colors.heart, 15)}
                 </View>
                 <View style={[__style.likeView, { marginLeft: -2 }]}>
                   <MyText>{item?.like_count}</MyText>
                 </View>
-              </View>}
+              </Pressable>}
 
           </View>
         </View>
@@ -86,11 +93,13 @@ const CommentModal = ({
       onBackdropPress={closeModal}
       onBackButtonPress={closeModal}
       useNativeDriverForBackdrop={true}
+      hasBackdrop={false}
       animationIn="slideInUp"
       animationOut="slideOutDown"
       animationInTiming={500}
       animationOutTiming={500}
       avoidKeyboard={true}
+      hideModalContentWhileAnimating={true}
       style={{ margin: 0, }}>
       <SafeAreaView style={{ flex: 1 }} >
         <View style={__style.rootView}>
@@ -103,34 +112,41 @@ const CommentModal = ({
               {icons.crosssWithCircle()}
             </Pressable>
           </View>
+
           <View style={{ flex: 1 }}>
-            <FlatList
-              data={comments}
-              keyExtractor={(item) => item?._id}
-              renderItem={({ item, index }) => commentView(item, index, false)}
-              ListEmptyComponent={!loader && <EmptyView label={"No comment exist"} />}
-              showsVerticalScrollIndicator={false}
-            />
-          </View>
-          <View style={__style.inputRootView}>
-            <View style={__style.textInputView}>
-              <TextInput
-                style={__style.input}
-                selectionColor={colors.selection}
-                multiline={true}
-                textAlignVertical="top"
-                placeholder='Write a comment...'
-                placeholderTextColor={colors.placeholder}
-                keyboardAppearance="dark"
-                autoFocus={focus}
+            <View style={{ flex: 1 }}>
+              <FlatList
+                data={comments}
+                keyExtractor={(item) => item?._id}
+                renderItem={({ item, index }) => commentView(item, index, false)}
+                ListEmptyComponent={!loader && <EmptyView label={"No comment exist"} />}
+                showsVerticalScrollIndicator={false}
+                onEndReached={onEndReached}
+                ListFooterComponent={<FooterLoader isVisible={footerLoader} />}
               />
             </View>
-            <TouchableOpacity style={__style.btnView}>
-              {icons.send(colors.white, 18)}
-            </TouchableOpacity>
+            <View style={__style.inputRootView}>
+              <View style={__style.textInputView}>
+                <TextInput
+                  style={__style.input}
+                  selectionColor={colors.selection}
+                  multiline={true}
+                  textAlignVertical="top"
+                  placeholder='Write a comment...'
+                  placeholderTextColor={colors.placeholder}
+                  keyboardAppearance="dark"
+                  autoFocus={focus}
+                />
+              </View>
+              <TouchableOpacity style={__style.btnView}>
+                {icons.send(colors.white, 18)}
+              </TouchableOpacity>
+            </View>
+            <MyLoader enable={loader} />
           </View>
         </View>
-        <MyLoader enable={loader} />
+
+        {isVisible && <Toast />}
       </SafeAreaView>
       <SafeAreaView style={{ flex: 0, backgroundColor: colors.secondaryVariant }} />
     </Modal>

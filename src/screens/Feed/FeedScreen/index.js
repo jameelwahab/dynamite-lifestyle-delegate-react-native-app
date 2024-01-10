@@ -2,71 +2,283 @@ import { View, Text, FlatList } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import RootView from '../../../components/RootView'
 import MyText from '../../../components/MyText'
-import MyLoader from '../../../components/MyLoader'
-import { GET_FEED_LIST } from '../../../DAL'
+import MyLoader, { SimpleLoader } from '../../../components/MyLoader'
+import { GET_FEED_LIST, GET_COMMENT_LIST, GET_LIKE_LIST, GET_COMMENT_LIKES_LIST } from '../../../DAL'
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../../redux/reducers/userSlice'
 import FeedView from './FeedView'
 import { selectTimeZone } from '../../../redux/reducers/timezoneSlice'
 import { selectSettings } from '../../../redux/reducers/settingSlice'
 import CommentModal from './CommentModal'
-import { GET_COMMENT_LIST } from '../../../DAL/Feed'
+import LikeModal from './LikeModal'
+import OptionModal from '../../../components/OptionModal'
+import { icons } from '../../../utilities/icons'
+import ConfirmationModal from '../../../components/ConfirmationModal'
 
+
+let feedVar = {
+  page: 0,
+  canLoadMore: false,
+}
+
+let commentVar = {
+  page: 0,
+  canLoadMore: false,
+  id: "",
+}
+
+let likeVar = {
+  page: 0,
+  canLoadMore: false,
+  id: "",
+  actionType: ""
+}
 const FeedScreen = ({ navigation }) => {
   const { token, user } = useSelector(selectUser);
   const timezone = useSelector(selectTimeZone);
   const { settings } = useSelector(selectSettings);
   const [feed, setFeed] = useState([]);
+  const [feedFooterLoader, setFeedFooterLoader] = useState(false);
+  const [likesFooterLoader, setLikesFooterLoader] = useState(false);
+  const [commentsFooterLoader, setCommentsFooterLoader] = useState(false);
+  const [feedOptionModal, setFeedOptionModal] = useState({ isVisible: false, selectedItem: null })
+  const [confirmation, setConfirmation] = useState({ isVisible: false, item: null, title: "", type: "" })
   const [comments, setComments] = useState({
     modalVisibility: false,
     list: [],
     loader: false,
     focus: false
   });
+
+  const [likes, setLikes] = useState({
+    modalVisibility: false,
+    list: [],
+    loader: false,
+
+  });
   const [loader, setLoader] = useState(true);
 
 
 
 
-  const getComments = async (fd) => {
-    let res = await GET_COMMENT_LIST({ navigation, token, body: fd });
-    if (res.code == 200) {
-      setComments({
-        modalVisibility: true,
-        list: res?.comment,
-        loader: false
-      })
-    } else {
-    }
-  }
+
 
   const openComments = (id, focus) => {
+    commentVar = {
+      page: 0,
+      canLoadMore: false,
+      id: id
+    };
     setComments({
       list: [],
       modalVisibility: true,
       loader: true,
       focus: focus
     });
-    let fd = new FormData();
-    fd.append("feed_id", id);
-    getComments(fd);
+
+    getComments();
   }
 
 
-  const getFeed = async () => {
-    let res = await GET_FEED_LIST({ navigation, token, type: "the_cosmos", level: "all" });
+  const showLikesOfComments = (id) => {
+    setLikes({
+      list: [],
+      modalVisibility: true,
+      loader: true,
+    });
+    likeVar = {
+      ...likeVar,
+      id: id,
+      actionType: "like",
+    }
+    getLikes(true);
+  }
+
+  const showLikes = (id) => {
+    setLikes({
+      list: [],
+      modalVisibility: true,
+      loader: true,
+    });
+    likeVar = {
+      page: 0,
+      canLoadMore: false,
+      id: id,
+      actionType: "all",
+    }
+    getLikes(false);
+  }
+
+
+  const getComments = async () => {
+    let fd = new FormData();
+    fd.append("feed_id", commentVar.id);
+    let res = await GET_COMMENT_LIST({ navigation, token, body: fd, page: commentVar.page });
     if (res.code == 200) {
-      setFeed(res?.feeds)
-      setLoader(false)
+      if (res?.total_pages > (1 + commentVar.page)) {
+        commentVar = {
+          ...commentVar,
+          page: commentVar.page + 1,
+          canLoadMore: true
+        }
+      } else {
+        commentVar = {
+          ...commentVar,
+          canLoadMore: false
+        }
+      }
+      console.log("comments?.modalVisibility", comments?.modalVisibility)
+      setComments({
+        modalVisibility: true,
+        list: [...comments?.list, ...res?.comment],
+        loader: false
+      });
+      setCommentsFooterLoader(false);
     } else {
-      setLoader(false)
+      setComments({
+        modalVisibility: true,
+        list: [],
+        loader: false
+      });
+      setCommentsFooterLoader(false);
+    }
+  }
+
+
+  const getLikes = async (forCmments) => {
+    let fd = new FormData();
+    fd.append("feed", likeVar.id);
+    fd.append("action_type", likeVar.actionType);
+    let res;
+    if (forCmments) {
+      res = await GET_COMMENT_LIKES_LIST({ navigation, token, body: fd, page: likeVar?.page });
+    } else {
+      res = await GET_LIKE_LIST({ navigation, token, body: fd, page: likeVar?.page });
+    }
+    if (res.code == 200) {
+      if (res?.total_pages > (1 + likeVar.page)) {
+        likeVar = {
+          ...likeVar,
+          canLoadMore: true,
+          page: likeVar.page + 1,
+        }
+      } else {
+        likeVar = {
+          ...likeVar,
+          canLoadMore: false
+        }
+      }
+      setLikes((prev) => ({
+        modalVisibility: true,
+        list: [...prev.list, ...res?.feed_activity],
+        loader: false
+      }));
+      setLikesFooterLoader(true);
+    } else {
+      setLikes({
+        modalVisibility: true,
+        list: [],
+        loader: false
+      });
+      setLikesFooterLoader(true);
+    }
+  }
+
+  const getFeed = async () => {
+    let res = await GET_FEED_LIST({ navigation, token, type: "the_cosmos", level: "all", page: feedVar.page });
+    if (res.code == 200) {
+      if (res?.total_pages < feedVar.page) {
+        feedVar = {
+          ...feedVar,
+          canLoadMore: false
+        }
+      } else {
+        feedVar = {
+          page: feedVar.page + 1,
+          canLoadMore: true
+        }
+      }
+      setFeed([...feed, ...res?.feeds])
+      setLoader(false);
+      setFeedFooterLoader(false);
+    } else {
+      setLoader(false);
+      setFeedFooterLoader(false);
+    }
+  }
+
+  const resetCounts = () => {
+    feedVar = {
+      page: 0,
+      canLoadMore: false,
+    };
+    commentVar = {
+      page: 0,
+      canLoadMore: false,
+      id: ""
+    };
+    likeVar = {
+      page: 0,
+      canLoadMore: false,
+      id: "",
+      actionType: ''
     }
   }
 
   useEffect(() => {
+    resetCounts();
     getFeed()
   }, [])
 
+
+  const onCommentEndReached = () => {
+    if (commentVar?.canLoadMore && comments?.modalVisibility == true) {
+      commentVar = {
+        ...commentVar,
+        canLoadMore: false,
+      }
+      setCommentsFooterLoader(true);
+      getComments();
+    }
+  }
+
+  const onLikesEndReached = () => {
+    console.log("onLikesEndReached", likes, likeVar)
+    if (likeVar?.canLoadMore && likes?.modalVisibility == true) {
+      likeVar = {
+        ...likeVar,
+        canLoadMore: false,
+      }
+      setLikesFooterLoader(true);
+      getLikes(false);
+
+    }
+  }
+
+  const openOptions = (item) => {
+    setFeedOptionModal({
+      isVisible: true,
+      selectedItem: item,
+    })
+  }
+
+  const confirmationAction = () => {
+
+  }
+
+  const actionOfFeedOptions = (selectedOpt)=>{
+console.log(selectedOpt,"selectedOpt")
+  }
+
+
+  const filterTheOptions = (options) => {
+    if (feedOptionModal?.selectedItem?.is_feature)
+      return options.slice().filter(x => x.type != "pin");
+    else if (!feedOptionModal?.selectedItem?.is_feature)
+      return options.slice().filter(x => x.type != "unpin");
+    else return options
+
+  }
 
   return (
     <RootView hideSubHeader>
@@ -75,6 +287,17 @@ const FeedScreen = ({ navigation }) => {
           data={feed}
           showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item?._id}
+          onEndReached={() => {
+            console.log("onEndReached", feedVar)
+            if (feedVar?.canLoadMore) {
+              feedVar = {
+                ...feedVar,
+                canLoadMore: false,
+              }
+              setFeedFooterLoader(true);
+              getFeed();
+            }
+          }}
           renderItem={({ item, index }) =>
             <FeedView
               item={item}
@@ -84,7 +307,13 @@ const FeedScreen = ({ navigation }) => {
               token={token}
               settings={settings}
               openComments={openComments}
+              showLikes={showLikes}
+              openOptions={openOptions}
             />}
+          ListFooterComponent={
+            <View style={{ height: 50, alignItems: "center", justifyContent: "center" }}>
+              {feedFooterLoader && <SimpleLoader />}
+            </View>}
         />
       </View>
       <CommentModal
@@ -94,16 +323,76 @@ const FeedScreen = ({ navigation }) => {
           setComments({
             modalVisibility: false,
             list: [],
-            loader: false
+            loader: false,
+            id: ""
           })}
         comments={comments?.list}
         user={user}
         loader={comments?.loader}
         focus={comments?.focus}
+        showLikesOfComments={showLikesOfComments}
+        onEndReached={onCommentEndReached}
+        footerLoader={commentsFooterLoader}
       />
+
+
+      <LikeModal
+        isVisible={likes?.modalVisibility}
+        timezone={timezone}
+        closeModal={() =>
+          setLikes({
+            modalVisibility: false,
+            list: [],
+            loader: false
+          })}
+        likes={likes?.list}
+        user={user}
+        loader={likes?.loader}
+        onEndReached={onLikesEndReached}
+        footerLoader={likesFooterLoader}
+      />
+
+      <OptionModal
+        optionList={filterTheOptions(feedOptionList)}
+        closeModal={() => setFeedOptionModal({ isVisible: false, selectedItem: null })}
+        onSelected={actionOfFeedOptions}
+        isVisible={feedOptionModal?.isVisible} />
+
+
+      <ConfirmationModal
+        closeModal={() => setConfirmation({ isVisible: false, title: "", item: null, type: "" })}
+        isVisible={confirmation.isVisible}
+        onAgree={confirmationAction}
+        title={confirmation.title}
+      />
+
       <MyLoader enable={loader} />
-    </RootView>
+    </RootView >
   )
 }
 
 export default FeedScreen
+
+
+const feedOptionList = [{
+  icon: icons.edit,
+  title: "Edit",
+  type: "edit"
+
+},
+{
+  icon: icons.trash,
+  title: "Delete",
+  type: "delete"
+},
+{
+  icon: icons.pin,
+  title: "Pin",
+  type: "pin"
+},
+{
+  icon: icons.pin,
+  title: "Unpin",
+  type: "unpin"
+},
+]

@@ -85,5 +85,6 @@ export const icons = {
   heartUnfilled: (color = colors.white, size = 20) => { return (<MaterialCommunityIcons name="heart-outline" color={color} size={size} />) },
   heartFilled: (color = colors.white, size = 20) => { return (<MaterialCommunityIcons name="heart" color={color} size={size} />) },
   comment: (color = colors.white, size = 20) => { return (<MaterialCommunityIcons name="message-outline" color={color} size={size} />) },
+  pin: (color = colors.primary, size = 17) => { return (<Octicons name="pin" color={color} size={size} />) },
 
 }

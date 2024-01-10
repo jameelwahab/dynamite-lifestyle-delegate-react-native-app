@@ -19,7 +19,7 @@ const SideDrawer = () => {
         headerShown: false, drawerType: 'front',
         drawerStyle: { backgroundColor: colors.secondary },
         drawerActiveTintColor: colors.primary,
-        unmountOnBlur: true
+        unmountOnBlur: true,
       }}
       drawerContent={props => <SideBar {...props} />}
 

@@ -47,7 +47,7 @@ export class MyWebview extends Component {
 
 
   render() {
-    let { html, style } = this.props;
+    let { html, style,baseStyle } = this.props;
     return (
       <RenderHTML
         WebView={WebView}
@@ -56,13 +56,14 @@ export class MyWebview extends Component {
         customHTMLElementModels={this.customHTMLElementModels}
         renderers={this.renderers}
         enableExperimentalMarginCollapsing={true}
+        baseStyle={baseStyle}
         enableExperimentalBRCollapsing={true}
         tagsStyles={{
           a: {
             color: colors.white,
             textDecorationColor: colors.white,
             fontFamily: this.props.html.includes("<b>") ? undefined : fonts.regular,
-            fontSize: 16,
+            fontSize: 14,
             margin: 0,
           },
           div: {
@@ -71,7 +72,7 @@ export class MyWebview extends Component {
             margin: 0,
           },
           p: {
-            margin: 0
+            margin: 0,
           },
           h1: {
             margin: 0

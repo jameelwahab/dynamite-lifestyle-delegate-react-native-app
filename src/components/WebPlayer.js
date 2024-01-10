@@ -1,17 +1,29 @@
-import { View, Text, ActivityIndicator } from 'react-native'
+import { View, Text, ActivityIndicator, Dimensions } from 'react-native'
 import React, { useRef, useState } from 'react'
+import WebView from 'react-native-webview';
+import { colors } from '../utilities/colors';
 
 const WebPlayer = ({ url, width, height, borderRadius }) => {
   const player = useRef();
   const [isLoading, setIsLoading] = useState(true);
 
+
+  getUrl = () => {
+
+
+    let encodedurl = "https://thesourcedev.dynamitelifestyle.com/mobile-player/" + encodeURIComponent(url);
+    console.log(url, "url")
+    return encodedurl
+  }
+
   return (
     <View
       renderToHardwareTextureAndroid={true}
       style={{
-        width: !!width ? width : Dimensions.get("screen").width,
+        width: !!width ? width : Dimensions.get("screen").width-40,
         height: !!height ? height : 300,
         borderRadius: !!borderRadius ? borderRadius : 0,
+        alignItems:'center'
       }}>
       {!!url &&
         <WebView
@@ -50,7 +62,7 @@ const WebPlayer = ({ url, width, height, borderRadius }) => {
           }}
           cacheMode={'LOAD_NO_CACHE'}
           renderToHardwareTextureAndroid={true}
-          source={{ uri: this.getUrl(), }}
+          source={{ uri: getUrl() }}
         />}
       {isLoading && (
         <View style={{

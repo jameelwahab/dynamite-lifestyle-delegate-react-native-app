@@ -80,7 +80,9 @@ const Dasboard = ({ navigation }) => {
 
         {!!settings?.dashboard_content &&
           <View style={{ marginTop: 10 }}>
-            <MyWebview html={settings?.dashboard_content} />
+            <MyWebview
+            baseStyle={{size:10}}
+             html={settings?.dashboard_content} />
           </View>}
 
 

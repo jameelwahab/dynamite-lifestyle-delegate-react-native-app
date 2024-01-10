@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'
-import React from 'react'
+import React, { memo } from 'react'
 import UserImage from '../../../components/UserImage'
 import MyText from '../../../components/MyText'
 import { convertTimezone } from '../../../functions/convertTime'
@@ -11,9 +11,10 @@ import MyWebview from '../../../components/MyWebview'
 import MyImage2 from '../../../components/MyImage2'
 import MyImage from '../../../components/MyImage'
 import CollapsibleText from '../../../components/CollapsibleText'
+import WebPlayer from '../../../components/WebPlayer'
 
-const FeedView = ({ item, index, user, token, timezone, settings, openComments }) => {
-
+const FeedView = memo(({ item, index, user, token, timezone, settings, openComments, showLikes ,openOptions}) => {
+  console.log("feedView")
   const profileView = () => (
     <View style={__style.profileView}>
       <UserImage
@@ -41,9 +42,11 @@ const FeedView = ({ item, index, user, token, timezone, settings, openComments }
         />
       </View>
       {user?._id == item?.action_info?.action_id &&
-        <View style={__style.profileTypeIconView}>
+        <TouchableOpacity
+        onPress={()=>openOptions(item)}
+         style={__style.profileTypeIconView}>
           {icons.threeDots(colors.primary, 15)}
-        </View>}
+        </TouchableOpacity>}
     </View>
   )
 
@@ -60,11 +63,13 @@ const FeedView = ({ item, index, user, token, timezone, settings, openComments }
       )}
 
       {item.feed_type == "video" && item.video_url != '' && (
-        <Player url={item.video_url} />
+        <View style={{ alignItems: "center",marginTop:10 }}>
+          <WebPlayer height={250} url={item.video_url} />
+        </View>
       )}
 
       {item.feed_type == "embed_code" && !!item.embed_code &&
-        <View style={{ alignItems: "center" }}>
+        <View >
           <MyWebview
             fullWidth={true}
             html={item.embed_code}
@@ -78,29 +83,31 @@ const FeedView = ({ item, index, user, token, timezone, settings, openComments }
   const statsView = () => (
     <View style={__style.statView}>
 
-
-      <TouchableOpacity
-        style={__style.likeView}>
-        {icons.heartFilled(colors.heart, 20)}
-        <View style={__style.likeImagesView}>
-          {item?.top_liked_user?.map((item, index) => {
-            if (index < 2)
-              return (
-                <View style={[__style.likeImageView, { marginLeft: -(index + 5) }]}>
-                  <MyImage
-                    style={__style.likeImage}
-                    source={{
-                      uri: S3_URL + item?.user_info_action_by?.profile_image
-                    }}
-                  />
-                </View>
-              )
-            else return null;
-          })}
-          {item?.like_count > 2 &&
-            <MyText fontSize={12}>{` and ${item?.like_count - 2} others`}</MyText>}
-        </View>
-      </TouchableOpacity>
+      {!!item?.like_count > 0 ?
+        <TouchableOpacity
+          onPress={() => showLikes(item?._id)}
+          style={__style.likeView}>
+          {icons.heartFilled(colors.heart, 20)}
+          <View style={__style.likeImagesView}>
+            {item?.top_liked_user?.map((item, index) => {
+              if (index < 2)
+                return (
+                  <View style={[__style.likeImageView, { marginLeft: -(index + 5) }]}>
+                    <MyImage
+                      style={__style.likeImage}
+                      source={{
+                        uri: S3_URL + item?.user_info_action_by?.profile_image
+                      }}
+                    />
+                  </View>
+                )
+              else return null;
+            })}
+            {item?.like_count > 2 &&
+              <MyText fontSize={12}>{` and ${item?.like_count - 2} others`}</MyText>}
+          </View>
+        </TouchableOpacity> :
+        <View />}
 
       {item?.comment_count > 0 &&
         <TouchableOpacity
@@ -140,7 +147,7 @@ const FeedView = ({ item, index, user, token, timezone, settings, openComments }
       {actionView()}
     </View>
   )
-}
+});
 
 export default FeedView;
 
