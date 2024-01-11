@@ -249,14 +249,14 @@ export default ImagesForFeed
 const PressableWrapper = ({ swiper, children, onPress }) => {
   if (!!swiper) {
     return (
-      <Pressable onPress={onPress} >
+      <Pressable onPress={onPress}  style={{borderRadius:10,overflow:"hidden"}}>
         {children}
       </Pressable>
     )
   }
   else {
     return (
-      <Pressable onPress={onPress} >
+      <Pressable onPress={onPress} style={{borderRadius:10,overflow:"hidden"}}>
         {children}
       </Pressable>
     )

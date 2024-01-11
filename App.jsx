@@ -10,7 +10,11 @@ import Toast, {
 } from 'react-native-toast-message';
 import {Provider} from 'react-redux';
 import {store} from './src/redux';
-import TrackPlayer, { AppKilledPlaybackBehavior, Capability } from 'react-native-track-player';
+import TrackPlayer, {
+  AppKilledPlaybackBehavior,
+  Capability,
+} from 'react-native-track-player';
+import {PaperProvider} from 'react-native-paper';
 
 const toastConfig = {
   success: props => <SuccessToast {...props} text2NumberOfLines={2} />,
@@ -18,12 +22,12 @@ const toastConfig = {
 };
 
 const App = () => {
-
-  const setupPlayer = ()=>{
-    TrackPlayer.setupPlayer({ waitForBuffer: true, }).then(() => {
+  const setupPlayer = () => {
+    TrackPlayer.setupPlayer({waitForBuffer: true}).then(() => {
       TrackPlayer.updateOptions({
-        android:{
-          appKilledPlaybackBehavior:AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification
+        android: {
+          appKilledPlaybackBehavior:
+            AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification,
         },
         stopWithApp: true,
         notificationCapabilities: [
@@ -31,15 +35,11 @@ const App = () => {
           Capability.Pause,
           Capability.SeekTo,
         ],
-        capabilities: [
-          Capability.Play,
-          Capability.Pause,
-          Capability.SeekTo,
-        ],
+        capabilities: [Capability.Play, Capability.Pause, Capability.SeekTo],
         compactCapabilities: [Capability.Play, Capability.Pause],
-      })
-    })
-  }
+      });
+    });
+  };
   useEffect(() => {
     setupPlayer();
     LogBox.ignoreLogs([
@@ -49,10 +49,12 @@ const App = () => {
   return (
     <View style={{flex: 1, backgroundColor: colors.darkSecondary}}>
       <Provider store={store}>
-        <NavigationContainer>
-          <AppStack />
-          <Toast config={toastConfig} />
-        </NavigationContainer>
+        <PaperProvider>
+          <NavigationContainer>
+            <AppStack />
+            <Toast config={toastConfig} />
+          </NavigationContainer>
+        </PaperProvider>
       </Provider>
     </View>
   );

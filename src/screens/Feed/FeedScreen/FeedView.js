@@ -13,7 +13,7 @@ import MyImage from '../../../components/MyImage'
 import CollapsibleText from '../../../components/CollapsibleText'
 import WebPlayer from '../../../components/WebPlayer'
 
-const FeedView = memo(({ item, index, user, token, timezone, settings, openComments, showLikes ,openOptions}) => {
+function FeedView({ item, index, user, token, timezone, settings, openComments, showLikes, openOptions }) {
   console.log("feedView")
   const profileView = () => (
     <View style={__style.profileView}>
@@ -43,8 +43,8 @@ const FeedView = memo(({ item, index, user, token, timezone, settings, openComme
       </View>
       {user?._id == item?.action_info?.action_id &&
         <TouchableOpacity
-        onPress={()=>openOptions(item)}
-         style={__style.profileTypeIconView}>
+          onPress={() => openOptions(item)}
+          style={__style.profileTypeIconView}>
           {icons.threeDots(colors.primary, 15)}
         </TouchableOpacity>}
     </View>
@@ -63,7 +63,7 @@ const FeedView = memo(({ item, index, user, token, timezone, settings, openComme
       )}
 
       {item.feed_type == "video" && item.video_url != '' && (
-        <View style={{ alignItems: "center",marginTop:10 }}>
+        <View style={{ alignItems: "center", marginTop: 10 }}>
           <WebPlayer height={250} url={item.video_url} />
         </View>
       )}
@@ -147,9 +147,19 @@ const FeedView = memo(({ item, index, user, token, timezone, settings, openComme
       {actionView()}
     </View>
   )
-});
+};
 
-export default FeedView;
+function areEqual(prevProps, nextProps) {
+  console.log(prevProps, "prevProps");
+  console.log(nextProps, "nextProps");
+  if (JSON.stringify(prevProps) !== JSON.stringify(nextProps)) {
+    return true
+  }
+  return false
+}
+
+
+export default React.memo(FeedView)
 
 
 const __style = StyleSheet.create({

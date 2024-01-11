@@ -31,10 +31,11 @@ const OptionModal = ({
               onPress={() => onSelected?.(item)}
               underlayColor={colors.secondary} >
               <View style={{ paddingVertical: 12, flexDirection: "row", alignItems: "center", paddingLeft: 20 }}>
+                {!!item.icon &&
                 <View style={{ height: 25, width: 25, justifyContent: "center", alignItems: "center" }}>
                   {typeof (item.icon) == "function" ? item.icon() :
                     <Image source={item.icon} style={{ height: 25, width: 25, tintColor: colors.primary }} />}
-                </View>
+                </View>}
                 <View style={{ marginLeft: 10 }}>
 
                   <MyText fontSize={16} >{item.title}</MyText>

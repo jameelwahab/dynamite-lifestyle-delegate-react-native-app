@@ -1,9 +1,9 @@
 import { View, Text, FlatList } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import RootView from '../../../components/RootView'
 import MyText from '../../../components/MyText'
 import MyLoader, { SimpleLoader } from '../../../components/MyLoader'
-import { GET_FEED_LIST, GET_COMMENT_LIST, GET_LIKE_LIST, GET_COMMENT_LIKES_LIST } from '../../../DAL'
+import { GET_FEED_LIST, GET_COMMENT_LIST, GET_LIKE_LIST, GET_COMMENT_LIKES_LIST, FEED_ACTIONS, DELETE_FEED_POST } from '../../../DAL'
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../../redux/reducers/userSlice'
 import FeedView from './FeedView'
@@ -14,6 +14,8 @@ import LikeModal from './LikeModal'
 import OptionModal from '../../../components/OptionModal'
 import { icons } from '../../../utilities/icons'
 import ConfirmationModal from '../../../components/ConfirmationModal'
+import showToast from '../../../functions/showToast'
+import AddPost from './AddPost'
 
 
 let feedVar = {
@@ -34,6 +36,7 @@ let likeVar = {
   actionType: ""
 }
 const FeedScreen = ({ navigation }) => {
+  const addPostRef = useRef()
   const { token, user } = useSelector(selectUser);
   const timezone = useSelector(selectTimeZone);
   const { settings } = useSelector(selectSettings);
@@ -198,12 +201,29 @@ const FeedScreen = ({ navigation }) => {
           canLoadMore: true
         }
       }
-      setFeed([...feed, ...res?.feeds])
+      setFeed(feedVar.page <= 1 ? res?.feeds : [...feed, ...res?.feeds])
       setLoader(false);
       setFeedFooterLoader(false);
     } else {
       setLoader(false);
       setFeedFooterLoader(false);
+    }
+  }
+
+  const feedAction = async (fd) => {
+    let res = await FEED_ACTIONS({ navigation, token, formData: fd });
+    if (res.code == 200) {
+      showToast({ title: res?.message, type: "success" })
+      resetCounts();
+      getFeed();
+    }
+  }
+
+  const deleteFeedPostAPI = async (id) => {
+    let res = await DELETE_FEED_POST({ navigation, token, feedId: id });
+    if (res.code == 200) {
+      showToast({ title: res?.message, type: "success" })
+      setFeed((list) => list.filter(f => f._id != id));
     }
   }
 
@@ -227,7 +247,7 @@ const FeedScreen = ({ navigation }) => {
 
   useEffect(() => {
     resetCounts();
-    getFeed()
+    getFeed();
   }, [])
 
 
@@ -263,11 +283,54 @@ const FeedScreen = ({ navigation }) => {
   }
 
   const confirmationAction = () => {
+    if (confirmation.type == "pin" || confirmation.type == "unpin") {
+      let fd = new FormData();
+      fd.append("feed", confirmation?.item?._id);
+      fd.append("action", confirmation.type == "pin" ? "feature" : "unfeature");
+      feedAction(fd)
+    } else if (confirmation.type == "delete") {
+      deleteFeedPostAPI(confirmation?.item?._id)
+    }
 
+    setConfirmation({
+      isVisible: false,
+      item: null,
+      title: "",
+      type: null
+    })
   }
 
-  const actionOfFeedOptions = (selectedOpt)=>{
-console.log(selectedOpt,"selectedOpt")
+  const actionOfFeedOptions = (selectedOpt) => {
+    console.log(selectedOpt, "selectedOpt");
+    let item = feedOptionModal.selectedItem;
+
+    setFeedOptionModal({
+      isVisible: false,
+      selectedItem: null
+    })
+    if (selectedOpt?.type == "pin" || selectedOpt?.type == "unpin") {
+      setTimeout(() => {
+        setConfirmation({
+          isVisible: true,
+          item: item,
+          title: `Are you sure you want to ${selectedOpt?.title} this post?`,
+          type: selectedOpt?.type
+        })
+      }, 500);
+    } else if (selectedOpt?.type == "delete") {
+      setTimeout(() => {
+        setConfirmation({
+          isVisible: true,
+          item: item,
+          title: `Are you sure you want to delete this post?`,
+          type: selectedOpt?.type
+        })
+      }, 500);
+    } else if (selectedOpt?.type == "edit") {
+      setTimeout(() => {
+        addPostRef?.current?.selectItemForEdit(item)
+      }, 500);
+    }
   }
 
 
@@ -280,6 +343,42 @@ console.log(selectedOpt,"selectedOpt")
 
   }
 
+  const headerView = () =>
+  (<AddPost
+    ref={addPostRef}
+    refresh={() => {
+      resetCounts();
+      getFeed();
+    }}
+    user={user}
+    token={token}
+    navigation={navigation}
+    updateFeedItem={(newFeed) => setFeed(feeds => {
+      let index = feeds.findIndex(feed => feed._id === newFeed?._id);
+      console.log("updateFeedItem", newFeed, index);
+      if (index !== -1) {
+        feeds.splice(index, 1, newFeed);
+      }
+      console.log("updateFeedItem after", feeds[index]);
+      return [...feeds];
+    })}
+  />)
+
+  const feedRenderView = useCallback(({ item, index }) =>
+    <FeedView
+
+      item={item}
+      index={index}
+      timezone={timezone}
+      user={user}
+      token={token}
+      settings={settings}
+      openComments={openComments}
+      showLikes={showLikes}
+      openOptions={openOptions}
+
+    />, [feed]);
+
   return (
     <RootView hideSubHeader>
       <View style={{ flex: 1 }}>
@@ -287,6 +386,7 @@ console.log(selectedOpt,"selectedOpt")
           data={feed}
           showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item?._id}
+          ListHeaderComponent={headerView}
           onEndReached={() => {
             console.log("onEndReached", feedVar)
             if (feedVar?.canLoadMore) {
@@ -298,24 +398,14 @@ console.log(selectedOpt,"selectedOpt")
               getFeed();
             }
           }}
-          renderItem={({ item, index }) =>
-            <FeedView
-              item={item}
-              index={index}
-              timezone={timezone}
-              user={user}
-              token={token}
-              settings={settings}
-              openComments={openComments}
-              showLikes={showLikes}
-              openOptions={openOptions}
-            />}
+          renderItem={feedRenderView}
           ListFooterComponent={
             <View style={{ height: 50, alignItems: "center", justifyContent: "center" }}>
               {feedFooterLoader && <SimpleLoader />}
             </View>}
         />
       </View>
+      {console.log(commentVar?.id,"commentVar?.id")}
       <CommentModal
         isVisible={comments?.modalVisibility}
         timezone={timezone}
@@ -333,6 +423,10 @@ console.log(selectedOpt,"selectedOpt")
         showLikesOfComments={showLikesOfComments}
         onEndReached={onCommentEndReached}
         footerLoader={commentsFooterLoader}
+        token={token}
+        navigation={navigation}
+        feedId={commentVar?.id}
+        setComments={setComments}
       />
 
 
