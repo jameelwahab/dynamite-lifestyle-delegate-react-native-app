@@ -13,7 +13,7 @@ import MyImage from '../../../components/MyImage'
 import CollapsibleText from '../../../components/CollapsibleText'
 import WebPlayer from '../../../components/WebPlayer'
 
-function FeedView({ item, index, user, token, timezone, settings, openComments, showLikes, openOptions }) {
+function FeedView({ item, index, user, token, timezone, settings, openComments, showLikes, openOptions, onLikebtnPress }) {
   console.log("feedView")
   const profileView = () => (
     <View style={__style.profileView}>
@@ -123,7 +123,9 @@ function FeedView({ item, index, user, token, timezone, settings, openComments, 
   const actionView = () => (
     <View style={__style.actionView}>
 
-      <TouchableOpacity style={__style.actionBtn}>
+      <TouchableOpacity
+        onPress={() => onLikebtnPress(item?._id, item?.is_liked)}
+        style={__style.actionBtn}>
         {item?.is_liked ?
           icons.heartFilled(colors.heart, 18) :
           icons.heartUnfilled(colors.white, 18)}

@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import RootView from '../../../components/RootView'
 import MyText from '../../../components/MyText'
 import MyLoader, { SimpleLoader } from '../../../components/MyLoader'
-import { GET_FEED_LIST, GET_COMMENT_LIST, GET_LIKE_LIST, GET_COMMENT_LIKES_LIST, FEED_ACTIONS, DELETE_FEED_POST } from '../../../DAL'
+import { GET_FEED_LIST, GET_COMMENT_LIST, GET_LIKE_LIST, GET_COMMENT_LIKES_LIST, FEED_ACTIONS, DELETE_FEED_POST, FEED_LIKE_ACTIONS } from '../../../DAL'
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../../redux/reducers/userSlice'
 import FeedView from './FeedView'
@@ -41,6 +41,8 @@ const FeedScreen = ({ navigation }) => {
   const timezone = useSelector(selectTimeZone);
   const { settings } = useSelector(selectSettings);
   const [feed, setFeed] = useState([]);
+  const [loader, setLoader] = useState(true);
+  const [feedLevel, setFeedLevel] = useState('all');
   const [feedFooterLoader, setFeedFooterLoader] = useState(false);
   const [likesFooterLoader, setLikesFooterLoader] = useState(false);
   const [commentsFooterLoader, setCommentsFooterLoader] = useState(false);
@@ -59,10 +61,14 @@ const FeedScreen = ({ navigation }) => {
     loader: false,
 
   });
-  const [loader, setLoader] = useState(true);
 
 
 
+  const selectFeedlevel = (lvl) => {
+    setLoader(true);
+    setFeed([])
+    setFeedLevel(lvl);
+  }
 
 
 
@@ -130,10 +136,10 @@ const FeedScreen = ({ navigation }) => {
           canLoadMore: false
         }
       }
-      console.log("comments?.modalVisibility", comments?.modalVisibility)
+      console.log("comments?.modalVisibility", commentVar?.page, comments?.modalVisibility)
       setComments({
         modalVisibility: true,
-        list: [...comments?.list, ...res?.comment],
+        list: commentVar?.page <= 1 ? res?.comment : [...comments?.list, ...res?.comment],
         loader: false
       });
       setCommentsFooterLoader(false);
@@ -188,7 +194,7 @@ const FeedScreen = ({ navigation }) => {
   }
 
   const getFeed = async () => {
-    let res = await GET_FEED_LIST({ navigation, token, type: "the_cosmos", level: "all", page: feedVar.page });
+    let res = await GET_FEED_LIST({ navigation, token, type: "the_cosmos", level: feedLevel, page: feedVar.page });
     if (res.code == 200) {
       if (res?.total_pages < feedVar.page) {
         feedVar = {
@@ -248,7 +254,7 @@ const FeedScreen = ({ navigation }) => {
   useEffect(() => {
     resetCounts();
     getFeed();
-  }, [])
+  }, [feedLevel])
 
 
   const onCommentEndReached = () => {
@@ -333,6 +339,14 @@ const FeedScreen = ({ navigation }) => {
     }
   }
 
+  const updateFeedItemsSpecificField = (feedId, updatedObj) => {
+    let index = feed.findIndex(item => item._id == feedId);
+    if (index > -1) {
+      feed[index] = { ...feed[index], ...updatedObj };
+      setFeed([...feed]);
+    }
+  }
+
 
   const filterTheOptions = (options) => {
     if (feedOptionModal?.selectedItem?.is_feature)
@@ -343,9 +357,28 @@ const FeedScreen = ({ navigation }) => {
 
   }
 
+  const onLikebtnPress = async (feedId, isLike) => {
+    let fd = new FormData();
+    fd.append("action", !isLike ? "feedlike" : "feedunlike");
+    fd.append("feed", feedId);
+    updateFeedItemsSpecificField(feedId, { is_liked: isLike ? false : true });
+    let res = await FEED_LIKE_ACTIONS({ token, navigation, formdata: fd });
+    if (res.code == 200) {
+      updateFeedItemsSpecificField(feedId, {
+        is_liked: res?.action_response?.is_liked,
+        top_liked_user: res?.action_response?.top_liked_user,
+        like_count: res?.action_response?.like_count
+      });
+    } else {
+      updateFeedItemsSpecificField(feedId, { is_liked: isLike });
+    }
+  }
+
   const headerView = () =>
   (<AddPost
     ref={addPostRef}
+    feedLevel={feedLevel}
+    selectFeedlevel={selectFeedlevel}
     refresh={() => {
       resetCounts();
       getFeed();
@@ -376,7 +409,7 @@ const FeedScreen = ({ navigation }) => {
       openComments={openComments}
       showLikes={showLikes}
       openOptions={openOptions}
-
+      onLikebtnPress={onLikebtnPress}
     />, [feed]);
 
   return (
@@ -405,7 +438,7 @@ const FeedScreen = ({ navigation }) => {
             </View>}
         />
       </View>
-      {console.log(commentVar?.id,"commentVar?.id")}
+      {console.log(commentVar?.id, "commentVar?.id")}
       <CommentModal
         isVisible={comments?.modalVisibility}
         timezone={timezone}
@@ -427,6 +460,7 @@ const FeedScreen = ({ navigation }) => {
         navigation={navigation}
         feedId={commentVar?.id}
         setComments={setComments}
+        updateFeedItemsSpecificField={updateFeedItemsSpecificField}
       />
 
 

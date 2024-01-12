@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, TextInput, Pressable, ScrollView } from 'react-native'
-import React, { forwardRef, useImperativeHandle, useState } from 'react'
+import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react'
 import UserImage from '../../../components/UserImage'
 import Modal from 'react-native-modal'
 import { colors } from '../../../utilities/colors'
@@ -20,8 +20,11 @@ import { CREATE_FEED, FEED_DETAIL, UPDATE_FEED, UPLOAD_FEED_IMAGES } from '../..
 import { tokens } from 'react-native-paper/lib/typescript/styles/themes/v3/tokens'
 import showToast from '../../../functions/showToast'
 import { S3_URL } from '../../../utilities/constants'
+import LevelModal from './LevelModal'
+import MyTouchableInput from '../../../components/MyTouchableInput'
 
-const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem }, ref) => {
+const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, selectFeedlevel, feedLevel }, ref) => {
+  const lvlModalRef = useRef()
   const [loader, setLoader] = useState(false);
   const [isPostModalVisible, setPostModalVisibilty] = useState(false);
   const [isImageVisible, setImageModalVisibilty] = useState(false);
@@ -31,7 +34,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem }
     visibility: false
   });
   const [postCategory, setPostCategory] = useState("general");
-  const [postCeatedFor, setPostCreatedFor] = useState("delegate");
+  const [postCeatedFor, setPostCreatedFor] = useState(feedLevel != 'all' ? feedLevel : "delegate");
   const [postType, setPostType] = useState("general");
   const [postText, setPostText] = useState("");
   const [images, setImages] = useState([]);
@@ -446,47 +449,68 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem }
     )
   }
   return (
+    <View>
+      {/* //*  Level select View */}
+      <Pressable
+        onPress={() => {
+          console.log(lvlModalRef, "lvlModalRef")
+          lvlModalRef?.current?.openLvlModal()
+        }}
+        style={__style.lvlbtnView}>
+        <View style={__style.levlBtnLabel}>
+          <MyText color={colors.lightText2} fontSize={12} >Select Level</MyText>
+        </View>
+        <MyText type={"medium"} style={{ textTransform: "capitalize" }} >{feedLevel}</MyText>
+        {icons.down(colors.lightText2)}
+      </Pressable>
 
-    <View style={__style.rootView}>
-      <View style={__style.inputRootView}>
-        <UserImage
-          image={user?.image?.thumbnail_1}
-          name={user?.first_name}
-          size={40}
-        />
+      <View style={__style.rootView}>
+        <View style={__style.inputRootView}>
+          <UserImage
+            image={user?.image?.thumbnail_1}
+            name={user?.first_name}
+            size={40}
+          />
 
-        <TouchableOpacity
-          onPress={() => openModal("general")}
-          style={__style.inputView}>
-          <MyText>What's on your mind?</MyText>
-        </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => openModal("general")}
+            style={__style.inputView}>
+            <MyText>What's on your mind?</MyText>
+          </TouchableOpacity>
+        </View>
+        <View style={__style.divider} />
+
+        <View style={__style.buttonsRow} >
+          <TouchableOpacity
+            onPress={() => openModal("video")}
+            style={__style.buttonView}>
+            <MyText style={__style.buttonText}>Upload Video</MyText>
+            {icons.video(colors.white, 15)}
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => openModal("image")}
+            style={__style.buttonView}>
+            <MyText style={__style.buttonText}>Upload Image</MyText>
+            {icons.camera(colors.white, 15)}
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => openModal("embed_code")}
+            style={__style.buttonView}>
+            <MyText style={__style.buttonText}>Embeded Code</MyText>
+            {icons.code(colors.white, 15)}
+          </TouchableOpacity>
+        </View>
+        {Modal_addPost()}
+
       </View>
-      <View style={__style.divider} />
 
-      <View style={__style.buttonsRow} >
-        <TouchableOpacity
-          onPress={() => openModal("video")}
-          style={__style.buttonView}>
-          <MyText style={__style.buttonText}>Upload Video</MyText>
-          {icons.video(colors.white, 15)}
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={() => openModal("image")}
-          style={__style.buttonView}>
-          <MyText style={__style.buttonText}>Upload Image</MyText>
-          {icons.camera(colors.white, 15)}
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={() => openModal("embed_code")}
-          style={__style.buttonView}>
-          <MyText style={__style.buttonText}>Embeded Code</MyText>
-          {icons.code(colors.white, 15)}
-        </TouchableOpacity>
-      </View>
-      {Modal_addPost()}
-
+      <LevelModal
+        selectFeedlevel={selectFeedlevel}
+        feedLevel={feedLevel}
+        ref={lvlModalRef}
+      />
     </View>
 
   )
@@ -517,6 +541,9 @@ const PostCretedFor = [
 ]
 
 const __style = StyleSheet.create({
+  lvlbtnView: { flexDirection: "row", borderWidth: 1, borderColor: colors.lightText, height: 45, borderRadius: 10, marginTop: 10, alignItems: "center", paddingHorizontal: 10, justifyContent: "space-between" },
+  levlBtnLabel: { backgroundColor: colors.darkSecondary, alignSelf: "flex-start", paddingHorizontal: 5, position: "absolute", top: -8, left: 5 },
+
   rootView: {
     backgroundColor: colors.secondary,
     padding: 15,

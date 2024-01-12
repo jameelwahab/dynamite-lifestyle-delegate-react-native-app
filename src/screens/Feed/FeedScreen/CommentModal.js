@@ -17,6 +17,7 @@ import OptionModal from '../../../components/OptionModal';
 import showToast from '../../../functions/showToast';
 import { ADD_COMMENT, COMMENT_LIKE_ACTIONS, DELETE_COMMENT, EDIT_COMMENT } from '../../../DAL';
 import ConfirmationModal from '../../../components/ConfirmationModal';
+import LikeModalForComments from './LikeModalForComments';
 
 const CommentModal = ({
   isVisible,
@@ -32,10 +33,12 @@ const CommentModal = ({
   token,
   navigation,
   feedId,
-  setComments
+  setComments,
+  updateFeedItemsSpecificField
 }) => {
   console.log(feedId, "feedId")
-  const cmtTextInputRef = useRef()
+  const cmtTextInputRef = useRef();
+  const likeModalRef = useRef();
   const [commentText, setCommentText] = useState("");
   const [isLoading, setLoader] = useState(false);
   const [selectedComment, setSelectedComment] = useState(null);
@@ -160,7 +163,8 @@ const CommentModal = ({
         console.log(obj, "obj")
         return { ...obj };
       })
-      setSelectedComment(null)
+      setSelectedComment(null);
+      updateFeedItemsSpecificField?.(res?.action_response?.feed?._id, { comment_count: res?.action_response?.feed?.comment_count })
     } else {
       setLoader(false);
     }
@@ -243,7 +247,8 @@ const CommentModal = ({
       }
       setCommentText("");
       setSelectedComment(null);
-      setSelectedCommentFor("")
+      setSelectedCommentFor("");
+      updateFeedItemsSpecificField?.(res?.action_response?.feed?._id, { comment_count: res?.action_response?.feed?.comment_count })
     } else {
       setLoader(false);
     }
@@ -313,7 +318,10 @@ const CommentModal = ({
             </View>
             {item?.like_count > 0 &&
               <Pressable
-                onPress={() => showLikesOfComments(item?._id)}
+                onPress={() => {
+                  console.log(likeModalRef?.current, "likeModalRef?.current")
+                  likeModalRef?.current?.openLikeModal(item?._id)
+                }}
                 style={__style.commentActionView}>
                 <View style={__style.likeView}>
                   {icons.heartFilled(colors.heart, 15)}
@@ -458,6 +466,13 @@ const CommentModal = ({
           onAgree={onAgreePress}
           title={confirmation?.title}
           closeModal={() => setConfirmation({ isVisible: false, title: "", selectedItem: null })}
+        />
+
+        <LikeModalForComments
+          ref={likeModalRef}
+          navigation={navigation}
+          token={token}
+          timezone={timezone}
         />
       </SafeAreaView>
       <SafeAreaView style={{ flex: 0, backgroundColor: colors.secondaryVariant }} />

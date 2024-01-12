@@ -18,7 +18,7 @@ import { selectSettings } from '../../redux/reducers/settingSlice'
 import MyWebview from '../../components/MyWebview'
 import ResponsiveImage from '../../components/ResponsiveImage'
 import utilities from '../../utilities'
-import { S3_URL } from '../../utilities/constants'
+import { S3_URL, dateTimeFormat } from '../../utilities/constants'
 import ResponsiveImage2 from '../../components/ResponsiveImage2'
 import { selectTimeZone } from '../../redux/reducers/timezoneSlice'
 
@@ -81,8 +81,8 @@ const Dasboard = ({ navigation }) => {
         {!!settings?.dashboard_content &&
           <View style={{ marginTop: 10 }}>
             <MyWebview
-            baseStyle={{size:10}}
-             html={settings?.dashboard_content} />
+              baseStyle={{ size: 10 }}
+              html={settings?.dashboard_content} />
           </View>}
 
 
@@ -120,7 +120,7 @@ const Dasboard = ({ navigation }) => {
           <TouchableOpacity
             onPress={() => setBookingTab(1)}
             style={[__style.tabView, bookingTab == 1 && __style.tabSelectedView]}>
-            <MyText color={bookingTab == 1 ? colors.primary : undefined} type={bookingTab == 1 ? "medium" : undefined}>
+            <MyText fontSize={18} color={bookingTab == 1 ? colors.primary : undefined} type={bookingTab == 1 ? "medium" : undefined}>
               Latest Bookings
             </MyText>
             <View style={[__style.selectline, { backgroundColor: bookingTab == 1 ? colors.primary : colors.transparent }]} />
@@ -129,7 +129,7 @@ const Dasboard = ({ navigation }) => {
           <TouchableOpacity
             onPress={() => setBookingTab(2)}
             style={[__style.tabView, bookingTab == 2 && __style.tabSelectedView]}>
-            <MyText color={bookingTab == 2 ? colors.primary : undefined} type={bookingTab == 2 ? "medium" : undefined} >
+            <MyText fontSize={18} color={bookingTab == 2 ? colors.primary : undefined} type={bookingTab == 2 ? "medium" : undefined} >
               Upcoming Bookings
             </MyText>
             <View style={[__style.selectline, { backgroundColor: bookingTab == 2 ? colors.primary : colors.transparent }]} />
@@ -154,7 +154,7 @@ const Dasboard = ({ navigation }) => {
           </View>
         </View>
         {itemView("Booking page", item?.page?.sale_page_title)}
-        {itemView("Date", moment(item?.start_date_time).format("DD-MM-YYYY") + " (" + moment(item?.time,"hh:mm A").format("hh:mm A") + " - " + moment(item?.time,"hh:mm A").add({ minutes: item?.slot_duration }).format("hh:mm A") + ")")}
+        {itemView("Date", moment(item?.start_date_time).format("DD-MM-YYYY") + " (" + moment(item?.time, "hh:mm A").format("hh:mm A") + " - " + moment(item?.time, "hh:mm A").add({ minutes: item?.slot_duration }).format("hh:mm A") + ")")}
         {itemView("Booking Status", item?.booking_status_info?.title, item?.booking_status_info?.background_color)}
 
       </View>
@@ -199,6 +199,21 @@ const Dasboard = ({ navigation }) => {
   const topView = () => {
     return (
       <View style={__style.topView}>
+
+
+        {!!filter?.start_date && filter?.end_date ?
+          <View style={__style.chip}>
+            <MyText type='medium' fontSize={12} color={colors.black} style={{ marginRight: 5 }} >
+              {`${moment(filter?.start_date, "YYYY-MM-DD").format(dateTimeFormat.date)} to ${moment(filter?.end_date, "YYYY-MM-DD").format(dateTimeFormat.date)}`}
+            </MyText>
+            <TouchableOpacity
+              hitSlop={{ bottom: 5, top: 5, left: 5, right: 5 }}
+              onPress={() => filterTheData({})} >
+              {icons.crosssWithCircle_20(colors.black, 20)}
+            </TouchableOpacity>
+          </View> :
+          <View />}
+
         <Pressable onPress={onFilterScreen} style={__style.filterButton} >
           {icons.filter(colors.primary, 15)}
           <MyText color={colors.primary} style={{ marginLeft: 5 }} >Filter</MyText>
@@ -235,6 +250,13 @@ const Dasboard = ({ navigation }) => {
 export default Dasboard;
 
 const __style = StyleSheet.create({
+  chip: {
+    backgroundColor: colors.primary, borderRadius: 15,
+    justifyContent: "center", padding: 5,
+    alignSelf: "flex-start",
+    flexDirection: "row",
+    alignItems: "center"
+  },
   countersView: {
     flexDirection: "row",
     alignItems: "center",
@@ -252,7 +274,7 @@ const __style = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 8
   },
-  topView: { flex: 1, flexDirection: "row", justifyContent: "flex-end" },
+  topView: { flex: 1, flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
   tabsView: {
     flexDirection: "row",
     marginBottom: 10,

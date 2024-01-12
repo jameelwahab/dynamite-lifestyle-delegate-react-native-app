@@ -53,7 +53,7 @@ export const icons = {
   crosss: (color = colors.white, size = 20) => { return (<Ionicons name="close" color={color} size={size} />) },
   plus: (color = colors.white, size = 20) => { return (<Octicons name="plus" color={color} size={size} />) },
   search: () => { return (<Feather name="search" color={colors.white} size={17} />) },
-  down: () => { return (<Ionicons name="caret-down" color={colors.white} size={17} />) },
+  down: (color = colors.white, size = 17) => { return (<Ionicons name="caret-down" color={color} size={size} />) },
   threeDots: (color = colors.primary, size = 12) => { return (<Entypo name="dots-three-vertical" color={color} size={size} />) },
   download: (color = colors.primary, size = 17) => { return (<Feather name="download" color={color} size={size} />) },
   edit: () => { return (<Feather name="edit" color={colors.primary} size={17} />) },
@@ -86,7 +86,7 @@ export const icons = {
   heartFilled: (color = colors.white, size = 20) => { return (<MaterialCommunityIcons name="heart" color={color} size={size} />) },
   comment: (color = colors.white, size = 20) => { return (<MaterialCommunityIcons name="message-outline" color={color} size={size} />) },
   pin: (color = colors.primary, size = 17) => { return (<Octicons name="pin" color={color} size={size} />) },
-video: (color = colors.primary, size = 17) => { return (<Ionicons name="videocam" color={color} size={size} />) },
-code: (color = colors.primary, size = 17) => { return (<Ionicons name="code-slash" color={color} size={size} />) },
+  video: (color = colors.primary, size = 17) => { return (<Ionicons name="videocam" color={color} size={size} />) },
+  code: (color = colors.primary, size = 17) => { return (<Ionicons name="code-slash" color={color} size={size} />) },
 
 }
