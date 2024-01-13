@@ -18,9 +18,11 @@ const ResponsiveImage2 = memo(({ uri, style, width }) => {
     return (
       <FastImage
         source={{ uri: uri }}
+        // style={[
+        //   { width: width, aspectRatio: size.width / size.height },
+        // ]}
         style={[
-
-          { width: width, aspectRatio: size.width / size.height }
+          { width: width, aspectRatio: size.width / size.height },
         ]}
       />
     )

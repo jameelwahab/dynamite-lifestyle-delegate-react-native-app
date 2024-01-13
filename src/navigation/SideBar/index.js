@@ -13,13 +13,31 @@ import { selectSettings } from '../../redux/reducers/settingSlice';
 import MyImage2 from '../../components/MyImage2';
 import ResponsiveImage2 from '../../components/ResponsiveImage2';
 import utilities from '../../utilities';
+import { selectSocket } from '../../redux/reducers/socketSlice';
 
 const index = (props) => {
   const { navigation, state } = props;
   const { navbar } = useSelector(selectNavbar);
   const { settings } = useSelector(selectSettings);
+  const { socket } = useSelector(selectSocket);
   const [isCollapsed, setCollapsed] = useState([]);
 
+  useEffect(() => {
+    socket.on("connect_error", () => {
+      console.log("%c connect_error", 'background:#0000FF; color: #FFF', socket,)
+      socket.connect();
+    });
+
+
+    socket.on("connect", () => {
+      console.log("%c socket connected ", 'background:#A020F0; color: #FFF', socket)
+    });
+
+    return () => {
+      socket.off("connect");
+      socket.off("connect_error");
+    }
+  }, [])
 
   const toggleCollapse = (item) => {
     let index = isCollapsed.findIndex(x => x == item.value);
@@ -116,13 +134,10 @@ export default index;
 
 const __styles = StyleSheet.create({
   logoView: {
-    width: 200,alignSelf: "center", marginBottom: 10,
+    width: 200, alignSelf: "center", marginBottom: 10,
     marginTop: Platform.OS == "android" ? 10 : 0
   },
-  logo: {
-    height: "100%",
-    width: "100%",
-  },
+
   itemRootView: {
     borderRadius: 10,
     marginHorizontal: 5,

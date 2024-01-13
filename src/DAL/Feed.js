@@ -10,6 +10,16 @@ export const GET_FEED_LIST =
     })
   }
 
+export const GET_FEED_EXTRA_DATA =
+  ({ token, navigation, level, }) => {
+    return invokeApi({
+      path: `api/feeds/delegate_portal/extra_data/get?list_type=${level}`,
+      method: "GET",
+      token,
+      navigation,
+    })
+  }
+
 
 export const GET_COMMENT_LIST =
   ({ token, navigation, body, page }) => {
@@ -71,6 +81,7 @@ export const UPLOAD_FEED_IMAGES = ({ token, navigation, formData }) => {
     navigation,
   })
 }
+
 
 
 export const CREATE_FEED = ({ token, navigation, formData }) => {
@@ -158,7 +169,7 @@ export const COMMENT_LIKE_ACTIONS = ({ token, navigation, body: {
 }
 
 
-export const FEED_LIKE_ACTIONS = ({ token, navigation,formdata}) => {
+export const FEED_LIKE_ACTIONS = ({ token, navigation, formdata }) => {
   return invokeApi({
     path: `api/feeds/delegate_portal/action`,
     method: "POST",

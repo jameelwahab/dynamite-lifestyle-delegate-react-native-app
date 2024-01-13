@@ -22,9 +22,11 @@ import showToast from '../../../functions/showToast'
 import { S3_URL } from '../../../utilities/constants'
 import LevelModal from './LevelModal'
 import MyTouchableInput from '../../../components/MyTouchableInput'
+import FeedTabs from '../FeedTabs'
 
-const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, selectFeedlevel, feedLevel }, ref) => {
+const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, selectFeedlevel, feedLevel, tab }, ref) => {
   const lvlModalRef = useRef()
+  const tablRef = useRef()
   const [loader, setLoader] = useState(false);
   const [isPostModalVisible, setPostModalVisibilty] = useState(false);
   const [isImageVisible, setImageModalVisibilty] = useState(false);
@@ -40,7 +42,8 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   const [images, setImages] = useState([]);
   const [videoLink, setVideoLink] = useState("");
   const [embededCode, setEmbededCode] = useState("");
-  const [editId, setEditId] = useState("")
+  const [editId, setEditId] = useState("");
+  const [show, setShow] = useState(false)
 
   useImperativeHandle(ref, () => {
     return {
@@ -50,8 +53,9 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   }, []);
 
   const selectItemForEdit = (item) => {
+    console.log(item, "item")
     setEditId(item._id);
-    setPostCategory(item?.source_by);
+    setPostCategory(item?.feed_appear_by == "public" ? "general" : "win");
     setPostCreatedFor(item?.created_for_level_or_type == "both" ? "delegate" : item?.created_for_level_or_type);
     setPostType(item?.feed_type);
     setPostText(item?.description);
@@ -148,19 +152,19 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
       });
 
     }
-
+    console.log(postCeatedFor, "  <==postCeatedFor")
 
     let fd = new FormData();
-    fd.append("feed_appear_by", "public");
+    fd.append("feed_appear_by", postCategory == "general" ? "public" : "win");
     fd.append("feed_type", postType);
     fd.append("video_url", postType == "video" ? videoLink : "");
     fd.append("description", postText);
     fd.append("embed_code", postType == "embed_code" ? embededCode : "");
     fd.append("feed_images", postType == 'image' ? JSON.stringify(uploadedImages) : "[]");
-    fd.append("created_for_level_or_type", "both");
+    fd.append("created_for_level_or_type", postCeatedFor != "consultant" ? "both" : "consultant");
     if (!(!!editId)) {
       fd.append("is_publish", "true");
-      fd.append("feed_created_for", postCeatedFor);
+      fd.append("feed_created_for", "delegate");
     }
 
     if (!!editId) {
@@ -448,69 +452,72 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
     )
   }
+
   return (
     <View>
-      {/* //*  Level select View */}
-      <Pressable
-        onPress={() => {
-          console.log(lvlModalRef, "lvlModalRef")
-          lvlModalRef?.current?.openLvlModal()
-        }}
-        style={__style.lvlbtnView}>
-        <View style={__style.levlBtnLabel}>
-          <MyText color={colors.lightText2} fontSize={12} >Select Level</MyText>
-        </View>
-        <MyText type={"medium"} style={{ textTransform: "capitalize" }} >{feedLevel}</MyText>
-        {icons.down(colors.lightText2)}
-      </Pressable>
+      {tab == 0 &&
+        <View >
+          <Pressable
+            onPress={() => {
+              console.log(lvlModalRef, "lvlModalRef")
+              lvlModalRef?.current?.openLvlModal()
+            }}
+            style={__style.lvlbtnView}>
+            <View style={__style.levlBtnLabel}>
+              <MyText color={colors.lightText2} fontSize={12} >Select Level</MyText>
+            </View>
+            <MyText type={"medium"} style={{ textTransform: "capitalize" }} >{feedLevel}</MyText>
+            {icons.down(colors.lightText2)}
+          </Pressable>
 
-      <View style={__style.rootView}>
-        <View style={__style.inputRootView}>
-          <UserImage
-            image={user?.image?.thumbnail_1}
-            name={user?.first_name}
-            size={40}
+          <View style={__style.rootView}>
+            <View style={__style.inputRootView}>
+              <UserImage
+                image={user?.image?.thumbnail_1}
+                name={user?.first_name}
+                size={40}
+              />
+
+              <TouchableOpacity
+                onPress={() => openModal("general")}
+                style={__style.inputView}>
+                <MyText>What's on your mind?</MyText>
+              </TouchableOpacity>
+            </View>
+            <View style={__style.divider} />
+
+            <View style={__style.buttonsRow} >
+              <TouchableOpacity
+                onPress={() => openModal("video")}
+                style={__style.buttonView}>
+                <MyText style={__style.buttonText}>Upload Video</MyText>
+                {icons.video(colors.white, 15)}
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => openModal("image")}
+                style={__style.buttonView}>
+                <MyText style={__style.buttonText}>Upload Image</MyText>
+                {icons.camera(colors.white, 15)}
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => openModal("embed_code")}
+                style={__style.buttonView}>
+                <MyText style={__style.buttonText}>Embeded Code</MyText>
+                {icons.code(colors.white, 15)}
+              </TouchableOpacity>
+            </View>
+            {Modal_addPost()}
+
+          </View>
+
+          <LevelModal
+            selectFeedlevel={selectFeedlevel}
+            feedLevel={feedLevel}
+            ref={lvlModalRef}
           />
-
-          <TouchableOpacity
-            onPress={() => openModal("general")}
-            style={__style.inputView}>
-            <MyText>What's on your mind?</MyText>
-          </TouchableOpacity>
-        </View>
-        <View style={__style.divider} />
-
-        <View style={__style.buttonsRow} >
-          <TouchableOpacity
-            onPress={() => openModal("video")}
-            style={__style.buttonView}>
-            <MyText style={__style.buttonText}>Upload Video</MyText>
-            {icons.video(colors.white, 15)}
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => openModal("image")}
-            style={__style.buttonView}>
-            <MyText style={__style.buttonText}>Upload Image</MyText>
-            {icons.camera(colors.white, 15)}
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => openModal("embed_code")}
-            style={__style.buttonView}>
-            <MyText style={__style.buttonText}>Embeded Code</MyText>
-            {icons.code(colors.white, 15)}
-          </TouchableOpacity>
-        </View>
-        {Modal_addPost()}
-
-      </View>
-
-      <LevelModal
-        selectFeedlevel={selectFeedlevel}
-        feedLevel={feedLevel}
-        ref={lvlModalRef}
-      />
+        </View>}
     </View>
 
   )

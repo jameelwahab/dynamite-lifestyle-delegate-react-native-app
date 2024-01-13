@@ -8,7 +8,8 @@ import { colors } from '../../utilities/colors'
 
 import Dasboard from '../../screens/Dashboard'
 import FilterScreen from '../../screens/Dashboard/FilterScreen'
-import FeedScreen from '../../screens/Feed/FeedScreen'
+import Feed from '../../screens/Feed'
+// import FeedScreen from '../../screens/Feed/FeedScreen'
 
 
 
@@ -20,7 +21,7 @@ const StackFeed = ({ route }) => {
       <FeedStack.Navigator
         initialRouteName={routes.feedScreen}
         screenOptions={{ headerShown: false }}>
-        <FeedStack.Screen name={routes.feedScreen} component={FeedScreen} />
+        <FeedStack.Screen name={routes.feedScreen} component={Feed} />
         {/*//? Default Screens Start */}
         {defaultScreens.map((x, i) => (
           <FeedStack.Screen key={x.name} name={x.name} component={x.component} />

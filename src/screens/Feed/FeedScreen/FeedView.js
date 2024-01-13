@@ -14,7 +14,7 @@ import CollapsibleText from '../../../components/CollapsibleText'
 import WebPlayer from '../../../components/WebPlayer'
 
 function FeedView({ item, index, user, token, timezone, settings, openComments, showLikes, openOptions, onLikebtnPress }) {
-  console.log("feedView")
+  console.log( item?.feed_created_for == "delegate","is-delegate")
   const profileView = () => (
     <View style={__style.profileView}>
       <UserImage
@@ -33,10 +33,9 @@ function FeedView({ item, index, user, token, timezone, settings, openComments, 
       <View >
         <Image source={{
           uri:
-            item?.feed_created_for == "delegate" ?
+            item?.created_for_level_or_type == "delegate" ?
               S3_URL + settings?.delegate_feed_icon :
-              item?.feed_created_for == "consultant" ?
-                S3_URL + settings?.consultant_feed_icon : null
+              S3_URL + settings?.consultant_feed_icon
         }}
           style={__style.feedTypeIcon}
         />

@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import RootView from '../../../components/RootView'
 import MyText from '../../../components/MyText'
 import MyLoader, { SimpleLoader } from '../../../components/MyLoader'
-import { GET_FEED_LIST, GET_COMMENT_LIST, GET_LIKE_LIST, GET_COMMENT_LIKES_LIST, FEED_ACTIONS, DELETE_FEED_POST, FEED_LIKE_ACTIONS } from '../../../DAL'
+import { GET_FEED_LIST, GET_COMMENT_LIST, GET_LIKE_LIST, GET_COMMENT_LIKES_LIST, FEED_ACTIONS, DELETE_FEED_POST, FEED_LIKE_ACTIONS, GET_FEED_EXTRA_DATA } from '../../../DAL'
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../../redux/reducers/userSlice'
 import FeedView from './FeedView'
@@ -16,6 +16,11 @@ import { icons } from '../../../utilities/icons'
 import ConfirmationModal from '../../../components/ConfirmationModal'
 import showToast from '../../../functions/showToast'
 import AddPost from './AddPost'
+import { selectSocket } from '../../../redux/reducers/socketSlice'
+import { useNavigation } from '@react-navigation/native'
+import FeedTabs from '../FeedTabs'
+import FeedEvents from '../FeedEvents'
+import Leaderboard from '../Leaderboard.js'
 
 
 let feedVar = {
@@ -35,19 +40,23 @@ let likeVar = {
   id: "",
   actionType: ""
 }
-const FeedScreen = ({ navigation }) => {
+const FeedScreen = ({ }) => {
+  const navigation = useNavigation();
   const addPostRef = useRef()
   const { token, user } = useSelector(selectUser);
+  const { socket } = useSelector(selectSocket);
   const timezone = useSelector(selectTimeZone);
   const { settings } = useSelector(selectSettings);
   const [feed, setFeed] = useState([]);
+  const [feedData, setFeedData] = useState(null);
   const [loader, setLoader] = useState(true);
   const [feedLevel, setFeedLevel] = useState('all');
   const [feedFooterLoader, setFeedFooterLoader] = useState(false);
   const [likesFooterLoader, setLikesFooterLoader] = useState(false);
   const [commentsFooterLoader, setCommentsFooterLoader] = useState(false);
   const [feedOptionModal, setFeedOptionModal] = useState({ isVisible: false, selectedItem: null })
-  const [confirmation, setConfirmation] = useState({ isVisible: false, item: null, title: "", type: "" })
+  const [confirmation, setConfirmation] = useState({ isVisible: false, item: null, title: "", type: "" });
+  const [tab, setTab] = useState(0);
   const [comments, setComments] = useState({
     modalVisibility: false,
     list: [],
@@ -64,62 +73,9 @@ const FeedScreen = ({ navigation }) => {
 
 
 
-  const selectFeedlevel = (lvl) => {
-    setLoader(true);
-    setFeed([])
-    setFeedLevel(lvl);
-  }
+  // !  API's /////////////////
 
-
-
-  const openComments = (id, focus) => {
-    commentVar = {
-      page: 0,
-      canLoadMore: false,
-      id: id
-    };
-    setComments({
-      list: [],
-      modalVisibility: true,
-      loader: true,
-      focus: focus
-    });
-
-    getComments();
-  }
-
-
-  const showLikesOfComments = (id) => {
-    setLikes({
-      list: [],
-      modalVisibility: true,
-      loader: true,
-    });
-    likeVar = {
-      ...likeVar,
-      id: id,
-      actionType: "like",
-    }
-    getLikes(true);
-  }
-
-  const showLikes = (id) => {
-    setLikes({
-      list: [],
-      modalVisibility: true,
-      loader: true,
-    });
-    likeVar = {
-      page: 0,
-      canLoadMore: false,
-      id: id,
-      actionType: "all",
-    }
-    getLikes(false);
-  }
-
-
-  const getComments = async () => {
+  const getComments = async (append = false) => {
     let fd = new FormData();
     fd.append("feed_id", commentVar.id);
     let res = await GET_COMMENT_LIST({ navigation, token, body: fd, page: commentVar.page });
@@ -139,7 +95,7 @@ const FeedScreen = ({ navigation }) => {
       console.log("comments?.modalVisibility", commentVar?.page, comments?.modalVisibility)
       setComments({
         modalVisibility: true,
-        list: commentVar?.page <= 1 ? res?.comment : [...comments?.list, ...res?.comment],
+        list: !append ? res?.comment : [...comments?.list, ...res?.comment],
         loader: false
       });
       setCommentsFooterLoader(false);
@@ -152,7 +108,6 @@ const FeedScreen = ({ navigation }) => {
       setCommentsFooterLoader(false);
     }
   }
-
 
   const getLikes = async (forCmments) => {
     let fd = new FormData();
@@ -216,6 +171,13 @@ const FeedScreen = ({ navigation }) => {
     }
   }
 
+  const api__getFeedExtraData = async () => {
+    let res = await GET_FEED_EXTRA_DATA({ navigation, token, level: "the_cosmos" });
+    if (res.code == 200) {
+      setFeedData(res)
+    }
+  }
+
   const feedAction = async (fd) => {
     let res = await FEED_ACTIONS({ navigation, token, formData: fd });
     if (res.code == 200) {
@@ -251,11 +213,218 @@ const FeedScreen = ({ navigation }) => {
     }
   }
 
+
+  // !  SOCKET AND its fcuntions /////////////////
+
+  const updateComments = (data) => {
+    console.log("updateComments", data, commentVar);
+    if (data?.feed_id == commentVar?.id) {
+      console.log("updateComments", data);
+      if (data?.action == "add_comment") {
+        setComments((obj) => ({
+          ...obj,
+          list: [data?.action_response?.comment, ...obj.list]
+        }))
+      } else if (data?.action == "delete_comment") {
+        setComments((obj) => ({
+          ...obj,
+          list: [...obj.list.slice("").filter(x => x._id != data?.comment)]
+        }))
+      } else if (data?.action == "edit_comment" || data?.action == "delete_comment_reply") {
+
+        setComments((obj) => {
+          let eeditedComment = data?.action_response?.comment;
+          let nList = [...obj.list];
+          let index = nList.findIndex(x => x._id == eeditedComment?._id);
+          if (index > -1) {
+            nList.splice(index, 1, { ...nList[index], ...eeditedComment });
+          }
+          return {
+            ...obj,
+            list: [...nList]
+          }
+        })
+      } else if (data?.action == "add_comment_reply") {
+        console.log("updateComments 23", "add_comment_reply")
+        setComments((obj) => {
+          let newChildComment = { ...data?.action_response?.comment, parent_comment: data?.action_response?.parent_comment }
+          let pId = data?.action_response?.parent_comment
+          let nList = [...obj.list];
+          let index = nList.findIndex(x => x._id == pId);
+          if (index > -1) {
+            nList.splice(index, 1, { ...nList[index], child_comment: [newChildComment, ...nList[index].child_comment] });
+          }
+          console.log(obj.list, index, "check edited")
+          return {
+            ...obj,
+            list: nList
+          }
+        })
+      } else if (data?.action == "edit_comment_reply") {
+        setComments((obj) => {
+          let pId = data?.action_response?.comment?.parent_comment;
+          let cId = data?.action_response?.comment?._id;
+          let editedComment = data?.action_response?.comment;
+          let nList = [...obj.list];
+          let index = nList.findIndex(x => x._id == pId);
+          if (index > -1) {
+            let childList = [...nList[index].child_comment];
+            let childIndex = childList.findIndex(x => x._id == cId);
+            if (childIndex > -1) {
+              childList.splice(childIndex, 1, editedComment);
+              nList.splice(index, 1, { ...nList[index], child_comment: childList });
+            }
+          }
+          return {
+            ...obj,
+            list: nList
+          }
+        })
+      } else if (data?.action == "commentunlike" || data?.action == "commentlike") {
+        console.log("updateComments 23", "add_comment_reply")
+        setComments((obj) => {
+          let editedComment = data?.action_response;
+          let nList = [...obj.list];
+          if (!!editedComment?.parent_comment) {
+            let index = nList.findIndex(x => x._id == editedComment?.parent_comment);
+            if (index > -1) {
+              let childList = [...nList[index].child_comment];
+              let childIndex = childList.findIndex(x => x._id == editedComment?.comment);
+              if (childIndex > -1) {
+                childList.splice(childIndex, 1, {
+                  ...nList[index].child_comment[childIndex],
+                  like_count: editedComment?.comment_like_count,
+                  is_liked: editedComment?.is_liked
+                });
+                nList.splice(index, 1, { ...nList[index], child_comment: childList });
+              }
+            }
+          }
+          else {
+            let index = nList.findIndex(x => x._id == editedComment?.comment);
+            console.log(index, "index")
+            if (index > -1) {
+              nList.splice(index, 1, {
+                ...nList[index],
+                like_count: editedComment?.comment_like_count,
+                is_liked: editedComment?.is_liked
+              })
+            }
+          }
+          return {
+            ...obj,
+            list: nList
+          }
+        })
+      }
+    }
+  }
+
+  const socketReceiverAction = (data) => {
+    console.log("socketReceiverAction", data);
+    if (data?.action == "feedlike" || data?.action == "feedunlike") {
+      updateFeedItemsSpecificField(data?.feed_id, {
+        is_liked: data?.action_response?.is_liked,
+        like_count: data?.action_response?.like_count,
+        top_liked_user: data?.action_response?.top_liked_user
+      })
+    } else if (data?.action == "add_comment") {
+      updateFeedCommentCount(data?.feed_id, +1);
+    } else if (data?.action == "delete_comment") {
+      updateFeedCommentCount(data?.feed_id, -1);
+    }
+
+    if (data?.action.includes("comment")) {
+      updateComments(data)
+    }
+  }
+
+  const enableSocketEvents = () => {
+    socket.emit("delegate_feed_room", "delegate_live_feed_room");
+    socket.emit("live_event_room", "live_feed_room");
+    socket.on("delegate_live_feed_room_reciever", socketReceiverAction);
+    socket.on("live_feed_room_reciever", socketReceiverAction);
+  }
+
+  const disableSocketEvents = () => {
+    socket.off("delegate_live_feed_room_reciever", socketReceiverAction);
+    socket.off("live_feed_room_reciever", socketReceiverAction);
+  }
+
+  // !  USE  EFFECTS /////////////////
+
   useEffect(() => {
     resetCounts();
     getFeed();
   }, [feedLevel])
 
+  useEffect(() => {
+    enableSocketEvents();
+    api__getFeedExtraData();
+    return () => {
+      disableSocketEvents();
+    }
+  }, [])
+
+
+
+  // !  FUNCTIONALITIES /////////////////
+
+
+  const changeTab = (newTab) => {
+    setTab(newTab);
+  }
+
+  const selectFeedlevel = (lvl) => {
+    setLoader(true);
+    setFeed([])
+    setFeedLevel(lvl);
+  }
+
+  const openComments = (id, focus) => {
+    commentVar = {
+      page: 0,
+      canLoadMore: false,
+      id: id
+    };
+    setComments({
+      list: [],
+      modalVisibility: true,
+      loader: true,
+      focus: focus
+    });
+
+    getComments();
+  }
+
+  const showLikesOfComments = (id) => {
+    setLikes({
+      list: [],
+      modalVisibility: true,
+      loader: true,
+    });
+    likeVar = {
+      ...likeVar,
+      id: id,
+      actionType: "like",
+    }
+    getLikes(true);
+  }
+
+  const showLikes = (id) => {
+    setLikes({
+      list: [],
+      modalVisibility: true,
+      loader: true,
+    });
+    likeVar = {
+      page: 0,
+      canLoadMore: false,
+      id: id,
+      actionType: "all",
+    }
+    getLikes(false);
+  }
 
   const onCommentEndReached = () => {
     if (commentVar?.canLoadMore && comments?.modalVisibility == true) {
@@ -264,7 +433,7 @@ const FeedScreen = ({ navigation }) => {
         canLoadMore: false,
       }
       setCommentsFooterLoader(true);
-      getComments();
+      getComments(true);
     }
   }
 
@@ -340,13 +509,29 @@ const FeedScreen = ({ navigation }) => {
   }
 
   const updateFeedItemsSpecificField = (feedId, updatedObj) => {
-    let index = feed.findIndex(item => item._id == feedId);
-    if (index > -1) {
-      feed[index] = { ...feed[index], ...updatedObj };
-      setFeed([...feed]);
-    }
+    setFeed((list) => {
+      let index = list.findIndex(item => item._id == feedId);
+      if (index > -1) {
+        list[index] = { ...list[index], ...updatedObj };
+      }
+      return [...list]
+    })
   }
 
+  const updateFeedCommentCount = (feedId, count) => {
+    setFeed((list) => {
+      let index = list.findIndex(item => item._id == feedId);
+      if (index > -1) {
+        let newCount = !!list[index].comment_count ? list[index].comment_count : 0;
+        newCount = newCount + count;
+        if (newCount <= 0) {
+          newCount = 0;
+        }
+        list[index] = { ...list[index], comment_count: newCount };
+      }
+      return [...list]
+    })
+  }
 
   const filterTheOptions = (options) => {
     if (feedOptionModal?.selectedItem?.is_feature)
@@ -369,37 +554,66 @@ const FeedScreen = ({ navigation }) => {
         top_liked_user: res?.action_response?.top_liked_user,
         like_count: res?.action_response?.like_count
       });
-    } else {
-      updateFeedItemsSpecificField(feedId, { is_liked: isLike });
     }
   }
 
-  const headerView = () =>
-  (<AddPost
-    ref={addPostRef}
-    feedLevel={feedLevel}
-    selectFeedlevel={selectFeedlevel}
-    refresh={() => {
-      resetCounts();
-      getFeed();
-    }}
-    user={user}
-    token={token}
-    navigation={navigation}
-    updateFeedItem={(newFeed) => setFeed(feeds => {
-      let index = feeds.findIndex(feed => feed._id === newFeed?._id);
-      console.log("updateFeedItem", newFeed, index);
-      if (index !== -1) {
-        feeds.splice(index, 1, newFeed);
-      }
-      console.log("updateFeedItem after", feeds[index]);
-      return [...feeds];
-    })}
-  />)
+  // !  VIEWS /////////////////
+
+  const footerView = () => {
+    if (tab == 0) {
+      return (
+        <View style={{ height: 50, alignItems: "center", justifyContent: "center" }}>
+          {feedFooterLoader && <SimpleLoader />}
+        </View>
+      )
+    } else if (tab == 1) {
+      return (
+        <FeedEvents
+          upcomingEvents={feedData?.upcoming_events_array}
+          currentEvent={feedData?.current_events_array}
+          noticeboard={feedData?.notice_board}
+        />)
+    } else if (tab == 2) {
+      return (
+        <Leaderboard
+          monthlyCounts={feedData?.consultant_list_by_monthly_count}
+          weeklyCounts={feedData?.consultant_list_by_weekly_count}
+        />)
+    }
+  }
+
+  const headerView = () => {
+    return (
+      <View>
+        <FeedTabs tab={tab} changeTab={changeTab} />
+        <AddPost
+          ref={addPostRef}
+          tab={tab}
+          feedLevel={feedLevel}
+          selectFeedlevel={selectFeedlevel}
+          refresh={() => {
+            resetCounts();
+            getFeed();
+          }}
+          user={user}
+          token={token}
+          navigation={navigation}
+          updateFeedItem={(newFeed) => setFeed(feeds => {
+            let index = feeds.findIndex(feed => feed._id === newFeed?._id);
+            console.log("updateFeedItem", newFeed, index);
+            if (index !== -1) {
+              feeds.splice(index, 1, newFeed);
+            }
+            console.log("updateFeedItem after", feeds[index]);
+            return [...feeds];
+          })}
+        />
+      </View>
+    )
+  }
 
   const feedRenderView = useCallback(({ item, index }) =>
     <FeedView
-
       item={item}
       index={index}
       timezone={timezone}
@@ -412,17 +626,19 @@ const FeedScreen = ({ navigation }) => {
       onLikebtnPress={onLikebtnPress}
     />, [feed]);
 
+
   return (
-    <RootView hideSubHeader>
+    <View style={{ flex: 1 }}>
       <View style={{ flex: 1 }}>
         <FlatList
-          data={feed}
+          data={tab == 0 ? feed : []}
+          // onViewableItemsChanged={(e) => console.log("onViewableItemsChanged", e)}
           showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item?._id}
-          ListHeaderComponent={headerView}
+          ListHeaderComponent={headerView()}
           onEndReached={() => {
             console.log("onEndReached", feedVar)
-            if (feedVar?.canLoadMore) {
+            if (feedVar?.canLoadMore && tab == 0) {
               feedVar = {
                 ...feedVar,
                 canLoadMore: false,
@@ -431,11 +647,8 @@ const FeedScreen = ({ navigation }) => {
               getFeed();
             }
           }}
-          renderItem={feedRenderView}
-          ListFooterComponent={
-            <View style={{ height: 50, alignItems: "center", justifyContent: "center" }}>
-              {feedFooterLoader && <SimpleLoader />}
-            </View>}
+          renderItem={tab == 0 && feedRenderView}
+          ListFooterComponent={footerView}
         />
       </View>
       {console.log(commentVar?.id, "commentVar?.id")}
@@ -495,7 +708,7 @@ const FeedScreen = ({ navigation }) => {
       />
 
       <MyLoader enable={loader} />
-    </RootView >
+    </View >
   )
 }
 

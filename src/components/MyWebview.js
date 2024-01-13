@@ -58,6 +58,7 @@ export class MyWebview extends Component {
         enableExperimentalMarginCollapsing={true}
         baseStyle={baseStyle}
         enableExperimentalBRCollapsing={true}
+        enableExperimentalGhostLinesPrevention={true} 
         tagsStyles={{
           a: {
             color: colors.white,
@@ -70,6 +71,7 @@ export class MyWebview extends Component {
             color: colors.white,
             fontFamily: this.props.html.includes("<b>") ? undefined : fonts.regular,
             margin: 0,
+            padding: 0,
           },
           p: {
             margin: 0,

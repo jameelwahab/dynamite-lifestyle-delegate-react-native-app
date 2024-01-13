@@ -51,7 +51,7 @@ const CommentModal = ({
   const [options, setOptions] = useState({
     isVisible: false,
     selectedItem: null,
-  })
+  });
 
   const onAgreePress = () => {
     deleteCommentFromServer(confirmation?.selectedItem?._id);
@@ -283,7 +283,7 @@ const CommentModal = ({
             <View style={__style.profiletNameView}>
               <MyText fontSize={13} type='bold' >{item?.user_info_action_for?.name}</MyText>
               <View style={{ marginTop: 3 }}>
-                <MyText color={colors.lightText2} fontSize={10}>{convertTimezone(item?.createdAt, timezone).format("DD MMM YYYY [at] hh:mm A")}</MyText>
+                <MyText color={colors.lightText2} fontSize={10}>{convertTimezone(item?.comment_date_time, timezone).format("DD MMM YYYY [at] hh:mm A")}</MyText>
               </View>
             </View>
             {user?._id == item?.user_info_action_for?.action_id &&
@@ -319,7 +319,7 @@ const CommentModal = ({
             {item?.like_count > 0 &&
               <Pressable
                 onPress={() => {
-                  console.log(likeModalRef?.current, "likeModalRef?.current")
+                  // console.log(likeModalRef?.current, "likeModalRef?.current")
                   likeModalRef?.current?.openLikeModal(item?._id)
                 }}
                 style={__style.commentActionView}>
@@ -333,8 +333,7 @@ const CommentModal = ({
 
           </View>
         </View>
-
-        {item?.child_comment?.map((item2, index2) => commentView(item2, index2, true))}
+        {!!item?.child_comment && Array.isArray(item?.child_comment) && item?.child_comment.map((item2, index2) => commentView(item2, index2, true))}
 
       </View>
     )
