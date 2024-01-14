@@ -4,7 +4,7 @@ import UserImage from '../../../components/UserImage'
 import MyText from '../../../components/MyText'
 import { convertTimezone } from '../../../functions/convertTime'
 import { colors } from '../../../utilities/colors'
-import { S3_URL } from '../../../utilities/constants'
+import { S3_URL, isDev } from '../../../utilities/constants'
 import ImagesForFeed from './ImagesForFeed'
 import { icons } from '../../../utilities/icons'
 import MyWebview from '../../../components/MyWebview'
@@ -12,9 +12,12 @@ import MyImage2 from '../../../components/MyImage2'
 import MyImage from '../../../components/MyImage'
 import CollapsibleText from '../../../components/CollapsibleText'
 import WebPlayer from '../../../components/WebPlayer'
+import ResponsiveImage2 from '../../../components/ResponsiveImage2'
+import utilities from '../../../utilities'
+import openUrl from '../../../functions/openUrl'
 
-function FeedView({ item, index, user, token, timezone, settings, openComments, showLikes, openOptions, onLikebtnPress }) {
-  console.log( item?.feed_created_for == "delegate","is-delegate")
+function FeedView({ item, index, user, token, timezone, settings, openComments, showLikes, openOptions, onLikebtnPress, isCosmos, sourceLevelIcons,isScheduledFeed }) {
+  console.log(item?.feed_created_for == "delegate", "is-delegate")
   const profileView = () => (
     <View style={__style.profileView}>
       <UserImage
@@ -30,12 +33,23 @@ function FeedView({ item, index, user, token, timezone, settings, openComments, 
           <MyText type="light" color={colors.lightText2} fontSize={10}>{convertTimezone(item?.createdAt, timezone).format("DD MMM YYYY [at] hh:mm A")}</MyText>
         </View>
       </View>
+      {!item?.is_publish &&
+        <View style={{ marginRight: 5 }}>
+          <Image source={icons.schedule}
+            style={{ tintColor: colors.primary, height: 25, width: 25 }}
+          />
+        </View>}
       <View >
-        <Image source={{
+        <MyImage
+        indicatorProps={{color: colors.secondaryVariant}}
+          source={{
           uri:
-            item?.created_for_level_or_type == "delegate" ?
-              S3_URL + settings?.delegate_feed_icon :
-              S3_URL + settings?.consultant_feed_icon
+            isCosmos || isScheduledFeed ?
+              item?.created_for_level_or_type == "delegate" ?
+                S3_URL + settings?.delegate_feed_icon :
+                S3_URL + settings?.consultant_feed_icon
+              :
+              S3_URL + sourceLevelIcons?.[`${item?.created_for_level_or_type}_badge`]
         }}
           style={__style.feedTypeIcon}
         />
@@ -67,14 +81,49 @@ function FeedView({ item, index, user, token, timezone, settings, openComments, 
         </View>
       )}
 
+
+      {isDev && item.feed_type == "live" && !!item?.image?.thumbnail_1 &&
+        <View style={{ alignItems: "center", minHeight: 20 }} >
+          <ResponsiveImage2
+            width={utilities.screenWidth() - 40}
+            uri={S3_URL + item?.image?.thumbnail_1}
+          />
+          {item.feed_type == "live" && (
+            <View style={__style.streamingStatusView} >
+              <MyText type='bold' color={colors.white} fontSize={12}  >
+                {item?.is_live_streaming ? "Live" : "Offline"}</MyText>
+            </View>
+          )}
+
+        </View>
+      }
+
       {item.feed_type == "embed_code" && !!item.embed_code &&
-        <View >
+        <View style={{}} >
           <MyWebview
-            fullWidth={true}
-            html={item.embed_code}
+            fullWidth
+            html={item.embed_code.replace("width", "")}
           />
         </View>
       }
+
+
+      {!!item?.event_info?.is_event_info &&
+        <View style={__style.eventRootView} >
+          <View style={__style.eventTitleView}>
+            <MyWebview html={item?.event_info?.event_title} />
+          </View>
+          <TouchableOpacity
+            onPress={() => openUrl(item?.event_info?.button_link)}
+            style={[__style.eventBtnView, { backgroundColor: item?.event_info?.button_background_color, }]}>
+            <MyText
+              color={item?.event_info?.button_text_color}
+              type='light'
+              style={{ paddingHorizontal: 10, }}
+            >{item?.event_info?.button_text}</MyText>
+          </TouchableOpacity>
+        </View>}
+
 
     </View>
   )
@@ -144,8 +193,11 @@ function FeedView({ item, index, user, token, timezone, settings, openComments, 
     <View style={__style.rootView}>
       {profileView()}
       {descriptionView()}
-      {statsView()}
-      {actionView()}
+      {item?.is_publish &&
+        <>
+          {statsView()}
+          {actionView()}
+        </>}
     </View>
   )
 };
@@ -174,6 +226,42 @@ const __style = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
 
+  },
+  eventRootView: {
+    borderWidth: 1,
+    marginVertical: 20,
+    borderColor: colors.white,
+    backgroundColor: colors.black,
+    paddingHorizontal: 5,
+    marginHorizontal: 2,
+    borderRadius: 5
+  },
+  eventTitleView: {
+    margin: 0,
+    padding: 5
+  },
+  eventBtnView: {
+    flexGrow: 1,
+    minHeight: 35,
+
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 5,
+    paddingVertical: 3,
+    marginVertical: 3,
+    flex: 1,
+    minWidth: 50
+  },
+  streamingStatusView: {
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: colors.primary2,
+    paddingHorizontal: 10,
+    position: "absolute",
+    top: 5,
+    left: 5,
+    paddingVertical: 3,
+    backgroundColor: colors.secondary
   },
   profileNameView: {
     marginLeft: 10,

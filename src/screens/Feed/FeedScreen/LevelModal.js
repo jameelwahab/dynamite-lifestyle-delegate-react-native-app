@@ -5,7 +5,7 @@ import utilities from '../../../utilities';
 import Modal from 'react-native-modal';
 import { fonts } from '../../../utilities/fonts';
 import MyText from '../../../components/MyText';
-const LevelModal = forwardRef(({ feedLevel, selectFeedlevel }, ref) => {
+const LevelModal = forwardRef(({ feedLevel, selectFeedlevel, isCosmos }, ref) => {
   const [isVisible, setIsVisible] = useState(false);
 
   useImperativeHandle(ref, () => {
@@ -35,7 +35,7 @@ const LevelModal = forwardRef(({ feedLevel, selectFeedlevel }, ref) => {
           backgroundColor: feedLevel == item ? colors.secondarySelect : undefined,
           paddingVertical: 20, alignItems: "center"
         }} >
-        <MyText align='center' style={{textTransform:"capitalize"}} type='medium' >
+        <MyText align='center' style={{ textTransform:item=="pta"?"uppercase": "capitalize" }} type='medium' >
           {item}
         </MyText>
       </Pressable>
@@ -59,21 +59,21 @@ const LevelModal = forwardRef(({ feedLevel, selectFeedlevel }, ref) => {
           <View style={{
             backgroundColor: colors.secondary,
             borderTopLeftRadius: 10,
-            borderTopRightRadius:10,
+            borderTopRightRadius: 10,
             maxHeight: utilities.windowHeight() * 0.7,
             overflow: "hidden"
           }}>
 
             <FlatList
-              data={options}
+              data={isCosmos ? options : sourceOptions}
               renderItem={optionView}
               showsVerticalScrollIndicator={false}
             />
           </View>
-          
+
 
         </SafeAreaView>
-        <SafeAreaView style={{flex:0,backgroundColor:colors.secondary}} />
+        <SafeAreaView style={{ flex: 0, backgroundColor: colors.secondary }} />
       </Modal>
     )
   }
@@ -85,6 +85,7 @@ const LevelModal = forwardRef(({ feedLevel, selectFeedlevel }, ref) => {
   )
 });
 
-const options = ["all", 'delegate', 'consultnant']
+const options = ["all", 'delegate', 'consultnant'];
+const sourceOptions = ["all", 'dynamite', 'pta', 'elite', 'mastery'];
 
 export default LevelModal

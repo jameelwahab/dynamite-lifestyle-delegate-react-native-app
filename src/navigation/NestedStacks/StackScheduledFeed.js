@@ -13,22 +13,22 @@ import Feed from '../../screens/Feed'
 
 
 
-const FeedStack = createNativeStackNavigator()
+const ScheduledFeedStack = createNativeStackNavigator()
 
-const StackFeed = ({ route }) => {
+const StackScheduledFeed = ({ route }) => {
   return (
     <View style={{ flex: 1, backgroundColor: colors.darkSecondary }}>
-      <FeedStack.Navigator
-        initialRouteName={routes.feedScreen}
+      <ScheduledFeedStack.Navigator
+        initialRouteName={routes.scheduleFeedScreen}
         screenOptions={{ headerShown: false }}>
-        <FeedStack.Screen initialParams={route.params} name={routes.feedScreen} component={Feed} />
+        <ScheduledFeedStack.Screen initialParams={route.params} name={routes.scheduleFeedScreen} component={Feed} />
         {/*//? Default Screens Start */}
         {defaultScreens.map((x, i) => (
-          <FeedStack.Screen key={x.name} name={x.name} component={x.component} />
+          <ScheduledFeedStack.Screen key={x.name} name={x.name} component={x.component} />
         ))}
         {/*//? Default Screens End */}
-      </FeedStack.Navigator>
+      </ScheduledFeedStack.Navigator>
     </View>
   )
 }
-export default StackFeed
+export default StackScheduledFeed

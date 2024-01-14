@@ -70,8 +70,8 @@ export class MyWebview extends Component {
           div: {
             color: colors.white,
             fontFamily: this.props.html.includes("<b>") ? undefined : fonts.regular,
-            margin: 0,
-            padding: 0,
+            // margin: 0,
+            // padding: 0,
           },
           p: {
             margin: 0,

@@ -5,7 +5,8 @@ export const domain = "https://apidev.dynamitelifestyle.com/";
 export const socketUrl = "https://apidev.dynamitelifestyle.com";
 export const S3_URL = "https://dynamite-lifestyle-dev-app-bucket.s3.amazonaws.com/";
 export const appName = displayName;
-
+export const websiteBaseUrl = "https://sourcedev.dynamitelifestyle.com/"
+export const isDev = true;
 
 
 
@@ -13,7 +14,7 @@ export const appName = displayName;
 
 export const dateTimeFormat = {
   date: "DD-MM-YYYY",
-  time: "HH:mm A",
+  time: "hh:mm A",
   dateTime: "DD-MM-YYYY hh:mm A",
   dateTimeWithText: (text) => `DD-MM-YYYY [${text}] hh:mm A`
 }

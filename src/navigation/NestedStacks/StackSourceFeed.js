@@ -13,22 +13,22 @@ import Feed from '../../screens/Feed'
 
 
 
-const FeedStack = createNativeStackNavigator()
+const FeedSourceStack = createNativeStackNavigator()
 
-const StackFeed = ({ route }) => {
+const StackSourceFeed = ({ route }) => {
   return (
     <View style={{ flex: 1, backgroundColor: colors.darkSecondary }}>
-      <FeedStack.Navigator
-        initialRouteName={routes.feedScreen}
+      <FeedSourceStack.Navigator
+        initialRouteName={routes.sourceFeedScreen}
         screenOptions={{ headerShown: false }}>
-        <FeedStack.Screen initialParams={route.params} name={routes.feedScreen} component={Feed} />
+        <FeedSourceStack.Screen initialParams={route.params} name={routes.sourceFeedScreen} component={Feed} />
         {/*//? Default Screens Start */}
         {defaultScreens.map((x, i) => (
-          <FeedStack.Screen key={x.name} name={x.name} component={x.component} />
+          <FeedSourceStack.Screen key={x.name} name={x.name} component={x.component} />
         ))}
         {/*//? Default Screens End */}
-      </FeedStack.Navigator>
+      </FeedSourceStack.Navigator>
     </View>
   )
 }
-export default StackFeed
+export default StackSourceFeed

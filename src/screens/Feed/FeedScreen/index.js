@@ -21,6 +21,8 @@ import { useNavigation } from '@react-navigation/native'
 import FeedTabs from '../FeedTabs'
 import FeedEvents from '../FeedEvents'
 import Leaderboard from '../Leaderboard.js'
+import EmptyView from '../../../components/EmptyView'
+
 
 
 let feedVar = {
@@ -40,9 +42,12 @@ let likeVar = {
   id: "",
   actionType: ""
 }
-const FeedScreen = ({ }) => {
-  const navigation = useNavigation();
+const FeedScreen = ({ navigation, route }) => {
+  console.log(route, "feedroute")
   const addPostRef = useRef()
+  const { feedFor } = route?.params;
+  const isCosmos = feedFor == "the_cosmos";
+  const isScheduledFeed = feedFor == "scheduled";
   const { token, user } = useSelector(selectUser);
   const { socket } = useSelector(selectSocket);
   const timezone = useSelector(selectTimeZone);
@@ -149,17 +154,17 @@ const FeedScreen = ({ }) => {
   }
 
   const getFeed = async () => {
-    let res = await GET_FEED_LIST({ navigation, token, type: "the_cosmos", level: feedLevel, page: feedVar.page });
+    let res = await GET_FEED_LIST({ navigation, token, type: feedFor, level: feedLevel, page: feedVar.page });
     if (res.code == 200) {
-      if (res?.total_pages < feedVar.page) {
-        feedVar = {
-          ...feedVar,
-          canLoadMore: false
-        }
-      } else {
+      if (res?.total_pages > (1 + feedVar.page)) {
         feedVar = {
           page: feedVar.page + 1,
           canLoadMore: true
+        }
+      } else {
+        feedVar = {
+          ...feedVar,
+          canLoadMore: false
         }
       }
       setFeed(feedVar.page <= 1 ? res?.feeds : [...feed, ...res?.feeds])
@@ -172,7 +177,7 @@ const FeedScreen = ({ }) => {
   }
 
   const api__getFeedExtraData = async () => {
-    let res = await GET_FEED_EXTRA_DATA({ navigation, token, level: "the_cosmos" });
+    let res = await GET_FEED_EXTRA_DATA({ navigation, token, level: feedFor });
     if (res.code == 200) {
       setFeedData(res)
     }
@@ -578,6 +583,9 @@ const FeedScreen = ({ }) => {
         <Leaderboard
           monthlyCounts={feedData?.consultant_list_by_monthly_count}
           weeklyCounts={feedData?.consultant_list_by_weekly_count}
+          isCosmos={isCosmos}
+          pages={feedData?.sale_pages}
+          user={user}
         />)
     }
   }
@@ -585,7 +593,10 @@ const FeedScreen = ({ }) => {
   const headerView = () => {
     return (
       <View>
-        <FeedTabs tab={tab} changeTab={changeTab} />
+        <FeedTabs
+          isCosmos={isCosmos}
+          tab={tab}
+          changeTab={changeTab} />
         <AddPost
           ref={addPostRef}
           tab={tab}
@@ -600,13 +611,14 @@ const FeedScreen = ({ }) => {
           navigation={navigation}
           updateFeedItem={(newFeed) => setFeed(feeds => {
             let index = feeds.findIndex(feed => feed._id === newFeed?._id);
-            console.log("updateFeedItem", newFeed, index);
             if (index !== -1) {
               feeds.splice(index, 1, newFeed);
             }
-            console.log("updateFeedItem after", feeds[index]);
             return [...feeds];
           })}
+          isCosmos={isCosmos}
+          isScheduledFeed={isScheduledFeed}
+          timezone={timezone}
         />
       </View>
     )
@@ -624,6 +636,9 @@ const FeedScreen = ({ }) => {
       showLikes={showLikes}
       openOptions={openOptions}
       onLikebtnPress={onLikebtnPress}
+      isCosmos={isCosmos}
+      isScheduledFeed={isScheduledFeed}
+      sourceLevelIcons={feedData?.feed_setting}
     />, [feed]);
 
 
@@ -636,6 +651,7 @@ const FeedScreen = ({ }) => {
           showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item?._id}
           ListHeaderComponent={headerView()}
+          ListEmptyComponent={!loader && tab == 0 && <EmptyView label={"Posts not found"} />}
           onEndReached={() => {
             console.log("onEndReached", feedVar)
             if (feedVar?.canLoadMore && tab == 0) {

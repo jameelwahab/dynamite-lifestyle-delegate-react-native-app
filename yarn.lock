@@ -6212,6 +6212,14 @@ react-native-collapsible@^1.6.1:
   resolved "https://registry.yarnpkg.com/react-native-collapsible/-/react-native-collapsible-1.6.1.tgz#27e289831a6955aebde98abff2424a7710f36f02"
   integrity sha512-orF4BeiXd2hZW7fu9YcqIJXzN6TJcFcddY807D3MAOVktLuW9oQ+RIkrTJ5DR3v9ZOFfREkOjEmS79qeUTvkBQ==
 
+react-native-color-picker@^0.6.0:
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/react-native-color-picker/-/react-native-color-picker-0.6.0.tgz#3b06eaaa0dfa9d90b45bf37bbb13776625c1fd2b"
+  integrity sha512-CptAssfTEGww97ev5GfaGTwu3IMBbBFi9ZDai1fgYRurQ7oQTcDp00lOoFIgLXr/acHNME2PjL7Ks/c+leVKFg==
+  dependencies:
+    prop-types "^15.5.10"
+    tinycolor2 "^1.4.1"
+
 react-native-color@^0.0.10:
   version "0.0.10"
   resolved "https://registry.yarnpkg.com/react-native-color/-/react-native-color-0.0.10.tgz#9cbc0da191c67ae4fc3a04bef7bc54a685784c7d"

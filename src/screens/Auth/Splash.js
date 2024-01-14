@@ -77,7 +77,6 @@ const Splash = ({ navigation }) => {
       }
     });
 
-    
 
     return newArray;
 

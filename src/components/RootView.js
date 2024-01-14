@@ -1,7 +1,8 @@
-import { View, Text, StyleSheet, SafeAreaView, StatusBar } from 'react-native'
+import { View, Text, StyleSheet, StatusBar, SafeAreaView } from 'react-native'
 import React from 'react'
 import { colors } from '../utilities/colors'
 import Header from './Header'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 
 const RootView = ({
@@ -15,14 +16,17 @@ const RootView = ({
   hideNotificaitonIcon = false,
   hideProfile = false,
   hideChatIcon = false,
-  hideSubHeader=false,
+  hideSubHeader = false,
   backgroundColor,
   titleView,
   children,
   customBackPress
 }) => {
+  const { top, bottom, left, right } = useSafeAreaInsets();
   return (
-    <SafeAreaView style={[__RootView.root, !!backgroundColor && { backgroundColor }]}>
+    <View style={[__RootView.root, !!backgroundColor && { backgroundColor },
+    { paddingTop: top, paddingBottom: bottom, paddingLeft: left, paddingRight: right }
+    ]}>
       <StatusBar backgroundColor={!!backgroundColor ? backgroundColor : colors.darkSecondary} barStyle={"light-content"} />
       {!hideHeader &&
         <Header
@@ -42,7 +46,7 @@ const RootView = ({
       <View style={{ flex: 1, paddingHorizontal: 10 }}>
         {children}
       </View>
-    </SafeAreaView>
+    </View>
   )
 }
 

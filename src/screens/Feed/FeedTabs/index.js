@@ -11,69 +11,20 @@ import FeedScreen from '../FeedScreen';
 import FeedEvents from '../FeedEvents';
 import Leaderboard from '../Leaderboard.js';
 
-const FeedTabs = ({ changeTab, tab }) => {
+const FeedTabs = ({ isCosmos, changeTab, tab }) => {
   const menuRef = useRef()
   const { settings } = useSelector(selectSettings);
   const { user } = useSelector(selectUser);
-  // console.log(settings, "settings")
 
-  // useImperativeHandle(ref, () => {
-  //   return {
-  //     index
-  //   }
-  // }, [])
-
-  const renderTabBar = props => (
-    <TabBar
-      {...props}
-      scrollEnabled={true}
-      indicatorStyle={{ backgroundColor: colors.primary }}
-      style={{
-        backgroundColor: colors.darkSecondary,
-        shadowColor: colors.lightText2,
-        shadowOffset: {
-          width: 0,
-          height: 1,
-        },
-        shadowOpacity: 0.20,
-        shadowRadius: 1.41,
-      }}
-      tabStyle={{ width: "auto", paddingHorizontal: 20 }}
-      renderLabel={({ route, focused, color }) => (
-        <>
-          <MyText color={focused ? colors.primary : colors.lightText} type='medium' >
-            {route.title}
-          </MyText>
-        </>
-      )}
-    />
-  );
-
-  const renderScene = ({ route }) => {
-    console.log(route, "route")
-    switch (route.index) {
-      case 0:
-        // setShow(true);
-        return null;
-      case 1:
-        changeTab("ls")
-        // setShow(false);
-        return null;
-      case 2:
-        // setShow(false);
-        return null;
-    }
-
-  }
 
   return (
     <View style={{ marginHorizontal: -10 }}>
-      {!!settings?.the_cosmos_banner_image &&
+      {!!settings?.the_cosmos_banner_image && isCosmos &&
         <HeaderBanner image={settings?.the_cosmos_banner_image} user={user} />}
       <View style={{ height: 50, marginTop: 10 }}>
         <FlatList
           contentContainerStyle={{ paddingHorizontal: 10 }}
-          data={tabs}
+          data={isCosmos ? tabsForCosmos : tabsForSource}
           horizontal
           showsHorizontalScrollIndicator={false}
           ref={menuRef}
@@ -91,7 +42,7 @@ const FeedTabs = ({ changeTab, tab }) => {
                   }, 100);
                 }}
                 style={{ justifyContent: "center", paddingHorizontal: 10 }}>
-                <MyText fontSize={15} type={index == tab ?'medium':'regular'} color={index == tab ? colors.primary2 : colors.lightText} >
+                <MyText fontSize={15} type={index == tab ? 'medium' : 'regular'} color={index == tab ? colors.primary2 : colors.lightText} >
                   {item.title}
                 </MyText>
 
@@ -107,8 +58,14 @@ const FeedTabs = ({ changeTab, tab }) => {
 
 export default FeedTabs;
 
-const tabs = [
+const tabsForCosmos = [
   { title: 'FEEDS', key: 'feed', index: 0 },
   { title: 'NOTICE BOARD & EVENTS', key: 'events', index: 1 },
   { title: 'LEADERBOARD', key: 'leaderboard', index: 2 },
+];
+
+const tabsForSource = [
+  { title: 'FEEDS', key: 'feed', index: 0 },
+  { title: 'NOTICE BOARD & EVENTS', key: 'events', index: 1 },
+  { title: 'PAGES', key: 'page', index: 2 },
 ];

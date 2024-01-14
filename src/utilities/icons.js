@@ -25,6 +25,7 @@ export const icons = {
   emptyBox: require('../assets/icons/empty-box.png'),
   textEdit: require('../assets/icons/textEdit.png'),
   addImage: require('../assets/icons/addImage.png'),
+  schedule: require('../assets/icons/scheduled.png'),
 
   //todo:   sideBar Icons
 
@@ -61,7 +62,7 @@ export const icons = {
   trashFilled: () => { return (<Fontisto name="trash" color={colors.primary} size={17} />) },
   reply: () => { return (<Octicons name="reply" color={colors.primary} size={17} />) },
   upload: () => { return (<FontAwesome name="cloud-upload" color={colors.primary} size={25} />) },
-  clock: () => { return (<Octicons name="clock" color={colors.primary} size={17} />) },
+  clock: (color = colors.primary, size = 17) => { return (<Octicons name="clock" color={color} size={size} />) },
   minusCircle: () => { return (<Feather name="minus-circle" color={colors.primary} size={25} />) },
   plusCircle: () => { return (<Feather name="plus-circle" color={colors.primary} size={25} />) },
   back: (color = colors.white, size = 20) => { return (<MaterialIcons name="arrow-back" color={color} size={size} />) },
@@ -82,11 +83,14 @@ export const icons = {
   sent: (color = colors.white, size = 20) => { return (<Ionicons name="checkmark" color={color} size={size} />) },
   pound: (color = colors.white, size = 20) => { return (<MaterialIcons name="currency-pound" color={color} size={size} />) },
   calendar: (color = colors.white, size = 20) => { return (<Ionicons name="calendar-outline" color={color} size={size} />) },
+  calendarTick: (color = colors.white, size = 20) => { return (<MaterialCommunityIcons name="calendar-check" color={color} size={size} />) },
   heartUnfilled: (color = colors.white, size = 20) => { return (<MaterialCommunityIcons name="heart-outline" color={color} size={size} />) },
   heartFilled: (color = colors.white, size = 20) => { return (<MaterialCommunityIcons name="heart" color={color} size={size} />) },
   comment: (color = colors.white, size = 20) => { return (<MaterialCommunityIcons name="message-outline" color={color} size={size} />) },
   pin: (color = colors.primary, size = 17) => { return (<Octicons name="pin" color={color} size={size} />) },
   video: (color = colors.primary, size = 17) => { return (<Ionicons name="videocam" color={color} size={size} />) },
   code: (color = colors.primary, size = 17) => { return (<Ionicons name="code-slash" color={color} size={size} />) },
+  goto: (color = colors.primary, size = 17) => { return (<Ionicons name="open-outline" color={color} size={size} />) },
+
 
 }

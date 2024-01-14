@@ -6,7 +6,10 @@ const routes = {
   chatNavigator: "CHAT_NAVIGATOR",
   contactSupportNavigator: "CONTACT_SUPPORT_NAVIGATOR",
   dasboardNavigator: "MISSION_CONTROL_NAVIGATOR",
-  feedNavigator: "FEED_NAVIGATOR",
+  feedNavigator: "COSMOS_FEED_NAVIGATOR",
+  sourceFeedNavigator: "SOURCE_FEED_NAVIGATOR",
+  allSourcesFeedNavigator: "ALL_SOURCE_FEED_NAVIGATOR",
+  scheduledFeedNavigator: "SCHEDULED_FEED_NAVIGATOR",
 
 
   //! ///    Screens'
@@ -52,7 +55,10 @@ const routes = {
   missionControlfilterScreen: "MISSION_CONTROL_FILTER_SCREEN",
 
   //? Feed 
-  feedScreen: "FEED_SCREEN"
+  feedScreen: "COSMOS_FEED_SCREEN",
+  allSourceFeedScreen: "ALL_SOURCE_FEED_SCREEN",
+  sourceFeedScreen: "S)URCE_FEED_SCREEN",
+  scheduleFeedScreen: "SCHEDULED_FEED_SCREEN",
 }
 
 export default routes;

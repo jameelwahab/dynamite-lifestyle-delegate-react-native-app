@@ -10,7 +10,8 @@ const MyTouchableInput = ({
   value,
   onPress,
   icon = icons.down,
-  noSpace = false
+  noSpace = false,
+  view = null
 }) => {
   const [isFocused, setFocused] = useState(false)
   return (
@@ -19,20 +20,21 @@ const MyTouchableInput = ({
       style={{ marginBottom: noSpace ? 0 : 15 }}>
       <Text pointerEvents="none" style={[__MyInputStyles.labelText, isFocused ? __MyInputStyles.focusedLabelText : undefined]}>{label}</Text>
       <View pointerEvents="none" style={[__MyInputStyles.inputView, isFocused ? __MyInputStyles.focusedView : undefined]}>
-        <TextInput
-          pointerEvents="none"
-          onFocus={() => setFocused(true)}
-          onBlur={() => setFocused(false)}
-          style={[__MyInputStyles.input]}
-          value={value}
-          keyboardAppearance="dark"
-          selectionColor={colors.text}
-          autoCorrect={false}
-          placeholder={placeholder}
-          placeholderTextColor={colors.placeholder}
-          textAlignVertical={"center"}
-          editable={false}
-        />
+        {!!view ? view() :
+          <TextInput
+            pointerEvents="none"
+            onFocus={() => setFocused(true)}
+            onBlur={() => setFocused(false)}
+            style={[__MyInputStyles.input]}
+            value={value}
+            keyboardAppearance="dark"
+            selectionColor={colors.text}
+            autoCorrect={false}
+            placeholder={placeholder}
+            placeholderTextColor={colors.placeholder}
+            textAlignVertical={"center"}
+            editable={false}
+          />}
         <View style={{ paddingHorizontal: 10 }}>
           {icon()}
         </View>

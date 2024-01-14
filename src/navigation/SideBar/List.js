@@ -15,6 +15,7 @@ export const drawerMenuList = [
     component: StackMissionControl,
     icon: icons.sidebar.dashboard,
     params: {
+
     }
   },
   {
@@ -24,6 +25,7 @@ export const drawerMenuList = [
     component: StackFeed,
     icon: icons.sidebar.cosmos,
     params: {
+      feedFor: "the_cosmos"
     }
   },
   {
@@ -56,6 +58,40 @@ export const drawerMenuList = [
     params: {
     }
   },
+
+  {
+    value: "the_source_feed",
+    key: routes.sourceFeedNavigator,
+    collapsible: false,
+    component: StackFeed,
+    icon: icons.sidebar.handPromise,
+    params: {
+      feedFor: "the_source",
+    }
+  },
+
+  {
+    value: "all_source_feed",
+    key: routes.allSourcesFeedNavigator,
+    collapsible: false,
+    component: StackFeed,
+    icon: icons.sidebar.handPromise,
+    params: {
+      feedFor: "all_source"
+    }
+  },
+
+  {
+    value: "scheduled_feeds",
+    key: routes.scheduledFeedNavigator,
+    collapsible: false,
+    component: StackFeed,
+    icon: icons.sidebar.handPromise,
+    params: {
+      feedFor: "scheduled"
+    }
+  },
+
   {
     value: "support",
     collapsible: true,

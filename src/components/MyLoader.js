@@ -45,17 +45,24 @@ const MyLoader = ({
   }
 };
 
-const SimpleLoader = ({ size = 30 }) => {
+const SimpleLoader = ({ size = 30, withBackground }) => {
   return (
-    <LottieView
-      source={require("../assets/animations/loader1.json")}
-      style={{
-        height: size,
-        width: size,
-      }}
-      autoPlay
-      loop
-    />
+    <View style={[withBackground ? {
+      backgroundColor: colors.secondary,
+      borderRadius: 900,
+      alignItems: "center", justifyContent: "center"
+    } : {}]}>
+      <LottieView
+        source={require("../assets/animations/loader1.json")}
+        style={{
+          height: size,
+          width: size,
+        }}
+        autoPlay
+        loop
+      />
+    </View>
+
   )
 }
 

@@ -19,12 +19,19 @@ import Toast from 'react-native-toast-message'
 import { CREATE_FEED, FEED_DETAIL, UPDATE_FEED, UPLOAD_FEED_IMAGES } from '../../../DAL'
 import { tokens } from 'react-native-paper/lib/typescript/styles/themes/v3/tokens'
 import showToast from '../../../functions/showToast'
-import { S3_URL } from '../../../utilities/constants'
+import { S3_URL, dateTimeFormat } from '../../../utilities/constants'
 import LevelModal from './LevelModal'
 import MyTouchableInput from '../../../components/MyTouchableInput'
 import FeedTabs from '../FeedTabs'
+import Editor from '../../../components/Editor'
+import { TriangleColorPicker } from 'react-native-color-picker'
+import ColorModal from '../../../components/ColorModal'
+import DateTimePicker from 'react-native-modal-datetime-picker'
+import moment from 'moment'
+import { convertTimezone, convertTimezoneFrom } from '../../../functions/convertTime'
 
-const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, selectFeedlevel, feedLevel, tab }, ref) => {
+
+const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, selectFeedlevel, feedLevel, tab, isCosmos, isScheduledFeed, timezone }, ref) => {
   const lvlModalRef = useRef()
   const tablRef = useRef()
   const [loader, setLoader] = useState(false);
@@ -36,7 +43,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     visibility: false
   });
   const [postCategory, setPostCategory] = useState("general");
-  const [postCeatedFor, setPostCreatedFor] = useState(feedLevel != 'all' ? feedLevel : "delegate");
+  const [postCeatedFor, setPostCreatedFor] = useState(isCosmos ? feedLevel != 'all' ? feedLevel : "delegate" : PostCretedForSourceFeed[0].type);
   const [postType, setPostType] = useState("general");
   const [postText, setPostText] = useState("");
   const [images, setImages] = useState([]);
@@ -44,6 +51,24 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   const [embededCode, setEmbededCode] = useState("");
   const [editId, setEditId] = useState("");
   const [show, setShow] = useState(false)
+  const [isEventViewVisible, setEventViewVisiblity] = useState(false);
+  const [eventTitle, setEventTitle] = useState("");
+  const [eventBtnText, setEventBtnText] = useState("");
+  const [eventBtnLink, setEventBtnLink] = useState("");
+  const [eventBtnTextColor, setEventBtnTextColor] = useState(colors.white)
+  const [eventBtnColor, setEventBtnColor] = useState(colors.primary2);
+  const [colorModal, setColorModal] = useState({
+    visibility: false,
+    for: 0
+  });
+
+  const [dateModalVisible, setDateModalVisible] = useState(false);
+  const [timeModalVisibe, setTimeModalVisibe] = useState(false);
+  const [publishDate, setPublishDate] = useState(moment().format(dateTimeFormat.date));
+  const [publishTime, setPublishTime] = useState("12:00 AM");
+  // const [first, setfirst] = useState(second)
+
+
 
   useImperativeHandle(ref, () => {
     return {
@@ -53,7 +78,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   }, []);
 
   const selectItemForEdit = (item) => {
-    console.log(item, "item")
+    console.log(item, "item for edit");
     setEditId(item._id);
     setPostCategory(item?.feed_appear_by == "public" ? "general" : "win");
     setPostCreatedFor(item?.created_for_level_or_type == "both" ? "delegate" : item?.created_for_level_or_type);
@@ -63,6 +88,18 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     setVideoLink(item?.video_url);
     setEmbededCode(item?.embed_code)
     setPostModalVisibilty(true);
+    if (!!item?.event_info && Object.keys(item?.event_info).length > 0) {
+      setEventViewVisiblity(true);
+      setEventTitle(item?.event_info?.event_title)
+      setEventBtnText(item?.event_info?.button_text);
+      setEventBtnLink(item?.event_info?.button_link);
+      setEventBtnColor(item?.event_info?.button_background_color);
+      setEventBtnTextColor(item?.event_info?.button_text_color)
+    }
+    if (!!item?.schedule_date_time && !item?.is_publish) {
+      setPublishDate(moment(item?.schedule_date_time).tz(timezone.admin).format(dateTimeFormat.date));
+      setPublishTime(moment(item?.schedule_date_time).tz(timezone.admin).format(dateTimeFormat.time));
+    }
   }
 
 
@@ -85,7 +122,15 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     setImages("");
     setVideoLink("");
     setEmbededCode("");
-    setImages([])
+    setImages([]);
+    setEventViewVisiblity(false);
+    setEventTitle("")
+    setEventBtnText("");
+    setEventBtnLink("");
+    setEventBtnColor(colors.primary2);
+    setEventBtnTextColor(colors.white);
+    setPublishDate(moment().format(dateTimeFormat.date));
+    setPublishTime("12:00 AM");
   }
 
   const openOptionModal = (Modalfor) => {
@@ -97,7 +142,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
       })
     } else if (Modalfor == "createdFor") {
       setOption({
-        list: PostCretedFor,
+        list: isCosmos ? PostCretedFor : PostCretedForSourceFeed,
         visibility: true,
         type: Modalfor
       })
@@ -123,6 +168,22 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   }
 
   const addPostBtn = async () => {
+    if (postText.trim() == "" && images.length == 0 && embededCode.trim() == "" && videoLink.trim() == "") {
+      showToast({ body: "Please add data to be posted", title: "Alert", type: "info" });
+      return
+    } else if (isEventViewVisible) {
+      if (eventTitle.trim() == "") {
+        showToast({ body: "Please enter event title", title: "Alert", type: "info" });
+        return
+      } else if (eventBtnText.trim() == "") {
+        showToast({ body: "Please enter event button title", title: "Alert", type: "info" });
+        return
+      } else if (eventBtnLink.trim() == "") {
+        showToast({ body: "Please enter event button link", title: "Alert", type: "info" });
+        return
+      }
+    }
+
     setLoader(true);
     let uploadedImages = [];
     if (postType == "image" && images.length > 0) {
@@ -161,10 +222,25 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     fd.append("description", postText);
     fd.append("embed_code", postType == "embed_code" ? embededCode : "");
     fd.append("feed_images", postType == 'image' ? JSON.stringify(uploadedImages) : "[]");
-    fd.append("created_for_level_or_type", postCeatedFor != "consultant" ? "both" : "consultant");
+    fd.append("created_for_level_or_type", isCosmos ? postCeatedFor != "consultant" ? "both" : "consultant" : postCeatedFor);
+
+    if (isEventViewVisible) {
+      let eventObj = {
+        event_title: eventTitle,
+        button_text: eventBtnText.trim(),
+        button_link: eventBtnLink.trim(),
+        button_background_color: eventBtnColor,
+        button_text_color: eventBtnText,
+        is_event_info: true
+      }
+      fd.append("event_info", JSON.stringify(eventObj));
+    }
+    if (isScheduledFeed) {
+      fd.append("schedule_date_time", moment(publishDate, dateTimeFormat.date).format("YYYY-MM-DD") + " " + moment(publishTime, dateTimeFormat.time).format("HH:MM"))
+    }
     if (!(!!editId)) {
-      fd.append("is_publish", "true");
-      fd.append("feed_created_for", "delegate");
+      fd.append("is_publish", isScheduledFeed ? "false" : "true");
+      fd.append("feed_created_for", isCosmos ? "delegate" : "general");
     }
 
     if (!!editId) {
@@ -203,6 +279,32 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     }
   }
 
+  // const colorModal = () => {
+  //   return (
+  //     <Modal
+  //       isVisible={colorModalVisible}
+  //       onBackdropPress={() => setColorModalVisible(false)}
+  //       onBackButtonPress={() => setColorModalVisible(false)}
+  //       useNativeDriverForBackdrop={true}
+  //       animationIn={"zoomIn"}
+  //       animationOut={"zoomOut"}
+  //       animationInTiming={300}
+  //       animationOutTiming={300}
+  //       style={{ margin: 0 }}>
+  //       <View style={{ height: 400, borderRadius: 20, backgroundColor: colors.secondary }}>
+  //         <View style={{ height: 200, width: 200, }}>
+  //           <TriangleColorPicker
+  //             ref={r => { this.picker = r }}
+  //             hideSliders
+  //             hideControls
+  //             onColorSelected={color => alert(`Color selected: ${color}`)}
+  //             style={{ flex: 1 }}
+  //           />
+  //         </View>
+  //       </View>
+
+  //     </Modal>)
+  // }
 
 
   const Modal_addPost = () => {
@@ -216,9 +318,11 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
         hasBackdrop={false}
         animationInTiming={500}
         animationOutTiming={500}
+        // avoidKeyboard={true}
         style={{ margin: 0 }}>
         <SafeAreaView style={{ flex: 1 }} >
           <View pointerEvents={loader ? "none" : "auto"} style={__style.modalRootView}>
+
             <View style={__style.headingView}>
               <View style={__style.modalclosebtn} />
               <View style={__style.headingTextView}>
@@ -231,207 +335,304 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
               </TouchableOpacity>
             </View>
             <View style={[__style.divider, { marginTop: -1 }]} />
-            <View style={__style.postView}>
+            <ScrollView automaticallyAdjustKeyboardInsets={true} showsVerticalScrollIndicator={false}>
 
-              {/* //* Profile view with actions */}
+              <View style={__style.postView}>
 
-              <View style={[__style.inputRootView,]}>
-                <UserImage
-                  image={user?.image?.thumbnail_1}
-                  name={user?.first_name}
-                  size={45}
-                />
-                <View style={{ marginLeft: 10, flex: 1 }}>
-                  <MyText fontSize={16} type="bold">{user?.first_name + " " + user?.last_name}</MyText>
-                  <View style={__style.modalActionButtonRow}>
+                {/* //* Profile view with actions */}
 
-                    <TouchableOpacity
-                      onPress={() => openOptionModal("category")}
-                      style={__style.modalDropBtns}>
-                      <MyText style={{ textTransform: "capitalize" }}>
-                        {postCategory}</MyText>
-                      {icons.downwardArrow(17, colors.white)}
-                    </TouchableOpacity>
+                <View style={[__style.inputRootView,]}>
+                  <UserImage
+                    image={user?.image?.thumbnail_1}
+                    name={user?.first_name}
+                    size={45}
+                  />
+                  <View style={{ marginLeft: 10, flex: 1 }}>
+                    <MyText fontSize={16} type="bold">{user?.first_name + " " + user?.last_name}</MyText>
+                    <View style={__style.modalActionButtonRow}>
 
-                    <TouchableOpacity
-                      onPress={() => openOptionModal("createdFor")}
-                      style={__style.modalDropBtns}>
-                      <MyText style={{ textTransform: "capitalize" }}>
-                        {postCeatedFor}
-                      </MyText>
-                      {icons.downwardArrow(17, colors.white)}
-                    </TouchableOpacity>
-                    {!!!editId &&
-                      <View opacity={0.7}>
-                        <TouchableOpacity
-                          style={__style.modalDropBtns}>
-                          <MyText>Publish</MyText>
-                          {icons.downwardArrow(17, colors.white)}
-                        </TouchableOpacity>
-                      </View>}
+                      <TouchableOpacity
+                        onPress={() => openOptionModal("category")}
+                        style={__style.modalDropBtns}>
+                        <MyText style={{ textTransform: "capitalize" }}>
+                          {postCategory}</MyText>
+                        {icons.downwardArrow(17, colors.white)}
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                        onPress={() => openOptionModal("createdFor")}
+                        style={__style.modalDropBtns}>
+                        {isCosmos ?
+                          <MyText style={{ textTransform: "capitalize" }}>
+                            {postCeatedFor}
+                          </MyText> :
+                          <MyText >
+                            {PostCretedForSourceFeed.find(x => x.type == postCeatedFor)?.title}
+                          </MyText>}
+                        {icons.downwardArrow(17, colors.white)}
+                      </TouchableOpacity>
+                      {!!!editId &&
+                        <View opacity={0.7}>
+                          <TouchableOpacity
+                            style={__style.modalDropBtns}>
+                            <MyText>Publish</MyText>
+                            {icons.downwardArrow(17, colors.white)}
+                          </TouchableOpacity>
+                        </View>}
+                    </View>
                   </View>
                 </View>
-              </View>
 
 
 
 
-              {/*//*   Post Text     */}
+                {/*//*   Post Text     */}
 
-              <TextInput
-                style={__style.modalInput}
-                multiline={true}
-                autoCapitalize='none'
-                autoComplete="off"
-                textAlignVertical="top"
-                autoCorrect={false}
-                onChangeText={(text) => setPostText(text)}
-                value={postText}
-                placeholder="What's on your mind?"
-                placeholderTextColor={colors.lightText2}
-              />
+                <TextInput
+                  style={__style.modalInput}
+                  multiline={true}
+                  autoCapitalize='none'
+                  autoComplete="off"
+                  textAlignVertical="top"
+                  autoCorrect={false}
+                  onChangeText={(text) => setPostText(text)}
+                  value={postText}
+                  placeholder="What's on your mind?"
+                  placeholderTextColor={colors.lightText2}
+                />
 
 
-              {/*//*   Images List     */}
-              {postType == "image" &&
-                <View>
-                  <View style={{ flexDirection: "row", marginBottom: 5 }}>
-                    <ScrollView horizontal
-                      contentContainerStyle={{ paddingVertical: 10 }}
-                      indicatorStyle="white"
-                    >
-                      {images.map((image, index) => (
-                        <View>
-                          <MyImage
-                            source={{ uri: !!image.uri ? image.uri : S3_URL + image.thumbnail_1 }}
-                            style={{ width: ((utilities.screenWidth() - 40) / 4), aspectRatio: 1, borderRadius: 10, marginRight: 10, overflow: "hidden" }}
-                          />
-                          <TouchableOpacity
-                            onPress={() => {
-                              setImages((images) => images.filter((x, i) => i != index))
+                {/*//*   Schedule View    */}
+                {isScheduledFeed &&
+                  <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
+                    <View style={{ flex: 1 }}>
+                      <MyTouchableInput
+                        label='Publish Date (Europe/Dublin)*'
+                        value={publishDate}
+                        icon={() => icons.calendar(colors.white, 20)}
+                        onPress={() => setDateModalVisible(true)}
+                      />
+                    </View>
+                    <View style={{ flex: 1, marginLeft: 10 }}>
+                      <MyTouchableInput
+                        label='Publish Time*'
+                        value={publishTime}
+                        icon={() => icons.clock(colors.white, 20)}
+                        onPress={() => setTimeModalVisibe(true)}
+                      />
+                    </View>
+                  </View>}
 
-                            }}
-                            style={[__style.inputCrossBtn, { backgroundColor: colors.primary, right: 5, top: -8 }]}>
-                            {icons.crosss(colors.black, 15)}
-                          </TouchableOpacity>
-                        </View>
-                      ))}
-                    </ScrollView>
-                  </View>
 
-                  {/*//*   Image View     */}
 
+
+
+
+
+                {/*//*   Event View    */}
+                {isEventViewVisible && !isCosmos &&
                   <View>
-                    <Pressable
-                      onPress={() => setImageModalVisibilty(true)}
-                      style={__style.addPhotoView}>
-                      <MyText type='medium' color={colors.primary} >Add Photo</MyText>
-                      {icons.upload()}
-                    </Pressable>
+                    <Editor
+                      label='Event Title*'
+                      initialValue={eventTitle}
+                      onChange={(text) => setEventTitle(text)}
+                      backgroundColor={colors.secondaryVariant}
+                      height={120}
+                    />
+
+                    <View style={{ flexDirection: "row" }}>
+                      <View style={{ flex: 1 }}>
+                        <MyInputs
+                          label='Button Text*'
+                          value={eventBtnText}
+                          onChangeText={(text) => setEventBtnText(text)}
+                        />
+                      </View>
+                      <View style={{ flex: 1, marginLeft: 10 }}>
+                        <MyInputs
+                          label='Button Link*'
+                          value={eventBtnLink}
+                          onChangeText={(text) => setEventBtnLink(text)}
+                        />
+                      </View>
+                    </View>
+
+
+                    <View style={{ flexDirection: "row" }}>
+                      <View style={{ flex: 1 }}>
+                        <MyTouchableInput
+                          onPress={() => setColorModal({ visibility: true, for: 1 })}
+                          label='Button Text Color*'
+                          view={() => (
+                            <View style={{ flex: 1, }}>
+                              <View style={[__style.eventColorView, { backgroundColor: eventBtnTextColor, }]} />
+                            </View>
+                          )}
+                        />
+                      </View>
+                      <View style={{ flex: 1, marginLeft: 10 }}>
+                        <MyTouchableInput
+                          onPress={() => setColorModal({ visibility: true, for: 2 })}
+                          label='Button Background Color*'
+                          view={() => (
+                            <View style={{ flex: 1, }}>
+                              <View style={[__style.eventColorView, { backgroundColor: eventBtnColor, }]} />
+                            </View>
+                          )}
+                        />
+                      </View>
+                    </View>
+
+                  </View>}
+
+
+                {/*//*   Images List     */}
+                {postType == "image" &&
+                  <View>
+                    <View style={{ flexDirection: "row", marginBottom: 5 }}>
+                      <ScrollView horizontal
+                        contentContainerStyle={{ paddingVertical: 10 }}
+                        indicatorStyle="white"
+                      >
+                        {images.map((image, index) => (
+                          <View>
+                            <MyImage
+                              source={{ uri: !!image.uri ? image.uri : S3_URL + image.thumbnail_1 }}
+                              style={{ width: ((utilities.screenWidth() - 40) / 4), aspectRatio: 1, borderRadius: 10, marginRight: 10, overflow: "hidden" }}
+                            />
+                            <TouchableOpacity
+                              onPress={() => {
+                                setImages((images) => images.filter((x, i) => i != index))
+
+                              }}
+                              style={[__style.inputCrossBtn, { backgroundColor: colors.primary, right: 5, top: -8 }]}>
+                              {icons.crosss(colors.black, 15)}
+                            </TouchableOpacity>
+                          </View>
+                        ))}
+                      </ScrollView>
+                    </View>
+
+                    {/*//*   Image View     */}
+
+                    <View>
+                      <Pressable
+                        onPress={() => setImageModalVisibilty(true)}
+                        style={__style.addPhotoView}>
+                        <MyText type='medium' color={colors.primary} >Add Photo</MyText>
+                        {icons.upload()}
+                      </Pressable>
+                      <TouchableOpacity
+                        onPress={() => setPostType("general")}
+                        style={[__style.inputCrossBtn, { top: -5, backgroundColor: colors.black }]}>
+                        {icons.crosss(colors.primary, 15)}
+                      </TouchableOpacity>
+                    </View>
+                  </View>}
+                {/* //*     Post Video url      */}
+
+
+                {postType == "video" &&
+                  <View >
+                    <TextInput
+                      style={__style.videoInput}
+                      autoCapitalize='none'
+                      autoComplete="off"
+                      autoCorrect={false}
+                      onChangeText={(text) => setVideoLink(text)}
+                      value={videoLink}
+                      placeholder="Video URL"
+                      placeholderTextColor={colors.lightText2}
+                    />
                     <TouchableOpacity
                       onPress={() => setPostType("general")}
-                      style={[__style.inputCrossBtn, { top: -5, backgroundColor: colors.black }]}>
-                      {icons.crosss(colors.primary, 15)}
+                      style={__style.inputCrossBtn}>
+                      {icons.crosss(colors.white, 15)}
+                    </TouchableOpacity>
+                  </View>}
+
+
+                {/* //*     Post Embed Code      */}
+                {postType == "embed_code" &&
+                  <View >
+                    <TextInput
+                      style={[__style.videoInput, { height: 120 }]}
+                      multiline={true}
+                      textAlignVertical='top'
+                      autoCapitalize='none'
+                      autoComplete="off"
+                      autoCorrect={false}
+                      onChangeText={(text) => setEmbededCode(text)}
+                      value={embededCode}
+                      placeholder="Embeded Code"
+                      placeholderTextColor={colors.lightText2}
+                    />
+                    <TouchableOpacity
+                      onPress={() => setPostType("general")}
+                      style={__style.inputCrossBtn}>
+                      {icons.crosss(colors.white, 15)}
+                    </TouchableOpacity>
+                  </View>}
+
+
+                {/* //*     post type action buttonns  */}
+                <View style={__style.typeButtonRow}>
+                  <View style={{ flex: 1, flexDirection: "row" }}>
+                    <TouchableOpacity
+                      onPress={() => setPostType("image")}
+                      style={__style.typeButtonView}>
+                      {icons.camera(postType == "image" ? colors.primary : colors.white, 17)}
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      onPress={() => setPostType("video")}
+                      style={__style.typeButtonView}>
+                      {icons.video(postType == "video" ? colors.primary : colors.white, 17)}
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      onPress={() => setPostType("embed_code")}
+                      style={__style.typeButtonView}>
+                      {icons.code(postType == "embed_code" ? colors.primary : colors.white, 17)}
                     </TouchableOpacity>
                   </View>
-                </View>}
-              {/* //*     Post Video url      */}
-
-
-              {postType == "video" &&
-                <View >
-                  <TextInput
-                    style={__style.videoInput}
-                    autoCapitalize='none'
-                    autoComplete="off"
-                    autoCorrect={false}
-                    onChangeText={(text) => setVideoLink(text)}
-                    value={videoLink}
-                    placeholder="Video URL"
-                    placeholderTextColor={colors.lightText2}
-                  />
-                  <TouchableOpacity
-                    onPress={() => setPostType("general")}
-                    style={__style.inputCrossBtn}>
-                    {icons.crosss(colors.white, 15)}
-                  </TouchableOpacity>
-                </View>}
-
-
-              {/* //*     Post Embed Code      */}
-              {postType == "embed_code" &&
-                <View >
-                  <TextInput
-                    style={[__style.videoInput, { height: 120 }]}
-                    multiline={true}
-                    textAlignVertical='top'
-                    autoCapitalize='none'
-                    autoComplete="off"
-                    autoCorrect={false}
-                    onChangeText={(text) => setEmbededCode(text)}
-                    value={embededCode}
-                    placeholder="Embeded Code"
-                    placeholderTextColor={colors.lightText2}
-                  />
-                  <TouchableOpacity
-                    onPress={() => setPostType("general")}
-                    style={__style.inputCrossBtn}>
-                    {icons.crosss(colors.white, 15)}
-                  </TouchableOpacity>
-                </View>}
-
-
-              {/* //*     post type action buttonns  */}
-              <View style={__style.typeButtonRow}>
-
-                <TouchableOpacity
-                  onPress={() => setPostType("image")}
-                  style={__style.typeButtonView}>
-                  {icons.camera(postType == "image" ? colors.primary : colors.white, 17)}
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  onPress={() => setPostType("video")}
-                  style={__style.typeButtonView}>
-                  {icons.video(postType == "video" ? colors.primary : colors.white, 17)}
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  onPress={() => setPostType("embed_code")}
-                  style={__style.typeButtonView}>
-                  {icons.code(postType == "embed_code" ? colors.primary : colors.white, 17)}
-                </TouchableOpacity>
+                  {!isCosmos &&
+                    <TouchableOpacity
+                      onPress={() => setEventViewVisiblity((prev) => !prev)}
+                      style={__style.typeButtonView}>
+                      {icons.calendarTick(isEventViewVisible ? colors.primary : colors.white, 20)}
+                    </TouchableOpacity>
+                  }
+                </View>
 
 
               </View>
 
-
-            </View>
-
-            {/* //*    add post Button  */}
-            {!!editId ?
-              <View style={{ flexDirection: "row", marginVertical: 20, marginHorizontal: 20 }}>
-                <View style={{ flex: 1 }}>
+              {/* //*    add post Button  */}
+              {!!editId ?
+                <View style={{ flexDirection: "row", marginVertical: 20, marginHorizontal: 20 }}>
+                  <View style={{ flex: 1 }}>
+                    <MyButton
+                      isLoading={loader}
+                      onPress={addPostBtn}
+                      invert={true} title={"cancel"} />
+                  </View>
+                  <View style={{ flex: 1, marginLeft: 10 }}>
+                    <MyButton
+                      isLoading={loader}
+                      onPress={addPostBtn}
+                      invert={true} title={loader ? 'updating...' : 'Update'} />
+                  </View>
+                </View> :
+                <View style={{ marginVertical: 20, marginHorizontal: 20 }}>
                   <MyButton
                     isLoading={loader}
                     onPress={addPostBtn}
-                    invert={true} title={"cancel"} />
-                </View>
-                <View style={{ flex: 1, marginLeft: 10 }}>
-                  <MyButton
-                    isLoading={loader}
-                    onPress={addPostBtn}
-                    invert={true} title={loader ? 'updating...' : 'Update'} />
-                </View>
-              </View> :
-              <View style={{ marginVertical: 20, marginHorizontal: 20 }}>
-                <MyButton
-                  isLoading={loader}
-                  onPress={addPostBtn}
-                  invert={true} title={loader ? 'POSTING...' : 'POST'} />
-              </View>}
-
+                    invert={true} title={loader ? 'POSTING...' : 'POST'} />
+                </View>}
+            </ScrollView>
           </View>
+
           <ImageUploadModal
             closeModal={() => setImageModalVisibilty(false)}
             isVisible={isImageVisible}
@@ -445,10 +646,51 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
             closeModal={closeOptionModal}
             onSelected={onOptionSelected}
           />
+
+          <ColorModal
+            isVisible={colorModal.visibility}
+            clodeModal={() => setColorModal({ visibility: false, for: 0 })}
+            selectedColor={colorModal.for == 1 ? eventBtnTextColor : colorModal.for == 2 ? eventBtnColor : ""}
+            getColor={(color) => {
+              if (colorModal.for == 1) {
+                setEventBtnTextColor(color)
+              } else if (colorModal.for == 2) {
+                setEventBtnColor(color)
+              }
+            }}
+          />
+
+          <DateTimePicker
+            isVisible={dateModalVisible}
+            mode="date"
+            date={moment(publishDate, dateTimeFormat.date).toDate()}
+            textColor={colors.darkSecondary}
+            buttonTextColorIOS={colors.primary2}
+            onConfirm={(date) => {
+              setPublishDate(moment(date).format(dateTimeFormat.date))
+              setDateModalVisible(false)
+            }}
+            onCancel={() => setDateModalVisible(false)}
+          />
+
+          <DateTimePicker
+            isVisible={timeModalVisibe}
+            mode="time"
+            date={moment(publishTime, dateTimeFormat.time).toDate()}
+            textColor={colors.darkSecondary}
+            buttonTextColorIOS={colors.primary2}
+            minuteInterval={15}
+            onConfirm={(time) => {
+              setPublishTime(moment(time).format(dateTimeFormat.time))
+              setTimeModalVisibe(false)
+            }}
+            onCancel={() => setTimeModalVisibe(false)}
+          />
+
           {isPostModalVisible && <Toast />}
         </SafeAreaView>
         <SafeAreaView style={{ flex: 0, backgroundColor: colors.secondary }} ></SafeAreaView>
-      </Modal>
+      </Modal >
 
     )
   }
@@ -516,6 +758,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
             selectFeedlevel={selectFeedlevel}
             feedLevel={feedLevel}
             ref={lvlModalRef}
+            isCosmos={isCosmos}
           />
         </View>}
     </View>
@@ -547,6 +790,26 @@ const PostCretedFor = [
   },
 ]
 
+
+const PostCretedForSourceFeed = [
+  {
+    title: "Dynamite",
+    type: "dynamite"
+  },
+  {
+    title: "PTA",
+    type: "pta"
+  },
+  {
+    title: "Elite",
+    type: "elite"
+  },
+  {
+    title: "Mastery",
+    type: "mastery"
+  },
+]
+
 const __style = StyleSheet.create({
   lvlbtnView: { flexDirection: "row", borderWidth: 1, borderColor: colors.lightText, height: 45, borderRadius: 10, marginTop: 10, alignItems: "center", paddingHorizontal: 10, justifyContent: "space-between" },
   levlBtnLabel: { backgroundColor: colors.darkSecondary, alignSelf: "flex-start", paddingHorizontal: 5, position: "absolute", top: -8, left: 5 },
@@ -569,6 +832,9 @@ const __style = StyleSheet.create({
     marginLeft: 10,
     flex: 1,
     borderRadius: 30
+  },
+  eventColorView: {
+    height: "70%", width: "90%", alignSelf: "center", borderRadius: 5
   },
   divider: {
     height: 1,
