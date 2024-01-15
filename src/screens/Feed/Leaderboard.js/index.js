@@ -8,7 +8,7 @@ import copyText from '../../../functions/copyText'
 import { websiteBaseUrl } from '../../../utilities/constants'
 import openUrl from '../../../functions/openUrl'
 
-const Leaderboard = ({ monthlyCounts, weeklyCounts, pages, isCosmos, user }) => {
+const Leaderboard = ({ monthlyCounts, weeklyCounts, pages, isCosmos, user, affiliateMember }) => {
   console.log(user, "user")
   const userCountsView = (item, index) => {
     return (
@@ -34,12 +34,12 @@ const Leaderboard = ({ monthlyCounts, weeklyCounts, pages, isCosmos, user }) => 
           <MyText fontSize={16} >{item?.sale_page_title}</MyText>
         </View>
         <TouchableOpacity
-          onPress={() => openUrl(websiteBaseUrl + item?.sale_page_title_slug)}
+          onPress={() => openUrl(websiteBaseUrl + item?.sale_page_title_slug + "/" + affiliateMember?.affiliate_url_name)}
           style={__styles.btn}>
           {icons.goto(colors.primary, 20)}
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={() => copyText(websiteBaseUrl + item?.sale_page_title_slug, "Preview Url copied to clipboard")}
+          onPress={() => copyText(websiteBaseUrl + item?.sale_page_title_slug + "/" + affiliateMember?.affiliate_url_name, "Preview Url copied to clipboard")}
           style={__styles.btn}>
           {icons.copyOulined(20, colors.primary)}
         </TouchableOpacity>

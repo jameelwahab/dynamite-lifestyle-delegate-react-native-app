@@ -388,9 +388,13 @@ const MessageList = ({ navigation, route }) => {
   }
 
   const onBackPress = () => {
-    navigation.navigate(routes.chatList, {
-      refresh: isNewChat
-    })
+    if (!!route?.params?.canGoBack) {
+      navigation.goBack()
+    } else {
+      navigation.navigate(routes.chatList, {
+        refresh: isNewChat
+      })
+    }
   }
 
   return (

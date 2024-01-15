@@ -25,7 +25,7 @@ const StackChat = () => {
         {/*//? Default Screens End */}
 
         <ChatStack.Screen name={routes.chatList} component={ChatList} />
-        <ChatStack.Screen name={routes.chatMessageList} component={MessageList} />
+        {/* <ChatStack.Screen name={routes.chatMessageList} component={MessageList} /> */}
         <ChatStack.Screen name={routes.startNewChat} component={StartNewChat} />
 
       </ChatStack.Navigator>

@@ -16,8 +16,7 @@ import ResponsiveImage2 from '../../../components/ResponsiveImage2'
 import utilities from '../../../utilities'
 import openUrl from '../../../functions/openUrl'
 
-function FeedView({ item, index, user, token, timezone, settings, openComments, showLikes, openOptions, onLikebtnPress, isCosmos, sourceLevelIcons,isScheduledFeed }) {
-  console.log(item?.feed_created_for == "delegate", "is-delegate")
+function FeedView({ item, index, user, token, timezone, settings, openComments, showLikes, openOptions, onLikebtnPress, isCosmos, sourceLevelIcons, isScheduledFeed }) {
   const profileView = () => (
     <View style={__style.profileView}>
       <UserImage
@@ -41,20 +40,21 @@ function FeedView({ item, index, user, token, timezone, settings, openComments, 
         </View>}
       <View >
         <MyImage
-        indicatorProps={{color: colors.secondaryVariant}}
+          indicatorProps={{ color: colors.secondaryVariant }}
           source={{
-          uri:
-            isCosmos || isScheduledFeed ?
-              item?.created_for_level_or_type == "delegate" ?
-                S3_URL + settings?.delegate_feed_icon :
-                S3_URL + settings?.consultant_feed_icon
-              :
-              S3_URL + sourceLevelIcons?.[`${item?.created_for_level_or_type}_badge`]
-        }}
+            uri:
+              isCosmos || isScheduledFeed ?
+                item?.created_for_level_or_type == "delegate" ?
+                  S3_URL + settings?.delegate_feed_icon :
+                  S3_URL + settings?.consultant_feed_icon
+                :
+                S3_URL + sourceLevelIcons?.[`${item?.created_for_level_or_type}_badge`]
+          }}
           style={__style.feedTypeIcon}
         />
       </View>
-      {user?._id == item?.action_info?.action_id &&
+      {(((isCosmos || isScheduledFeed) && user?._id == item?.action_info?.action_id) ||
+        (!isCosmos && !isScheduledFeed)) &&
         <TouchableOpacity
           onPress={() => openOptions(item)}
           style={__style.profileTypeIconView}>
@@ -90,6 +90,7 @@ function FeedView({ item, index, user, token, timezone, settings, openComments, 
           />
           {item.feed_type == "live" && (
             <View style={__style.streamingStatusView} >
+              <View style={[{ backgroundColor: item?.is_live_streaming ? colors.delete : colors.lightText, }, __style.liveSteamStatus]} />
               <MyText type='bold' color={colors.white} fontSize={12}  >
                 {item?.is_live_streaming ? "Live" : "Offline"}</MyText>
             </View>
@@ -130,7 +131,6 @@ function FeedView({ item, index, user, token, timezone, settings, openComments, 
 
   const statsView = () => (
     <View style={__style.statView}>
-
       {!!item?.like_count > 0 ?
         <TouchableOpacity
           onPress={() => showLikes(item?._id)}
@@ -252,6 +252,10 @@ const __style = StyleSheet.create({
     flex: 1,
     minWidth: 50
   },
+  liveSteamStatus: {
+    borderRadius: 999, height: 10, width: 10,
+    marginRight: 5
+  },
   streamingStatusView: {
     borderRadius: 15,
     borderWidth: 1,
@@ -261,7 +265,9 @@ const __style = StyleSheet.create({
     top: 5,
     left: 5,
     paddingVertical: 3,
-    backgroundColor: colors.secondary
+    backgroundColor: colors.secondary,
+    flexDirection: "row",
+    alignItems: "center",
   },
   profileNameView: {
     marginLeft: 10,

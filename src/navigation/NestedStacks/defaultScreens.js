@@ -1,3 +1,4 @@
+import MessageList from "../../screens/Chat/MessageList.js";
 import ChangePassword from "../../screens/Profile/ChangePassword";
 import EditProfile from "../../screens/Profile/EditProfile";
 import OtherSettings from "../../screens/Settings/OtherSettings";
@@ -26,6 +27,10 @@ export const defaultScreens = [
   {
     name: routes.reminderSettings,
     component: ReminderSettings
+  },
+  {
+    name: routes.chatMessageList,
+    component: MessageList
   }
-  
+
 ]

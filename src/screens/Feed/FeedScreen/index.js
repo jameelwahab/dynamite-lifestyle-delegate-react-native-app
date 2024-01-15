@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import RootView from '../../../components/RootView'
 import MyText from '../../../components/MyText'
 import MyLoader, { SimpleLoader } from '../../../components/MyLoader'
-import { GET_FEED_LIST, GET_COMMENT_LIST, GET_LIKE_LIST, GET_COMMENT_LIKES_LIST, FEED_ACTIONS, DELETE_FEED_POST, FEED_LIKE_ACTIONS, GET_FEED_EXTRA_DATA } from '../../../DAL'
+import { GET_FEED_LIST, GET_COMMENT_LIST, GET_LIKE_LIST, GET_COMMENT_LIKES_LIST, FEED_ACTIONS, DELETE_FEED_POST, FEED_LIKE_ACTIONS, GET_FEED_EXTRA_DATA, IS_CHAT_EXIST } from '../../../DAL'
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../../redux/reducers/userSlice'
 import FeedView from './FeedView'
@@ -22,6 +22,8 @@ import FeedTabs from '../FeedTabs'
 import FeedEvents from '../FeedEvents'
 import Leaderboard from '../Leaderboard.js'
 import EmptyView from '../../../components/EmptyView'
+import { colors } from '../../../utilities/colors'
+import routes from '../../../navigation/routes'
 
 
 
@@ -48,6 +50,7 @@ const FeedScreen = ({ navigation, route }) => {
   const { feedFor } = route?.params;
   const isCosmos = feedFor == "the_cosmos";
   const isScheduledFeed = feedFor == "scheduled";
+  const isAllSourceFeed = feedFor == "all_source";
   const { token, user } = useSelector(selectUser);
   const { socket } = useSelector(selectSocket);
   const timezone = useSelector(selectTimeZone);
@@ -55,7 +58,10 @@ const FeedScreen = ({ navigation, route }) => {
   const [feed, setFeed] = useState([]);
   const [feedData, setFeedData] = useState(null);
   const [loader, setLoader] = useState(true);
-  const [feedLevel, setFeedLevel] = useState('all');
+  const [feedLevel, setFeedLevel] = useState(
+    isCosmos ? user?.team_type == "both" ? 'all' : user?.team_type :
+      isAllSourceFeed ? "all" : "dynamite"
+  );
   const [feedFooterLoader, setFeedFooterLoader] = useState(false);
   const [likesFooterLoader, setLikesFooterLoader] = useState(false);
   const [commentsFooterLoader, setCommentsFooterLoader] = useState(false);
@@ -510,6 +516,43 @@ const FeedScreen = ({ navigation, route }) => {
       setTimeout(() => {
         addPostRef?.current?.selectItemForEdit(item)
       }, 500);
+    } else if (selectedOpt?.type == "message") {
+      onChatScreen(item?.action_info?.action_id)
+    }
+  }
+
+  const onChatScreen = async (memberId) => {
+    let res = await IS_CHAT_EXIST({ token, navigation, memberId })
+    if (res.code == 200) {
+      if (res.is_chat_exist) {
+        let member = res.chat.member.find(x => x._id != user?._id)
+        navigation.navigate(routes.chatMessageList, {
+          isOnline: member?.is_online,
+          memberId: member?._id,
+          firstName: member?.first_name,
+          lastName: member?.last_name,
+          lastSeen: "",
+          profileImage: !!member?.profile_image ? member?.profile_image : "",
+          chatId: res?.chat?._id,
+          canGoBack: true,
+          resetCountToZero: () => { },
+          refresh: () => { },
+        })
+      } else {
+        let member = res.user_info;
+        navigation.navigate(routes.chatMessageList, {
+          isOnline: member?.is_online,
+          memberId: member?._id,
+          firstName: member?.first_name,
+          lastName: member?.last_name,
+          lastSeen: !!member?.last_login_activity ? member?.last_login_activity : "",
+          profileImage: !!member?.member ? member?.member : "",
+          chatId: "",
+          canGoBack: true,
+          resetCountToZero: () => { },
+          refresh: () => { },
+        })
+      }
     }
   }
 
@@ -539,12 +582,24 @@ const FeedScreen = ({ navigation, route }) => {
   }
 
   const filterTheOptions = (options) => {
+    let newList = [...options];
     if (feedOptionModal?.selectedItem?.is_feature)
-      return options.slice().filter(x => x.type != "pin");
+      newList = newList.slice().filter(x => x.type != "pin");
     else if (!feedOptionModal?.selectedItem?.is_feature)
-      return options.slice().filter(x => x.type != "unpin");
-    else return options
+      newList = newList.slice().filter(x => x.type != "unpin");
+    else
+      newList = options;
 
+    if (!isCosmos || !isScheduledFeed) {
+      newList = newList.slice().filter(x => {
+        if (x.type == "message" && user?._id == feedOptionModal?.selectedItem?.action_info?.action_id) {
+          return false
+        }
+        return true
+      });
+    }
+
+    return newList
   }
 
   const onLikebtnPress = async (feedId, isLike) => {
@@ -584,6 +639,7 @@ const FeedScreen = ({ navigation, route }) => {
           monthlyCounts={feedData?.consultant_list_by_monthly_count}
           weeklyCounts={feedData?.consultant_list_by_weekly_count}
           isCosmos={isCosmos}
+          affiliateMember={feedData?.affiliate_member}
           pages={feedData?.sale_pages}
           user={user}
         />)
@@ -751,5 +807,10 @@ const feedOptionList = [{
   icon: icons.pin,
   title: "Unpin",
   type: "unpin"
+},
+{
+  icon: () => icons.send(colors.primary, 17),
+  title: "Message",
+  type: "message"
 },
 ]
