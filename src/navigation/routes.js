@@ -10,6 +10,7 @@ const routes = {
   sourceFeedNavigator: "SOURCE_FEED_NAVIGATOR",
   allSourcesFeedNavigator: "ALL_SOURCE_FEED_NAVIGATOR",
   scheduledFeedNavigator: "SCHEDULED_FEED_NAVIGATOR",
+  allMemberNavigator: "ALL_MEMBER_NAVIGATOR",
 
 
   //! ///    Screens'
@@ -57,8 +58,13 @@ const routes = {
   //? Feed 
   feedScreen: "COSMOS_FEED_SCREEN",
   allSourceFeedScreen: "ALL_SOURCE_FEED_SCREEN",
-  sourceFeedScreen: "S)URCE_FEED_SCREEN",
+  sourceFeedScreen: "SOURCE_FEED_SCREEN",
   scheduleFeedScreen: "SCHEDULED_FEED_SCREEN",
+
+  //? Members
+  allMemberScreens: "ALL_MEMBER_SCREEN"
+
+
 }
 
 export default routes;

@@ -34,6 +34,7 @@ export const icons = {
     help: require("../assets/sidebarIcons/help.png"),
     dashboard: require("../assets/sidebarIcons/dashbaord.webp"),
     cosmos: require("../assets/sidebarIcons/cosmos.webp"),
+    member: require("../assets/sidebarIcons/member.webp"),
   },
 
   user: () => { return (<FontAwesome6 name="user-large" color={colors.primary} size={17} />) },
@@ -91,6 +92,7 @@ export const icons = {
   video: (color = colors.primary, size = 17) => { return (<Ionicons name="videocam" color={color} size={size} />) },
   code: (color = colors.primary, size = 17) => { return (<Ionicons name="code-slash" color={color} size={size} />) },
   goto: (color = colors.primary, size = 17) => { return (<Ionicons name="open-outline" color={color} size={size} />) },
+  message: (color = colors.primary, size = 17) => { return (<MaterialIcons name="message" color={color} size={size} />) },
 
 
 }

@@ -6,6 +6,7 @@ import StackInternalTickets from "../NestedStacks/StackInternalTicket";
 import StackContactSupport from "../NestedStacks/StackContactSupport";
 import StackMissionControl from "../NestedStacks/SackMisisonControl";
 import StackFeed from "../NestedStacks/StackFeed";
+import StackAllMember from "../NestedStacks/StackAllMembers";
 
 export const drawerMenuList = [
   {
@@ -57,6 +58,22 @@ export const drawerMenuList = [
     icon: icons.sidebar.handPromise,
     params: {
     }
+  },
+
+  {
+    value: "members",
+    collapsible: true,
+    key: null,
+    icon: icons.sidebar.member,
+    nestedmenu: [
+      {
+        value: "all_member_list",
+        key: routes.allMemberNavigator,
+        component: StackAllMember,
+        icon: icons.sidebar.member,
+        params: {}
+      },
+    ]
   },
 
   {

@@ -45,6 +45,9 @@ const Splash = ({ navigation }) => {
   }
 
   const makeArrayOfSidebar = (list, user) => {
+    list.forEach(x => {
+      console.log([x.option_label, x.option_value])
+    })
     let newArray = [];
     newArray.push({ ...drawerMenuList[0], title: "Mission Control" });
     drawerMenuList.forEach((item) => {
