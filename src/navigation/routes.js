@@ -62,7 +62,8 @@ const routes = {
   scheduleFeedScreen: "SCHEDULED_FEED_SCREEN",
 
   //? Members
-  allMemberScreens: "ALL_MEMBER_SCREEN"
+  allMemberScreens: "ALL_MEMBER_SCREEN",
+  memberDetails: "MEMBER_DETAIL_SCREEN",
 
 
 }

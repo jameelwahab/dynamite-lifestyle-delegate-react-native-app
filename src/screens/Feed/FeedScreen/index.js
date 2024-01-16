@@ -228,20 +228,47 @@ const FeedScreen = ({ navigation, route }) => {
   // !  SOCKET AND its fcuntions /////////////////
 
   const updateComments = (data) => {
-    console.log("updateComments", data, commentVar);
+    console.log("updateComments", data);
     if (data?.feed_id == commentVar?.id) {
-      console.log("updateComments", data);
       if (data?.action == "add_comment") {
+
         setComments((obj) => ({
           ...obj,
           list: [data?.action_response?.comment, ...obj.list]
         }))
+        setFeed((list) => {
+          let index = list.findIndex(item => item._id == data?.action_response?.feed?._id);
+          if (index > -1) {
+            list[index] = { ...list[index], comment_count: data?.action_response?.feed?.comment_count };
+          }
+          return [...list]
+        })
       } else if (data?.action == "delete_comment") {
         setComments((obj) => ({
           ...obj,
           list: [...obj.list.slice("").filter(x => x._id != data?.comment)]
         }))
-      } else if (data?.action == "edit_comment" || data?.action == "delete_comment_reply") {
+        setFeed((list) => {
+          let index = list.findIndex(item => item._id == data?.action_response?.feed?._id);
+          if (index > -1) {
+            list[index] = { ...list[index], comment_count: data?.action_response?.feed?.comment_count };
+          }
+          return [...list]
+        })
+      } else if (data?.action == "edit_comment") {
+        setComments((obj) => {
+          let eeditedComment = data?.action_response?.comment;
+          let nList = [...obj.list];
+          let index = nList.findIndex(x => x._id == eeditedComment?._id);
+          if (index > -1) {
+            nList.splice(index, 1, { ...nList[index], message: eeditedComment?.message });
+          }
+          return {
+            ...obj,
+            list: [...nList]
+          }
+        })
+      } else if (data?.action == "delete_comment_reply") {
 
         setComments((obj) => {
           let eeditedComment = data?.action_response?.comment;
@@ -255,8 +282,16 @@ const FeedScreen = ({ navigation, route }) => {
             list: [...nList]
           }
         })
+
+        setFeed((list) => {
+          let index = list.findIndex(item => item._id == data?.action_response?.feed?._id);
+          if (index > -1) {
+            list[index] = { ...list[index], comment_count: data?.action_response?.feed?.comment_count };
+          }
+          return [...list]
+        })
+
       } else if (data?.action == "add_comment_reply") {
-        console.log("updateComments 23", "add_comment_reply")
         setComments((obj) => {
           let newChildComment = { ...data?.action_response?.comment, parent_comment: data?.action_response?.parent_comment }
           let pId = data?.action_response?.parent_comment
@@ -270,6 +305,14 @@ const FeedScreen = ({ navigation, route }) => {
             ...obj,
             list: nList
           }
+        })
+
+        setFeed((list) => {
+          let index = list.findIndex(item => item._id == data?.action_response?.feed?._id);
+          if (index > -1) {
+            list[index] = { ...list[index], comment_count: data?.action_response?.feed?.comment_count };
+          }
+          return [...list]
         })
       } else if (data?.action == "edit_comment_reply") {
         setComments((obj) => {
@@ -292,7 +335,6 @@ const FeedScreen = ({ navigation, route }) => {
           }
         })
       } else if (data?.action == "commentunlike" || data?.action == "commentlike") {
-        console.log("updateComments 23", "add_comment_reply")
         setComments((obj) => {
           let editedComment = data?.action_response;
           let nList = [...obj.list];
@@ -332,17 +374,13 @@ const FeedScreen = ({ navigation, route }) => {
   }
 
   const socketReceiverAction = (data) => {
-    console.log("socketReceiverAction", data);
+    console.log("%csocketReceiverAction", 'background:#624B2D; color: #FFF', data);
     if (data?.action == "feedlike" || data?.action == "feedunlike") {
       updateFeedItemsSpecificField(data?.feed_id, {
         is_liked: data?.action_response?.is_liked,
         like_count: data?.action_response?.like_count,
         top_liked_user: data?.action_response?.top_liked_user
       })
-    } else if (data?.action == "add_comment") {
-      updateFeedCommentCount(data?.feed_id, +1);
-    } else if (data?.action == "delete_comment") {
-      updateFeedCommentCount(data?.feed_id, -1);
     }
 
     if (data?.action.includes("comment")) {
@@ -609,11 +647,13 @@ const FeedScreen = ({ navigation, route }) => {
     updateFeedItemsSpecificField(feedId, { is_liked: isLike ? false : true });
     let res = await FEED_LIKE_ACTIONS({ token, navigation, formdata: fd });
     if (res.code == 200) {
-      updateFeedItemsSpecificField(feedId, {
-        is_liked: res?.action_response?.is_liked,
-        top_liked_user: res?.action_response?.top_liked_user,
-        like_count: res?.action_response?.like_count
-      });
+      // updateFeedItemsSpecificField(feedId, {
+      //   is_liked: res?.action_response?.is_liked,
+      //   top_liked_user: res?.action_response?.top_liked_user,
+      //   like_count: res?.action_response?.like_count
+      // });
+    } else {
+      updateFeedItemsSpecificField(feedId, { is_liked: isLike });
     }
   }
 
@@ -706,7 +746,7 @@ const FeedScreen = ({ navigation, route }) => {
           // onViewableItemsChanged={(e) => console.log("onViewableItemsChanged", e)}
           showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item?._id}
-          ListHeaderComponent={headerView()}
+          ListHeaderComponent={!loader && headerView()}
           ListEmptyComponent={!loader && tab == 0 && <EmptyView label={"Posts not found"} />}
           onEndReached={() => {
             console.log("onEndReached", feedVar)

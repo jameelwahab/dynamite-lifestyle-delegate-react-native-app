@@ -49,12 +49,10 @@ const App = () => {
   return (
     <View style={{flex: 1, backgroundColor: colors.darkSecondary}}>
       <Provider store={store}>
-        <PaperProvider>
-          <NavigationContainer>
-            <AppStack />
-            <Toast config={toastConfig} />
-          </NavigationContainer>
-        </PaperProvider>
+        <NavigationContainer>
+          <AppStack />
+          <Toast config={toastConfig} />
+        </NavigationContainer>
       </Provider>
     </View>
   );

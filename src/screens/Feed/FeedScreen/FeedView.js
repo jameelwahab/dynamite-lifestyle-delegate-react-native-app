@@ -119,7 +119,7 @@ function FeedView({ item, index, user, token, timezone, settings, openComments, 
             style={[__style.eventBtnView, { backgroundColor: item?.event_info?.button_background_color, }]}>
             <MyText
               color={item?.event_info?.button_text_color}
-              type='light'
+              type='medium'
               style={{ paddingHorizontal: 10, }}
             >{item?.event_info?.button_text}</MyText>
           </TouchableOpacity>

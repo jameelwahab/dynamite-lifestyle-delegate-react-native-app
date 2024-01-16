@@ -9,14 +9,14 @@ const CollapsibleText = ({ style, children }) => {
 
   if (Platform.OS == "android") {
     return (
-      <MyText fontSize={13} dataDetectorType="all" userSelect={"all"} selectable={true} style={style}>
+      <MyText  fontSize={13} dataDetectorType="all" userSelect={"all"} selectable={true} style={style}>
         <MyText >
-          {showFull ? children : children.slice(0, 150) + "..."}
+          {children.length < 150 ? children : showFull ? children : children.slice(0, 150) + "..."}
         </MyText>
         {children.length > 150 && (
           <MyText
             onPress={() => setShowFull(!showFull)}
-            style={{ color: colors.golden, fontSize: 16, includeFontPadding: false }} >
+            style={{ color: colors.primary, fontSize: 14, includeFontPadding: false, fontFamily: fonts.medium, marginLeft: -5 }} >
             {showFull ? " See Less" : " See More"}
           </MyText>
         )}

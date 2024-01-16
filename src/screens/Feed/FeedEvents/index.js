@@ -15,19 +15,21 @@ const FeedEvents = ({ upcomingEvents, currentEvent, noticeboard }) => {
 
   const eventView = (item, index) => {
     return (
-      <View style={{}}>
-        {index != 0 && <View style={__styles.divider} />}
-        <MyText >{item?.title}</MyText>
+      <View style={{backgroundColor:colors.secondary,borderRadius:10,padding:10,marginTop:10}}>
+        {/* {index != 0 && <View style={__styles.divider} />} */}
+        
         <View style={__styles.eventImageView}>
           <ResponsiveImage
             uri={S3_URL + item?.images?.thumbnail_1}
+            style
           />
         </View>
         <View style={__styles.eventDescView}>
+        <MyText fontSize={16} type='medium' >{item?.title}</MyText>
           <MyWebview html={item?.description} fullWidth />
         </View>
         {!!item?.button_text &&
-          <View style={{ alignItems: "center" }}>
+          <View style={{ alignItems: "center",marginTop:10 }}>
             <MyButton
               title={item?.button_text}
               textStyle={{ color: colors.black, }}
@@ -45,15 +47,17 @@ const FeedEvents = ({ upcomingEvents, currentEvent, noticeboard }) => {
       {currentEvent.length > 0 &&
         <View style={__styles.noticeboardView}>
           <View style={__styles.eventHeadingView}>
-            <MyText type='medium' fontSize={16} >Current Events</MyText>
+            <MyText type='bold' color={colors.primary} fontSize={18} >Current Events</MyText>
           </View>
           {currentEvent.map(eventView)}
         </View>}
 
+        
+
       {upcomingEvents.length > 0 &&
         <View style={__styles.noticeboardView}>
           <View style={__styles.eventHeadingView}>
-            <MyText type='medium' fontSize={16} >Upcoming Events</MyText>
+            <MyText type='bold' color={colors.primary} fontSize={18} >Upcoming Events</MyText>
           </View>
           {upcomingEvents.map(eventView)}
         </View>}
@@ -65,15 +69,18 @@ export default FeedEvents;
 
 const __styles = StyleSheet.create({
   noticeboardView: {
-    backgroundColor: colors.secondary,
+    // backgroundColor: colors.secondary,
     borderRadius: 10,
-    padding: 10,
+    // padding: 10,
     marginTop: 10
   },
   divider: {
     height: 1, width: "70%", alignSelf: "center", backgroundColor: colors.border, marginVertical: 30
   },
-  eventHeadingView: { marginBottom: 20 },
-  eventImageView: { marginTop: 5, alignItems: "center" },
-  eventDescView: { marginTop: 5, }
+  eventHeadingView: {  },
+  eventImageView: { 
+    // marginTop: 10,
+     alignItems: "center",
+ },
+  eventDescView: { marginTop: 10, }
 })

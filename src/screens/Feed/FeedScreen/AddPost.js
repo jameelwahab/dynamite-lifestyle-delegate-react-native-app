@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, TextInput, Pressable, ScrollView } from 'react-native'
-import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react'
+import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import UserImage from '../../../components/UserImage'
 import Modal from 'react-native-modal'
 import { colors } from '../../../utilities/colors'
@@ -29,6 +29,9 @@ import ColorModal from '../../../components/ColorModal'
 import DateTimePicker from 'react-native-modal-datetime-picker'
 import moment from 'moment'
 import { convertTimezone, convertTimezoneFrom } from '../../../functions/convertTime'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import MyWebview from '../../../components/MyWebview'
+import openUrl from '../../../functions/openUrl'
 
 
 const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, selectFeedlevel, feedLevel, tab, isCosmos, isScheduledFeed, timezone }, ref) => {
@@ -51,22 +54,20 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   const [embededCode, setEmbededCode] = useState("");
   const [editId, setEditId] = useState("");
   const [show, setShow] = useState(false)
-  const [isEventViewVisible, setEventViewVisiblity] = useState(false);
+  const [isEventViewComplete, setEventComplete] = useState(false);
   const [eventTitle, setEventTitle] = useState("");
   const [eventBtnText, setEventBtnText] = useState("");
   const [eventBtnLink, setEventBtnLink] = useState("");
   const [eventBtnTextColor, setEventBtnTextColor] = useState(colors.white)
   const [eventBtnColor, setEventBtnColor] = useState(colors.primary2);
-  const [colorModal, setColorModal] = useState({
-    visibility: false,
-    for: 0
-  });
+
+
 
   const [dateModalVisible, setDateModalVisible] = useState(false);
   const [timeModalVisibe, setTimeModalVisibe] = useState(false);
   const [publishDate, setPublishDate] = useState(moment().format(dateTimeFormat.date));
   const [publishTime, setPublishTime] = useState("12:00 AM");
-  // const [first, setfirst] = useState(second)
+  const [eventModalVisible, setEventModalVisible] = useState(false)
 
 
 
@@ -89,7 +90,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     setEmbededCode(item?.embed_code)
     setPostModalVisibilty(true);
     if (!!item?.event_info && Object.keys(item?.event_info).length > 0) {
-      setEventViewVisiblity(true);
+      setEventComplete(true);
       setEventTitle(item?.event_info?.event_title)
       setEventBtnText(item?.event_info?.button_text);
       setEventBtnLink(item?.event_info?.button_link);
@@ -123,7 +124,8 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     setVideoLink("");
     setEmbededCode("");
     setImages([]);
-    setEventViewVisiblity(false);
+    setEditId("");
+    setEventComplete(false);
     setEventTitle("")
     setEventBtnText("");
     setEventBtnLink("");
@@ -168,20 +170,24 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   }
 
   const addPostBtn = async () => {
+    // if (postType == "general" && ) {
+    //   showToast({ body: "Please add some text to be posted", title: "Alert", type: "info" });
+    //   return
+    // }
+    // else if (postType == "image") {
+    //   showToast({ body: "Please add data to be posted", title: "Alert", type: "info" });
+    //   return
+    // } else if (postType == "video") {
+    //   showToast({ body: "Please add data to be posted", title: "Alert", type: "info" });
+    //   return
+    // } else if (postType == "embed_code") {
+    //   showToast({ body: "Please add data to be posted", title: "Alert", type: "info" });
+    //   return
+    // }
+
     if (postText.trim() == "" && images.length == 0 && embededCode.trim() == "" && videoLink.trim() == "") {
       showToast({ body: "Please add data to be posted", title: "Alert", type: "info" });
       return
-    } else if (isEventViewVisible) {
-      if (eventTitle.trim() == "") {
-        showToast({ body: "Please enter event title", title: "Alert", type: "info" });
-        return
-      } else if (eventBtnText.trim() == "") {
-        showToast({ body: "Please enter event button title", title: "Alert", type: "info" });
-        return
-      } else if (eventBtnLink.trim() == "") {
-        showToast({ body: "Please enter event button link", title: "Alert", type: "info" });
-        return
-      }
     }
 
     setLoader(true);
@@ -224,13 +230,13 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     fd.append("feed_images", postType == 'image' ? JSON.stringify(uploadedImages) : "[]");
     fd.append("created_for_level_or_type", isCosmos ? postCeatedFor != "consultant" ? "both" : "consultant" : postCeatedFor);
 
-    if (isEventViewVisible) {
+    if (isEventViewComplete) {
       let eventObj = {
         event_title: eventTitle,
         button_text: eventBtnText.trim(),
         button_link: eventBtnLink.trim(),
         button_background_color: eventBtnColor,
-        button_text_color: eventBtnText,
+        button_text_color: eventBtnTextColor,
         is_event_info: true
       }
       fd.append("event_info", JSON.stringify(eventObj));
@@ -279,32 +285,189 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     }
   }
 
-  // const colorModal = () => {
-  //   return (
-  //     <Modal
-  //       isVisible={colorModalVisible}
-  //       onBackdropPress={() => setColorModalVisible(false)}
-  //       onBackButtonPress={() => setColorModalVisible(false)}
-  //       useNativeDriverForBackdrop={true}
-  //       animationIn={"zoomIn"}
-  //       animationOut={"zoomOut"}
-  //       animationInTiming={300}
-  //       animationOutTiming={300}
-  //       style={{ margin: 0 }}>
-  //       <View style={{ height: 400, borderRadius: 20, backgroundColor: colors.secondary }}>
-  //         <View style={{ height: 200, width: 200, }}>
-  //           <TriangleColorPicker
-  //             ref={r => { this.picker = r }}
-  //             hideSliders
-  //             hideControls
-  //             onColorSelected={color => alert(`Color selected: ${color}`)}
-  //             style={{ flex: 1 }}
-  //           />
-  //         </View>
-  //       </View>
 
-  //     </Modal>)
-  // }
+
+  const btn_cancelEvent = () => {
+
+    setEventTitle("")
+    setEventBtnText("");
+    setEventBtnLink("");
+    setEventBtnColor(colors.primary2);
+    setEventBtnTextColor(colors.white);
+    setEventComplete(false);
+    setEventModalVisible(false)
+  }
+
+
+
+  const EventModal = () => {
+    const [title, setTitle] = useState("");
+    const [btnText, setBtnText] = useState("");
+    const [link, setLink] = useState("");
+    const [textColor, setTextColor] = useState(colors.white)
+    const [btnColor, setBtnColor] = useState(colors.primary2);
+    const [colorModal, setColorModal] = useState({
+      visibility: false,
+      for: 0
+    });
+
+    useEffect(() => {
+      if (eventModalVisible) {
+        setTitle(eventTitle)
+        setBtnText(eventBtnText);
+        setLink(eventBtnLink);
+        setBtnColor(eventBtnColor);
+        setTextColor(eventBtnTextColor);
+      }
+    }, [eventModalVisible])
+
+    const btn_addEvent = () => {
+      if (title.trim() == "") {
+        showToast({ body: "Please enter event title", title: "Alert", type: "info" });
+        return
+      } else if (btnText.trim() == "") {
+        showToast({ body: "Please enter event button title", title: "Alert", type: "info" });
+        return
+      } else if (link.trim() == "") {
+        showToast({ body: "Please enter event button link", title: "Alert", type: "info" });
+        return
+      } else {
+        setEventTitle(title);
+        setEventBtnText(btnText);
+        setEventBtnLink(link);
+        setEventBtnTextColor(textColor);
+        setEventBtnColor(btnColor)
+        setEventComplete(true);
+        setEventModalVisible(false)
+      }
+    }
+
+    const btn_cancel = () => {
+      setTitle("")
+      setBtnText("");
+      setLink("");
+      setBtnColor(colors.primary2);
+      setTextColor(colors.white);
+    }
+    return (
+      <Modal
+        isVisible={eventModalVisible}
+        onBackdropPress={btn_cancel}
+        onBackButtonPress={btn_cancel}
+        useNativeDriverForBackdrop={true}
+        animationIn={"slideInRight"}
+        animationOut={"slideOutRight"}
+        animationInTiming={300}
+        animationOutTiming={300}
+        style={{ margin: 0 }}>
+        <SafeAreaView style={{ flex: 1 }} >
+          <View pointerEvents={loader ? "none" : "auto"} style={__style.modalRootView}>
+            <View style={__style.headingView}>
+              <TouchableOpacity
+                onPress={() => {
+                  setEventModalVisible(false);
+                  setTimeout(() => {
+                    btn_cancel()
+                  }, 350);
+                }}
+                style={[__style.modalclosebtn, { backgroundColor: colors.border }]} >
+                {icons.back(colors.white, 20)}
+              </TouchableOpacity>
+
+              <View style={__style.headingTextView}>
+                <MyText type='bold' fontSize={28} >{"Event"}</MyText>
+              </View>
+              <View style={__style.modalclosebtn} />
+            </View>
+
+            {/*//*   Event View    */}
+            {!isCosmos &&
+              <View style={{ paddingHorizontal: 20, flex: 1 }}>
+                <KeyboardAwareScrollView
+                  showsVerticalScrollIndicator={false} contentContainerStyle={{ marginTop: 10, paddingBottom: 30 }}>
+                  <Editor
+                    label='Event Title*'
+                    initialValue={title}
+                    onChange={(text) => setTitle(text)}
+                    backgroundColor={colors.secondaryVariant}
+                    height={120}
+                  />
+
+                  <View style={{}}>
+                    <View style={{}}>
+                      <MyInputs
+                        label='Button Text*'
+                        value={btnText}
+                        onChangeText={(text) => setBtnText(text)}
+                      />
+                    </View>
+                    <View style={{}}>
+                      <MyInputs
+                        label='Button Link*'
+                        value={link}
+                        onChangeText={(text) => setLink(text)}
+                      />
+                    </View>
+                  </View>
+
+
+                  <View style={{}}>
+                    <View style={{}}>
+                      <MyTouchableInput
+                        onPress={() => setColorModal({ visibility: true, for: 1 })}
+                        label='Button Text event*'
+                        view={() => (
+                          <View style={{ flex: 1, }}>
+                            <View style={[__style.eventColorView, { backgroundColor: textColor, }]} />
+                          </View>
+                        )}
+                      />
+                    </View>
+                    <View style={{}}>
+                      <MyTouchableInput
+                        onPress={() => setColorModal({ visibility: true, for: 2 })}
+                        label='Button background color*'
+                        view={() => (
+                          <View style={{ flex: 1, }}>
+                            <View style={[__style.eventColorView, { backgroundColor: btnColor, }]} />
+                          </View>
+                        )}
+                      />
+                    </View>
+                  </View>
+                  <View style={{ justifyContent: "flex-end", flexDirection: "row", marginTop: 10 }}>
+                    <MyButton style={{ paddingHorizontal: 20 }} invert title={isEventViewComplete ? "Remove" : 'CANCEL'}
+                      onPress={() => {
+                        btn_cancelEvent()
+                        btn_cancel()
+                      }} />
+                    <MyButton style={{ paddingHorizontal: 20, marginLeft: 20 }} invert title='DONE'
+                      onPress={btn_addEvent}
+                    />
+                  </View>
+                </KeyboardAwareScrollView>
+              </View>}
+
+          </View>
+
+          <ColorModal
+            isVisible={colorModal.visibility}
+            clodeModal={() => setColorModal({ visibility: false, for: 0 })}
+            selectedColor={colorModal.for == 1 ? eventBtnTextColor : colorModal.for == 2 ? eventBtnColor : ""}
+            getColor={(color) => {
+              if (colorModal.for == 1) {
+                setTextColor(color)
+              } else if (colorModal.for == 2) {
+                setBtnColor(color)
+              }
+            }}
+          />
+
+        </SafeAreaView>
+        <SafeAreaView style={{ flex: 0, backgroundColor: colors.secondary }} />
+        {eventModalVisible && <Toast />}
+      </Modal>)
+  }
 
 
   const Modal_addPost = () => {
@@ -335,7 +498,8 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
               </TouchableOpacity>
             </View>
             <View style={[__style.divider, { marginTop: -1 }]} />
-            <ScrollView automaticallyAdjustKeyboardInsets={true} showsVerticalScrollIndicator={false}>
+            <KeyboardAwareScrollView
+              showsVerticalScrollIndicator={false}>
 
               <View style={__style.postView}>
 
@@ -347,6 +511,8 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                     name={user?.first_name}
                     size={45}
                   />
+
+                  {/* //* Dropdown btns */}
                   <View style={{ marginLeft: 10, flex: 1 }}>
                     <MyText fontSize={16} type="bold">{user?.first_name + " " + user?.last_name}</MyText>
                     <View style={__style.modalActionButtonRow}>
@@ -375,8 +541,8 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                         <View opacity={0.7}>
                           <TouchableOpacity
                             style={__style.modalDropBtns}>
-                            <MyText>Publish</MyText>
-                            {icons.downwardArrow(17, colors.white)}
+                            <MyText>{isScheduledFeed ? "Schedule" : "Publish"}</MyText>
+                            {/* {icons.downwardArrow(17, colors.white)} */}
                           </TouchableOpacity>
                         </View>}
                     </View>
@@ -404,86 +570,79 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
                 {/*//*   Schedule View    */}
                 {isScheduledFeed &&
-                  <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
-                    <View style={{ flex: 1 }}>
-                      <MyTouchableInput
-                        label='Publish Date (Europe/Dublin)*'
-                        value={publishDate}
-                        icon={() => icons.calendar(colors.white, 20)}
-                        onPress={() => setDateModalVisible(true)}
-                      />
-                    </View>
-                    <View style={{ flex: 1, marginLeft: 10 }}>
-                      <MyTouchableInput
-                        label='Publish Time*'
-                        value={publishTime}
-                        icon={() => icons.clock(colors.white, 20)}
-                        onPress={() => setTimeModalVisibe(true)}
-                      />
-                    </View>
-                  </View>}
-
-
-
-
-
-
-
-                {/*//*   Event View    */}
-                {isEventViewVisible && !isCosmos &&
-                  <View>
-                    <Editor
-                      label='Event Title*'
-                      initialValue={eventTitle}
-                      onChange={(text) => setEventTitle(text)}
-                      backgroundColor={colors.secondaryVariant}
-                      height={120}
-                    />
-
-                    <View style={{ flexDirection: "row" }}>
-                      <View style={{ flex: 1 }}>
-                        <MyInputs
-                          label='Button Text*'
-                          value={eventBtnText}
-                          onChangeText={(text) => setEventBtnText(text)}
-                        />
-                      </View>
-                      <View style={{ flex: 1, marginLeft: 10 }}>
-                        <MyInputs
-                          label='Button Link*'
-                          value={eventBtnLink}
-                          onChangeText={(text) => setEventBtnLink(text)}
-                        />
-                      </View>
-                    </View>
-
-
-                    <View style={{ flexDirection: "row" }}>
+                  <View style={{ marginBottom: 10 }}>
+                    <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
                       <View style={{ flex: 1 }}>
                         <MyTouchableInput
-                          onPress={() => setColorModal({ visibility: true, for: 1 })}
-                          label='Button Text Color*'
-                          view={() => (
-                            <View style={{ flex: 1, }}>
-                              <View style={[__style.eventColorView, { backgroundColor: eventBtnTextColor, }]} />
-                            </View>
-                          )}
+                          noSpace
+                          label='Publish Date*'
+                          value={publishDate}
+                          icon={() => icons.calendar(colors.lightPrimary, 20)}
+                          onPress={() => setDateModalVisible(true)}
                         />
                       </View>
                       <View style={{ flex: 1, marginLeft: 10 }}>
                         <MyTouchableInput
-                          onPress={() => setColorModal({ visibility: true, for: 2 })}
-                          label='Button Background Color*'
-                          view={() => (
-                            <View style={{ flex: 1, }}>
-                              <View style={[__style.eventColorView, { backgroundColor: eventBtnColor, }]} />
-                            </View>
-                          )}
+                          noSpace
+                          label='Publish Time*'
+                          value={publishTime}
+                          icon={() => icons.clock(colors.lightPrimary, 20)}
+                          onPress={() => setTimeModalVisibe(true)}
                         />
                       </View>
                     </View>
+                    <MyText style={{ marginTop: 5 }} fontSize={12} color={colors.lightText}  >{"Date and Time are in Europe/Dublin timezone"}</MyText>
+                  </View>
+                }
 
-                  </View>}
+
+                {/* //* Eent View */}
+
+                {isEventViewComplete &&
+                  <View style={{ paddingHorizontal: 10 }} >
+                    <View style={__style.eventRootView} >
+                      <View style={__style.eventTitleView}>
+                        <MyWebview html={eventTitle} />
+                      </View>
+                      <TouchableOpacity
+                        onPress={() => openUrl(eventBtnLink)}
+                        style={[__style.eventBtnView, { backgroundColor: eventBtnColor, }]}>
+                        <MyText
+                          color={eventBtnTextColor}
+                          type='medium'
+                          style={{ paddingHorizontal: 10, }}
+                        >{eventBtnText}</MyText>
+                      </TouchableOpacity>
+                    </View>
+
+                    <TouchableOpacity
+                      onPress={() => setEventModalVisible(true)}
+                      style={{
+                        backgroundColor: colors.white, height: 30, width: 30, borderRadius: 30 / 2, alignItems: "center", justifyContent: "center", position: "absolute", right: 0, top: 5,
+                        shadowColor: "#fff",
+                        shadowOffset: {
+                          width: 0,
+                          height: 2,
+                        },
+                        shadowOpacity: 0.25,
+                        shadowRadius: 3.84,
+
+                        elevation: 5,
+                      }} >
+                      {icons.editpencil(colors.border, 20)}
+                    </TouchableOpacity>
+
+                    {/* <View style={{ backgroundColor: colors.grey, height: 30, width: 30, borderRadius: 30 / 2, alignItems: "center", justifyContent: "center", position: "absolute", top: 0, left: 2 }} >
+                      {icons.edit(colors.white, 15)}
+                    </View> */}
+                  </View>
+                }
+
+
+
+
+
+
 
 
                 {/*//*   Images List     */}
@@ -510,6 +669,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                             </TouchableOpacity>
                           </View>
                         ))}
+
                       </ScrollView>
                     </View>
 
@@ -598,9 +758,10 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                   </View>
                   {!isCosmos &&
                     <TouchableOpacity
-                      onPress={() => setEventViewVisiblity((prev) => !prev)}
+                      // onPress={() => setEventComplete((prev) => !prev)}
+                      onPress={() => setEventModalVisible(true)}
                       style={__style.typeButtonView}>
-                      {icons.calendarTick(isEventViewVisible ? colors.primary : colors.white, 20)}
+                      {icons.calendarTick(isEventViewComplete ? colors.primary : colors.white, 20)}
                     </TouchableOpacity>
                   }
                 </View>
@@ -630,7 +791,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                     onPress={addPostBtn}
                     invert={true} title={loader ? 'POSTING...' : 'POST'} />
                 </View>}
-            </ScrollView>
+            </KeyboardAwareScrollView>
           </View>
 
           <ImageUploadModal
@@ -647,22 +808,11 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
             onSelected={onOptionSelected}
           />
 
-          <ColorModal
-            isVisible={colorModal.visibility}
-            clodeModal={() => setColorModal({ visibility: false, for: 0 })}
-            selectedColor={colorModal.for == 1 ? eventBtnTextColor : colorModal.for == 2 ? eventBtnColor : ""}
-            getColor={(color) => {
-              if (colorModal.for == 1) {
-                setEventBtnTextColor(color)
-              } else if (colorModal.for == 2) {
-                setEventBtnColor(color)
-              }
-            }}
-          />
 
           <DateTimePicker
             isVisible={dateModalVisible}
             mode="date"
+            display='spinner'
             date={moment(publishDate, dateTimeFormat.date).toDate()}
             textColor={colors.darkSecondary}
             buttonTextColorIOS={colors.primary2}
@@ -676,6 +826,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
           <DateTimePicker
             isVisible={timeModalVisibe}
             mode="time"
+            display="spinner"
             date={moment(publishTime, dateTimeFormat.time).toDate()}
             textColor={colors.darkSecondary}
             buttonTextColorIOS={colors.primary2}
@@ -687,7 +838,9 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
             onCancel={() => setTimeModalVisibe(false)}
           />
 
-          {isPostModalVisible && <Toast />}
+          {EventModal()}
+
+          {isPostModalVisible && !eventModalVisible && <Toast />}
         </SafeAreaView>
         <SafeAreaView style={{ flex: 0, backgroundColor: colors.secondary }} ></SafeAreaView>
       </Modal >
@@ -957,5 +1110,31 @@ const __style = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
     justifyContent: "center"
-  }
+  },
+
+  eventRootView: {
+    borderWidth: 1,
+    marginVertical: 20,
+    borderColor: colors.white,
+    backgroundColor: colors.black,
+    paddingHorizontal: 5,
+    marginHorizontal: 2,
+    borderRadius: 5
+  },
+  eventTitleView: {
+    margin: 0,
+    padding: 5
+  },
+  eventBtnView: {
+    flexGrow: 1,
+    minHeight: 35,
+
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 5,
+    paddingVertical: 3,
+    marginVertical: 3,
+    flex: 1,
+    minWidth: 50
+  },
 })

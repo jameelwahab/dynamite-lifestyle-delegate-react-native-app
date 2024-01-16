@@ -1,4 +1,4 @@
-import { View, Text, SafeAreaView, StyleSheet, FlatList, Pressable, TouchableOpacity, TextInput, ActivityIndicator } from 'react-native'
+import { View, Text, SafeAreaView, StyleSheet, FlatList, Pressable, TouchableOpacity, TextInput, ActivityIndicator, Platform } from 'react-native'
 import React, { useRef, useState } from 'react'
 import Modal from 'react-native-modal';
 import utilities from '../../../utilities';
@@ -69,7 +69,10 @@ const CommentModal = ({
       setSelectedComment(item);
       setSelectedCommentFor("edit")
       setCommentText(item?.message);
-      cmtTextInputRef?.current?.focus()
+      console.log(cmtTextInputRef, "cmtTextInputRef")
+      setTimeout(() => {
+        cmtTextInputRef?.current?.focus()
+      }, 500);
     } else if (action?.type == "delete") {
       setTimeout(() => {
         setConfirmation({
@@ -114,28 +117,28 @@ const CommentModal = ({
       }
     });
     if (res?.code == 200) {
-      if (!!commentForlike?.parent_comment) {
-        setComments((obj) => {
-          let parentIndex = obj.list.findIndex(cmt => cmt?._id == commentForlike?.parent_comment);
-          let newObj = {
-            ...obj.list[parentIndex].child_comment[index],
-            is_liked: res?.action_response?.is_liked,
-            like_count: res?.action_response?.comment_like_count
-          };
-          obj.list[parentIndex].child_comment.splice(index, 1, newObj);
-          return { ...obj };
-        })
-      } else {
-        setComments((obj) => {
-          let newObj = {
-            ...obj.list[index],
-            is_liked: res?.action_response?.is_liked,
-            like_count: res?.action_response?.comment_like_count
-          };
-          obj.list.splice(index, 1, newObj);
-          return { ...obj };
-        })
-      }
+      // if (!!commentForlike?.parent_comment) {
+      //   setComments((obj) => {
+      //     let parentIndex = obj.list.findIndex(cmt => cmt?._id == commentForlike?.parent_comment);
+      //     let newObj = {
+      //       ...obj.list[parentIndex].child_comment[index],
+      //       is_liked: res?.action_response?.is_liked,
+      //       like_count: res?.action_response?.comment_like_count
+      //     };
+      //     obj.list[parentIndex].child_comment.splice(index, 1, newObj);
+      //     return { ...obj };
+      //   })
+      // } else {
+      //   setComments((obj) => {
+      //     let newObj = {
+      //       ...obj.list[index],
+      //       is_liked: res?.action_response?.is_liked,
+      //       like_count: res?.action_response?.comment_like_count
+      //     };
+      //     obj.list.splice(index, 1, newObj);
+      //     return { ...obj };
+      //   })
+      // }
     } else {
 
     }
@@ -149,22 +152,22 @@ const CommentModal = ({
       showToast({ title: res?.message, type: "success" });
       setLoader(false);
       setCommentText("");
-      setComments(obj => {
-        let index = obj.list.findIndex(comment => comment._id == commentId);
-        if (index > -1) {
-          obj.list.splice(index, 1);
-        } else {
-          let newComment = res?.action_response?.comment;
-          let index2 = obj.list.findIndex(comment => comment._id == newComment?._id);
-          if (index2 > -1) {
-            obj.list[index2].child_comment = newComment.child_comment
-          }
-        }
-        console.log(obj, "obj")
-        return { ...obj };
-      })
+      // setComments(obj => {
+      //   let index = obj.list.findIndex(comment => comment._id == commentId);
+      //   if (index > -1) {
+      //     obj.list.splice(index, 1);
+      //   } else {
+      //     let newComment = res?.action_response?.comment;
+      //     let index2 = obj.list.findIndex(comment => comment._id == newComment?._id);
+      //     if (index2 > -1) {
+      //       obj.list[index2].child_comment = newComment.child_comment
+      //     }
+      //   }
+      //   console.log(obj, "obj")
+      //   return { ...obj };
+      // })
       setSelectedComment(null);
-      updateFeedItemsSpecificField?.(res?.action_response?.feed?._id, { comment_count: res?.action_response?.feed?.comment_count })
+      // updateFeedItemsSpecificField?.(res?.action_response?.feed?._id, { comment_count: res?.action_response?.feed?.comment_count })
     } else {
       setLoader(false);
     }
@@ -182,27 +185,27 @@ const CommentModal = ({
       let editedComment = res?.action_response?.comment;
 
 
-      if (!!editedComment?.parent_comment) {
+      // if (!!editedComment?.parent_comment) {
 
-        setComments(obj => {
-          let index = obj.list.findIndex(comment => comment._id == editedComment?.parent_comment);
-          if (index > -1) {
-            let childCommentIndex = obj.list[index].child_comment.findIndex(childComment => childComment?._id == editedComment?._id);
-            if (childCommentIndex > -1)
-              obj.list[index].child_comment.splice(childCommentIndex, 1, editedComment);
-          }
-          return { ...obj };
-        })
+      //   setComments(obj => {
+      //     let index = obj.list.findIndex(comment => comment._id == editedComment?.parent_comment);
+      //     if (index > -1) {
+      //       let childCommentIndex = obj.list[index].child_comment.findIndex(childComment => childComment?._id == editedComment?._id);
+      //       if (childCommentIndex > -1)
+      //         obj.list[index].child_comment.splice(childCommentIndex, 1, editedComment);
+      //     }
+      //     return { ...obj };
+      //   })
 
-      } else {
-        setComments(obj => {
-          let index = obj.list.findIndex(comment => comment._id == editedComment?._id);
-          if (index > -1) {
-            obj.list.splice(index, 1, editedComment);
-          }
-          return { ...obj };
-        })
-      }
+      // } else {
+      //   setComments(obj => {
+      //     let index = obj.list.findIndex(comment => comment._id == editedComment?._id);
+      //     if (index > -1) {
+      //       obj.list.splice(index, 1, editedComment);
+      //     }
+      //     return { ...obj };
+      //   })
+      // }
 
       setSelectedComment(null);
       setSelectedCommentFor("")
@@ -231,24 +234,24 @@ const CommentModal = ({
     if (res.code == 200) {
       showToast({ title: res?.message, type: "success" });
       setLoader(false);
-      if (!!res?.action_response?.parent_comment) {
-        setComments(obj => {
-          let index = obj.list.findIndex(obj => obj._id == res?.action_response?.parent_comment);
-          if (index > -1) {
-            obj.list[index].child_comment.unshift(res?.action_response?.comment)
-          }
-          return { ...obj }
-        })
-      } else {
-        setComments(obj => ({
-          ...obj,
-          list: [res?.action_response?.comment, ...obj.list]
-        }))
-      }
+      // if (!!res?.action_response?.parent_comment) {
+      //   setComments(obj => {
+      //     let index = obj.list.findIndex(obj => obj._id == res?.action_response?.parent_comment);
+      //     if (index > -1) {
+      //       obj.list[index].child_comment.unshift(res?.action_response?.comment)
+      //     }
+      //     return { ...obj }
+      //   })
+      // } else {
+      //   setComments(obj => ({
+      //     ...obj,
+      //     list: [res?.action_response?.comment, ...obj.list]
+      //   }))
+      // }
       setCommentText("");
       setSelectedComment(null);
       setSelectedCommentFor("");
-      updateFeedItemsSpecificField?.(res?.action_response?.feed?._id, { comment_count: res?.action_response?.feed?.comment_count })
+      // updateFeedItemsSpecificField?.(res?.action_response?.feed?._id, { comment_count: res?.action_response?.feed?.comment_count })
     } else {
       setLoader(false);
     }
@@ -296,7 +299,7 @@ const CommentModal = ({
 
             </View>
           </View>
-          <CollapsibleText>{item?.message}</CollapsibleText>
+          <CollapsibleText style={{ marginTop: 5 }}>{item?.message}</CollapsibleText>
 
           <View style={[__style.commentActionView, { marginTop: 5 }]}>
             <View style={[__style.commentActionView, { flex: 1 }]}>
@@ -359,6 +362,13 @@ const CommentModal = ({
       animationOutTiming={500}
       avoidKeyboard={true}
       onModalHide={resetStates}
+      onModalShow={() => {
+        if (focus && Platform.OS == "android") {
+          setTimeout(() => {
+            cmtTextInputRef?.current?.focus()
+          }, 1000);
+        }
+      }}
       hideModalContentWhileAnimating={true}
       style={{ margin: 0, }}>
       <SafeAreaView style={{ flex: 1 }} >
@@ -410,7 +420,7 @@ const CommentModal = ({
                           setSelectedCommentFor("");
                           cmtTextInputRef?.current?.blur()
                         }}
-                        type='bold'>{"cancel"}</MyText></MyText>
+                        type='bold'>{"Cancel"}</MyText></MyText>
 
                   </View>}
 
@@ -424,6 +434,7 @@ const CommentModal = ({
                     ref={cmtTextInputRef}
                     style={__style.input}
                     selectionColor={colors.selection}
+                    cursorColor={colors.white}
                     multiline={true}
                     value={commentText}
                     onChangeText={(text) => setCommentText(text)}
@@ -431,7 +442,8 @@ const CommentModal = ({
                     placeholder='Write a comment...'
                     placeholderTextColor={colors.placeholder}
                     keyboardAppearance="dark"
-                    autoFocus={focus}
+                    autoFocus={Platform.OS == "ios" ? focus : false}
+                    focusable={true}
                     autoCorrect={false}
                     autoCapitalize='none'
                     autoComplete="off"
@@ -551,12 +563,16 @@ const __style = StyleSheet.create({
   inputRootView: { flexDirection: "row", alignItems: "flex-end", paddingVertical: 10 },
   textInputView: {
     minHeight: 40,
-    backgroundColor: colors.secondary,
+    backgroundColor: "#1c2131",
+    // borderWidth:0.5,
+    // borderColor:colors.white,
     marginHorizontal: 10,
     borderRadius: 10,
     maxHeight: 80,
     padding: 5,
-    flex: 1
+    flex: 1,
+
+
   },
   input: {
     color: colors.white,
@@ -575,7 +591,8 @@ const __style = StyleSheet.create({
     marginBottom: 2.5
   },
   likeView: {
-    borderWidth: 0.5, borderColor: colors.lightPrimary2, borderRadius: 999, height: 20, width: 20, alignItems: 'center', justifyContent: "center"
+    // borderWidth: 0.5, borderColor: colors.lightPrimary2,
+    borderRadius: 999, height: 20, width: 20, alignItems: 'center', justifyContent: "center"
   },
   shadow: {
     shadowColor: "#FFF",

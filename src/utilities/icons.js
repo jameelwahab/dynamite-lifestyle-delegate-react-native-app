@@ -58,7 +58,7 @@ export const icons = {
   down: (color = colors.white, size = 17) => { return (<Ionicons name="caret-down" color={color} size={size} />) },
   threeDots: (color = colors.primary, size = 12) => { return (<Entypo name="dots-three-vertical" color={color} size={size} />) },
   download: (color = colors.primary, size = 17) => { return (<Feather name="download" color={color} size={size} />) },
-  edit: () => { return (<Feather name="edit" color={colors.primary} size={17} />) },
+  edit: (color = colors.primary, size = 17) => { return (<Feather name="edit" color={color} size={size} />) },
   trash: () => { return (<Feather name="trash" color={colors.primary} size={17} />) },
   trashFilled: () => { return (<Fontisto name="trash" color={colors.primary} size={17} />) },
   reply: () => { return (<Octicons name="reply" color={colors.primary} size={17} />) },
@@ -93,6 +93,7 @@ export const icons = {
   code: (color = colors.primary, size = 17) => { return (<Ionicons name="code-slash" color={color} size={size} />) },
   goto: (color = colors.primary, size = 17) => { return (<Ionicons name="open-outline" color={color} size={size} />) },
   message: (color = colors.primary, size = 17) => { return (<MaterialIcons name="message" color={color} size={size} />) },
-
+  history: (color = colors.primary, size = 17) => { return (<FontAwesome5 name="history" color={color} size={size} />) },
+  editpencil: (color = colors.primary, size = 17) => { return (<MaterialIcons name="mode-edit" color={color} size={size} />) },
 
 }
