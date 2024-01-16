@@ -2,13 +2,13 @@ import { View, Text } from 'react-native'
 import React, { useState } from 'react'
 import RootView from '../../components/RootView'
 import MyText from '../../components/MyText'
-import MyInputs from '../../components/MyInputs'
 import { MyButton } from '../../components/MyButton'
 import MyLoader from '../../components/MyLoader'
 import { CHANGE_ZOOM_CRED } from '../../DAL'
 import { useDispatch, useSelector } from 'react-redux'
 import { selectUser, setConsultant } from '../../redux/reducers/userSlice'
 import showToast from '../../functions/showToast'
+import MyInputs from '../../components/MyInputs'
 
 const ZoomSettings = ({ navigation }) => {
   const { token, user } = useSelector(selectUser);

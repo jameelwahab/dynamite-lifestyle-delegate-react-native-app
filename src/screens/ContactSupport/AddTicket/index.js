@@ -1,7 +1,6 @@
 import { View, Text, ScrollView, FlatList, TouchableOpacity, Pressable, SafeAreaView, TouchableHighlight } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import RootView from '../../../components/RootView'
-import MyInputs from '../../../components/MyInputs';
 import MyTouchableInput from '../../../components/MyTouchableInput';
 import utilities from '../../../utilities';
 import { colors } from '../../../utilities/colors';
@@ -20,6 +19,7 @@ import showToast from '../../../functions/showToast';
 import MyLoader from '../../../components/MyLoader';
 import OptionModal from '../../../components/OptionModal';
 import { EDIT_TICKET_CONTECT_SUPPORT } from '../../../DAL/ContactSupport';
+import MyInputs from '../../../components/MyInputs';
 
 const oneFourthOfScreen = (utilities.windowWidth() - 40) / 4;
 const AddTicket = ({ navigation, route }) => {

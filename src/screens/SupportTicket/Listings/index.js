@@ -7,12 +7,12 @@ import { colors } from '../../../utilities/colors';
 import MyText from '../../../components/MyText';
 import ListView from './ListView';
 import { fonts } from '../../../utilities/fonts';
-import MyInputs from '../../../components/MyInputs';
 import Modal from 'react-native-modal'
 import { INETRNAL_TCIKETS_LIST_BY_TYPE, LIST_OF_DEPARTMENTS, SUPPORT_TCIKETS_LIST_BY_TYPE } from '../../../DAL';
 import { useSelector } from 'react-redux';
 import { selectUser } from '../../../redux/reducers/userSlice';
 import debounce from '../../../functions/debounce';
+import MyInputs from '../../../components/MyInputs';
 
 
 

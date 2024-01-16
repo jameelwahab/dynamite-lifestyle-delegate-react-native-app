@@ -14,7 +14,6 @@ import AddNote from '../../Notes/AddNote';
 import Notes from '../Notes';
 import List from '../../Notes/List';
 import Modal from 'react-native-modal'
-import MyInputs from '../../../components/MyInputs';
 import { TransparentButton } from '../../../components/MyButton';
 import Toast from 'react-native-toast-message';
 import showToast from '../../../functions/showToast';
@@ -24,6 +23,7 @@ import Collapsible from 'react-native-collapsible';
 import { icons } from '../../../utilities/icons';
 import { convertTimezone } from '../../../functions/convertTime';
 import { selectTimeZone } from '../../../redux/reducers/timezoneSlice';
+import MyInputs from '../../../components/MyInputs';
 
 let autoMessages = [];
 const Detail = ({ navigation, route }) => {

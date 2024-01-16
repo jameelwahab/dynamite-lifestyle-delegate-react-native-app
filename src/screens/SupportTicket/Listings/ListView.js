@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { View, FlatList, Image, SafeAreaView, TouchableHighlight, Pressable, Dimensions, Platform, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { colors } from '../../../utilities/colors';
 import MyText from '../../../components/MyText';
-import MyInputs from '../../../components/MyInputs';
 import { icons } from '../../../utilities/icons';
 import Modal from 'react-native-modal'
 import routes from '../../../navigation/routes';
@@ -24,6 +23,7 @@ import UserImage from '../../../components/UserImage';
 import utilities from '../../../utilities';
 import { convertTimezone } from '../../../functions/convertTime';
 import { selectTimeZone } from '../../../redux/reducers/timezoneSlice';
+import MyInputs from '../../../components/MyInputs';
 
 
 const ListView = ({ isLoading, list, active, route, departmentList, token, refresh, user, setLoader, isLoadingMore, loadMore, type }) => {

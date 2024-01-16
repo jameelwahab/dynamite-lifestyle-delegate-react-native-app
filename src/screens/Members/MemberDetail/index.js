@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TouchableHighlight, Pressable } from 'react-native'
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import RootView from '../../../components/RootView'
 import MyText from '../../../components/MyText'
 import { colors } from '../../../utilities/colors'
@@ -10,14 +10,27 @@ import { convertTimezone } from '../../../functions/convertTime'
 import { dateTimeFormat } from '../../../utilities/constants'
 import { useSelector } from 'react-redux'
 import { selectTimeZone } from '../../../redux/reducers/timezoneSlice'
+import LeadModal from '../Components/LeadModal'
+import { selectUser } from '../../../redux/reducers/userSlice'
 
 const MemberDetail = ({ navigation, route }) => {
   const timezone = useSelector(selectTimeZone)
+  const { token } = useSelector(selectUser)
+  const leadModalRef = useRef();
   const [member, setMember] = useState(route?.params?.member);
   const [showMorePages, setShowMorePages] = useState(false);
   const [showMorePrograms, setShowMorePrograms] = useState(false);
 
-  console.log(member, "member")
+
+
+  // ? funcvtions
+
+  const selectLeadStatus = () => {
+
+  }
+
+  // ? Views
+
 
   const topView = () => {
     return (
@@ -56,7 +69,7 @@ const MemberDetail = ({ navigation, route }) => {
       <View style={{ flexDirection: "row", alignItems: "center" }}>
         <TouchableHighlight
           style={{ flex: 1 }}
-          onPress={() => { }}>
+          onPress={() => leadModalRef?.current?.openModal()}>
           <View style={[__styles.leadRootView, !!member?.lead_status && {
             backgroundColor: member?.lead_status?.background_color
           }]}>
@@ -193,10 +206,18 @@ const MemberDetail = ({ navigation, route }) => {
     <RootView hideSubHeader >
       {topView()}
       <ScrollView
-        contentContainerStyle={{ paddingTop: 10, paddingBottom: 30 ,paddingHorizontal: 5}}
+        contentContainerStyle={{ paddingTop: 10, paddingBottom: 30, paddingHorizontal: 5 }}
         indicatorStyle='white'>
         {memberStatView()}
       </ScrollView>
+
+      <LeadModal
+        ref={leadModalRef}
+        navigation={navigation}
+        token={token}
+        selectLeadStatus={selectLeadStatus}
+
+      />
     </RootView>
   )
 }

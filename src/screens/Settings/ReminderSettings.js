@@ -5,7 +5,6 @@ import MyText from '../../components/MyText'
 import { useDispatch, useSelector } from 'react-redux'
 import { selectUser, setConsultant } from '../../redux/reducers/userSlice'
 import { colors } from '../../utilities/colors'
-import MyInputs from '../../components/MyInputs'
 import Editor from '../../components/Editor'
 import { KeyboardAwareFlatList } from 'react-native-keyboard-aware-scroll-view'
 import MyTouchableInput from '../../components/MyTouchableInput'
@@ -20,6 +19,7 @@ import { UPDATE_REMINDER_MESSAGES, UPLOAD_FILE_TO_S3 } from '../../DAL'
 import showToast from '../../functions/showToast'
 import invokeApi from '../../functions/invokeAPI'
 import MyLoader from '../../components/MyLoader'
+import MyInputs from '../../components/MyInputs'
 
 const ReminderSettings = ({ navigation }) => {
   const dispatch = useDispatch()

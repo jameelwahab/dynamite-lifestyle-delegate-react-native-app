@@ -5,7 +5,6 @@ import MyText from '../../../components/MyText'
 import { icons } from '../../../utilities/icons'
 import { colors } from '../../../utilities/colors'
 import MyTouchableInput from '../../../components/MyTouchableInput'
-import MyInputs from '../../../components/MyInputs'
 import Modal from 'react-native-modal'
 import { MEMBERS_LIST, PORTAL_LIST } from '../../../DAL'
 import utilities from '../../../utilities'
@@ -17,6 +16,7 @@ import debounce from '../../../functions/debounce'
 import MyLoader from '../../../components/MyLoader'
 import showToast from '../../../functions/showToast'
 import EmptyView from '../../../components/EmptyView'
+import MyInputs from '../../../components/MyInputs'
 
 const StartNewChat = ({ navigation, route }) => {
   const { resetCountToZero, refresh } = route?.params;

@@ -38,6 +38,7 @@ const MyInputs = ({
           scrollEnabled={multiline}
           keyboardAppearance="dark"
           keyboardType={keyboardType}
+          // keyboardType="numeric"
           selectionColor={colors.selection}
           autoCorrect={false}
           multiline={multiline}

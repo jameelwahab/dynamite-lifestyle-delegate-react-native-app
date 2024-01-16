@@ -11,7 +11,6 @@ import { ADD_AS_NOTE, MESSAGE_LIST_BY_CHAT_ID, READ_ALL_MESSAGES } from '../../.
 import { selectUser } from '../../../redux/reducers/userSlice';
 import MyLoader, { SimpleLoader } from '../../../components/MyLoader';
 import utilities from '../../../utilities';
-import MyInputs from '../../../components/MyInputs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { fonts } from '../../../utilities/fonts';
 import { icons } from '../../../utilities/icons';

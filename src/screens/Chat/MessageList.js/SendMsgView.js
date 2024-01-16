@@ -4,7 +4,6 @@ import { colors } from '../../../utilities/colors'
 import Collapsible from 'react-native-collapsible'
 import { icons } from '../../../utilities/icons'
 import Modal from 'react-native-modal'
-import MyInputs from '../../../components/MyInputs'
 import MyText from '../../../components/MyText'
 import { TransparentButton } from '../../../components/MyButton'
 import showToast from '../../../functions/showToast'
@@ -32,6 +31,7 @@ import moment from 'moment'
 import { PERMISSIONS, request, requestMultiple } from 'react-native-permissions'
 import { SimpleLoader } from '../../../components/MyLoader'
 import { isUrl } from '../../../functions/regex'
+import MyInputs from '../../../components/MyInputs'
 let selection;
 
 const SendMsgView = ({ receiver, navigation, edit, clearEdit }) => {

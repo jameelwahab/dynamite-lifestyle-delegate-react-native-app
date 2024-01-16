@@ -18,7 +18,6 @@ import { S3_URL, socketUrl } from '../../utilities/constants';
 import { useDispatch, useSelector } from 'react-redux';
 import { setUserAndToken } from '../../redux/reducers/userSlice';
 import { selectSettings, setSettings } from '../../redux/reducers/settingSlice';
-import MyInputs from '../../components/MyInputs';
 import FastImage from 'react-native-fast-image';
 import MyImage2 from '../../components/MyImage2';
 import { setTimeZone } from '../../redux/reducers/timezoneSlice';
@@ -26,6 +25,7 @@ import { setNavbar } from '../../redux/reducers/navbarSlice';
 import { drawerMenuList } from '../../navigation/SideBar/List';
 import { setSocket } from '../../redux/reducers/socketSlice';
 import { io } from 'socket.io-client';
+import MyInputs from '../../components/MyInputs';
 
 
 

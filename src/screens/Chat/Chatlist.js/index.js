@@ -15,7 +15,6 @@ import moment from 'moment'
 import FAB from '../../../components/FAB'
 import EmptyView from '../../../components/EmptyView'
 import MyTouchableInput from '../../../components/MyTouchableInput'
-import MyInputs from '../../../components/MyInputs'
 import debounce from '../../../functions/debounce'
 import Modal from 'react-native-modal'
 import utilities from '../../../utilities'
@@ -27,6 +26,7 @@ import { fonts } from '../../../utilities/fonts'
 import { selectSocket } from '../../../redux/reducers/socketSlice'
 import { convertTimezone } from '../../../functions/convertTime'
 import { selectTimeZone } from '../../../redux/reducers/timezoneSlice'
+import MyInputs from '../../../components/MyInputs' 
 
 
 let page = 0;

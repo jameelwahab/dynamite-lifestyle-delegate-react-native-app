@@ -5,7 +5,6 @@ import React, { useEffect, useState, useRef } from 'react'
 import RootView from '../../components/RootView'
 import { colors } from '../../utilities/colors'
 import { icons } from '../../utilities/icons'
-import MyInputs from '../../components/MyInputs'
 import { MyButton } from '../../components/MyButton'
 import utilities from '../../utilities'
 import CountryModal from '../../components/CountryModal'
@@ -22,6 +21,7 @@ import { EDIT_PROFILE } from '../../DAL'
 import MyLoader from '../../components/MyLoader'
 import showToast from '../../functions/showToast'
 import { setUserTimeZone } from '../../redux/reducers/timezoneSlice'
+import MyInputs from '../../components/MyInputs'
 
 const EditProfile = ({ navigation }) => {
   const [isCountryModalVisible, setIsCountryModalVisible] = useState(false);

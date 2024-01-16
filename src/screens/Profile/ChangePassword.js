@@ -1,13 +1,13 @@
 import { View, Text } from 'react-native'
 import React, { useState } from 'react'
 import RootView from '../../components/RootView'
-import MyInputs from '../../components/MyInputs'
 import { MyButton } from '../../components/MyButton'
 import showToast from '../../functions/showToast'
 import MyLoader from '../../components/MyLoader'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { CHNAGE_PASSWORD } from '../../DAL'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import MyInputs from '../../components/MyInputs'
 
 const ChangePassword = ({ navigation }) => {
   const [oldPassword, setOldPassword] = useState("");

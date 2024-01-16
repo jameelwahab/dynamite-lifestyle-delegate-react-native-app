@@ -21,3 +21,13 @@ export const LIST_OF_MEMBERS = ({ token, navigation, page, searchText, body: {
     navigation,
   })
 }
+
+
+export const LEAD_STATUS_LIST = ({ token, navigation, }) => {
+  return invokeApi({
+    path: `api/lead_status/active_lead_status`,
+    method: "GET",
+    token,
+    navigation,
+  })
+}

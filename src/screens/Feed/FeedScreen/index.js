@@ -421,6 +421,7 @@ const FeedScreen = ({ navigation, route }) => {
 
 
   const changeTab = (newTab) => {
+    // console.log(newTab,"newTab")
     setTab(newTab);
   }
 
@@ -666,7 +667,8 @@ const FeedScreen = ({ navigation, route }) => {
           {feedFooterLoader && <SimpleLoader />}
         </View>
       )
-    } else if (tab == 1) {
+    }
+    else if (tab == 1) {
       return (
         <FeedEvents
           upcomingEvents={feedData?.upcoming_events_array}
@@ -684,6 +686,8 @@ const FeedScreen = ({ navigation, route }) => {
           user={user}
         />)
     }
+    else
+      return null
   }
 
   const headerView = () => {
@@ -746,7 +750,7 @@ const FeedScreen = ({ navigation, route }) => {
           // onViewableItemsChanged={(e) => console.log("onViewableItemsChanged", e)}
           showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item?._id}
-          ListHeaderComponent={!loader && headerView()}
+          ListHeaderComponent={headerView}
           ListEmptyComponent={!loader && tab == 0 && <EmptyView label={"Posts not found"} />}
           onEndReached={() => {
             console.log("onEndReached", feedVar)

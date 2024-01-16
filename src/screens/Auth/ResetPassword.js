@@ -3,7 +3,6 @@ import React, { useState } from 'react'
 import RootView from '../../components/RootView'
 import MyText from '../../components/MyText'
 import { colors } from '../../utilities/colors'
-import MyInputs from '../../components/MyInputs'
 import routes from '../../navigation/routes'
 import { MyButton } from '../../components/MyButton'
 import AuthHeader from '../../components/AuthHeader'
@@ -11,6 +10,7 @@ import MyLoader from '../../components/MyLoader'
 import showToast from '../../functions/showToast'
 import { RESET_PASSWORD } from '../../DAL'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import MyInputs from '../../components/MyInputs'
 
 const ResetPassword = ({ navigation, route }) => {
   const [loader, setLoader] = useState(false);
