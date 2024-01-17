@@ -84,6 +84,7 @@ export const drawerMenuList = [
     icon: icons.sidebar.handPromise,
     params: {
       feedFor: "the_source",
+      title: "The Source Feed",
     }
   },
 
@@ -94,7 +95,8 @@ export const drawerMenuList = [
     component: StackFeed,
     icon: icons.sidebar.handPromise,
     params: {
-      feedFor: "all_source"
+      feedFor: "all_source",
+      title: "All Source Feed",
     }
   },
 
@@ -105,7 +107,8 @@ export const drawerMenuList = [
     component: StackFeed,
     icon: icons.sidebar.handPromise,
     params: {
-      feedFor: "scheduled"
+      feedFor: "scheduled",
+      title: "Schedule Feed",
     }
   },
 

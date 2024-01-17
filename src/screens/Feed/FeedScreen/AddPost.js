@@ -32,6 +32,7 @@ import { convertTimezone, convertTimezoneFrom } from '../../../functions/convert
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import MyWebview from '../../../components/MyWebview'
 import openUrl from '../../../functions/openUrl'
+import { isUrl } from '../../../functions/regex'
 
 
 const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, selectFeedlevel, feedLevel, tab, isCosmos, isScheduledFeed, timezone }, ref) => {
@@ -69,6 +70,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   const [publishTime, setPublishTime] = useState("12:00 AM");
   const [eventModalVisible, setEventModalVisible] = useState(false)
 
+ 
 
 
   useImperativeHandle(ref, () => {
@@ -242,7 +244,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
       fd.append("event_info", JSON.stringify(eventObj));
     }
     if (isScheduledFeed) {
-      fd.append("schedule_date_time", moment(publishDate, dateTimeFormat.date).format("YYYY-MM-DD") + " " + moment(publishTime, dateTimeFormat.time).format("HH:MM"))
+      fd.append("schedule_date_time", moment(publishDate, dateTimeFormat.date).format("YYYY-MM-DD") + " " + moment(publishTime, dateTimeFormat.time).format("HH:mm"))
     }
     if (!(!!editId)) {
       fd.append("is_publish", isScheduledFeed ? "false" : "true");
@@ -330,6 +332,9 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
         return
       } else if (link.trim() == "") {
         showToast({ body: "Please enter event button link", title: "Alert", type: "info" });
+        return
+      } else if (!isUrl(link.trim())) {
+        showToast({ body: "Please enter valid link", title: "Alert", type: "info" });
         return
       } else {
         setEventTitle(title);

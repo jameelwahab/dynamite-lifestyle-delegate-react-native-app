@@ -16,7 +16,7 @@ import ResponsiveImage2 from '../../../components/ResponsiveImage2'
 import utilities from '../../../utilities'
 import openUrl from '../../../functions/openUrl'
 
-function FeedView({ item, index, user, token, timezone, settings, openComments, showLikes, openOptions, onLikebtnPress, isCosmos, sourceLevelIcons, isScheduledFeed }) {
+function FeedView({ item, index, user, token, timezone, settings, openComments, showLikes, openOptions, onLikebtnPress, isCosmos, sourceLevelIcons, isScheduledFeed, openScheduleTimeModal }) {
   const profileView = () => (
     <View style={__style.profileView}>
       <UserImage
@@ -33,11 +33,13 @@ function FeedView({ item, index, user, token, timezone, settings, openComments, 
         </View>
       </View>
       {!item?.is_publish &&
-        <View style={{ marginRight: 5 }}>
+        <TouchableOpacity
+          onPress={() => openScheduleTimeModal(item?.schedule_date_time)}
+          style={{ marginRight: 5 }}>
           <Image source={icons.schedule}
             style={{ tintColor: colors.primary, height: 25, width: 25 }}
           />
-        </View>}
+        </TouchableOpacity>}
       <View >
         <MyImage
           indicatorProps={{ color: colors.secondaryVariant }}
@@ -100,7 +102,7 @@ function FeedView({ item, index, user, token, timezone, settings, openComments, 
       }
 
       {item.feed_type == "embed_code" && !!item.embed_code &&
-        <View style={{}} >
+        <View style={{marginTop:10}} >
           <MyWebview
             fullWidth
             html={item.embed_code.replace("width", "")}

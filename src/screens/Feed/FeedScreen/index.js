@@ -24,6 +24,8 @@ import Leaderboard from '../Leaderboard.js'
 import EmptyView from '../../../components/EmptyView'
 import { colors } from '../../../utilities/colors'
 import routes from '../../../navigation/routes'
+import ScheduleModal from './ScheduleModal'
+import Header from '../../../components/Header'
 
 
 
@@ -47,6 +49,7 @@ let likeVar = {
 const FeedScreen = ({ navigation, route }) => {
   console.log(route, "feedroute")
   const addPostRef = useRef()
+  const scheduleModalRef = useRef();
   const { feedFor } = route?.params;
   const isCosmos = feedFor == "the_cosmos";
   const isScheduledFeed = feedFor == "scheduled";
@@ -693,6 +696,10 @@ const FeedScreen = ({ navigation, route }) => {
   const headerView = () => {
     return (
       <View>
+        {route?.params?.title &&
+          <View style={{  marginTop: 5, marginLeft: 5 }}>
+            <MyText fontSize={18} type='bold' color={colors.primary} >{route?.params?.title}</MyText></View>
+        }
         <FeedTabs
           isCosmos={isCosmos}
           tab={tab}
@@ -739,11 +746,13 @@ const FeedScreen = ({ navigation, route }) => {
       isCosmos={isCosmos}
       isScheduledFeed={isScheduledFeed}
       sourceLevelIcons={feedData?.feed_setting}
+      openScheduleTimeModal={scheduleModalRef?.current?.openScheduleTimeModal}
     />, [feed]);
 
 
   return (
     <View style={{ flex: 1 }}>
+
       <View style={{ flex: 1 }}>
         <FlatList
           data={tab == 0 ? feed : []}
@@ -822,6 +831,8 @@ const FeedScreen = ({ navigation, route }) => {
         onAgree={confirmationAction}
         title={confirmation.title}
       />
+
+      <ScheduleModal ref={scheduleModalRef} />
 
       <MyLoader enable={loader} />
     </View >

@@ -13,6 +13,7 @@ const HeaderBanner = ({ image, user ,}) => {
         <ResponsiveImage2
           uri={S3_URL + image}
           width={utilities.screenWidth()}
+          
         />
       </View>
       <View style={__styles.profileView}>
@@ -33,7 +34,8 @@ const __styles = StyleSheet.create({
   imageView: {
     borderRadius: 10,
     overflow: "hidden",
-    marginTop: "auto"
+    marginTop: "auto",
+    
 
 
   },
@@ -42,6 +44,7 @@ const __styles = StyleSheet.create({
     width: 100,
     borderWidth: 5,
     borderColor: colors.primary2,
+    borderColor: colors.primary2,backgroundColor:colors.secondary,
     borderRadius: 10,
     position: "absolute",
     zIndex: 2,

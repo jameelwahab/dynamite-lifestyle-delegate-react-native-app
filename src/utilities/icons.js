@@ -49,7 +49,7 @@ export const icons = {
   image: () => { return (<Ionicons name="image" color={colors.primary} size={25} />) },
   images: () => { return (<Ionicons name="images" color={colors.primary} size={20} />) },
   camera: (color = colors.primary, size = 20) => { return (<Fontisto name="camera" color={color} size={size} />) },
-  crosssWithCircle: () => { return (<MaterialIcons name="cancel" color={colors.white} size={30} />) },
+  crosssWithCircle: (color = colors.white, size = 30) => { return (<MaterialIcons name="cancel" color={color} size={size} />) },
   crosssWithCircle_20: (color = colors.white, size = 20) => { return (<MaterialIcons name="cancel" color={color} size={size} />) },
   noIcon: () => { return (<MaterialIcons name="cancel" color={colors.transparent} size={20} />) },
   crosss: (color = colors.white, size = 20) => { return (<Ionicons name="close" color={color} size={size} />) },

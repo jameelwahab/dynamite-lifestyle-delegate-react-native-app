@@ -28,7 +28,8 @@ const Header = ({
   titleView,
   hideProfile = false,
   customBackPress,
-  hideSubHeader = false
+  hideSubHeader = false,
+  hideUpperHeader = false,
 }) => {
   const { user, token } = useSelector(selectUser)
   const navigation = useNavigation()
@@ -61,30 +62,31 @@ const Header = ({
         isVisible={isUserModalVisible}
         closeModal={() => setIsUserModalVisible(false)}
       />
-      <View style={__header.rootView}>
-        <View style={__header.leftButtonView}>
-          {showBackButtonOnTop ?
-            <Pressable onPress={onBackButtonPress} style={__header.leftButtonView}>
-              <Ionicons name="arrow-back-outline" color={colors.primary} size={25} />
-            </Pressable> :
-            !hideHambugerMenu &&
-            <Pressable onPress={toggleSideMenu} style={__header.leftButtonView}>
-              {/* <Image source={menu} style={__header.leftButtonIcon} /> */}
-              <Ionicons name="menu" color={colors.primary} size={25} />
-              {/* <Image source={icons.threeLinesMenu} style={{height:30,width:30,tintColor:colors.primary,transform:[{rotateZ:"180deg"}]}} /> */}
-            </Pressable>
-          }
-        </View>
-        <View style={{ flex: 1, justifyContent: "flex-end", alignItems: "center", flexDirection: "row", paddingRight: 10 }}>
+
+        <View style={__header.rootView}>
+          <View style={__header.leftButtonView}>
+            {showBackButtonOnTop ?
+              <Pressable onPress={onBackButtonPress} style={__header.leftButtonView}>
+                <Ionicons name="arrow-back-outline" color={colors.primary} size={25} />
+              </Pressable> :
+              !hideHambugerMenu &&
+              <Pressable onPress={toggleSideMenu} style={__header.leftButtonView}>
+                {/* <Image source={menu} style={__header.leftButtonIcon} /> */}
+                <Ionicons name="menu" color={colors.primary} size={25} />
+                {/* <Image source={icons.threeLinesMenu} style={{height:30,width:30,tintColor:colors.primary,transform:[{rotateZ:"180deg"}]}} /> */}
+              </Pressable>
+            }
+          </View>
+          <View style={{ flex: 1, justifyContent: "flex-end", alignItems: "center", flexDirection: "row", paddingRight: 10 }}>
 
 
-          {!hideChatIcon && user?.is_chat_allow &&
-            <TouchableOpacity
-              onPress={() => navigateToChatScreen()}
-              style={__header.RightButtonView}>
-              <Ionicons name="chatbox-ellipses" color={colors.primary} size={17} />
-            </TouchableOpacity>}
-          {/* 
+            {!hideChatIcon && user?.is_chat_allow &&
+              <TouchableOpacity
+                onPress={() => navigateToChatScreen()}
+                style={__header.RightButtonView}>
+                <Ionicons name="chatbox-ellipses" color={colors.primary} size={17} />
+              </TouchableOpacity>}
+            {/* 
           {!hideNotificaitonIcon &&
             <TouchableOpacity
               style={__header.RightButtonView}>
@@ -92,20 +94,20 @@ const Header = ({
             </TouchableOpacity>} */}
 
 
-          {!hideProfile &&
-            <TouchableOpacity
-              onPress={() => setIsUserModalVisible(!isUserModalVisible)}>
-              <MyImage source={
-                !!user?.image?.thumbnail_1 ?
-                  { uri: S3_URL + user?.image?.thumbnail_1 }
-                  : icons.dummyUser}
-                style={{ height: 35, width: 35 }}
-                imageStyle={{ borderRadius: 35 / 2, borderWidth: 1 / 2, borderColor: colors.white }}
-              />
-            </TouchableOpacity>
-          }
+            {!hideProfile &&
+              <TouchableOpacity
+                onPress={() => setIsUserModalVisible(!isUserModalVisible)}>
+                <MyImage source={
+                  !!user?.image?.thumbnail_1 ?
+                    { uri: S3_URL + user?.image?.thumbnail_1 }
+                    : icons.dummyUser}
+                  style={{ height: 35, width: 35 }}
+                  imageStyle={{ borderRadius: 35 / 2, borderWidth: 1 / 2, borderColor: colors.white }}
+                />
+              </TouchableOpacity>
+            }
+          </View>
         </View>
-      </View>
       {hideSubHeader == false &&
         <View style={__header.secondView}>
           {!hideBackBottomButton &&
@@ -124,6 +126,7 @@ const Header = ({
           }
         </View>
       }
+
     </View>
   )
 }
