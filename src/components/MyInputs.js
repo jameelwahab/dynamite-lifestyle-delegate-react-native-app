@@ -32,7 +32,7 @@ const MyInputs = ({
         <TextInput
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
-          style={[__MyInputStyles.input, multiline ? __MyInputStyles.multilineView : undefined, !!rightIcon && { paddingLeft: 0 }]}
+          style={[__MyInputStyles.input, multiline ? __MyInputStyles.multilineView : undefined, !!rightIcon && { paddingLeft: !!leftIcon ? 0 : 10 }]}
           value={value}
           onChangeText={onChangeText}
           scrollEnabled={multiline}
@@ -83,7 +83,7 @@ const __MyInputStyles = StyleSheet.create({
   },
   multilineView: {
     height: 100,
-    
+
   },
   labelText: {
     fontFamily: fonts.regular,

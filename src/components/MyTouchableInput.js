@@ -11,21 +11,26 @@ const MyTouchableInput = ({
   onPress,
   icon = icons.down,
   noSpace = false,
-  view = null
+  view = null,
+  iconOnPress,
+  subTextView
 }) => {
   const [isFocused, setFocused] = useState(false)
   return (
     <Pressable
       onPress={onPress}
       style={{ marginBottom: noSpace ? 0 : 15 }}>
-      <Text pointerEvents="none" style={[__MyInputStyles.labelText, isFocused ? __MyInputStyles.focusedLabelText : undefined]}>{label}</Text>
-      <View pointerEvents="none" style={[__MyInputStyles.inputView, isFocused ? __MyInputStyles.focusedView : undefined]}>
+      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+        <Text pointerEvents={!!iconOnPress ? "auto" : "none"} style={[__MyInputStyles.labelText, isFocused ? __MyInputStyles.focusedLabelText : undefined]}>{label}</Text>
+        {!!subTextView ? subTextView() : <View />}
+      </View>
+      <View pointerEvents={!!iconOnPress ? "auto" : "none"} style={[__MyInputStyles.inputView, isFocused ? __MyInputStyles.focusedView : undefined, !!view && { height: null, }]}>
         {!!view ? view() :
           <TextInput
             pointerEvents="none"
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
-            style={[__MyInputStyles.input]}
+            style={[__MyInputStyles.input, !!view && { height: undefined }]}
             value={value}
             keyboardAppearance="dark"
             selectionColor={colors.text}
@@ -35,9 +40,10 @@ const MyTouchableInput = ({
             textAlignVertical={"center"}
             editable={false}
           />}
-        <View style={{ paddingHorizontal: 10 }}>
+        <Pressable onPress={iconOnPress}
+          style={{ paddingHorizontal: 10, height: 45, justifyContent: "center" }}>
           {icon()}
-        </View>
+        </Pressable>
       </View>
 
     </Pressable>

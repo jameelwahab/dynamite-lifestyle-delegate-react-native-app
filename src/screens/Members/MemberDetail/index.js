@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TouchableHighlight, Pressable } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TouchableHighlight, Pressable, Image } from 'react-native'
 import React, { useRef, useState } from 'react'
 import RootView from '../../../components/RootView'
 import MyText from '../../../components/MyText'
@@ -12,11 +12,15 @@ import { useSelector } from 'react-redux'
 import { selectTimeZone } from '../../../redux/reducers/timezoneSlice'
 import LeadModal from '../Components/LeadModal'
 import { selectUser } from '../../../redux/reducers/userSlice'
+import LeadHistoryModal from '../Components/LeadHistoryModal'
+import { IS_CHAT_EXIST } from '../../../DAL'
+import routes from '../../../navigation/routes'
 
 const MemberDetail = ({ navigation, route }) => {
-  const timezone = useSelector(selectTimeZone)
-  const { token } = useSelector(selectUser)
   const leadModalRef = useRef();
+  const hitoryModalRef = useRef();
+  const timezone = useSelector(selectTimeZone)
+  const { token, user } = useSelector(selectUser)
   const [member, setMember] = useState(route?.params?.member);
   const [showMorePages, setShowMorePages] = useState(false);
   const [showMorePrograms, setShowMorePrograms] = useState(false);
@@ -25,8 +29,60 @@ const MemberDetail = ({ navigation, route }) => {
 
   // ? funcvtions
 
-  const selectLeadStatus = () => {
+  const updateLeadStatus = (leadStatus, icome, date) => {
+    let lead = {
 
+      background_color: leadStatus?.background_color,
+      text_color: leadStatus?.text_color,
+      title: leadStatus?.title,
+      _id: leadStatus?._id
+
+    }
+    setMember({
+      ...member,
+      lead_status: lead,
+      lead_status_history: [{
+        income_value: icome,
+        changed_date_time: date,
+        lead_status: lead
+      },
+      ...member?.lead_status_history]
+    })
+  }
+
+  const onChatScreen = async (memberId) => {
+    let res = await IS_CHAT_EXIST({ token, navigation, memberId })
+    if (res.code == 200) {
+      if (res.is_chat_exist) {
+        let member = res.chat.member.find(x => x._id != user?._id)
+        navigation.navigate(routes.chatMessageList, {
+          isOnline: member?.is_online,
+          memberId: member?._id,
+          firstName: member?.first_name,
+          lastName: member?.last_name,
+          lastSeen: "",
+          profileImage: !!member?.profile_image ? member?.profile_image : "",
+          chatId: res?.chat?._id,
+          canGoBack: true,
+          resetCountToZero: () => { },
+          refresh: () => { },
+        })
+      } else {
+        let member = res.user_info;
+        navigation.navigate(routes.chatMessageList, {
+          isOnline: member?.is_online,
+          memberId: member?._id,
+          firstName: member?.first_name,
+          lastName: member?.last_name,
+          lastSeen: !!member?.last_login_activity ? member?.last_login_activity : "",
+          profileImage: !!member?.member ? member?.member : "",
+          chatId: "",
+          canGoBack: true,
+          resetCountToZero: () => { },
+          refresh: () => { },
+        })
+      }
+    }
   }
 
   // ? Views
@@ -56,12 +112,22 @@ const MemberDetail = ({ navigation, route }) => {
             <MyText fontSize={12} >{member?.email}</MyText>
           </View>
 
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => onChatScreen(member?._id)}>
             {icons.message(colors.primary, 20)}
           </TouchableOpacity>
         </View>
       </View>
     )
+  }
+
+  const wheelOfLifeStatus = () => {
+    if (!!member?.is_wheel_of_life) {
+      return (
+        <View style={__styles.noteView}>
+          <Image source={icons.wheelOfLife} style={{ height: "100%", width: "100%" }} />
+        </View>
+      )
+    }
   }
 
   const leadStatusView = () => {
@@ -85,9 +151,12 @@ const MemberDetail = ({ navigation, route }) => {
             </View>
           </View>
         </TouchableHighlight>
-        <TouchableOpacity style={__styles.historyBtn}>
-          {icons.history(colors.primary, 20)}
-        </TouchableOpacity>
+        {!!member?.lead_status > 0 &&
+          <TouchableOpacity
+            onPress={() => hitoryModalRef?.current?.openModal()}
+            style={__styles.historyBtn}>
+            {icons.history(colors.primary, 15)}
+          </TouchableOpacity>}
       </View>
     )
   }
@@ -179,6 +248,7 @@ const MemberDetail = ({ navigation, route }) => {
           member?.affliliate?.affiliate_user_info?.first_name + " " + member?.affliliate?.affiliate_user_info?.last_name + " (" + member?.affliliate?.affiliate_url_name + ") " : "Master Link"} />
         <StatView title={"Nurture"} value={!!member?.nurture ? member?.nurture?.first_name + " " + member?.nurture?.last_name : "N/A"} />
         <StatView title={"Delegate"} value={!!member?.consultant ? member?.consultant?.first_name + " " + member?.consultant?.last_name : "N/A"} />
+        <StatView title={"Wheel of life"} view={wheelOfLifeStatus} />
         <StatView title={"Last Login Activity"} value={convertTimezone(member?.last_login_activity, timezone).format(dateTimeFormat.dateTime)} />
         <StatView title={"Phone Number"} value={member?.contact_number} />
         <StatView title={"Lead Status"} view={leadStatusView} />
@@ -191,8 +261,8 @@ const MemberDetail = ({ navigation, route }) => {
         <StatView title={"Assessment Coins"} value={member?.attitude_assessment_coins_count} />
         <StatView title={"Meditation Coins"} value={member?.meditation_coins_count} />
         <StatView title={"Goal Statement"} value={!!member?.goal_statement_completed_status ? "completed" : "Incomplete"} />
-        <StatView title={"Created At"} value={!!member?.membership_purchase_expiry ? "member?.membership_purchase_expiry" : "N/A"} />
-        <StatView title={"Membership Expire"} value={convertTimezone(member?.createdAt, timezone).format(dateTimeFormat.date)} />
+        <StatView title={"Membership Expire"} value={!!member?.membership_purchase_expiry ? member?.membership_purchase_expiry : "N/A"} />
+        <StatView title={"Created At"} value={convertTimezone(member?.createdAt, timezone).format(dateTimeFormat.date)} />
         <StatView title={"Status"} view={statusView} />
         <StatView title={"Goal"} view={goalView} />
 
@@ -215,8 +285,16 @@ const MemberDetail = ({ navigation, route }) => {
         ref={leadModalRef}
         navigation={navigation}
         token={token}
-        selectLeadStatus={selectLeadStatus}
+        updateLeadStatus={updateLeadStatus}
+        memberId={member?._id}
+        oldLead={member?.lead_status}
+      />
 
+      <LeadHistoryModal
+        ref={hitoryModalRef}
+        memberId={member?._id}
+        navigation={navigation}
+        token={token}
       />
     </RootView>
   )
@@ -249,7 +327,7 @@ const __styles = StyleSheet.create({
     alignSelf: "flex-start"
   },
   historyBtn: {
-    width: 40,
+    width: 30,
     paddingVertical: 5,
     alignItems: "center"
   },

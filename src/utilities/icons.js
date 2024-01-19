@@ -26,7 +26,7 @@ export const icons = {
   textEdit: require('../assets/icons/textEdit.png'),
   addImage: require('../assets/icons/addImage.png'),
   schedule: require('../assets/icons/scheduled.png'),
-
+  wheelOfLife: require('../assets/icons/wheel-icon.webp'),
   //todo:   sideBar Icons
 
   sidebar: {
@@ -54,7 +54,7 @@ export const icons = {
   noIcon: () => { return (<MaterialIcons name="cancel" color={colors.transparent} size={20} />) },
   crosss: (color = colors.white, size = 20) => { return (<Ionicons name="close" color={color} size={size} />) },
   plus: (color = colors.white, size = 20) => { return (<Octicons name="plus" color={color} size={size} />) },
-  search: () => { return (<Feather name="search" color={colors.white} size={17} />) },
+  search: (color = colors.white, size = 17) => { return (<Feather name="search" color={color} size={size} />) },
   down: (color = colors.white, size = 17) => { return (<Ionicons name="caret-down" color={color} size={size} />) },
   threeDots: (color = colors.primary, size = 12) => { return (<Entypo name="dots-three-vertical" color={color} size={size} />) },
   download: (color = colors.primary, size = 17) => { return (<Feather name="download" color={color} size={size} />) },
@@ -95,5 +95,7 @@ export const icons = {
   message: (color = colors.primary, size = 17) => { return (<MaterialIcons name="message" color={color} size={size} />) },
   history: (color = colors.primary, size = 17) => { return (<FontAwesome5 name="history" color={color} size={size} />) },
   editpencil: (color = colors.primary, size = 17) => { return (<MaterialIcons name="mode-edit" color={color} size={size} />) },
+  sort: (color = colors.primary, size = 17) => { return (<Octicons name="sort-desc" color={color} size={size} />) },
+
 
 }

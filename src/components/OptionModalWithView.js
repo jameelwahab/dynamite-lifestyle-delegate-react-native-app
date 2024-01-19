@@ -11,9 +11,7 @@ const OptionModal = ({
   closeModal,
   onSelected,
   optionList,
-  titleKey = undefined,
-  renderText,
-  noIcon = false
+  renderItem
 }) => {
   return (
     <Modal
@@ -27,25 +25,23 @@ const OptionModal = ({
       <SafeAreaView style={{ backgroundColor: colors.secondaryVariant, marginTop: "auto", borderTopLeftRadius: 10, borderTopRightRadius: 10, maxHeight: 500 }} >
         <FlatList
           data={optionList}
-          // scrollEnabled={false}
+          scrollEnabled={false}
           contentContainerStyle={{ paddingVertical: 10 }}
           renderItem={({ item, index }) => (
             <TouchableHighlight
               onPress={() => onSelected?.(item)}
               underlayColor={colors.secondary} >
               <View style={{ paddingVertical: 12, flexDirection: "row", alignItems: "center", paddingLeft: 20 }}>
-                {!!item.icon && noIcon == false &&
+                {!!item.icon &&
                   <View style={{ height: 25, width: 25, justifyContent: "center", alignItems: "center" }}>
                     {typeof (item.icon) == "function" ? item.icon() :
                       <Image source={item.icon} style={{ height: 25, width: 25, tintColor: colors.primary }} />}
                   </View>}
                 <View style={{ marginLeft: 10 }}>
-                  {!!renderText ?
-                    renderText({ item, index }) :
-                    <MyText fontSize={16} >{
+
+                  <MyText fontSize={16} >{
                       !!titleKey ? item[titleKey]
                         : item.title}</MyText>
-                  }
                 </View>
               </View>
             </TouchableHighlight>

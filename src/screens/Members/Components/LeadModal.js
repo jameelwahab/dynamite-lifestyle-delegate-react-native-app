@@ -1,8 +1,8 @@
 import { View, Text, StyleSheet, Pressable, SafeAreaView, FlatList, TouchableHighlight, ScrollView } from 'react-native'
-import React, { forwardRef, useImperativeHandle, useState } from 'react'
+import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import Modal from 'react-native-modal'
 import { icons } from '../../../utilities/icons';
-import { LEAD_STATUS_LIST } from '../../../DAL';
+import { CHANGE_LEAD_STATUS, EDIT_LEAD_STATUS, LEAD_STATUS_LIST } from '../../../DAL';
 import MyLoader from '../../../components/MyLoader';
 import { colors } from '../../../utilities/colors';
 import MyText from '../../../components/MyText';
@@ -12,16 +12,38 @@ import MyInputs from '../../../components/MyInputs';
 import { MyButton } from '../../../components/MyButton';
 import moment from 'moment';
 import { dateTimeFormat } from '../../../utilities/constants';
+import CalendarModal from '../../../components/CalendarModal';
+import showToast from '../../../functions/showToast';
+import ConfirmationModal from '../../../components/ConfirmationModal';
 
-const LeadModal = forwardRef(({ token, navigation, selectLeadStatus }, ref) => {
+const LeadModal = forwardRef(({ token, navigation, updateLeadStatus, memberId, oldLead, edit = false }, ref) => {
+  const calendarModalRef = useRef();
   const [isVisible, setIsVisible] = useState(false);
   const [loader, setLoader] = useState(false)
+  const [rootLoader, setRootLoader] = useState(false);
   const [list, setList] = useState([]);
   const [leadModaVisible, setLeadModaVisible] = useState(false);
   const [selectedLead, setSelectedLead] = useState(null);
-  const [icome, setIcome] = useState(0);
-  const [date, setDate] = useState(moment())
+  const [icome, setIcome] = useState("0");
+  const [date, setDate] = useState(moment());
+  const [isConfirmationVisible, setIsConfirmationVisible] = useState(false);
 
+  useEffect(() => {
+    console.log(oldLead, "oldLead")
+    if (isVisible) {
+      if (edit) {
+        console.log(moment(oldLead?.changed_date_time).format(dateTimeFormat.date), "oldLead")
+        setSelectedLead(!!oldLead ? oldLead?.lead_status : null)
+
+        setIcome(!!oldLead?.income_value ? oldLead?.income_value : "0")
+        setTimeout(() => {
+          setDate(moment(oldLead?.changed_date_time))
+        }, 200);
+      } else {
+        setSelectedLead(!!oldLead ? oldLead : null)
+      }
+    }
+  }, [isVisible])
 
   useImperativeHandle(ref, () => {
     return {
@@ -33,8 +55,8 @@ const LeadModal = forwardRef(({ token, navigation, selectLeadStatus }, ref) => {
   const closeModal = () => {
     setIsVisible(false);
     setLeadModaVisible(false);
-    setIcome(0);
-    setSelectedLead()
+    setIcome("0");
+    setSelectedLead(null);
     setList([]);
   }
 
@@ -53,6 +75,76 @@ const LeadModal = forwardRef(({ token, navigation, selectLeadStatus }, ref) => {
       setLoader(false)
     } else {
       setLoader(false)
+    }
+  }
+
+  const onAgreeClick = () => {
+    setIsConfirmationVisible(false);
+    setRootLoader(true);
+    changeLeadStatusForMember()
+  }
+
+  const onUpdateBtnPress = () => {
+    if (!!selectedLead == false) {
+      showToast({ body: "Please select lead status", title: "Alert", type: "info" })
+      return
+    } else {
+      if (edit) {
+        updateLeadStatusForMember();
+      } else {
+        setIsConfirmationVisible(true);
+      }
+
+      // selectLeadStatus({ income: icome, date: moment(date).format('YYYY-MM-DD'), leadId: selectedLead?._id })
+      // setRootLoader(true);
+    }
+  }
+
+  const updateLeadStatusForMember = async () => {
+    let res = await EDIT_LEAD_STATUS({
+      token, navigation, body: {
+        changed_date_time: moment(date).format('YYYY-MM-DD'),
+        income_value: Number(icome),
+        lead_status: selectedLead?._id,
+        member_id: memberId,
+        id: oldLead?._id
+      }
+    });
+
+    if (res.code == 200) {
+      setRootLoader(false);
+      setIsVisible(false)
+      updateLeadStatus?.();
+      setIcome("0");
+      setDate(moment())
+      setSelectedLead(null)
+      showToast({ title: "Success", body: res.message, type: "success" })
+    } else {
+      setRootLoader(false);
+    }
+  }
+
+  const changeLeadStatusForMember = async () => {
+    let res = await CHANGE_LEAD_STATUS({
+      token, navigation, body: {
+        changed_date_time: moment(date).format('YYYY-MM-DD'),
+        income_value: Number(icome),
+        lead_status: selectedLead?._id,
+        member_id: memberId,
+
+      }
+    });
+
+    if (res.code == 200) {
+      setRootLoader(false);
+      setIsVisible(false)
+      updateLeadStatus(selectedLead, icome, date);
+      setIcome("0");
+      setDate(moment())
+      setSelectedLead(null)
+      showToast({ title: "Success", body: res.message, type: "success" })
+    } else {
+      setRootLoader(false);
     }
   }
 
@@ -124,6 +216,7 @@ const LeadModal = forwardRef(({ token, navigation, selectLeadStatus }, ref) => {
                 />
               </View>
               <MyLoader enable={loader} />
+
             </View>
           </View>
         </SafeAreaView>
@@ -150,24 +243,25 @@ const LeadModal = forwardRef(({ token, navigation, selectLeadStatus }, ref) => {
               {icons.back(colors.primary, 25)}
             </Pressable>
             <View style={{ marginLeft: 10 }}>
-              <MyText fontSize={18} color={colors.primary} type='medium' >Change Lead Status</MyText>
+              <MyText fontSize={18} color={colors.primary} type='medium' >{edit ? "Edit History Lead Status" : "Change Lead Status"}</MyText>
               {/* <MyText color={colors.lightText} fontSize={12}>Select Lead Status from list below</MyText> */}
             </View>
           </View>
           <View style={{ paddingHorizontal: 20, flex: 1 }}>
             <ScrollView contentContainerStyle={{ paddingTop: 20 }}>
-              <MyTouchableInput
-                label='Lead Status*'
-                icon={() => icons.down(colors.primary, 20)}
-                onPress={() => setLeadModaVisible(true)}
-                value={!!selectedLead && selectedLead?.title}
-                placeholder='Please select the lead status'
-              />
-
+              <View pointerEvents={edit ? "none" : "auto"} opacity={edit ? 0.6 : 1}>
+                <MyTouchableInput
+                  label='Lead Status*'
+                  icon={() => icons.down(colors.primary, 20)}
+                  onPress={() => setLeadModaVisible(true)}
+                  value={!!selectedLead && selectedLead?.title}
+                  placeholder='Please select the lead status'
+                />
+              </View>
               <MyInputs
                 label='Income*'
-                value={icome.toString()}
-                onChangeText={(text) => setIcome(Number(text))}
+                value={icome}
+                onChangeText={(text) => setIcome(text)}
                 keyboardType="number-pad"
               />
 
@@ -175,13 +269,24 @@ const LeadModal = forwardRef(({ token, navigation, selectLeadStatus }, ref) => {
                 label='Date*'
                 value={moment(date).format(dateTimeFormat.date)}
                 icon={() => icons.calendar(colors.primary, 20)}
+                onPress={() => calendarModalRef?.current?.openModal()}
               />
 
-              <MyButton invert title='Update' />
+              <MyButton invert title='Update' onPress={onUpdateBtnPress} />
             </ScrollView>
           </View>
         </View>
+
+        <CalendarModal ref={calendarModalRef}
+          onDateSelected={(selectedDate) => setDate(selectedDate)} />
+        <ConfirmationModal
+          isVisible={isConfirmationVisible}
+          title={"Are you sure you want to update lead status?"}
+          onAgree={onAgreeClick}
+          closeModal={() => setIsConfirmationVisible(false)}
+        />
         {modalLead()}
+        <MyLoader enable={rootLoader} />
       </SafeAreaView>
       <SafeAreaView style={{ flex: 0, backgroundColor: colors.secondary }} />
       {isVisible && <Toast />}
