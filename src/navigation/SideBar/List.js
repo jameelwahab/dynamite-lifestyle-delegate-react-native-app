@@ -7,6 +7,8 @@ import StackContactSupport from "../NestedStacks/StackContactSupport";
 import StackMissionControl from "../NestedStacks/SackMisisonControl";
 import StackFeed from "../NestedStacks/StackFeed";
 import StackAllMember from "../NestedStacks/StackAllMembers";
+import StackNurtureMembers from "../NestedStacks/StackNurtureMembers";
+import StackMembers from "../NestedStacks/StackMembers";
 
 export const drawerMenuList = [
   {
@@ -67,11 +69,33 @@ export const drawerMenuList = [
     icon: icons.sidebar.member,
     nestedmenu: [
       {
+        value: "members",
+        key: routes.memberNavigator,
+        component: StackMembers,
+        icon: icons.sidebar.member,
+        params: {
+          type: "member"
+        }
+      },
+
+      {
+        value: "nurture_members",
+        key: routes.nurtureNavigator,
+        component: StackNurtureMembers,
+        icon: icons.sidebar.member,
+        params: {
+          type: "nurture"
+        }
+      },
+
+      {
         value: "all_member_list",
         key: routes.allMemberNavigator,
         component: StackAllMember,
         icon: icons.sidebar.member,
-        params: {}
+        params: {
+          type: "all-member"
+        }
       },
     ]
   },

@@ -11,6 +11,8 @@ const routes = {
   allSourcesFeedNavigator: "ALL_SOURCE_FEED_NAVIGATOR",
   scheduledFeedNavigator: "SCHEDULED_FEED_NAVIGATOR",
   allMemberNavigator: "ALL_MEMBER_NAVIGATOR",
+  memberNavigator: "MEMBERS_NAVIGATOR",
+  nurtureNavigator: "NURTURE_NAVIGATOR",
 
 
   //! ///    Screens'
@@ -61,8 +63,8 @@ const routes = {
   sourceFeedScreen: "SOURCE_FEED_SCREEN",
   scheduleFeedScreen: "SCHEDULED_FEED_SCREEN",
 
-  //? Members
-  allMemberScreens: "ALL_MEMBER_SCREEN",
+  //? AllMembers
+  allMemberScreens: "MEMBER_SCREEN",
   memberDetails: "MEMBER_DETAIL_SCREEN",
 
 

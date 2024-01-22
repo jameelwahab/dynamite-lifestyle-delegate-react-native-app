@@ -15,8 +15,13 @@ import { selectUser } from '../../../redux/reducers/userSlice'
 import LeadHistoryModal from '../Components/LeadHistoryModal'
 import { IS_CHAT_EXIST } from '../../../DAL'
 import routes from '../../../navigation/routes'
+import moment from 'moment'
 
 const MemberDetail = ({ navigation, route }) => {
+  const { type } = route?.params;
+  const isAllMembers = type == "all-member";
+  const isMembers = type == "member";
+  const isNurture = type == "nurture";
   const leadModalRef = useRef();
   const hitoryModalRef = useRef();
   const timezone = useSelector(selectTimeZone)
@@ -109,7 +114,7 @@ const MemberDetail = ({ navigation, route }) => {
 
           <View style={__styles.memberProfileNameView}>
             <MyText fontSize={14} type='bold'>{member?.first_name + " " + member?.last_name}</MyText>
-            <MyText fontSize={12} >{member?.email}</MyText>
+            {isAllMembers && <MyText fontSize={12} >{member?.email}</MyText>}
           </View>
 
           <TouchableOpacity onPress={() => onChatScreen(member?._id)}>
@@ -241,30 +246,39 @@ const MemberDetail = ({ navigation, route }) => {
     )
   }
 
+  console.log(member,"member")
   const memberStatView = () => {
     return (
       <View>
-        <StatView title={"Reffered User"} value={!!member?.affliliate ?
-          member?.affliliate?.affiliate_user_info?.first_name + " " + member?.affliliate?.affiliate_user_info?.last_name + " (" + member?.affliliate?.affiliate_url_name + ") " : "Master Link"} />
-        <StatView title={"Nurture"} value={!!member?.nurture ? member?.nurture?.first_name + " " + member?.nurture?.last_name : "N/A"} />
-        <StatView title={"Delegate"} value={!!member?.consultant ? member?.consultant?.first_name + " " + member?.consultant?.last_name : "N/A"} />
+        {isAllMembers && <StatView title={"Reffered User"} value={!!member?.affliliate ?
+          member?.affliliate?.affiliate_user_info?.first_name + " " + member?.affliliate?.affiliate_user_info?.last_name + " (" + member?.affliliate?.affiliate_url_name + ") " : "Master Link"} />}
+        {!isNurture && <StatView title={"Nurture"} value={!!member?.nurture ? member?.nurture?.first_name + " " + member?.nurture?.last_name : "N/A"} />}
+        {!isMembers && <StatView title={"Delegate"} value={!!member?.consultant ? member?.consultant?.first_name + " " + member?.consultant?.last_name : "N/A"} />}
         <StatView title={"Wheel of life"} view={wheelOfLifeStatus} />
         <StatView title={"Last Login Activity"} value={convertTimezone(member?.last_login_activity, timezone).format(dateTimeFormat.dateTime)} />
         <StatView title={"Phone Number"} value={member?.contact_number} />
         <StatView title={"Lead Status"} view={leadStatusView} />
+        {isMembers && <StatView title={"Wheel of Life Completed Date"} value={!!member?.wheel_of_life_completed_date ? moment(member?.wheel_of_life_completed_date).format(dateTimeFormat.date) : "N/A"} />}
         <StatView title={"Client Note"} view={noteView} />
         <StatView title={"Pages"} view={pagesView} />
-        <StatView title={"Programmes"} view={ProgrammsView} />
-        <StatView title={"Wheel of Life Enable"} value={!!member?.is_wheel_of_life ? "Yes" : "No"} />
-        <StatView title={"Daily Intention Coins"} value={member?.dynamite_diary_coins_count} />
-        <StatView title={"Gratitude Coins"} value={member?.dynamite_gratitude_coins_count} />
-        <StatView title={"Assessment Coins"} value={member?.attitude_assessment_coins_count} />
-        <StatView title={"Meditation Coins"} value={member?.meditation_coins_count} />
-        <StatView title={"Goal Statement"} value={!!member?.goal_statement_completed_status ? "completed" : "Incomplete"} />
-        <StatView title={"Membership Expire"} value={!!member?.membership_purchase_expiry ? member?.membership_purchase_expiry : "N/A"} />
-        <StatView title={"Created At"} value={convertTimezone(member?.createdAt, timezone).format(dateTimeFormat.date)} />
+        {isAllMembers &&
+          <>
+            <StatView title={"Programmes"} view={ProgrammsView} />
+            <StatView title={"Wheel of Life Enable"} value={!!member?.is_wheel_of_life ? "Yes" : "No"} />
+            <StatView title={"Daily Intention Coins"} value={member?.dynamite_diary_coins_count} />
+            <StatView title={"Gratitude Coins"} value={member?.dynamite_gratitude_coins_count} />
+            <StatView title={"Assessment Coins"} value={member?.attitude_assessment_coins_count} />
+            <StatView title={"Meditation Coins"} value={member?.meditation_coins_count} />
+            <StatView title={"Goal Statement"} value={!!member?.goal_statement_completed_status ? "completed" : "Incomplete"} />
+          </>}
+        <StatView title={"Registrartion Date"} value={!!member?.goal_statement_completed_status ? "completed" : "Incomplete"} />
+        <StatView title={"Membership Expire"} value={!!member?.membership_purchase_expiry ?
+          isAllMembers ? member?.membership_purchase_expiry :
+            moment(new Date(member?.membership_purchase_expiry)).tz(timezone.admin).format(dateTimeFormat.date)
+          : "N/A"} />
+        <StatView title={isAllMembers ? "Created At" : "Registration Date"} value={moment(member?.createdAt).format(dateTimeFormat.date)} />
         <StatView title={"Status"} view={statusView} />
-        <StatView title={"Goal"} view={goalView} />
+        {isAllMembers && <StatView title={"Goal"} view={goalView} />}
 
       </View>
     )

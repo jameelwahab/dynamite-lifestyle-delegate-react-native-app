@@ -46,10 +46,11 @@ const Splash = ({ navigation }) => {
 
   const makeArrayOfSidebar = (list, user) => {
     list.forEach(x => {
-      console.log([x.option_label, x.option_value])
+      console.log(x.option_label, x.option_value)
     })
     let newArray = [];
-    newArray.push({ ...drawerMenuList[0], title: "Mission Control" });
+    let menuindex = 0;
+    newArray.push({ ...drawerMenuList[0], title: "Mission Control", index: menuindex });
     drawerMenuList.forEach((item) => {
 
       let index = list.findIndex(x => x.option_value == item.value)
@@ -60,7 +61,8 @@ const Splash = ({ navigation }) => {
           if (item?.value == "chat" && !user?.is_chat_allow) {
 
           } else {
-            newArray.push({ ...item, title: list[index].option_label });
+            menuindex++
+            newArray.push({ ...item, title: list[index].option_label, index: menuindex });
           }
         } else {
 
@@ -69,11 +71,11 @@ const Splash = ({ navigation }) => {
           item?.nestedmenu.forEach((z) => {
             let nestedIndex = list.findIndex(x => x.option_value == z.value);
             if (nestedIndex > -1) {
-              nestedArray.push({ ...z, title: list[nestedIndex].option_label });
+              menuindex++
+              nestedArray.push({ ...z, title: list[nestedIndex].option_label, index: menuindex });
             }
           })
-
-          newArray.push({ ...item, title: list[index].option_label, nestedmenu: nestedArray });
+          newArray.push({ ...item, title: list[index].option_label, nestedmenu: nestedArray, });
 
         }
 

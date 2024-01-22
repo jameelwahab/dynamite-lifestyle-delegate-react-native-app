@@ -82,4 +82,32 @@ const expireDaysList = [{
   title: "Custom",
 }]
 
-export { filterFromlist, levelList, memberStatusList, onlineStatusList, membershipStatusList, expireDaysList }
+const sortList = [
+  {
+    key: "registration_date_asc",
+    title: "Registration Date (Oldest First)"
+  },
+  {
+    key: "registration_date_desc",
+    title: "Registration Date (Newest First)"
+  },
+  {
+    key: "membership_expiry_date_asc",
+    title: "Membership Expiry Date (Oldest First)"
+  },
+  {
+    key: "membership_expiry_date_desc",
+    title: "Membership Expiry Date (Newest First)"
+  },
+  {
+    key: "last_login_date_asc",
+    title: "Last Login Date (Oldest First)"
+  },
+  {
+    key: "last_login_date_desc",
+    title: "Last Login Date (Newest First)"
+  },
+
+]
+
+export {sortList, filterFromlist, levelList, memberStatusList, onlineStatusList, membershipStatusList, expireDaysList }

@@ -72,12 +72,12 @@ const index = (props) => {
       <Pressable
         key={item.value}
         onPress={() => changeSideBarScreen(item)}
-        style={[{ backgroundColor: index == props.state.index && item.collapsible == false ? colors.lightPrimary3 : undefined, }, __styles.itemRootView]}>
+        style={[{ backgroundColor: item?.index == props.state.index && item.collapsible == false ? colors.lightPrimary3 : undefined, }, __styles.itemRootView]}>
         <Image source={item?.icon} style={__styles.itemIcon} />
         <View style={{ flex: 1 }}>
           <MyText
             fontSize={14}
-            color={index == props.state.index && item.collapsible == false ? colors.primary : colors.text}
+            color={item?.index == props.state.index && item.collapsible == false ? colors.primary : colors.text}
             style={{ marginLeft: 20 }} >{item.title}</MyText>
         </View>
         {item.collapsible &&
@@ -94,11 +94,11 @@ const index = (props) => {
         <Pressable
           key={item.value}
           onPress={() => changeSideBarScreen(item)}
-          style={[{ backgroundColor: index == props.state.index ? colors.lightPrimary3 : undefined, }, __styles.itemRootView, __styles.nestedView]}>
+          style={[{ backgroundColor: item?.index == props.state.index ? colors.lightPrimary3 : undefined, }, __styles.itemRootView, __styles.nestedView]}>
           <Image source={item?.icon} style={__styles.itemIcon} />
           <MyText
             fontSize={14}
-            color={index == props.state.index ? colors.primary : colors.text}
+            color={item?.index == props.state.index ? colors.primary : colors.text}
             style={{ marginLeft: 20 }} >{item.title}</MyText>
         </Pressable>
       </Collapsible>

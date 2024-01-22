@@ -20,7 +20,7 @@ import { filterFromlist, levelList, memberStatusList, onlineStatusList, membersh
 import Toast from 'react-native-toast-message';
 import showToast from '../../../functions/showToast';
 
-const FilterModal = forwardRef(({ token, filterTheData, appliedFilter }, ref) => {
+const FilterModal = forwardRef(({ token, filterTheData, appliedFilter, isMembers, isNurture, isAllMembers }, ref) => {
   const calendarRef = useRef()
   const [isVisible, setIsVisible] = useState(false);
   const [nurtureModalVisibilty, setNurtureModalVisibilty] = useState(false);
@@ -57,8 +57,10 @@ const FilterModal = forwardRef(({ token, filterTheData, appliedFilter }, ref) =>
   const navigation = useNavigation();
 
 
-  const reset = () => {
-    setfilterFrom(filterFromlist[0]);
+  const reset = (clearSaved) => {
+    if (!clearSaved) {
+      setfilterFrom(filterFromlist[0]);
+    }
     setSelectedSavedFilter(null);
     setSalePage("");
     setPlan("");
@@ -80,6 +82,8 @@ const FilterModal = forwardRef(({ token, filterTheData, appliedFilter }, ref) =>
     setCoinsTo("0");
   }
 
+
+
   useImperativeHandle(ref, () => {
     return {
       openModal
@@ -91,7 +95,7 @@ const FilterModal = forwardRef(({ token, filterTheData, appliedFilter }, ref) =>
       getFilterData();
     } else {
       if (!isApplied) {
-        reset()
+        reset(false)
       }
     }
   }, [isVisible])
@@ -132,14 +136,15 @@ const FilterModal = forwardRef(({ token, filterTheData, appliedFilter }, ref) =>
     }
     console.log(obj, "filters")
     setApplied(!reset)
-    filterTheData(obj, filterData);
+    filterTheData(obj, filterData, !!selectedSavedFilter, !reset);
     setIsVisible(false);
 
   }
 
   const clearAll = () => {
-    reset();
-    applyFilter(true)
+    reset(false);
+    filterTheData(filteroObj, filterData, false, false)
+    setIsVisible(false)
   }
 
   const getFilterData = async () => {
@@ -348,14 +353,14 @@ const FilterModal = forwardRef(({ token, filterTheData, appliedFilter }, ref) =>
 
           {filterFrom.key == "saved-filter" &&
             <MyTouchableInput
-              label='Sale Pages'
+              label='Saved Filter'
               value={selectedSavedFilter?.filter_name}
               onPress={() => openOptionModal("savedfilter", "filter_name")}
               icon={() => icons.down(colors.primary, 15)}
               subTextView={() => !!selectedSavedFilter && (
                 <Pressable
                   style={__styles.clearbtnView}
-                  onPress={() => setSelectedSavedFilter(null)}>
+                  onPress={() => reset(true)}>
                   <MyText color={colors.primary} >Clear</MyText>
                 </Pressable>
               )}
@@ -392,34 +397,35 @@ const FilterModal = forwardRef(({ token, filterTheData, appliedFilter }, ref) =>
                   </Pressable>
                 )}
               />
-
-              <MyTouchableInput
-                label='Choose Nuture'
-                value={!!nurture ? `${nurture?.first_name} ${nurture?.last_name} | ${nurture?.team_type}` : ""}
-                onPress={() => setNurtureModalVisibilty(true)}
-                icon={() => icons.down(colors.primary, 15)}
-                subTextView={() => !!nurture && (
-                  <Pressable
-                    style={__styles.clearbtnView}
-                    onPress={() => setNurture("")}>
-                    <MyText color={colors.primary} >Clear</MyText>
-                  </Pressable>
-                )}
-              />
-
-              <MyTouchableInput
-                label='Choose Delegate'
-                value={!!delegate ? `${delegate?.first_name} ${delegate?.last_name} | ${delegate?.team_type}` : ""}
-                onPress={() => setDeletegateModalVisibility(true)}
-                icon={() => icons.down(colors.primary, 15)}
-                subTextView={() => !!delegate && (
-                  <Pressable
-                    style={__styles.clearbtnView}
-                    onPress={() => setDelegate("")}>
-                    <MyText color={colors.primary} >Clear</MyText>
-                  </Pressable>
-                )}
-              />
+              {!isNurture &&
+                <MyTouchableInput
+                  label='Choose Nuture'
+                  value={!!nurture ? `${nurture?.first_name} ${nurture?.last_name} | ${nurture?.team_type}` : ""}
+                  onPress={() => setNurtureModalVisibilty(true)}
+                  icon={() => icons.down(colors.primary, 15)}
+                  subTextView={() => !!nurture && (
+                    <Pressable
+                      style={__styles.clearbtnView}
+                      onPress={() => setNurture("")}>
+                      <MyText color={colors.primary} >Clear</MyText>
+                    </Pressable>
+                  )}
+                />
+              }
+              {!isMembers &&
+                <MyTouchableInput
+                  label='Choose Delegate'
+                  value={!!delegate ? `${delegate?.first_name} ${delegate?.last_name} | ${delegate?.team_type}` : ""}
+                  onPress={() => setDeletegateModalVisibility(true)}
+                  icon={() => icons.down(colors.primary, 15)}
+                  subTextView={() => !!delegate && (
+                    <Pressable
+                      style={__styles.clearbtnView}
+                      onPress={() => setDelegate("")}>
+                      <MyText color={colors.primary} >Clear</MyText>
+                    </Pressable>
+                  )}
+                />}
 
               {/* <MyTouchableInput
             label='Choose Delegate'
@@ -640,6 +646,31 @@ const FilterModal = forwardRef(({ token, filterTheData, appliedFilter }, ref) =>
 })
 
 export default FilterModal;
+
+const filteroObj = {
+  "community": [],
+  "event_page": [],
+  "lead_status": [],
+  "plan": null,
+  "nurture": null,
+  "delegate": null,
+  "is_date_range": false,
+  "coins_range": false,
+  "coins_from": 0,
+  "coins_to": 0,
+  "from_date": null,
+  "to_date": null,
+  "membership_purchase_expiry_from": moment(),
+  "membership_purchase_expiry_to": moment(),
+  "date": null,
+  "coins": null,
+  "membership_expiry": null,
+  "status": "",
+  "expiry_in": 3,
+  "member_ship_expiry": "",
+  "user_status_type": "",
+}
+
 
 const __styles = StyleSheet.create({
   clearbtnView: {
