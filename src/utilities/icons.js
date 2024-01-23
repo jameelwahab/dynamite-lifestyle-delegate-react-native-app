@@ -40,7 +40,7 @@ export const icons = {
   user: () => { return (<FontAwesome6 name="user-large" color={colors.primary} size={17} />) },
   copy: () => { return (<Ionicons name="copy" color={colors.primary} size={17} />) },
   copyOulined: (size = 20, color = colors.primary) => { return (<Ionicons name="copy-outline" color={color} size={size} />) },
-  lock: () => { return (<Fontisto name="locked" color={colors.primary} size={17} />) },
+  lock: (color = colors.primary, size = 17) => { return (<Fontisto name="locked" color={color} size={size} />) },
   gear: () => { return (<Ionicons name="settings" color={colors.primary} size={17} />) },
   forwardArrow: (size = 20, color = colors.primary) => { return (<Ionicons name="chevron-forward" color={color} size={size} />) },
   backwardArrow: (size = 20, color = colors.primary) => { return (<Ionicons name="chevron-back" color={color} size={size} />) },
@@ -96,6 +96,9 @@ export const icons = {
   history: (color = colors.primary, size = 17) => { return (<FontAwesome5 name="history" color={color} size={size} />) },
   editpencil: (color = colors.primary, size = 17) => { return (<MaterialIcons name="mode-edit" color={color} size={size} />) },
   sort: (color = colors.primary, size = 17) => { return (<Octicons name="sort-desc" color={color} size={size} />) },
+  eye: (color = colors.primary, size = 17) => { return (<Ionicons name="eye" color={color} size={size} />) },
+  notes: (color = colors.primary, size = 17) => { return (<MaterialCommunityIcons name="clipboard-text" color={color} size={size} />) },
+
 
 
 }

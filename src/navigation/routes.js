@@ -66,7 +66,9 @@ const routes = {
   //? AllMembers
   allMemberScreens: "MEMBER_SCREEN",
   memberDetails: "MEMBER_DETAIL_SCREEN",
-
+  memberAddNote: "MEMBER_ADD_NOTE",
+  memberNotesListing: "MEMBER_NOTES_LISTING",
+  memberSubscribersListing: "MEMBER_SUBSCRIPTION_LISTING",
 
 }
 

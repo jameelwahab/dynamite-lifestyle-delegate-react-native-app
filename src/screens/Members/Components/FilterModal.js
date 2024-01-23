@@ -19,6 +19,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { filterFromlist, levelList, memberStatusList, onlineStatusList, membershipStatusList, expireDaysList } from './list'
 import Toast from 'react-native-toast-message';
 import showToast from '../../../functions/showToast';
+import OptionModalWithSearch from '../../../components/OptionModalWithSearch';
 
 const FilterModal = forwardRef(({ token, filterTheData, appliedFilter, isMembers, isNurture, isAllMembers }, ref) => {
   const calendarRef = useRef()
@@ -52,7 +53,15 @@ const FilterModal = forwardRef(({ token, filterTheData, appliedFilter, isMembers
     isVisible: false,
     list: [],
     selectedFor: "",
-    titleKey: ""
+    titleKey: "",
+  })
+
+  const [searchOptionModal, setSearchOptionModal] = useState({
+    isVisible: false,
+    list: [],
+    selectedFor: "",
+    titleKey: "",
+    title: "",
   })
   const navigation = useNavigation();
 
@@ -82,6 +91,46 @@ const FilterModal = forwardRef(({ token, filterTheData, appliedFilter, isMembers
     setCoinsTo("0");
   }
 
+  const checkFiltersApplied = () => {
+    console.log(appliedFilter, "checkFiltersApplied")
+    setfilterFrom(appliedFilter?.isSavedFilterApplied ? filterFromlist[1] : filterFromlist[0]);
+    setSelectedSavedFilter((prev) => appliedFilter?.isSavedFilterApplied ? prev : null);
+
+    setSalePage((prev) => !!appliedFilter?.event_page[0] ? prev : "");
+    setPlan((prev) => !!appliedFilter?.event_page[0] ? prev : "");
+    setNurture((prev) => !!appliedFilter?.nurture ? prev : "");
+    setDelegate((prev) => !!appliedFilter?.delegate ? prev : "")
+    setLeadStatus((prev) => {
+      let list = [];
+      prev.forEach((x) => {
+        if (appliedFilter?.lead_status?.findIndex(y => y == x._id) > -1) {
+          list.push(x)
+        }
+      })
+      return list;
+    });
+    setSelectedLevel((prev) => {
+      let list = [];
+      prev.forEach((x) => {
+        if (appliedFilter?.community?.findIndex(y => y == x.key) > -1) {
+          list.push(x)
+        }
+      })
+      return list;
+    })
+    setMemberStatus((prev) => typeof (appliedFilter?.status) != "string" ? prev : "");
+    setOnlineStatus((prev) => !!appliedFilter?.user_status_type ? prev : "");
+    setMembershipStatus((prev) => !!appliedFilter?.member_ship_expiry ? prev : "");
+    setExpireIn((prev) => !!appliedFilter?.expiry_in && appliedFilter?.member_ship_expiry == "not_expired" ? prev : "")
+    setMembershipExpiryStartDate((prev) => !!appliedFilter?.expiry_in && appliedFilter?.member_ship_expiry == "not_expired" && appliedFilter?.expiry_in == "custom" ? moment(appliedFilter?.membership_purchase_expiry_from, "YYYY-MM-DD") : moment());
+    setMembershipExpiryEndDate((prev) => !!appliedFilter?.expiry_in && appliedFilter?.member_ship_expiry == "not_expired" && appliedFilter?.expiry_in == "custom" ? moment(appliedFilter?.membership_purchase_expiry_to, "YYYY-MM-DD") : moment());
+    setShowDateRange((prev) => appliedFilter?.is_date_range == prev ? prev : false);
+    setStartDate((prev) => !!appliedFilter?.is_date_range ? prev : null);
+    setEndDate((prev) => !!appliedFilter?.is_date_range ? prev : null)
+    setShowCoinsRange((prev) => !!appliedFilter?.coins_range ? prev : false);
+    setCoinsFrom((prev) => !!appliedFilter?.coins_range ? prev : "0");
+    setCoinsTo((prev) => !!appliedFilter?.coins_range ? prev : "0");
+  }
 
 
   useImperativeHandle(ref, () => {
@@ -93,6 +142,8 @@ const FilterModal = forwardRef(({ token, filterTheData, appliedFilter, isMembers
   useEffect(() => {
     if (isVisible) {
       getFilterData();
+      checkFiltersApplied()
+
     } else {
       if (!isApplied) {
         reset(false)
@@ -147,8 +198,8 @@ const FilterModal = forwardRef(({ token, filterTheData, appliedFilter, isMembers
     setIsVisible(false)
   }
 
-  const getFilterData = async () => {
-    let res = await GET_FILTER_DATA({ navigation, token, });
+  const getFilterData = async (searchText = "") => {
+    let res = await GET_FILTER_DATA({ navigation, token, searchText });
     if (res.code == 200) {
       setFilterData(res)
     }
@@ -190,18 +241,70 @@ const FilterModal = forwardRef(({ token, filterTheData, appliedFilter, isMembers
       isVisible: true,
       list: list,
       selectedFor: openFor,
-      titleKey: title
+      titleKey: title,
+    })
+  }
+
+  const openSearchOptionModal = (openFor, title = undefined) => {
+    let list = [];
+    let heading = "";
+    if (openFor == "savedfilter") {
+      list = filterData?.saved_portal_filter;
+      heading = "Saved Filters"
+    } else if (openFor == "salepage") {
+      list = filterData?.sale_pages
+      heading = "Page"
+    } else if (openFor == "plan") {
+      list = !!salePage?.payment_plans ? salePage?.payment_plans : []
+      heading = "Plan"
+    } else if (openFor == "leadstatus") {
+      heading = "Lead Status"
+      filterData?.lead_status.forEach(x => {
+        if (leadStatus.findIndex(y => y._id == x._id) == -1) {
+          list.push(x)
+        }
+      })
+    } else if (openFor == "level") {
+      heading = "Level"
+      levelList.forEach(x => {
+        if (selectedLevel.findIndex(y => y.key == x.key) == -1) {
+          list.push(x)
+        }
+      })
+    }
+
+    console.log(list, "list")
+
+    setSearchOptionModal({
+      isVisible: true,
+      list: list,
+      selectedFor: openFor,
+      titleKey: title,
+      title: heading
     })
   }
 
   const onOptionSelected = (seletecOpt) => {
-    let { selectedFor } = optionModal;
-    setOptionModal({
-      isVisible: false,
-      list: [],
-      selectedFor: "",
-      titleKey: ""
-    })
+    let selectedFor;
+    if (optionModal.isVisible) {
+      selectedFor = optionModal.selectedFor;
+      setOptionModal({
+        isVisible: false,
+        list: [],
+        selectedFor: "",
+        titleKey: ""
+      })
+    } else {
+      selectedFor = searchOptionModal.selectedFor;
+      setSearchOptionModal({
+        isVisible: false,
+        list: [],
+        selectedFor: "",
+        titleKey: "",
+        title: ""
+      })
+    }
+
     if (selectedFor == "filterType") {
       setfilterFrom(seletecOpt)
     } else if (selectedFor == "savedfilter") {
@@ -253,9 +356,18 @@ const FilterModal = forwardRef(({ token, filterTheData, appliedFilter, isMembers
     }
   }
 
-  const openCalendarFor = (openFor) => {
+  const filterDataLocally = (oldlist, text) => {
+    let titleKey = searchOptionModal.titleKey;
+
+    return oldlist.slice().filter(x => x[titleKey].toLowerCase().includes(text.trim().toLowerCase()));
+
+  }
+
+
+
+  const openCalendarFor = (openFor, date) => {
     setCalenderFor(openFor)
-    calendarRef?.current?.openModal()
+    calendarRef?.current?.openModal(date)
   }
 
   const onDateSelected = (date) => {
@@ -288,6 +400,16 @@ const FilterModal = forwardRef(({ token, filterTheData, appliedFilter, isMembers
       isVisible: false,
       list: [],
       selectedFor: ""
+    })
+  }
+
+
+  const closeSearchOptionModal = () => {
+    setSearchOptionModal({
+      isVisible: false,
+      list: [],
+      selectedFor: "",
+      title: ""
     })
   }
 
@@ -355,7 +477,7 @@ const FilterModal = forwardRef(({ token, filterTheData, appliedFilter, isMembers
             <MyTouchableInput
               label='Saved Filter'
               value={selectedSavedFilter?.filter_name}
-              onPress={() => openOptionModal("savedfilter", "filter_name")}
+              onPress={() => openSearchOptionModal("savedfilter", "filter_name")}
               icon={() => icons.down(colors.primary, 15)}
               subTextView={() => !!selectedSavedFilter && (
                 <Pressable
@@ -373,7 +495,7 @@ const FilterModal = forwardRef(({ token, filterTheData, appliedFilter, isMembers
               <MyTouchableInput
                 label='Sale Pages'
                 value={salePage?.sale_page_title}
-                onPress={() => openOptionModal("salepage", "sale_page_title")}
+                onPress={() => openSearchOptionModal("salepage", "sale_page_title")}
                 icon={() => icons.down(colors.primary, 15)}
                 subTextView={() => !!salePage && (
                   <Pressable
@@ -387,7 +509,7 @@ const FilterModal = forwardRef(({ token, filterTheData, appliedFilter, isMembers
               <MyTouchableInput
                 label='Choose Plan'
                 value={plan?.plan_title}
-                onPress={() => openOptionModal("plan", "plan_title")}
+                onPress={() => openSearchOptionModal("plan", "plan_title")}
                 icon={() => icons.down(colors.primary, 15)}
                 subTextView={() => !!plan && (
                   <Pressable
@@ -433,7 +555,7 @@ const FilterModal = forwardRef(({ token, filterTheData, appliedFilter, isMembers
 
               <MyTouchableInput
                 view={selectedleadStatusView}
-                iconOnPress={() => openOptionModal("leadstatus", "title")}
+                iconOnPress={() => openSearchOptionModal("leadstatus", "title")}
                 label='Lead Status'
                 icon={() => icons.down(colors.primary, 15)}
                 subTextView={() => leadStatus.length > 0 && (
@@ -448,7 +570,7 @@ const FilterModal = forwardRef(({ token, filterTheData, appliedFilter, isMembers
               <MyTouchableInput
                 label='Levels'
                 view={selectedlevelView}
-                iconOnPress={() => openOptionModal("level", "title")}
+                iconOnPress={() => openSearchOptionModal("level", "title")}
                 icon={() => icons.down(colors.primary, 15)}
                 subTextView={() => selectedLevel.length > 0 && (
                   <Pressable
@@ -464,6 +586,13 @@ const FilterModal = forwardRef(({ token, filterTheData, appliedFilter, isMembers
                 value={memberStatus?.title}
                 onPress={() => openOptionModal("memberstatus", "title")}
                 icon={() => icons.down(colors.primary, 15)}
+                subTextView={() => !!memberStatus && (
+                  <Pressable
+                    style={__styles.clearbtnView}
+                    onPress={() => setMemberStatus("")}>
+                    <MyText color={colors.primary} >Clear</MyText>
+                  </Pressable>
+                )}
               />
 
               <MyTouchableInput
@@ -471,6 +600,13 @@ const FilterModal = forwardRef(({ token, filterTheData, appliedFilter, isMembers
                 value={onlineStatus?.title}
                 onPress={() => openOptionModal("onlinestatus", "title")}
                 icon={() => icons.down(colors.primary, 15)}
+                subTextView={() => !!onlineStatus && (
+                  <Pressable
+                    style={__styles.clearbtnView}
+                    onPress={() => setOnlineStatus("")}>
+                    <MyText color={colors.primary} >Clear</MyText>
+                  </Pressable>
+                )}
               />
 
               <MyTouchableInput
@@ -478,6 +614,13 @@ const FilterModal = forwardRef(({ token, filterTheData, appliedFilter, isMembers
                 value={membershipStatus?.title}
                 onPress={() => openOptionModal("membershipstatus", "title")}
                 icon={() => icons.down(colors.primary, 15)}
+                subTextView={() => !!membershipStatus && (
+                  <Pressable
+                    style={__styles.clearbtnView}
+                    onPress={() => setMembershipStatus("")}>
+                    <MyText color={colors.primary} >Clear</MyText>
+                  </Pressable>
+                )}
               />
               {membershipStatus?.key == "not_expired" &&
                 <>
@@ -492,16 +635,16 @@ const FilterModal = forwardRef(({ token, filterTheData, appliedFilter, isMembers
                       <MyTouchableInput
                         label='Membership Expiry Start Date'
                         value={moment(membershipExpiryStartDate).format(dateTimeFormat.date)}
-                        icon={icons.calendar}
-                        onPress={() => openCalendarFor("MESD")}
+                        icon={() => icons.calendar(colors.primary, 20)}
+                        onPress={() => openCalendarFor("MESD", membershipExpiryStartDate)}
                       />
 
 
                       <MyTouchableInput
                         label='Membership Expiry End Date'
                         value={moment(membershipExpiryEndDate).format(dateTimeFormat.date)}
-                        icon={icons.calendar}
-                        onPress={() => openCalendarFor("MEED")}
+                        icon={() => icons.calendar(colors.primary, 20)}
+                        onPress={() => openCalendarFor("MEED", membershipExpiryEndDate)}
                       />
                     </>}
                 </>
@@ -517,15 +660,15 @@ const FilterModal = forwardRef(({ token, filterTheData, appliedFilter, isMembers
                   <MyTouchableInput
                     label='Start Date*'
                     value={!!startDate ? moment(startDate).format(dateTimeFormat.date) : ""}
-                    icon={icons.calendar}
-                    onPress={() => openCalendarFor("SD")}
+                    icon={() => icons.calendar(colors.primary, 20)}
+                    onPress={() => openCalendarFor("SD", startDate)}
                   />
 
                   <MyTouchableInput
                     label='End Date*'
                     value={!!endDate ? moment(endDate).format(dateTimeFormat.date) : ""}
-                    icon={icons.calendar}
-                    onPress={() => openCalendarFor("ED")}
+                    icon={() => icons.calendar(colors.primary, 20)}
+                    onPress={() => openCalendarFor("ED", endDate)}
                   />
                 </View>}
 
@@ -614,23 +757,38 @@ const FilterModal = forwardRef(({ token, filterTheData, appliedFilter, isMembers
           noIcon={true}
         />
 
-        <OptionModal
+        <OptionModalWithSearch
+          closeModal={closeSearchOptionModal}
+          isVisible={searchOptionModal.isVisible}
+          onSelected={onOptionSelected}
+          optionList={searchOptionModal.list}
+          titleKey={searchOptionModal.titleKey}
+          noIcon={true}
+          title={searchOptionModal?.title}
+          filterTheList={filterDataLocally}
+        />
+
+        <OptionModalWithSearch
           closeModal={() => setNurtureModalVisibilty(false)}
           isVisible={nurtureModalVisibilty}
           onSelected={onNutureSelected}
           optionList={!!filterData?.delegates_list ? filterData?.delegates_list : []}
           renderText={({ item }) => <MyText style={{ textTransform: "capitalize" }} >{`${item?.first_name} ${item?.last_name} | ${item?.team_type}`}</MyText>}
           noIcon={true}
+          title="Nurture"
+          onSearchTextChange={(text) => getFilterData(text)}
         />
 
 
-        <OptionModal
+        <OptionModalWithSearch
           closeModal={() => setDeletegateModalVisibility(false)}
           isVisible={deletegateModalVisibility}
           onSelected={onDelegateSelected}
-          optionList={!!filterData?.delegates_list ? filterData?.delegates : []}
+          optionList={!!filterData?.delegates_list ? filterData?.delegates_list : []}
           renderText={({ item }) => <MyText style={{ textTransform: "capitalize" }} >{`${item?.first_name} ${item?.last_name} | ${item?.team_type}`}</MyText>}
           noIcon={true}
+          title="Delegate"
+          onSearchTextChange={(text) => getFilterData(text)}
         />
 
         <CalendarModal

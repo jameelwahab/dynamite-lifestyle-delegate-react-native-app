@@ -16,6 +16,7 @@ import LeadHistoryModal from '../Components/LeadHistoryModal'
 import { IS_CHAT_EXIST } from '../../../DAL'
 import routes from '../../../navigation/routes'
 import moment from 'moment'
+import numFormatter from '../../../DAL/numFormatter'
 
 const MemberDetail = ({ navigation, route }) => {
   const { type } = route?.params;
@@ -246,16 +247,18 @@ const MemberDetail = ({ navigation, route }) => {
     )
   }
 
-  console.log(member,"member")
+  console.log(member, "member")
   const memberStatView = () => {
     return (
       <View>
+        <StatView title={"Coins"} value={numFormatter(member?.coins_count)} uppercase />
         {isAllMembers && <StatView title={"Reffered User"} value={!!member?.affliliate ?
           member?.affliliate?.affiliate_user_info?.first_name + " " + member?.affliliate?.affiliate_user_info?.last_name + " (" + member?.affliliate?.affiliate_url_name + ") " : "Master Link"} />}
         {!isNurture && <StatView title={"Nurture"} value={!!member?.nurture ? member?.nurture?.first_name + " " + member?.nurture?.last_name : "N/A"} />}
         {!isMembers && <StatView title={"Delegate"} value={!!member?.consultant ? member?.consultant?.first_name + " " + member?.consultant?.last_name : "N/A"} />}
+        <StatView title={"Community Level"} value={member?.community_level} uppercase={member?.community_level == 'pta'} />
         <StatView title={"Wheel of life"} view={wheelOfLifeStatus} />
-        <StatView title={"Last Login Activity"} value={convertTimezone(member?.last_login_activity, timezone).format(dateTimeFormat.dateTime)} />
+        <StatView title={"Last Login Activity"} uppercase value={convertTimezone(member?.last_login_activity, timezone).format(dateTimeFormat.dateTime)} />
         <StatView title={"Phone Number"} value={member?.contact_number} />
         <StatView title={"Lead Status"} view={leadStatusView} />
         {isMembers && <StatView title={"Wheel of Life Completed Date"} value={!!member?.wheel_of_life_completed_date ? moment(member?.wheel_of_life_completed_date).format(dateTimeFormat.date) : "N/A"} />}
@@ -271,7 +274,6 @@ const MemberDetail = ({ navigation, route }) => {
             <StatView title={"Meditation Coins"} value={member?.meditation_coins_count} />
             <StatView title={"Goal Statement"} value={!!member?.goal_statement_completed_status ? "completed" : "Incomplete"} />
           </>}
-        <StatView title={"Registrartion Date"} value={!!member?.goal_statement_completed_status ? "completed" : "Incomplete"} />
         <StatView title={"Membership Expire"} value={!!member?.membership_purchase_expiry ?
           isAllMembers ? member?.membership_purchase_expiry :
             moment(new Date(member?.membership_purchase_expiry)).tz(timezone.admin).format(dateTimeFormat.date)

@@ -79,9 +79,9 @@ export const SAVE_FILTER = ({ token, navigation, body: {
   })
 }
 
-export const GET_FILTER_DATA = ({ token, navigation, }) => {
+export const GET_FILTER_DATA = ({ token, navigation, searchText }) => {
   return invokeApi({
-    path: `api/consultant/filter_data_for/delegate?search_text=&delegate_search_text=&filter_on_tab_name=all-member`,
+    path: `api/consultant/filter_data_for/delegate?search_text=&delegate_search_text=${searchText}&filter_on_tab_name=all-member`,
     method: "GET",
     token,
     navigation,
@@ -144,6 +144,71 @@ export const DELETE_STATUS_HISTORY = ({ token, navigation, body: {
       id, lead_status, member_id
     },
     method: "POST",
+    token,
+    navigation,
+  })
+}
+
+
+export const MEMBER_NOTES_LIST = ({ token, navigation, memberId }) => {
+  return invokeApi({
+    path: `api/member/list_personal_note/${memberId}`,
+    method: "GET",
+    token,
+    navigation,
+  })
+}
+
+
+
+export const MEMBER_ADD_NOTE = ({ token, navigation, member_id, personal_note }) => {
+  return invokeApi({
+    path: `api/member/update_personal_note`,
+    method: "POST",
+    postData: {
+      member_id, personal_note
+    },
+    token,
+    navigation,
+  })
+}
+
+export const MEMBER_UPDATE_NOTE = ({ token, navigation, member_id, personal_note, note_id }) => {
+  return invokeApi({
+    path: `api/member/edit_personal_note`,
+    method: "POST",
+    postData: { member_id, personal_note, note_id },
+    token,
+    navigation,
+  })
+}
+
+export const MEMBER_DELETE_NOTE = ({ token, navigation, member_id, note_id }) => {
+  return invokeApi({
+    path: `api/member/remove_personal_note`,
+    method: "POST",
+    postData: { member_id, note_id },
+    token,
+    navigation,
+  })
+}
+
+
+export const MEMBER_SUBSCRIPTION_LIST = ({ token, navigation, memberId, page, searchText }) => {
+  return invokeApi({
+    path: `api/member/event_subscriber_list/member_id/${memberId}?page=${page}&limit=50&search_text=${searchText}`,
+    method: "GET",
+    token,
+    navigation,
+  })
+}
+
+
+
+export const MEMBER_DELETE_SUBSCRIPTION = ({ token, navigation, subscriptionId }) => {
+  return invokeApi({
+    path: `api/event_subscriber/delete_event_subscriber/${subscriptionId}`,
+    method: "DELETE",
     token,
     navigation,
   })

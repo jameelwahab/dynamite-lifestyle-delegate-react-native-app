@@ -7,10 +7,12 @@ import routes from '../routes'
 import { defaultScreens } from './defaultScreens'
 import { colors } from '../../utilities/colors'
 
+
 import MemberList from '../../screens/Members/MemberList'
 import MemberDetail from '../../screens/Members/MemberDetail'
-// import FeedScreen from '../../screens/Feed/FeedScreen'
-
+import AddNote from '../../screens/Members/Notes/AddNote'
+import List from '../../screens/Members/Notes/List'
+import SubscriptionList from '../../screens/Members/Subscriptions'
 
 
 const NurtureStack = createNativeStackNavigator()
@@ -23,6 +25,9 @@ const StackNurtureMembers = ({ route }) => {
         screenOptions={{ headerShown: false }}>
         <NurtureStack.Screen initialParams={route.params} name={routes.allMemberScreens} component={MemberList} />
         <NurtureStack.Screen initialParams={route.params} name={routes.memberDetails} component={MemberDetail} />
+        <NurtureStack.Screen name={routes.memberNotesListing} component={List} />
+        <NurtureStack.Screen name={routes.memberAddNote} component={AddNote} />
+        <NurtureStack.Screen name={routes.memberSubscribersListing} component={SubscriptionList} />
         {/*//? Default Screens Start */}
         {defaultScreens.map((x, i) => (
           <NurtureStack.Screen key={x.name} name={x.name} component={x.component} />

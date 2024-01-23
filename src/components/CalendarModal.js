@@ -19,7 +19,8 @@ const CalendarModal = forwardRef(({ onDateSelected }, ref) => {
     }
   }, [])
 
-  const openModal = () => {
+  const openModal = (date) => {
+    setDate(!!date ? moment(date).format("YYYY-MM-DD") : moment().format("YYYY-MM-DD"));
     setIsVisible(true)
   }
 
@@ -86,16 +87,17 @@ const CalendarModal = forwardRef(({ onDateSelected }, ref) => {
 
                 }}
                 onDayPress={(day) => {
-                  console.log(day,"day")
-                  setDate(day.dateString)
+                  setIsVisible(false);
+                  onDateSelected?.(moment(day.dateString, "YYYY-MM-DD"));
+
                 }}
               />
             </View>
 
-            <View style={{ flexDirection: "row", justifyContent: "flex-end", marginTop: 10 }}>
+            {/* <View style={{ flexDirection: "row", justifyContent: "flex-end", marginTop: 10 }}>
               <TransparentButton title='CANCEL' onPress={closeModal} />
               <TransparentButton title='AGREE' onPress={onAgreeClick} />
-            </View>
+            </View> */}
 
           </View>
         </SafeAreaView>

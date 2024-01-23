@@ -126,7 +126,7 @@ const LeadHistoryModal = forwardRef(({ token, navigation, memberId }, ref) => {
             </Pressable>
           </View>
 
-          <StatView title={"Income Value"} value={item?.income_value} />
+          <StatView title={"Income Value"} value={"£ " + item?.income_value} />
           <StatView title={"Action Info"} value={`${item?.action_info?.name}\n(${item?.action_info?.action_user_type.replace("_", " ")})`} />
           <StatView title={"Date"} value={moment(item?.changed_date_time).format(dateTimeFormat.date)} />
         </View>
@@ -184,7 +184,7 @@ const LeadHistoryModal = forwardRef(({ token, navigation, memberId }, ref) => {
             ref={leadModalRef2}
             navigation={navigation}
             token={token}
-            updateLeadStatus={()=>{
+            updateLeadStatus={() => {
               getHistory();
               setSelectedLeadStatusForEdit
             }}

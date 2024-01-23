@@ -2,6 +2,7 @@ import { View, Text, TouchableOpacity, StyleSheet, TouchableHighlight } from 're
 import React from 'react'
 import { colors } from '../utilities/colors'
 import { fonts } from '../utilities/fonts'
+import { icons } from '../utilities/icons'
 
 
 const MyButton = ({
@@ -48,7 +49,23 @@ const TransparentButton = ({
   )
 }
 
-export { MyButton, TransparentButton }
+const MenuButton = ({ size = 25, onPress = () => { } }) => {
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      style={{
+        height: size, width: size, borderRadius: size / 2, alignItems: "center", justifyContent: "center",
+        backgroundColor: colors.lightPrimary3,
+        marginHorizontal: 5
+      }}
+      
+    >
+      {icons.threeDots(colors.primary, size - 7)}
+    </TouchableOpacity>
+  )
+}
+
+export { MyButton, TransparentButton, MenuButton }
 
 const __MyButtonStyles = StyleSheet.create({
   rootView: {

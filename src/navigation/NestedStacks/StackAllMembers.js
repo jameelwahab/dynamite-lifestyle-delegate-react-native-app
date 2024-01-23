@@ -8,7 +8,11 @@ import { colors } from '../../utilities/colors'
 
 import MemberList from '../../screens/Members/MemberList'
 import MemberDetail from '../../screens/Members/MemberDetail'
-// import FeedScreen from '../../screens/Feed/FeedScreen'
+import AddNote from '../../screens/Members/Notes/AddNote'
+import List from '../../screens/Members/Notes/List'
+import SubscriptionList from '../../screens/Members/Subscriptions'
+
+
 
 
 
@@ -22,6 +26,10 @@ const StackAllMember = ({ route }) => {
         screenOptions={{ headerShown: false }}>
         <AllMemberStack.Screen initialParams={route.params} name={routes.allMemberScreens} component={MemberList} />
         <AllMemberStack.Screen initialParams={route.params} name={routes.memberDetails} component={MemberDetail} />
+        <AllMemberStack.Screen name={routes.memberNotesListing} component={List} />
+        <AllMemberStack.Screen name={routes.memberAddNote} component={AddNote} />
+        <AllMemberStack.Screen name={routes.memberSubscribersListing} component={SubscriptionList} />
+
         {/*//? Default Screens Start */}
         {defaultScreens.map((x, i) => (
           <AllMemberStack.Screen key={x.name} name={x.name} component={x.component} />

@@ -9,8 +9,9 @@ import { colors } from '../../utilities/colors'
 
 import MemberList from '../../screens/Members/MemberList'
 import MemberDetail from '../../screens/Members/MemberDetail'
-// import FeedScreen from '../../screens/Feed/FeedScreen'
-
+import AddNote from '../../screens/Members/Notes/AddNote'
+import List from '../../screens/Members/Notes/List'
+import SubscriptionList from '../../screens/Members/Subscriptions'
 
 
 const MemberStack = createNativeStackNavigator()
@@ -23,6 +24,9 @@ const StackMembers = ({ route }) => {
         screenOptions={{ headerShown: false }}>
         <MemberStack.Screen initialParams={route.params} name={routes.allMemberScreens} component={MemberList} />
         <MemberStack.Screen initialParams={route.params} name={routes.memberDetails} component={MemberDetail} />
+        <MemberStack.Screen name={routes.memberNotesListing} component={List} />
+        <MemberStack.Screen name={routes.memberAddNote} component={AddNote} />
+        <MemberStack.Screen name={routes.memberSubscribersListing} component={SubscriptionList} />
         {/*//? Default Screens Start */}
         {defaultScreens.map((x, i) => (
           <MemberStack.Screen key={x.name} name={x.name} component={x.component} />

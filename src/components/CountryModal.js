@@ -89,11 +89,7 @@ export default function CountryModal({ selectCountry = () => { }, isVisible, clo
               {icons.crosssWithCircle()}
             </Pressable>
           </View>
-          {/* <View>
-            <Pressable onPress={closeModal} style={{ alignSelf: "flex-end", marginRight: 10, marginBottom: 10 }}>
-              {icons.crosssWithCircle()}
-            </Pressable>
-          </View> */}
+
           <View style={ModalStyle.searchView}>
             <View>
               {icons.search()}

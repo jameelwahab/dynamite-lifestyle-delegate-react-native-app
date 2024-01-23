@@ -1,46 +1,47 @@
 import { View, Text, SafeAreaView, TouchableOpacity, StyleSheet, FlatList } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import RootView from '../../components/RootView'
-import { colors } from '../../utilities/colors'
+import RootView from '../../../components/RootView'
+import { colors } from '../../../utilities/colors'
 import { useSelector } from 'react-redux'
-import { selectUser } from '../../redux/reducers/userSlice'
-import MyLoader from '../../components/MyLoader'
-import MyText from '../../components/MyText'
-import { icons } from '../../utilities/icons'
-import FAB from '../../components/FAB'
-import { DELETE_NOTES, LIST_OF_NOTES } from '../../DAL'
-import routes from '../../navigation/routes'
-import MyWebview from '../../components/MyWebview'
-import UserImage from '../../components/UserImage'
+import { selectUser } from '../../../redux/reducers/userSlice'
+import MyLoader from '../../../components/MyLoader'
+import MyText from '../../../components/MyText'
+import { icons } from '../../../utilities/icons'
+import FAB from '../../../components/FAB'
+import { DELETE_NOTES, LIST_OF_NOTES, MEMBER_DELETE_NOTE, MEMBER_NOTES_LIST, NOTES_LIST } from '../../../DAL'
+import routes from '../../../navigation/routes'
+import MyWebview from '../../../components/MyWebview'
+import UserImage from '../../../components/UserImage'
 import moment from 'moment'
-import OptionModal from '../../components/OptionModal'
-import ConfirmationModal from '../../components/ConfirmationModal'
+import OptionModal from '../../../components/OptionModal'
+import ConfirmationModal from '../../../components/ConfirmationModal'
 import { useNavigation } from '@react-navigation/native'
-import EmptyView from '../../components/EmptyView'
-import { convertTimezone } from '../../functions/convertTime'
-const List = ({ ticket, user, timezone }) => {
-  const navigation = useNavigation();
+import EmptyView from '../../../components/EmptyView'
+import { convertTimezone } from '../../../functions/convertTime'
+import { selectTimeZone } from '../../../redux/reducers/timezoneSlice'
+import { dateTimeFormat } from '../../../utilities/constants'
+const List = ({ navigation, route }) => {
+  console.log(route, "route")
+  const ticket = "";
+  const { memberId } = route?.params;
+  const timezone = useSelector(selectTimeZone)
   const { token } = useSelector(selectUser);
   const [loader, setLoader] = useState(false)
-  const [list, setList] = useState([])
+  const [list, setList] = useState([]);
+  const [autoResponderMsg, setAutoResponderMsg] = useState([]);
   const [optionModal, setOptionModal] = useState({ isVisible: false, for: "" })
   const [confirmationModal, setConfirmationModal] = useState({ isVisible: false, title: "" })
 
 
-  const getNotesList = async () => {
-    let res = await LIST_OF_NOTES({ token, navigation, id: ticket?._id });
-    setLoader(false)
-    if (res.code == 200) {
-      setList(res?.support_ticket?.internal_note)
-    }
-  }
+
 
   const optionsAction = (opt) => {
     if (opt.type == "edit") {
-      navigation.navigate(routes.addNote, {
-        ticketId: ticket?._id,
-        refresh: getNotesList,
-        note: optionModal?.for
+      navigation.navigate(routes.memberAddNote, {
+        memberId: memberId,
+        refresh: getNotesFromServer,
+        note: optionModal?.for,
+        autoResponderMsg: autoResponderMsg
       });
       setOptionModal({ isVisible: false, for: "" })
     } else if (opt.type == "delete") {
@@ -53,38 +54,48 @@ const List = ({ ticket, user, timezone }) => {
 
   const deleteNote = async (noteId) => {
     setLoader(true);
-    let res = await DELETE_NOTES({ token, navigation, ticketId: ticket?._id, noteId });
+    let res = await MEMBER_DELETE_NOTE({ token, navigation, member_id: memberId, note_id: noteId });
     if (res.code == 200) {
-      getNotesList()
+      getNotesFromServer()
     } else {
       setLoader(false)
     }
 
   }
 
-  useEffect(() => {
-    if (!!ticket) {
-      setList(ticket?.internal_note)
+  const getNotesFromServer = async () => {
+    let res = await MEMBER_NOTES_LIST({ token, navigation, memberId: memberId })
+    if (res.code == 200) {
+      setList(res.member.personal_note);
+      setAutoResponderMsg(res?.auto_responder_message)
+      setLoader(false)
+    } else {
+      setLoader(false)
     }
-  }, [ticket])
+  }
+
+  useEffect(() => {
+    setLoader(true)
+    getNotesFromServer();
+  }, [])
 
   const renderList = ({ item, index }) => {
     return (
       <View style={__styles.itemRootView}>
         <View style={__styles.itemUserView}>
           <UserImage
-            image={item?.action_user_info?.profile_image}
-            name={item?.action_user_info?.action_name}
+            image={item?.action_info?.profile_image}
+            name={item?.action_info?.name}
             size={30}
           />
 
           <View style={__styles.itemNameAndDateView} >
             <View style={{ flex: 1 }}>
               <MyText color={colors.primary} fontSize={14} >
-                {item?.action_user_info?.action_name}
+                {item?.action_info?.name}
               </MyText>
             </View>
-            <MyText fontSize={10} >{convertTimezone(item?.note_date_time, timezone).format("YYYY-MM-DD hh:mm A")}</MyText>
+
 
             <TouchableOpacity
               onPress={() => setOptionModal({ isVisible: true, for: item })}
@@ -95,25 +106,29 @@ const List = ({ ticket, user, timezone }) => {
         </View>
         <View style={{ paddingVertical: 5 }}>
           <MyWebview
-            html={item?.internal_note}
+            html={item?.note}
           />
         </View>
+
+          <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 5 }}>
+            <MyText fontSize={10} color={colors.lightText2} >{"Created At: " + convertTimezone(item?.note_date_time, timezone).format(dateTimeFormat.dateTime)}</MyText>
+            {!!item?.last_updated_date_time ?
+              <MyText fontSize={10} color={colors.lightText2}>{"Last Action: " + convertTimezone(item?.last_updated_date_time, timezone).format(dateTimeFormat.dateTime)}</MyText> : <View />}
+          </View>
       </View>
     )
   }
 
   return (
-    <RootView hideHeader >
-      <View style={{ flex: 1, marginHorizontal: -10 }}>
-
-
+    <RootView title='Personal Notes' >
+      <View style={{ flex: 1, }}>
         <View style={{ flex: 1, marginTop: 10, }}>
           <FlatList
             data={list}
             renderItem={renderList}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: 70 }}
-            ListEmptyComponent={() =>
+            ListEmptyComponent={!loader &&
               <EmptyView label={"No notes"} />
             }
           />
@@ -124,9 +139,10 @@ const List = ({ ticket, user, timezone }) => {
         <MyLoader enable={loader} />
         <FAB
           onPress={() =>
-            navigation.navigate(routes.addNote, {
-              ticketId: ticket?._id,
-              refresh: getNotesList
+            navigation.navigate(routes.memberAddNote, {
+              memberId: memberId,
+              refresh: getNotesFromServer,
+              autoResponderMsg: autoResponderMsg
             })}
           icon={() => icons.plus(colors.black, 20)}
         />

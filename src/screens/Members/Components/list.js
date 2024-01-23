@@ -27,9 +27,6 @@ const levelList = [{
 }]
 
 const memberStatusList = [{
-  key: "none",
-  title: "None",
-}, {
   key: "active",
   title: "Active",
 }, {
@@ -39,9 +36,6 @@ const memberStatusList = [{
 
 
 const onlineStatusList = [{
-  key: "all",
-  title: "All",
-}, {
   key: "online",
   title: "Online",
 }, {
@@ -49,16 +43,14 @@ const onlineStatusList = [{
   title: "Offline",
 }]
 
-const membershipStatusList = [{
-  key: "none",
-  title: "None",
-}, {
-  key: "expired",
-  title: "Expired",
-}, {
-  key: "not_expired",
-  title: "Active",
-}]
+const membershipStatusList = [
+  {
+    key: "expired",
+    title: "Expired",
+  }, {
+    key: "not_expired",
+    title: "Active",
+  }]
 
 
 const expireDaysList = [{
@@ -110,4 +102,4 @@ const sortList = [
 
 ]
 
-export {sortList, filterFromlist, levelList, memberStatusList, onlineStatusList, membershipStatusList, expireDaysList }
+export { sortList, filterFromlist, levelList, memberStatusList, onlineStatusList, membershipStatusList, expireDaysList }

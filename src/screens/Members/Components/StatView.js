@@ -5,7 +5,7 @@ import { colors } from '../../../utilities/colors'
 
 
 
-const StatView = ({ title, value, view = null }) => {
+const StatView = ({ title, value, view = null, uppercase = false }) => {
   return (
     <View style={{ flexDirection: "row", alignItems: "center", borderBottomWidth: 1 / 3, borderBottomColor: colors.lightText, paddingBottom: 10, marginTop: 10, }}>
       <View style={{ flex: 0.7 }}>
@@ -13,7 +13,7 @@ const StatView = ({ title, value, view = null }) => {
       </View>
       <View style={{ flex: 1 }}>
         {!!view ? view() :
-          <MyText style={{ textTransform: "capitalize" }} fontSize={12} type='medium' >{value}</MyText>}
+          <MyText style={{ textTransform: uppercase ? "uppercase" : "capitalize" }} fontSize={12} type='medium' >{value}</MyText>}
       </View>
     </View>
   )

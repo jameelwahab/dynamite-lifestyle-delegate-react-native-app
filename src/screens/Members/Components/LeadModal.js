@@ -15,6 +15,8 @@ import { dateTimeFormat } from '../../../utilities/constants';
 import CalendarModal from '../../../components/CalendarModal';
 import showToast from '../../../functions/showToast';
 import ConfirmationModal from '../../../components/ConfirmationModal';
+import { useSelector } from 'react-redux';
+import { selectUser } from '../../../redux/reducers/userSlice';
 
 const LeadModal = forwardRef(({ token, navigation, updateLeadStatus, memberId, oldLead, edit = false }, ref) => {
   const calendarModalRef = useRef();
@@ -28,6 +30,8 @@ const LeadModal = forwardRef(({ token, navigation, updateLeadStatus, memberId, o
   const [date, setDate] = useState(moment());
   const [isConfirmationVisible, setIsConfirmationVisible] = useState(false);
 
+
+
   useEffect(() => {
     console.log(oldLead, "oldLead")
     if (isVisible) {
@@ -35,7 +39,7 @@ const LeadModal = forwardRef(({ token, navigation, updateLeadStatus, memberId, o
         console.log(moment(oldLead?.changed_date_time).format(dateTimeFormat.date), "oldLead")
         setSelectedLead(!!oldLead ? oldLead?.lead_status : null)
 
-        setIcome(!!oldLead?.income_value ? oldLead?.income_value : "0")
+        setIcome(!!oldLead?.income_value ? oldLead?.income_value.toString() : "0")
         setTimeout(() => {
           setDate(moment(oldLead?.changed_date_time))
         }, 200);
@@ -180,16 +184,15 @@ const LeadModal = forwardRef(({ token, navigation, updateLeadStatus, memberId, o
                   keyExtractor={(item, index) => {
                     return index.toString();
                   }}
-                  ItemSeparatorComponent={() => (
-                    <View
-                      style={{
-                        height: 0.3,
-                        width: '100%',
-                        alignSelf: 'center',
-                        backgroundColor: '#B4B4B5',
-                      }}
-                    />
-                  )}
+                  // ItemSeparatorComponent={
+                  //   <View
+                  //     style={{
+                  //       height: 0.5,
+                  //       width: '100%',
+                  //       alignSelf: 'center',
+                  //       backgroundColor: '#B4B4B5',
+                  //     }}
+                  //   />}
                   contentContainerStyle={{ paddingBottom: 30 }}
                   renderItem={({ item, index }) => (
                     <TouchableHighlight
@@ -213,6 +216,7 @@ const LeadModal = forwardRef(({ token, navigation, updateLeadStatus, memberId, o
                       </View>
                     </TouchableHighlight>
                   )}
+
                 />
               </View>
               <MyLoader enable={loader} />
@@ -269,7 +273,7 @@ const LeadModal = forwardRef(({ token, navigation, updateLeadStatus, memberId, o
                 label='Date*'
                 value={moment(date).format(dateTimeFormat.date)}
                 icon={() => icons.calendar(colors.primary, 20)}
-                onPress={() => calendarModalRef?.current?.openModal()}
+                onPress={() => calendarModalRef?.current?.openModal(date)}
               />
 
               <MyButton invert title='Update' onPress={onUpdateBtnPress} />
