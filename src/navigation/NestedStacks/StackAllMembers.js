@@ -11,6 +11,8 @@ import MemberDetail from '../../screens/Members/MemberDetail'
 import AddNote from '../../screens/Members/Notes/AddNote'
 import List from '../../screens/Members/Notes/List'
 import SubscriptionList from '../../screens/Members/Subscriptions'
+import QuestionsList from '../../screens/Members/QuestionsList'
+import GenericQuetionList from '../../screens/Questions/GenericQuetionList'
 
 
 
@@ -29,7 +31,8 @@ const StackAllMember = ({ route }) => {
         <AllMemberStack.Screen name={routes.memberNotesListing} component={List} />
         <AllMemberStack.Screen name={routes.memberAddNote} component={AddNote} />
         <AllMemberStack.Screen name={routes.memberSubscribersListing} component={SubscriptionList} />
-
+        <AllMemberStack.Screen name={routes.memberQuestionListing} component={QuestionsList} />
+        <AllMemberStack.Screen name={routes.genericQestionListing} component={GenericQuetionList} />
         {/*//? Default Screens Start */}
         {defaultScreens.map((x, i) => (
           <AllMemberStack.Screen key={x.name} name={x.name} component={x.component} />

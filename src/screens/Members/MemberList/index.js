@@ -79,6 +79,10 @@ const MemberList = ({ navigation, route }) => {
       navigation.navigate(routes.memberSubscribersListing, {
         memberId: item?._id
       })
+    } else if (opt?.key == "question-answer") {
+      navigation.navigate(routes.memberQuestionListing, {
+        memberId: item?._id
+      })
     }
   }
 
@@ -277,7 +281,7 @@ const MemberList = ({ navigation, route }) => {
 
   const countLength = () => {
     let count = 0;
-    console.log("<========== Filter Start =================>")
+
     Object.keys(Filter).forEach(filter => {
       if (Array.isArray(Filter[filter])) {
         count = count + Filter[filter].length;
@@ -287,18 +291,16 @@ const MemberList = ({ navigation, route }) => {
         }
       } else if (typeof (Filter[filter]) == "boolean") {
         if (Filter[filter]) {
-          
+
           count = count + 1;
         }
-        
+
       }
-      
+
     })
     if (!!sorted) {
       count = count + 1;
     }
-    console.log(count, "count")
-    console.log("<========== Filter End =================>")
     return count;
   }
 
@@ -310,8 +312,8 @@ const MemberList = ({ navigation, route }) => {
           <>
 
             <View style={[__styles.allChipView, countLength() > 5 ?
-              { height: showChips ? undefined : 55, overflow: "hidden" }:{
-                height:undefined,overflow:"visible"
+              { height: showChips ? undefined : 55, overflow: "hidden" } : {
+                height: undefined, overflow: "visible"
               }]}>
               <View style={{}}>
                 <MyText type='bold' >{"Filtered By : "}</MyText>
@@ -513,11 +515,11 @@ const optionList = [
   //   title: "View Profile",
   //   icon: () => icons.eye(colors.primary, 20)
   // },
-  // {
-  //   key: "question-answer",
-  //   title: "Questions Answers",
-  //   icon: () => icons.lock(colors.primary, 20)
-  // },
+  {
+    key: "question-answer",
+    title: "Questions Answers",
+    icon: () => icons.lock(colors.primary, 20)
+  },
 
 ]
 

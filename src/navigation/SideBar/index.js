@@ -104,7 +104,8 @@ const index = (props) => {
       </Collapsible>
     )
   }
-  console.log(settings?.brand_logo, "settings?.brand_logo")
+
+  
   return (
     <DrawerContentScrollView
       style={{ backgroundColor: colors.secondary }}

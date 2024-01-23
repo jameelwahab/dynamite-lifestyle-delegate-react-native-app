@@ -6,16 +6,16 @@ export const LIST_OF_MEMBERS = ({ token, navigation, page, searchText, body: {
   event_page = [], expiry_in = 3, filter_From = "", filter_name = null, from_date = null,
   is_date_range = false, lead_status = [], member_ship_expiry = "", membership_expiry = null,
   membership_purchase_expiry_from = moment(), membership_purchase_expiry_to = moment(),
-  nurture = null, plan = null, sort_by = null, status = "", to_date = null,
+  nurture = null, delegate = null, plan = null, sort_by = null, status = "", to_date = null,
   user_status_type = "", search_text = ""
 } }) => {
   return invokeApi({
-    path: `api/member/member_list_for_delegate?page=${page}&limit=10&search_text=${searchText}`,
+    path: `api/member/member_list_for_delegate?page=${page}&limit=20&search_text=${searchText}`,
     method: "POST",
     postData: {
       coins, coins_from, coins_range, coins_to, community, date, event_page, expiry_in, filter_From,
       filter_name, from_date, is_date_range, lead_status, member_ship_expiry, membership_expiry, membership_expiry,
-      membership_purchase_expiry_from, membership_purchase_expiry_to, nurture, plan, sort_by, status, to_date, user_status_type,
+      membership_purchase_expiry_from, membership_purchase_expiry_to, nurture, delegate, plan, sort_by, status, to_date, user_status_type,
       search_text
     },
     token,
@@ -50,7 +50,7 @@ export const LIST_OF_NURTURE = ({ token, navigation, page, searchText, body: {
   event_page = [], expiry_in = 3, filter_From = "", filter_name = null, from_date = null,
   is_date_range = false, lead_status = [], member_ship_expiry = "", membership_expiry = null,
   membership_purchase_expiry_from = moment(), membership_purchase_expiry_to = moment(),
-  nurture = null, plan = null, sort_by = null, status = "", to_date = null,
+  delegate = null, plan = null, sort_by = null, status = "", to_date = null,
   user_status_type = "", search_text = ""
 } }) => {
   return invokeApi({
@@ -59,7 +59,7 @@ export const LIST_OF_NURTURE = ({ token, navigation, page, searchText, body: {
     postData: {
       coins, coins_from, coins_range, coins_to, community, date, event_page, expiry_in, filter_From,
       filter_name, from_date, is_date_range, lead_status, member_ship_expiry, membership_expiry, membership_expiry,
-      membership_purchase_expiry_from, membership_purchase_expiry_to, nurture, plan, sort_by, status, to_date, user_status_type,
+      membership_purchase_expiry_from, membership_purchase_expiry_to, delegate, plan, sort_by, status, to_date, user_status_type,
       search_text
     },
     token,
@@ -196,7 +196,7 @@ export const MEMBER_DELETE_NOTE = ({ token, navigation, member_id, note_id }) =>
 
 export const MEMBER_SUBSCRIPTION_LIST = ({ token, navigation, memberId, page, searchText }) => {
   return invokeApi({
-    path: `api/member/event_subscriber_list/member_id/${memberId}?page=${page}&limit=50&search_text=${searchText}`,
+    path: `api/member/event_subscriber_list/member_id/${memberId}?page=${page}&limit=20&search_text=${searchText}`,
     method: "GET",
     token,
     navigation,
@@ -209,6 +209,15 @@ export const MEMBER_DELETE_SUBSCRIPTION = ({ token, navigation, subscriptionId }
   return invokeApi({
     path: `api/event_subscriber/delete_event_subscriber/${subscriptionId}`,
     method: "DELETE",
+    token,
+    navigation,
+  })
+}
+
+export const MEMBER_QUESTIONS_MODULE_LIST = ({ token, navigation, memberId }) => {
+  return invokeApi({
+    path: `api/questionnaire/list_member_question_and_answers/${memberId}`,
+    method: "GET",
     token,
     navigation,
   })

@@ -69,6 +69,11 @@ const routes = {
   memberAddNote: "MEMBER_ADD_NOTE",
   memberNotesListing: "MEMBER_NOTES_LISTING",
   memberSubscribersListing: "MEMBER_SUBSCRIPTION_LISTING",
+  memberQuestionListing: "MEMBER_QUESTIONS_LISTING",
+
+
+  //? Questions
+  genericQestionListing: "QUESTION_LISTING",
 
 }
 

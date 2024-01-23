@@ -12,8 +12,6 @@ import { drawerMenuList } from './List';
 const Drawer = createDrawerNavigator();
 
 const SideDrawer = () => {
-
-  
   return (
     <Drawer.Navigator
       backBehavior="firstRoute"

@@ -104,6 +104,7 @@ const List = ({ ticket, user, timezone }) => {
 
   return (
     <RootView hideHeader >
+      
       <View style={{ flex: 1, marginHorizontal: -10 }}>
 
 

@@ -17,6 +17,7 @@ import { IS_CHAT_EXIST } from '../../../DAL'
 import routes from '../../../navigation/routes'
 import moment from 'moment'
 import numFormatter from '../../../DAL/numFormatter'
+import NotesModal from '../Components/NotesModal'
 
 const MemberDetail = ({ navigation, route }) => {
   const { type } = route?.params;
@@ -25,6 +26,7 @@ const MemberDetail = ({ navigation, route }) => {
   const isNurture = type == "nurture";
   const leadModalRef = useRef();
   const hitoryModalRef = useRef();
+  const notesModalRef = useRef();
   const timezone = useSelector(selectTimeZone)
   const { token, user } = useSelector(selectUser)
   const [member, setMember] = useState(route?.params?.member);
@@ -169,9 +171,12 @@ const MemberDetail = ({ navigation, route }) => {
 
   const noteView = () => {
     return (
-      <View style={__styles.noteView}>
+      <Pressable
+        disabled={member?.personal_note.length == 0}
+        onPress={() => notesModalRef?.current?.openModal(member?.personal_note)}
+        style={__styles.noteView}>
         <MyText color={colors.black} fontSize={14} >{member?.personal_note.length}</MyText>
-      </View>
+      </Pressable>
     )
   }
 
@@ -185,8 +190,8 @@ const MemberDetail = ({ navigation, route }) => {
 
   const goalView = () => {
     return (
-      <View style={[__styles.statusView, { backgroundColor: !!member?.goal_statement_status?.status ? colors.online : colors.heart }]}>
-        <MyText color={colors.white} fontSize={14} >{!!member?.goal_statement_status?.status ? "Unlocked" : "Locked"}</MyText>
+      <View style={[__styles.statusView, { backgroundColor: !!member?.goal_statement_status ? colors.online : colors.heart }]}>
+        <MyText color={colors.white} fontSize={14} >{!!member?.goal_statement_status ? "Unlocked" : "Locked"}</MyText>
       </View>
     )
   }
@@ -247,7 +252,7 @@ const MemberDetail = ({ navigation, route }) => {
     )
   }
 
-  console.log(member, "member")
+
   const memberStatView = () => {
     return (
       <View>
@@ -258,7 +263,7 @@ const MemberDetail = ({ navigation, route }) => {
         {!isMembers && <StatView title={"Delegate"} value={!!member?.consultant ? member?.consultant?.first_name + " " + member?.consultant?.last_name : "N/A"} />}
         <StatView title={"Community Level"} value={member?.community_level} uppercase={member?.community_level == 'pta'} />
         <StatView title={"Wheel of life"} view={wheelOfLifeStatus} />
-        <StatView title={"Last Login Activity"} uppercase value={convertTimezone(member?.last_login_activity, timezone).format(dateTimeFormat.dateTime)} />
+        <StatView title={"Last Login Activity"} uppercase value={convertTimezone(member?.last_login_activity,timezone).format(dateTimeFormat.dateTime)} />
         <StatView title={"Phone Number"} value={member?.contact_number} />
         <StatView title={"Lead Status"} view={leadStatusView} />
         {isMembers && <StatView title={"Wheel of Life Completed Date"} value={!!member?.wheel_of_life_completed_date ? moment(member?.wheel_of_life_completed_date).format(dateTimeFormat.date) : "N/A"} />}
@@ -267,12 +272,12 @@ const MemberDetail = ({ navigation, route }) => {
         {isAllMembers &&
           <>
             <StatView title={"Programmes"} view={ProgrammsView} />
-            <StatView title={"Wheel of Life Enable"} value={!!member?.is_wheel_of_life ? "Yes" : "No"} />
-            <StatView title={"Daily Intention Coins"} value={member?.dynamite_diary_coins_count} />
-            <StatView title={"Gratitude Coins"} value={member?.dynamite_gratitude_coins_count} />
-            <StatView title={"Assessment Coins"} value={member?.attitude_assessment_coins_count} />
-            <StatView title={"Meditation Coins"} value={member?.meditation_coins_count} />
-            <StatView title={"Goal Statement"} value={!!member?.goal_statement_completed_status ? "completed" : "Incomplete"} />
+            <StatView title={"Wheel of Life Enable"} value={member?.is_wheel_of_life_enable ? "YES" : "No"} />
+            <StatView title={"Daily Intention Coins"} value={numFormatter(member?.dynamite_diary_coins_count, 1)} uppercase />
+            <StatView title={"Gratitude Coins"} value={numFormatter(member?.dynamite_gratitude_coins_count, 1)} uppercase />
+            <StatView title={"Assessment Coins"} value={numFormatter(member?.attitude_assessment_coins_count, 1)} uppercase />
+            <StatView title={"Meditation Coins"} value={numFormatter(member?.meditation_coins_count, 1)} uppercase />
+            <StatView title={"Goal Statement"} value={!!member?.goal_statement_completed_status ? `completed (${moment(member.goal_statement_completed_date).format(dateTimeFormat.date)})` : "Incomplete"} />
           </>}
         <StatView title={"Membership Expire"} value={!!member?.membership_purchase_expiry ?
           isAllMembers ? member?.membership_purchase_expiry :
@@ -312,6 +317,8 @@ const MemberDetail = ({ navigation, route }) => {
         navigation={navigation}
         token={token}
       />
+
+      <NotesModal ref={notesModalRef} />
     </RootView>
   )
 }
@@ -336,7 +343,7 @@ const __styles = StyleSheet.create({
     // paddingVertical: 5,
     // paddingHorizontal: 15,
     height: 25,
-    width: 80,
+    minWidth: 80,
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 30,

@@ -31,7 +31,7 @@ const List = ({ navigation, route }) => {
   const [autoResponderMsg, setAutoResponderMsg] = useState([]);
   const [optionModal, setOptionModal] = useState({ isVisible: false, for: "" })
   const [confirmationModal, setConfirmationModal] = useState({ isVisible: false, title: "" })
-
+  const [member, setMember] = useState(null)
 
 
 
@@ -66,9 +66,12 @@ const List = ({ navigation, route }) => {
   const getNotesFromServer = async () => {
     let res = await MEMBER_NOTES_LIST({ token, navigation, memberId: memberId })
     if (res.code == 200) {
+      let userMember = { ...res.member };
+      delete userMember.personal_note;
       setList(res.member.personal_note);
       setAutoResponderMsg(res?.auto_responder_message)
-      setLoader(false)
+      setLoader(false);
+      setMember(userMember);
     } else {
       setLoader(false)
     }
@@ -92,8 +95,9 @@ const List = ({ navigation, route }) => {
           <View style={__styles.itemNameAndDateView} >
             <View style={{ flex: 1 }}>
               <MyText color={colors.primary} fontSize={14} >
-                {item?.action_info?.name}
+                {`${item?.action_info?.name} ${item?.action_by=="admin_user"?"(Admin)":"(Delegate)"} `}
               </MyText>
+              <MyText fontSize={10} color={colors.lightText2} >{"Created at: " + convertTimezone(item?.note_date_time, timezone).format(dateTimeFormat.dateTime)}</MyText>
             </View>
 
 
@@ -110,17 +114,36 @@ const List = ({ navigation, route }) => {
           />
         </View>
 
-          <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 5 }}>
-            <MyText fontSize={10} color={colors.lightText2} >{"Created At: " + convertTimezone(item?.note_date_time, timezone).format(dateTimeFormat.dateTime)}</MyText>
-            {!!item?.last_updated_date_time ?
-              <MyText fontSize={10} color={colors.lightText2}>{"Last Action: " + convertTimezone(item?.last_updated_date_time, timezone).format(dateTimeFormat.dateTime)}</MyText> : <View />}
+        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 5 }}>
+          
+          {!!item?.last_updated_date_time ?
+            <MyText fontSize={10} color={colors.lightText2}>{"Last Action: " + convertTimezone(item?.last_updated_date_time, timezone).format(dateTimeFormat.dateTime)}</MyText> : <View />}
+        </View>
+      </View>
+    )
+  }
+
+  const topView = () => {
+    return (
+      <View style={{ flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", paddingBottom: 5 }}>
+        <View style={{ marginLeft: 5, height: 35, flexDirection: "row", alignItems: "center", }}>
+          <UserImage image={member?.profile_image} name={member?.first_name} size={30} />
+          <View style={{ marginLeft: 10 }}>
+            <MyText type='bold' fontSize={12} >{`${member?.first_name} ${member?.last_name}`}</MyText>
+            <MyText type='medium' color={colors.lightText2} fontSize={10} >{`${member?.email}`}</MyText>
           </View>
+        </View>
+
+        <View style={{ marginTop: -2, paddingBottom: 5 }}>
+          <MyText fontSize={10} type='medium' color={colors.lightText2}>{`Total: ${list?.length}`}</MyText>
+        </View>
       </View>
     )
   }
 
   return (
     <RootView title='Personal Notes' >
+      {!!member && topView()}
       <View style={{ flex: 1, }}>
         <View style={{ flex: 1, marginTop: 10, }}>
           <FlatList
