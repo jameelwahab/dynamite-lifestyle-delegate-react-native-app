@@ -116,11 +116,11 @@ const optionList = [
     title: "Personal Notes",
     icon: () => icons.notes(colors.primary, 20)
   },
-  // {
-  //   key: "profile",
-  //   title: "View Profile",
-  //   icon: () => icons.eye(colors.primary, 20)
-  // },
+  {
+    key: "profile",
+    title: "View Profile",
+    icon: () => icons.eye(colors.primary, 20)
+  },
   {
     key: "question-answer",
     title: "Questions Answers",

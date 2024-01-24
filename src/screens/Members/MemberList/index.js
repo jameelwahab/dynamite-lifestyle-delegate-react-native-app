@@ -86,7 +86,12 @@ const MemberList = ({ navigation, route }) => {
       navigation.navigate(routes.memberQuestionListing, {
         memberId: item?._id
       })
+    } else if (opt?.key == "profile") {
+      navigation.navigate(routes.memberProfile, {
+        memberId: item?._id
+      })
     }
+
   }
 
   const filterTheData = (obj, data, isSavedFilter, isFilter) => {

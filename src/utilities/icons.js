@@ -66,7 +66,7 @@ export const icons = {
   upload: () => { return (<FontAwesome name="cloud-upload" color={colors.primary} size={25} />) },
   clock: (color = colors.primary, size = 17) => { return (<Octicons name="clock" color={color} size={size} />) },
   minusCircle: () => { return (<Feather name="minus-circle" color={colors.primary} size={25} />) },
-  plusCircle: (color=colors.primary,size=25) => { return (<Feather name="plus-circle" color={color} size={size} />) },
+  plusCircle: (color = colors.primary, size = 25) => { return (<Feather name="plus-circle" color={color} size={size} />) },
   back: (color = colors.white, size = 20) => { return (<MaterialIcons name="arrow-back" color={color} size={size} />) },
   info: (color = colors.white, size = 20) => { return (<FontAwesome6 name="info" color={color} size={size} />) },
   upward: (color = colors.white, size = 20) => { return (<Ionicons name="caret-up" color={color} size={size} />) },
@@ -99,7 +99,7 @@ export const icons = {
   sort: (color = colors.primary, size = 17) => { return (<Octicons name="sort-desc" color={color} size={size} />) },
   eye: (color = colors.primary, size = 17) => { return (<Ionicons name="eye" color={color} size={size} />) },
   notes: (color = colors.primary, size = 17) => { return (<MaterialCommunityIcons name="clipboard-text" color={color} size={size} />) },
-
+  whatsapp: (color = colors.primary, size = 17) => { return (<MaterialCommunityIcons name="whatsapp" color={color} size={size} />) },
 
 
 }

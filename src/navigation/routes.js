@@ -70,7 +70,7 @@ const routes = {
   memberNotesListing: "MEMBER_NOTES_LISTING",
   memberSubscribersListing: "MEMBER_SUBSCRIPTION_LISTING",
   memberQuestionListing: "MEMBER_QUESTIONS_LISTING",
-
+  memberProfile: "MEMBER_PROFILE",
 
   //? Questions
   genericQestionListing: "QUESTION_LISTING",

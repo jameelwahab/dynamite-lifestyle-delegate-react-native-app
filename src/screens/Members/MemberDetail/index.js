@@ -54,6 +54,10 @@ const MemberDetail = ({ navigation, route }) => {
       navigation.navigate(routes.memberQuestionListing, {
         memberId: member?._id
       })
+    } else if (opt?.key == "profile") {
+      navigation.navigate(routes.memberProfile, {
+        memberId: member?._id
+      })
     }
   }
 

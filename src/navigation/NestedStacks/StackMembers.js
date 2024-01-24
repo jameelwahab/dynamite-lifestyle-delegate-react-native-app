@@ -14,6 +14,7 @@ import List from '../../screens/Members/Notes/List'
 import SubscriptionList from '../../screens/Members/Subscriptions'
 import GenericQuetionList from '../../screens/Questions/GenericQuetionList'
 import QuestionsList from '../../screens/Members/QuestionsList'
+import MemberProfile from '../../screens/Members/MemberProfile.js'
 
 
 const MemberStack = createNativeStackNavigator()
@@ -31,6 +32,7 @@ const StackMembers = ({ route }) => {
         <MemberStack.Screen name={routes.memberSubscribersListing} component={SubscriptionList} />
         <MemberStack.Screen name={routes.memberQuestionListing} component={QuestionsList} />
         <MemberStack.Screen name={routes.genericQestionListing} component={GenericQuetionList} />
+        <MemberStack.Screen name={routes.memberProfile} component={MemberProfile} />
         {/*//? Default Screens Start */}
         {defaultScreens.map((x, i) => (
           <MemberStack.Screen key={x.name} name={x.name} component={x.component} />

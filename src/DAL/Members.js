@@ -222,3 +222,14 @@ export const MEMBER_QUESTIONS_MODULE_LIST = ({ token, navigation, memberId, page
     navigation,
   })
 }
+
+export const MEMBER_PROFILE = ({ token, navigation, memberId, startDate, endDate }) => {
+  return invokeApi({
+    path: `api/member/${memberId}?start_date=${startDate}&end_date=${endDate}`,
+    method: "GET",
+    token,
+    navigation,
+  })
+}
+
+

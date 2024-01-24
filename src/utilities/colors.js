@@ -24,5 +24,6 @@ export const colors = {
   transparent: "#FFFFFF00",
   grey: "#696969",
   online: "#337447",
+  green:"#4B9831",
   chip: "#343b4b"
 }
