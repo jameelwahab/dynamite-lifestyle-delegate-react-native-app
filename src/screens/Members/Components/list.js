@@ -1,3 +1,6 @@
+import { colors } from "../../../utilities/colors"
+import { icons } from "../../../utilities/icons"
+
 const filterFromlist = [{
   key: "new-filter",
   title: "Apply New Filter",
@@ -102,4 +105,28 @@ const sortList = [
 
 ]
 
-export { sortList, filterFromlist, levelList, memberStatusList, onlineStatusList, membershipStatusList, expireDaysList }
+const optionList = [
+  {
+    key: "subscription",
+    title: "View Subscription",
+    icon: () => icons.eye(colors.primary, 20)
+  },
+  {
+    key: "notes",
+    title: "Personal Notes",
+    icon: () => icons.notes(colors.primary, 20)
+  },
+  // {
+  //   key: "profile",
+  //   title: "View Profile",
+  //   icon: () => icons.eye(colors.primary, 20)
+  // },
+  {
+    key: "question-answer",
+    title: "Questions Answers",
+    icon: () => icons.lock(colors.primary, 20)
+  },
+
+]
+
+export { sortList, filterFromlist, levelList, memberStatusList, onlineStatusList, membershipStatusList, expireDaysList, optionList }

@@ -214,9 +214,9 @@ export const MEMBER_DELETE_SUBSCRIPTION = ({ token, navigation, subscriptionId }
   })
 }
 
-export const MEMBER_QUESTIONS_MODULE_LIST = ({ token, navigation, memberId }) => {
+export const MEMBER_QUESTIONS_MODULE_LIST = ({ token, navigation, memberId, page }) => {
   return invokeApi({
-    path: `api/questionnaire/list_member_question_and_answers/${memberId}`,
+    path: `api/questionnaire/list_member_question_and_answers/${memberId}?page=${page}&limit=20`,
     method: "GET",
     token,
     navigation,

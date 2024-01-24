@@ -18,6 +18,9 @@ import routes from '../../../navigation/routes'
 import moment from 'moment'
 import numFormatter from '../../../DAL/numFormatter'
 import NotesModal from '../Components/NotesModal'
+import OptionModal from '../../../components/OptionModal'
+import { optionList } from '../Components/list'
+import { MenuButton } from '../../../components/MyButton'
 
 const MemberDetail = ({ navigation, route }) => {
   const { type } = route?.params;
@@ -32,7 +35,26 @@ const MemberDetail = ({ navigation, route }) => {
   const [member, setMember] = useState(route?.params?.member);
   const [showMorePages, setShowMorePages] = useState(false);
   const [showMorePrograms, setShowMorePrograms] = useState(false);
+  const [isOptionModalVisible, setIsOptionModalVisible] = useState(false)
 
+  const onOptSelected = (opt) => {
+    console.log(opt, "onOptSelected");
+    setIsOptionModalVisible(false)
+    if (opt?.key == "notes") {
+      navigation.navigate(routes.memberNotesListing, {
+        for: "members",
+        memberId: member?._id
+      })
+    } else if (opt?.key == "subscription") {
+      navigation.navigate(routes.memberSubscribersListing, {
+        memberId: member?._id
+      })
+    } else if (opt?.key == "question-answer") {
+      navigation.navigate(routes.memberQuestionListing, {
+        memberId: member?._id
+      })
+    }
+  }
 
 
   // ? funcvtions
@@ -120,9 +142,14 @@ const MemberDetail = ({ navigation, route }) => {
             {isAllMembers && <MyText fontSize={12} >{member?.email}</MyText>}
           </View>
 
-          <TouchableOpacity onPress={() => onChatScreen(member?._id)}>
+          <TouchableOpacity style={{ marginRight: 10 }} onPress={() => onChatScreen(member?._id)}>
             {icons.message(colors.primary, 20)}
           </TouchableOpacity>
+          <MenuButton
+            size={22}
+            onPress={() => setIsOptionModalVisible(true)}
+          />
+
         </View>
       </View>
     )
@@ -263,7 +290,7 @@ const MemberDetail = ({ navigation, route }) => {
         {!isMembers && <StatView title={"Delegate"} value={!!member?.consultant ? member?.consultant?.first_name + " " + member?.consultant?.last_name : "N/A"} />}
         <StatView title={"Community Level"} value={member?.community_level} uppercase={member?.community_level == 'pta'} />
         <StatView title={"Wheel of life"} view={wheelOfLifeStatus} />
-        <StatView title={"Last Login Activity"} uppercase value={convertTimezone(member?.last_login_activity,timezone).format(dateTimeFormat.dateTime)} />
+        <StatView title={"Last Login Activity"} uppercase value={convertTimezone(member?.last_login_activity, timezone).format(dateTimeFormat.dateTime)} />
         <StatView title={"Phone Number"} value={member?.contact_number} />
         <StatView title={"Lead Status"} view={leadStatusView} />
         {isMembers && <StatView title={"Wheel of Life Completed Date"} value={!!member?.wheel_of_life_completed_date ? moment(member?.wheel_of_life_completed_date).format(dateTimeFormat.date) : "N/A"} />}
@@ -318,6 +345,12 @@ const MemberDetail = ({ navigation, route }) => {
         token={token}
       />
 
+      <OptionModal
+        closeModal={() => setIsOptionModalVisible(false)}
+        isVisible={isOptionModalVisible}
+        onSelected={onOptSelected}
+        optionList={optionList}
+      />
       <NotesModal ref={notesModalRef} />
     </RootView>
   )

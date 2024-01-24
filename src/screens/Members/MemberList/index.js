@@ -24,9 +24,9 @@ import Collapsible from 'react-native-collapsible'
 import FooterLoader from '../../../components/FooterLoader'
 import FilterModal from '../Components/FilterModal'
 import moment from 'moment'
-import { filterFromlist, levelList, memberStatusList, onlineStatusList, membershipStatusList, expireDaysList } from '../Components/list'
+import { filterFromlist, levelList, memberStatusList, onlineStatusList, membershipStatusList, expireDaysList, optionList } from '../Components/list'
 import utilities from '../../../utilities'
-import { MenuButton, TransparentButton } from '../../../components/MyButton'
+import { MenuButton, MyButton, TransparentButton } from '../../../components/MyButton'
 import SaveFilterModal from '../Components/SaveFilterModal'
 import OptionModal from '../../../components/OptionModal'
 
@@ -335,14 +335,36 @@ const MemberList = ({ navigation, route }) => {
             </View>
 
             {isFilterApplied &&
-              <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
+              <View style={{ flexDirection: "row", marginTop: 10 }}>
+                <View style={{ flexDirection: "row", flex: 1 }}>
+                  {!isSavedFilterApplied &&
+                    <TouchableOpacity
+                      onPress={saveFilter}
+                      style={{ borderWidth: 1, borderColor: colors.primary, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 5, backgroundColor: colors.lightPrimary3 }}>
+                      <MyText color={colors.primary}>{"Save Filter"}</MyText>
+                    </TouchableOpacity>
+                    // <MyButton invert textStyle={{fontSize:12}} style={{paddingHorizontal:5,height:30}} title='Save Filter' onPress={saveFilter} />
+                  }
+                  <TouchableOpacity
+                    onPress={clearFilter}
+                    style={{ borderRadius: 10, paddingHorizontal: 10, paddingVertical: 5, backgroundColor: colors.lightPrimary3, marginLeft: 5 }}>
+                    <MyText color={colors.primary}>{"Clear All"}</MyText>
+                  </TouchableOpacity>
+                  {/* <TransparentButton title='Clear All' onPress={clearFilter} /> */}
 
-                {!isSavedFilterApplied &&
-                  <TransparentButton title='Save Filter' onPress={saveFilter} />}
-                <TransparentButton title='Clear All' onPress={clearFilter} />
-
-                {countLength() > 5 && <TransparentButton title={showChips ?
-                  "Show Less" : "Show All"} onPress={() => setShowChips(!showChips)} />}
+                </View>
+                <TouchableOpacity
+                  onPress={() => setShowChips(!showChips)}
+                  style={{ borderRadius: 10, paddingHorizontal: 10, paddingVertical: 5, backgroundColor: colors.lightPrimary3, marginLeft: 5, flexDirection: "row", alignItems: "center" }}>
+                  <MyText color={colors.primary}>{showChips ? "Show Less" : "Show All"}</MyText>
+                  <View style={{ transform: [{ rotateZ: showChips ? "180deg" : "0deg" }] }}>
+                    {icons.down(colors.primary, 15)}
+                  </View>
+                </TouchableOpacity>
+                {/* {countLength() > 5 &&
+                 <TransparentButton title={showChips ?
+                  "Show Less" : "Show All"} onPress={() => setShowChips(!showChips)} />
+                  } */}
               </View>
             }
           </>}
@@ -499,29 +521,7 @@ const MemberList = ({ navigation, route }) => {
 
 export default MemberList
 
-const optionList = [
-  {
-    key: "subscription",
-    title: "View Subscription",
-    icon: () => icons.eye(colors.primary, 20)
-  },
-  {
-    key: "notes",
-    title: "Personal Notes",
-    icon: () => icons.notes(colors.primary, 20)
-  },
-  // {
-  //   key: "profile",
-  //   title: "View Profile",
-  //   icon: () => icons.eye(colors.primary, 20)
-  // },
-  {
-    key: "question-answer",
-    title: "Questions Answers",
-    icon: () => icons.lock(colors.primary, 20)
-  },
 
-]
 
 const sort = {
   key: "registration_date_desc",
