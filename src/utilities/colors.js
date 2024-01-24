@@ -6,6 +6,7 @@ export const colors = {
   lightPrimary: '#F6BD4B99',
   lightPrimary2: '#F6BD4B33',
   lightPrimary3: '#F6BD4B1F',
+  beige: "#B19E5A",
   secondary: "#1F2536",
   darkSecondary: "#131825",
   secondaryVariant: '#252d41',

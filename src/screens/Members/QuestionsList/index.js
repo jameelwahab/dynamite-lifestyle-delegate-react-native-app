@@ -13,6 +13,10 @@ import moment from 'moment'
 import { dateTimeFormat } from '../../../utilities/constants'
 import routes from '../../../navigation/routes'
 import FooterLoader from '../../../components/FooterLoader'
+import { MenuButton } from '../../../components/MyButton'
+import OptionModal from '../../../components/OptionModal'
+import { icons } from '../../../utilities/icons'
+import MyLoader from '../../../components/MyLoader'
 
 let page = 0;
 let canLoadMore = false
@@ -21,7 +25,8 @@ const QuestionsList = ({ navigation, route }) => {
   const { memberId } = route?.params
   const [loader, setLoader] = useState(false);
   const [footerLoader, setFooterLoader] = useState(false);
-  const [list, setList] = useState([])
+  const [list, setList] = useState([]);
+  const [optionModal, setOptionModal] = useState({ isVisible: false, item: null })
 
 
   const getQuestionsListFromServer = async (firstTime = false) => {
@@ -45,6 +50,18 @@ const QuestionsList = ({ navigation, route }) => {
     }
   }
 
+  const onOptSelected = (opt) => {
+    let { item } = optionModal
+    setOptionModal({ isVisible: false, item: null })
+    if (opt.key == "answers") {
+      navigation.navigate(routes.genericQestionListing, {
+        created_for: item?.created_for,
+        id: !!item?.created_for_id?._id ? item?.created_for_id?._id : "",
+        memberId: memberId
+      })
+    }
+  }
+
   useEffect(() => {
     setLoader(true)
     getQuestionsListFromServer(true)
@@ -56,7 +73,7 @@ const QuestionsList = ({ navigation, route }) => {
         onPress={() => {
           navigation.navigate(routes.genericQestionListing, {
             created_for: item?.created_for,
-            id: item?._id,
+            id: !!item?.created_for_id?._id ? item?.created_for_id?._id : "",
             memberId: memberId
           })
         }}
@@ -64,6 +81,10 @@ const QuestionsList = ({ navigation, route }) => {
       >
         <View style={{ flexDirection: 'row', justifyContent: "space-between", alignItems: "center" }}>
           <MyText color={colors.primary} >{(index + 1) + "."}</MyText>
+          <MenuButton
+            size={20}
+            onPress={() => setOptionModal({ isVisible: true, item: item })}
+          />
         </View>
         <StatView title={"Questions Created For"} value={item?.created_for.replace(/_/g, " ").replace(/-/g, " ")} />
         <StatView title={"Module Title"} value={!!item?.created_for_id?.title ? item?.created_for_id?.title : "N/A"} />
@@ -74,6 +95,7 @@ const QuestionsList = ({ navigation, route }) => {
 
   return (
     <RootView title="Questions Answers List">
+
       <FlatList
         data={list}
         renderItem={renderList}
@@ -89,8 +111,23 @@ const QuestionsList = ({ navigation, route }) => {
         }}
 
       />
+
+      <MyLoader enable={loader} />
+
+      <OptionModal
+        isVisible={optionModal?.isVisible}
+        optionList={optionList}
+        closeModal={() => setOptionModal({ isVisible: false, item: null })}
+        onSelected={onOptSelected}
+      />
     </RootView>
   )
 }
 
 export default QuestionsList
+
+const optionList = [{
+  key: "answers",
+  title: "Answers Details",
+  icon: () => icons.edit(colors.primary, 18)
+}]

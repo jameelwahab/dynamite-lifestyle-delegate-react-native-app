@@ -142,8 +142,8 @@ const SubscriptionList = ({ navigation, route }) => {
             onPress={() => setOptionModal({ isVisible: true, selectedItem: item })}
             size={20} />
         </View>
-        {StatView({ title: "Page Title", value: item?.page_info?.sale_page_title })}
-        {StatView({ title: "Plan Title", value: `${item?.plan_info?.plan_title} (${item?.plan_info?.payment_access})` })}
+        {StatView({ title: "Page Title", value: !!item?.page_info?.sale_page_title ? item?.page_info?.sale_page_title : "N/A" })}
+        {StatView({ title: "Plan Title", value: !!item?.plan_info?.plan_title ? `${item?.plan_info?.plan_title} (${item?.plan_info?.payment_access})` : "N/A" })}
         {StatView({ title: "Referral User", value: !!item?.affiliate_info?.affiliate_user_info ? `${item?.affiliate_info?.affiliate_user_info?.first_name} ${item?.affiliate_info?.affiliate_user_info?.last_name}` : "N/A" })}
         {StatView({ title: "Subscription Date", value: moment(item?.createdAt).format(dateTimeFormat.date) })}
         {StatView({ title: "Agreement PDF", view: () => pdfLinkView(item?.aggrement_pdf_url) })}
@@ -157,9 +157,9 @@ const SubscriptionList = ({ navigation, route }) => {
 
       <View style={{ backgroundColor: colors.darkSecondary }}>
         <TitleView title={"Member Subscriptions"} />
-        <View style={{ flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between",paddingBottom:5 }}>
+        <View style={{ flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", paddingBottom: 5 }}>
           {!!member ?
-            <View style={{marginLeft:5, height: 35, flexDirection: "row", alignItems: "center",}}>
+            <View style={{ marginLeft: 5, height: 35, flexDirection: "row", alignItems: "center", }}>
               <UserImage image={member?.profile_image} name={member?.first_name} size={30} />
               <View style={{ marginLeft: 10 }}>
                 <MyText type='bold' fontSize={12} >{`${member?.first_name} ${member?.last_name}`}</MyText>

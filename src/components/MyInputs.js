@@ -21,11 +21,14 @@ const MyInputs = ({
   rightIcon = null,
   rightIconOnPress = () => { },
   noSpace = false,
+  editable = true,
+  isSearch = false,
+  onSubmitEditing
 }) => {
   const [isFocused, setFocused] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   return (
-    <View style={{ marginBottom: noSpace ? 0 : 15 }}>
+    <View pointerEvents={editable ? "auto" : "none"} style={{ marginBottom: noSpace ? 0 : 15 }}>
       <Text style={[__MyInputStyles.labelText, isFocused ? __MyInputStyles.focusedLabelText : undefined]}>{label}</Text>
       <View style={[__MyInputStyles.inputView, multiline ? __MyInputStyles.multilineView : undefined, isFocused ? __MyInputStyles.focusedView : undefined]}>
         {!!leftIcon && <View style={[__MyInputStyles.leftButton]} >{leftIcon()}</View>}
@@ -38,6 +41,9 @@ const MyInputs = ({
           scrollEnabled={multiline}
           keyboardAppearance="dark"
           keyboardType={keyboardType}
+          returnKeyType={isSearch ? "search" : "default"}
+          onSubmitEditing={onSubmitEditing}
+          editable={editable}
           // keyboardType="numeric"
           selectionColor={colors.selection}
           autoCorrect={false}

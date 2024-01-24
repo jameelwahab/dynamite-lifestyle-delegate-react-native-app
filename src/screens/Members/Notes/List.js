@@ -69,6 +69,7 @@ const List = ({ navigation, route }) => {
       let userMember = { ...res.member };
       delete userMember.personal_note;
       setList(res.member.personal_note);
+      route?.params?.updateNotes?.(res.member.personal_note, memberId);
       setAutoResponderMsg(res?.auto_responder_message)
       setLoader(false);
       setMember(userMember);
@@ -95,17 +96,17 @@ const List = ({ navigation, route }) => {
           <View style={__styles.itemNameAndDateView} >
             <View style={{ flex: 1 }}>
               <MyText color={colors.primary} fontSize={14} >
-                {`${item?.action_info?.name} ${item?.action_by=="admin_user"?"(Admin)":"(Delegate)"} `}
+                {`${item?.action_info?.name} ${item?.action_by == "admin_user" ? "(Admin)" : "(Delegate)"} `}
               </MyText>
               <MyText fontSize={10} color={colors.lightText2} >{"Created at: " + convertTimezone(item?.note_date_time, timezone).format(dateTimeFormat.dateTime)}</MyText>
             </View>
 
-
-            <TouchableOpacity
-              onPress={() => setOptionModal({ isVisible: true, for: item })}
-              style={__styles.threeDotBtnView}>
-              {icons.threeDots()}
-            </TouchableOpacity>
+            {item?.action_by != "admin_user" &&
+              <TouchableOpacity
+                onPress={() => setOptionModal({ isVisible: true, for: item })}
+                style={__styles.threeDotBtnView}>
+                {icons.threeDots()}
+              </TouchableOpacity>}
           </View>
         </View>
         <View style={{ paddingVertical: 5 }}>
@@ -115,7 +116,7 @@ const List = ({ navigation, route }) => {
         </View>
 
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 5 }}>
-          
+
           {!!item?.last_updated_date_time ?
             <MyText fontSize={10} color={colors.lightText2}>{"Last Action: " + convertTimezone(item?.last_updated_date_time, timezone).format(dateTimeFormat.dateTime)}</MyText> : <View />}
         </View>

@@ -43,7 +43,8 @@ const MemberDetail = ({ navigation, route }) => {
     if (opt?.key == "notes") {
       navigation.navigate(routes.memberNotesListing, {
         for: "members",
-        memberId: member?._id
+        memberId: member?._id,
+        updateNotes: updateTheNotes
       })
     } else if (opt?.key == "subscription") {
       navigation.navigate(routes.memberSubscribersListing, {
@@ -54,6 +55,11 @@ const MemberDetail = ({ navigation, route }) => {
         memberId: member?._id
       })
     }
+  }
+
+  const updateTheNotes = (notes, memberId) => {
+    route?.params?.updateNotes?.(notes, memberId);
+    setMember({ ...member, personal_note: notes });
   }
 
 
@@ -200,7 +206,7 @@ const MemberDetail = ({ navigation, route }) => {
     return (
       <Pressable
         disabled={member?.personal_note.length == 0}
-        onPress={() => notesModalRef?.current?.openModal(member?.personal_note)}
+        onPress={() => notesModalRef?.current?.openModal([...member?.personal_note].reverse())}
         style={__styles.noteView}>
         <MyText color={colors.black} fontSize={14} >{member?.personal_note.length}</MyText>
       </Pressable>
@@ -351,7 +357,12 @@ const MemberDetail = ({ navigation, route }) => {
         onSelected={onOptSelected}
         optionList={optionList}
       />
-      <NotesModal ref={notesModalRef} />
+      <NotesModal
+        memberId={member?._id}
+        navigation={navigation}
+        ref={notesModalRef}
+        updateNotes={updateTheNotes}
+      />
     </RootView>
   )
 }

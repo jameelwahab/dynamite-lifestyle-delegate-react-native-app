@@ -13,6 +13,8 @@ import MemberDetail from '../../screens/Members/MemberDetail'
 import AddNote from '../../screens/Members/Notes/AddNote'
 import List from '../../screens/Members/Notes/List'
 import SubscriptionList from '../../screens/Members/Subscriptions'
+import GenericQuetionList from '../../screens/Questions/GenericQuetionList'
+import QuestionsList from '../../screens/Members/QuestionsList'
 
 
 const NurtureStack = createNativeStackNavigator()
@@ -28,6 +30,8 @@ const StackNurtureMembers = ({ route }) => {
         <NurtureStack.Screen name={routes.memberNotesListing} component={List} />
         <NurtureStack.Screen name={routes.memberAddNote} component={AddNote} />
         <NurtureStack.Screen name={routes.memberSubscribersListing} component={SubscriptionList} />
+        <NurtureStack.Screen name={routes.memberQuestionListing} component={QuestionsList} />
+        <NurtureStack.Screen name={routes.genericQestionListing} component={GenericQuetionList} />
         {/*//? Default Screens Start */}
         {defaultScreens.map((x, i) => (
           <NurtureStack.Screen key={x.name} name={x.name} component={x.component} />

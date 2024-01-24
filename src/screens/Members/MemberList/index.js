@@ -34,6 +34,8 @@ import OptionModal from '../../../components/OptionModal'
 
 let canLoadMore = false;
 let page = 0;
+let isFirst = true;
+let controller;
 const MemberList = ({ navigation, route }) => {
   const { type } = route?.params;
   console.log(type, "type")
@@ -73,7 +75,8 @@ const MemberList = ({ navigation, route }) => {
     if (opt?.key == "notes") {
       navigation.navigate(routes.memberNotesListing, {
         for: "members",
-        memberId: item?._id
+        memberId: item?._id,
+        updateNotes: updateNotes
       })
     } else if (opt?.key == "subscription") {
       navigation.navigate(routes.memberSubscribersListing, {
@@ -94,7 +97,7 @@ const MemberList = ({ navigation, route }) => {
   }
 
 
-  const getMembers = async (isFirstTime) => {
+  const getMembers = async (isFirstTime, noSearch = false) => {
     if (isFirstTime) {
       setLoader(true);
       setList([])
@@ -103,27 +106,27 @@ const MemberList = ({ navigation, route }) => {
 
     if (isAllMembers) {
       res = await LIST_OF_MEMBERS({
-        token, navigation, page: page, searchText: search, body: {
+        token, navigation, page: page, searchText: noSearch ? "" : search, body: {
           sort_by: !!sorted ? sorted?.key : null,
           ...Filter,
           search_text: search
-        }
+        },
       });
     } else if (isMembers) {
       res = await LIST_OF_MEMBERS_ONLY({
-        token, navigation, page: page, searchText: search, body: {
+        token, navigation, page: page, searchText: noSearch ? "" : search, body: {
           sort_by: !!sorted ? sorted?.key : null,
           ...Filter,
           search_text: search
-        }
+        },
       });
     } else if (isNurture) {
       res = await LIST_OF_NURTURE({
-        token, navigation, page: page, searchText: search, body: {
+        token, navigation, page: page, searchText: noSearch ? "" : search, body: {
           sort_by: !!sorted ? sorted?.key : null,
           ...Filter,
           search_text: search
-        }
+        },
       });
     }
     if (res.code == 200) {
@@ -167,6 +170,7 @@ const MemberList = ({ navigation, route }) => {
       setLoader(false)
       setFooterLoader(false);
     }
+    isFirst = false;
   }
 
   const saveFilter = () => {
@@ -180,18 +184,37 @@ const MemberList = ({ navigation, route }) => {
     setIsSavedFilterApplied(false)
 
   }
+  const updateNotes = (notes, MemberId) => {
+    let newList = [...list]
+    let index = list.findIndex(x => x._id === MemberId);
+    if (index > -1) {
+      let obj = { ...list[index], personal_note: notes }
+      newList.splice(index, 1, obj)
+      setList(newList)
+    }
+  }
 
   useEffect(() => {
+
     page = 0;
     canLoadMore = false
     debounce(() => getMembers(true), 100)
-  }, [search, JSON.stringify(sorted), JSON.stringify(Filter)])
+  }, [JSON.stringify(sorted), JSON.stringify(Filter)])
+
+  // useEffect(() => {
+  //   if (!isFirst) {
+
+  //     page = 0;
+  //     canLoadMore = false
+  //     debounce(() => getMembers(true,), 100)
+  //   }
+  // }, [search])
 
 
   const onMemberDetail = (item) => {
     navigation.navigate(routes.memberDetails, {
       member: item,
-
+      updateNotes: updateNotes
     })
   }
 
@@ -204,7 +227,7 @@ const MemberList = ({ navigation, route }) => {
           <MyText fontSize={18} type='bold' color={colors.primary} >{
             isAllMembers ? "All Members" :
               isMembers ? "Members" :
-                isNurture ? "Nurture" : ""
+                isNurture ? "Nurture Members" : ""
           }</MyText>
           <MyText fontSize={10} type='medium' color={colors.lightText2}>{`Showing ${list.length} of ${total}`}</MyText>
         </View>
@@ -369,16 +392,42 @@ const MemberList = ({ navigation, route }) => {
             }
           </>}
         {/* <Collapsible collapsed={searchCollapsed}> */}
-        <View style={{ marginTop: -5 }}>
-          <MyInputs
-            rightIcon={!!search ? icons.crosssWithCircle_20 : icons.noIcon}
-            leftIcon={icons.search}
-            value={search}
-            placeholder='Search...'
-            onChangeText={(text) => setSearch(text)}
-            rightIconOnPress={() => setSearch("")}
-            noSpace
-          />
+        <View style={{ marginTop: 5 }}>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <View style={{ flex: 1, marginTop: -15 }}>
+              <MyInputs
+                rightIcon={!!search ? icons.crosssWithCircle_20 : icons.noIcon}
+                leftIcon={icons.search}
+                value={search}
+                placeholder='Search...'
+                onChangeText={(text) => setSearch(text)}
+                rightIconOnPress={() => {
+                  setSearch("")
+                  page = 0;
+                  canLoadMore = false
+                  getMembers(true, true)
+                }}
+                noSpace
+                isSearch={true}
+                onSubmitEditing={() => {
+                  page = 0;
+                  canLoadMore = false
+                  getMembers(true)
+                }}
+              />
+            </View>
+            <View style={{ marginLeft: 5 }}>
+              <MyButton invert title='Search'
+                onPress={() => {
+                  page = 0;
+                  canLoadMore = false
+                  getMembers(true)
+                }}
+                style={{ margin: 0, paddingHorizontal: 5, height: 43, marginTop: 3 }}
+                textStyle={{ fontSize: 12, }}
+              />
+            </View>
+          </View>
         </View>
         {/* </Collapsible> */}
       </View>)

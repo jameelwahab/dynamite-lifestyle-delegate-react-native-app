@@ -15,7 +15,7 @@ export default async function invokeApi({
   checkAuth = true,
   token = "",
   noAlerts = false,
-  navigation = null
+  navigation = null,
 }) {
   const reqObj = {
     method,
@@ -23,9 +23,10 @@ export default async function invokeApi({
     headers: {
       ...headers,
       "x-sh-auth": token
-    }
+    },
   };
 
+ 
   reqObj.params = queryParams;
 
   if (method === 'POST') {
@@ -44,6 +45,7 @@ export default async function invokeApi({
 
   try {
     results = await axios(reqObj);
+
     console.log(`<===Api-Success-Result===>\t %c${path} \n`, 'background:#0F0; color: #000', results);
     return results.data;
 

@@ -8,7 +8,9 @@ import { dateTimeFormat } from '../../../utilities/constants';
 import { useSelector } from 'react-redux';
 import { selectTimeZone } from '../../../redux/reducers/timezoneSlice';
 import { icons } from '../../../utilities/icons';
-const NotesModal = forwardRef(({ }, ref) => {
+import MyWebview from '../../../components/MyWebview';
+import routes from '../../../navigation/routes';
+const NotesModal = forwardRef(({ memberId, navigation, updateNotes }, ref) => {
   const [isVisible, setIsVisible] = useState(false);
   const [list, setList] = useState([])
   const timezone = useSelector(selectTimeZone)
@@ -26,6 +28,7 @@ const NotesModal = forwardRef(({ }, ref) => {
 
   const closeModal = () => {
     setIsVisible(false);
+    setList([]);
   }
 
   return (
@@ -40,12 +43,30 @@ const NotesModal = forwardRef(({ }, ref) => {
       animationInTiming={300}
       animationOutTiming={300}
     >
-      <SafeAreaView style={{ borderTopLeftRadius: 10, borderTopRightRadius: 10, marginTop: "auto", backgroundColor: colors.secondary, flex: 0.6 }}>
-        <View style={{ padding: 10, paddingHorizontal: 20, paddingTop: 20,flexDirection:"row",justifyContent:"space-between",alignItems:"center" }}>
-          <MyText color={colors.primary} fontSize={20} type='bold' >Notes</MyText>
-          <Pressable onPress={closeModal}>
-            {icons.crosssWithCircle(colors.border,25)}
-          </Pressable>
+      <SafeAreaView style={{ borderTopLeftRadius: 10, borderTopRightRadius: 10, marginTop: "auto", backgroundColor: colors.secondary, flex: 0.8 }}>
+        <View style={{ padding: 10, paddingHorizontal: 20, paddingTop: 20, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+          <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
+            <MyText color={colors.primary} fontSize={20} type='bold' >Notes</MyText>
+            <Pressable
+              style={{ marginLeft: 10 }}
+              onPress={() => {
+                closeModal()
+                navigation.navigate(routes.memberNotesListing, {
+                  for: "members",
+                  memberId,
+                  updateNotes: updateNotes
+                })
+              }}>
+              {icons.plusCircle(colors.primary, 20)}
+            </Pressable>
+          </View>
+
+          <View style={{}}>
+
+            <Pressable onPress={closeModal}>
+              {icons.crosssWithCircle(colors.white, 25)}
+            </Pressable>
+          </View>
         </View>
         <View style={{ flex: 1 }}>
           <FlatList
@@ -62,7 +83,8 @@ const NotesModal = forwardRef(({ }, ref) => {
                   </View>
                 </View>
                 <View style={{ marginTop: 5 }}>
-                  <MyText>{item?.note}</MyText>
+                  {/* <MyText>{}</MyText> */}
+                  <MyWebview fullWidth html={item?.note} />
                 </View>
                 <View style={{ height: 0.7, width: "100%", backgroundColor: colors.lightText, marginTop: 10, marginBottom: 20, borderRadius: 10 }} />
               </View>
