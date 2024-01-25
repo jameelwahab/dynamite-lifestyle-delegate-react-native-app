@@ -17,12 +17,13 @@ import { MenuButton } from '../../../components/MyButton'
 import OptionModal from '../../../components/OptionModal'
 import { icons } from '../../../utilities/icons'
 import MyLoader from '../../../components/MyLoader'
+import MemberView from '../../../components/MemberView'
 
 let page = 0;
 let canLoadMore = false
 const QuestionsList = ({ navigation, route }) => {
   let { token } = useSelector(selectUser);
-  const { memberId } = route?.params
+  const { memberId, member } = route?.params
   const [loader, setLoader] = useState(false);
   const [footerLoader, setFooterLoader] = useState(false);
   const [list, setList] = useState([]);
@@ -95,23 +96,24 @@ const QuestionsList = ({ navigation, route }) => {
 
   return (
     <RootView title="Questions Answers List">
+      {!!member && <MemberView member={member} />}
+      <View style={{ flex: 1 }}>
+        <FlatList
+          data={list}
+          renderItem={renderList}
+          ListEmptyComponent={!loader && <EmptyView />}
+          showsVerticalScrollIndicator={false}
+          ListFooterComponent={<FooterLoader isVisible={footerLoader} />}
+          onEndReached={() => {
+            if (canLoadMore) {
+              canLoadMore = false;
+              setFooterLoader(true);
+              getQuestionsListFromServer(false);
+            }
+          }}
 
-      <FlatList
-        data={list}
-        renderItem={renderList}
-        ListEmptyComponent={!loader && <EmptyView />}
-        showsVerticalScrollIndicator={false}
-        ListFooterComponent={<FooterLoader isVisible={footerLoader} />}
-        onEndReached={() => {
-          if (canLoadMore) {
-            canLoadMore = false;
-            setFooterLoader(true);
-            getQuestionsListFromServer(false);
-          }
-        }}
-
-      />
-
+        />
+      </View>
       <MyLoader enable={loader} />
 
       <OptionModal

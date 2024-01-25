@@ -52,7 +52,8 @@ const MemberDetail = ({ navigation, route }) => {
       })
     } else if (opt?.key == "question-answer") {
       navigation.navigate(routes.memberQuestionListing, {
-        memberId: member?._id
+        memberId: member?._id,
+        member: member
       })
     } else if (opt?.key == "profile") {
       navigation.navigate(routes.memberProfile, {
@@ -139,19 +140,22 @@ const MemberDetail = ({ navigation, route }) => {
             {icons.back(colors.primary, 25)}
           </TouchableOpacity>
 
-          <View>
-            <UserImage
-              image={member?.profile_image}
-              name={member?.first_name}
-              size={30} />
-            <View style={[{ backgroundColor: member?.is_online ? colors.online : colors.primary2, }, __styles.memberStatusView]} />
-          </View>
+          <Pressable
+            onPress={() => onOptSelected({ key: "profile" })}
+            style={{ flexDirection: "row", flex: 1, alignItems: "center" }}>
+            <View>
+              <UserImage
+                image={member?.profile_image}
+                name={member?.first_name}
+                size={30} />
+              <View style={[{ backgroundColor: member?.is_online ? colors.online : colors.primary2, }, __styles.memberStatusView]} />
+            </View>
 
-          <View style={__styles.memberProfileNameView}>
-            <MyText fontSize={14} type='bold'>{member?.first_name + " " + member?.last_name}</MyText>
-            {isAllMembers && <MyText fontSize={12} >{member?.email}</MyText>}
-          </View>
-
+            <View style={__styles.memberProfileNameView}>
+              <MyText fontSize={14} type='bold'>{member?.first_name + " " + member?.last_name}</MyText>
+              {isAllMembers && <MyText fontSize={12} >{member?.email}</MyText>}
+            </View>
+          </Pressable>
           <TouchableOpacity style={{ marginRight: 10 }} onPress={() => onChatScreen(member?._id)}>
             {icons.message(colors.primary, 20)}
           </TouchableOpacity>

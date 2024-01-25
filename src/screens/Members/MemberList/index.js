@@ -1,4 +1,4 @@
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image, ScrollView } from 'react-native'
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image, ScrollView, Pressable } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import RootView from '../../../components/RootView'
 import MyText from '../../../components/MyText'
@@ -84,7 +84,8 @@ const MemberList = ({ navigation, route }) => {
       })
     } else if (opt?.key == "question-answer") {
       navigation.navigate(routes.memberQuestionListing, {
-        memberId: item?._id
+        memberId: item?._id,
+        member: item
       })
     } else if (opt?.key == "profile") {
       navigation.navigate(routes.memberProfile, {
@@ -401,16 +402,12 @@ const MemberList = ({ navigation, route }) => {
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <View style={{ flex: 1, marginTop: -15 }}>
               <MyInputs
-                rightIcon={!!search ? icons.crosssWithCircle_20 : icons.noIcon}
-                leftIcon={icons.search}
+                rightIcon={search.length > 0 ? icons.crosssWithCircle_20 : icons.noIcon}
                 value={search}
                 placeholder='Search...'
                 onChangeText={(text) => setSearch(text)}
                 rightIconOnPress={() => {
                   setSearch("")
-                  page = 0;
-                  canLoadMore = false
-                  getMembers(true, true)
                 }}
                 noSpace
                 isSearch={true}
@@ -422,15 +419,15 @@ const MemberList = ({ navigation, route }) => {
               />
             </View>
             <View style={{ marginLeft: 5 }}>
-              <MyButton invert title='Search'
+              <TouchableOpacity
                 onPress={() => {
                   page = 0;
                   canLoadMore = false
                   getMembers(true)
                 }}
-                style={{ margin: 0, paddingHorizontal: 5, height: 43, marginTop: 3 }}
-                textStyle={{ fontSize: 12, }}
-              />
+                style={{ borderWidth: 1, borderColor: colors.primary, flex: 1, marginTop: 5, paddingHorizontal: 10, borderRadius: 5, justifyContent: "center" }} >
+                {icons.search(colors.primary, 20)}
+              </TouchableOpacity>
             </View>
           </View>
         </View>
@@ -444,19 +441,24 @@ const MemberList = ({ navigation, route }) => {
       <View style={__styles.memberRootView}>
 
         <View style={__styles.memberProfileView}>
-          <View>
-            <UserImage
-              image={item?.profile_image}
-              name={item?.first_name}
-              size={30} />
-            <View style={[{ backgroundColor: item?.is_online ? colors.online : colors.primary2, }, __styles.memberStatusView]} />
-          </View>
+          <Pressable
+            onPress={() => navigation.navigate(routes.memberProfile, {
+              memberId: item?._id
+            })}
+            style={{ flexDirection: "row", flex: 1, alignItems: "center" }}>
+            <View>
+              <UserImage
+                image={item?.profile_image}
+                name={item?.first_name}
+                size={30} />
+              <View style={[{ backgroundColor: item?.is_online ? colors.online : colors.primary2, }, __styles.memberStatusView]} />
+            </View>
 
-          <View style={__styles.memberProfileNameView}>
-            <MyText fontSize={14} type='bold'>{item?.first_name + " " + item?.last_name}</MyText>
-            {isAllMembers && <MyText fontSize={12} >{item?.email}</MyText>}
-          </View>
-
+            <View style={__styles.memberProfileNameView}>
+              <MyText fontSize={14} type='bold'>{item?.first_name + " " + item?.last_name}</MyText>
+              {isAllMembers && <MyText fontSize={12} >{item?.email}</MyText>}
+            </View>
+          </Pressable>
           {item?.is_wheel_of_life &&
             <View style={{ marginRight: 10 }}>
               <Image source={icons.wheelOfLife} style={{ height: 20, width: 20 }} />

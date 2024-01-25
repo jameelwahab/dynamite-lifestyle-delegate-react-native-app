@@ -1,4 +1,4 @@
-import { View, Text, Pressable } from 'react-native'
+import { View, Text, Pressable, Platform } from 'react-native'
 import React from 'react'
 import CheckBox from '@react-native-community/checkbox'
 import MyText from './MyText'
@@ -8,7 +8,7 @@ const MyCheckBox = ({ value, title = "", onPress, circle = false, size = 20, col
   return (
     <Pressable
       onPress={onPress}
-      style={{ flexDirection: "row", alignItems: "center", paddingLeft: 1, paddingBottom: 10 }}>
+      style={{ flexDirection: "row", alignItems: "center", paddingLeft: 1, paddingBottom: 10, }}>
       <CheckBox
         onAnimationType="bounce"
         offAnimationType="bounce"
@@ -23,7 +23,9 @@ const MyCheckBox = ({ value, title = "", onPress, circle = false, size = 20, col
         tintColors={{ true: color, false: color }}
         value={value}
       />
-      <MyText color={textColor} style={{ marginLeft: 10 }} >{title}</MyText>
+      <View style={{ marginLeft: Platform.OS == "ios" ? 10 : 20 }}>
+        <MyText color={textColor}  >{title}</MyText>
+      </View>
 
     </Pressable>
   )

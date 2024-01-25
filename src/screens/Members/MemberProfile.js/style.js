@@ -32,3 +32,22 @@ export const __styles = StyleSheet.create({
     marginTop: 5
   }
 })
+
+export const calendarStyles = StyleSheet.create({
+  typeView: {
+    flexDirection: "row",  borderWidth: 1, borderColor: colors.primary, borderRadius: 5,
+    marginBottom: 10
+  },
+  typeBtn: {
+    paddingHorizontal: 10,
+    paddingVertical: 5
+  },
+  typeDivider: {
+    width: 1,
+    height: "100%",
+    backgroundColor: colors.primary
+  },
+  selectedText: {
+    backgroundColor: colors.primary
+  }
+})

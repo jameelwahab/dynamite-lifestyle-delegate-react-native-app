@@ -1,13 +1,19 @@
-import { View, Text, Pressable } from 'react-native'
+import { View, Text, Pressable, ScrollView } from 'react-native'
 import React, { useState } from 'react'
 import { __styles } from './style'
 import MyText from '../../../components/MyText'
 import { colors } from '../../../utilities/colors'
 import QuestionComponent from '../../Questions/QuestionComponent'
+import { LineChart } from 'react-native-chart-kit';
+import utilities from '../../../utilities'
+import moment from 'moment'
+
+const NinetyDaysView = ({ member, graphData }) => {
+  const [tab, setTab] = useState(0);
 
 
-const NinetyDaysView = ({ member }) => {
-  const [tab, setTab] = useState(0)
+
+
 
   const TabView = () => {
     return (
@@ -34,15 +40,54 @@ const NinetyDaysView = ({ member }) => {
 
   const graphView = () => {
     return (
-      <View>
+      <View style={{ alignItems: "center", marginVertical: 30 }}>
+        <ScrollView horizontal>
+          <LineChart
+            data={{
+              labels: graphData.map(x => x.day),
+              datasets: [
+                {
+                  data: graphData.map(x => x.earning),
+                },
+                {
+                  data: [0],
+                  withDots: false,
+                },
+                {
+                  data: [member?.target_amount],
+                  withDots: false,
+                }
+              ]
+            }}
+            width={utilities.screenWidth() - 40}
+            height={300}
+            segments={4}
+            // interval={1000}
+            yAxisLabel={''}
+            yAxisSuffix=""
+            // yAxisInterval={1}
 
+            chartConfig={{
+              decimalPlaces: 0,
+              backgroundColor: colors.secondaryVariant,
+              backgroundGradientFrom: colors.secondaryVariant,
+              backgroundGradientTo: colors.secondaryVariant,
+              color: (opacity = 1) => colors.white,
+              labelColor: (opacity = 1) => colors.white,
+              style: {},
+              propsForDots: {
+                stroke: colors.white,
+              },
+            }}
+          />
+        </ScrollView>
       </View>
     )
   }
 
   const questionsView = () => {
     return (
-      <View style={{paddingHorizontal:10}}>
+      <View style={{ paddingHorizontal: 10 }}>
         {member?.ninety_day_questions_list?.map((item, index) => (
           <QuestionComponent item={item} index={index} />
         ))}
