@@ -104,9 +104,7 @@ const QuestionComponent = ({ item, index }) => {
             noSpace
           /> */}
           <View style={{ borderWidth: 1/2, borderRadius: 10, borderColor: colors.white,minHeight:100,padding:10 }}>
-            {!!item?.answer?.answer_statement ?
-              <MyText color={colors.white} >{item?.answer?.answer_statement}</MyText> :
-              <MyText color={colors.lightText2}>{item?.question_placeholder}</MyText>}
+              <MyText color={colors.white} >{item?.answer?.answer_statement}</MyText>
           </View>
         </View>
       </View>

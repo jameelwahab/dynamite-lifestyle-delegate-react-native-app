@@ -58,12 +58,14 @@ const MemberList = ({ navigation, route }) => {
   const [filterData, setFilterData] = useState(null);
   const [isSavedFilterApplied, setIsSavedFilterApplied] = useState(false);
   const [isFilterApplied, setIsFilterApplied] = useState(false);
+  const [filterChipList, setFilterChipList] = useState([])
   const [optionModal, setOptionModal] = useState({
     isVisible: false,
     selectedItem: null,
   })
 
   const updateFilter = (updation) => {
+    // console.log(updation,"updateFilter")
     setFilter((filter) => ({ ...filter, ...updation }))
     setIsSavedFilterApplied(false)
   }
@@ -96,6 +98,119 @@ const MemberList = ({ navigation, route }) => {
   }
 
   const filterTheData = (obj, data, isSavedFilter, isFilter) => {
+    // let list = [];
+    // console.log(obj, "check 123")
+    // Object.keys(obj).forEach((x, i) => {
+    //   console.log(obj[x], 'Check');
+    //   if (Array.isArray(obj[x])) {
+    //     if (x == "community") {
+    //       obj[x].forEach((z, j) => {
+    //         let nOBj = {
+    //           label: levelList.find(y => y.key == z).title,
+    //           value: z,
+    //           type: x
+    //         }
+    //         list.push(nOBj);
+
+    //       })
+    //     } else if (x == "event_page") {
+    //       let id = obj[x][0]
+    //       if(!!id){
+    //       let nOBj = {
+    //         label: filterData?.sale_pages.find((x) => x._id == id)?.sale_page_title,
+    //         value: id,
+    //         type: x
+    //       }
+    //       list.push(nOBj);
+    //     }
+    //     } else if (x == "lead_status") {
+    //       obj[x].forEach((z, j) => {
+    //         let nOBj = {
+    //           label: filterData?.lead_status.find(y => y._id == z)?.title,
+    //           value: z,
+    //           type: x
+    //         }
+    //         list.push(nOBj);
+    //       })
+    //     }
+    //   } else if (x == 'delegate' && !!obj[x]) {
+    //     let nOBj = {
+    //       label: getNameForDelage(filterData?.delegates_list, obj[x]),
+    //       value: obj[x],
+    //       type: x
+    //     }
+    //     list.push(nOBj);
+    //   } else if (x == 'nurture' && !!obj[x]) {
+    //     let nOBj = {
+    //       label: getNameForDelage(filterData?.delegates_list, obj[x]),
+    //       value: obj[x],
+    //       type: x
+    //     }
+    //     list.push(nOBj);
+    //   } else if (x == 'plan' && !!obj[x]) {
+    //     let pageId = obj.event_page[0];
+    //     if (!!pageId) {
+    //       let nOBj = {
+    //         label: filterData?.sale_pages.find((x) => x._id == pageId)?.payment_plans.find(z => z?._id == obj[x])?.plan_title,
+    //         value: obj[x],
+    //         type: x
+    //       }
+    //       list.push(nOBj);
+    //     }
+    //   } else if (x == 'status' && typeof (obj[x]) == "boolean") {
+    //     let nOBj = {
+    //       label: obj[x] ? "Active" : "Inactive",
+    //       value: "statusActive",
+    //       type: x
+    //     }
+    //     list.push(nOBj);
+    //   } else if (x == 'user_status_type' && !!obj[x]) {
+    //     let nOBj = {
+    //       label: obj[x].charAt(0).toUpperCase() + obj[x].slice(1),
+    //       value: obj[x],
+    //       type: x
+    //     }
+    //     list.push(nOBj);
+    //   } else if (x == 'member_ship_expiry' && obj[x] == "expired") {
+    //     let nOBj = {
+    //       label: "Expired",
+    //       value: obj[x],
+    //       type: x
+    //     }
+    //     list.push(nOBj);
+    //   } else if (x == 'member_ship_expiry' && obj[x] == "not_expired" && obj.expiry_in != 'custom') {
+    //     let nOBj = {
+    //       label: `Expire in ${obj.expiry_in} days`,
+    //       value: obj[x],
+    //       type: "expiry_in"
+    //     }
+    //     list.push(nOBj);
+    //   } else if (x == 'member_ship_expiry' && obj[x] == "not_expired" && obj.expiry_in == 'custom') {
+    //     let nOBj = {
+    //       label:`Membership Expiry Start Date : ${moment(obj?.membership_purchase_expiry_from).format("YYYY-MM-DD")} - Membership Expiry End Date : ${moment(obj?.membership_purchase_expiry_to).format("YYYY-MM-DD")}`,
+    //       value: obj[x],
+    //       type: "expiry_in"
+    //     }
+    //     list.push(nOBj);
+    //   } else if (x == 'is_date_range' && !!obj[x]) {
+    //     let nOBj = {
+    //       label: `Start Date : ${moment(obj?.from_date).format("YYYY-MM-DD")} - End Date : ${moment(obj?.to_date).format("YYYY-MM-DD")}`,
+    //       value: obj[x],
+    //       type: x
+    //     }
+    //     list.push(nOBj);
+    //   }
+    //   else if (x == 'coins_range' && !!obj[x]) {
+    //     let nOBj = {
+    //       label: `Start Coins : ${obj.coins_from} - End Coins : ${obj.coins_to}`,
+    //       value: "coins_range_true",
+    //       type: x
+    //     }
+    //     list.push(nOBj);
+    //   }
+    // })
+
+    // setFilterChipList(list);
     setIsFilterApplied(isFilter)
     setIsSavedFilterApplied(isSavedFilter)
     setFilter({ ...obj })
@@ -333,6 +448,35 @@ const MemberList = ({ navigation, route }) => {
     return count;
   }
 
+  const filterRemoveAction = (item) => {
+    if (item.type == "community") {
+      updateFilter({ community: Filter?.community.slice().filter(z => z != item.value) });
+    } else if (item.type == "event_page") {
+      updateFilter({ event_page: [] })
+    } else if (item.type == "lead_status") {
+      updateFilter({ lead_status: Filter?.lead_status.filter(y => y != item.value) })
+    } else if (item.type == "plan") {
+      updateFilter({ plan: null })
+    } else if (item.type == "delegate") {
+      updateFilter({ delegate: null })
+    } else if (item.type == "nurture") {
+      updateFilter({ nurture: null })
+    } else if (item.type == "status") {
+      updateFilter({ status: "" })
+    } else if (item.type == "user_status_type") {
+      updateFilter({ user_status_type: "" })
+    } else if (item.type == "member_ship_expiry") {
+      updateFilter({ member_ship_expiry: "", expiry_in: 3, })
+    } else if (item.type == "expiry_in") {
+      updateFilter({ expiry_in: 3, member_ship_expiry: "" })
+    } else if (item.type == "is_date_range") {
+      updateFilter({ is_date_range: false, from_date: null, to_date: null })
+    } else if (item.type == "coins_range") {
+      updateFilter({ coins_range: false, coins_from: 0, coins_to: 0 })
+    }
+
+    setFilterChipList((list) => list.slice().filter((x) => x.value != item.value))
+  }
 
   const headerView = () => {
     return (
@@ -347,6 +491,8 @@ const MemberList = ({ navigation, route }) => {
               <View style={{}}>
                 <MyText type='bold' >{"Filtered By : "}</MyText>
               </View>
+              {/* {filterChipList.map((item, index) =>
+                chip(item.label, () => filterRemoveAction(item)))} */}
               {Filter?.community?.map((x) => chip(levelList.find(y => y.key == x).title, () => updateFilter({ community: Filter?.community.slice().filter(z => z != x) })))}
               {!!Filter?.event_page[0] && chip(filterData?.sale_pages.find((x) => x._id == Filter?.event_page[0])?.sale_page_title, () => updateFilter({ event_page: [] }))}
               {!!sorted && chip(sorted.title, () => setSorted(null))}
@@ -382,14 +528,15 @@ const MemberList = ({ navigation, route }) => {
                   {/* <TransparentButton title='Clear All' onPress={clearFilter} /> */}
 
                 </View>
-                <TouchableOpacity
-                  onPress={() => setShowChips(!showChips)}
-                  style={{ borderRadius: 10, paddingHorizontal: 10, paddingVertical: 5, backgroundColor: colors.lightPrimary3, marginLeft: 5, flexDirection: "row", alignItems: "center" }}>
-                  <MyText color={colors.primary}>{showChips ? "Show Less" : "Show All"}</MyText>
-                  <View style={{ transform: [{ rotateZ: showChips ? "180deg" : "0deg" }] }}>
-                    {icons.down(colors.primary, 15)}
-                  </View>
-                </TouchableOpacity>
+                {countLength() > 5 &&
+                  <TouchableOpacity
+                    onPress={() => setShowChips(!showChips)}
+                    style={{ borderRadius: 10, paddingHorizontal: 10, paddingVertical: 5, backgroundColor: colors.lightPrimary3, marginLeft: 5, flexDirection: "row", alignItems: "center" }}>
+                    <MyText color={colors.primary}>{showChips ? "Show Less" : "Show All"}</MyText>
+                    <View style={{ transform: [{ rotateZ: showChips ? "180deg" : "0deg" }] }}>
+                      {icons.down(colors.primary, 15)}
+                    </View>
+                  </TouchableOpacity>}
                 {/* {countLength() > 5 &&
                  <TransparentButton title={showChips ?
                   "Show Less" : "Show All"} onPress={() => setShowChips(!showChips)} />
