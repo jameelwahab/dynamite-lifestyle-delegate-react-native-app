@@ -1,4 +1,4 @@
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image, ScrollView, Pressable } from 'react-native'
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image, ScrollView, Pressable, Keyboard } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import RootView from '../../../components/RootView'
 import MyText from '../../../components/MyText'
@@ -224,7 +224,7 @@ const MemberList = ({ navigation, route }) => {
       setList([])
     }
     let res;
-
+    Keyboard.dismiss();
     if (isAllMembers) {
       res = await LIST_OF_MEMBERS({
         token, navigation, page: page, searchText: noSearch ? "" : search, body: {
@@ -663,6 +663,7 @@ const MemberList = ({ navigation, route }) => {
     <RootView hideBackBottomButton titleView={topView}>
       <View style={{ flex: 1 }}>
         <FlatList
+          keyboardShouldPersistTaps="handled"
           ListHeaderComponent={headerView()}
           stickyHeaderHiddenOnScroll={true}
           stickyHeaderIndices={[0]}
