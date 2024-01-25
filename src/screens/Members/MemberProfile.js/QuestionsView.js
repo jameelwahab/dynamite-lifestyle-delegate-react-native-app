@@ -43,7 +43,7 @@ const QuestionsView = ({ member }) => {
   return (
     <View style={__styles.tabRootView} >
       {TabView()}
-      <View style={{ paddingHorizontal: 20 }}>
+      <View style={{ paddingHorizontal: 20,minHeight:300 }}>
         {tab == 0 ?
           <AssessmentQuestions
             list={member?.lesson_questionnaire_array}

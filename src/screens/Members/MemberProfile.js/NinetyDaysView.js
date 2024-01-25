@@ -7,6 +7,7 @@ import QuestionComponent from '../../Questions/QuestionComponent'
 import { LineChart } from 'react-native-chart-kit';
 import utilities from '../../../utilities'
 import moment from 'moment'
+import EmptyView from '../../../components/EmptyView'
 
 const NinetyDaysView = ({ member, graphData }) => {
   const [tab, setTab] = useState(0);
@@ -41,13 +42,14 @@ const NinetyDaysView = ({ member, graphData }) => {
   const graphView = () => {
     return (
       <View style={{ alignItems: "center", marginVertical: 30 }}>
-        <ScrollView horizontal>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           <LineChart
             data={{
               labels: graphData.map(x => x.day),
               datasets: [
                 {
                   data: graphData.map(x => x.earning),
+                  color: (opacity = 1) => colors.primary
                 },
                 {
                   data: [0],
@@ -59,9 +61,10 @@ const NinetyDaysView = ({ member, graphData }) => {
                 }
               ]
             }}
-            width={utilities.screenWidth() - 40}
+            width={(utilities.screenWidth() * 0.2) * graphData.length}
             height={300}
             segments={4}
+            bezier
             // interval={1000}
             yAxisLabel={''}
             yAxisSuffix=""
@@ -88,9 +91,14 @@ const NinetyDaysView = ({ member, graphData }) => {
   const questionsView = () => {
     return (
       <View style={{ paddingHorizontal: 10 }}>
-        {member?.ninety_day_questions_list?.map((item, index) => (
-          <QuestionComponent item={item} index={index} />
-        ))}
+        {member?.ninety_day_questions_list.length > 0 ?
+          <>
+            {member?.ninety_day_questions_list?.map((item, index) => (
+              <QuestionComponent item={item} index={index} />
+            ))}
+          </> :
+          <EmptyView label={"No Questions Found"} />
+        }
       </View>
     )
   }

@@ -7,6 +7,7 @@ import { __styles } from './style'
 import { MenuButton } from '../../../components/MyButton'
 import StatView from '../Components/StatView'
 import openUrl from '../../../functions/openUrl'
+import EmptyView from '../../../components/EmptyView'
 
 const SubscriptionVIew = ({ list }) => {
 
@@ -50,7 +51,8 @@ const SubscriptionVIew = ({ list }) => {
   }
   return (
     <View style={{ paddingHorizontal: 5 }}>
-      {list.map(renderItem)}
+      {list.length > 0 ? list.map(renderItem) :
+        <EmptyView />}
     </View>
   )
 }

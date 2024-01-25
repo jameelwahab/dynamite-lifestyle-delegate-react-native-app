@@ -233,3 +233,11 @@ export const MEMBER_PROFILE = ({ token, navigation, memberId, startDate, endDate
 }
 
 
+export const GET_EVENT_DETAIL = ({ token, navigation, slug }) => {
+  return invokeApi({
+    path: `api/event/detail/${slug}`,
+    method: "GET",
+    token,
+    navigation,
+  })
+}

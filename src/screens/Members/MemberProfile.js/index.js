@@ -40,6 +40,9 @@ const MemberProfile = ({ navigation, route }) => {
     let eDATE = moment(selectedDate).endOf(ttype).format('YYYY-MM-DD');
     let res = await MEMBER_PROFILE({ token, navigation, memberId: memberId, startDate: sDATE, endDate: eDATE })
     if (res.code == 200) {
+
+
+      //? make Calendar data
       let startDate = moment(selectedDate, "YYYY-MM-DD").startOf(ttype);
       let endDate = moment(selectedDate, "YYYY-MM-DD").endOf(ttype)
       let newArray = {};
@@ -54,6 +57,7 @@ const MemberProfile = ({ navigation, route }) => {
       }
 
 
+      //? make graph data
       let graphData = res?.member_earning_app.slice().sort((a, b) => new Date(a.date) - new Date(b.date));
       let newlist = [];
       graphData.forEach((x, i) => {
@@ -135,7 +139,7 @@ const MemberProfile = ({ navigation, route }) => {
 
   const TabView = () => {
     return (
-      <View style={{ marginVertical: 10 }}>
+      <View style={{ marginVertical: 10, height: 40, justifyContent: "center" }}>
 
         <FlatList
           ref={tabRef}
@@ -150,14 +154,26 @@ const MemberProfile = ({ navigation, route }) => {
                   tabRef?.current?.scrollToIndex({ index: index, animated: true });
                   setSelectedTab(item.key)
                 }}
-                style={{ paddingHorizontal: 10, height: 40, justifyContent: "center" }}>
-                <MyText color={colors.primary} type='medium' fontSize={16} >{item.title}</MyText>
+                style={{ paddingHorizontal: 10, justifyContent: "flex-end" }}>
+                <MyText color={item.key == selectedTab ? colors.primary : colors.lightText2} type='medium' fontSize={16} >{item.title}</MyText>
                 <View style={{ height: 2, width: "100%", marginTop: 2, borderRadius: 10, backgroundColor: item.key == selectedTab ? colors.primary : colors.transparent }} />
+
               </TouchableOpacity>
             )
           }}
         />
-
+        <View style={{
+          height: 1,
+          backgroundColor: colors.darkSecondary,
+          shadowColor: colors.lightText2,
+          shadowOffset: {
+            width: 0,
+            height: 1,
+          },
+          shadowOpacity: 0.20,
+          shadowRadius: 1.41,
+          elevation: 2
+        }} />
       </View>
     )
   }
@@ -166,7 +182,7 @@ const MemberProfile = ({ navigation, route }) => {
     return (
       <View>
         {selectedTab == "wol" ?
-          <WheelofLife member={member?.member} />
+          <WheelofLife member={member?.member} settings={member?.wheel_of_life_setting} />
           : selectedTab == "question" ?
             <QuestionsView member={member} />
             : selectedTab == "subscription" ?
@@ -230,7 +246,7 @@ const tabs = [{
 },
 {
   key: "daily-dynamite-graph",
-  title: "Daily Dynamite Intentions Analysis",
+  title: "Intentions Analysis",
 },
 {
   key: "calendar",

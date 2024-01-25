@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Pressable } from 'react-native'
+import { View, Text, StyleSheet, Pressable, Settings } from 'react-native'
 import React, { useState } from 'react'
 import { PieChart } from 'react-native-svg-charts';
 import utilities from '../../../utilities';
@@ -7,9 +7,10 @@ import { fonts } from '../../../utilities/fonts';
 import MyText from '../../../components/MyText';
 import AssessmentQuestions from './AssessmentQuestions';
 import { __styles } from './style';
+import MyWebview from '../../../components/MyWebview';
 
 const size = utilities.screenWidth() * 0.7
-const WheelofLife = ({ member }) => {
+const WheelofLife = ({ member, settings }) => {
   const [tab, setTab] = useState(0)
   const _10percentOfsize = (10 / 100) * size;
 
@@ -57,7 +58,7 @@ const WheelofLife = ({ member }) => {
           onPress={() => setTab(1)}
           style={__styles.tabBtn}>
           <View>
-            <MyText style={__styles.tabBtnText}>Assessment</MyText>
+            <MyText style={__styles.tabBtnText}>Questions</MyText>
             <View style={[__styles.tabSelector, { backgroundColor: tab == 1 ? colors.primary : colors.transparent }]} />
           </View>
         </Pressable>
@@ -112,8 +113,28 @@ const WheelofLife = ({ member }) => {
           </View>
         </View> :
         <View style={{ paddingBottom: "10%", paddingHorizontal: 10 }}>
+          <View style={WheelofLifeStyle.assessmentHeadingView}>
+            <MyText style={WheelofLifeStyle.assessmentHeading} >Assessment</MyText>
+          </View>
           <AssessmentQuestions list={member?.assessment} name={member?.first_name} />
-        </View>}
+
+          <View style={WheelofLifeStyle.assessmentHeadingView}>
+            <MyText style={WheelofLifeStyle.assessmentHeading} >Questions</MyText>
+          </View>
+          <AssessmentQuestions list={member?.wheel_of_life} name={member?.first_name} />
+
+
+
+          <View style={WheelofLifeStyle.assessmentHeadingView}>
+            <MyText style={WheelofLifeStyle.assessmentHeading} >Intention Statement</MyText>
+          </View>
+          {console.log(settings, 'check')}
+          <MyWebview fullWidth
+            html={settings?.wheel_of_life_intention_statement} />
+
+          <MyText type='light' style={{ marginTop: 3 }} color={colors.lightText2}>{member?.intention_statement}</MyText>
+        </View>
+      }
 
     </View>
   )
@@ -122,6 +143,20 @@ const WheelofLife = ({ member }) => {
 export default WheelofLife
 
 const WheelofLifeStyle = StyleSheet.create({
+  assessmentHeadingView: {
+    marginBottom: 20,
+    borderBottomColor: colors.placeholder,
+    borderBottomWidth: 0.7,
+    paddingBottom: 10,
+    marginHorizontal: -10,
+    paddingHorizontal: 10,
+    marginTop: 20
+  },
+  assessmentHeading: {
+    fontSize: 16,
+    color: colors.primary,
+    fontFamily: fonts.medium
+  },
   chartView: { alignItems: 'center', marginVertical: '10%', flex: 1 },
   questionView: { marginTop: 20, alignItems: 'center' },
   questionText: { fontSize: 24 },
