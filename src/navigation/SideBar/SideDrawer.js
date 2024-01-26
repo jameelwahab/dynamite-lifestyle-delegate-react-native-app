@@ -6,7 +6,7 @@ import { createDrawerNavigator } from '@react-navigation/drawer'
 import { icons } from '../../utilities/icons';
 import SideBar from '.'
 import { colors } from '../../utilities/colors';
-import { drawerMenuList } from './List';
+import { ChildComponents, ParentComponents, drawerMenuList } from './List';
 
 
 const Drawer = createDrawerNavigator();
@@ -24,26 +24,27 @@ const SideDrawer = () => {
       drawerContent={props => <SideBar {...props} />}
 
     >
-      {drawerMenuList.map((x) => {
-        if (!!x?.collapsible == false) {
+      {Object.keys(ParentComponents).map((x) => {
+        if (!!ParentComponents[x].key) {
           return <Drawer.Screen
-            key={x.key}
-            name={x.key}
-            component={x.component}
-            initialParams={x.params}
+            key={ParentComponents[x].key}
+            name={ParentComponents[x].key}
+            component={ParentComponents[x].component}
+            initialParams={ParentComponents[x].params}
           />
-        } else {
-          return x?.nestedmenu.map((y) => {
-            return <Drawer.Screen
-              key={y.key}
-              name={y.key}
-              component={y.component}
-              initialParams={y.params}
-            />
-          })
         }
-      }
-      )}
+      })}
+      {Object.keys(ChildComponents).map((x) => {
+        if (!!ChildComponents[x].key) {
+          return <Drawer.Screen
+            key={ChildComponents[x].key}
+            name={ChildComponents[x].key}
+            component={ChildComponents[x].component}
+            initialParams={ChildComponents[x].params}
+          />
+        }
+      })}
+
 
     </Drawer.Navigator>
   )

@@ -58,7 +58,11 @@ const MemberList = ({ navigation, route }) => {
   const [filterData, setFilterData] = useState(null);
   const [isSavedFilterApplied, setIsSavedFilterApplied] = useState(false);
   const [isFilterApplied, setIsFilterApplied] = useState(false);
-  const [filterChipList, setFilterChipList] = useState([])
+  const [filterChipList, setFilterChipList] = useState([{
+    label: sort.title,
+    value: sort.key,
+    type: "sort"
+  }])
   const [optionModal, setOptionModal] = useState({
     isVisible: false,
     selectedItem: null,
@@ -98,119 +102,127 @@ const MemberList = ({ navigation, route }) => {
   }
 
   const filterTheData = (obj, data, isSavedFilter, isFilter) => {
-    // let list = [];
-    // console.log(obj, "check 123")
-    // Object.keys(obj).forEach((x, i) => {
-    //   console.log(obj[x], 'Check');
-    //   if (Array.isArray(obj[x])) {
-    //     if (x == "community") {
-    //       obj[x].forEach((z, j) => {
-    //         let nOBj = {
-    //           label: levelList.find(y => y.key == z).title,
-    //           value: z,
-    //           type: x
-    //         }
-    //         list.push(nOBj);
+    let list = [];
+    console.log(obj, data, "check 123")
+    if (!!sorted) {
+      let nOBj = {
+        label: sorted.title,
+        value: sorted.key,
+        type: "sort"
+      }
+      list.push(nOBj)
+    }
+    Object.keys(obj).forEach((x, i) => {
+      console.log(obj[x], 'Check');
+      if (Array.isArray(obj[x])) {
+        if (x == "community") {
+          obj[x].forEach((z, j) => {
+            let nOBj = {
+              label: levelList.find(y => y.key == z).title,
+              value: z,
+              type: x
+            }
+            list.push(nOBj);
 
-    //       })
-    //     } else if (x == "event_page") {
-    //       let id = obj[x][0]
-    //       if(!!id){
-    //       let nOBj = {
-    //         label: filterData?.sale_pages.find((x) => x._id == id)?.sale_page_title,
-    //         value: id,
-    //         type: x
-    //       }
-    //       list.push(nOBj);
-    //     }
-    //     } else if (x == "lead_status") {
-    //       obj[x].forEach((z, j) => {
-    //         let nOBj = {
-    //           label: filterData?.lead_status.find(y => y._id == z)?.title,
-    //           value: z,
-    //           type: x
-    //         }
-    //         list.push(nOBj);
-    //       })
-    //     }
-    //   } else if (x == 'delegate' && !!obj[x]) {
-    //     let nOBj = {
-    //       label: getNameForDelage(filterData?.delegates_list, obj[x]),
-    //       value: obj[x],
-    //       type: x
-    //     }
-    //     list.push(nOBj);
-    //   } else if (x == 'nurture' && !!obj[x]) {
-    //     let nOBj = {
-    //       label: getNameForDelage(filterData?.delegates_list, obj[x]),
-    //       value: obj[x],
-    //       type: x
-    //     }
-    //     list.push(nOBj);
-    //   } else if (x == 'plan' && !!obj[x]) {
-    //     let pageId = obj.event_page[0];
-    //     if (!!pageId) {
-    //       let nOBj = {
-    //         label: filterData?.sale_pages.find((x) => x._id == pageId)?.payment_plans.find(z => z?._id == obj[x])?.plan_title,
-    //         value: obj[x],
-    //         type: x
-    //       }
-    //       list.push(nOBj);
-    //     }
-    //   } else if (x == 'status' && typeof (obj[x]) == "boolean") {
-    //     let nOBj = {
-    //       label: obj[x] ? "Active" : "Inactive",
-    //       value: "statusActive",
-    //       type: x
-    //     }
-    //     list.push(nOBj);
-    //   } else if (x == 'user_status_type' && !!obj[x]) {
-    //     let nOBj = {
-    //       label: obj[x].charAt(0).toUpperCase() + obj[x].slice(1),
-    //       value: obj[x],
-    //       type: x
-    //     }
-    //     list.push(nOBj);
-    //   } else if (x == 'member_ship_expiry' && obj[x] == "expired") {
-    //     let nOBj = {
-    //       label: "Expired",
-    //       value: obj[x],
-    //       type: x
-    //     }
-    //     list.push(nOBj);
-    //   } else if (x == 'member_ship_expiry' && obj[x] == "not_expired" && obj.expiry_in != 'custom') {
-    //     let nOBj = {
-    //       label: `Expire in ${obj.expiry_in} days`,
-    //       value: obj[x],
-    //       type: "expiry_in"
-    //     }
-    //     list.push(nOBj);
-    //   } else if (x == 'member_ship_expiry' && obj[x] == "not_expired" && obj.expiry_in == 'custom') {
-    //     let nOBj = {
-    //       label:`Membership Expiry Start Date : ${moment(obj?.membership_purchase_expiry_from).format("YYYY-MM-DD")} - Membership Expiry End Date : ${moment(obj?.membership_purchase_expiry_to).format("YYYY-MM-DD")}`,
-    //       value: obj[x],
-    //       type: "expiry_in"
-    //     }
-    //     list.push(nOBj);
-    //   } else if (x == 'is_date_range' && !!obj[x]) {
-    //     let nOBj = {
-    //       label: `Start Date : ${moment(obj?.from_date).format("YYYY-MM-DD")} - End Date : ${moment(obj?.to_date).format("YYYY-MM-DD")}`,
-    //       value: obj[x],
-    //       type: x
-    //     }
-    //     list.push(nOBj);
-    //   }
-    //   else if (x == 'coins_range' && !!obj[x]) {
-    //     let nOBj = {
-    //       label: `Start Coins : ${obj.coins_from} - End Coins : ${obj.coins_to}`,
-    //       value: "coins_range_true",
-    //       type: x
-    //     }
-    //     list.push(nOBj);
-    //   }
-    // })
+          })
+        } else if (x == "event_page") {
+          let id = obj[x][0]
+          if (!!id) {
+            let nOBj = {
+              label: data?.sale_pages.find((x) => x._id == id)?.sale_page_title,
+              value: id,
+              type: x
+            }
+            list.push(nOBj);
+          }
+        } else if (x == "lead_status") {
+          obj[x].forEach((z, j) => {
+            let nOBj = {
+              label: data?.lead_status.find(y => y._id == z)?.title,
+              value: z,
+              type: x
+            }
+            list.push(nOBj);
+          })
+        }
+      } else if (x == 'delegate' && !!obj[x]) {
+        let nOBj = {
+          label: getNameForDelage(data?.delegates_list, obj[x]),
+          value: obj[x],
+          type: x
+        }
+        list.push(nOBj);
+      } else if (x == 'nurture' && !!obj[x]) {
+        let nOBj = {
+          label: getNameForDelage(data?.delegates_list, obj[x]),
+          value: obj[x],
+          type: x
+        }
+        list.push(nOBj);
+      } else if (x == 'plan' && !!obj[x]) {
+        let pageId = obj.event_page[0];
+        if (!!pageId) {
+          let nOBj = {
+            label: data?.sale_pages.find((x) => x._id == pageId)?.payment_plans.find(z => z?._id == obj[x])?.plan_title,
+            value: obj[x],
+            type: x
+          }
+          list.push(nOBj);
+        }
+      } else if (x == 'status' && typeof (obj[x]) == "boolean") {
+        let nOBj = {
+          label: obj[x] ? "Active" : "Inactive",
+          value: "statusActive",
+          type: x
+        }
+        list.push(nOBj);
+      } else if (x == 'user_status_type' && !!obj[x]) {
+        let nOBj = {
+          label: obj[x].charAt(0).toUpperCase() + obj[x].slice(1),
+          value: obj[x],
+          type: x
+        }
+        list.push(nOBj);
+      } else if (x == 'member_ship_expiry' && obj[x] == "expired") {
+        let nOBj = {
+          label: "Expired",
+          value: obj[x],
+          type: x
+        }
+        list.push(nOBj);
+      } else if (x == 'member_ship_expiry' && obj[x] == "not_expired" && obj.expiry_in != 'custom') {
+        let nOBj = {
+          label: `Expire in ${obj.expiry_in} days`,
+          value: obj[x],
+          type: "expiry_in"
+        }
+        list.push(nOBj);
+      } else if (x == 'member_ship_expiry' && obj[x] == "not_expired" && obj.expiry_in == 'custom') {
+        let nOBj = {
+          label: `Membership Expiry Start Date : ${moment(obj?.membership_purchase_expiry_from).format("YYYY-MM-DD")} - Membership Expiry End Date : ${moment(obj?.membership_purchase_expiry_to).format("YYYY-MM-DD")}`,
+          value: obj[x],
+          type: "expiry_in"
+        }
+        list.push(nOBj);
+      } else if (x == 'is_date_range' && !!obj[x]) {
+        let nOBj = {
+          label: `Start Date : ${moment(obj?.from_date).format("YYYY-MM-DD")} - End Date : ${moment(obj?.to_date).format("YYYY-MM-DD")}`,
+          value: obj[x],
+          type: x
+        }
+        list.push(nOBj);
+      }
+      else if (x == 'coins_range' && !!obj[x]) {
+        let nOBj = {
+          label: `Start Coins : ${obj.coins_from} - End Coins : ${obj.coins_to}`,
+          value: "coins_range_true",
+          type: x
+        }
+        list.push(nOBj);
+      }
+    })
 
-    // setFilterChipList(list);
+    setFilterChipList(list);
     setIsFilterApplied(isFilter)
     setIsSavedFilterApplied(isSavedFilter)
     setFilter({ ...obj })
@@ -450,6 +462,8 @@ const MemberList = ({ navigation, route }) => {
 
   const filterRemoveAction = (item) => {
     if (item.type == "community") {
+      setSorted(null)
+    } else if (item.type == "community") {
       updateFilter({ community: Filter?.community.slice().filter(z => z != item.value) });
     } else if (item.type == "event_page") {
       updateFilter({ event_page: [] })
@@ -481,19 +495,27 @@ const MemberList = ({ navigation, route }) => {
   const headerView = () => {
     return (
       <View style={{ paddingHorizontal: 5, backgroundColor: colors.darkSecondary }}>
-        {(isFilterApplied || sorted != null) &&
+        {(isFilterApplied || sorted != null) && filterChipList.length > 0 &&
           <>
 
-            <View style={[__styles.allChipView, countLength() > 5 ?
-              { height: showChips ? undefined : 55, overflow: "hidden" } : {
-                height: undefined, overflow: "visible"
-              }]}>
+            <View style={[__styles.allChipView,]}>
               <View style={{}}>
                 <MyText type='bold' >{"Filtered By : "}</MyText>
               </View>
-              {/* {filterChipList.map((item, index) =>
-                chip(item.label, () => filterRemoveAction(item)))} */}
-              {Filter?.community?.map((x) => chip(levelList.find(y => y.key == x).title, () => updateFilter({ community: Filter?.community.slice().filter(z => z != x) })))}
+              {filterChipList.map((item, index) => {
+                if ((index >= 4 && showChips) || index < 4)
+                  return chip(item.label, () => filterRemoveAction(item))
+              })}
+              {filterChipList.length > 4 &&
+                <Pressable onPress={() => setShowChips(!showChips)}>
+                  <MyText type='medium'
+                    style={{
+                      color: colors.primary,
+                      paddingVertical: 5,
+                      paddingHorizontal: 10
+                    }} >{showChips ? "See Less..." : "See All..."}</MyText>
+                </Pressable>}
+              {/* {Filter?.community?.map((x) => chip(levelList.find(y => y.key == x).title, () => updateFilter({ community: Filter?.community.slice().filter(z => z != x) })))}
               {!!Filter?.event_page[0] && chip(filterData?.sale_pages.find((x) => x._id == Filter?.event_page[0])?.sale_page_title, () => updateFilter({ event_page: [] }))}
               {!!sorted && chip(sorted.title, () => setSorted(null))}
               {!!Filter?.event_page[0] && !!Filter?.plan && chip(filterData?.sale_pages.find((x) => x._id == Filter?.event_page[0])?.payment_plans.find(z => z?._id == Filter.plan)?.plan_title, () => updateFilter({ plan: null }))}
@@ -506,12 +528,12 @@ const MemberList = ({ navigation, route }) => {
               {Filter?.member_ship_expiry != "" && Filter?.member_ship_expiry == 'not_expired' && Filter?.expiry_in != 'custom' && chip(`Expiry in ${expireDaysList.find(x => x.key == Filter?.expiry_in)?.title}`, () => updateFilter({ expiry_in: 3, member_ship_expiry: "" }))}
               {Filter?.member_ship_expiry != "" && Filter?.member_ship_expiry == 'not_expired' && Filter?.expiry_in == "custom" && chip(`Membership Expiry Start Date : ${moment(filterData?.membership_purchase_expiry_from).format("YYYY-MM-DD")} - Membership Expiry End Date : ${moment(filterData?.membership_purchase_expiry_to).format("YYYY-MM-DD")}`, () => updateFilter({ expiry_in: 3, member_ship_expiry: "" }))}
               {!!Filter?.is_date_range && !!Filter?.from_date != "" && !!Filter?.to_date != "" && chip(`Start Date : ${moment(filterData?.from_date).format("YYYY-MM-DD")} - End Date : ${moment(filterData?.to_date).format("YYYY-MM-DD")}`, () => updateFilter({ is_date_range: false, from_date: null, to_date: null }))}
-              {!!Filter?.coins_range && chip(`Start Coins : ${Filter?.coins_from} - End Coins : ${Filter?.coins_to}`, () => updateFilter({ coins_range: false, coins_from: 0, coins_to: 0 }))}
+              {!!Filter?.coins_range && chip(`Start Coins : ${Filter?.coins_from} - End Coins : ${Filter?.coins_to}`, () => updateFilter({ coins_range: false, coins_from: 0, coins_to: 0 }))} */}
             </View>
 
             {isFilterApplied &&
-              <View style={{ flexDirection: "row", marginTop: 10 }}>
-                <View style={{ flexDirection: "row", flex: 1 }}>
+              <View style={{ flexDirection: "row", marginTop: 10, justifyContent: "flex-end" }}>
+                <View style={{ flexDirection: "row", }}>
                   {!isSavedFilterApplied &&
                     <TouchableOpacity
                       onPress={saveFilter}
@@ -528,7 +550,7 @@ const MemberList = ({ navigation, route }) => {
                   {/* <TransparentButton title='Clear All' onPress={clearFilter} /> */}
 
                 </View>
-                {countLength() > 5 &&
+                {/* {filterChipList.length > 4 &&
                   <TouchableOpacity
                     onPress={() => setShowChips(!showChips)}
                     style={{ borderRadius: 10, paddingHorizontal: 10, paddingVertical: 5, backgroundColor: colors.lightPrimary3, marginLeft: 5, flexDirection: "row", alignItems: "center" }}>
@@ -536,7 +558,7 @@ const MemberList = ({ navigation, route }) => {
                     <View style={{ transform: [{ rotateZ: showChips ? "180deg" : "0deg" }] }}>
                       {icons.down(colors.primary, 15)}
                     </View>
-                  </TouchableOpacity>}
+                  </TouchableOpacity>} */}
                 {/* {countLength() > 5 &&
                  <TransparentButton title={showChips ?
                   "Show Less" : "Show All"} onPress={() => setShowChips(!showChips)} />

@@ -91,12 +91,12 @@ const Splash = ({ navigation }) => {
     let res = await INIT_WITH_TOKEN({ token });
     if (res.code == 200) {
 
-      let sideBarList = makeArrayOfSidebar(res?.nav_items, res?.consultant);
+      // let sideBarList = makeArrayOfSidebar(res?.nav_items, res?.consultant);
 
       dispatch(setSettings(res?.consultant_setting));
       dispatch(setUserAndToken({ user: res?.consultant, token: token }));
       dispatch(setTimeZone({ user: res?.consultant?.time_zone, admin: res?.time_zone }));
-      dispatch(setNavbar(sideBarList));
+      dispatch(setNavbar(res?.nav_items));
       console.log(socketUrl + "?user_id=" + res?.consultant?._id, "scoketUrl")
       dispatch(setSocket(io(socketUrl, {
         query: {

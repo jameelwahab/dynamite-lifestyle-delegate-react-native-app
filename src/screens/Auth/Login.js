@@ -72,10 +72,10 @@ const Login = ({ navigation }) => {
     let res = await INIT_WITH_TOKEN({ token: resp?.token });
     if (res.code == 200) {
       await AsyncStorage.setItem("@token", resp?.token);
-      let sideBarList = makeArrayOfSidebar(res?.nav_items, res?.consultant);
+      // let sideBarList = makeArrayOfSidebar(res?.nav_items, res?.consultant);
       dispatch(setSettings(res?.consultant_setting));
       dispatch(setUserAndToken({ user: res?.consultant, token: resp?.token }));
-      dispatch(setNavbar(sideBarList));
+      dispatch(setNavbar(res?.nav_items));
       dispatch(setTimeZone({ user: res?.consultant?.time_zone, admin: res?.time_zone }))
       dispatch(setSocket(io(socketUrl, {
         query: {

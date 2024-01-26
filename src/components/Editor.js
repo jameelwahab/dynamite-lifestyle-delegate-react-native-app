@@ -17,6 +17,13 @@ import MyText from './MyText';
 import { icons } from '../utilities/icons';
 import { MyButton, TransparentButton } from './MyButton';
 import MyInputs from './MyInputs';
+import ImageUploadModal from './ImageUploadModal';
+import MyLoader from './MyLoader';
+import { useNavigation } from '@react-navigation/native';
+import { useSelector } from 'react-redux';
+import { selectUser } from '../redux/reducers/userSlice';
+import { UPLOAD_FILE_TO_S3 } from '../DAL';
+import { S3_URL } from '../utilities/constants';
 
 const ic_A = require('../assets/icons/A-alphabet.png');
 const ic_bucket = require('../assets/icons/paint.png');
@@ -28,21 +35,37 @@ const Editor = ({
   label = "",
   autoResonderMsgs = []
 }) => {
-
+  const navigation = useNavigation();
+  const { token } = useSelector(selectUser);
   const RichText = useRef();
   const scrollViewRef = useRef();
   const [link, setLink] = useState({ value: "", showDialog: false, title: "" })
   const [foreColor, setForeColor] = useState(colors.lightText2)
   const [backColor, setBackColor] = useState(undefined)
   const [colorModaal, setColorModaal] = useState({ value: "", isVisible: false, for: "" })
-
-
+  const [isImageModalVisible, setIsImageModalVisible] = useState(false)
+  const [loader, setLoader] = useState(false);
   //? Fore Color
 
   const updateColor = () => {
 
   }
 
+  const onImagePicked = async (image) => {
+    setLoader(true);
+    console.log(image, "imagePicked");
+    let fd = new FormData();
+    fd.append("width", image.width);
+    fd.append("image", image);
+    let res = await UPLOAD_FILE_TO_S3({ token, navigation, body: fd });
+    if (res.code == 200) {
+      setLoader(false)
+      RichText?.current?.insertImage(S3_URL + res?.image_path);
+      RichText?.current?.insertHTML("<br/>")
+    } else {
+      setLoader(false)
+    }
+  }
 
 
 
@@ -157,6 +180,8 @@ const Editor = ({
         onBackdropPress={() => closeDialogue()}
         useNativeDriverForBackdrop={true}
         avoidKeyboard={true}
+        animationIn={"zoomIn"}
+        animationOut={"zoomOut"}
       >
         <SafeAreaView>
           <View style={{ backgroundColor: colors.secondary, padding: 20, borderRadius: 10 }}>
@@ -187,7 +212,7 @@ const Editor = ({
     )
   };
 
-  
+
   return (
     <View>
       {/* {colorModal()} */}
@@ -232,17 +257,19 @@ const Editor = ({
             editor={RichText}
             onInsertLink={openDialogue}
             selectedIconTint={colors.primary}
+            keyboardDisplayRequiresUserAction={true}
             // editor={this[`TextEditor`]}
             actions={[
               actions.keyboard,
               actions.undo,
-              actions.redo,
+              "newline",
               actions.setBold,
               actions.setItalic,
               actions.setUnderline,
               actions.removeFormat,
               // actions.foreColor,
               // actions.hiliteColor,
+              "addImage",
               actions.insertLink,
               actions.setSubscript,
               actions.setSuperscript,
@@ -267,22 +294,39 @@ const Editor = ({
             ]}
 
             iconMap={{
-              [actions.foreColor]: ({ tintColor }) => (
+
+              // [actions.foreColor]: ({ tintColor }) => (
+              //   <TouchableOpacity
+              //     onPress={() => openModal("forecolor")}
+              //     style={{ alignItems: "center" }}>
+              //     <Image source={ic_A} style={{ height: 20, width: 20, tintColor: tintColor }} />
+              //     <View style={{ height: 2, width: 15, backgroundColor: foreColor }} />
+              //   </TouchableOpacity>
+              // ),
+              // [actions.hiliteColor]: ({ tintColor }) => (
+              //   <TouchableOpacity
+              //     onPress={() => openModal("backcolor")}
+              //     style={{ alignItems: "center", marginBottom: -1 }}>
+              //     <Image source={ic_bucket} style={{ height: 15, width: 15, tintColor: tintColor }} />
+              //     <View style={{ height: 2, width: 17, backgroundColor: backColor, marginTop: 2 }} />
+              //   </TouchableOpacity>
+              // ),
+              ["newline"]: ({ tintColor }) => (
                 <TouchableOpacity
-                  onPress={() => openModal("forecolor")}
-                  style={{ alignItems: "center" }}>
-                  <Image source={ic_A} style={{ height: 20, width: 20, tintColor: tintColor }} />
-                  <View style={{ height: 2, width: 15, backgroundColor: foreColor }} />
-                </TouchableOpacity>
-              ),
-              [actions.hiliteColor]: ({ tintColor }) => (
-                <TouchableOpacity
-                  onPress={() => openModal("backcolor")}
+                   onPress={() => {RichText?.current?.insertHTML("<br/>")}}
                   style={{ alignItems: "center", marginBottom: -1 }}>
-                  <Image source={ic_bucket} style={{ height: 15, width: 15, tintColor: tintColor }} />
-                  <View style={{ height: 2, width: 17, backgroundColor: backColor, marginTop: 2 }} />
+                  {icons.reply(tintColor, 20)}
                 </TouchableOpacity>
               ),
+
+              ["addImage"]: ({ tintColor }) => (
+                <TouchableOpacity
+                  onPress={() => setIsImageModalVisible(true)}
+                  style={{ alignItems: "center", marginBottom: -1 }}>
+                  {icons.image(tintColor, 20)}
+                </TouchableOpacity>
+              ),
+
               [actions.heading1]: ({ tintColor }) => (
                 <Text style={{ color: tintColor, fontWeight: '700' }}>
                   H1
@@ -318,6 +362,7 @@ const Editor = ({
                   P
                 </Text>
               ),
+
             }}
             style={{ backgroundColor: colors.backgorund2 }}
           />
@@ -342,6 +387,13 @@ const Editor = ({
             ))}
           </ScrollView>
         </View>
+
+        <ImageUploadModal
+          closeModal={() => setIsImageModalVisible(false)}
+          onImagePicked={onImagePicked}
+          isVisible={isImageModalVisible}
+        />
+        <MyLoader enable={loader} />
       </View>
     </View>
   )

@@ -48,6 +48,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   });
   const [postCategory, setPostCategory] = useState("general");
   const [postCeatedFor, setPostCreatedFor] = useState(isCosmos ? feedLevel != 'all' ? feedLevel : "delegate" : PostCretedForSourceFeed[0].type);
+  const [postCeatedForArray, setPostCreatedForArray] = useState([PostCretedForSourceFeed[0]]);
   const [postType, setPostType] = useState("general");
   const [postText, setPostText] = useState("");
   const [images, setImages] = useState([]);
@@ -70,7 +71,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   const [publishTime, setPublishTime] = useState("12:00 AM");
   const [eventModalVisible, setEventModalVisible] = useState(false)
 
- 
+  const [multipleLevelModalVisiblity, setMultipleLevelModalVisiblity] = useState(false);
 
 
   useImperativeHandle(ref, () => {
@@ -170,7 +171,28 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
     closeOptionModal()
   }
+  const onMultipleOptionSelected = (opt) => {
+    let list = [...postCeatedForArray];
+    let index = list.findIndex(x => x.type == opt.type);
+    console.log(list, index)
+    if (index > -1) {
+      list.splice(index, 1);
+    } else {
+      list.push(opt)
+    }
+    console.log(list)
+    setPostCreatedForArray([...list])
 
+  }
+  useEffect(() => {
+    console.log(postCeatedForArray)
+  }, [
+    JSON.stringify(postCeatedForArray)
+  ])
+
+  const checkSelected = (opt) => {
+    return !!postCeatedForArray.find(x => x.type == opt.type)
+  }
   const addPostBtn = async () => {
     // if (postType == "general" && ) {
     //   showToast({ body: "Please add some text to be posted", title: "Alert", type: "info" });
@@ -189,6 +211,9 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
     if (postText.trim() == "" && images.length == 0 && embededCode.trim() == "" && videoLink.trim() == "") {
       showToast({ body: "Please add data to be posted", title: "Alert", type: "info" });
+      return
+    } else if (!isCosmos && !!!editId && postCeatedForArray.length == 0) {
+      showToast({ body: "Please select post level", title: "Alert", type: "info" });
       return
     }
 
@@ -230,7 +255,13 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     fd.append("description", postText);
     fd.append("embed_code", postType == "embed_code" ? embededCode : "");
     fd.append("feed_images", postType == 'image' ? JSON.stringify(uploadedImages) : "[]");
-    fd.append("created_for_level_or_type", isCosmos ? postCeatedFor != "consultant" ? "both" : "consultant" : postCeatedFor);
+    if (!isCosmos && !!!editId) {
+      fd.append("created_for_level_or_type", JSON.stringify(postCeatedForArray.map(x => x.type)));
+    } else {
+      fd.append("created_for_level_or_type", isCosmos ?
+        feedLevel == 'all' ? JSON.stringify(["both"]) : JSON.stringify([postCeatedFor])
+        : JSON.stringify([postCeatedFor]));
+    }
 
     if (isEventViewComplete) {
       let eventObj = {
@@ -476,6 +507,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
 
   const Modal_addPost = () => {
+    let levelLength = postCeatedForArray.length
     return (
       <Modal
         isVisible={isPostModalVisible}
@@ -529,19 +561,19 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                           {postCategory}</MyText>
                         {icons.downwardArrow(17, colors.white)}
                       </TouchableOpacity>
-
-                      <TouchableOpacity
-                        onPress={() => openOptionModal("createdFor")}
-                        style={__style.modalDropBtns}>
-                        {isCosmos ?
-                          <MyText style={{ textTransform: "capitalize" }}>
-                            {postCeatedFor}
-                          </MyText> :
-                          <MyText >
-                            {PostCretedForSourceFeed.find(x => x.type == postCeatedFor)?.title}
-                          </MyText>}
-                        {icons.downwardArrow(17, colors.white)}
-                      </TouchableOpacity>
+                      {(isCosmos || !!editId) &&
+                        <TouchableOpacity
+                          onPress={() => openOptionModal("createdFor")}
+                          style={__style.modalDropBtns}>
+                          {isCosmos ?
+                            <MyText style={{ textTransform: "capitalize" }}>
+                              {postCeatedFor}
+                            </MyText> :
+                            <MyText >
+                              {PostCretedForSourceFeed.find(x => x.type == postCeatedFor)?.title}
+                            </MyText>}
+                          {icons.downwardArrow(17, colors.white)}
+                        </TouchableOpacity>}
                       {!!!editId &&
                         <View opacity={0.7}>
                           <TouchableOpacity
@@ -551,8 +583,29 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                           </TouchableOpacity>
                         </View>}
                     </View>
+                    {!isCosmos && !!!editId &&
+                      <View style={{ marginTop: 10 }}>
+                        <TouchableOpacity
+                          onPress={() => setMultipleLevelModalVisiblity(true)}
+                          style={[__style.modalDropBtns, { alignSelf: "flex-start" }]}>
+                          <MyText >
+                            {levelLength > 0 ? postCeatedForArray.map((x, i) => {
+                              let name = x.title;
+                              if ((i + 1) != levelLength) {
+                                name = name + ", ";
+                              }
+                              return name
+                            }) : "Select Level*"}
+                          </MyText>
+                          {icons.downwardArrow(17, colors.white)}
+                        </TouchableOpacity>
+                      </View>
+                    }
                   </View>
+
                 </View>
+
+
 
 
 
@@ -570,6 +623,9 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                   value={postText}
                   placeholder="What's on your mind?"
                   placeholderTextColor={colors.lightText2}
+                  keyboardAppearance="dark"
+                  selectionColor={colors.selection}
+                  cursorColor={colors.white}
                 />
 
 
@@ -814,6 +870,21 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
           />
 
 
+
+          {/* //? Multiple Option Level */}
+          <OptionModal
+            isVisible={multipleLevelModalVisiblity}
+            optionList={PostCretedForSourceFeed}
+            closeModal={() => setMultipleLevelModalVisiblity(false)}
+            onSelected={onMultipleOptionSelected}
+            multiple={true}
+            checkSelected={checkSelected}
+          />
+
+
+
+
+
           <DateTimePicker
             isVisible={dateModalVisible}
             mode="date"
@@ -918,6 +989,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
             ref={lvlModalRef}
             isCosmos={isCosmos}
           />
+
         </View>}
     </View>
 
@@ -980,7 +1052,7 @@ const __style = StyleSheet.create({
   },
   inputRootView: {
     flexDirection: "row",
-    alignItems: "center",
+
   },
   inputView: {
     backgroundColor: colors.secondaryVariant,
