@@ -6,6 +6,7 @@ import { colors } from '../../utilities/colors'
 import { icons } from '../../utilities/icons'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import routes from '../../navigation/routes'
+import crashlytics from '@react-native-firebase/crashlytics';
 
 const OtherSettings = ({ navigation }) => {
   return (
@@ -64,5 +65,5 @@ const SettingsList = [{
   name: "Change Password",
   icon: icons.lock,
   route: routes.changePassword
-}
+},
 ]

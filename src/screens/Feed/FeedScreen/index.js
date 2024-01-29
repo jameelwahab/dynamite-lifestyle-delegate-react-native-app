@@ -608,6 +608,10 @@ const FeedScreen = ({ navigation, route }) => {
     })
   }
 
+  const removeFromList = (id) => {
+    setFeed((list) => list.filter(f => f._id != id));
+  }
+
   const updateFeedCommentCount = (feedId, count) => {
     setFeed((list) => {
       let index = list.findIndex(item => item._id == feedId);
@@ -697,7 +701,7 @@ const FeedScreen = ({ navigation, route }) => {
     return (
       <View>
         {route?.params?.title &&
-          <View style={{  marginTop: 5, marginLeft: 5 }}>
+          <View style={{ marginTop: 5, marginLeft: 5 }}>
             <MyText fontSize={18} type='bold' color={colors.primary} >{route?.params?.title}</MyText></View>
         }
         <FeedTabs
@@ -726,6 +730,8 @@ const FeedScreen = ({ navigation, route }) => {
           isCosmos={isCosmos}
           isScheduledFeed={isScheduledFeed}
           timezone={timezone}
+          removeFromList={removeFromList}
+          isSuperDelegate={user?.is_super_delegate}
         />
       </View>
     )

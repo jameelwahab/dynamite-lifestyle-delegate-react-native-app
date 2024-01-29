@@ -35,7 +35,7 @@ import openUrl from '../../../functions/openUrl'
 import { isUrl } from '../../../functions/regex'
 
 
-const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, selectFeedlevel, feedLevel, tab, isCosmos, isScheduledFeed, timezone }, ref) => {
+const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, selectFeedlevel, feedLevel, tab, isCosmos, isScheduledFeed, timezone, removeFromList, isSuperDelegate }, ref) => {
   const lvlModalRef = useRef()
   const tablRef = useRef()
   const [loader, setLoader] = useState(false);
@@ -55,6 +55,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   const [videoLink, setVideoLink] = useState("");
   const [embededCode, setEmbededCode] = useState("");
   const [editId, setEditId] = useState("");
+  const [editFeed, setEditFeed] = useState(null);
   const [show, setShow] = useState(false)
   const [isEventViewComplete, setEventComplete] = useState(false);
   const [eventTitle, setEventTitle] = useState("");
@@ -84,6 +85,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   const selectItemForEdit = (item) => {
     console.log(item, "item for edit");
     setEditId(item._id);
+    setEditFeed(item);
     setPostCategory(item?.feed_appear_by == "public" ? "general" : "win");
     setPostCreatedFor(item?.created_for_level_or_type == "both" ? "delegate" : item?.created_for_level_or_type);
     setPostType(item?.feed_type);
@@ -128,6 +130,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     setEmbededCode("");
     setImages([]);
     setEditId("");
+    setEditFeed(null);
     setEventComplete(false);
     setEventTitle("")
     setEventBtnText("");
@@ -255,9 +258,12 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     fd.append("description", postText);
     fd.append("embed_code", postType == "embed_code" ? embededCode : "");
     fd.append("feed_images", postType == 'image' ? JSON.stringify(uploadedImages) : "[]");
-    if (!isCosmos && !!!editId) {
+    if (!isCosmos && !!editId == false && !isSuperDelegate) {
       fd.append("created_for_level_or_type", JSON.stringify(postCeatedForArray.map(x => x.type)));
-    } else {
+    } else if (!!editId) {
+      fd.append("created_for_level_or_type", postCeatedFor);
+    }
+    else {
       fd.append("created_for_level_or_type", isCosmos ?
         feedLevel == 'all' ? JSON.stringify(["both"]) : JSON.stringify([postCeatedFor])
         : JSON.stringify([postCeatedFor]));
@@ -305,7 +311,11 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
       if (res1.code == 200) {
 
         showToast({ title: res?.message, type: "success" })
-        updateFeedItem(res1?.feeds)
+        if (feedLevel != "all" && editFeed?.created_for_level_or_type != res1.feeds.created_for_level_or_type && !isCosmos) {
+          removeFromList(editId)
+        } else {
+          updateFeedItem(res1?.feeds)
+        }
         setPostModalVisibilty(false)
         setLoader(false);
         setEditId("")
@@ -561,7 +571,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                           {postCategory}</MyText>
                         {icons.downwardArrow(17, colors.white)}
                       </TouchableOpacity>
-                      {(isCosmos || !!editId) &&
+                      {(isCosmos || !!editId || !isSuperDelegate) &&
                         <TouchableOpacity
                           onPress={() => openOptionModal("createdFor")}
                           style={__style.modalDropBtns}>
@@ -569,7 +579,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                             <MyText style={{ textTransform: "capitalize" }}>
                               {postCeatedFor}
                             </MyText> :
-                            <MyText >
+                            <MyText  >
                               {PostCretedForSourceFeed.find(x => x.type == postCeatedFor)?.title}
                             </MyText>}
                           {icons.downwardArrow(17, colors.white)}
@@ -583,7 +593,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                           </TouchableOpacity>
                         </View>}
                     </View>
-                    {!isCosmos && !!!editId &&
+                    {!isCosmos && !!!editId && isSuperDelegate &&
                       <View style={{ marginTop: 10 }}>
                         <TouchableOpacity
                           onPress={() => setMultipleLevelModalVisiblity(true)}
@@ -937,7 +947,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
             <View style={__style.levlBtnLabel}>
               <MyText color={colors.lightText2} fontSize={12} >Select Level</MyText>
             </View>
-            <MyText type={"medium"} style={{ textTransform: "capitalize" }} >{feedLevel}</MyText>
+            <MyText type={"medium"} style={{ textTransform: feedLevel == "pta" ? "uppercase" : "capitalize" }} >{feedLevel}</MyText>
             {icons.down(colors.lightText2)}
           </Pressable>
 

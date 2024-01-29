@@ -248,6 +248,7 @@ const Editor = ({
                 onChange={text => onChange(text)}
                 androidLayerType="software"
                 androidHardwareAccelerationDisabled
+                scrollEnabled={true}
               />
             </ScrollView>
 
@@ -257,11 +258,12 @@ const Editor = ({
             editor={RichText}
             onInsertLink={openDialogue}
             selectedIconTint={colors.primary}
-            keyboardDisplayRequiresUserAction={true}
+            // keyboardDisplayRequiresUserAction={true}
             // editor={this[`TextEditor`]}
             actions={[
               actions.keyboard,
               actions.undo,
+              actions.redo,
               "newline",
               actions.setBold,
               actions.setItalic,

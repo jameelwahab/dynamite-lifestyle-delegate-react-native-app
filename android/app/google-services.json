@@ -1,0 +1,83 @@
+{
+  "project_info": {
+    "project_number": "942508686264",
+    "firebase_url": "https://dynamite-lifestyle.firebaseio.com",
+    "project_id": "dynamite-lifestyle",
+    "storage_bucket": "dynamite-lifestyle.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:942508686264:android:16660876529d175c65ad4d",
+        "android_client_info": {
+          "package_name": "com.dynamite.digital"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "942508686264-f51nlgh3slr44an15csjnrn6d24s29f6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDxzRl42UzUgiO4TJSS018mkI-Op98vvMw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "942508686264-f51nlgh3slr44an15csjnrn6d24s29f6.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "942508686264-gu72hduplhgg6ucsl3qo1mrqsbc2f58a.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "app.dynamitedigital.com"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:942508686264:android:ad36483c004155b665ad4d",
+        "android_client_info": {
+          "package_name": "com.dynamite.missioncontrol100"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "942508686264-f51nlgh3slr44an15csjnrn6d24s29f6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDxzRl42UzUgiO4TJSS018mkI-Op98vvMw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "942508686264-f51nlgh3slr44an15csjnrn6d24s29f6.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "942508686264-gu72hduplhgg6ucsl3qo1mrqsbc2f58a.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "app.dynamitedigital.com"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

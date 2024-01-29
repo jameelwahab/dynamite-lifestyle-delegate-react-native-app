@@ -33,8 +33,8 @@ target 'delegateApp' do
     # Hermes is now enabled by default. Disable by setting this flag to false.
     # Upcoming versions of React Native may rely on get_default_flags(), but
     # we make it explicit here to aid in the React Native upgrade process.
-    :hermes_enabled => false,
-#    :hermes_enabled => flags[:hermes_enabled],
+#    :hermes_enabled => false,
+    :hermes_enabled => flags[:hermes_enabled],
     :fabric_enabled => flags[:fabric_enabled],
     # Enables Flipper.
     #
@@ -45,6 +45,17 @@ target 'delegateApp' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
+  
+  pod 'Firebase', :modular_headers => true
+  pod 'FirebaseInstallations', :modular_headers => true
+  pod 'FirebaseCore', :modular_headers => true
+  pod 'GoogleUtilities', :modular_headers => true
+  pod 'nanopb', :modular_headers => true
+  pod 'FirebaseCoreExtension', :modular_headers => true
+  pod 'GoogleDataTransport', :modular_headers => true
+  #pod 'Stripe', :modular_headers => true
+  $RNFirebaseAsStaticFramework = true
+  
   target 'delegateAppTests' do
     inherit! :complete
     # Pods for testing

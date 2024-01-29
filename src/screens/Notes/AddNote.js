@@ -58,7 +58,7 @@ const AddNote = ({ navigation, route }) => {
   return (
     <RootView hideHeader>
       <KeyboardAwareScrollView>
-        <View>
+<View>
           <View style={{ flexDirection: "row", alignItems: "center", marginTop: 10 }}>
 
             <TouchableOpacity

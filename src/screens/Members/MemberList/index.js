@@ -311,6 +311,7 @@ const MemberList = ({ navigation, route }) => {
   }
 
   const clearFilter = () => {
+    setFilterChipList([])
     setFilter({ ...filteroObj });
     setSorted(null);
     setIsFilterApplied(false)
@@ -495,7 +496,7 @@ const MemberList = ({ navigation, route }) => {
   const headerView = () => {
     return (
       <View style={{ paddingHorizontal: 5, backgroundColor: colors.darkSecondary }}>
-        {(isFilterApplied || sorted != null) && filterChipList.length > 0 &&
+        {filterChipList.length > 0 &&
           <>
 
             <View style={[__styles.allChipView,]}>
@@ -515,6 +516,16 @@ const MemberList = ({ navigation, route }) => {
                       paddingHorizontal: 10
                     }} >{showChips ? "See Less..." : "See All..."}</MyText>
                 </Pressable>}
+
+
+             
+
+              {/* <TouchableOpacity
+                onPress={clearFilter}
+                style={{ borderRadius: 10, paddingHorizontal: 10, paddingVertical: 5, backgroundColor: colors.lightPrimary3, marginLeft: 5 }}>
+                <MyText color={colors.primary}>{"Clear All"}</MyText>
+              </TouchableOpacity> */}
+
               {/* {Filter?.community?.map((x) => chip(levelList.find(y => y.key == x).title, () => updateFilter({ community: Filter?.community.slice().filter(z => z != x) })))}
               {!!Filter?.event_page[0] && chip(filterData?.sale_pages.find((x) => x._id == Filter?.event_page[0])?.sale_page_title, () => updateFilter({ event_page: [] }))}
               {!!sorted && chip(sorted.title, () => setSorted(null))}
@@ -531,8 +542,25 @@ const MemberList = ({ navigation, route }) => {
               {!!Filter?.coins_range && chip(`Start Coins : ${Filter?.coins_from} - End Coins : ${Filter?.coins_to}`, () => updateFilter({ coins_range: false, coins_from: 0, coins_to: 0 }))} */}
             </View>
 
-            {isFilterApplied &&
+            {filterChipList.length > 0 &&
               <View style={{ flexDirection: "row", marginTop: 10, justifyContent: "flex-end" }}>
+                 <Pressable style={{  }} onPress={clearFilter}>
+                {/* <MyText type='medium'
+                  style={{
+                    // borderRadius:10,overflow:"hidden",
+                    // backgroundColor: colors.heart+"55",
+                    color: colors.delete,
+                    paddingVertical: 5,
+                    paddingHorizontal: 10,
+                    // textDecorationLine: "underline"
+                  }} >{"Clear Filter"}</MyText> */}
+                   <TouchableOpacity
+                      onPress={clearFilter}
+                      style={{marginRight:10, borderWidth: 1, borderColor: colors.delete, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 5, backgroundColor:colors.heart+"33" }}>
+                      <MyText color={colors.delete}>{"Clear Filter"}</MyText>
+                    </TouchableOpacity>
+              </Pressable>
+
                 <View style={{ flexDirection: "row", }}>
                   {!isSavedFilterApplied &&
                     <TouchableOpacity
@@ -542,11 +570,7 @@ const MemberList = ({ navigation, route }) => {
                     </TouchableOpacity>
                     // <MyButton invert textStyle={{fontSize:12}} style={{paddingHorizontal:5,height:30}} title='Save Filter' onPress={saveFilter} />
                   }
-                  <TouchableOpacity
-                    onPress={clearFilter}
-                    style={{ borderRadius: 10, paddingHorizontal: 10, paddingVertical: 5, backgroundColor: colors.lightPrimary3, marginLeft: 5 }}>
-                    <MyText color={colors.primary}>{"Clear All"}</MyText>
-                  </TouchableOpacity>
+
                   {/* <TransparentButton title='Clear All' onPress={clearFilter} /> */}
 
                 </View>
