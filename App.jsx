@@ -14,7 +14,8 @@ import TrackPlayer, {
   AppKilledPlaybackBehavior,
   Capability,
 } from 'react-native-track-player';
-import {PaperProvider} from 'react-native-paper';
+import notifee from '@notifee/react-native';
+
 
 const toastConfig = {
   success: props => <SuccessToast {...props} text2NumberOfLines={2} />,
@@ -40,7 +41,15 @@ const App = () => {
       });
     });
   };
+  const createChannel = async () => {
+    const channelId = await notifee.createChannel({
+      id: 'default',
+      name: 'Default Channel',
+    });
+  };
+  
   useEffect(() => {
+    createChannel();
     setupPlayer();
     LogBox.ignoreLogs([
       `You seem to update the renderers prop(s) of the "RenderHTML" component in short periods of time`,

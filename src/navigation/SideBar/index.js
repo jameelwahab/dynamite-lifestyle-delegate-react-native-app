@@ -15,6 +15,9 @@ import ResponsiveImage2 from '../../components/ResponsiveImage2';
 import utilities from '../../utilities';
 import { selectSocket } from '../../redux/reducers/socketSlice';
 import MyImage from '../../components/MyImage';
+import messaging from '@react-native-firebase/messaging';
+import notifee from '@notifee/react-native';
+
 
 const index = (props) => {
   const { navigation, state } = props;
@@ -22,6 +25,10 @@ const index = (props) => {
   const { settings } = useSelector(selectSettings);
   const { socket } = useSelector(selectSocket);
   const [isCollapsed, setCollapsed] = useState([]);
+
+
+
+
 
   useEffect(() => {
     socket.on("connect_error", () => {
@@ -34,9 +41,19 @@ const index = (props) => {
       console.log("%c socket connected ", 'background:#A020F0; color: #FFF', socket)
     });
 
+    const unsubscribe = messaging().onMessage(async remoteMessage => {
+      console.log("Remote Notification: ", remoteMessage)
+      notifee.displayNotification({
+        title: remoteMessage?.notification?.title,
+        body: remoteMessage?.notification?.body,
+        android: { channelId: "default" }
+      })
+    });
+
     return () => {
       socket.off("connect");
       socket.off("connect_error");
+      unsubscribe();
     }
   }, [])
 
@@ -80,18 +97,19 @@ const index = (props) => {
 
 
   const optionView = (item, index) => {
+    let isSelected = ParentComponents[item.value].key == props.state.routeNames[props.state.index];
     return (
       <Pressable
         key={item.value}
         onPress={() => changeSideBarScreen(item)}
-        style={[{ backgroundColor: item?.index == props.state.index && !!item?.is_expanded == false ? colors.lightPrimary3 : undefined, }, __styles.itemRootView]}>
+        style={[{ backgroundColor: isSelected && !!item?.is_expanded == false ? colors.lightPrimary3 : undefined, }, __styles.itemRootView]}>
         <MyImage
           source={{ uri: S3_URL + item?.icon }}
           style={__styles.itemIcon} />
         <View style={{ flex: 1, flexWrap: "wrap" }}>
           <MyText
             fontSize={14}
-            color={item?.index == props.state.index && !!item?.is_expanded == false ? colors.primary : colors.text}
+            color={isSelected && !!item?.is_expanded == false ? colors.primary : colors.text}
             style={{ marginLeft: 20 }} >{item.title}</MyText>
         </View>
         {!!item?.is_expanded &&
@@ -104,17 +122,18 @@ const index = (props) => {
 
   const nestedOptionView = (item, index, parentItem) => {
     if (!!ChildComponents[item.value]) {
+      let isSelected = ChildComponents[item.value].key == props.state.routeNames[props.state.index]
       return (
         <Collapsible key={item.value} collapsed={findCollapsed(parentItem)}>
           <Pressable
             key={item.value}
             onPress={() => changeSideBarChildScreen(item)}
-            style={[{ backgroundColor: item?.index == props.state.index ? colors.lightPrimary3 : undefined, }, __styles.itemRootView, __styles.nestedView]}>
+            style={[{ backgroundColor: isSelected ? colors.lightPrimary3 : undefined, }, __styles.itemRootView, __styles.nestedView]}>
             <MyImage source={{ uri: S3_URL + item?.icon }} style={__styles.itemIcon} />
             <View style={{ flex: 1, flexWrap: "wrap" }}>
               <MyText
                 fontSize={14}
-                color={item?.index == props.state.index ? colors.primary : colors.text}
+                color={isSelected ? colors.primary : colors.text}
                 style={{ marginLeft: 20 }} >{item.title}</MyText>
             </View>
           </Pressable>

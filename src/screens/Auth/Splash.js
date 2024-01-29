@@ -20,6 +20,7 @@ import { drawerMenuList } from '../../navigation/SideBar/List'
 import { setSocket } from '../../redux/reducers/socketSlice'
 import { io } from 'socket.io-client'
 import { socketUrl } from '../../utilities/constants'
+import notifee from '@notifee/react-native';
 
 
 const Splash = ({ navigation }) => {
@@ -104,6 +105,7 @@ const Splash = ({ navigation }) => {
           role: "delegate"
         }
       })))
+
       moveTo(routes.mainScreen)
     } else if (res.code == 401) {
       try {
@@ -133,6 +135,7 @@ const Splash = ({ navigation }) => {
   }
 
   const moveTo = (screen) => {
+    notifee.requestPermission()
     navigation.reset({
       index: 0,
       routes: [{ name: screen }]

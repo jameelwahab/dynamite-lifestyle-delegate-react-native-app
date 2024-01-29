@@ -26,6 +26,8 @@ import { drawerMenuList } from '../../navigation/SideBar/List';
 import { setSocket } from '../../redux/reducers/socketSlice';
 import { io } from 'socket.io-client';
 import MyInputs from '../../components/MyInputs';
+import messaging from '@react-native-firebase/messaging';
+
 
 
 
@@ -43,6 +45,13 @@ const Login = ({ navigation }) => {
   }
 
   const onMainScreen = async () => {
+    let fcm_token = "";
+    try {
+      fcm_token = await messaging().getToken();
+      console.log("fcm_token \n", fcm_token)
+    } catch (err) {
+      console.log("fcm_token error", err)
+    }
     if (email.trim() == "") {
       showToast({ body: "Please enter your email" });
     } else if (!isEmailValid(email.trim())) {
@@ -52,7 +61,7 @@ const Login = ({ navigation }) => {
     } else {
       setLoader(true);
       let fd = new FormData();
-      fd.append("fcm_token", "")
+      fd.append("fcm_token", fcm_token)
       fd.append("platform", "app")
       fd.append("login_by_device", Platform.OS)
       fd.append("email", email.trim())

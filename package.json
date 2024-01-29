@@ -35,6 +35,7 @@
     "@ronradtke/react-native-markdown-display": "^8.0.0",
     "axios": "^1.5.1",
     "html-entities": "^2.4.0",
+    "libphonenumber-js": "^1.10.54",
     "lottie-react-native": "^6.3.1",
     "moment": "^2.29.4",
     "moment-timezone": "^0.5.43",

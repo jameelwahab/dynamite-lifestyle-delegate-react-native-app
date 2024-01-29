@@ -18,11 +18,13 @@ export const colors = {
   black: "#000000",
   lightText: "#8c9aa6",
   lightText2: "#bec6da",
+  lightText2: "#bec6da",
   placeholder: "#637381",
   delete: "#ff3333",
   heart: "#CA5040",
   transparent: "#FFFFFF00",
   grey: "#696969",
+  lightGrey:"#A2A1A1",
   online: "#337447",
   green:"#4B9831",
   chip: "#343b4b"

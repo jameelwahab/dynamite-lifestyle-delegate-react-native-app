@@ -9,6 +9,7 @@ import StackFeed from "../NestedStacks/StackFeed";
 import StackAllMember from "../NestedStacks/StackAllMembers";
 import StackNurtureMembers from "../NestedStacks/StackNurtureMembers";
 import StackMembers from "../NestedStacks/StackMembers";
+import StackWhatsApp from "../NestedStacks/StackWhatsApp";
 
 export const drawerMenuList = [
   {
@@ -214,7 +215,12 @@ export const ParentComponents = {
     value: "support",
     key: null,
     params: {}
-  }
+  },
+  whatsapp_chat: {
+    key: routes.whatsappChatNavigator,
+    component: StackWhatsApp,
+    params: {}
+  },
 }
 
 export const ChildComponents = {

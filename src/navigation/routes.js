@@ -13,6 +13,7 @@ const routes = {
   allMemberNavigator: "ALL_MEMBER_NAVIGATOR",
   memberNavigator: "MEMBERS_NAVIGATOR",
   nurtureNavigator: "NURTURE_NAVIGATOR",
+  whatsappChatNavigator: "WHATSAPP_CHAT_NAVIGATOR",
 
 
   //! ///    Screens'
@@ -74,6 +75,13 @@ const routes = {
 
   //? Questions
   genericQestionListing: "QUESTION_LISTING",
+
+
+  //? chat
+  whtasappChat: "WHATSAPP_CHAT_SETTINGS_SCREEN",
+  whtasappChatList: "WHATSAPP_CHAT_LIST_SCREEN",
+  whtasappChatMessageList: "WHATSAPP_CHAT_MESSAGE_LIST_SCREEN",
+  whtasappStartNewChat: "WHATSAPP_START_NEW_CHAT_SCREEN",
 
 }
 

@@ -100,6 +100,5 @@ export const icons = {
   eye: (color = colors.primary, size = 17) => { return (<Ionicons name="eye" color={color} size={size} />) },
   notes: (color = colors.primary, size = 17) => { return (<MaterialCommunityIcons name="clipboard-text" color={color} size={size} />) },
   whatsapp: (color = colors.primary, size = 17) => { return (<MaterialCommunityIcons name="whatsapp" color={color} size={size} />) },
-
-
+  failed: (color = colors.primary, size = 17) => { return (<MaterialCommunityIcons name="cancel" color={color} size={size} />) },
 }

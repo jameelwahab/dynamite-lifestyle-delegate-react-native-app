@@ -26,4 +26,6 @@ export {
   MEMBER_PROFILE, GET_EVENT_DETAIL
 } from './Members'
 
+export { GET_WHATSAPP_MEMBER_LIST, INITIATE_WHATSAPP_CHAT, WHATSAPP_CHATLIST, WHATSAPP_MESSAGE_LIST } from './Whatsapp';
+
 export { QUESTIONS_LIST } from './Questions'
