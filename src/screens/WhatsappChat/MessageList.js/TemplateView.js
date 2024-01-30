@@ -5,7 +5,7 @@ import MyText from '../../../components/MyText'
 import { colors } from '../../../utilities/colors'
 import { icons } from '../../../utilities/icons'
 
-const TemplateView = ({ value, onPress, onClearBtnPress }) => {
+const TemplateView = ({ value, onPress, onClearBtnPress, sendBtnPress }) => {
   return (
     <View style={{ paddingTop: 15, }}>
       <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -26,6 +26,7 @@ const TemplateView = ({ value, onPress, onClearBtnPress }) => {
         </View>
         {!!value &&
           <TouchableOpacity
+            onPress={sendBtnPress}
             style={__style.sendButtonView}>
             {icons.send(colors.primary, 18)}
           </TouchableOpacity>}

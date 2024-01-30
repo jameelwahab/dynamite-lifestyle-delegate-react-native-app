@@ -79,117 +79,36 @@ const MessageList = ({ navigation, route }) => {
   }, [])
 
   const socketEvents = () => {
-    // socket.on("send_chat_message_event_for_sender", sendMessageReceiverForSender);
-    // socket.on("update_chat_message_event_for_sender", editMessageReceiverForSender);
-    // socket.on("delete_chat_message_event_for_sender", deleteMessageReceiverForSender);
-    // socket.on("send_chat_message_receiver", sendMessageReceiver);
-    // socket.on("update_chat_message_receiver", editMessageReceiver);
-    // socket.on("delete_chat_message_receiver", deleteMessageReceiver);
-    // socket.on("chat_message_status", readMsgSingnal);
-    // socket.on("member_online", memberOnlineSignal);
+    socket.on("whatsapp_chat_message_event_receiver", sendMessageReceiverForSender);
+    socket.on("whatsapp_message_status", onMessageStatus)
   }
 
   const removeSocketEvents = () => {
-    // socket.off("send_chat_message_event_for_sender", sendMessageReceiverForSender);
-    // socket.off("update_chat_message_event_for_sender", editMessageReceiverForSender);
-    // socket.off("delete_chat_message_event_for_sender", deleteMessageReceiverForSender);
-    // socket.off("send_chat_message_receiver", sendMessageReceiver);
-    // socket.off("update_chat_message_receiver", editMessageReceiver);
-    // socket.off("delete_chat_message_receiver", deleteMessageReceiver);
-    // socket.off("chat_message_status", readMsgSingnal);
-    // socket.off("member_online", memberOnlineSignal);
+    socket.off("whatsapp_chat_message_event_receiver", sendMessageReceiverForSender);
+    socket.off("whatsapp_message_status", onMessageStatus)
   }
 
 
-  const readMsgSingnal = (data) => {
-    console.log("chat_message_status", data);
-    if (data.status == "read") {
-      setChat((chatList) => {
-        chatList.map((chat) => chat.status = "read");
-        return [...chatList]
-      })
-    }
 
-  }
-
-  const memberOnlineSignal = (data) => {
-    console.log("member_online", data);
-    setMember((member) => {
-      if (data?.user_id == member?.memberId) {
-        member.isOnline = true;
-        setChat((chatList) => {
-          chatList.map((chat) => !!chat.status == false || chat.status == "sent" ? chat.status = "delivered" : chat.status);
-          return [...chatList]
-        });
-      }
-
-      return { ...member }
-    })
-  }
 
   const sendMessageReceiverForSender = (data) => {
     console.log(data, "sendMessageReceiverForSender")
-    setChat((chat) => [data?.message_obj, ...chat])
-    setMember((member) => { return { ...member, chatId: data?.chat_obj?._id, } })
+    setChat((chat) => [data?.data?.response, ...chat])
+    // setMember((member) => { return { ...member, chatId: data?.chat_obj?._id, } })
   }
 
-  const sendMessageReceiver = (data) => {
-    console.log(data, "sendMessageReceiver")
-    setChat((chat) => [data?.message_obj, ...chat])
+  const onMessageStatus = (data) => {
+    console.log(data, "whatsapp_message_status")
+    setChat((chats) => {
+      let index = chats.findIndex(chat => chat?.whatssapp_message_id == data?.whatssapp_message_id);
+      console.log(index, "index")
+      if (index > -1) {
+        chats.splice(index, 1, { ...chats[index], status: data?.status, failed_reason: data?.failed_reason })
+      }
+      return [...chats]
+    })
   }
 
-  const editMessageReceiverForSender = (data) => {
-    console.log(data, "editMessageReceiverForSender")
-    if (data.code == 200) {
-      setChat((chat) => {
-        let index = chat.findIndex(x => x?._id == data?.message_obj?._id);
-        if (index > -1) {
-          chat.splice(index, 1, data?.message_obj);
-          return [...chat]
-        }
-      })
-    }
-
-  }
-
-  const editMessageReceiver = (data) => {
-    console.log(data, "editMessageReceiver")
-    if (data.code == 200) {
-      setChat((chat) => {
-        let index = chat.findIndex(x => x?._id == data?.message_obj?._id);
-        if (index > -1) {
-          chat.splice(index, 1, data?.message_obj);
-          return [...chat]
-        }
-      })
-    }
-  }
-
-  const deleteMessageReceiverForSender = (data) => {
-    console.log(data, "deleteMessageReceiverForSender")
-    if (data.code == 200) {
-      setChat((chat) => {
-        let index = chat.findIndex(x => x?._id == data?.message_id);
-        if (index > -1) {
-          chat.splice(index, 1);
-          return [...chat]
-        }
-      })
-    }
-  }
-
-  const deleteMessageReceiver = (data) => {
-    console.log(data, "deleteMessageReceiver");
-    if (data.code == 200) {
-      setChat((chat) => {
-        let index = chat.findIndex(x => x?._id == data?.message_id);
-        if (index > -1) {
-          chat.splice(index, 1);
-          return [...chat]
-        }
-      })
-    }
-  }
 
 
   //! //////// APIS
@@ -216,6 +135,9 @@ const MessageList = ({ navigation, route }) => {
       // }
       setTamplates(res?.list_templates)
       setChat([...res?.data?.reverse()])
+
+      route?.params?.resetCountToZero?.(member?.chatId);
+      // route?.params?.refresh?.();
       // readAllMessagesAPI()
     }
   }
@@ -379,6 +301,31 @@ const MessageList = ({ navigation, route }) => {
     setState({ isPlaying: "", selected_audio: null })
   }
 
+  const sendBtnPress = () => {
+    if (!!!selectedTemplate) {
+      showToast({ title: "Please select a Template" })
+    } else {
+
+
+
+
+      let postData = {
+        receiver_id: member?.memberId,
+        chat_id: member?.chatId,
+        message: selectedTemplate?.name,
+        token: token,
+        message_type: "template"
+      }
+
+      console.log('whatsapp_chat_message_event', postData)
+      socket.emit('whatsapp_chat_message_event', postData)
+      setSelectedTemplate(null);
+      setShowTemplateView(false)
+      route?.params?.makeChatAccepted?.(member?.chatId);
+    }
+
+  }
+
 
 
   const renderMessages = ({ item, index }) => {
@@ -448,6 +395,7 @@ const MessageList = ({ navigation, route }) => {
               onClearBtnPress={() => setSelectedTemplate(null)}
               onPress={() => setIsTemplateModalShown(true)}
               value={!!selectedTemplate ? selectedTemplate.name : ""}
+              sendBtnPress={sendBtnPress}
             /> :
             <SendMsgView
               clearEdit={() => setEdit({ id: "", msg: "", image: "" })}
@@ -461,14 +409,7 @@ const MessageList = ({ navigation, route }) => {
       </KeyboardAvoidingView>
 
 
-      {/* Modal Components */}
-      <OptionModal
-        isVisible={opitonModal.isVisible}
-        optionList={opitonModal.optionList}
-        closeModal={() => setOptionModal({ isVisible: false, opt: "", item: null })}
-        onSelected={optionAction}
 
-      />
 
       <OptionModal
         isVisible={isTemplateModalShown}
@@ -485,12 +426,7 @@ const MessageList = ({ navigation, route }) => {
         visible={!!isImageZoomerVisible}
       />
 
-      <ConfirmationModal
-        closeModal={closeConfirmation}
-        isVisible={confirmation.isVisible}
-        onAgree={deleteMsg}
-        title={confirmation.title}
-      />
+
     </RootView>
   )
 }

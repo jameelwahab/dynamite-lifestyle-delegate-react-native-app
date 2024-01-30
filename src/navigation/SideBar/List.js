@@ -10,6 +10,9 @@ import StackAllMember from "../NestedStacks/StackAllMembers";
 import StackNurtureMembers from "../NestedStacks/StackNurtureMembers";
 import StackMembers from "../NestedStacks/StackMembers";
 import StackWhatsApp from "../NestedStacks/StackWhatsApp";
+import StackTransactions from "../NestedStacks/StackTransactions";
+import StackCommissions from "../NestedStacks/StackCommissions";
+import StackPaymentsRequest from "../NestedStacks/StackPaymentsRequest";
 
 export const drawerMenuList = [
   {
@@ -160,32 +163,34 @@ export const ParentComponents = {
   mission_control: {
     key: routes.dasboardNavigator,
     component: StackMissionControl,
-    params: {},
+    params: {
+      key: "mission_control"
+    },
   },
   the_cosmos: {
     key: routes.feedNavigator,
     component: StackFeed,
-    params: { feedFor: "the_cosmos" }
+    params: { feedFor: "the_cosmos", key: "the_cosmos" }
   },
   support_ticket: {
     key: routes.supportTicketNavigator,
     component: StackSupportTicket,
-    params: { type: "support_ticket" }
+    params: { type: "support_ticket", key: "support_ticket" }
   },
   'internal-tickets': {
     key: routes.internalTicketNavigator,
     component: StackInternalTickets,
-    params: { type: "internal_ticket" }
+    params: { type: "internal_ticket", key: "internal-tickets" }
   },
   chat: {
     key: routes.chatNavigator,
     component: StackChat,
-    params: {}
+    params: { key: "chat" }
   },
   members: {
     key: null,
     component: null,
-    params: {}
+    params: { key: "members" }
   },
   the_source_feed: {
     key: routes.sourceFeedNavigator,
@@ -193,6 +198,7 @@ export const ParentComponents = {
     params: {
       feedFor: "the_source",
       title: "The Source Feed",
+      key: "the_source_feed"
     }
   },
   all_source_feed: {
@@ -201,6 +207,7 @@ export const ParentComponents = {
     params: {
       feedFor: "all_source",
       title: "All Source Feed",
+      key: "all_source_feed"
     }
   },
   scheduled_feeds: {
@@ -209,39 +216,66 @@ export const ParentComponents = {
     params: {
       feedFor: "scheduled",
       title: "Schedule Feed",
+      key: "scheduled_feeds"
     }
   },
   support: {
     value: "support",
     key: null,
-    params: {}
+    params: {
+      key: "support"
+    }
   },
   whatsapp_chat: {
     key: routes.whatsappChatNavigator,
     component: StackWhatsApp,
-    params: {}
+    params: {
+      key: "whatsapp_chat"
+    }
   },
+  // payments: {
+  //   key: null,
+  //   component: null,
+  //   params: {
+  //     key: "payments"
+  //   }
+  // },
 }
 
 export const ChildComponents = {
   members: {
     key: routes.memberNavigator,
     component: StackMembers,
-    params: { type: "member" }
+    params: { type: "member", key: "members", parentKey: "members" }
   },
   nurture_members: {
     key: routes.nurtureNavigator,
     component: StackNurtureMembers,
-    params: { type: "nurture" }
+    params: { type: "nurture", key: "nurture", parentKey: "members" }
   },
   all_member_list: {
     key: routes.allMemberNavigator,
     component: StackAllMember,
-    params: { type: "all-member" }
+    params: { type: "all-member", key: "all_member_list", parentKey: "members" }
   },
   contact_support: {
     key: routes.contactSupportNavigator,
     component: StackContactSupport,
-    params: {}
+    params: { key: "contact_support", parentKey: "support" }
+  },
+  transactions: {
+    key: routes.transactionNavigator,
+    component: StackTransactions,
+    params: { key: "transactions", parentKey: "payments" }
+  },
+  commission_detail: {
+    key: routes.commissionNavigator,
+    component: StackCommissions,
+    params: { key: "commission_detail", parentKey: "payments" }
+  },
+  payment_request: {
+    key: routes.paymentRquesNavigator,
+    component: StackPaymentsRequest,
+    params: { key: "payment_request", parentKey: "payments" }
   },
 }

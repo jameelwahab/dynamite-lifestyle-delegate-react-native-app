@@ -10,11 +10,11 @@ import MyLoader, { SimpleLoader } from '../../../components/MyLoader'
 import showToast from '../../../functions/showToast'
 import { isValidNumber } from 'libphonenumber-js'
 
-const Memberlist = ({ list, loader, navigation, token, refresh, resetCountToZero, headerComponent }) => {
+const Memberlist = ({ list, loader, navigation, token, refresh, resetCountToZero, makeChatAccepted, headerComponent }) => {
   const [isLoading, setIsLoading] = useState(false)
 
   const onChatScreen = async (item) => {
-    console.log( item.contact_number,isValidNumber("+" + item.contact_number), "isValidNumber")
+    console.log(item.contact_number, isValidNumber("+" + item.contact_number), "isValidNumber")
     if (isValidNumber("+" + item.contact_number)) {
       setIsLoading(true)
       let res = await INITIATE_WHATSAPP_CHAT({ token, navigation, receiver_id: item?._id });
@@ -30,6 +30,7 @@ const Memberlist = ({ list, loader, navigation, token, refresh, resetCountToZero
           profileImage: !!member?.profile_image ? member?.profile_image : "",
           chatId: res?._id,
           resetCountToZero,
+          makeChatAccepted,
           refresh
         })
       } else {

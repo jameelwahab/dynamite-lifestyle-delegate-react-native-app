@@ -15,6 +15,7 @@ import AudioChatView from './AudioChatView'
 import openUrl from '../../../functions/openUrl';
 import { icons } from '../../../utilities/icons'
 import { MyButton } from '../../../components/MyButton'
+import UserImage from '../../../components/UserImage'
 
 
 const MsgView = ({ item, user, timezone, openImageZommer, playIconClick, stopPlayer, state, templates }) => {
@@ -43,29 +44,27 @@ const MsgView = ({ item, user, timezone, openImageZommer, playIconClick, stopPla
 
           {!!body?.text &&
             <View>
-              {body?.format == "IMAGE" ? templateImage(header?.example?.header_handle[0]) :
+              {body?.format == "IMAGE" ? templateImage(body?.example?.header_handle[0]) :
                 <MyText color={isMe1 ? colors.white : colors.black} >{body?.text}</MyText>}
             </View>
           }
 
           {!!footer?.text &&
             <View style={{ marginTop: 10 }}>
-              {footer?.format == "IMAGE" ? templateImage(header?.example?.header_handle[0]) :
+              {footer?.format == "IMAGE" ? templateImage(footer?.example?.header_handle[0]) :
                 <MyText color={isMe1 ? colors.lightText : colors.border} fontSize={10} type='medium' >{footer?.text}</MyText>}
             </View>}
 
-          {
-            button.map((x, i) => (
-              <View style={{ marginTop: 10 }}>
-                <MyButton
-                  style={{ height: 35 }}
-                  textStyle={{ textTransform: "capitalize", }}
-                  invert
-                  onPress={() => openUrl(x?.url)}
-                  title={x?.text} />
-              </View>))
-          }
-        </View >
+          {button.map((x, i) => (
+            <View style={{ marginTop: 10 }}>
+              <MyButton
+                style={{ height: 35 }}
+                textStyle={{ textTransform: "capitalize", }}
+                invert
+                onPress={() => openUrl(x?.url)}
+                title={x?.text} />
+            </View>))}
+        </View>
       )
     }
   }
@@ -83,93 +82,111 @@ const MsgView = ({ item, user, timezone, openImageZommer, playIconClick, stopPla
   }
 
   return (
-    <View
-      style={{ alignSelf: isMe(item.sender_info?._id) ? "flex-end" : "flex-start", }}>
-      <View
-        style={{
-          borderBottomRightRadius: isMe(item.sender_info?._id) ? 0 : 10,
-          borderBottomLeftRadius: isMe(item.sender_info?._id) ? 10 : 0,
-          backgroundColor: isMe(item.sender_info?._id) ? colors.secondaryVariant : colors.lightText2,
-          minWidth: utilities.screenWidth() * 0.4,
-          maxWidth: utilities.screenWidth() * 0.8,
-          padding: 5,
-          borderRadius: 10,
-          marginTop: 10
-        }}>
-        <View>
+    <View style={!isMe(item.sender_info?._id) && { flexDirection: "row", marginTop: 10 }}>
+      {!isMe(item.sender_info?._id) &&
+        <View style={{ marginTop: 10, marginRight: 10 }}>
+          <UserImage
+            image={item.sender_info?.profile_image}
+            name={item.sender_info?.first_name}
+            backgroundTransparent
+            size={30} />
+        </View>}
 
-          {/*//?   Image View  */}
+      <View>
+        {!isMe(item.sender_info?._id) &&
+          <View style={{ marginBottom: 2 }}>
+            <MyText fontSize={12} type='medium'>{`${item.sender_info?.first_name} ${item.sender_info?.last_name} (${item.sender_info?.user_type == "consultant" ?
+              "Delegate" : item.sender_info?.user_type == "member" ? "Member" : ""})`}</MyText>
+          </View>}
+        <View
+          style={{ alignSelf: isMe(item.sender_info?._id) ? "flex-end" : "flex-start", }}>
+          <View
+            style={{
+              borderBottomRightRadius: isMe(item.sender_info?._id) ? 0 : 10,
+              borderBottomLeftRadius: isMe(item.sender_info?._id) ? 10 : 0,
+              backgroundColor: isMe(item.sender_info?._id) ? colors.secondaryVariant : colors.lightText2,
+              minWidth: utilities.screenWidth() * 0.4,
+              maxWidth: utilities.screenWidth() * 0.8,
+              padding: 5,
+              borderRadius: 10,
+              marginTop: !isMe(item.sender_info?._id) ? 0 : 10
+            }}>
+            <View>
 
-          {item.message_type == 'image' && !!item.image &&
-            <TouchableOpacity
-              activeOpacity={0.5}
-              pointerEvents='box-only'
-              onPress={() => openImageZommer(item.image)}
-              style={{ padding: 2 }}>
-              <ResponsiveImage
-                uri={S3_URL + item?.image}
-                source={{ uri: S3_URL + item?.image }}
-              />
-            </TouchableOpacity>}
+              {/*//?   Image View  */}
 
-          {/*//?   Audio View  */}
+              {item.message_type == 'image' && !!item.image &&
+                <TouchableOpacity
+                  activeOpacity={0.5}
+                  pointerEvents='box-only'
+                  onPress={() => openImageZommer(item.image)}
+                  style={{ padding: 2 }}>
+                  <ResponsiveImage
+                    uri={S3_URL + item?.image}
+                    source={{ uri: S3_URL + item?.image }}
+                  />
+                </TouchableOpacity>}
 
-          {item?.message_type == 'audio' && !!item?.audio_url &&
-            <AudioChatView
-              isMine={isMe(item.sender_info?._id)}
-              currentPlaying={state.isPlaying}
-              currentTrack={state.selected_audio}
-              thisTrack={item._id}
-              onPress={() => playIconClick(item.audio_url, item._id, isMe(item.sender_info?._id))}
-              stopPlayer={stopPlayer}
-              totalDuration={item?.audio_duration}
-              url={item?.audio_url}
-            />
-          }
+              {/*//?   Audio View  */}
+
+              {item?.message_type == 'audio' && !!item?.audio_url &&
+                <AudioChatView
+                  isMine={isMe(item.sender_info?._id)}
+                  currentPlaying={state.isPlaying}
+                  currentTrack={state.selected_audio}
+                  thisTrack={item._id}
+                  onPress={() => playIconClick(item.audio_url, item._id, isMe(item.sender_info?._id))}
+                  stopPlayer={stopPlayer}
+                  totalDuration={item?.audio_duration}
+                  url={item?.audio_url}
+                />
+              }
 
 
 
-          {/*//?   Message View  */}
+              {/*//?   Message View  */}
 
-          <View style={{ paddingHorizontal: 5 }}>
-            {
-              item?.message_type == "template" ?
-                showTemplate(item?.message?.message, isMe(item.sender_info?._id)) :
-                isHtml(item?.message) ?
-                  <MyWebview
-                    style={isMe(item.sender_info?._id) ? WebviewStyleMine : WebviewStyleOther}
-                    html={item?.message?.message}
+              <View style={{ paddingHorizontal: 5 }}>
+                {
+                  item?.message_type == "template" ?
+                    showTemplate(item?.message?.message, isMe(item.sender_info?._id)) :
+                    isHtml(item?.message) ?
+                      <MyWebview
+                        style={isMe(item.sender_info?._id) ? WebviewStyleMine : WebviewStyleOther}
+                        html={item?.message?.message}
 
-                  /> :
+                      /> :
 
-                  <Markdown
-                    style={isMe(item.sender_info?._id) ? markdownStyleMine : markdownStyleOther}
-                    onLinkPress={(url) => {
-                      openUrl(url);
-                      return false
-                    }}>
-                    {item?.message?.message}
-                  </Markdown>
-            }
+                      <Markdown
+                        style={isMe(item.sender_info?._id) ? markdownStyleMine : markdownStyleOther}
+                        onLinkPress={(url) => {
+                          openUrl(url);
+                          return false
+                        }}>
+                        {item?.message?.message}
+                      </Markdown>
+                }
+              </View>
+
+              <View style={{ marginTop: 5, alignSelf: "flex-end", flexDirection: "row", alignItems: "center" }}>
+                {isMe(item.sender_info?._id) &&
+                  <View style={{ marginRight: 5 }}>
+                    {!!item?.status == false || item?.status == "sent"
+                      ? icons.sent(colors.white, 18) :
+                      item?.status == "failed" ? icons.failed(colors.delete, 18) :
+                        icons.seen(item?.status == "read" ? colors.primary : colors.white, 18)}
+                  </View>}
+                <MyText
+                  fontSize={10}
+                  color={isMe(item.sender_info?._id) ? colors.white : colors.black}>
+                  {convertTimezone(item?.createdAt, timezone).format(dateTimeFormat.dateTime)}
+                </MyText>
+              </View>
+            </View>
           </View>
-
-          <View style={{ marginTop: 5, alignSelf: "flex-end", flexDirection: "row", alignItems: "center" }}>
-            {isMe(item.sender_info?._id) &&
-              <View style={{ marginRight: 5 }}>
-                {!!item?.status == false || item?.status == "sent"
-                  ? icons.sent(colors.white, 18) :
-                  item?.status == "failed" ? icons.failed(colors.delete,18) :
-                    icons.seen(item?.status == "read" ? colors.primary : colors.white, 18)}
-              </View>}
-            <MyText
-              fontSize={10}
-              color={isMe(item.sender_info?._id) ? colors.white : colors.black}>
-              {convertTimezone(item?.createdAt, timezone).format(dateTimeFormat.dateTime)}
-            </MyText>
-          </View>
-        </View>
+        </View >
       </View>
-    </View >
+    </View>
   )
 }
 

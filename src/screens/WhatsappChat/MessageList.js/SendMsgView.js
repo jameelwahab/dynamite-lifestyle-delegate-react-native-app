@@ -224,55 +224,26 @@ const SendMsgView = ({ receiver, navigation, edit, clearEdit }) => {
   }
 
   const sendMsgButton = async (audioObj = null) => {
-    if (msg.text.trim() == "" && !!msg.image == false && !!audioObj == false) {
+    if (msg.text.trim() == "") {
       showToast({ title: "Please write something" })
     } else {
-      let imagePath = msg.image;
-      let audioPath = '';
-      if (!!msg.image?.uri) {
-        imagePath = await uplaodFileOnS3(msg.image, 'image').then((res) => res.image_path);
-        if (!!imagePath == false) {
-          return
-        }
-      } else if (!!audioObj.audio) {
-        audioPath = await uplaodFileOnS3(audioObj.audio, 'audio').then((res) => res.image_path);
-        if (!!audioPath == false) {
-          return
-        }
+
+
+
+
+      let postData = {
+        receiver_id: receiver?.memberId,
+        chat_id: receiver?.chatId,
+        message: msg.text.trim(),
+        token: token,
+        message_type: "text"
       }
 
 
-      if (!!edit?.id) {
 
-        const postData = {
-          message: msg.text.trim(),
-          message_id: edit?.id,
-          image: imagePath
-        };
-        console.log('update_chat_message', postData)
-        socket.emit('update_chat_message', postData)
-        setMsg({ text: "", image: "" })
-        clearEdit?.()
-      } else {
-
-        let postData = {
-          receiver_id: receiver?.memberId,
-          receiver_type: "member_user",
-          message: msg.text.trim(),
-          image: imagePath,
-          x_sh_auth: token,
-        }
-        if (!!audioPath) {
-          postData['audio_duration'] = audioObj.audioTime;
-          postData['audio_url'] = audioPath;
-        }
-
-
-        console.log('send_chat_message', postData)
-        socket.emit('send_chat_message', postData)
-        setMsg({ text: "", image: "" })
-
-      }
+      console.log('whatsapp_chat_message_event', postData)
+      socket.emit('whatsapp_chat_message_event', postData)
+      setMsg({ text: "", image: "" })
 
     }
   }
@@ -534,7 +505,7 @@ const __style = StyleSheet.create({
   inputRootView: {
     flexDirection: "row",
     alignItems: "flex-end",
-    marginLeft:10
+    marginLeft: 10
     // marginBottom: Platform.OS == "android" ? 10 : 0
 
 

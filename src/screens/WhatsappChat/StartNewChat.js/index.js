@@ -19,7 +19,7 @@ import EmptyView from '../../../components/EmptyView'
 import MyInputs from '../../../components/MyInputs'
 
 const StartNewChat = ({ navigation, route }) => {
-  const { resetCountToZero, refresh } = route?.params;
+  const { resetCountToZero, refresh ,makeChatAccepted} = route?.params;
   const { token, user } = useSelector(selectUser);
   const [portalList, setPortalList] = useState([]);
   const [loader, setLoader] = useState(true);
@@ -113,6 +113,8 @@ const StartNewChat = ({ navigation, route }) => {
         token={token}
         resetCountToZero={resetCountToZero}
         refresh={refresh}
+        makeChatAccepted={makeChatAccepted}
+        
       />)
   }
 
@@ -135,6 +137,7 @@ const StartNewChat = ({ navigation, route }) => {
           token={token}
           resetCountToZero={resetCountToZero}
           refresh={refresh}
+          makeChatAccepted={makeChatAccepted}
         />
         {/* <TabView
           renderTabBar={renderTabBar}

@@ -14,6 +14,9 @@ const routes = {
   memberNavigator: "MEMBERS_NAVIGATOR",
   nurtureNavigator: "NURTURE_NAVIGATOR",
   whatsappChatNavigator: "WHATSAPP_CHAT_NAVIGATOR",
+  transactionNavigator: "TRANSACTION_NAVIGATOR",
+  commissionNavigator: "COMMISSION_NAVIGATOR",
+  paymentRquesNavigator: "PAYMENT_REQUEST_NAVIGATOR",
 
 
   //! ///    Screens'
@@ -82,6 +85,17 @@ const routes = {
   whtasappChatList: "WHATSAPP_CHAT_LIST_SCREEN",
   whtasappChatMessageList: "WHATSAPP_CHAT_MESSAGE_LIST_SCREEN",
   whtasappStartNewChat: "WHATSAPP_START_NEW_CHAT_SCREEN",
+
+
+  //? Transactions
+  transactionScreen: "TRANSACTION_SCREEN",
+
+  //? Commissions
+  commissionDetailScreen: "COMMISSION_DETAIL_SCREEN",
+
+  //? Payment Request
+  paymentRequestScreen: "PAYMENT_REQUEST_SCREEN"
+
 
 }
 

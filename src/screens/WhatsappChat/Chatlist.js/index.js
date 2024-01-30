@@ -46,6 +46,7 @@ const ChatList = ({ navigation }) => {
   const [searchText, setSearchText] = useState("");
   const [tab, setTab] = useState('all')
 
+  console.log(user, "user")
 
   const onChatScreen = (member, item) => {
     navigation.navigate(routes.whtasappChatMessageList, {
@@ -56,7 +57,8 @@ const ChatList = ({ navigation }) => {
       showTemplate: member?.whatsapp_chat_status != 'accepted',
       chatId: item._id,
       resetCountToZero,
-      refresh
+      refresh,
+      makeChatAccepted
     })
   }
 
@@ -143,29 +145,12 @@ const ChatList = ({ navigation }) => {
 
 
   const socketEvents = () => {
-    // socket.on("send_chat_message_event_for_sender", newMsgReceive);
-    // socket.on("send_chat_message_receiver", newMsgReceive);
-    // socket.on("update_chat_message_event_for_sender", editMessageReceiver);
-    // socket.on("update_chat_message_receiver", editMessageReceiver);
-    // socket.on("delete_chat_message_event_for_sender", deleteMessageReceiver);
-    // socket.on("delete_chat_message_receiver", deleteMessageReceiver);
-    // socket.on("member_online", memberOnlineSignal);
-    // socket.on("member_offline", memberOfflineSignal);
-    // socket.on("consultant_offline", memberOfflineSignal);
-    // socket.on("chat_message_status", readMsgSingnal);
+    socket.on("whatsapp_chat_message_event_receiver", newMsgReceive);
   }
 
   const removeSocketEvents = () => {
-    // socket.off("send_chat_message_event_for_sender", newMsgReceive);
-    // socket.off("send_chat_message_receiver", newMsgReceive);
-    // socket.off("update_chat_message_event_for_sender", editMessageReceiver);
-    // socket.off("update_chat_message_receiver", editMessageReceiver);
-    // socket.off("delete_chat_message_event_for_sender", deleteMessageReceiver);
-    // socket.off("delete_chat_message_receiver", deleteMessageReceiver);
-    // socket.off("member_online", memberOnlineSignal);
-    // socket.off("member_offline", memberOfflineSignal);
-    // socket.off("consultant_offline", memberOfflineSignal);
-    // socket.off("chat_message_status", readMsgSingnal);
+
+    socket.off("whatsapp_chat_message_event_receiver", newMsgReceive);
   }
 
   const readMsgSingnal = (data) => {
@@ -188,139 +173,45 @@ const ChatList = ({ navigation }) => {
   }
 
   const newMsgReceive = (data) => {
-    console.log(data, "sendMessageReceiver")
-    if (data.code == 200) {
+    console.log(data, "whatsapp_chat_message_event_receiver")
+
+    if (!!data?.data?.response) {
+      let newChatObj = data?.data?.response;
       setChatList((chatList) => {
-        let index = chatList.findIndex(x => x?._id == data?.chat_obj?.chat?._id);
+        let index = chatList.findIndex(x => x?._id == newChatObj?.whatssapp_chat);
         console.log(index, "index")
         if (index > -1) {
-          let chatobj = { ...chatList[index] };
-          let newChatObj = data?.chat_obj?.chat;
-          chatobj = {
-            ...chatobj,
-            image: newChatObj.image,
-            last_message: newChatObj.last_message,
-            last_message_date_time: newChatObj.last_message_date_time,
-            message_id: newChatObj.message_id,
-            updatedAt: newChatObj.updatedAt,
-            message_type: newChatObj.message_type,
-            member: data?.chat_obj?.member,
-            last_message_sender: data?.message_obj?.sender_id,
-            last_message_status: data?.message_obj?.status,
-          };
-          console.log(chatobj, "newchatobj")
-          chatList.splice(index, 1, chatobj);
-        } else {
-          let newChatObj = data?.chat_obj?.chat;
+
+
           let chatobj = {
-            ...newChatObj,
-            member: data?.chat_obj?.member
-          }
-          chatList.unshift(chatobj);
-          console.log(chatList, "chatList")
+            ...chatList[index],
+            last_message: {
+              message: newChatObj?.message?.message,
+              message_type: newChatObj?.message?.message_type,
+              message_id: newChatObj?.whatssapp_message_id,
+            },
+            last_message_date_time: newChatObj?.createdAt,
+            // receiver_info: {
+            //   ...chatList[index].receiver_info,
+            //   unread_message_count: newChatObj?.receiver_info?.unread_message_count
+            // },
+            sender_info: {
+              ...chatList[index].sender_info,
+              unread_message_count: chatList[index]?.sender_info?.unread_message_count + 1
+            }
+          };
+          console.log(chatobj, index, "newchatobj")
+          console.log(chatobj, index, "newchatobj")
+          chatList.splice(index, 1, { ...chatobj });
+          console.log(chatList[index], "updated")
         }
         return [...chatList]
 
       })
     }
-  }
-
-
-
-  const editMessageReceiver = (data) => {
-    console.log(data, "editMessageReceiver")
-    if (data.code == 200) {
-      setChatList((chatList) => {
-        let index = chatList.findIndex(x => x?._id == data?.message_obj?.chat_id);
-        if (index > -1) {
-          let chatobj = { ...chatList[index] };
-          let newChatObj = data?.message_obj;
-          if (chatobj?.message_id == newChatObj?._id) {
-            chatobj = {
-              ...chatobj,
-              image: newChatObj.image,
-              last_message: newChatObj.message,
-              last_message_date_time: newChatObj.message_date_time,
-              message_id: newChatObj._id,
-              updatedAt: newChatObj.updatedAt,
-              message_type: newChatObj.message_type,
-            }
-            chatList.splice(index, 1, chatobj);
-            return [...chatList]
-          }
-          return chatList;
-        }
-      })
-    }
 
   }
 
-
-
-  const deleteMessageReceiver = (data) => {
-    console.log(data, "deleteMessageReceiver")
-    if (data.code == 200) {
-      if (data.is_last_message) {
-        setChatList((chatList) => {
-          let index = chatList.findIndex(x => x?._id == data?.chat_id);
-          if (index > -1) {
-            let chatobj = { ...chatList[index] };
-            let newChatObj = data?.message_obj;
-            chatobj = {
-              ...chatobj,
-              image: newChatObj.image,
-              last_message: newChatObj.message,
-              last_message_date_time: newChatObj.message_date_time,
-              message_id: newChatObj._id,
-              updatedAt: newChatObj.updatedAt,
-              message_type: newChatObj.message_type,
-            }
-            chatList.splice(index, 1, chatobj);
-            return [...chatList]
-          }
-        })
-      }
-    }
-  }
-
-
-  const memberOnlineSignal = (data) => {
-    console.log(data, "memberOnlineSignal")
-    setChatList((chatList) => {
-      let chatLength = chatList.length;
-      for (let i = 0; i < chatLength; i++) {
-        if (data.user_id == chatList[i].member[0]._id._id) {
-          chatList[i].member[0]._id.is_online = true;
-          chatList[i].last_message_status = "delivered";
-          return [...chatList]
-        }
-        else if (data.user_id == chatList[i].member[1]._id._id) {
-          chatList[i].member[1]._id.is_online = true;
-          chatList[i].last_message_status = "delivered";
-          return [...chatList]
-        }
-      }
-      return [...chatList]
-    })
-  }
-
-  const memberOfflineSignal = (data) => {
-    setChatList((chatList) => {
-      let chatLength = chatList.length;
-      for (let i = 0; i < chatLength; i++) {
-        if (data.user_id == chatList[i].member[0]._id._id) {
-          chatList[i].member[0]._id.is_online = false;
-          return [...chatList]
-        }
-        else if (data.user_id == chatList[i].member[1]._id._id) {
-          chatList[i].member[1]._id.is_online = false
-          return [...chatList]
-        }
-      }
-      return [...chatList]
-    })
-
-  }
 
 
   const resetCountToZero = (chatId) => {
@@ -329,13 +220,22 @@ const ChatList = ({ navigation }) => {
     console.log(index, "index")
     if (index > -1) {
       let chatobj = { ...chatList[index] };
-      let memberIndex = chatobj.member.findIndex(x => x._id?._id == user?._id);
-      console.log(memberIndex, "memberIndex")
-      if (memberIndex > -1) {
-        chatobj.member[memberIndex].unread_message_count = 0;
-        chatList.splice(index, 1, chatobj);
-        setChatList([...chatList])
-      }
+      chatobj.sender_info.unread_message_count = 0;
+      chatList.splice(index, 1, chatobj);
+      setChatList([...chatList])
+    }
+  }
+
+
+  const makeChatAccepted = (chatId) => {
+    console.log("makeChatAccepted",)
+    let index = chatList.findIndex(x => x._id == chatId);
+    console.log(index, "index makeChatAccepted")
+    if (index > -1) {
+      let chatobj = { ...chatList[index] };
+      chatobj.receiver_info.whatsapp_chat_status = "accepted";
+      chatList.splice(index, 1, chatobj);
+      setChatList([...chatList])
     }
   }
 
@@ -433,7 +333,7 @@ const ChatList = ({ navigation }) => {
                         item?.last_message?.message_type == 'video' ? "Video" : ""}
 
                 </MyText>
-                {otherUser?.unread_message_count > 0 &&
+                {otherUser?._id == user?._id && otherUser?.unread_message_count > 0 &&
                   <View style={__style.badge}>
                     <MyText fontSize={12} color={colors.black} >
                       {otherUser?.unread_message_count > 99 ? "99+" : otherUser?.unread_message_count}</MyText>
@@ -478,7 +378,8 @@ const ChatList = ({ navigation }) => {
       <FAB
         onPress={() => navigation.navigate(routes.whtasappStartNewChat, {
           resetCountToZero,
-          refresh
+          refresh,
+          makeChatAccepted
         })}
         icon={() => icons.plus(colors.black, 20)}
       />
