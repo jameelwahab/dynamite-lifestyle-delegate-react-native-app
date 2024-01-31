@@ -17,16 +17,18 @@ import { selectSocket } from '../../redux/reducers/socketSlice';
 import MyImage from '../../components/MyImage';
 import messaging from '@react-native-firebase/messaging';
 import notifee from '@notifee/react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 
 const index = (props) => {
+  const inset = useSafeAreaInsets();
   const { navigation, state } = props;
   const { navbar } = useSelector(selectNavbar);
   const { settings } = useSelector(selectSettings);
   const { socket } = useSelector(selectSocket);
   const [isCollapsed, setCollapsed] = useState([]);
 
-
+  console.log(inset, "inset")
 
 
 
@@ -96,23 +98,24 @@ const index = (props) => {
   }
 
 
-  const optionView = (item, index) => {
+  const optionView = (item, index, isCollaseable) => {
     let isSelected = ParentComponents[item.value].key == props.state.routeNames[props.state.index];
+
     return (
       <Pressable
         key={item.value}
         onPress={() => changeSideBarScreen(item)}
-        style={[{ backgroundColor: isSelected && !!item?.is_expanded == false ? colors.lightPrimary3 : undefined, }, __styles.itemRootView]}>
+        style={[{ backgroundColor: isSelected && isCollaseable == false ? colors.lightPrimary3 : undefined, }, __styles.itemRootView]}>
         <MyImage
           source={{ uri: S3_URL + item?.icon }}
           style={__styles.itemIcon} />
         <View style={{ flex: 1, flexWrap: "wrap" }}>
           <MyText
             fontSize={14}
-            color={isSelected && !!item?.is_expanded == false ? colors.primary : colors.text}
+            color={isSelected && isCollaseable == false ? colors.primary : colors.text}
             style={{ marginLeft: 20 }} >{item.title}</MyText>
         </View>
-        {!!item?.is_expanded &&
+        {isCollaseable &&
           <View style={{ paddingRight: 10 }}>
             {!findCollapsed(item) ? icons.upwardArrow() : icons.downwardArrow()}
           </View>}
@@ -145,7 +148,7 @@ const index = (props) => {
 
   return (
     <DrawerContentScrollView
-      style={{ backgroundColor: colors.secondary }}
+      contentContainerStyle={{ paddingBottom: inset.bottom + 20 }}
       {...props}>
       {!!settings?.brand_logo &&
         <View style={__styles.logoView}>
@@ -156,13 +159,15 @@ const index = (props) => {
         </View>}
 
       {navbar.map((x, i) => {
-        if (!!ParentComponents[x.value])
+        if (!!ParentComponents[x.value]) {
+          let isCollaseable = Array.isArray(x.child_options) && x.child_options.length > 0;
           return (
             <View key={x.value}>
-              {optionView(x, i)}
-              {!!x?.is_expanded && !!x?.child_options && x?.child_options.map((y, j) => nestedOptionView(y, i, x))}
+              {optionView(x, i, isCollaseable)}
+              {isCollaseable && x?.child_options.map((y, j) => nestedOptionView(y, i, x))}
             </View >
           )
+        }
       })}
     </DrawerContentScrollView >
   )

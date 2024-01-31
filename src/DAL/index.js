@@ -27,5 +27,5 @@ export {
 } from './Members'
 
 export { GET_WHATSAPP_MEMBER_LIST, INITIATE_WHATSAPP_CHAT, WHATSAPP_CHATLIST, WHATSAPP_MESSAGE_LIST } from './Whatsapp';
-
+export { GET_TRANSACTIONS_LIST, GET_COMMISSION_LIST } from './Payments'
 export { QUESTIONS_LIST } from './Questions'

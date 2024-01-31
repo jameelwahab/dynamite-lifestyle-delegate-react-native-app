@@ -81,9 +81,18 @@ const Login = ({ navigation }) => {
     let res = await INIT_WITH_TOKEN({ token: resp?.token });
     if (res.code == 200) {
       await AsyncStorage.setItem("@token", resp?.token);
+      let isChatAllowed = false;
+      let isWhatsappChatAllowed = false;
+      res?.nav_items.forEach(item =>{
+        if(item.value =="chat"){
+          isChatAllowed = true;
+        }else if(item.value =="whatsapp_chat"){
+          isWhatsappChatAllowed = true
+        }
+      })
       // let sideBarList = makeArrayOfSidebar(res?.nav_items, res?.consultant);
       dispatch(setSettings(res?.consultant_setting));
-      dispatch(setUserAndToken({ user: res?.consultant, token: resp?.token }));
+      dispatch(setUserAndToken({ user: res?.consultant, token: resp?.token ,isChatAllowed,isWhatsappChatAllowed }));
       dispatch(setNavbar(res?.nav_items));
       dispatch(setTimeZone({ user: res?.consultant?.time_zone, admin: res?.time_zone }))
       dispatch(setSocket(io(socketUrl, {

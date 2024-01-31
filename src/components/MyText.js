@@ -13,6 +13,8 @@ const MyText = ({
   underlined = false,
   style,
   isLabel = false,
+  capitalize = false,
+  uppercase = false,
   ...props
 }) => {
   return (
@@ -24,6 +26,7 @@ const MyText = ({
         fontSize,
         color,
         textAlign: align,
+        textTransform: capitalize ? "capitalize": uppercase ? "uppercase" :"none",
 
       },
         style,

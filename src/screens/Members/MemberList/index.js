@@ -42,7 +42,7 @@ const MemberList = ({ navigation, route }) => {
   const isAllMembers = type == "all-member";
   const isMembers = type == "member";
   const isNurture = type == "nurture";
-  const { token, user } = useSelector(selectUser);
+  const { token, user, isChatAllowed, isWhatsappChatAllowed } = useSelector(selectUser);
   const [showChips, setShowChips] = useState(false);
   const sortModalRef = useRef();
   const filterModalRef = useRef();
@@ -518,7 +518,7 @@ const MemberList = ({ navigation, route }) => {
                 </Pressable>}
 
 
-             
+
 
               {/* <TouchableOpacity
                 onPress={clearFilter}
@@ -544,8 +544,8 @@ const MemberList = ({ navigation, route }) => {
 
             {filterChipList.length > 0 &&
               <View style={{ flexDirection: "row", marginTop: 10, justifyContent: "flex-end" }}>
-                 <Pressable style={{  }} onPress={clearFilter}>
-                {/* <MyText type='medium'
+                <Pressable style={{}} onPress={clearFilter}>
+                  {/* <MyText type='medium'
                   style={{
                     // borderRadius:10,overflow:"hidden",
                     // backgroundColor: colors.heart+"55",
@@ -554,12 +554,12 @@ const MemberList = ({ navigation, route }) => {
                     paddingHorizontal: 10,
                     // textDecorationLine: "underline"
                   }} >{"Clear Filter"}</MyText> */}
-                   <TouchableOpacity
-                      onPress={clearFilter}
-                      style={{marginRight:10, borderWidth: 1, borderColor: colors.delete, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 5, backgroundColor:colors.heart+"33" }}>
-                      <MyText color={colors.delete}>{"Clear Filter"}</MyText>
-                    </TouchableOpacity>
-              </Pressable>
+                  <TouchableOpacity
+                    onPress={clearFilter}
+                    style={{ marginRight: 10, borderWidth: 1, borderColor: colors.delete, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 5, backgroundColor: colors.heart + "33" }}>
+                    <MyText color={colors.delete}>{"Clear Filter"}</MyText>
+                  </TouchableOpacity>
+                </Pressable>
 
                 <View style={{ flexDirection: "row", }}>
                   {!isSavedFilterApplied &&
@@ -657,11 +657,12 @@ const MemberList = ({ navigation, route }) => {
               <Image source={icons.wheelOfLife} style={{ height: 20, width: 20 }} />
             </View>}
 
+{isChatAllowed &&
           <TouchableOpacity
             style={{ marginRight: 5 }}
             onPress={() => onChatScreen(item?._id)}>
             {icons.message(colors.primary, 20)}
-          </TouchableOpacity>
+          </TouchableOpacity>}
 
           <MenuButton
             size={20}

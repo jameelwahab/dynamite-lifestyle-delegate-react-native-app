@@ -2,7 +2,9 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   user: null,
-  token: ""
+  token: "",
+  isChatAllowed: false,
+  isWhatsappChatAllowed: false,
 };
 const userSlice = createSlice({
   name: "user",
@@ -14,10 +16,12 @@ const userSlice = createSlice({
     clearUser: (state) => {
       state.user = null
     },
-    setUserAndToken: (state, action) => {
+    setUserAndToken: (state, action,) => {
        console.log(action,"action")
       state.user = action.payload.user;
       state.token = action.payload.token;
+      state.isChatAllowed = action.payload.isChatAllowed;
+      state.isWhatsappChatAllowed = action.payload.isWhatsappChatAllowed;
     },
     clearUserAndToken: (state) => {
       state = {

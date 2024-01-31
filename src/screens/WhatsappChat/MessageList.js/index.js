@@ -350,6 +350,7 @@ const MessageList = ({ navigation, route }) => {
     if (!!route?.params?.canGoBack) {
       navigation.goBack()
     } else {
+      route?.params?.resetCountToZero?.(member?.chatId);
       navigation.navigate(routes.whtasappChatList, {
         refresh: isNewChat
       })

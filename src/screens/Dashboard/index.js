@@ -21,6 +21,7 @@ import utilities from '../../utilities'
 import { S3_URL, dateTimeFormat } from '../../utilities/constants'
 import ResponsiveImage2 from '../../components/ResponsiveImage2'
 import { selectTimeZone } from '../../redux/reducers/timezoneSlice'
+import MyChip from '../../components/MyChip'
 
 const Dasboard = ({ navigation }) => {
   const { token } = useSelector(selectUser);
@@ -202,22 +203,31 @@ const Dasboard = ({ navigation }) => {
 
 
         {!!filter?.start_date && filter?.end_date ?
-          <View style={__style.chip}>
-            <MyText type='medium' fontSize={12} color={colors.black} style={{ marginRight: 5 }} >
-              {`${moment(filter?.start_date, "YYYY-MM-DD").format(dateTimeFormat.date)} to ${moment(filter?.end_date, "YYYY-MM-DD").format(dateTimeFormat.date)}`}
-            </MyText>
-            <TouchableOpacity
-              hitSlop={{ bottom: 5, top: 5, left: 5, right: 5 }}
-              onPress={() => filterTheData({})} >
-              {icons.crosssWithCircle_20(colors.black, 20)}
-            </TouchableOpacity>
-          </View> :
+          // <View style={__style.chip}>
+          //   <MyText type='medium' fontSize={12} color={colors.black} style={{ marginRight: 5 }} >
+          //     {`${moment(filter?.start_date, "YYYY-MM-DD").format(dateTimeFormat.date)} to ${moment(filter?.end_date, "YYYY-MM-DD").format(dateTimeFormat.date)}`}
+          //   </MyText>
+          //   <TouchableOpacity
+          //     hitSlop={{ bottom: 5, top: 5, left: 5, right: 5 }}
+          //     onPress={() => filterTheData({})} >
+          //     {icons.crosssWithCircle_20(colors.black, 20)}
+          //   </TouchableOpacity>
+          // </View> 
+          <MyChip
+            onPress={() => filterTheData({})}
+            title={`${moment(filter?.start_date, "YYYY-MM-DD").format(dateTimeFormat.date)} to ${moment(filter?.end_date, "YYYY-MM-DD").format(dateTimeFormat.date)}`}
+          />
+          :
           <View />}
 
-        <Pressable onPress={onFilterScreen} style={__style.filterButton} >
-          {icons.filter(colors.primary, 15)}
-          <MyText color={colors.primary} style={{ marginLeft: 5 }} >Filter</MyText>
-        </Pressable>
+        <TouchableOpacity
+          onPress={onFilterScreen}
+          style={__style.filterButton}
+          hitSlop={{ bottom: 5, top: 5, left: 5, right: 5 }}
+        >
+          {icons.filterCircle(colors.primary, 30)}
+          {/* <MyText color={colors.primary} style={{ marginLeft: 5 }} >Filter</MyText> */}
+        </TouchableOpacity>
       </View>
     )
   }
@@ -268,11 +278,11 @@ const __style = StyleSheet.create({
     // width: 50,
     alignItems: "center",
     flexDirection: "row",
-    borderWidth: 1,
+    // borderWidth: 1,
     borderColor: colors.primary,
     borderRadius: 10,
     paddingHorizontal: 15,
-    paddingVertical: 8
+    // paddingVertical: 8
   },
   topView: { flex: 1, flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
   tabsView: {

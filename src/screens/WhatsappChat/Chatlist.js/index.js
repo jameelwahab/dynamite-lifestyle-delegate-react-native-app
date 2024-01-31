@@ -1,5 +1,5 @@
 import { View, Text, FlatList, StyleSheet, TouchableHighlight, Keyboard, SafeAreaView, Pressable, TouchableOpacity, Platform } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useReducer, useState } from 'react'
 import RootView from '../../../components/RootView'
 import MyLoader, { SimpleLoader } from '../../../components/MyLoader'
 import MyText from '../../../components/MyText'
@@ -35,6 +35,8 @@ let canLoadMore = false;
 let __firstTime = true;
 let isNewChat = false;
 
+
+
 const ChatList = ({ navigation }) => {
   const { token, user } = useSelector(selectUser);
   const { socket } = useSelector(selectSocket);
@@ -61,6 +63,8 @@ const ChatList = ({ navigation }) => {
       makeChatAccepted
     })
   }
+
+
 
   const api_ChatList = async (newArray = false) => {
     let res = await WHATSAPP_CHATLIST({
@@ -131,6 +135,8 @@ const ChatList = ({ navigation }) => {
     console.log("HI 3", __firstTime)
     page = 0;
     canLoadMore = false;
+    setLoader(true);
+    setChatList([])
     api_ChatList()
     socketEvents();
 
@@ -173,18 +179,19 @@ const ChatList = ({ navigation }) => {
   }
 
   const newMsgReceive = (data) => {
-    console.log(data, "whatsapp_chat_message_event_receiver")
+    console.log(data, "whatsapp_chat_message_event_receiver", "chatlisting")
 
     if (!!data?.data?.response) {
       let newChatObj = data?.data?.response;
+      let list = [];
+      let newList = [];
       setChatList((chatList) => {
-        let index = chatList.findIndex(x => x?._id == newChatObj?.whatssapp_chat);
+        list = [...chatList];
+        let index = list.findIndex(x => x?._id == newChatObj?.whatssapp_chat);
         console.log(index, "index")
         if (index > -1) {
-
-
           let chatobj = {
-            ...chatList[index],
+            ...list[index],
             last_message: {
               message: newChatObj?.message?.message,
               message_type: newChatObj?.message?.message_type,
@@ -192,21 +199,20 @@ const ChatList = ({ navigation }) => {
             },
             last_message_date_time: newChatObj?.createdAt,
             // receiver_info: {
-            //   ...chatList[index].receiver_info,
+            //   ...list[index].receiver_info,
             //   unread_message_count: newChatObj?.receiver_info?.unread_message_count
             // },
             sender_info: {
-              ...chatList[index].sender_info,
-              unread_message_count: chatList[index]?.sender_info?.unread_message_count + 1
+              ...list[index].sender_info,
+              unread_message_count: list[index]?.sender_info?.unread_message_count + 1
             }
           };
-          console.log(chatobj, index, "newchatobj")
-          console.log(chatobj, index, "newchatobj")
-          chatList.splice(index, 1, { ...chatobj });
-          console.log(chatList[index], "updated")
+          list.splice(index, 1);
+          list = [chatobj, ...list];
+          // console.log(list,"list")
         }
-        return [...chatList]
-
+        console.log(list, "listlistlistlist")
+        return [...list]
       })
     }
 
@@ -215,15 +221,16 @@ const ChatList = ({ navigation }) => {
 
 
   const resetCountToZero = (chatId) => {
-    console.log("resetCountToZero",)
-    let index = chatList.findIndex(x => x._id == chatId);
-    console.log(index, "index")
-    if (index > -1) {
-      let chatobj = { ...chatList[index] };
-      chatobj.sender_info.unread_message_count = 0;
-      chatList.splice(index, 1, chatobj);
-      setChatList([...chatList])
-    }
+    setChatList((chatList) => {
+      let index = chatList.findIndex(x => x._id == chatId);
+      console.log(index, "index", "resetCountToZero")
+      if (index > -1) {
+        let chatobj = { ...chatList[index] };
+        chatobj.sender_info.unread_message_count = 0;
+        chatList.splice(index, 1, chatobj);
+      }
+      return [...chatList]
+    })
   }
 
 

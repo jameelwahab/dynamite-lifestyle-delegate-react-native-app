@@ -31,7 +31,7 @@ const Header = ({
   hideSubHeader = false,
   hideUpperHeader = false,
 }) => {
-  const { user, token } = useSelector(selectUser)
+  const { user, token,isChatAllowed } = useSelector(selectUser)
   const navigation = useNavigation()
   const [isUserModalVisible, setIsUserModalVisible] = useState(false)
 
@@ -80,7 +80,7 @@ const Header = ({
           <View style={{ flex: 1, justifyContent: "flex-end", alignItems: "center", flexDirection: "row", paddingRight: 10 }}>
 
 
-            {!hideChatIcon && user?.is_chat_allow &&
+            {!hideChatIcon && isChatAllowed &&
               <TouchableOpacity
                 onPress={() => navigateToChatScreen()}
                 style={__header.RightButtonView}>

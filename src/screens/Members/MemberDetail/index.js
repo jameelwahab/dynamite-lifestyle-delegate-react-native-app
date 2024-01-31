@@ -21,6 +21,7 @@ import NotesModal from '../Components/NotesModal'
 import OptionModal from '../../../components/OptionModal'
 import { optionList } from '../Components/list'
 import { MenuButton } from '../../../components/MyButton'
+import { selectNavbar } from '../../../redux/reducers/navbarSlice'
 
 const MemberDetail = ({ navigation, route }) => {
   const { type } = route?.params;
@@ -35,7 +36,9 @@ const MemberDetail = ({ navigation, route }) => {
   const [member, setMember] = useState(route?.params?.member);
   const [showMorePages, setShowMorePages] = useState(false);
   const [showMorePrograms, setShowMorePrograms] = useState(false);
-  const [isOptionModalVisible, setIsOptionModalVisible] = useState(false)
+  const [isOptionModalVisible, setIsOptionModalVisible] = useState(false);
+  const { navbar } = useSelector(selectNavbar);
+  const [isChatAllowed] = useState(!!navbar.find(x => x.value == 'chat'));
 
   const onOptSelected = (opt) => {
     console.log(opt, "onOptSelected");
@@ -126,6 +129,22 @@ const MemberDetail = ({ navigation, route }) => {
     }
   }
 
+
+
+  const onWhatsappChatScreen = (member, item) => {
+    navigation.navigate(routes.whtasappChatMessageList, {
+      memberId: member?._id,
+      firstName: member?.first_name,
+      lastName: member?.last_name,
+      profileImage: member?.profile_image,
+      showTemplate: member?.whatsapp_chat_status != 'accepted',
+      chatId: item._id,
+      resetCountToZero,
+      refresh,
+      makeChatAccepted
+    })
+  }
+
   // ? Views
 
 
@@ -156,9 +175,11 @@ const MemberDetail = ({ navigation, route }) => {
               {isAllMembers && <MyText fontSize={12} >{member?.email}</MyText>}
             </View>
           </Pressable>
+
           <TouchableOpacity style={{ marginRight: 10 }} onPress={() => onChatScreen(member?._id)}>
             {icons.message(colors.primary, 20)}
           </TouchableOpacity>
+          
           <MenuButton
             size={22}
             onPress={() => setIsOptionModalVisible(true)}

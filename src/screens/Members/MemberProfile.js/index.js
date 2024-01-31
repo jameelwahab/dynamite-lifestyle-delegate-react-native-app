@@ -2,7 +2,7 @@ import { View, Text, Pressable, ScrollView, FlatList, TouchableOpacity } from 'r
 import React, { useEffect, useRef, useState } from 'react'
 import RootView from '../../../components/RootView'
 import MyText from '../../../components/MyText'
-import { MEMBER_PROFILE } from '../../../DAL'
+import { INITIATE_WHATSAPP_CHAT, MEMBER_PROFILE } from '../../../DAL'
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../../redux/reducers/userSlice'
 import moment from 'moment'
@@ -21,10 +21,13 @@ import { convertTimezone } from '../../../functions/convertTime'
 import { selectTimeZone } from '../../../redux/reducers/timezoneSlice'
 import { onChatScreen } from '../../../functions/onChatScreen'
 import DailyDynamiteGraph from './DailyDynamiteGraph'
+import routes from '../../../navigation/routes'
+import { isValidNumber } from 'libphonenumber-js'
+import showToast from '../../../functions/showToast'
 
 
 const MemberProfile = ({ navigation, route }) => {
-  let { token, user } = useSelector(selectUser);
+  let { token, user, isChatAllowed, isWhatsappChatAllowed } = useSelector(selectUser);
   const timezone = useSelector(selectTimeZone)
   const { memberId } = route?.params
   const tabRef = useRef()
@@ -93,6 +96,33 @@ const MemberProfile = ({ navigation, route }) => {
     }
   }
 
+  const onWhatsappChatScreen = async () => {
+    console.log(member, "member?.contact_numbe")
+    if (isValidNumber("+" + member?.member?.contact_number)) {
+      setLoader(true)
+      let res = await INITIATE_WHATSAPP_CHAT({ token, navigation, receiver_id: memberId, });
+      setLoader(false)
+      console.log(res, "res")
+      if (!res.data.error) {
+        let rMember = res.data?.receiver_info;
+        navigation.navigate(routes.whtasappChatMessageList, {
+          memberId: rMember?._id,
+          firstName: rMember?.first_name,
+          showTemplate: rMember?.whatsapp_chat_status != 'accepted',
+          lastName: rMember?.last_name,
+          profileImage: !!rMember?.profile_image ? rMember?.profile_image : "",
+          chatId: res?.data?._id,
+          canGoBack: true
+        })
+      } else {
+        showToast({ body: res?.message, title: "Error" })
+      }
+    } else {
+      showToast({ body: "Provided contact number is invalid", title: "Invalid contact number" })
+    }
+  }
+
+
   const onArrowPress = (btnType) => {
     let newDate;
     if (btnType == "prev") {
@@ -125,14 +155,18 @@ const MemberProfile = ({ navigation, route }) => {
         <View style={{ flex: 1 }}>
           {!!member?.member && <MemberView member={member?.member} showPhoneNumber />}
         </View>
-        <Pressable style={__styles.topBtn}>
-          {icons.whatsapp(colors.primary, 22)}
-        </Pressable>
-        <Pressable
-          onPress={() => onChatScreen(memberId, token, navigation, user?._id)}
-          style={__styles.topBtn}>
-          {icons.message(colors.primary, 22)}
-        </Pressable>
+        {isWhatsappChatAllowed &&
+          <Pressable
+            onPress={() => onWhatsappChatScreen()}
+            style={__styles.topBtn}>
+            {icons.whatsapp(colors.primary, 22)}
+          </Pressable>}
+        {isChatAllowed &&
+          <Pressable
+            onPress={() => onChatScreen(memberId, token, navigation, user?._id)}
+            style={__styles.topBtn}>
+            {icons.message(colors.primary, 22)}
+          </Pressable>}
       </View>
     )
   }

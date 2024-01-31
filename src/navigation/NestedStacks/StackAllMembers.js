@@ -14,6 +14,7 @@ import SubscriptionList from '../../screens/Members/Subscriptions'
 import QuestionsList from '../../screens/Members/QuestionsList'
 import GenericQuetionList from '../../screens/Questions/GenericQuetionList'
 import MemberProfile from '../../screens/Members/MemberProfile.js'
+import MessageList from '../../screens/WhatsappChat/MessageList.js'
 
 
 
@@ -35,6 +36,7 @@ const StackAllMember = ({ route }) => {
         <AllMemberStack.Screen name={routes.memberQuestionListing} component={QuestionsList} />
         <AllMemberStack.Screen name={routes.genericQestionListing} component={GenericQuetionList} />
         <AllMemberStack.Screen name={routes.memberProfile} component={MemberProfile} />
+        <AllMemberStack.Screen name={routes.whtasappChatMessageList} component={MessageList} />
         {/*//? Default Screens Start */}
         {defaultScreens.map((x, i) => (
           <AllMemberStack.Screen key={x.name} name={x.name} component={x.component} />

@@ -28,7 +28,7 @@ const Memberlist = ({ list, loader, navigation, token, refresh, resetCountToZero
           showTemplate: member?.whatsapp_chat_status != 'accepted',
           lastName: member?.last_name,
           profileImage: !!member?.profile_image ? member?.profile_image : "",
-          chatId: res?._id,
+          chatId: res?.data?._id,
           resetCountToZero,
           makeChatAccepted,
           refresh

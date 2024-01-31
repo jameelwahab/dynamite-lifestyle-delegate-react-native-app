@@ -89,12 +89,13 @@ const routes = {
 
   //? Transactions
   transactionScreen: "TRANSACTION_SCREEN",
-
+  transactionfilterScreen: "TRANSACTION_FILTER_SCREEN",
   //? Commissions
   commissionDetailScreen: "COMMISSION_DETAIL_SCREEN",
 
   //? Payment Request
-  paymentRequestScreen: "PAYMENT_REQUEST_SCREEN"
+  paymentRequestScreen: "PAYMENT_REQUEST_SCREEN",
+  
 
 
 }

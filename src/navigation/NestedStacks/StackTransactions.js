@@ -5,6 +5,7 @@ import routes from '../routes';
 import Transactions from '../../screens/Payments/Transactions';
 import { colors } from '../../utilities/colors';
 import { defaultScreens } from './defaultScreens';
+import FilterScreen from '../../screens/Payments/Transactions/FilterScreen';
 
 const TransactionStack = createNativeStackNavigator();
 const StackTransactions = ({route}) => {
@@ -14,6 +15,7 @@ const StackTransactions = ({route}) => {
       initialRouteName={routes.transactionScreen}
       screenOptions={{ headerShown: false }}>
       <TransactionStack.Screen initialParams={route.params} name={routes.transactionScreen} component={Transactions} />
+      <TransactionStack.Screen name={routes.transactionfilterScreen} component={FilterScreen} />
       {/*//? Default Screens Start */}
       {defaultScreens.map((x, i) => (
         <TransactionStack.Screen key={x.name} name={x.name} component={x.component} />
