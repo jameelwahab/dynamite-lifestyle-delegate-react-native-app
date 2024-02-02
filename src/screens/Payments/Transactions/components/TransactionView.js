@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native'
 import React from 'react'
 import { colors } from '../../../../utilities/colors'
 import StatView from '../../../Members/Components/StatView'
@@ -8,9 +8,10 @@ import prependCurency from '../../../../functions/prependCurency';
 import openUrl from '../../../../functions/openUrl'
 import { S3_URL, dateTimeFormat } from '../../../../utilities/constants'
 import { convertTimezone } from '../../../../functions/convertTime'
+import { icons } from '../../../../utilities/icons'
 
 
-const TransactionView = ({ item, index,timezone }) => {
+const TransactionView = ({ item, index, timezone }) => {
 
 
   return (
@@ -21,8 +22,12 @@ const TransactionView = ({ item, index,timezone }) => {
         <View style={__styles.profileNameView}>
           <MyText type='medium' >{item?.member_info?.first_name + " " + item?.member_info?.last_name}</MyText>
 
-          <View style={{ backgroundColor: item?.transaction_status == "succeeded" ? colors.green : undefined, alignSelf: "flex-start", borderRadius: 10, paddingHorizontal: 5, paddingVertical: 2, marginTop: 1 }}>
-            <MyText capitalize type='medium' color={item?.transaction_status == "succeeded" ? colors.white : colors.transparent} fontSize={10} >succeeded</MyText>
+          {/* {item?.transaction_status == "succeeded" &&
+            <View style={{marginRight:10}}>
+              <Image source={icons.checked} style={{ height: 22, width: 22, tintColor: colors.green }} />
+            </View>} */}
+          <View style={{ backgroundColor: item?.transaction_status == "succeeded" ? colors.green+"33" : undefined, alignSelf: "flex-start", borderRadius: 10, paddingHorizontal: 5, paddingVertical: 2, marginTop:5}}>
+            <MyText capitalize type='bold' color={item?.transaction_status == "succeeded" ? colors.green : colors.transparent} fontSize={12} >succeeded</MyText>
           </View>
         </View>
       </View>
@@ -68,6 +73,9 @@ const __styles = StyleSheet.create({
   },
   profileNameView: {
     flex: 1,
-    marginLeft: 10
+    marginLeft: 10,
+    // flexDirection: "row",
+    // alignItems: "center",
+    // justifyContent: "space-between"
   }
 })

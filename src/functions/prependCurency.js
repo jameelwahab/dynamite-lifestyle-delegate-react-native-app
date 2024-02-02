@@ -7,6 +7,8 @@ const prependCurency = (currency) => {
     return "£"
   } else if (currency == "usd") {
     return "$"
+  } else if (currency == "eur") {
+    return "€"
   } else {
     return ""
   }

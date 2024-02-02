@@ -95,7 +95,8 @@ const routes = {
 
   //? Payment Request
   paymentRequestScreen: "PAYMENT_REQUEST_SCREEN",
-  
+  addEditPaymenyRequestScreen: "ADD_EDIT_PAYMENT_REQUEST_SCREEN",
+  PaymenyRequestDetailScreen: "PAYMENT_REQUEST_DETAIL_SCREEN"
 
 
 }

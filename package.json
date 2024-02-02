@@ -33,6 +33,7 @@
     "@react-navigation/native-stack": "^6.9.14",
     "@reduxjs/toolkit": "^1.9.7",
     "@ronradtke/react-native-markdown-display": "^8.0.0",
+    "@stripe/stripe-react-native": "^0.35.1",
     "axios": "^1.5.1",
     "html-entities": "^2.4.0",
     "libphonenumber-js": "^1.10.54",

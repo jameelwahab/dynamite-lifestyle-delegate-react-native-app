@@ -273,9 +273,9 @@ export const ChildComponents = {
     component: StackCommissions,
     params: { key: "commission_detail", parentKey: "payments" }
   },
-//   payment_request: {
-//     key: routes.paymentRquesNavigator,
-//     component: StackPaymentsRequest,
-//     params: { key: "payment_request", parentKey: "payments" }
-//   },
+  payment_request: {
+    key: routes.paymentRquesNavigator,
+    component: StackPaymentsRequest,
+    params: { key: "payment_request", parentKey: "payments" }
+  },
 }

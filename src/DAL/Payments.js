@@ -13,9 +13,99 @@ export const GET_TRANSACTIONS_LIST = ({ token, navigation, search_text, transact
 }
 
 
-export const GET_COMMISSION_LIST = ({ token, navigation,type,  page }) => {
+export const GET_COMMISSION_LIST = ({ token, navigation, type, page }) => {
   return invokeApi({
     path: `api/consultant/commision?page=${page}&limit=20&type=${type}`,
+    method: "GET",
+    token,
+    navigation
+  })
+}
+
+export const GET_PAYMENT_REQUEST_LIST = ({ token, navigation, page }) => {
+  return invokeApi({
+    path: `api/payment_request/list/consultant?page=${page}&limit=50`,
+    method: "GET",
+    token,
+    navigation
+  })
+}
+
+
+
+export const GET_MEMBER_LIST_FOR_PAYMENT_REQUEST = ({ token, navigation, searchText }) => {
+  return invokeApi({
+    path: `api/member/members_list_for_select/delegate?search_text=${searchText}`,
+    method: "GET",
+    token,
+    navigation
+  })
+}
+
+
+export const GET_PRODUCT_LIST = ({ token, navigation }) => {
+  return invokeApi({
+    path: `api/product/list/consultant?page=undefined&limit=undefined`,
+    method: "GET",
+    token,
+    navigation
+  })
+}
+
+
+export const GET_PAYMENT_TEMPLATE_AND_PROGRAMMES_LIST = ({ token, navigation, }) => {
+  return invokeApi({
+    path: `api/consultant/list_main_portal_program/delegate`,
+    method: "POST",
+    postData: { filter_array: ['program', 'payment_template'] },
+    token,
+    navigation
+  })
+}
+
+export const GET_TEMPLATE_DETAIL = ({ token, navigation, templateId }) => {
+  return invokeApi({
+    path: `api/payment_template/${templateId}`,
+    method: "GET",
+    token,
+    navigation
+  })
+}
+
+
+
+export const ADD_PAYMENT_REQUEST = ({ token, navigation, body }) => {
+  return invokeApi({
+    path: `api/payment_request/add`,
+    method: "POST",
+    postData: body,
+    token,
+    navigation
+  })
+}
+
+export const EDIT_PAYMENT_REQUEST = ({ token, navigation, body, slug }) => {
+  return invokeApi({
+    path: `api/payment_request/${slug}`,
+    method: "PUT",
+    postData: body,
+    token,
+    navigation
+  })
+}
+
+export const DELETE_PAYMENT_REQUEST = ({ token, navigation, slug }) => {
+  return invokeApi({
+    path: `api/payment_request/${slug}`,
+    method: "DELETE",
+    token,
+    navigation
+  })
+}
+
+export const GET_PAYMENT_REQUEST_DETAIL = ({ token, navigation, slug }) => {
+  return invokeApi({
+    path: `api/payment_request/${slug}`,
     method: "GET",
     token,
     navigation

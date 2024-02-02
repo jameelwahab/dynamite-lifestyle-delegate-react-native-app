@@ -7,7 +7,7 @@ import { colors } from '../utilities/colors'
 const SearchView = ({ search="", onChangeText, onSearchPress }) => {
   return (
     <View style={{ flexDirection: "row", alignItems: "center" }}>
-      <View style={{ flex: 1, marginTop: -10 }}>
+      <View style={{ flex: 1, marginTop: -15 }}>
         <MyInputs
           rightIcon={search.length > 0 ? icons.crosssWithCircle_20 : icons.noIcon}
           value={search}

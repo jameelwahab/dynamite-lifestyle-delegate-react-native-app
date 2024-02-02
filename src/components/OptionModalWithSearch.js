@@ -87,7 +87,6 @@ const OptionModalWithSearch = ({
               {icons.crosss()}
             </Pressable>}
         </View>
-        {console.log(!!filterTheList,"!!filterTheList")}
         <View style={{ flex: 1 }}>
           <FlatList
             data={!!filterTheList ? filterTheList(optionList,searchText) : optionList}

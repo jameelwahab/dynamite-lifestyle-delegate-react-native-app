@@ -93,7 +93,13 @@ const MessageList = ({ navigation, route }) => {
 
   const sendMessageReceiverForSender = (data) => {
     console.log(data, "sendMessageReceiverForSender")
-    setChat((chat) => [data?.data?.response, ...chat])
+
+    setChat((chat) => {
+      if (chat.length == 0) {
+        route?.params?.refresh?.();
+      }
+      return [data?.data?.response, ...chat]
+    })
     // setMember((member) => { return { ...member, chatId: data?.chat_obj?._id, } })
   }
 
@@ -136,8 +142,8 @@ const MessageList = ({ navigation, route }) => {
       setTamplates(res?.list_templates)
       setChat([...res?.data?.reverse()])
 
-      route?.params?.resetCountToZero?.(member?.chatId);
-      // route?.params?.refresh?.();
+      // route?.params?.resetCountToZero?.(member?.chatId);
+      route?.params?.refresh?.();
       // readAllMessagesAPI()
     }
   }

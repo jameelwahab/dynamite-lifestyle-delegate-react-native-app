@@ -27,6 +27,7 @@ export const icons = {
   addImage: require('../assets/icons/addImage.png'),
   schedule: require('../assets/icons/scheduled.png'),
   wheelOfLife: require('../assets/icons/wheel-icon.webp'),
+  checked: require('../assets/icons/checked.png'),
   //todo:   sideBar Icons
 
   sidebar: {

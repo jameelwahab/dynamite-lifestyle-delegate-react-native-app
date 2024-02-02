@@ -17,19 +17,31 @@ const TransactionView = ({ item, index, timezone, isCredit }) => {
   return (
     <View style={__styles.itemRootView}>
       {isCredit &&
-        <View style={__styles.profileView}>
-          <UserImage image={item?.member_info?.profile_image} name={item?.member_info?.first_name}
-            backgroundTransparent size={35} />
-          <View style={__styles.profileNameView}>
-            <MyText type='medium' >{item?.member_info?.first_name + " " + item?.member_info?.last_name}</MyText>
-          </View>
-        </View>}
+        <>
+
+          {!!item?.member_info?.first_name ?
+            <View style={__styles.profileView}>
+              <UserImage image={item?.member_info?.profile_image} name={item?.member_info?.first_name}
+                backgroundTransparent size={35} />
+              <View style={__styles.profileNameView}>
+                <MyText type='medium' >{item?.member_info?.first_name + " " + item?.member_info?.last_name}</MyText>
+              </View>
+            </View> :
+            <View style={__styles.profileView}>
+              <UserImage image={undefined} name={item?.shipping_object?.name}
+                backgroundTransparent size={35} />
+              <View style={__styles.profileNameView}>
+                <MyText type='medium' >{item?.shipping_object?.name}</MyText>
+              </View>
+            </View>}
+        </>
+        }
       <View>
         {/* <StatView title={"Program Amount"} value={prependCurency(item?.currency) + " " + item?.amount} /> */}
         {/* <StatView title={"Transaction"} value={`Sale Page (${item?.sale_page?.sale_page_title} | ${item?.plan?.plan_title} | ${item?.plan?.payment_access})`} /> */}
         {/* <StatView title={"Commission Amount"} value={prependCurency(item?.currency) + " " + item?.referral_commission} /> */}
         {/* <StatView title={"Transaction Mode"} value={item?.transaction_mode} /> */}
-        <StatView title={"Transaction Date"} value={isCredit ? convertTimezone(item?.transaction_date, timezone).format(dateTimeFormat.date) : item?.transaction_date}  uppercase/>
+        <StatView title={"Transaction Date"} value={isCredit ? convertTimezone(item?.transaction_date, timezone).format(dateTimeFormat.date) : item?.transaction_date} uppercase />
         {isCredit ?
           <StatView title={"Credit"} value={prependCurency(item?.currency) + " " + Number(item?.referral_commission)?.toFixed(2)} /> :
           <StatView title={"Paid"} value={prependCurency(item?.currency) + " " + Number(item?.amount).toFixed(2)} />}

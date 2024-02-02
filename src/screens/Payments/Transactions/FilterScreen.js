@@ -9,12 +9,12 @@ import OptionModal from '../../../components/OptionModal'
 
 const FilterScreen = ({ navigation, route }) => {
   const { title, changeMode, mode } = route?.params;
-  const [selectedMode, setSelectedMode] = useState(mode);
+  const [selectedMode, setSelectedMode] = useState(!!mode?mode:list[0]);
   const [optionModal, setOptionModal] = useState(false)
 
   const onClearPress = () => {
     setSelectedMode(null);
-    changeMode?.(null);
+    changeMode?.(list[0]);
     navigation.goBack();
   }
   const onFilterPress = () => {
@@ -33,18 +33,18 @@ const FilterScreen = ({ navigation, route }) => {
             label='Transaction Mode'
             onPress={() => setOptionModal(true)}
             value={!!selectedMode ? selectedMode?.title : ""}
-            subTextView={() => !!selectedMode && (
-              <Pressable
-                style={__styles.clearbtnView}
-                onPress={() => setSelectedMode(null)}>
-                <MyText color={colors.primary} >Clear</MyText>
-              </Pressable>
-            )}
+            // subTextView={() => !!selectedMode && (
+            //   <Pressable
+            //     style={__styles.clearbtnView}
+            //     onPress={() => setSelectedMode(null)}>
+            //     <MyText color={colors.primary} >Clear</MyText>
+            //   </Pressable>
+            // )}
           />
 
           <View style={{ flexDirection: "row", alignSelf: "flex-end", marginTop: 5 }}>
             <View>
-              <MyButton onPress={onClearPress} style={__styles.btn} invert title='Clear All' />
+              <MyButton onPress={onClearPress} style={__styles.btn} invert title='Clear' />
             </View>
             <View style={{ marginLeft: 15 }} >
               <MyButton onPress={onFilterPress} style={__styles.btn} textStyle={{ color: colors.black }} title='Filter' />

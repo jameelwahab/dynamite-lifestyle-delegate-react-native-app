@@ -102,7 +102,8 @@ export default function CountryModal({ selectCountry = () => { }, isVisible, clo
                 placeholderTextColor={colors.lightText}
                 spellCheck={false}
                 style={{ color: colors.text, paddingVertical: 12, marginLeft: 10, fontFamily: fonts.medium, includeFontPadding: false }}
-                selectionColor={colors.black}
+                selectionColor={colors.selection}
+                cursorColor={colors.white}
               />
             </View>
           </View>

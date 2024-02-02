@@ -406,6 +406,7 @@ const SendMsgView = ({ receiver, navigation, edit, clearEdit }) => {
                   placeholderTextColor={colors.lightText}
                   selectionColor={colors.selection}
                   multiline={true}
+
                   // textAlignVertical='top'
                   keyboardAppearance='dark'
                   autoCorrect={false}
@@ -518,6 +519,7 @@ const __style = StyleSheet.create({
     fontFamily: fonts.regular,
     includeFontPadding: false,
     paddingVertical: 0,
+    paddingRight:5
   },
 
   textinputIcon: {

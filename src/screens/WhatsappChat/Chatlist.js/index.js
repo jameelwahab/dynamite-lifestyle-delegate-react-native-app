@@ -209,11 +209,14 @@ const ChatList = ({ navigation }) => {
           };
           list.splice(index, 1);
           list = [chatobj, ...list];
+          if(list.length==1){
+            refresh?.()
+          }
           // console.log(list,"list")
         }
         console.log(list, "listlistlistlist")
         return [...list]
-      })
+      });
     }
 
   }
@@ -340,7 +343,7 @@ const ChatList = ({ navigation }) => {
                         item?.last_message?.message_type == 'video' ? "Video" : ""}
 
                 </MyText>
-                {otherUser?._id == user?._id && otherUser?.unread_message_count > 0 &&
+                {otherUser?.unread_message_count > 0 &&
                   <View style={__style.badge}>
                     <MyText fontSize={12} color={colors.black} >
                       {otherUser?.unread_message_count > 99 ? "99+" : otherUser?.unread_message_count}</MyText>
