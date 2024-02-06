@@ -111,3 +111,45 @@ export const GET_PAYMENT_REQUEST_DETAIL = ({ token, navigation, slug }) => {
     navigation
   })
 }
+
+
+export const PAY_RECURRING = ({ token, navigation, body: { payment_request_slug, source_token } }) => {
+  return invokeApi({
+    path: `api/member/pay_now_by_consultant`,
+    method: "POST",
+    postData: { payment_request_slug, source_token },
+    token,
+    navigation
+  })
+}
+
+export const GET_CLIENT_SECRET_FOR_PAY_ONETIME = ({ token, navigation, body: { payment_request_slug } }) => {
+  return invokeApi({
+    path: `api/member/pay_one_time_by_consultant`,
+    method: "POST",
+    postData: { payment_request_slug },
+    token,
+    navigation
+  })
+}
+
+export const CHANGE_ONETIME_PAYMNET_STATUS_TO_PAID =
+  ({ token, navigation, body: { payment_request_slug } }) => {
+    return invokeApi({
+      path: `api/member/change_one_time_payment_status_by_consultant`,
+      method: "POST",
+      postData: { payment_request_slug },
+      token,
+      navigation
+    })
+  }
+
+export const BANK_PAYMENT_LINK =
+  ({ token, navigation, transactionId }) => {
+    return invokeApi({
+      path: `api/payment_request/get_bank_request_url/${transactionId}`,
+      method: "GET",
+      token,
+      navigation
+    })
+  }

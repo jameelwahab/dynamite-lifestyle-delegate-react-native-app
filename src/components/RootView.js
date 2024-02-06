@@ -7,6 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 const RootView = ({
   title = "",
+  subTitle = "",
   hideHambugerMenu = false,
   rightButtonIcon = null,
   rightButtonOnPress = null,
@@ -31,6 +32,7 @@ const RootView = ({
       {!hideHeader &&
         <Header
           title={title}
+          subTitle={subTitle}
           showBackButtonOnTop={showBackButtonOnTop}
           hideHambugerMenu={hideHambugerMenu}
           hideBackBottomButton={hideBackBottomButton}

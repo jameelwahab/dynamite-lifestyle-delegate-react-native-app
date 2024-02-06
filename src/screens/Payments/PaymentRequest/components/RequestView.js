@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, Pressable } from 'react-native'
 import React from 'react'
 import StatView from '../../../Members/Components/StatView'
 import MyText from '../../../../components/MyText'
@@ -11,23 +11,27 @@ import { MenuButton } from '../../../../components/MyButton'
 
 
 
-const RequestView = ({ item, index ,openOptionModal}) => {
+const RequestView = ({ item, index, openOptionModal, onDetail }) => {
   return (
     <View style={__styles.itemRootView}>
       <View style={__styles.profileView}>
-        <UserImage image={item?.member?.profile_image} name={item?.member?.first_name}
-          backgroundTransparent size={35} />
-        <View style={__styles.profileNameView}>
-          <MyText type='medium' >{item?.member?.first_name + " " + item?.member?.last_name}</MyText>
-        </View>
+        <Pressable
+          onPress={() => onDetail(item?.payment_request_slug)}
+          style={[__styles.profileView, { flex: 1, marginRight: 10 }]} >
+          <UserImage image={item?.member?.profile_image} name={item?.member?.first_name}
+            backgroundTransparent size={35} />
+          <View style={__styles.profileNameView}>
+            <MyText type='medium' >{item?.member?.first_name + " " + item?.member?.last_name}</MyText>
+          </View>
+        </Pressable>
         <MenuButton
-        onPress={()=>openOptionModal(item)}
+          onPress={() => openOptionModal(item)}
           size={20} />
       </View>
       <View>
-        <StatView title={"Request Title"} value={!!item?.request_title?item?.request_title:"N/A"} noFontTransform />
-        <StatView title={"Product"} value={!!item?.product?.name?item?.product?.name:"N/A"} />
-        <StatView title={"Payment Template"} value={!!item?.payment_template?.title?item?.payment_template?.title:"N/A"} noFontTransform />
+        <StatView title={"Request Title"} value={!!item?.request_title ? item?.request_title : "N/A"} noFontTransform />
+        <StatView title={"Product"} value={!!item?.product?.name ? item?.product?.name : "N/A"} />
+        <StatView title={"Payment Template"} value={!!item?.payment_template?.title ? item?.payment_template?.title : "N/A"} noFontTransform />
         <StatView title={"Request Type"} value={item?.request_type} />
         <StatView title={"Total Amount"} value={prependCurency(item?.currency) + " " + item?.total_amount} />
         <StatView title={"Initial Amount"} value={prependCurency(item?.currency) + " " + item?.initial_amount} />

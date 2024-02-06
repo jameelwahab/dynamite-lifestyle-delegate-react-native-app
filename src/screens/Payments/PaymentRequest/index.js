@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import RootView from '../../../components/RootView'
 import { useSelector } from 'react-redux'
 import { selectNavbar } from '../../../redux/reducers/navbarSlice'
-import { DELETE_PAYMENT_REQUEST, GET_PAYMENT_REQUEST_LIST } from '../../../DAL'
+import { BANK_PAYMENT_LINK, DELETE_PAYMENT_REQUEST, GET_PAYMENT_REQUEST_LIST } from '../../../DAL'
 import { selectUser } from '../../../redux/reducers/userSlice'
 import MyLoader from '../../../components/MyLoader'
 import FooterLoader from '../../../components/FooterLoader'
@@ -19,6 +19,8 @@ import routes from '../../../navigation/routes'
 import OptionModal from '../../../components/OptionModal'
 import showToast from '../../../functions/showToast'
 import ConfirmationModal from '../../../components/ConfirmationModal'
+import MyRefreshControl from '../../../components/MyRefreshControl'
+import copyText from '../../../functions/copyText'
 
 
 let page = 0;
@@ -31,6 +33,7 @@ const PaymentRequest = ({ navigation, route }) => {
   const [list, setList] = useState([]);
   const [total, setTotal] = useState(0);
   const [loader, setLoader] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [footerLoader, setFooterLoader] = useState(false);
   const [confirmationModal, setConfirmation] = useState({ isVisible: false, item: null })
   const [optionModal, setOptionModal] = useState({ isVisible: false, selectedItem: null, list: [] })
@@ -53,9 +56,11 @@ const PaymentRequest = ({ navigation, route }) => {
       setList(newArray ? res?.payment_request : [...list, ...res?.payment_request]);
       setLoader(false);
       setFooterLoader(false);
+      setRefreshing(false);
     } else {
       setLoader(false)
       setFooterLoader(false);
+      setRefreshing(false);
     }
   }
 
@@ -101,6 +106,8 @@ const PaymentRequest = ({ navigation, route }) => {
     }
   }
 
+
+
   const updateListItem = (obj) => {
     let index = list.findIndex(x => obj._id == x._id);
     if (index > -1) {
@@ -114,12 +121,24 @@ const PaymentRequest = ({ navigation, route }) => {
     setList([reqObj, ...list])
   }
 
-  const callAPI = () => {
+  const changePayStatus = (updation) => {
+    let index = list.findIndex(x => updation?._id == x._id);
+    if (index > -1) {
+      list.splice(index, 1, { ...list[index], ...updation });
+      setList([...list])
+    }
+  }
+
+  const callAPI = (refresh = false) => {
     page = 0;
     canLoadMore = false;
     setTotal(0)
     setList([])
-    setLoader(true);
+    if (refresh) {
+      setRefreshing(true);
+    } else {
+      setLoader(true);
+    }
     api_payment_request_list(true)
 
   }
@@ -156,32 +175,63 @@ const PaymentRequest = ({ navigation, route }) => {
         setConfirmation({ isVisible: true, item: selectedItem })
       }, 400);
     } else if (opt.key == "detail") {
-      navigation.navigate(routes.PaymenyRequestDetailScreen, {
-        slug: selectedItem?.payment_request_slug
-      })
+      onTransactionalDetail(selectedItem?.payment_request_slug)
+    } else if (opt.key == "bank") {
+      copyBankLinkFromServer(selectedItem?._id);
     }
   }
 
+  const copyBankLinkFromServer = async (id) => {
+    setLoader(true);
+    let res = await BANK_PAYMENT_LINK({ navigation, token, transactionId: id });
+    setLoader(false);
+    if (res.code == 200) {
+      copyText(res?.redirect_url);
+      showToast({ title: "Bank URL coppied to clipboard", type: "success" });
+    }
+  }
+
+
+  const onTransactionalDetail = (slug) => {
+    navigation.navigate(routes.PaymenyRequestDetailScreen, {
+      slug: slug,
+      backScreenFunc: changePayStatus
+    })
+  }
+
   const openOptionModal = (item) => {
-    console.log(item,"item")
+    console.log(item, "item");
+    console.log(optionsList, "optionsList");
     let list = [];
-    if (item?.payment_status == "paid" ||item?.is_first_paid) {
+    console.log(list, "1")
+    if (item?.payment_status == "paid" || item?.is_first_paid) {
       list = optionsList.slice().filter(x => x.key != "edit");
     } else {
       list = optionsList
     }
+    console.log(list, "2")
+    console.log(item?.payment_status != "paid" && item?.is_first_paid == false && item?.request_type == "onetime")
+    if (item?.payment_status != "paid" && item?.is_first_paid == false && item?.request_type == "onetime") {
+      list = [...list, bankOpt]
+    }
+    console.log(list, "3")
     setOptionModal({ isVisible: true, list: list, selectedItem: item });
   }
 
   const itemView = ({ item, index }) => {
     return (
-      <RequestView item={item} index={index} openOptionModal={openOptionModal} />
+      <RequestView item={item} index={index} openOptionModal={openOptionModal}
+        onDetail={onTransactionalDetail}
+      />
     )
   }
 
 
   return (
-    <RootView title={title} hideBackBottomButton>
+    <RootView 
+    title={title} 
+    subTitle={`Showing ${list.length} of ${total}`}
+    hideBackBottomButton>
       <View style={{ flex: 1, }}>
         <FlatList
           data={list}
@@ -191,7 +241,7 @@ const PaymentRequest = ({ navigation, route }) => {
           // stickyHeaderIndices={[0]}
           // stickyHeaderHiddenOnScroll={true}
           renderItem={itemView}
-          ListEmptyComponent={!loader && <EmptyView label={'No Payment Requests Found'} />}
+          ListEmptyComponent={!loader && !refreshing && <EmptyView label={'No Payment Requests Found'} />}
           ListFooterComponent={<FooterLoader isVisible={footerLoader} />}
         />
       </View>
@@ -218,7 +268,6 @@ const PaymentRequest = ({ navigation, route }) => {
 export default PaymentRequest
 
 const optionsList = [
-
   {
     title: "Edit",
     key: "edit",
@@ -234,5 +283,10 @@ const optionsList = [
     key: "detail",
     icon: icons.threeLinesMenu
   },
-
 ]
+
+const bankOpt = {
+  title: "Copy Bank Payment Link",
+  key: "bank",
+  icon: icons.bank
+}

@@ -90,6 +90,14 @@ const Login = ({ navigation }) => {
           isWhatsappChatAllowed = true
         }
       })
+      let stripeKey = "";
+      if (res?.site_setting?.stripe_mode == "sandBox") {
+        stripeKey = res?.site_setting?.sandBox_publish_key
+      } else if (res?.site_setting?.stripe_mode == "live") {
+        stripeKey = res?.site_setting?.live_publish_key
+      }
+
+      dispatch(setSettings({ ...res?.consultant_setting, stripeKey: stripeKey } ));
       // let sideBarList = makeArrayOfSidebar(res?.nav_items, res?.consultant);
       dispatch(setSettings(res?.consultant_setting));
       dispatch(setUserAndToken({ user: res?.consultant, token: resp?.token ,isChatAllowed,isWhatsappChatAllowed }));
