@@ -67,6 +67,7 @@ const LevelModal = forwardRef(({ feedLevel, selectFeedlevel, isCosmos }, ref) =>
             <FlatList
               data={isCosmos ? options : sourceOptions}
               renderItem={optionView}
+              keyExtractor={(item) => item}
               showsVerticalScrollIndicator={false}
             />
           </View>

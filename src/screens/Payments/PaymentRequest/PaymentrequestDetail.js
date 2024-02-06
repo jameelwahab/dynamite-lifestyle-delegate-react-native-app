@@ -1,4 +1,4 @@
-import { View, Text, FlatList } from 'react-native'
+import { View, Text, FlatList, ScrollView } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import RootView from '../../../components/RootView'
 import MyText from '../../../components/MyText'
@@ -42,9 +42,13 @@ const PaymentrequestDetail = ({ navigation, route }) => {
       setLoader(false);
     }
   }
-
+  const striperInitilizer = async () => {
+    console.log(settings?.stripeKey, "stripeKey")
+    let initilize = await initStripe({ publishableKey: settings?.stripeKey });
+    console.log(initilize, "initilize")
+  }
   useEffect(() => {
-    initStripe({ publishableKey: settings?.stripeKey })
+    striperInitilizer();
     getPaymentRequestDeatil(false)
   }, [])
 
@@ -101,7 +105,7 @@ const PaymentrequestDetail = ({ navigation, route }) => {
         if (error) {
           console.log(error, "stripe payment error")
           setLoader(false);
-          showToast({ title: "Payment Failed", message: error?.message });
+          showToast({ title: "Payment Failed", body: error?.localizedMessage });
         } else {
           console.log(paymentIntent, "paymentIntent")
           changePayementStatusToServer()
@@ -123,46 +127,41 @@ const PaymentrequestDetail = ({ navigation, route }) => {
     }
   }
 
-
-
-
-
   const paymentView = () => {
     return (
       <View>
         <View style={{ marginTop: 10 }}>
           <MyText color={colors.primary} fontSize={18} type='medium' >Enter Card Details</MyText>
         </View>
-        <CardField
-          postalCodeEnabled={false}
-          placeholders={{
-            number: 'Card Number...',
-          }}
-
-          cardStyle={{
-            backgroundColor: colors.secondary,
-            textColor: colors.white,
-            fontFamily: fonts.regular,
-            placeholderColor: colors.placeholder,
-            borderRadius: 10,
-            cursorColor: colors.white,
-          }}
-          style={{
-            width: '100%',
-            height: 40,
-            marginTop: 10,
-          }}
-          onCardChange={(res) => {
-            setIsComplete(res?.complete)
-          }}
-        />
+        <View style={{ marginTop: 10, }}>
+          <CardField
+            postalCodeEnabled={false}
+            placeholders={{ number: 'Card Number...', }}
+            cardStyle={{
+              backgroundColor: colors.secondary,
+              textColor: colors.white,
+              fontFamily: fonts.regular,
+              placeholderColor: colors.placeholder,
+              keyboardAppearance: "dark",
+              borderRadius: 10,
+              cursorColor: colors.white,
+            }}
+            style={{ height: 40, }}
+            onCardChange={(res) => {
+              setIsComplete(res?.complete)
+            }}
+          />
+        </View>
         {isComplete &&
           <View style={{ alignSelf: "flex-end", marginTop: 10 }}>
             <MyButton onPress={onPayPress} style={{ paddingHorizontal: 20, height: 35 }} invert title='Pay' />
-          </View>}
-      </View>
+          </View>
+        }
+      </View >
     )
   }
+
+
 
   const statusView = (value) => {
     return (
@@ -171,14 +170,13 @@ const PaymentrequestDetail = ({ navigation, route }) => {
       </View>)
   }
 
-  const renderTransaction = ({ item, index }) => {
+  const renderTransaction = (item, index) => {
     return (<View style={{ backgroundColor: colors.secondary, padding: 10, borderRadius: 10, marginTop: 10 }}>
 
       <StatView title={"Amount:"} value={prependCurency(item?.currency) + " " + item?.amount} />
       <StatView title={"Transaction Note:"} value={item?.transaction_note} />
       <StatView title={"Transaction Date:"} value={item?.transaction_date} />
       <StatView title={"Status:"} view={() => statusView(item?.transaction_status == "succeeded")} />
-
     </View>)
   }
 
@@ -222,12 +220,19 @@ const PaymentrequestDetail = ({ navigation, route }) => {
   return (
     <RootView title={"Payment Request Transaction"} >
       <View style={{ flex: 1 }}>
-        <FlatList
-          data={!!data?.payment_request_transaction ? data?.payment_request_transaction : []}
-          renderItem={renderTransaction}
-          ListHeaderComponent={headerView()}
-          ListEmptyComponent={!loader && <EmptyView />}
-        />
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          automaticallyAdjustKeyboardInsets={true}
+          keyboardShouldPersistTaps="handled">
+
+          {headerView()}
+          {(!!data?.payment_request_transaction &&
+            data?.payment_request_transaction.length > 0) ?
+            data?.payment_request_transaction.map((x, i) => renderTransaction(x, i)) :
+            !loader && <EmptyView />
+          }
+
+        </ScrollView>
       </View>
       <MyLoader enable={loader} />
     </RootView>

@@ -8,7 +8,7 @@ const ResponsiveImage2 = memo(({ uri, style, width }) => {
   const [loader, setLoader] = useState(false);
 
   useEffect(() => {
-    console.log(uri, "uri")
+
     Image.getSize(uri, (width, height) => {
       setSize({ width, height })
     })

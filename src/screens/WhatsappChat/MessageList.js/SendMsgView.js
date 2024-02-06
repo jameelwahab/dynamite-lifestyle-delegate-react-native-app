@@ -168,7 +168,7 @@ const SendMsgView = ({ receiver, navigation, edit, clearEdit }) => {
           });
         }
       });
-      console.log(uri, "uri")
+
 
 
 

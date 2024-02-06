@@ -129,6 +129,7 @@ const LikeModalForComments = forwardRef(({ navigation, token,timezone }, ref) =>
                 showsVerticalScrollIndicator={false}
                 renderItem={userLikeView}
                 onEndReached={onEndReached}
+                keyExtractor={(item) => item?._id}
                 ListFooterComponent={<FooterLoader enable={footerLoader} />}
               />
               <MyLoader enable={loader} />

@@ -64,6 +64,7 @@ const ImagesForFeed = ({ index, list, swiper }) => {
           ref={listRef}
           data={list}
           horizontal={true}
+          keyExtractor={(item) => item?.thumbnail_1}
           renderItem={({ item, index }) => (
             <Pressable onPress={() => selectImage(index)}
               style={{ width: 100, height: 100, borderWidth: state.index == index ? 5 : 0, borderColor: colors.silver }}>

@@ -63,7 +63,7 @@ const Dasboard = ({ navigation }) => {
   const onFilterScreen = () => {
     navigation.navigate(routes.missionControlfilterScreen, { filterTheData, filter })
   }
-  console.log(settings, "settings")
+
 
   //? //////// Views
 
@@ -82,7 +82,7 @@ const Dasboard = ({ navigation }) => {
         {!!settings?.dashboard_content &&
           <View style={{ marginTop: 10 }}>
             <MyWebview
-              baseStyle={{ size: 10 }}
+              fullWidth={true}
               html={settings?.dashboard_content} />
           </View>}
 

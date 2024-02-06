@@ -142,7 +142,9 @@ function FeedView({ item, index, user, token, timezone, settings, openComments, 
             {item?.top_liked_user?.map((item, index) => {
               if (index < 2)
                 return (
-                  <View style={[__style.likeImageView, { marginLeft: -(index + 5) }]}>
+                  <View 
+                  key={item?.user_info_action_by?.profile_image}
+                  style={[__style.likeImageView, { marginLeft: -(index + 5) }]}>
                     <MyImage
                       style={__style.likeImage}
                       source={{

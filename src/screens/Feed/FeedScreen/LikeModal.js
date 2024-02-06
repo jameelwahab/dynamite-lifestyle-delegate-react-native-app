@@ -79,6 +79,7 @@ const LikeModal = ({
                 showsVerticalScrollIndicator={false}
                 renderItem={userLikeView}
                 onEndReached={onEndReached}
+                keyExtractor={(item) => item?._id}
                 // ListEmptyComponent={!loader && <EmptyView label={"No Likes Exist"} />}
                 ListFooterComponent={<FooterLoader enable={footerLoader} />}
               />

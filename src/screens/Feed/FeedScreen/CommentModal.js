@@ -36,7 +36,6 @@ const CommentModal = ({
   setComments,
   updateFeedItemsSpecificField
 }) => {
-  console.log(feedId, "feedId")
   const cmtTextInputRef = useRef();
   const likeModalRef = useRef();
   const [commentText, setCommentText] = useState("");

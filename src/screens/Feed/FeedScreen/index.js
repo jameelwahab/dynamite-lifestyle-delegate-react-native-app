@@ -47,7 +47,6 @@ let likeVar = {
   actionType: ""
 }
 const FeedScreen = ({ navigation, route }) => {
-  console.log(route, "feedroute")
   const addPostRef = useRef()
   const scheduleModalRef = useRef();
   const { feedFor } = route?.params;
@@ -231,7 +230,6 @@ const FeedScreen = ({ navigation, route }) => {
   // !  SOCKET AND its fcuntions /////////////////
 
   const updateComments = (data) => {
-    console.log("updateComments", data);
     if (data?.feed_id == commentVar?.id) {
       if (data?.action == "add_comment") {
 

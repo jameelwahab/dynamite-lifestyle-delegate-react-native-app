@@ -7,9 +7,6 @@ import { useSelector } from 'react-redux';
 import { selectSettings } from '../../../redux/reducers/settingSlice';
 import HeaderBanner from './HeaderBanner';
 import { selectUser } from '../../../redux/reducers/userSlice';
-import FeedScreen from '../FeedScreen';
-import FeedEvents from '../FeedEvents';
-import Leaderboard from '../Leaderboard.js';
 
 const FeedTabs = ({ isCosmos, changeTab, tab }) => {
   const menuRef = useRef()

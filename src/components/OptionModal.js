@@ -42,6 +42,7 @@ const OptionModal = ({
         }
         <FlatList
           data={optionList}
+          keyExtractor={(item, index) => item?.key}
           // scrollEnabled={false}
           contentContainerStyle={{ paddingVertical: 10 }}
           renderItem={({ item, index }) => {
