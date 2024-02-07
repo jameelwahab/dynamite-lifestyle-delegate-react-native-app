@@ -7,11 +7,14 @@ import { icons } from '../../utilities/icons';
 import SideBar from '.'
 import { colors } from '../../utilities/colors';
 import { ChildComponents, ParentComponents, drawerMenuList } from './List';
+import { useSelector } from 'react-redux';
+import { selectNavbar } from '../../redux/reducers/navbarSlice';
 
 
 const Drawer = createDrawerNavigator();
 
 const SideDrawer = () => {
+  const { navbar } = useSelector(selectNavbar);
   return (
     <Drawer.Navigator
       backBehavior="firstRoute"
@@ -21,6 +24,7 @@ const SideDrawer = () => {
         drawerActiveTintColor: colors.primary,
         unmountOnBlur: true,
       }}
+      initialRouteName={ParentComponents[navbar[0]?.value]?.key}
       drawerContent={props => <SideBar {...props} />}
 
     >
@@ -44,8 +48,6 @@ const SideDrawer = () => {
           />
         }
       })}
-
-
     </Drawer.Navigator>
   )
 }

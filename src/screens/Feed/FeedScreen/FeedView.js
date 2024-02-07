@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, Image, TouchableOpacity, Pressable } from 'react-native'
 import React, { memo } from 'react'
 import UserImage from '../../../components/UserImage'
 import MyText from '../../../components/MyText'
@@ -16,22 +16,26 @@ import ResponsiveImage2 from '../../../components/ResponsiveImage2'
 import utilities from '../../../utilities'
 import openUrl from '../../../functions/openUrl'
 
-function FeedView({ item, index, user, token, timezone, settings, openComments, showLikes, openOptions, onLikebtnPress, isCosmos, sourceLevelIcons, isScheduledFeed, openScheduleTimeModal }) {
+function FeedView({ item, index, user, token, timezone, settings, openComments, showLikes, openOptions, onLikebtnPress, isCosmos, sourceLevelIcons, isScheduledFeed, openScheduleTimeModal, onFeedDetail }) {
   const profileView = () => (
     <View style={__style.profileView}>
-      <UserImage
-        image={item?.action_info?.profile_image}
-        name={item?.action_info?.name}
-        backgroundTransparent={true}
-        size={35}
-      />
-      <View style={__style.profileNameView}>
-        <MyText type='bold'  >{item?.action_info?.name}</MyText>
+      <Pressable
+        // onPress={() => onFeedDetail(item?._id)}
+        style={[__style.profileView, { flex: 1 }]} >
+        <UserImage
+          image={item?.action_info?.profile_image}
+          name={item?.action_info?.name}
+          backgroundTransparent={true}
+          size={35}
+        />
+        <View style={__style.profileNameView}>
+          <MyText type='bold'  >{item?.action_info?.name}</MyText>
 
-        <View style={{ marginTop: 2 }}>
-          <MyText type="light" color={colors.lightText2} fontSize={10}>{convertTimezone(item?.createdAt, timezone).format("DD MMM YYYY [at] hh:mm A")}</MyText>
+          <View style={{ marginTop: 2 }}>
+            <MyText type="light" color={colors.lightText2} fontSize={10}>{convertTimezone(item?.createdAt, timezone).format("DD MMM YYYY [at] hh:mm A")}</MyText>
+          </View>
         </View>
-      </View>
+      </Pressable>
       {!item?.is_publish &&
         <TouchableOpacity
           onPress={() => openScheduleTimeModal(item?.schedule_date_time)}
@@ -102,7 +106,7 @@ function FeedView({ item, index, user, token, timezone, settings, openComments, 
       }
 
       {item.feed_type == "embed_code" && !!item.embed_code &&
-        <View style={{marginTop:10}} >
+        <View style={{ marginTop: 10 }} >
           <MyWebview
             fullWidth
             html={item.embed_code.replace("width", "")}
@@ -142,9 +146,9 @@ function FeedView({ item, index, user, token, timezone, settings, openComments, 
             {item?.top_liked_user?.map((item, index) => {
               if (index < 2)
                 return (
-                  <View 
-                  key={item?.user_info_action_by?.profile_image}
-                  style={[__style.likeImageView, { marginLeft: -(index + 5) }]}>
+                  <View
+                    key={item?.user_info_action_by?.profile_image}
+                    style={[__style.likeImageView, { marginLeft: -(index + 5) }]}>
                     <MyImage
                       style={__style.likeImage}
                       source={{

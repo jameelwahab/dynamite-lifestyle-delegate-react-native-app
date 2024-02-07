@@ -21,6 +21,7 @@ import { setSocket } from '../../redux/reducers/socketSlice'
 import { io } from 'socket.io-client'
 import { socketUrl } from '../../utilities/constants'
 import notifee from '@notifee/react-native';
+import InitWithAuth from '../../functions/InitWithAuth'
 
 
 const Splash = ({ navigation }) => {
@@ -31,8 +32,10 @@ const Splash = ({ navigation }) => {
   checkAuth = async () => {
     try {
       let token = await AsyncStorage.getItem("@token");
+      console.log(token, "token")
       if (token != null) {
-        with_Auth(token);
+        // with_Auth(token);
+        await InitWithAuth(token, navigation, () => { }, dispatch);
 
 
       } else {
@@ -109,7 +112,7 @@ const Splash = ({ navigation }) => {
         stripeKey = res?.site_setting?.live_publish_key
       }
 
-      dispatch(setSettings({ ...res?.consultant_setting, stripeKey: stripeKey } ));
+      dispatch(setSettings({ ...res?.consultant_setting, stripeKey: stripeKey }));
       dispatch(setUserAndToken({ user: res?.consultant, token: token, isChatAllowed, isWhatsappChatAllowed }));
       dispatch(setTimeZone({ user: res?.consultant?.time_zone, admin: res?.time_zone }));
       dispatch(setNavbar(res?.nav_items));

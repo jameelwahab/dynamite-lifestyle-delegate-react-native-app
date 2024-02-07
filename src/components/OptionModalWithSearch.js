@@ -91,7 +91,7 @@ const OptionModalWithSearch = ({
           <FlatList
             data={!!filterTheList ? filterTheList(optionList,searchText) : optionList}
             // scrollEnabled={false}
-            keyExtractor={(item, index) => item?.key.toString()}
+            keyExtractor={(item, index) => `OptionWithsearch${index}`}
             contentContainerStyle={{}}
             ListEmptyComponent={<EmptyView label={`No ${title} found`} />}
             renderItem={({ item, index }) => (

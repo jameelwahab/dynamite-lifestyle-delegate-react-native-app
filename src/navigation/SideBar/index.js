@@ -16,10 +16,16 @@ import utilities from '../../utilities';
 import { selectSocket } from '../../redux/reducers/socketSlice';
 import MyImage from '../../components/MyImage';
 import messaging from '@react-native-firebase/messaging';
-import notifee from '@notifee/react-native';
+import notifee, { EventType } from '@notifee/react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import notificationHandler from '../../functions/notificationHandler';
 
 
+
+let sub2 = null;
+let sub3 = null;
+let sub4 = null;
+let sub5 = null;
 const index = (props) => {
   const inset = useSafeAreaInsets();
   const { navigation, state } = props;
@@ -30,9 +36,77 @@ const index = (props) => {
 
   console.log(inset, "inset")
 
+  const pushNotificationhandlers = async () => {
+    sub2 = null;
+    sub3 = null;
+    sub4 = null;
+    sub5 = null;
+    let initialNotification = await notifee.getInitialNotification();
 
+    if (!!initialNotification) {
+      console.log('[initialNotification] notifee Notification caused application to open', initialNotification);
+      if (Platform.OS == "ios") {
+        console.log('[initialNotification] notifee Notification caused application to open', initialNotification);
+        // setTimeout(() => {
+
+        // }, 500);
+        notificationHandler(initialNotification, navigation, navbar);
+      }
+    }
+
+
+    sub2 = notifee.onForegroundEvent(({ type, detail }) => {
+      console.log("onForegroundEvent", type, detail)
+      switch (type) {
+        case EventType.DISMISSED:
+          console.log('notifee User dismissed notification', detail.notification);
+          break;
+        case EventType.PRESS:
+          console.log('[onForegroundEvent] notifee User Pressed notification', detail);
+          notificationHandler(detail.notification, navigation, navbar);
+          // this.notificationActions(detail)
+          // notificationHandler(detail.notification, this.props.dispatch, setSideBarScreen, this.props.state, this.state.menu_visible)
+          break;
+      } 
+    });
+
+    sub3 = notifee.onBackgroundEvent(async ({ type, detail }) => {
+      console.log("onBackgroundEvent", type, detail)
+      switch (type) {
+        case EventType.DISMISSED:
+          console.log('notifee User dismissed notification', detail.notification);
+          break;
+        case EventType.PRESS:
+          console.log('[onBackgroundEvent] notifee User Pressed notification', detail);
+          // this.notificationActions(detail)
+          notificationHandler(detail.notification, navigation, navbar);
+          break;
+      }
+    });
+
+    sub4 = messaging().onNotificationOpenedApp(remoteMessage => {
+      console.log('[onNotificationOpenedApp] Notification caused app to open from background state:', remoteMessage)
+      if (remoteMessage) {
+        if (Platform.OS == "android") {
+          notificationHandler(remoteMessage, navigation, navbar);
+        }
+      }
+    });
+
+
+    sub5 = messaging().getInitialNotification().then(remoteMessage => {
+      console.log('Notification caused app to open from quit state:', remoteMessage);
+      if (remoteMessage) {
+        if (Platform.OS == "android") {
+          notificationHandler(remoteMessage, navigation, navbar);
+        }
+      }
+    });
+
+  }
 
   useEffect(() => {
+    pushNotificationhandlers()
     socket.on("connect_error", () => {
       console.log("%c connect_error", 'background:#0000FF; color: #FFF', socket,)
       socket.connect();
@@ -48,7 +122,8 @@ const index = (props) => {
       notifee.displayNotification({
         title: remoteMessage?.notification?.title,
         body: remoteMessage?.notification?.body,
-        android: { channelId: "default" }
+        android: { channelId: "default" },
+        data: remoteMessage?.data
       })
     });
 
@@ -56,6 +131,10 @@ const index = (props) => {
       socket.off("connect");
       socket.off("connect_error");
       unsubscribe();
+      !!sub2 && sub2();
+      !!sub3 && sub3();
+      !!sub4 && sub4();
+      !!sub5 && sub5();
     }
   }, [])
 

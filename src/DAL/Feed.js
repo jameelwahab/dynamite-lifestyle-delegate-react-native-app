@@ -10,6 +10,16 @@ export const GET_FEED_LIST =
     })
   }
 
+export const GET_FEED_DETAIL =
+  ({ token, navigation, feedId }) => {
+    return invokeApi({
+      path: `api/feeds/detail/delegate/${feedId}`,
+      method: "GET",
+      token,
+      navigation,
+    })
+  }
+
 export const GET_FEED_EXTRA_DATA =
   ({ token, navigation, level, }) => {
     return invokeApi({

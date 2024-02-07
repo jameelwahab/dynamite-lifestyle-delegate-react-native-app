@@ -26,7 +26,6 @@ const OptionModal = ({
         <FlatList
           data={optionList}
           scrollEnabled={false}
-          keyExtractor={(item, index) => item?.key.toString()}
           contentContainerStyle={{ paddingVertical: 10 }}
           renderItem={({ item, index }) => (
             <TouchableHighlight

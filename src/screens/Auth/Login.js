@@ -27,6 +27,7 @@ import { setSocket } from '../../redux/reducers/socketSlice';
 import { io } from 'socket.io-client';
 import MyInputs from '../../components/MyInputs';
 import messaging from '@react-native-firebase/messaging';
+import InitWithAuth from '../../functions/InitWithAuth';
 
 
 
@@ -68,7 +69,10 @@ const Login = ({ navigation }) => {
       fd.append("password", password)
       let res = await LOGIN({ body: fd });
       if (res.code == 200) {
-        await with_Auth(res)
+        let savedTOken = await AsyncStorage.setItem("@token", res?.token);
+        console.log(savedTOken, "savedTOken")
+        // await with_Auth(res)
+        await InitWithAuth(res?.token, navigation, setLoader, dispatch);
       }
 
       setLoader(false);
@@ -83,10 +87,10 @@ const Login = ({ navigation }) => {
       await AsyncStorage.setItem("@token", resp?.token);
       let isChatAllowed = false;
       let isWhatsappChatAllowed = false;
-      res?.nav_items.forEach(item =>{
-        if(item.value =="chat"){
+      res?.nav_items.forEach(item => {
+        if (item.value == "chat") {
           isChatAllowed = true;
-        }else if(item.value =="whatsapp_chat"){
+        } else if (item.value == "whatsapp_chat") {
           isWhatsappChatAllowed = true
         }
       })
@@ -97,10 +101,8 @@ const Login = ({ navigation }) => {
         stripeKey = res?.site_setting?.live_publish_key
       }
 
-      dispatch(setSettings({ ...res?.consultant_setting, stripeKey: stripeKey } ));
-      // let sideBarList = makeArrayOfSidebar(res?.nav_items, res?.consultant);
-      dispatch(setSettings(res?.consultant_setting));
-      dispatch(setUserAndToken({ user: res?.consultant, token: resp?.token ,isChatAllowed,isWhatsappChatAllowed }));
+      dispatch(setSettings({ ...res?.consultant_setting, stripeKey: stripeKey }));
+      dispatch(setUserAndToken({ user: res?.consultant, token: resp?.token, isChatAllowed, isWhatsappChatAllowed }));
       dispatch(setNavbar(res?.nav_items));
       dispatch(setTimeZone({ user: res?.consultant?.time_zone, admin: res?.time_zone }))
       dispatch(setSocket(io(socketUrl, {

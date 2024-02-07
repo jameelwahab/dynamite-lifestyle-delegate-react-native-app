@@ -14,7 +14,7 @@ import { convertTimezone } from '../../../functions/convertTime'
 import moment from 'moment'
 import { dateTimeFormat } from '../../../utilities/constants'
 import EmptyView from '../../../components/EmptyView'
-import { CardField, initStripe, confirmPayment, createToken } from '@stripe/stripe-react-native';
+import { CardField, initStripe, confirmPayment, createToken, } from '@stripe/stripe-react-native';
 import { fonts } from '../../../utilities/fonts'
 import { MyButton } from '../../../components/MyButton'
 import { selectSettings } from '../../../redux/reducers/settingSlice'
@@ -124,6 +124,8 @@ const PaymentrequestDetail = ({ navigation, route }) => {
     if (res.code == 200) {
       showToast({ title: "Payment Successful", type: "success" });
       getPaymentRequestDeatil(true);
+    } else {
+      setLoader(false);
     }
   }
 
@@ -171,7 +173,7 @@ const PaymentrequestDetail = ({ navigation, route }) => {
   }
 
   const renderTransaction = (item, index) => {
-    return (<View style={{ backgroundColor: colors.secondary, padding: 10, borderRadius: 10, marginTop: 10 }}>
+    return (<View key={item?._id} style={{ backgroundColor: colors.secondary, padding: 10, borderRadius: 10, marginTop: 10 }}>
 
       <StatView title={"Amount:"} value={prependCurency(item?.currency) + " " + item?.amount} />
       <StatView title={"Transaction Note:"} value={item?.transaction_note} />

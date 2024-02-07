@@ -66,7 +66,7 @@ const routes = {
   allSourceFeedScreen: "ALL_SOURCE_FEED_SCREEN",
   sourceFeedScreen: "SOURCE_FEED_SCREEN",
   scheduleFeedScreen: "SCHEDULED_FEED_SCREEN",
-
+  feedDetailScreen: "FEED_DETAIL_SCREEN",
   //? AllMembers
   allMemberScreens: "MEMBER_SCREEN",
   memberDetails: "MEMBER_DETAIL_SCREEN",

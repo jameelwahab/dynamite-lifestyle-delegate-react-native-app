@@ -13,6 +13,7 @@ import { LOGOUT } from '../../DAL'
 import copyText from '../../functions/copyText'
 import { useDispatch, useSelector } from 'react-redux'
 import { clearSocket, selectSocket } from '../../redux/reducers/socketSlice'
+import notifee from '@notifee/react-native';
 
 
 const ProfileDropDown = ({ isVisible = false, closeModal = () => { }, user }) => {
@@ -30,8 +31,10 @@ const ProfileDropDown = ({ isVisible = false, closeModal = () => { }, user }) =>
     }
 
     closeModal()
+
     socket.disconnect();
     dispatch(clearSocket())
+    notifee.setBadgeCount(0);
     setTimeout(() => {
       navigation.reset({
         index: 0,

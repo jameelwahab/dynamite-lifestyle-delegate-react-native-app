@@ -44,7 +44,7 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
   //? Actions functions
 
   const ticketActions = (option) => {
-    console.log(option, "option")
+    console.log(option, "option", isOptionModalShown.for)
 
 
 

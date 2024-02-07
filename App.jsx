@@ -14,7 +14,7 @@ import TrackPlayer, {
   AppKilledPlaybackBehavior,
   Capability,
 } from 'react-native-track-player';
-import notifee from '@notifee/react-native';
+import notifee, { AndroidImportance } from '@notifee/react-native';
 
 
 const toastConfig = {
@@ -45,6 +45,7 @@ const App = () => {
     const channelId = await notifee.createChannel({
       id: 'default',
       name: 'Default Channel',
+      importance: AndroidImportance.HIGH
     });
   };
   

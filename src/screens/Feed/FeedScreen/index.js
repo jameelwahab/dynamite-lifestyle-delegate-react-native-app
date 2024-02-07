@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import RootView from '../../../components/RootView'
 import MyText from '../../../components/MyText'
 import MyLoader, { SimpleLoader } from '../../../components/MyLoader'
-import { GET_FEED_LIST, GET_COMMENT_LIST, GET_LIKE_LIST, GET_COMMENT_LIKES_LIST, FEED_ACTIONS, DELETE_FEED_POST, FEED_LIKE_ACTIONS, GET_FEED_EXTRA_DATA, IS_CHAT_EXIST } from '../../../DAL'
+import { GET_FEED_LIST, GET_COMMENT_LIST, GET_LIKE_LIST, GET_COMMENT_LIKES_LIST, FEED_ACTIONS, DELETE_FEED_POST, FEED_LIKE_ACTIONS, GET_FEED_EXTRA_DATA, IS_CHAT_EXIST, GET_FEED_DETAIL } from '../../../DAL'
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../../redux/reducers/userSlice'
 import FeedView from './FeedView'
@@ -49,7 +49,7 @@ let likeVar = {
 const FeedScreen = ({ navigation, route }) => {
   const addPostRef = useRef()
   const scheduleModalRef = useRef();
-  const { feedFor } = route?.params;
+  const { feedFor, feedId } = route?.params;
   const isCosmos = feedFor == "the_cosmos";
   const isScheduledFeed = feedFor == "scheduled";
   const isAllSourceFeed = feedFor == "all_source";
@@ -162,6 +162,31 @@ const FeedScreen = ({ navigation, route }) => {
   }
 
   const getFeed = async () => {
+    if (!!feedId) {
+      getFeedDetail()
+    } else {
+      getFeedList()
+    }
+  }
+
+  const getFeedDetail = async () => {
+    let res = await GET_FEED_DETAIL({ navigation, token, feedId: feedId });
+    if (res.code == 200) {
+
+      setFeed([res?.feeds])
+      setLoader(false);
+      setFeedFooterLoader(false);
+
+      if (route?.params?.openCommentModal) {
+        openComments(feedId, false)
+      }
+    } else {
+      setLoader(false);
+      setFeedFooterLoader(false);
+    }
+  }
+
+  const getFeedList = async () => {
     let res = await GET_FEED_LIST({ navigation, token, type: feedFor, level: feedLevel, page: feedVar.page });
     if (res.code == 200) {
       if (res?.total_pages > (1 + feedVar.page)) {
@@ -596,6 +621,12 @@ const FeedScreen = ({ navigation, route }) => {
     }
   }
 
+  const onFeedDetail = (id) => {
+    navigation.navigate(routes.feedDetailScreen, {
+      feedId: id,
+    })
+  }
+
   const updateFeedItemsSpecificField = (feedId, updatedObj) => {
     setFeed((list) => {
       let index = list.findIndex(item => item._id == feedId);
@@ -751,6 +782,7 @@ const FeedScreen = ({ navigation, route }) => {
       isScheduledFeed={isScheduledFeed}
       sourceLevelIcons={feedData?.feed_setting}
       openScheduleTimeModal={scheduleModalRef?.current?.openScheduleTimeModal}
+      onFeedDetail={onFeedDetail}
     />, [feed]);
 
 
@@ -763,11 +795,11 @@ const FeedScreen = ({ navigation, route }) => {
           // onViewableItemsChanged={(e) => console.log("onViewableItemsChanged", e)}
           showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item?._id}
-          ListHeaderComponent={headerView}
+          ListHeaderComponent={!!!feedId && headerView}
           ListEmptyComponent={!loader && tab == 0 && <EmptyView label={"Posts not found"} />}
           onEndReached={() => {
             console.log("onEndReached", feedVar)
-            if (feedVar?.canLoadMore && tab == 0) {
+            if (!!!feedId && feedVar?.canLoadMore && tab == 0) {
               feedVar = {
                 ...feedVar,
                 canLoadMore: false,
