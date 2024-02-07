@@ -16,7 +16,7 @@ import utilities from '../../utilities';
 import { selectSocket } from '../../redux/reducers/socketSlice';
 import MyImage from '../../components/MyImage';
 import messaging from '@react-native-firebase/messaging';
-import notifee, { EventType } from '@notifee/react-native';
+import notifee, { AndroidBadgeIconType, EventType } from '@notifee/react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import notificationHandler from '../../functions/notificationHandler';
 
@@ -67,7 +67,7 @@ const index = (props) => {
           // this.notificationActions(detail)
           // notificationHandler(detail.notification, this.props.dispatch, setSideBarScreen, this.props.state, this.state.menu_visible)
           break;
-      } 
+      }
     });
 
     sub3 = notifee.onBackgroundEvent(async ({ type, detail }) => {
@@ -122,7 +122,11 @@ const index = (props) => {
       notifee.displayNotification({
         title: remoteMessage?.notification?.title,
         body: remoteMessage?.notification?.body,
-        android: { channelId: "default" },
+        android: {
+          channelId: "default",
+          color: colors.secondary,
+          smallIcon: "ic_notification"
+        },
         data: remoteMessage?.data
       })
     });

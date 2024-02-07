@@ -98,7 +98,7 @@ export default function CountryModal({ selectCountry = () => { }, isVisible, clo
               <TextInput
                 value={searchText}
                 onChangeText={searchInList}
-                placeholder="Austrailia|Belgium"
+                placeholder="Select Country..."
                 placeholderTextColor={colors.lightText}
                 spellCheck={false}
                 style={{ color: colors.text, paddingVertical: 12, marginLeft: 10, fontFamily: fonts.medium, includeFontPadding: false }}
@@ -195,7 +195,7 @@ const ModalStyle = StyleSheet.create({
     borderRadius: 10,
     marginHorizontal: 10,
     marginTop: 10,
-    marginBottom:10
+    marginBottom: 10
   },
   flatlistItemText: {
     fontSize: 16,
