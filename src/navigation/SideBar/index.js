@@ -1,4 +1,4 @@
-import { View, Text, Pressable, Image, StyleSheet, Platform, Dimensions } from 'react-native'
+import { View, Text, Pressable, Image, StyleSheet, Platform, Dimensions, TextInput, Keyboard, SafeAreaView, ScrollView, StatusBar } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { DrawerContentScrollView } from '@react-navigation/drawer';
 import MyText from '../../components/MyText';
@@ -19,6 +19,8 @@ import messaging from '@react-native-firebase/messaging';
 import notifee, { AndroidBadgeIconType, EventType } from '@notifee/react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import notificationHandler from '../../functions/notificationHandler';
+import { selectUser } from '../../redux/reducers/userSlice';
+import RootView from '../../components/RootView';
 
 
 
@@ -30,11 +32,13 @@ const index = (props) => {
   const inset = useSafeAreaInsets();
   const { navigation, state } = props;
   const { navbar } = useSelector(selectNavbar);
+  const { user } = useSelector(selectUser);
   const { settings } = useSelector(selectSettings);
   const { socket } = useSelector(selectSocket);
   const [isCollapsed, setCollapsed] = useState([]);
+  const [searchText, setSearchText] = useState("")
 
-  console.log(inset, "inset")
+  console.log(user, "user")
 
   const pushNotificationhandlers = async () => {
     sub2 = null;
@@ -94,7 +98,7 @@ const index = (props) => {
     });
 
 
-    sub5 = messaging().getInitialNotification().then(remoteMessage => {
+    messaging().getInitialNotification().then(remoteMessage => {
       console.log('Notification caused app to open from quit state:', remoteMessage);
       if (remoteMessage) {
         if (Platform.OS == "android") {
@@ -138,7 +142,7 @@ const index = (props) => {
       !!sub2 && sub2();
       !!sub3 && sub3();
       !!sub4 && sub4();
-      !!sub5 && sub5();
+      // !!sub5 && sub5();
     }
   }, [])
 
@@ -158,20 +162,28 @@ const index = (props) => {
 
   const changeSideBarScreen = async (screen) => {
 
-    if (!!screen?.is_expanded) {
+
+    Keyboard.dismiss()
+    navigation.closeDrawer()
+    setTimeout(() => {
+      console.log(navigation, state, "navigation")
+      navigation.jumpTo(ParentComponents[screen.value].key)
+    }, 200);
+
+  }
+
+  const onOptionClick = async (screen, isCollpasable) => {
+
+    if (isCollpasable) {
       toggleCollapse(screen)
     } else {
-      navigation.closeDrawer()
-      setTimeout(() => {
-        console.log(navigation, state, "navigation")
-        navigation.jumpTo(ParentComponents[screen.value].key)
-      }, 200);
+      changeSideBarScreen(screen)
     }
   }
 
   const changeSideBarChildScreen = async (screen) => {
 
-
+    Keyboard.dismiss()
     navigation.closeDrawer()
     setTimeout(() => {
       console.log(navigation, state, "navigation")
@@ -180,14 +192,47 @@ const index = (props) => {
 
   }
 
+  const searchableList = () => {
+    if (searchText.trim().length == 0) {
+      return navbar
+    } else {
+      let list = [];
+      let searchableText = searchText.trim().toLowerCase();
+      navbar.forEach((x, i) => {
+        if (x.title.toLowerCase().includes(searchableText) || (!!x?.path && x?.path.toLowerCase().includes(searchableText))) {
+          list.push(x);
+        }
 
-  const optionView = (item, index, isCollaseable) => {
+        if (Array.isArray(x?.child_options)) {
+          let childList = [];
+          x?.child_options.forEach((y) => {
+            if (y.title.toLowerCase().includes(searchableText) || y?.path.toLowerCase().includes(searchableText)) {
+              childList.push(y)
+            }
+          })
+          if (childList.length > 0) {
+            let index = list.findIndex(z => z._id == x._id);
+
+            if (index > -1) {
+              list.splice(index, 1, { ...list[index], child_options: childList, })
+            } else {
+              list.push({ ...x, child_options: childList, });
+            }
+          }
+        }
+      })
+      return list
+    }
+  }
+
+
+  const optionView = (item, index, isCollaseable, showDot) => {
     let isSelected = ParentComponents[item.value].key == props.state.routeNames[props.state.index];
 
     return (
       <Pressable
         key={item.value}
-        onPress={() => changeSideBarScreen(item)}
+        onPress={() => onOptionClick(item, isCollaseable)}
         style={[{ backgroundColor: isSelected && isCollaseable == false ? colors.lightPrimary3 : undefined, }, __styles.itemRootView]}>
         <MyImage
           source={{ uri: S3_URL + item?.icon }}
@@ -202,6 +247,9 @@ const index = (props) => {
           <View style={{ paddingRight: 10 }}>
             {!findCollapsed(item) ? icons.upwardArrow() : icons.downwardArrow()}
           </View>}
+
+        {showDot &&
+          <View style={__styles.notifier} />}
       </Pressable>
     )
   }
@@ -228,11 +276,10 @@ const index = (props) => {
     } else return null;
   }
 
-
+  const { top, bottom, left, right } = inset;
   return (
-    <DrawerContentScrollView
-      contentContainerStyle={{ paddingBottom: inset.bottom + 20 }}
-      {...props}>
+    <View style={{ flex: 1, paddingLeft: left, paddingRight: right, paddingTop: top, paddingBottom: bottom, backgroundColor: colors.secondary }}>
+
       {!!settings?.brand_logo &&
         <View style={__styles.logoView}>
           <ResponsiveImage2
@@ -240,19 +287,45 @@ const index = (props) => {
             uri={S3_URL + settings?.brand_logo}
             style={__styles.logo} />
         </View>}
+      <View style={__styles.searchRoot}>
+        <View>
+          {icons.search(colors.placeholder, 20)}
+        </View>
+        <TextInput
+          style={__styles.searchInput}
+          placeholderTextColor={colors.placeholder}
+          placeholder='Search...'
+          autoComplete="off"
+          autoCorrect={false}
+          autoCapitalize="none"
+          value={searchText}
+          onChangeText={(text) => setSearchText(text)}
+          selectionColor={colors.selection}
+          cursorColor={colors.white}
+          keyboardAppearance="dark"
+        />
+      </View>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: inset.bottom + 20 }}
+        keyboardShouldPersistTaps="handled"
+        {...props}>
 
-      {navbar.map((x, i) => {
-        if (!!ParentComponents[x.value]) {
-          let isCollaseable = Array.isArray(x.child_options) && x.child_options.length > 0;
-          return (
-            <View key={x.value}>
-              {optionView(x, i, isCollaseable)}
-              {isCollaseable && x?.child_options.map((y, j) => nestedOptionView(y, i, x))}
-            </View >
-          )
+        {
+          searchableList().map((x, i) => {
+            if (!!ParentComponents[x.value]) {
+              let isCollaseable = Array.isArray(x.child_options);
+              return (
+                <View key={x.value}>
+                  {optionView(x, i, isCollaseable, user[showDotArray[x.value]])}
+                  {isCollaseable && x?.child_options.map((y, j) => nestedOptionView(y, i, x))}
+                </View >
+              )
+            }
+          })
         }
-      })}
-    </DrawerContentScrollView >
+      </ScrollView >
+    </View>
   )
 }
 
@@ -261,7 +334,8 @@ export default index;
 const __styles = StyleSheet.create({
   logoView: {
     width: 200,
-    alignSelf: "center", marginBottom: 10,
+    alignSelf: "center",
+    marginBottom: 10,
     marginTop: Platform.OS == "android" ? 10 : 0
   },
 
@@ -279,7 +353,29 @@ const __styles = StyleSheet.create({
   },
   nestedView: {
     paddingLeft: "12%"
-  }
+  },
+  searchRoot: {
+    borderWidth: 1,
+    borderColor: colors.border,
+    height: 40,
+    marginHorizontal: 10,
+    paddingHorizontal: 10,
+    borderRadius: 10,
+    alignItems: "center",
+    flexDirection: "row",
+    marginBottom: 10
+  },
+  searchInput: {
+    flex: 1,
+    paddingLeft: 10,
+    height: "100%",
+    color: colors.white
+  },
+  notifier: { marginRight: 10, height: 12, width: 12, backgroundColor: colors.primary2, borderRadius: 12 / 2, }
 })
 
+const showDotArray = {
+  "internal-tickets": "is_internal_ticket_notify",
+  "support_ticket": "is_sidebar_notify"
+}
 

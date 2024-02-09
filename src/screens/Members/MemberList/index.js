@@ -1,4 +1,4 @@
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image, ScrollView, Pressable, Keyboard } from 'react-native'
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image, ScrollView, Pressable, Keyboard, Platform } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import RootView from '../../../components/RootView'
 import MyText from '../../../components/MyText'
@@ -29,6 +29,9 @@ import utilities from '../../../utilities'
 import { MenuButton, MyButton, TransparentButton } from '../../../components/MyButton'
 import SaveFilterModal from '../Components/SaveFilterModal'
 import OptionModal from '../../../components/OptionModal'
+import downloadImage from '../../../functions/downloadImage'
+import RNFetchBlob from 'react-native-blob-util';
+import showToast from '../../../functions/showToast'
 
 
 
@@ -99,6 +102,44 @@ const MemberList = ({ navigation, route }) => {
       })
     }
 
+  }
+
+  const makeCsv = async () => {
+    let file = ""
+    let header = `First Name, Last Name, Email, Contact Number\n`;
+    list.forEach((x, i) => {
+      file += `${x?.first_name}, ${x?.last_name}, ${x?.email}, ${x?.contact_number} \n`;
+
+    })
+    file = header + file;
+    const pathToWrite =
+      Platform.OS == "ios" ?
+        `${RNFetchBlob.fs.dirs.DocumentDir}/CSV/data.csv` :
+        `${RNFetchBlob.fs.dirs.DownloadDir}/CSV/data.csv`;
+
+    console.log(file, "file")
+
+    RNFetchBlob.fs
+      .writeFile(pathToWrite, file, 'utf8')
+      .then(async (res) => {
+        if (Platform.OS == "android") {
+          let result = await RNFetchBlob.MediaCollection.copyToMediaStore({
+            name: "data.csv", // name of the file
+            parentFolder: 'Mission Control', // subdirectory in the Media Store, e.g. HawkIntech/Files to create a folder HawkIntech with a subfolder Files and save the image within this folder
+            mimeType: 'text/csv'
+          },
+            'Download', // Media Collection to store the file in ("Audio" | "Image" | "Video" | "Download")
+            pathToWrite // Path to the file being copied in the apps own storage
+          );
+          showToast({ title: "CSV File Downloaded", type: "success" })
+          console.log(result)
+        } else if (Platform.OS == "ios") {
+          console.log(res, "res")
+          showToast({ title: "CSV File Downloaded", type: "success" })
+          console.log(await RNFetchBlob.fs.ls(RNFetchBlob.fs.dirs.DocumentDir + "/CSV"))
+        }
+      })
+      .catch(error => console.error(error));
   }
 
   const filterTheData = (obj, data, isSavedFilter, isFilter) => {
@@ -366,6 +407,12 @@ const MemberList = ({ navigation, route }) => {
           <MyText fontSize={10} type='medium' color={colors.lightText2}>{`Showing ${list.length} of ${total}`}</MyText>
         </View>
         <View style={{ flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "flex-end" }}>
+          {user?.is_super_delegate &&
+            <TouchableOpacity
+              onPress={() => makeCsv()}
+              style={__styles.headerBtn} >
+              <Image source={icons.csv} style={{ height: 12, aspectRatio: 1.5 }} />
+            </TouchableOpacity>}
           <TouchableOpacity
             onPress={() => sortModalRef?.current?.openModal()}
             style={__styles.headerBtn} >
@@ -657,12 +704,12 @@ const MemberList = ({ navigation, route }) => {
               <Image source={icons.wheelOfLife} style={{ height: 20, width: 20 }} />
             </View>}
 
-{isChatAllowed &&
-          <TouchableOpacity
-            style={{ marginRight: 5 }}
-            onPress={() => onChatScreen(item?._id)}>
-            {icons.message(colors.primary, 20)}
-          </TouchableOpacity>}
+          {isChatAllowed &&
+            <TouchableOpacity
+              style={{ marginRight: 5 }}
+              onPress={() => onChatScreen(item?._id)}>
+              {icons.message(colors.primary, 20)}
+            </TouchableOpacity>}
 
           <MenuButton
             size={20}
@@ -678,7 +725,7 @@ const MemberList = ({ navigation, route }) => {
 
         <View>
           <StatView title={"Coins"} value={numFormatter(item?.coins_count)} uppercase />
-          {isAllMembers && <StatView title={"Reffered User"} value={!!item?.affliliate ?
+          {isAllMembers && <StatView title={"Reffered User"} value={!!item?.affliliate?.affiliate_user_info?.first_name ?
             item?.affliliate?.affiliate_user_info?.first_name + " " + item?.affliliate?.affiliate_user_info?.last_name + " (" + item?.affliliate?.affiliate_url_name + ") " : "Master Link"} />}
           {!isNurture && <StatView title={"Nurture"} value={!!item?.nurture ? item?.nurture?.first_name + " " + item?.nurture?.last_name : "N/A"} />}
           {!isMembers && <StatView title={"Delegate"} value={!!item?.consultant ? item?.consultant?.first_name + " " + item?.consultant?.last_name : "N/A"} />}
