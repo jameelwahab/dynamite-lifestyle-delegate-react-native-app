@@ -5,7 +5,7 @@ import FeedScreen from './FeedScreen'
 
 const Feed = (props) => {
   return (
-    <RootView hideSubHeader>
+    <RootView hideSubHeader >
       {/* <FeedTabs/> */}
       
       <FeedScreen  {...props} />

@@ -70,6 +70,7 @@ const FeedScreen = ({ navigation, route }) => {
   const [feedOptionModal, setFeedOptionModal] = useState({ isVisible: false, selectedItem: null })
   const [confirmation, setConfirmation] = useState({ isVisible: false, item: null, title: "", type: "" });
   const [tab, setTab] = useState(0);
+  const [inView, setInView] = useState("")
   const [comments, setComments] = useState({
     modalVisibility: false,
     list: [],
@@ -726,9 +727,19 @@ const FeedScreen = ({ navigation, route }) => {
       return null
   }
 
+  const onViewableItemsChanged = React.useCallback((item) => {
+    if (!!item?.viewableItems[1] && item?.viewableItems[1]?.item?.is_reward_feed == true) {
+      setInView(item?.viewableItems[1]?.item?._id)
+    } else if (!!item?.viewableItems[0] && item?.viewableItems[0]?.item?.is_reward_feed == true) {
+      setInView(item?.viewableItems[0]?.item?._id)
+    }
+  }, [])
+
+
+
   const headerView = () => {
     return (
-      <View>
+      <View style={{paddingHorizontal:10}}>
         {route?.params?.title &&
           <View style={{ marginTop: 5, marginLeft: 5 }}>
             <MyText fontSize={18} type='bold' color={colors.primary} >{route?.params?.title}</MyText></View>
@@ -768,6 +779,7 @@ const FeedScreen = ({ navigation, route }) => {
 
   const feedRenderView = useCallback(({ item, index }) =>
     <FeedView
+      isInView={inView == item?._id}
       item={item}
       index={index}
       timezone={timezone}
@@ -783,16 +795,19 @@ const FeedScreen = ({ navigation, route }) => {
       sourceLevelIcons={feedData?.feed_setting}
       openScheduleTimeModal={scheduleModalRef?.current?.openScheduleTimeModal}
       onFeedDetail={onFeedDetail}
-    />, [feed]);
+    />, [feed, inView]);
 
+    const viewConfigRef = React.useRef({ viewAreaCoveragePercentThreshold: 50 })
 
   return (
     <View style={{ flex: 1 }}>
 
-      <View style={{ flex: 1 }}>
+      <View style={{ flex: 1 ,marginHorizontal:-10}}>
         <FlatList
           data={tab == 0 ? feed : []}
+          onViewableItemsChanged={onViewableItemsChanged}
           // onViewableItemsChanged={(e) => console.log("onViewableItemsChanged", e)}
+          viewabilityConfig={viewConfigRef.current}
           showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item?._id}
           ListHeaderComponent={!!!feedId && headerView}

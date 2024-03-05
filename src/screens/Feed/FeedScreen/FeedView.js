@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity, Pressable } from 'react-native'
-import React, { memo } from 'react'
+import React, { memo, useEffect, useState } from 'react'
 import UserImage from '../../../components/UserImage'
 import MyText from '../../../components/MyText'
 import { convertTimezone } from '../../../functions/convertTime'
@@ -15,8 +15,46 @@ import WebPlayer from '../../../components/WebPlayer'
 import ResponsiveImage2 from '../../../components/ResponsiveImage2'
 import utilities from '../../../utilities'
 import openUrl from '../../../functions/openUrl'
+import DropShadow from "react-native-drop-shadow";
 
-function FeedView({ item, index, user, token, timezone, settings, openComments, showLikes, openOptions, onLikebtnPress, isCosmos, sourceLevelIcons, isScheduledFeed, openScheduleTimeModal, onFeedDetail }) {
+export const FeedView = ({ item, index, user, token, isInView, timezone, settings, openComments, showLikes, openOptions, onLikebtnPress, isCosmos, sourceLevelIcons, isScheduledFeed, openScheduleTimeModal, onFeedDetail })=> {
+  const [animationState, setAnimationState] = useState(0)
+
+  useEffect(() => {
+    if(index == 1)
+    console.log("isInView", isInView)
+    if (isInView) {
+      startAnimation()
+    } else {
+      setAnimationState(0)
+    }
+  }, [isInView])
+
+  const startAnimation = () => {
+    setAnimationState(1)
+    setTimeout(() => {
+      console.log("EndAnimation")
+      setAnimationState(0)
+    }, 5000);
+  }
+
+
+  const animationView = () => {
+    return (
+      <>
+        {!!item?.reward_data?.reward_feed_gif && animationState == 1 &&
+          <View style={__style.animationView}>
+            <Image
+              indicatorProps={{ indeterminate: false }}
+              source={{ uri: S3_URL + item?.reward_data?.reward_feed_gif }}
+              style={{ height: "100%", width: "100%" }}
+
+            />
+          </View>}
+      </>
+    )
+  }
+
   const profileView = () => (
     <View style={__style.profileView}>
       <Pressable
@@ -197,16 +235,20 @@ function FeedView({ item, index, user, token, timezone, settings, openComments, 
     </View>
   )
 
+
   return (
-    <View style={__style.rootView}>
-      {profileView()}
-      {descriptionView()}
-      {item?.is_publish &&
-        <>
-          {statsView()}
-          {actionView()}
-        </>}
-    </View>
+    <DropShadow style={[__style.rootView, { shadowColor: item?.is_reward_feed ? colors.primary : colors.darkSecondary, }]}>
+      {animationView()}
+      <View>
+        {profileView()}
+        {descriptionView()}
+        {item?.is_publish &&
+          <>
+            {statsView()}
+            {actionView()}
+          </>}
+      </View>
+    </DropShadow>
   )
 };
 
@@ -225,11 +267,27 @@ export default React.memo(FeedView)
 
 const __style = StyleSheet.create({
   rootView: {
-    marginTop: 10,
+    marginTop: 15,
     backgroundColor: colors.secondary,
     padding: 10,
-    borderRadius: 10
+    borderRadius: 10,
+    shadowOffset: {
+      width: 0,
+      height: 0,
+    },
+    shadowOpacity: 1,
+    shadowRadius: 7,
+    marginHorizontal: 10
   },
+  animationView: {
+    width: "100%",
+    height: "100%",
+    // height: 900,
+    position: 'absolute',
+    zIndex: -1,
+    overflow: "hidden",
+  },
+
   profileView: {
     flexDirection: "row",
     alignItems: "center",

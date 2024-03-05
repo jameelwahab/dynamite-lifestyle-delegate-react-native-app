@@ -958,36 +958,39 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                 size={40}
               />
 
+              {/* <View style={{ flex: 1 }}> */}
               <TouchableOpacity
                 onPress={() => openModal("general")}
                 style={__style.inputView}>
-                <MyText>What's on your mind?</MyText>
+                <MyText adjustsFontSizeToFit={true} fontSize={13} >What's on your mind?</MyText>
               </TouchableOpacity>
+              <View style={__style.buttonsRow} >
+                <TouchableOpacity
+                  onPress={() => openModal("video")}
+                  style={__style.buttonView}>
+                  {/*   <MyText style={__style.buttonText}>Upload Video</MyText> */}
+                  {icons.video(colors.white, 18)}
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={() => openModal("image")}
+                  style={__style.buttonView}>
+                  {/* <MyText style={__style.buttonText}>Upload Image</MyText> */}
+                  {icons.camera(colors.white, 18)}
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={() => openModal("embed_code")}
+                  style={__style.buttonView}>
+                  {/* <MyText style={__style.buttonText}>Embeded Code</MyText> */}
+                  {icons.code(colors.white, 18)}
+                </TouchableOpacity>
+                {/* </View> */}
+              </View>
             </View>
-            <View style={__style.divider} />
+            {/* <View style={__style.divider} /> */}
 
-            <View style={__style.buttonsRow} >
-              <TouchableOpacity
-                onPress={() => openModal("video")}
-                style={__style.buttonView}>
-                <MyText style={__style.buttonText}>Upload Video</MyText>
-                {icons.video(colors.white, 15)}
-              </TouchableOpacity>
 
-              <TouchableOpacity
-                onPress={() => openModal("image")}
-                style={__style.buttonView}>
-                <MyText style={__style.buttonText}>Upload Image</MyText>
-                {icons.camera(colors.white, 15)}
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                onPress={() => openModal("embed_code")}
-                style={__style.buttonView}>
-                <MyText style={__style.buttonText}>Embeded Code</MyText>
-                {icons.code(colors.white, 15)}
-              </TouchableOpacity>
-            </View>
             {Modal_addPost()}
 
           </View>
@@ -1055,22 +1058,25 @@ const __style = StyleSheet.create({
 
   rootView: {
     backgroundColor: colors.secondary,
-    padding: 15,
+    paddingVertical: 15,
+    paddingHorizontal:10,
     borderRadius: 10,
     marginTop: 10
   },
   inputRootView: {
     flexDirection: "row",
-
+    alignItems: "center"
   },
   inputView: {
     backgroundColor: colors.secondaryVariant,
     height: 40,
-    padding: 10,
+    paddingHorizontal: 10,
     justifyContent: "center",
     marginLeft: 10,
     flex: 1,
-    borderRadius: 30
+    borderRadius: 30,
+    borderWidth: 1 / 2,
+    borderColor: colors.white + "11"
   },
   eventColorView: {
     height: "70%", width: "90%", alignSelf: "center", borderRadius: 5
@@ -1081,18 +1087,28 @@ const __style = StyleSheet.create({
     marginTop: 15
   },
   buttonsRow: {
-    marginTop: 5
+    // marginTop: 10,
+    flexDirection: "row",
+    // alignItems: "center",
+    // justifyContent: "flex-end"
   },
   buttonView: {
-    flexDirection: "row",
+    borderWidth: 1 / 2,
+    borderColor: colors.white + "11",
+    marginLeft: 10,
+    // flexDirection: "row",
     alignItems: "center",
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: colors.white,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
+    height: 40,
+    width: 40,
+    // flex:1,
+    borderRadius: 40 / 2,
+    // borderWidth: 1,
+    // borderColor: colors.se,
+    backgroundColor: colors.secondaryVariant,
+    // paddingHorizontal: 10,
+    // paddingVertical: 8,
     justifyContent: "center",
-    marginTop: 10,
+
 
   },
   buttonText: {

@@ -98,7 +98,7 @@ const ImagesForFeed = ({ index, list, swiper }) => {
             style={{ alignSelf: "center" }}
           />
         </PressableWrapper>
-      ) : length == 2 ? (
+      ) : length == 2 ? ( 
         <View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
           <PressableWrapper swiper={swiper} onPress={() => openImageZoomer(0)}>
             <ResponsiveImage2
