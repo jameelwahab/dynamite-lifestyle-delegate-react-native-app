@@ -1,5 +1,5 @@
-import { View, Text, SafeAreaView, StyleSheet, FlatList, Pressable, TouchableOpacity, TextInput, ActivityIndicator, Platform } from 'react-native'
-import React, { useRef, useState } from 'react'
+import { View, Text, SafeAreaView, StyleSheet, FlatList, Pressable, TouchableOpacity, TextInput, ActivityIndicator, Platform, Image } from 'react-native'
+import React, { useEffect, useRef, useState } from 'react'
 import Modal from 'react-native-modal';
 import utilities from '../../../utilities';
 import { colors } from '../../../utilities/colors';
@@ -15,9 +15,13 @@ import Toast from 'react-native-toast-message';
 import FooterLoader from '../../../components/FooterLoader';
 import OptionModal from '../../../components/OptionModal';
 import showToast from '../../../functions/showToast';
-import { ADD_COMMENT, COMMENT_LIKE_ACTIONS, DELETE_COMMENT, EDIT_COMMENT } from '../../../DAL';
+import { ADD_COMMENT, ADD_COMMENT_V2, COMMENT_LIKE_ACTIONS, DELETE_COMMENT, EDIT_COMMENT, EDIT_COMMENT_V2 } from '../../../DAL';
 import ConfirmationModal from '../../../components/ConfirmationModal';
 import LikeModalForComments from './LikeModalForComments';
+import ImageUploadModal from '../../../components/ImageUploadModal';
+import MyImage from '../../../components/MyImage';
+import { S3_URL } from '../../../utilities/constants';
+import ImageZoomer from '../../../components/ImageZoomer';
 
 const CommentModal = ({
   isVisible,
@@ -39,9 +43,12 @@ const CommentModal = ({
   const cmtTextInputRef = useRef();
   const likeModalRef = useRef();
   const [commentText, setCommentText] = useState("");
+  const [commentImage, setCommentImage] = useState(null);
+  const [imageModalVisibility, setImageModalVisibility] = useState(false)
   const [isLoading, setLoader] = useState(false);
   const [selectedComment, setSelectedComment] = useState(null);
   const [selectedCommentFor, setSelectedCommentFor] = useState("");
+  const [imageForZoom, setImageForZoom] = useState("")
   const [confirmation, setConfirmation] = useState({
     title: "",
     selectedItem: null,
@@ -52,6 +59,10 @@ const CommentModal = ({
     selectedItem: null,
   });
 
+  useEffect(() => {
+    setLoader(false)
+  }, [isVisible])
+
   const onAgreePress = () => {
     deleteCommentFromServer(confirmation?.selectedItem?._id);
     setConfirmation({
@@ -61,14 +72,17 @@ const CommentModal = ({
     })
   }
 
+
   const onSelectOption = (action) => {
     let item = options?.selectedItem
     setOptions({ isVisible: false, selectedItem: null })
     if (action?.type == "edit") {
       setSelectedComment(item);
+      if (item?.image?.thumbnail_1) {
+        setCommentImage(item?.image?.thumbnail_1)
+      }
       setSelectedCommentFor("edit")
       setCommentText(item?.message);
-      console.log(cmtTextInputRef, "cmtTextInputRef")
       setTimeout(() => {
         cmtTextInputRef?.current?.focus()
       }, 500);
@@ -176,11 +190,17 @@ const CommentModal = ({
     setLoader(true);
     let fd = new FormData();
     fd.append("message", commentText.trim());
-    let res = await EDIT_COMMENT({ token, navigation, commentId: selectedComment?._id, formData: fd })
+    if (!!commentImage && !!commentImage?.uri) {
+      fd.append("image", commentImage);
+    } else if (!!selectedComment?.image?.thumbnail_1 && !!commentImage == false) {
+      fd.append("is_image_deleted", true);
+    }
+    let res = await EDIT_COMMENT_V2({ token, navigation, commentId: selectedComment?._id, formData: fd })
     if (res.code == 200) {
       showToast({ title: res?.message, type: "success" });
       setLoader(false);
       setCommentText("");
+      setCommentImage(null)
       let editedComment = res?.action_response?.comment;
 
 
@@ -216,20 +236,28 @@ const CommentModal = ({
   const addComentToServer = async () => {
     setLoader(true);
 
-    let body;
-    body = { feed: feedId, message: commentText.trim() };
+    // let body;
+    // body = { feed: feedId, message: commentText.trim() };
 
+    // if (!!selectedComment) {
+    //   body = {
+    //     ...body,
+    //     parent_comment: selectedComment?._id
+    //   }
+    // }
+    // console.log(!!selectedComment, 'check')
+    // console.log(body, "body", selectedComment)
+    let formData = new FormData();
+    formData.append("feed", feedId);
+    formData.append("message", commentText.trim());
     if (!!selectedComment) {
-      body = {
-        ...body,
-        parent_comment: selectedComment?._id
-      }
+      formData.append("parent_comment", selectedComment?._id);
     }
-    console.log(!!selectedComment, 'check')
-    console.log(body, "body", selectedComment)
+    if (!!commentImage) {
+      formData.append("image", commentImage);
+    }
 
-
-    let res = await ADD_COMMENT({ token, navigation, body })
+    let res = await ADD_COMMENT_V2({ token, navigation, formData })
     if (res.code == 200) {
       showToast({ title: res?.message, type: "success" });
       setLoader(false);
@@ -248,6 +276,7 @@ const CommentModal = ({
       //   }))
       // }
       setCommentText("");
+      setCommentImage(null);
       setSelectedComment(null);
       setSelectedCommentFor("");
       // updateFeedItemsSpecificField?.(res?.action_response?.feed?._id, { comment_count: res?.action_response?.feed?.comment_count })
@@ -257,8 +286,8 @@ const CommentModal = ({
   }
 
   const sendBtnClick = () => {
-    if (commentText.trim() == "") {
-      showToast({ body: "Please enter comment", })
+    if (!!commentText.trim() == false && !!commentImage == false) {
+      showToast({ body: "Please enter comment or select image to send", })
       return
     }
 
@@ -298,7 +327,18 @@ const CommentModal = ({
 
             </View>
           </View>
-          <CollapsibleText style={{ marginTop: 5 }}>{item?.message}</CollapsibleText>
+          {!!item?.message &&
+            <CollapsibleText style={{ marginTop: 5 }}>{item?.message}</CollapsibleText>}
+
+          {!!item?.image?.thumbnail_1 &&
+            <Pressable
+              onPress={() => setImageForZoom(item?.image?.thumbnail_1)}
+              style={[__style.selectedCommentImageView, { marginLeft: 0, marginBottom: 5 }]}>
+              <MyImage
+                source={{ uri: S3_URL + item?.image?.thumbnail_1 }}
+                style={{ height: '100%', width: '100%' }}
+              />
+            </Pressable>}
 
           <View style={[__style.commentActionView, { marginTop: 5 }]}>
             <View style={[__style.commentActionView, { flex: 1 }]}>
@@ -311,6 +351,7 @@ const CommentModal = ({
                 <TouchableOpacity
                   onPress={() => {
                     setSelectedComment(item);
+                    setCommentImage(null)
                     setSelectedCommentFor("reply");
                     cmtTextInputRef?.current?.focus();
                   }}
@@ -321,7 +362,6 @@ const CommentModal = ({
             {item?.like_count > 0 &&
               <Pressable
                 onPress={() => {
-                  // console.log(likeModalRef?.current, "likeModalRef?.current")
                   likeModalRef?.current?.openLikeModal(item?._id)
                 }}
                 style={__style.commentActionView}>
@@ -396,10 +436,30 @@ const CommentModal = ({
               />
             </View>
             <View style={__style.shadow}>
-              <View>
+              <View style={__style.commentUpperView}>
+
+                {!!commentImage &&
+                  <View>
+                    <View style={__style.selectedCommentImageView}>
+
+                      <MyImage
+                        source={{
+                          uri: !!commentImage?.uri ? commentImage?.uri : S3_URL + commentImage
+                        }}
+                        style={{ width: "100%", height: "100%", }}
+                      />
+                    </View>
+                    <Pressable
+                      hitSlop={{ top: 5, bottom: 5, left: 5, right: 5 }}
+                      onPress={() => setCommentImage(null)}
+                      style={__style.removeImageBtnView}>
+                      {icons.crosss()}
+                    </Pressable>
+                  </View>}
+
                 {!!selectedComment &&
                   <View
-                    style={{ paddingHorizontal: 10, paddingTop: 8, marginBottom: -5 }}>
+                    style={__style.commentUpperViewOptions}>
                     <MyText
                       type='bold'
                       color={colors.lightText2}
@@ -416,6 +476,7 @@ const CommentModal = ({
                         onPress={() => {
                           setSelectedComment(null);
                           setCommentText("");
+                          setCommentImage(null)
                           setSelectedCommentFor("");
                           cmtTextInputRef?.current?.blur()
                         }}
@@ -424,11 +485,15 @@ const CommentModal = ({
                   </View>}
 
 
-
               </View>
               <View style={__style.inputRootView}>
 
                 <View style={__style.textInputView}>
+                  <TouchableOpacity
+                    onPress={() => setImageModalVisibility(true)}
+                    style={__style.addImageBtn}>
+                    {icons.addImage()}
+                  </TouchableOpacity>
                   <TextInput
                     ref={cmtTextInputRef}
                     style={__style.input}
@@ -458,6 +523,8 @@ const CommentModal = ({
                     icons.send(colors.white, 18)}
                 </TouchableOpacity>
               </View>
+
+
             </View>
             <MyLoader enable={loader} />
           </View>
@@ -483,6 +550,18 @@ const CommentModal = ({
           navigation={navigation}
           token={token}
           timezone={timezone}
+        />
+
+        <ImageUploadModal
+          closeModal={() => setImageModalVisibility(false)}
+          onImagePicked={(image) => setCommentImage(image)}
+          isVisible={imageModalVisibility}
+        />
+
+        <ImageZoomer
+          visible={!!imageForZoom}
+          closeModal={() => setImageForZoom("")}
+          url={imageForZoom}
         />
       </SafeAreaView>
       <SafeAreaView style={{ flex: 0, backgroundColor: colors.secondaryVariant }} />
@@ -523,6 +602,8 @@ const __style = StyleSheet.create({
   headingView: {
     flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 15, borderBottomWidth: 1 / 3, borderBottomColor: colors.lightText
   },
+  commentUpperView: { flexDirection: "row", alignItems: "flex-end" },
+  commentUpperViewOptions: { paddingHorizontal: 10, paddingTop: 8, marginBottom: -5 },
   commentView: {
     backgroundColor: colors.secondarySelect,
     paddingTop: 10,
@@ -533,6 +614,18 @@ const __style = StyleSheet.create({
     borderRadius: 5
 
   },
+
+  removeImageBtnView: {
+    width: 20, height: 20,
+    borderRadius: 25 / 2,
+    backgroundColor: colors.delete,
+    alignItems: "center",
+    justifyContent: "center",
+    position: "absolute",
+    right: -8, top: 2
+  },
+  selectedCommentImageView: { width: 90, height: 60, borderRadius: 12, marginLeft: 10, overflow: "hidden", marginTop: 10, marginBottom: -5 },
+
   profiletView: {
     flexDirection: "row",
     alignItems: "center"
@@ -570,14 +663,20 @@ const __style = StyleSheet.create({
     maxHeight: 80,
     padding: 5,
     flex: 1,
+    flexDirection: "row",
 
-
+  },
+  addImageBtn: {
+    justifyContent: "flex-start",
+    marginTop: 5,
+    paddingHorizontal: 5
   },
   input: {
     color: colors.white,
     fontFamily: fonts.regular,
     margin: 0,
     padding: 0,
+    flex: 1
   },
   btnView: {
     height: 35,

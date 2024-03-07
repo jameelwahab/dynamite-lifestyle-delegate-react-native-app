@@ -145,9 +145,31 @@ export const ADD_COMMENT = ({ token, navigation, body: { feed, message, parent_c
   })
 }
 
+export const ADD_COMMENT_V2 = ({ token, navigation, formData }) => {
+  return invokeApi({
+    path: `api/comment/delegate/add`,
+    method: "POST",
+    headers: { 'Content-Type': 'multipart/form-data' },
+    postData: formData,
+    token,
+    navigation,
+  })
+}
+
 export const EDIT_COMMENT = ({ token, navigation, formData, commentId }) => {
   return invokeApi({
     path: `api/comment/${commentId}`,
+    method: "PUT",
+    headers: { 'Content-Type': 'multipart/form-data' },
+    postData: formData,
+    token,
+    navigation,
+  })
+}
+
+export const EDIT_COMMENT_V2 = ({ token, navigation, formData, commentId }) => {
+  return invokeApi({
+    path: `api/comment/update/${commentId}`,
     method: "PUT",
     headers: { 'Content-Type': 'multipart/form-data' },
     postData: formData,

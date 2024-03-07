@@ -17,12 +17,12 @@ import utilities from '../../../utilities'
 import openUrl from '../../../functions/openUrl'
 import DropShadow from "react-native-drop-shadow";
 
-export const FeedView = ({ item, index, user, token, isInView, timezone, settings, openComments, showLikes, openOptions, onLikebtnPress, isCosmos, sourceLevelIcons, isScheduledFeed, openScheduleTimeModal, onFeedDetail })=> {
+export const FeedView = ({ item, index, user, token, isInView, timezone, settings, openComments, showLikes, openOptions, onLikebtnPress, isCosmos, sourceLevelIcons, isScheduledFeed, openScheduleTimeModal, onFeedDetail }) => {
   const [animationState, setAnimationState] = useState(0)
 
   useEffect(() => {
-    if(index == 1)
-    console.log("isInView", isInView)
+    if (index == 1)
+      console.log("isInView", isInView)
     if (isInView) {
       startAnimation()
     } else {
@@ -237,16 +237,19 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
 
 
   return (
-    <DropShadow style={[__style.rootView, { shadowColor: item?.is_reward_feed ? colors.primary : colors.darkSecondary, }]}>
-      {animationView()}
-      <View>
-        {profileView()}
-        {descriptionView()}
-        {item?.is_publish &&
-          <>
-            {statsView()}
-            {actionView()}
-          </>}
+    <DropShadow style={[__style.shadow, { shadowColor: item?.is_reward_feed ? colors.primary : colors.darkSecondary, }]}>
+      <View style={__style.rootView}>
+        {animationView()}
+
+        <View >
+          {profileView()}
+          {descriptionView()}
+          {item?.is_publish &&
+            <>
+              {statsView()}
+              {actionView()}
+            </>}
+        </View>
       </View>
     </DropShadow>
   )
@@ -266,17 +269,20 @@ export default React.memo(FeedView)
 
 
 const __style = StyleSheet.create({
-  rootView: {
-    marginTop: 15,
-    backgroundColor: colors.secondary,
-    padding: 10,
-    borderRadius: 10,
+  shadow: {
     shadowOffset: {
       width: 0,
       height: 0,
     },
     shadowOpacity: 1,
     shadowRadius: 7,
+  },
+  rootView: {
+    marginTop: 15,
+    backgroundColor: colors.secondary,
+    padding: 10,
+    borderRadius: 10,
+
     marginHorizontal: 10
   },
   animationView: {

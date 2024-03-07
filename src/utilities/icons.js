@@ -104,4 +104,5 @@ export const icons = {
   whatsapp: (color = colors.primary, size = 17) => { return (<MaterialCommunityIcons name="whatsapp" color={color} size={size} />) },
   failed: (color = colors.primary, size = 17) => { return (<MaterialCommunityIcons name="cancel" color={color} size={size} />) },
   bank: (color = colors.primary, size = 17) => { return (<MaterialCommunityIcons name="bank" color={color} size={size} />) },
+  addImage: (color = colors.primary, size = 17) => { return (<MaterialCommunityIcons name="image-plus" color={color} size={size} />) },
 }

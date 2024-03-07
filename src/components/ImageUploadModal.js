@@ -49,8 +49,8 @@ const ImageUploadModal = ({
 
         })
           .then(image => {
-            console.log(image, "image")
-            let resp = makeImageObject(image);
+
+            console.log(resp, "image")
             onImagePicked(multiple ? [resp] : resp);
             setTimeout(() =>
               closeModal(), 500)
@@ -82,7 +82,6 @@ const ImageUploadModal = ({
       maxFiles: 20
     })
       .then(image => {
-        console.log(image, "image")
         if (!multiple) {
           onImagePicked(makeImageObject(image));
         } else {
@@ -123,6 +122,7 @@ const ImageUploadModal = ({
       height: image.height,
       width: image.width,
     }
+    console.log("ImagePicked", obj);
     return obj
   }
   return (
