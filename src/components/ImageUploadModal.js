@@ -50,8 +50,8 @@ const ImageUploadModal = ({
         })
           .then(image => {
 
-            console.log(resp, "image")
-            onImagePicked(multiple ? [resp] : resp);
+            console.log(image, "image")
+            onImagePicked(multiple ? [image] : makeImageObject(image));
             setTimeout(() =>
               closeModal(), 500)
           })

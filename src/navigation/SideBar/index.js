@@ -1,6 +1,6 @@
 import { View, Text, Pressable, Image, StyleSheet, Platform, Dimensions, TextInput, Keyboard, SafeAreaView, ScrollView, StatusBar } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { DrawerContentScrollView } from '@react-navigation/drawer';
+import { DrawerContentScrollView, useDrawerStatus } from '@react-navigation/drawer';
 import MyText from '../../components/MyText';
 import { colors } from '../../utilities/colors';
 import { icons } from '../../utilities/icons';
@@ -31,6 +31,7 @@ let sub5 = null;
 const index = (props) => {
   const inset = useSafeAreaInsets();
   const { navigation, state } = props;
+  const isDrawerOpen = useDrawerStatus() == "open";
   const { navbar } = useSelector(selectNavbar);
   const { user } = useSelector(selectUser);
   const { settings } = useSelector(selectSettings);
@@ -38,7 +39,12 @@ const index = (props) => {
   const [isCollapsed, setCollapsed] = useState([]);
   const [searchText, setSearchText] = useState("")
 
-  console.log(user, "user")
+  useEffect(() => {
+    if (!isDrawerOpen) {
+      Keyboard.dismiss()
+      setSearchText("")
+    }
+  }, [isDrawerOpen])
 
   const pushNotificationhandlers = async () => {
     sub2 = null;

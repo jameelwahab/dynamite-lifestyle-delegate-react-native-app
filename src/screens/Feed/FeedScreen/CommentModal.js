@@ -459,7 +459,8 @@ const CommentModal = ({
               <View style={__style.commentUpperView}>
 
                 {!!commentImage &&
-                  <View>
+                  <Pressable
+                    onPress={() => setImageForZoom(!!commentImage?.uri ? commentImage?.uri : commentImage)}>
                     <View style={__style.selectedCommentImageView}>
 
                       <MyImage
@@ -475,7 +476,7 @@ const CommentModal = ({
                       style={__style.removeImageBtnView}>
                       {icons.crosss()}
                     </Pressable>
-                  </View>}
+                  </Pressable>}
 
                 {!!selectedComment &&
                   <View
@@ -522,7 +523,7 @@ const CommentModal = ({
                     multiline={true}
                     value={commentText}
                     onChangeText={(text) => setCommentText(text)}
-                    textAlignVertical="top"
+                    textAlignVertical="center"
                     placeholder='Write a comment...'
                     placeholderTextColor={colors.placeholder}
                     keyboardAppearance="dark"
@@ -582,6 +583,7 @@ const CommentModal = ({
           visible={!!imageForZoom}
           closeModal={() => setImageForZoom("")}
           url={imageForZoom}
+          noUrl={!!imageForZoom && imageForZoom?.includes("file")}
         />
       </SafeAreaView>
       <SafeAreaView style={{ flex: 0, backgroundColor: colors.secondaryVariant }} />
