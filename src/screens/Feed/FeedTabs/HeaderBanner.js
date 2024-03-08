@@ -35,9 +35,6 @@ const __styles = StyleSheet.create({
     borderRadius: 10,
     overflow: "hidden",
     marginTop: "auto",
-    
-
-
   },
   profileView: {
     height: 100,

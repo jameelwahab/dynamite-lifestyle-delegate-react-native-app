@@ -38,7 +38,8 @@ const CommentModal = ({
   navigation,
   feedId,
   setComments,
-  updateFeedItemsSpecificField
+  updateFeedItemsSpecificField,
+  socketEmittersForAction
 }) => {
   const cmtTextInputRef = useRef();
   const likeModalRef = useRef();
@@ -64,7 +65,7 @@ const CommentModal = ({
   }, [isVisible])
 
   const onAgreePress = () => {
-    deleteCommentFromServer(confirmation?.selectedItem?._id);
+    deleteCommentFromServer(confirmation?.selectedItem);
     setConfirmation({
       isVisible: false,
       selectedItem: null,
@@ -130,6 +131,7 @@ const CommentModal = ({
       }
     });
     if (res?.code == 200) {
+      socketEmittersForAction(res?.action_response)
       // if (!!commentForlike?.parent_comment) {
       //   setComments((obj) => {
       //     let parentIndex = obj.list.findIndex(cmt => cmt?._id == commentForlike?.parent_comment);
@@ -157,11 +159,15 @@ const CommentModal = ({
     }
   }
 
-  const deleteCommentFromServer = async (commentId) => {
-    console.log(commentId, "commentId")
+  const deleteCommentFromServer = async (comment) => {
+
     setLoader(true);
-    let res = await DELETE_COMMENT({ token, navigation, commentId: commentId })
+    let res = await DELETE_COMMENT({ token, navigation, commentId: comment?._id })
     if (res.code == 200) {
+      socketEmittersForAction(res?.action_response,
+        !!comment?.parent_comment ? "delete_comment_reply" : "delete_comment",
+        { comment: comment?._id }
+      )
       showToast({ title: res?.message, type: "success" });
       setLoader(false);
       setCommentText("");
@@ -197,6 +203,10 @@ const CommentModal = ({
     }
     let res = await EDIT_COMMENT_V2({ token, navigation, commentId: selectedComment?._id, formData: fd })
     if (res.code == 200) {
+      socketEmittersForAction(res?.action_response,
+        !!selectedComment?.parent_comment ? "edit_comment_reply" : "edit_comment",
+        { comment: selectedComment?._id }
+      )
       showToast({ title: res?.message, type: "success" });
       setLoader(false);
       setCommentText("");
@@ -247,11 +257,13 @@ const CommentModal = ({
     // }
     // console.log(!!selectedComment, 'check')
     // console.log(body, "body", selectedComment)
+    let action = "add_comment";
     let formData = new FormData();
     formData.append("feed", feedId);
     formData.append("message", commentText.trim());
     if (!!selectedComment) {
       formData.append("parent_comment", selectedComment?._id);
+      action = "add_comment_reply"
     }
     if (!!commentImage) {
       formData.append("image", commentImage);
@@ -259,6 +271,13 @@ const CommentModal = ({
 
     let res = await ADD_COMMENT_V2({ token, navigation, formData })
     if (res.code == 200) {
+      if (!!selectedComment) {
+        socketEmittersForAction(res?.action_response, action)
+      } else {
+        socketEmittersForAction(res?.action_response, action, {
+
+        })
+      }
       showToast({ title: res?.message, type: "success" });
       setLoader(false);
       // if (!!res?.action_response?.parent_comment) {
@@ -384,7 +403,8 @@ const CommentModal = ({
   const resetStates = () => {
     setCommentText("");
     setSelectedComment(null);
-    setSelectedCommentFor("")
+    setSelectedCommentFor("");
+    setCommentImage(null)
 
   }
 
@@ -603,7 +623,7 @@ const __style = StyleSheet.create({
     flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 15, borderBottomWidth: 1 / 3, borderBottomColor: colors.lightText
   },
   commentUpperView: { flexDirection: "row", alignItems: "flex-end" },
-  commentUpperViewOptions: { paddingHorizontal: 10, paddingTop: 8, marginBottom: -5 },
+  commentUpperViewOptions: { paddingHorizontal: 10, paddingTop: 8, marginBottom: -5, flex: 1 },
   commentView: {
     backgroundColor: colors.secondarySelect,
     paddingTop: 10,

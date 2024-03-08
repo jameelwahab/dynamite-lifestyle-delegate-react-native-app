@@ -238,9 +238,8 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
 
   return (
     <DropShadow style={[__style.shadow, { shadowColor: item?.is_reward_feed ? colors.primary : colors.darkSecondary, }]}>
-      <View style={__style.rootView}>
+      <View style={[__style.rootView, item?.is_reward_feed ? __style.rewardBorderView : null]}>
         {animationView()}
-
         <View >
           {profileView()}
           {descriptionView()}
@@ -277,13 +276,17 @@ const __style = StyleSheet.create({
     shadowOpacity: 1,
     shadowRadius: 7,
   },
+  rewardBorderView: {
+    borderWidth: 1,
+    borderColor: colors.primary
+  },
   rootView: {
     marginTop: 15,
     backgroundColor: colors.secondary,
     padding: 10,
     borderRadius: 10,
+    marginHorizontal: 10,
 
-    marginHorizontal: 10
   },
   animationView: {
     width: "100%",

@@ -255,6 +255,24 @@ const FeedScreen = ({ navigation, route }) => {
 
   // !  SOCKET AND its fcuntions /////////////////
 
+  const socketEmittersForAction = (resp, action = "", extra = {}) => {
+    let socketData = {
+      action: !!action ? action : resp?.action,
+      action_by: user?._id,
+      action_response: resp,
+      creator_id: resp?.creator_id,
+      feed_id: typeof (resp?.feed) == "object" ? resp?.feed?._id : resp?.feed,
+      token: token,
+      ...extra
+    }
+    console.log(isCosmos, "Emitted Socket data", socketData)
+    if (isCosmos) {
+      socket.emit("delegate_feed_room_action_event", socketData);
+    } else {
+      socket.emit("feed_room_action_event", socketData);
+    }
+  }
+
   const updateComments = (data) => {
     if (data?.feed_id == commentVar?.id) {
       if (data?.action == "add_comment") {
@@ -288,7 +306,16 @@ const FeedScreen = ({ navigation, route }) => {
           let nList = [...obj.list];
           let index = nList.findIndex(x => x._id == eeditedComment?._id);
           if (index > -1) {
-            nList.splice(index, 1, { ...nList[index], message: eeditedComment?.message });
+            let obj = {
+              ...nList[index],
+              message: eeditedComment?.message
+            }
+            if (!!eeditedComment?.image) {
+              obj["image"] = eeditedComment?.image
+            } else {
+              delete obj["image"]
+            }
+            nList.splice(index, 1, obj);
           }
           return {
             ...obj,
@@ -397,6 +424,14 @@ const FeedScreen = ({ navigation, route }) => {
           }
         })
       }
+    } else {
+      setFeed((list) => {
+        let index = list.findIndex(item => item._id == data?.action_response?.feed?._id);
+        if (index > -1) {
+          list[index] = { ...list[index], comment_count: data?.action_response?.feed?.comment_count };
+        }
+        return [...list]
+      })
     }
   }
 
@@ -413,6 +448,19 @@ const FeedScreen = ({ navigation, route }) => {
     if (data?.action.includes("comment")) {
       updateComments(data)
     }
+  }
+
+
+  const SocketEvents = () => {
+    if (socket?.connected) {
+      enableSocketEvents()
+    }
+    socket.on("connect", () => {
+      enableSocketEvents()
+    })
+    socket.on("disconnect", () => {
+      disableSocketEvents()
+    })
   }
 
   const enableSocketEvents = () => {
@@ -435,7 +483,7 @@ const FeedScreen = ({ navigation, route }) => {
   }, [feedLevel])
 
   useEffect(() => {
-    enableSocketEvents();
+    SocketEvents()
     api__getFeedExtraData();
     return () => {
       disableSocketEvents();
@@ -685,6 +733,7 @@ const FeedScreen = ({ navigation, route }) => {
     updateFeedItemsSpecificField(feedId, { is_liked: isLike ? false : true });
     let res = await FEED_LIKE_ACTIONS({ token, navigation, formdata: fd });
     if (res.code == 200) {
+      socketEmittersForAction(res?.action_response, "")
       // updateFeedItemsSpecificField(feedId, {
       //   is_liked: res?.action_response?.is_liked,
       //   top_liked_user: res?.action_response?.top_liked_user,
@@ -739,7 +788,7 @@ const FeedScreen = ({ navigation, route }) => {
 
   const headerView = () => {
     return (
-      <View style={{paddingHorizontal:10}}>
+      <View style={{ paddingHorizontal: 10 }}>
         {route?.params?.title &&
           <View style={{ marginTop: 5, marginLeft: 5 }}>
             <MyText fontSize={18} type='bold' color={colors.primary} >{route?.params?.title}</MyText></View>
@@ -797,12 +846,12 @@ const FeedScreen = ({ navigation, route }) => {
       onFeedDetail={onFeedDetail}
     />, [feed, inView]);
 
-    const viewConfigRef = React.useRef({ viewAreaCoveragePercentThreshold: 50 })
+  const viewConfigRef = React.useRef({ viewAreaCoveragePercentThreshold: 50 })
 
   return (
     <View style={{ flex: 1 }}>
 
-      <View style={{ flex: 1 ,marginHorizontal:-10}}>
+      <View style={{ flex: 1, marginHorizontal: -10 }}>
         <FlatList
           data={tab == 0 ? feed : []}
           onViewableItemsChanged={onViewableItemsChanged}
@@ -850,6 +899,7 @@ const FeedScreen = ({ navigation, route }) => {
         feedId={commentVar?.id}
         setComments={setComments}
         updateFeedItemsSpecificField={updateFeedItemsSpecificField}
+        socketEmittersForAction={socketEmittersForAction}
       />
 
 
