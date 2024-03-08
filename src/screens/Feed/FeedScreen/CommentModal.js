@@ -583,7 +583,7 @@ const CommentModal = ({
           visible={!!imageForZoom}
           closeModal={() => setImageForZoom("")}
           url={imageForZoom}
-          noUrl={!!imageForZoom && imageForZoom?.includes("file")}
+          noUrl={!!imageForZoom && (imageForZoom?.includes("file") || imageForZoom?.includes("react-native-image-crop-picker"))}
         />
       </SafeAreaView>
       <SafeAreaView style={{ flex: 0, backgroundColor: colors.secondaryVariant }} />
