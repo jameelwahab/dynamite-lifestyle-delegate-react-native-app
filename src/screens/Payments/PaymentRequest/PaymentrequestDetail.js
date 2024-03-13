@@ -20,6 +20,7 @@ import { MyButton } from '../../../components/MyButton'
 import { selectSettings } from '../../../redux/reducers/settingSlice'
 import showToast from '../../../functions/showToast'
 
+
 const PaymentrequestDetail = ({ navigation, route }) => {
   const { slug, backScreenFunc } = route?.params;
   const { token } = useSelector(selectUser);

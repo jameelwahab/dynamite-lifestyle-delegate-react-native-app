@@ -816,7 +816,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
                     <TouchableOpacity
                       onPress={() => setPostType("video")}
-                      style={__style.typeButtonView}>
+                      style={[__style.typeButtonView,]}>
                       {icons.video(postType == "video" ? colors.primary : colors.white, 17)}
                     </TouchableOpacity>
 
@@ -939,7 +939,6 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
         <View >
           <Pressable
             onPress={() => {
-              console.log(lvlModalRef, "lvlModalRef")
               lvlModalRef?.current?.openLvlModal()
             }}
             style={__style.lvlbtnView}>
@@ -952,37 +951,41 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
           <View style={__style.rootView}>
             <View style={__style.inputRootView}>
+
               <UserImage
                 image={user?.image?.thumbnail_1}
                 name={user?.first_name}
                 size={40}
               />
 
-              {/* <View style={{ flex: 1 }}> */}
               <TouchableOpacity
                 onPress={() => openModal("general")}
                 style={__style.inputView}>
-                <MyText adjustsFontSizeToFit={true} fontSize={13} >What's on your mind?</MyText>
+                <MyText adjustsFontSizeToFit={true} fontSize={13} >
+                  {`What's on your mind${!!user?.first_name ? ", " + user?.first_name : ""}?`}
+                </MyText>
               </TouchableOpacity>
+            </View>
+            <View style={[__style.inputRootView, { marginTop: 10 }]}>
               <View style={__style.buttonsRow} >
-                <TouchableOpacity
-                  onPress={() => openModal("video")}
-                  style={__style.buttonView}>
-                  {/*   <MyText style={__style.buttonText}>Upload Video</MyText> */}
-                  {icons.video(colors.white, 18)}
-                </TouchableOpacity>
 
                 <TouchableOpacity
                   onPress={() => openModal("image")}
                   style={__style.buttonView}>
-                  {/* <MyText style={__style.buttonText}>Upload Image</MyText> */}
                   {icons.camera(colors.white, 18)}
                 </TouchableOpacity>
 
                 <TouchableOpacity
+                  onPress={() => openModal("video")}
+                  style={[__style.buttonView, { marginHorizontal: 10 }]}>
+                  {icons.video(colors.white, 18)}
+                </TouchableOpacity>
+
+
+
+                <TouchableOpacity
                   onPress={() => openModal("embed_code")}
                   style={__style.buttonView}>
-                  {/* <MyText style={__style.buttonText}>Embeded Code</MyText> */}
                   {icons.code(colors.white, 18)}
                 </TouchableOpacity>
                 {/* </View> */}
@@ -1058,8 +1061,8 @@ const __style = StyleSheet.create({
 
   rootView: {
     backgroundColor: colors.secondary,
-    paddingVertical: 15,
-    paddingHorizontal:10,
+    paddingVertical: 10,
+    paddingHorizontal: 10,
     borderRadius: 10,
     marginTop: 10
   },
@@ -1095,18 +1098,12 @@ const __style = StyleSheet.create({
   buttonView: {
     borderWidth: 1 / 2,
     borderColor: colors.white + "11",
-    marginLeft: 10,
-    // flexDirection: "row",
     alignItems: "center",
     height: 40,
-    width: 40,
-    // flex:1,
+    // width: 40,
+    flex: 1,
     borderRadius: 40 / 2,
-    // borderWidth: 1,
-    // borderColor: colors.se,
     backgroundColor: colors.secondaryVariant,
-    // paddingHorizontal: 10,
-    // paddingVertical: 8,
     justifyContent: "center",
 
 
@@ -1202,7 +1199,7 @@ const __style = StyleSheet.create({
     width: 40,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: colors.border,
+    backgroundColor: colors.secondarySelect,
     borderRadius: 40 / 2,
     marginRight: 10
   },

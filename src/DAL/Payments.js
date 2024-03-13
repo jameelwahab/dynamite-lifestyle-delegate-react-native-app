@@ -144,10 +144,22 @@ export const CHANGE_ONETIME_PAYMNET_STATUS_TO_PAID =
     })
   }
 
-export const BANK_PAYMENT_LINK =
-  ({ token, navigation, transactionId }) => {
+
+
+export const GET_PAYEMENT_DETAIL =
+  ({ token, navigation, requestId }) => {
     return invokeApi({
-      path: `api/payment_request/get_bank_request_url/${transactionId}`,
+      path: `api/payment_request/payment_request_detail_for/bank_by_delegate/${requestId}`,
+      method: "GET",
+      token,
+      navigation
+    })
+  }
+
+export const BANK_PAYMENT_LINK =
+  ({ token, navigation, transactionId, currency = "" }) => {
+    return invokeApi({
+      path: `api/payment_request/get_bank_request_url/${transactionId}?payable_currency=${currency.toUpperCase()}`,
       method: "GET",
       token,
       navigation

@@ -54,6 +54,8 @@ const App = () => {
     setupPlayer();
     LogBox.ignoreLogs([
       `You seem to update the renderers prop(s) of the "RenderHTML" component in short periods of time`,
+      'Non-serializable values were found in the navigation state',
+      'The player has already been initialized via setupPlayer.'
     ]);
   }, []);
   return (

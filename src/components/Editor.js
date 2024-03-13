@@ -374,7 +374,7 @@ const Editor = ({
 
 
         <View style={{ flexDirection: "row", marginTop: 10 }}>
-          <ScrollView horizontal>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             {autoResonderMsgs.map((x, i) => (
               <TouchableOpacity
                 key={x._id}

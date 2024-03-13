@@ -1,9 +1,9 @@
 import { View, Text, FlatList, StyleSheet } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import RootView from '../../../components/RootView'
 import { useSelector } from 'react-redux'
 import { selectNavbar } from '../../../redux/reducers/navbarSlice'
-import { BANK_PAYMENT_LINK, DELETE_PAYMENT_REQUEST, GET_PAYMENT_REQUEST_LIST } from '../../../DAL'
+import { BANK_PAYMENT_LINK, DELETE_PAYMENT_REQUEST, GET_PAYEMENT_DETAIL, GET_PAYMENT_REQUEST_LIST } from '../../../DAL'
 import { selectUser } from '../../../redux/reducers/userSlice'
 import MyLoader from '../../../components/MyLoader'
 import FooterLoader from '../../../components/FooterLoader'
@@ -21,11 +21,13 @@ import showToast from '../../../functions/showToast'
 import ConfirmationModal from '../../../components/ConfirmationModal'
 import MyRefreshControl from '../../../components/MyRefreshControl'
 import copyText from '../../../functions/copyText'
+import BankOptionModal from './components/BankOptionModal'
 
 
 let page = 0;
 let canLoadMore = false;
 const PaymentRequest = ({ navigation, route }) => {
+  const bankOptionModalRef = useRef()
   const { key, parentKey } = route.params
   const { navbar } = useSelector(selectNavbar);
   const { token } = useSelector(selectUser);
@@ -177,17 +179,26 @@ const PaymentRequest = ({ navigation, route }) => {
     } else if (opt.key == "detail") {
       onTransactionalDetail(selectedItem?.payment_request_slug)
     } else if (opt.key == "bank") {
-      copyBankLinkFromServer(selectedItem?._id);
+      getRequestDeatilForBankPayment(selectedItem?._id)
+      // bankOptionModalRef?.current?.openModal(selectedItem)
+      // console.log(bankOptionModalRef,"bankOptionModalRef");
+      // copyBankLinkFromServer(selectedItem?._id);
     }
   }
 
-  const copyBankLinkFromServer = async (id) => {
+
+
+  const getRequestDeatilForBankPayment = async (id) => {
     setLoader(true);
-    let res = await BANK_PAYMENT_LINK({ navigation, token, transactionId: id });
+    let res = await GET_PAYEMENT_DETAIL({ navigation, token, requestId: id });
     setLoader(false);
     if (res.code == 200) {
-      copyText(res?.redirect_url);
-      showToast({ title: "Bank URL coppied to clipboard", type: "success" });
+
+      setTimeout(() => {
+        bankOptionModalRef?.current?.openModal(res)
+      }, 200);
+      // copyText(res?.redirect_url);
+      // showToast({ title: "Bank URL coppied to clipboard", type: "success" });
     }
   }
 
@@ -228,10 +239,10 @@ const PaymentRequest = ({ navigation, route }) => {
 
 
   return (
-    <RootView 
-    title={title} 
-    subTitle={`Showing ${list.length} of ${total}`}
-    hideBackBottomButton>
+    <RootView
+      title={title}
+      subTitle={`Showing ${list.length} of ${total}`}
+      hideBackBottomButton>
       <View style={{ flex: 1, }}>
         <FlatList
           data={list}
@@ -261,6 +272,11 @@ const PaymentRequest = ({ navigation, route }) => {
 
         onAgree={onConfirmationAgree}
         isVisible={confirmationModal?.isVisible} />
+
+      <BankOptionModal
+        ref={bankOptionModalRef}
+        token={token}
+        navigation={navigation} />
     </RootView>
   )
 }

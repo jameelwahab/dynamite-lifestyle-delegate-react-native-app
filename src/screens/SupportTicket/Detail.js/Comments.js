@@ -240,7 +240,7 @@ const Comments = ({ commentsList, ticket, user, autoMessages, addMessage, listRo
 
       <ImageZoomer
         closeModal={() => setModalImage("")}
-        visible={modalImage}
+        visible={!!modalImage}
         url={modalImage}
 
       />

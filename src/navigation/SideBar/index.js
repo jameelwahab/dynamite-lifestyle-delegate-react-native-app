@@ -172,7 +172,6 @@ const index = (props) => {
     Keyboard.dismiss()
     navigation.closeDrawer()
     setTimeout(() => {
-      console.log(navigation, state, "navigation")
       navigation.jumpTo(ParentComponents[screen.value].key)
     }, 200);
 
@@ -192,7 +191,6 @@ const index = (props) => {
     Keyboard.dismiss()
     navigation.closeDrawer()
     setTimeout(() => {
-      console.log(navigation, state, "navigation")
       navigation.jumpTo(ChildComponents[screen.value].key)
     }, 200);
 

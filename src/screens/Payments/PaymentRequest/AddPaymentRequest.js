@@ -235,6 +235,17 @@ const AddPaymentRequest = ({ navigation, route }) => {
     })
   }
 
+  const clearSelectedPaymentTemplate = () => {
+    setSelected({
+      template: null, title: "",
+      status: statusList[0],
+      currency: currencyList[1], product: null,
+      programme: null, requestType: null, totalAmount: "", vat: "", note: "",
+      initialAmount: "", installments: "", installmentAmount: "", planType: null,
+      noOfDays: ""
+    })
+  }
+
   useEffect(() => {
     setInstallemtAmount()
   }, [selected?.totalAmount, selected?.installmentAmount, selected?.installments])
@@ -329,97 +340,109 @@ const AddPaymentRequest = ({ navigation, route }) => {
               label='Payment Template'
               onPress={() => setOptionModal({ list: paymentTemplates, type: "template", isVisible: true, titlekey: "title" })}
               value={!!selected?.template ? selected?.template?.title : ""}
+              subTextView={() => !!selected?.template && (
+                <Pressable
+                  style={__styles.clearbtnView}
+                  onPress={clearSelectedPaymentTemplate}>
+                  <MyText color={colors.primary} >Clear</MyText>
+                </Pressable>
+              )}
             />
 
-            <MyInputs
-              label='Request Title*'
-              value={selected?.title}
-              onChangeText={(text) => setSelected({ title: text })}
-            />
 
-            <MyTouchableInput
-              label='Status'
-              onPress={() => setOptionModal({ list: statusList, type: "status", isVisible: true, titlekey: "title" })}
-              value={!!selected?.status ? selected?.status?.title : ""}
-            />
 
-            <MyTouchableInput
-              label='Currency*'
-              onPress={() => setOptionModal({ list: currencyList, type: "currency", isVisible: true, titlekey: "title" })}
-              value={!!selected?.currency ? selected?.currency?.title : ""}
-            />
-
-            <MyTouchableInput
-              label='Product'
-              onPress={() => setOptionModal({ list: products, type: "product", isVisible: true, titlekey: "name" })}
-              value={!!selected?.product ? selected?.product?.name : ""}
-            />
-
-            <MyTouchableInput
-              label='Programme'
-              onPress={() => setOptionModal({ list: progammes, type: "programme", isVisible: true, titlekey: "title" })}
-              value={!!selected?.programme ? selected?.programme?.title : ""}
-            />
-
-            <MyTouchableInput
-              label='Payment Request Type'
-              onPress={() => setOptionModal({ list: requestList, type: "requestType", isVisible: true, titlekey: "title" })}
-              value={!!selected?.requestType ? selected?.requestType?.title : ""} />
-
-            <MyInputs
-              label='Total Amount*'
-              value={String(selected?.totalAmount)}
-              onChangeText={(text) => setSelected({ totalAmount: text })}
-              keyboardType="numeric"
-            />
-
-            <Collapsible collapsed={selected?.requestType?.key != "recurring"}>
-
+            <View
+              opacity={!!selected?.template ? 0.6 : 1}
+              pointerEvents={!!selected?.template ? "none" : "auto"}>
               <MyInputs
-                label='Initial Amount*'
-                value={String(selected?.initialAmount)}
-                onChangeText={(text) => setSelected({ initialAmount: text })}
-                keyboardType="numeric"
-              />
-
-              <MyInputs
-
-                label='No. of Installments*'
-                value={String(selected?.installments)}
-                onChangeText={(text) => setSelected({ installments: text })}
-                keyboardType="numeric"
-              />
-
-              <MyInputs
-                editable={false}
-                label='Installments Amount*'
-                value={String(selected?.installmentAmount)}
-                // onChangeText={(text) => setSelected({ installmentAmount: text })}
-                keyboardType="numeric"
+                label='Request Title*'
+                value={selected?.title}
+                onChangeText={(text) => setSelected({ title: text })}
               />
 
               <MyTouchableInput
-                label='Plan Payment Type*'
-                onPress={() => setOptionModal({ list: planTypeList, type: "planType", isVisible: true, titlekey: "title" })}
-                value={!!selected?.planType ? selected?.planType?.title : ""} />
+                label='Status'
+                onPress={() => setOptionModal({ list: statusList, type: "status", isVisible: true, titlekey: "title" })}
+                value={!!selected?.status ? selected?.status?.title : ""}
+              />
 
+              <MyTouchableInput
+                label='Currency*'
+                onPress={() => setOptionModal({ list: currencyList, type: "currency", isVisible: true, titlekey: "title" })}
+                value={!!selected?.currency ? selected?.currency?.title : ""}
+              />
 
-              <Collapsible collapsed={selected?.requestType?.key != "recurring" || selected?.planType?.key != "custom"}>
+              <MyTouchableInput
+                label='Product'
+                onPress={() => setOptionModal({ list: products, type: "product", isVisible: true, titlekey: "name" })}
+                value={!!selected?.product ? selected?.product?.name : ""}
+              />
+
+              <MyTouchableInput
+                label='Programme'
+                onPress={() => setOptionModal({ list: progammes, type: "programme", isVisible: true, titlekey: "title" })}
+                value={!!selected?.programme ? selected?.programme?.title : ""}
+              />
+
+              <MyTouchableInput
+                label='Payment Request Type'
+                onPress={() => setOptionModal({ list: requestList, type: "requestType", isVisible: true, titlekey: "title" })}
+                value={!!selected?.requestType ? selected?.requestType?.title : ""} />
+
+              <MyInputs
+                label='Total Amount*'
+                value={String(selected?.totalAmount)}
+                onChangeText={(text) => setSelected({ totalAmount: text })}
+                keyboardType="numeric"
+              />
+
+              <Collapsible collapsed={selected?.requestType?.key != "recurring"}>
+
                 <MyInputs
-                  label='No. of Days*'
-                  value={String(selected?.noOfDays)}
-                  onChangeText={(text) => setSelected({ noOfDays: text })}
+                  label='Initial Amount*'
+                  value={String(selected?.initialAmount)}
+                  onChangeText={(text) => setSelected({ initialAmount: text })}
                   keyboardType="numeric"
                 />
+
+                <MyInputs
+
+                  label='No. of Installments*'
+                  value={String(selected?.installments)}
+                  onChangeText={(text) => setSelected({ installments: text })}
+                  keyboardType="numeric"
+                />
+
+                <MyInputs
+                  editable={false}
+                  label='Installments Amount*'
+                  value={String(selected?.installmentAmount)}
+                  // onChangeText={(text) => setSelected({ installmentAmount: text })}
+                  keyboardType="numeric"
+                />
+
+                <MyTouchableInput
+                  label='Plan Payment Type*'
+                  onPress={() => setOptionModal({ list: planTypeList, type: "planType", isVisible: true, titlekey: "title" })}
+                  value={!!selected?.planType ? selected?.planType?.title : ""} />
+
+
+                <Collapsible collapsed={selected?.requestType?.key != "recurring" || selected?.planType?.key != "custom"}>
+                  <MyInputs
+                    label='No. of Days*'
+                    value={String(selected?.noOfDays)}
+                    onChangeText={(text) => setSelected({ noOfDays: text })}
+                    keyboardType="numeric"
+                  />
+                </Collapsible>
               </Collapsible>
-            </Collapsible>
 
 
-            <MyInputs
-              label='VAT Number'
-              value={selected?.vat}
-              onChangeText={(text) => setSelected({ vat: text })} />
-
+              <MyInputs
+                label='VAT Number'
+                value={selected?.vat}
+                onChangeText={(text) => setSelected({ vat: text })} />
+            </View>
             <MyInputs
               label='Transaction Note' multiline
               value={selected?.note}
@@ -498,4 +521,5 @@ const __styles = StyleSheet.create({
   clearbtnView: {
     paddingBottom: 5, paddingLeft: 10, paddingRight: 5
   },
+
 })

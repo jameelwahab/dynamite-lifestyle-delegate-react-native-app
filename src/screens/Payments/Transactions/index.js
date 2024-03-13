@@ -26,7 +26,6 @@ import MyChip from '../../../components/MyChip'
 let page = 0;
 let canLoadMore = false;
 const Transactions = ({ navigation, route }) => {
-  console.log(route, "route")
   const { key, parentKey } = route?.params
   const { navbar } = useSelector(selectNavbar);
   const { token } = useSelector(selectUser);

@@ -38,7 +38,7 @@ const SubscriptionVIew = ({ list }) => {
 
   const renderItem = (item, index) => {
     return (
-      <View style={{ backgroundColor: colors.secondary, borderRadius: 10, marginTop: 10, padding: 10 }}>
+      <View key={item?._id} style={{ backgroundColor: colors.secondary, borderRadius: 10, marginTop: 10, padding: 10 }}>
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
           <MyText color={colors.primary} > {`${index + 1}.`}</MyText>
         </View>

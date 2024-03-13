@@ -21,7 +21,6 @@ import { convertTimezone } from '../../../functions/convertTime'
 import { selectTimeZone } from '../../../redux/reducers/timezoneSlice'
 import { dateTimeFormat } from '../../../utilities/constants'
 const List = ({ navigation, route }) => {
-  console.log(route, "route")
   const ticket = "";
   const { memberId } = route?.params;
   const timezone = useSelector(selectTimeZone)

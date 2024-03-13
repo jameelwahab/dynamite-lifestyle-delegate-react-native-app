@@ -876,7 +876,7 @@ const FeedScreen = ({ navigation, route }) => {
           ListFooterComponent={footerView}
         />
       </View>
-      {console.log(commentVar?.id, "commentVar?.id")}
+
       <CommentModal
         isVisible={comments?.modalVisibility}
         timezone={timezone}
