@@ -131,7 +131,7 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
         list.forEach((x, i) => {
           if (x._id == data.comment_id) {
             list.splice(i, 1);
-          } else {
+          } else if (!!x?.replies && Array.isArray(x?.replies)) {
             x.replies.forEach((y, j) => {
               if (y._id == data.comment_id) {
                 x.replies.splice(j, 1);
@@ -161,7 +161,7 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
 
     socket.on("make_message_featured_unfeatured_receiver", (data) => {
       console.log("On make_message_featured_unfeatured_receiver --->\n", data)
-      getLiveChatFromServer
+      getLiveChatFromServer()
     });
 
     socket.on("live_event_message_like_receiver", (data) => {
@@ -252,6 +252,8 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
       setTimeout(() => {
         openInputModal()
       }, 550);
+    } else if (opt.type == "pin" || opt.type == "unpin") {
+      pinUnpinComment(item)
     }
   }
 
@@ -268,6 +270,7 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
       deleteComment(item?._id);
     }, 300);
   }
+
   const getLiveChatFromServer = async () => {
     let res = await GET_PORTAL_CHAT_LIST({ token, navigation, videoId });
     if (res.code == 200) {
@@ -351,6 +354,17 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
     socket.emit("live_event_message_like", socketObj)
   }
 
+  const pinUnpinComment = (comment) => {
+    const event_id = eventId;
+
+    socket.emit("make_message_featured_unfeatured", {
+      comment_id: comment?._id,
+      event_id,
+      is_featured: !comment.is_featured,
+      action_by: "consultant"
+    });
+  }
+
   const sendMsg = async () => {
     if (text.trim() === '') {
       showToast({ body: "Please write something to comment.", title: "Alert" })
@@ -411,6 +425,22 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
     }, 300);
   }
 
+  const filterOptions = (list) => {
+
+    if (!!optionModal?.item?.parent_message) {
+      return list.slice().filter(x => x.type != "pin" && x.type != "unpin")
+
+    } else if (!!optionModal?.item && optionModal?.item?.is_featured) {
+      return list.slice().filter(x => x.type != "pin")
+
+    } else {
+      return list.slice().filter(x => x.type != "unpin")
+
+    }
+
+
+  }
+
   const InputModal = () => {
     return (
       <Modal
@@ -429,7 +459,7 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
           {inputView(true)}
 
         </SafeAreaView>
-          {inputModalVisibility && <Toast/>}
+        {inputModalVisibility && <Toast />}
       </Modal>)
   }
 
@@ -496,7 +526,7 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
             {forModal ?
               <TextInput
                 style={__style.sendMsgTextView}
-                placeholder={'Write a comment...*'}
+                placeholder={selectedCommentFor == "reply" ? 'Write a reply...*' : 'Write a comment...*'}
                 placeholderTextColor={colors.lightGrey}
                 multiline={true}
                 selectionColor={colors.selection}
@@ -506,6 +536,7 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
                 value={text}
                 onChangeText={(val) => setText(val)}
                 keyboardAppearance={"dark"}
+                textAlignVertical="center"
                 ref={inputRef}
               /> :
               <TouchableOpacity
@@ -514,7 +545,7 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
                 <TextInput
                   pointerEvents="none"
                   style={__style.sendMsgTextView}
-                  placeholder={'Write a comment...*'}
+                  placeholder={selectedCommentFor == "reply" ? 'Write a reply...*' : 'Write a comment...*'}
                   placeholderTextColor={colors.lightGrey}
                   multiline={true}
                   selectionColor={colors.selection}
@@ -524,6 +555,7 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
                   editable={false}
                   value={text}
                   keyboardAppearance={"dark"}
+                  textAlignVertical="center"
                 />
               </TouchableOpacity>
             }
@@ -596,7 +628,7 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
                   {item?.is_liked ? " Liked" : " Like"}
                 </MyText>
               </TouchableOpacity>
-              {!isChild &&
+              {!isChild && !item?.is_featured &&
                 <TouchableOpacity
                   onPress={() => {
                     setSelectedCommentFor("reply");
@@ -690,7 +722,7 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
             isVisible={optionModal?.isVisible}
             onSelected={onSelectedOption}
             closeModal={() => setOptionModal({ isVisible: false, item: null })}
-            optionList={OptionList}
+            optionList={filterOptions(OptionList)}
           />
 
           {InputModal()}
@@ -821,7 +853,7 @@ const __style = StyleSheet.create({
   sendMsgTextView: {
     flex: 1,
     fontFamily: fonts.regular,
-    paddingTop: Platform.OS == "ios" ? 12 : 0,
+    paddingTop: 12,
     color: colors.white
   },
   selectedImageView: {
@@ -860,5 +892,10 @@ const OptionList = [
     icon: icons.pin,
     title: "Pin",
     type: "pin"
+  },
+  {
+    icon: icons.pin,
+    title: "Unpin",
+    type: "unpin"
   },
 ]
