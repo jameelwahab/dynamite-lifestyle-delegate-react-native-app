@@ -263,7 +263,6 @@ const AddPaymentRequest = ({ navigation, route }) => {
     <RootView title={!!editItem ? "Edit Payment Request" : "Add Payment Request"}>
       <View style={{ flex: 1, }}>
         <KeyboardAwareScrollView
-          style={{ paddingHorizontal: 10, }}
           contentContainerStyle={{ paddingBottom: 40, paddingTop: 10, }}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}>
@@ -506,7 +505,7 @@ const __styles = StyleSheet.create({
     borderWidth: 0.5,
     borderColor: colors.border,
     paddingTop: 20,
-    paddingHorizontal: 15,
+    paddingHorizontal: 10,
     marginTop: 10,
     borderRadius: 10,
     backgroundColor: colors.secondary

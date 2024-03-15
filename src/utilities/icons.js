@@ -105,4 +105,5 @@ export const icons = {
   failed: (color = colors.primary, size = 17) => { return (<MaterialCommunityIcons name="cancel" color={color} size={size} />) },
   bank: (color = colors.primary, size = 17) => { return (<MaterialCommunityIcons name="bank" color={color} size={size} />) },
   addImage: (color = colors.primary, size = 17) => { return (<MaterialCommunityIcons name="image-plus" color={color} size={size} />) },
+  attachment: (color = colors.primary, size = 17) => { return (<Entypo name="attachment" color={color} size={size} />) },
 }

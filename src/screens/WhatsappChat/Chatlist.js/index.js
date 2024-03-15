@@ -48,7 +48,6 @@ const ChatList = ({ navigation }) => {
   const [searchText, setSearchText] = useState("");
   const [tab, setTab] = useState('all')
 
-  console.log(user, "user")
 
   const onChatScreen = (member, item) => {
     navigation.navigate(routes.whtasappChatMessageList, {

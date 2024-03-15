@@ -36,3 +36,4 @@ export {
   BANK_PAYMENT_LINK, GET_PAYEMENT_DETAIL
 } from './Payments'
 export { QUESTIONS_LIST } from './Questions'
+export { GET_PORTAL_LIST, GET_PORTAL_CHAT_LIST, GET_PORTAL_DETAIL, GET_PORTAL_CHAT_MESSAGE_LIKES } from "./Portals"

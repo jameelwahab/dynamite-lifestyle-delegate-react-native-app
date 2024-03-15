@@ -13,6 +13,7 @@ import StackWhatsApp from "../NestedStacks/StackWhatsApp";
 import StackTransactions from "../NestedStacks/StackTransactions";
 import StackCommissions from "../NestedStacks/StackCommissions";
 import StackPaymentsRequest from "../NestedStacks/StackPaymentsRequest";
+import StackPortals from "../NestedStacks/StackPortals";
 
 export const drawerMenuList = [
   {
@@ -238,6 +239,13 @@ export const ParentComponents = {
     component: null,
     params: {
       key: "payments"
+    }
+  },
+  portals: {
+    key: routes.portalNavigator,
+    component: StackPortals,
+    params: {
+      key: "my_portals"
     }
   },
 }

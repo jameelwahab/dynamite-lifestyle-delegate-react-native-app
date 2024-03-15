@@ -51,8 +51,8 @@ export class MyWebview extends Component {
     return (
       <RenderHTML
         WebView={WebView}
-        contentWidth={this.props.fullWidth ? Dimensions.get("window").width - 40 : Dimensions.get("window").width / 1.5}
-        source={{ html: "<div>" + html + "</div>" }}
+        contentWidth={this.props.fullWidth ? Dimensions.get("window").width - 40 : !!this.props.width ? this.props.width : Dimensions.get("window").width / 1.5}
+        source={{ html: "<div>" + html.replace(/padding/g,"") + "</div>" }}
         customHTMLElementModels={this.customHTMLElementModels}
         renderers={this.renderers}
         enableExperimentalMarginCollapsing={true}

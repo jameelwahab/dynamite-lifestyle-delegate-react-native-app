@@ -6,7 +6,7 @@ import MyText from './MyText'
 import { TransparentButton } from './MyButton'
 import { colors } from '../utilities/colors'
 
-const ConfirmationModal = ({isVisible,closeModal,title,onAgree}) => {
+const ConfirmationModal = ({ isVisible, closeModal, title, onAgree }) => {
   return (
     <Modal
       isVisible={isVisible}

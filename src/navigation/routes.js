@@ -17,6 +17,7 @@ const routes = {
   transactionNavigator: "TRANSACTION_NAVIGATOR",
   commissionNavigator: "COMMISSION_NAVIGATOR",
   paymentRquesNavigator: "PAYMENT_REQUEST_NAVIGATOR",
+  portalNavigator: "PORTAL_NAVIGATOR",
 
 
   //! ///    Screens'
@@ -96,8 +97,12 @@ const routes = {
   //? Payment Request
   paymentRequestScreen: "PAYMENT_REQUEST_SCREEN",
   addEditPaymenyRequestScreen: "ADD_EDIT_PAYMENT_REQUEST_SCREEN",
-  PaymenyRequestDetailScreen: "PAYMENT_REQUEST_DETAIL_SCREEN"
+  PaymenyRequestDetailScreen: "PAYMENT_REQUEST_DETAIL_SCREEN",
 
+
+  //? Portals
+  portalListScreen: "PAYMENT_LIST_SCREEN",
+  portalDetailScreen: "PAYMENT_DETAIL_SCREEN",
 
 }
 

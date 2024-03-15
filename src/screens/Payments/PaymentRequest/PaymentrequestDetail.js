@@ -30,6 +30,7 @@ const PaymentrequestDetail = ({ navigation, route }) => {
   const [isComplete, setIsComplete] = useState(false);
 
 
+
   const getPaymentRequestDeatil = async (isPayment) => {
     setLoader(true);
     let res = await GET_PAYMENT_REQUEST_DETAIL({ navigation, token, slug });
@@ -155,6 +156,8 @@ const PaymentrequestDetail = ({ navigation, route }) => {
             }}
           />
         </View>
+
+
         {isComplete &&
           <View style={{ alignSelf: "flex-end", marginTop: 10 }}>
             <MyButton onPress={onPayPress} style={{ paddingHorizontal: 20, height: 35 }} invert title='Pay' />
