@@ -34,7 +34,7 @@ import openUrl from '../../../functions/openUrl'
 import { isUrl } from '../../../functions/regex'
 
 
-const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, selectFeedlevel, feedLevel, tab, isCosmos, isScheduledFeed, timezone, removeFromList, isSuperDelegate }, ref) => {
+const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, selectFeedlevel, feedLevel, tab, isCosmos, isScheduledFeed, timezone, removeFromList, isSuperDelegate, hideLevelView, isEventFeed, eventId }, ref) => {
   const lvlModalRef = useRef()
   const tablRef = useRef()
   const [loader, setLoader] = useState(false);
@@ -284,8 +284,13 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     }
     if (!(!!editId)) {
       fd.append("is_publish", isScheduledFeed ? "false" : "true");
-      fd.append("feed_created_for", isCosmos ? "delegate" : "general");
+      fd.append("feed_created_for", isEventFeed ? "event" : isCosmos ? "delegate" : "general");
+      if (isEventFeed) {
+        fd.append("event_id", eventId);
+      }
     }
+
+
 
     if (!!editId) {
       editTheFeedPostAPI(fd);
@@ -429,7 +434,9 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
             {!isCosmos &&
               <View style={{ paddingHorizontal: 20, flex: 1 }}>
                 <KeyboardAwareScrollView
-                  showsVerticalScrollIndicator={false} contentContainerStyle={{ marginTop: 10, paddingBottom: 30 }}>
+                  enableResetScrollToCoords={false}
+                  showsVerticalScrollIndicator={false}
+                  contentContainerStyle={{ marginTop: 10, paddingBottom: 30 }}>
                   <Editor
                     label='Event Title*'
                     initialValue={title}
@@ -937,17 +944,18 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     <View>
       {tab == 0 &&
         <View >
-          <Pressable
-            onPress={() => {
-              lvlModalRef?.current?.openLvlModal()
-            }}
-            style={__style.lvlbtnView}>
-            <View style={__style.levlBtnLabel}>
-              <MyText color={colors.lightText2} fontSize={12} >Select Level</MyText>
-            </View>
-            <MyText type={"medium"} style={{ textTransform: feedLevel == "pta" ? "uppercase" : "capitalize" }} >{feedLevel}</MyText>
-            {icons.down(colors.lightText2)}
-          </Pressable>
+          {!hideLevelView &&
+            <Pressable
+              onPress={() => {
+                lvlModalRef?.current?.openLvlModal()
+              }}
+              style={__style.lvlbtnView}>
+              <View style={__style.levlBtnLabel}>
+                <MyText color={colors.lightText2} fontSize={12} >Select Level</MyText>
+              </View>
+              <MyText type={"medium"} style={{ textTransform: feedLevel == "pta" ? "uppercase" : "capitalize" }} >{feedLevel}</MyText>
+              {icons.down(colors.lightText2)}
+            </Pressable>}
 
           <View style={__style.rootView}>
             <View style={__style.inputRootView}>

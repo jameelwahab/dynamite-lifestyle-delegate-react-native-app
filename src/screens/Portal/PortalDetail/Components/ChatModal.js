@@ -1,10 +1,10 @@
 import { View, Text, StyleSheet, SafeAreaView, Pressable, FlatList, TouchableOpacity, TextInput, Platform } from 'react-native'
-import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
+import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import Modal from 'react-native-modal';
 import MyText from '../../../../components/MyText';
 import { colors } from '../../../../utilities/colors';
 import { icons } from '../../../../utilities/icons';
-import { GET_PORTAL_CHAT_LIST, UPLOAD_FILE_FOR_CHAT } from '../../../../DAL';
+import { GET_PORTAL_CHAT_LIST, GET_PORTAL_EXISTING_CHAT_BY_VIDEO_ID, UPLOAD_FILE_FOR_CHAT } from '../../../../DAL';
 import MyLoader, { SimpleLoader } from '../../../../components/MyLoader';
 import { load } from 'react-native-track-player/lib/trackPlayer';
 import CollapsibleText from '../../../../components/CollapsibleText';
@@ -25,11 +25,18 @@ import LikeModal from './LikeModal';
 import showToast from '../../../../functions/showToast';
 import ConfirmationModal from '../../../../components/ConfirmationModal';
 import Toast from 'react-native-toast-message';
+import EmptyView from '../../../../components/EmptyView';
+
+
+let page = 0;
+let canLoadMore = false;
 
 const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone, purchaseLink, linkImage, eventId, user }) => {
   const { socket } = useSelector(selectSocket);
   const likeModalRef = useRef();
+  const chatListRef = useRef();
   const inputRef = useRef();
+  const isLive = !!eventId == true;
   const [list, setList] = useState([]);
   const [pinList, setPinList] = useState([]);
   const [loader, setLoader] = useState(false);
@@ -49,7 +56,9 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
     title: ""
   })
   const [selectedMsg, setSelectedMsg] = useState(null)
-  const [selectedCommentFor, setSelectedCommentFor] = useState("")
+  const [selectedCommentFor, setSelectedCommentFor] = useState("");
+  const [showScroller, setShowScroller] = useState(false);
+  const [footerLoader, setFooterLoader] = useState(false);
 
   useEffect(() => {
     return () => {
@@ -57,7 +66,6 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
     }
   }, [])
   const socketEvents = () => {
-
 
 
 
@@ -272,12 +280,40 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
   }
 
   const getLiveChatFromServer = async () => {
+
     let res = await GET_PORTAL_CHAT_LIST({ token, navigation, videoId });
     if (res.code == 200) {
       setList(res?.dynamite_event_category_video_chat.reverse());
       setPinList(res?.dynamite_event_category_video_featured_chat);
     }
     setLoader(false);
+  }
+
+  const getOldChatFromServer = async () => {
+    let res = await GET_PORTAL_EXISTING_CHAT_BY_VIDEO_ID({ token, navigation, videoId, page: 0 });
+    if (res.code == 200) {
+      setList(page == 0 ? res?.dynamite_event_category_video_chat : [...list, ...res?.dynamite_event_category_video_chat]);
+      setPinList(res?.dynamite_event_category_video_featured_chat);
+      if (res.total_pages > page) {
+        canLoadMore = true;
+        page = page + 1;
+      } else {
+        canLoadMore = false;
+      }
+
+
+
+    }
+    setFooterLoader(false);
+    setLoader(false);
+  }
+
+  const loadMore = () => {
+    if (!isLive && canLoadMore) {
+      canLoadMore = false;
+      setFooterLoader(true);
+      getOldChatFromServer();
+    }
   }
 
   const enableEocketEvents = () => {
@@ -294,8 +330,12 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
 
   const onModalShow = () => {
     setLoader(true);
-    getLiveChatFromServer()
-    enableEocketEvents()
+    if (isLive) {
+      getLiveChatFromServer()
+      enableEocketEvents()
+    } else {
+      getOldChatFromServer()
+    }
   }
 
   const onModalHide = () => {
@@ -307,7 +347,7 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
     setSelectedMsg(null);
     setImage("")
     offSocketEvents()
-
+    setShowScroller(false)
   }
 
   const uploadImage = async () => {
@@ -440,6 +480,16 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
 
 
   }
+
+
+
+  const onViewableItemsChanged = useCallback(({ viewableItems }) => {
+    if (viewableItems.find(x => x.index == 0)) {
+      setShowScroller(false)
+    } else {
+      setShowScroller(true)
+    }
+  }, [])
 
   const InputModal = () => {
     return (
@@ -585,7 +635,8 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
 
   const commentView = (item, index, isChild, pinned = false) => {
     return (
-      <View key={item?._id}>
+      <View
+        key={item?._id}>
         <View style={[__style.commentView, { marginLeft: isChild ? "10%" : undefined }]}>
           <View style={__style.profileView}>
             <UserImage
@@ -602,10 +653,20 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
               </View>
               <MyText fontSize={10} color={colors.lightGrey} type='medium' >{convertTimezone(item?.createdAt, timezone).format(dateTimeFormat.dateTime)}</MyText>
             </View>
-            <MenuButton
-              size={20}
-              onPress={() => setOptionModal({ isVisible: true, item: item })}
-            />
+            {isLive ?
+              <MenuButton
+                size={20}
+                onPress={() => setOptionModal({ isVisible: true, item: item })}
+              /> :
+              item?.like_count > 0 ?
+                <TouchableOpacity
+                  onPress={() => likeModalRef?.current?.openLikeModal?.(item?._id, "event")}
+                  style={[__style.actionsBtn]}>
+                  {icons.heartFilled(colors.heart, 18)}
+                  <MyText> {item?.like_count}</MyText>
+                </TouchableOpacity> :
+                null
+            }
           </View>
           <CollapsibleText>{item?.message}</CollapsibleText>
           {!!item.file_url &&
@@ -618,7 +679,8 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
               />
             </Pressable>}
 
-          <View style={[__style.actionsRow, { marginTop: 10 }]}>
+          {isLive && <View style={[__style.actionsRow, { marginTop: 10 }]}>
+
             <View style={[__style.actionsRow, { flex: 1 }]}>
               <TouchableOpacity
                 onPress={() => likeChatComment(item, isChild)}
@@ -647,10 +709,10 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
                 {icons.heartFilled(colors.heart, 18)}
                 <MyText> {item?.like_count}</MyText>
               </TouchableOpacity>}
-          </View>
+          </View>}
         </View>
         {item?.replies && item?.replies.map((item2, index2) => commentView(item2, index2, true))}
-      </View >
+      </View>
     )
   }
   return (
@@ -672,7 +734,9 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
       <SafeAreaView style={__style.root}>
         <View style={__style.innerRoot}>
           <View style={__style.header}>
-            <MyText fontSize={20} type='bold' >Live Chat</MyText>
+            <MyText fontSize={20} type='bold' >
+              {isLive ? "Live Chat" : "Chat"}
+            </MyText>
             <Pressable
               onPress={closeModal}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
@@ -692,21 +756,43 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
                   data={pinList}
                   showsVerticalScrollIndicator={false}
                   renderItem={({ item, index }) => commentView(item, index, false, true)}
+
                 />
                 <View style={{ height: 1, backgroundColor: colors.golden, }} />
               </View>
 
             }
+
             <View style={{ flex: 1 }}>
               <FlatList
                 contentContainerStyle={{ paddingVertical: 10 }}
                 data={list}
                 renderItem={({ item, index }) => commentView(item, index, false)}
-                inverted={true}
+                inverted={isLive ? true : false}
+                ref={chatListRef}
+                onViewableItemsChanged={onViewableItemsChanged}
+                onEndReached={loadMore}
+                ListEmptyComponent={!loader && !isLive && <EmptyView />}
+                ListFooterComponent={<View style={{ height: 50 }}>
+                  {footerLoader && <SimpleLoader />}
+                </View>}
+
+
               />
+              {showScroller && isLive &&
+                <Pressable onPress={() => {
+                  chatListRef?.current?.scrollToIndex({
+                    animated: true,
+                    index: 0
+                  })
+                }}
+                  style={__style.scrollToBottomView}>
+                  <MyText color={colors.black} >Scroll to Bottom </MyText>
+                  {icons.downArrow(colors.black, 18)}
+                </Pressable>}
             </View>
 
-            {inputView(false)}
+            {isLive ? inputView(false) : undefined}
 
           </View>
 
@@ -875,6 +961,18 @@ const __style = StyleSheet.create({
     right: -8
   },
   commentUpperViewOptions: { paddingHorizontal: 10, flex: 1, paddingBottom: 10, },
+  scrollToBottomView: {
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    backgroundColor: colors.primary,
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row",
+    alignSelf: "center",
+    borderRadius: 20,
+    position: "absolute",
+    bottom: 10
+  }
 })
 
 const OptionList = [

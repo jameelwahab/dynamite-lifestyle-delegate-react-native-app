@@ -22,7 +22,6 @@ const Tabs = ({ list, changeTab, tab }) => {
             return (
               <TouchableOpacity
                 onPress={() => {
-                  console.log(menuRef, "menuRef")
                   menuRef?.current?.scrollToIndex({
                     index: index,
                     animated: true

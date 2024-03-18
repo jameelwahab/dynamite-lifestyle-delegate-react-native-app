@@ -101,9 +101,10 @@ const routes = {
 
 
   //? Portals
-  portalListScreen: "PAYMENT_LIST_SCREEN",
-  portalDetailScreen: "PAYMENT_DETAIL_SCREEN",
-
+  portalListScreen: "PORTAL_LIST_SCREEN",
+  portalDetailScreen: "PORTAL_DETAIL_SCREEN",
+  portalEventVidoScreen: "PORTAL_EVENT_VIDEO_SCREEN",
+  portalChatList: "PORTAL_CHAT_LIST"
 }
 
 export default routes;

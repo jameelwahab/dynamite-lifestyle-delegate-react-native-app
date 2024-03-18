@@ -38,7 +38,8 @@ const EventListing = ({ navigation, route }) => {
 
   const onPortalDetailScreen = (item) => {
     navigation.navigate(routes?.portalDetailScreen, {
-      eventId: item?._id
+      eventId: item?._id,
+      feedFor:"event"
     })
   }
 

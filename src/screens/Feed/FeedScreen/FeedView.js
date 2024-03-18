@@ -17,12 +17,11 @@ import utilities from '../../../utilities'
 import openUrl from '../../../functions/openUrl'
 import DropShadow from "react-native-drop-shadow";
 
-export const FeedView = ({ item, index, user, token, isInView, timezone, settings, openComments, showLikes, openOptions, onLikebtnPress, isCosmos, sourceLevelIcons, isScheduledFeed, openScheduleTimeModal, onFeedDetail }) => {
+export const FeedView = ({ item, index, user, token, isInView, timezone, settings, openComments, showLikes, openOptions, onLikebtnPress, isCosmos, sourceLevelIcons, isScheduledFeed, openScheduleTimeModal, onFeedDetail,isEventFeed }) => {
   const [animationState, setAnimationState] = useState(0)
 
   useEffect(() => {
     if (index == 1)
-      console.log("isInView", isInView)
     if (isInView) {
       startAnimation()
     } else {
@@ -33,7 +32,6 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
   const startAnimation = () => {
     setAnimationState(1)
     setTimeout(() => {
-      console.log("EndAnimation")
       setAnimationState(0)
     }, 5000);
   }
@@ -57,8 +55,7 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
 
   const profileView = () => (
     <View style={__style.profileView}>
-      <Pressable
-        // onPress={() => onFeedDetail(item?._id)}
+      <View
         style={[__style.profileView, { flex: 1 }]} >
         <UserImage
           image={item?.action_info?.profile_image}
@@ -73,7 +70,7 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
             <MyText type="light" color={colors.lightText2} fontSize={10}>{convertTimezone(item?.createdAt, timezone).format("DD MMM YYYY [at] hh:mm A")}</MyText>
           </View>
         </View>
-      </Pressable>
+      </View>
       {!item?.is_publish &&
         <TouchableOpacity
           onPress={() => openScheduleTimeModal(item?.schedule_date_time)}
@@ -82,6 +79,7 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
             style={{ tintColor: colors.primary, height: 25, width: 25 }}
           />
         </TouchableOpacity>}
+        {!(!!isEventFeed) &&
       <View >
         <MyImage
           indicatorProps={{ color: colors.secondaryVariant }}
@@ -96,7 +94,7 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
           }}
           style={__style.feedTypeIcon}
         />
-      </View>
+      </View>}
       {(((isCosmos || isScheduledFeed) && user?._id == item?.action_info?.action_id) ||
         (!isCosmos && !isScheduledFeed)) &&
         <TouchableOpacity

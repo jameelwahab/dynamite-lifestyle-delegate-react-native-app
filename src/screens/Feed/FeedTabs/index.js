@@ -1,5 +1,5 @@
 import { View, Text, useWindowDimensions, ScrollView, FlatList, TouchableOpacity } from 'react-native'
-import React, { createRef, forwardRef, useImperativeHandle, useRef, useState } from 'react'
+import React, { createRef, forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { TabBar, TabView } from 'react-native-tab-view'
 import MyText from '../../../components/MyText';
 import { colors } from '../../../utilities/colors';
@@ -8,10 +8,20 @@ import { selectSettings } from '../../../redux/reducers/settingSlice';
 import HeaderBanner from './HeaderBanner';
 import { selectUser } from '../../../redux/reducers/userSlice';
 
-const FeedTabs = ({ isCosmos, changeTab, tab }) => {
-  const menuRef = useRef()
+const FeedTabs = ({ isCosmos, changeTab, tab, CustomTabs }) => {
+  const menuRef = useRef();
   const { settings } = useSelector(selectSettings);
   const { user } = useSelector(selectUser);
+
+  useEffect(() => {
+    setTimeout(() => {
+      menuRef?.current?.scrollToIndex({
+        index: tab,
+        animated: true
+      })
+    }, 200);
+
+  }, [tab])
 
 
   return (
@@ -21,22 +31,22 @@ const FeedTabs = ({ isCosmos, changeTab, tab }) => {
       <View style={{ height: 50, marginTop: 10 }}>
         <FlatList
           contentContainerStyle={{ paddingHorizontal: 10 }}
-          data={isCosmos ? tabsForCosmos : tabsForSource}
+          data={!!CustomTabs ? tabsForEvents.concat(CustomTabs) : isCosmos ? tabsForCosmos : tabsForSource}
           horizontal
           showsHorizontalScrollIndicator={false}
           ref={menuRef}
+
           renderItem={({ item, index }) => {
             return (
               <TouchableOpacity
                 onPress={() => {
-                  console.log(menuRef, "menuRef")
-                  menuRef?.current?.scrollToIndex({
-                    index: index,
-                    animated: true
-                  })
-                  setTimeout(() => {
-                    changeTab(index)
-                  }, 100);
+                  // menuRef?.current?.scrollToIndex({
+                  //   index: index,
+                  //   animated: true
+                  // })
+                  // setTimeout(() => {
+                  changeTab(index)
+                  // }, 100);
                 }}
                 style={{ justifyContent: "center", paddingHorizontal: 10 }}>
                 <MyText fontSize={15} type={index == tab ? 'medium' : 'regular'} color={index == tab ? colors.primary2 : colors.lightText} >
@@ -65,4 +75,9 @@ const tabsForSource = [
   { title: 'FEEDS', key: 'feed', index: 0 },
   { title: 'NOTICE BOARD & EVENTS', key: 'events', index: 1 },
   { title: 'PAGES', key: 'page', index: 2 },
+];
+
+const tabsForEvents = [
+  { title: 'FEEDS', key: 'feed', index: 0 },
+  { title: 'EVENTS', key: 'events', index: 1 },
 ];

@@ -36,3 +36,22 @@ export const GET_PORTAL_CHAT_MESSAGE_LIKES = ({ token, navigation, id, page }) =
     navigation,
   })
 }
+
+
+export const GET_PORTAL_EXISTING_CHAT_BY_VIDEO_ID = ({ token, navigation, videoId, page }) => {
+  return invokeApi({
+    path: `api/dynamite_event_category_video_chat/existing_chat/list/${videoId}?page=${page}&limit=20`,
+    method: "GET",
+    token,
+    navigation,
+  })
+}
+
+export const GET_PORTAL_USER_LIST = ({ token, navigation, slug, searchText, status }) => {
+  return invokeApi({
+    path: `api/chat/list_of_member_for_chat_against_event/v1/${slug}?page=0&search_text=${searchText}&type=${status}`,
+    method: "GET",
+    token,
+    navigation,
+  })
+}

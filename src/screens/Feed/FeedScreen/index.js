@@ -46,13 +46,14 @@ let likeVar = {
   id: "",
   actionType: ""
 }
-const FeedScreen = ({ navigation, route }) => {
+const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, upcomingEvents, currentEvents }) => {
   const addPostRef = useRef()
   const scheduleModalRef = useRef();
-  const { feedFor, feedId } = route?.params;
+  const { feedFor, feedId, eventId = "" } = route?.params;
   const isCosmos = feedFor == "the_cosmos";
   const isScheduledFeed = feedFor == "scheduled";
   const isAllSourceFeed = feedFor == "all_source";
+  const isEventFeed = feedFor == "event";
   const { token, user } = useSelector(selectUser);
   const { socket } = useSelector(selectSocket);
   const timezone = useSelector(selectTimeZone);
@@ -61,13 +62,14 @@ const FeedScreen = ({ navigation, route }) => {
   const [feedData, setFeedData] = useState(null);
   const [loader, setLoader] = useState(true);
   const [feedLevel, setFeedLevel] = useState(
-    isCosmos ? user?.team_type == "both" ? 'all' : user?.team_type :
-      isAllSourceFeed ? "all" : "dynamite"
+    isEventFeed ? "all" :
+      isCosmos ? user?.team_type == "both" ? 'all' : user?.team_type :
+        isAllSourceFeed ? "all" : "dynamite"
   );
   const [feedFooterLoader, setFeedFooterLoader] = useState(false);
   const [likesFooterLoader, setLikesFooterLoader] = useState(false);
   const [commentsFooterLoader, setCommentsFooterLoader] = useState(false);
-  const [feedOptionModal, setFeedOptionModal] = useState({ isVisible: false, selectedItem: null })
+  const [feedOptionModal, setFeedOptionModal] = useState({ isVisible: false, selectedItem: null, })
   const [confirmation, setConfirmation] = useState({ isVisible: false, item: null, title: "", type: "" });
   const [tab, setTab] = useState(0);
   const [inView, setInView] = useState("")
@@ -188,7 +190,7 @@ const FeedScreen = ({ navigation, route }) => {
   }
 
   const getFeedList = async () => {
-    let res = await GET_FEED_LIST({ navigation, token, type: feedFor, level: feedLevel, page: feedVar.page });
+    let res = await GET_FEED_LIST({ navigation, token, type: feedFor, level: feedLevel, page: feedVar.page, eventId: eventId });
     if (res.code == 200) {
       if (res?.total_pages > (1 + feedVar.page)) {
         feedVar = {
@@ -707,14 +709,19 @@ const FeedScreen = ({ navigation, route }) => {
 
   const filterTheOptions = (options) => {
     let newList = [...options];
-    if (feedOptionModal?.selectedItem?.is_feature)
-      newList = newList.slice().filter(x => x.type != "pin");
-    else if (!feedOptionModal?.selectedItem?.is_feature)
-      newList = newList.slice().filter(x => x.type != "unpin");
-    else
-      newList = options;
 
-    if (!isCosmos || !isScheduledFeed) {
+    if ((isEventFeed && feedOptionModal?.selectedItem?.action_info?.action_id == user?._id) || !isEventFeed) {
+      if (feedOptionModal?.selectedItem?.is_feature)
+        newList = newList.slice().filter(x => x.type != "pin" && x.type != "notes");
+      else if (!feedOptionModal?.selectedItem?.is_feature)
+        newList = newList.slice().filter(x => x.type != "unpin" && x.type != "notes");
+      else
+        newList = newList.slice().filter(x => x.type != "notes");
+    } else if (isEventFeed) {
+      newList = newList.slice().filter(x => x.type == "notes");
+    }
+
+    if (!isCosmos || !isScheduledFeed || !isEventFeed) {
       newList = newList.slice().filter(x => {
         if (x.type == "message" && user?._id == feedOptionModal?.selectedItem?.action_info?.action_id) {
           return false
@@ -754,14 +761,20 @@ const FeedScreen = ({ navigation, route }) => {
         </View>
       )
     }
+
     else if (tab == 1) {
       return (
         <FeedEvents
-          upcomingEvents={feedData?.upcoming_events_array}
-          currentEvent={feedData?.current_events_array}
+          upcomingEvents={isEventFeed ? upcomingEvents : feedData?.upcoming_events_array}
+          currentEvent={isEventFeed ? currentEvents : feedData?.current_events_array}
+          isEventFeed={isEventFeed}
           noticeboard={feedData?.notice_board}
         />)
-    } else if (tab == 2) {
+    }
+    else if (isEventFeed) {
+      return showTabView(tab)
+    }
+    else if (tab == 2) {
       return (
         <Leaderboard
           monthlyCounts={feedData?.consultant_list_by_monthly_count}
@@ -789,14 +802,18 @@ const FeedScreen = ({ navigation, route }) => {
   const headerView = () => {
     return (
       <View style={{ paddingHorizontal: 10 }}>
+
         {route?.params?.title &&
           <View style={{ marginTop: 5, marginLeft: 5 }}>
             <MyText fontSize={18} type='bold' color={colors.primary} >{route?.params?.title}</MyText></View>
         }
+        {!!CustomHeader && CustomHeader()}
         <FeedTabs
+          CustomTabs={CustomTabs}
           isCosmos={isCosmos}
           tab={tab}
           changeTab={changeTab} />
+
         <AddPost
           ref={addPostRef}
           tab={tab}
@@ -818,9 +835,12 @@ const FeedScreen = ({ navigation, route }) => {
           })}
           isCosmos={isCosmos}
           isScheduledFeed={isScheduledFeed}
+          isEventFeed={isEventFeed}
+          eventId={isEventFeed ? eventId : ""}
           timezone={timezone}
           removeFromList={removeFromList}
           isSuperDelegate={user?.is_super_delegate}
+          hideLevelView={isEventFeed}
         />
       </View>
     )
@@ -840,6 +860,7 @@ const FeedScreen = ({ navigation, route }) => {
       openOptions={openOptions}
       onLikebtnPress={onLikebtnPress}
       isCosmos={isCosmos}
+      isEventFeed={isEventFeed}
       isScheduledFeed={isScheduledFeed}
       sourceLevelIcons={feedData?.feed_setting}
       openScheduleTimeModal={scheduleModalRef?.current?.openScheduleTimeModal}
@@ -968,5 +989,11 @@ const feedOptionList = [{
   icon: () => icons.send(colors.primary, 17),
   title: "Message",
   type: "message"
+},
+
+{
+  icon: () => icons.notes(colors.primary, 17),
+  title: "Add as Personal Notes",
+  type: "notes"
 },
 ]

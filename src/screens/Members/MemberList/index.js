@@ -144,7 +144,7 @@ const MemberList = ({ navigation, route }) => {
 
   const filterTheData = (obj, data, isSavedFilter, isFilter) => {
     let list = [];
-    console.log(obj, data, "check 123")
+
     if (!!sorted) {
       let nOBj = {
         label: sorted.title,

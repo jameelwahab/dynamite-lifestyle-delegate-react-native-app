@@ -8,9 +8,10 @@ import ResponsiveImage from '../../../components/ResponsiveImage'
 import { S3_URL } from '../../../utilities/constants'
 import { MyButton } from '../../../components/MyButton'
 import ResponsiveImage2 from '../../../components/ResponsiveImage2'
+import openUrl from '../../../functions/openUrl'
 
-const FeedEvents = ({ upcomingEvents, currentEvent, noticeboard }) => {
-  console.log(currentEvent, "currentEvent")
+const FeedEvents = ({ upcomingEvents, currentEvent, noticeboard,isEventFeed }) => {
+  console.log(upcomingEvents, "upcomingEvents")
 
 
   const eventView = (item, index) => {
@@ -31,6 +32,7 @@ const FeedEvents = ({ upcomingEvents, currentEvent, noticeboard }) => {
         {!!item?.button_text &&
           <View style={{ alignItems: "center",marginTop:10 }}>
             <MyButton
+            onPress={()=>openUrl(item?.button_link)}
               title={item?.button_text}
               textStyle={{ color: colors.black, }}
               style={{ height: 40, paddingHorizontal: 20, marginTop: 5 }} />
@@ -40,10 +42,11 @@ const FeedEvents = ({ upcomingEvents, currentEvent, noticeboard }) => {
   }
 
   return (
-    <View style={{}}>
+    <View style={{marginHorizontal:10}}>
+      {!isEventFeed &&
       <View style={[__styles.noticeboardView, { alignItems: "center", }]}>
         <MyWebview html={noticeboard.replace("56", "2")} fullWidth />
-      </View>
+      </View>}
       {currentEvent.length > 0 &&
         <View style={__styles.noticeboardView}>
           <View style={__styles.eventHeadingView}>

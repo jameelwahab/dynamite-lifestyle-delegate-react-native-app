@@ -10,6 +10,7 @@ import Feather from 'react-native-vector-icons/Feather';
 import Entypo from 'react-native-vector-icons/Entypo';
 import Octicons from 'react-native-vector-icons/Octicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import AntDesign  from 'react-native-vector-icons/AntDesign';
 
 
 export const icons = {
@@ -70,6 +71,7 @@ export const icons = {
   minusCircle: () => { return (<Feather name="minus-circle" color={colors.primary} size={25} />) },
   plusCircle: (color = colors.primary, size = 25) => { return (<Feather name="plus-circle" color={color} size={size} />) },
   back: (color = colors.white, size = 20) => { return (<MaterialIcons name="arrow-back" color={color} size={size} />) },
+  downArrow: (color = colors.white, size = 20) => { return (<AntDesign name="arrowdown" color={color} size={size} />) },
   info: (color = colors.white, size = 20) => { return (<FontAwesome6 name="info" color={color} size={size} />) },
   upward: (color = colors.white, size = 20) => { return (<Ionicons name="caret-up" color={color} size={size} />) },
   downward: (color = colors.white, size = 20) => { return (<Ionicons name="caret-down" color={color} size={size} />) },
@@ -91,6 +93,7 @@ export const icons = {
   heartUnfilled: (color = colors.white, size = 20) => { return (<MaterialCommunityIcons name="heart-outline" color={color} size={size} />) },
   heartFilled: (color = colors.white, size = 20) => { return (<MaterialCommunityIcons name="heart" color={color} size={size} />) },
   comment: (color = colors.white, size = 20) => { return (<MaterialCommunityIcons name="message-outline" color={color} size={size} />) },
+  chat: (color = colors.white, size = 20) => { return (<Ionicons name="chatbubble-ellipses" color={color} size={size} />) },
   pin: (color = colors.primary, size = 17) => { return (<Octicons name="pin" color={color} size={size} />) },
   video: (color = colors.primary, size = 17) => { return (<Ionicons name="videocam" color={color} size={size} />) },
   code: (color = colors.primary, size = 17) => { return (<Ionicons name="code-slash" color={color} size={size} />) },

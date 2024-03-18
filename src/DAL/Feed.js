@@ -1,9 +1,9 @@
 import invokeApi from "../functions/invokeAPI";
 
 export const GET_FEED_LIST =
-  ({ token, navigation, level, type, page }) => {
+  ({ token, navigation, level, type, page,eventId }) => {
     return invokeApi({
-      path: `api/feeds/delegate_portal/listing?page=${page}&limit=10&list_type=${type}&level_or_type=${level}`,
+      path: `api/feeds/delegate_portal/listing?page=${page}&limit=10&list_type=${type}&level_or_type=${level}&event=${eventId}`,
       method: "GET",
       token,
       navigation,
