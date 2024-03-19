@@ -10,7 +10,7 @@ import Feather from 'react-native-vector-icons/Feather';
 import Entypo from 'react-native-vector-icons/Entypo';
 import Octicons from 'react-native-vector-icons/Octicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import AntDesign  from 'react-native-vector-icons/AntDesign';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 
 
 export const icons = {
@@ -20,6 +20,7 @@ export const icons = {
   dummyUser2: require("../assets/icons/dummy-user-2.png"),
   threeLinesMenu: require("../assets/icons/threeBarsMenu.png"),
   photo: require("../assets/icons/photo.png"),
+  photo1: require("../assets/icons/genericImage.png"),
   refresh: require('../assets/icons/reload.png'),
   send: require('../assets/icons/send.png'),
   tick: require('../assets/icons/tick.png'),
@@ -67,6 +68,7 @@ export const icons = {
   trashFilled: () => { return (<Fontisto name="trash" color={colors.primary} size={17} />) },
   reply: (color = colors.primary, size = 17) => { return (<Octicons name="reply" color={color} size={size} />) },
   upload: () => { return (<FontAwesome name="cloud-upload" color={colors.primary} size={25} />) },
+  upload2: (color = colors.primary, size = 17) => { return (<Feather name="upload" color={color} size={size} />) },
   clock: (color = colors.primary, size = 17) => { return (<Octicons name="clock" color={color} size={size} />) },
   minusCircle: () => { return (<Feather name="minus-circle" color={colors.primary} size={25} />) },
   plusCircle: (color = colors.primary, size = 25) => { return (<Feather name="plus-circle" color={color} size={size} />) },
@@ -109,4 +111,6 @@ export const icons = {
   bank: (color = colors.primary, size = 17) => { return (<MaterialCommunityIcons name="bank" color={color} size={size} />) },
   addImage: (color = colors.primary, size = 17) => { return (<MaterialCommunityIcons name="image-plus" color={color} size={size} />) },
   attachment: (color = colors.primary, size = 17) => { return (<Entypo name="attachment" color={color} size={size} />) },
+  category: (color = colors.white, size = 20) => { return (<MaterialIcons name="category" color={color} size={size} />) },
+  members: (color = colors.white, size = 20) => { return (<FontAwesome5 name="user-friends" color={color} size={size} />) },
 }

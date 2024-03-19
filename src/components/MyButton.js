@@ -49,16 +49,16 @@ const TransparentButton = ({
   )
 }
 
-const MenuButton = ({ size = 25, onPress = () => { } }) => {
+const MenuButton = ({ size = 25, onPress = () => { }, style }) => {
   return (
     <TouchableOpacity
       onPress={onPress}
-      style={{
+      style={[{
         height: size, width: size, borderRadius: size / 2, alignItems: "center", justifyContent: "center",
         backgroundColor: colors.lightPrimary3,
-        marginHorizontal: 5
-      }}
-      
+        marginHorizontal: 5,
+      }, style]}
+
     >
       {icons.threeDots(colors.primary, size - 7)}
     </TouchableOpacity>

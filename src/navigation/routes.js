@@ -18,6 +18,7 @@ const routes = {
   commissionNavigator: "COMMISSION_NAVIGATOR",
   paymentRquesNavigator: "PAYMENT_REQUEST_NAVIGATOR",
   portalNavigator: "PORTAL_NAVIGATOR",
+  myPortalNavigator: "MY_PORTAL_NAVIGATOR",
 
 
   //! ///    Screens'
@@ -104,7 +105,9 @@ const routes = {
   portalListScreen: "PORTAL_LIST_SCREEN",
   portalDetailScreen: "PORTAL_DETAIL_SCREEN",
   portalEventVidoScreen: "PORTAL_EVENT_VIDEO_SCREEN",
-  portalChatList: "PORTAL_CHAT_LIST"
+  portalChatList: "PORTAL_CHAT_LIST",
+  portalAddEdit: "PORTAL_ADD_EDIT",
+  portalLockSettings: "PORTAL_LOCK_SETTINGS",
 }
 
 export default routes;

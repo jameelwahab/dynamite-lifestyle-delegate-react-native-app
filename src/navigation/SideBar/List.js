@@ -14,6 +14,7 @@ import StackTransactions from "../NestedStacks/StackTransactions";
 import StackCommissions from "../NestedStacks/StackCommissions";
 import StackPaymentsRequest from "../NestedStacks/StackPaymentsRequest";
 import StackPortals from "../NestedStacks/StackPortals";
+import StackMyPortals from "../NestedStacks/StackMyPortals";
 
 export const drawerMenuList = [
   {
@@ -245,9 +246,16 @@ export const ParentComponents = {
     key: routes.portalNavigator,
     component: StackPortals,
     params: {
-      key: "my_portals"
+      key: "portals"
     }
   },
+  my_portals: {
+    key: routes.myPortalNavigator,
+    component: StackMyPortals,
+    params: {
+      key: "my_portals"
+    }
+  }
 }
 
 export const ChildComponents = {

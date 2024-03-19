@@ -1,6 +1,7 @@
 import { Linking } from 'react-native'
 
 export default function openUrl(link) {
+  console.log(link,'link')
   try {
     if (!!link) {
       if (!link.includes("http:") && !link.includes("https:")) {

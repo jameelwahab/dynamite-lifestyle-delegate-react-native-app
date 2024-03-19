@@ -41,10 +41,11 @@ const MyInputs = ({
           scrollEnabled={multiline}
           keyboardAppearance="dark"
           keyboardType={keyboardType}
+          // keyboardType="number-pad"
           returnKeyType={isSearch ? "search" : "default"}
           onSubmitEditing={onSubmitEditing}
           editable={editable}
-          // keyboardType="numeric"
+          
           selectionColor={colors.selection}
           autoCorrect={false}
           multiline={multiline}

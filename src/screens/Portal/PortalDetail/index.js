@@ -90,7 +90,7 @@ const EventListing = ({ navigation, route }) => {
 
           {!!event?.banner1_image?.thumbnail_1 &&
             <Pressable
-              onPress={() => openUrl("")}
+            onPress={() => openUrl(event?.banner1_link)}
               style={__style.bannerImageView}>
               <ResponsiveImage2 uri={S3_URL + event?.banner1_image?.thumbnail_1} />
             </Pressable>}
@@ -120,7 +120,7 @@ const EventListing = ({ navigation, route }) => {
   const titleView = () => {
     return (
       <View style={{ flexDirection: "row" }}>
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1,justifyContent:"center" }}>
           <MyText fontSize={18} type='medium' color={colors.primary} >{event?.title}</MyText>
         </View>
         {user?.is_chat_allow && !!event &&
