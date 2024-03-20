@@ -14,7 +14,8 @@ const UploadFileInput = ({
   subLabel = "",
   selectedImage,
   onImagePicked,
-  onRemoveBtnPress
+  onRemoveBtnPress,
+  hideRemoveButton = false
 }) => {
   const [isImagePickerVisible, setIsImagePickerVisible] = useState(false);
   const [imageForZoom, setImageForZoom] = useState("")
@@ -59,7 +60,7 @@ const UploadFileInput = ({
               </View>
             </View>}
 
-          {!!selectedImage &&
+          {!!selectedImage && hideRemoveButton==false &&
             <TouchableOpacity
               onPress={onRemoveBtnPress}
               style={__styles.removeIconBtn}>

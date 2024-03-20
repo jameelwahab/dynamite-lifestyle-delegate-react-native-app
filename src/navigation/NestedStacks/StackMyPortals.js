@@ -15,6 +15,10 @@ import LockEventSettings from '../../screens/Portal/PortalAction/LockEventSettin
 import AddEditPortal from '../../screens/Portal/PortalAction/AddEditPortal';
 import TimerEventSettings from '../../screens/Portal/PortalAction/TimerEventSettings';
 import AddMembers from '../../screens/Portal/PortalAction/AddMembers';
+import MembersAddEdit from '../../screens/Portal/PortalMembers/MembersAddEdit';
+import MembersList from '../../screens/Portal/PortalMembers/MembersList';
+import EevntList from '../../screens/Portal/PortalEvents/EevntList';
+import EventAddEdit from '../../screens/Portal/PortalEvents/EventAddEdit';
 
 
 const MyPortals = createNativeStackNavigator();
@@ -33,6 +37,12 @@ const StackMyPortals = ({ route }) => {
         <MyPortals.Screen name={routes.portalLockSettings} component={LockEventSettings} />
         <MyPortals.Screen name={routes.portalTimerSettings} component={TimerEventSettings} />
         <MyPortals.Screen name={routes.portalAddMembers} component={AddMembers} />
+
+        <MyPortals.Screen name={routes.portalAddEditMembers} component={MembersAddEdit} />
+        <MyPortals.Screen name={routes.portalMembersList} component={MembersList} />
+
+        <MyPortals.Screen name={routes.portalEventsList} component={EevntList} />        
+        <MyPortals.Screen name={routes.portalAddEditEvents} component={EventAddEdit} />
 
         {/*//? Default Screens Start */}
         {defaultScreens.map((x, i) => (

@@ -157,3 +157,97 @@ export const ASSIGN_PROGRAM_MEMBERS_TO_PORTAL = ({ token, navigation, event_id, 
     navigation,
   })
 }
+
+
+export const PORTAL_EVENT_LIST = ({ token, navigation, eventId }) => {
+  return invokeApi({
+    path: `api/home_event?type=event&event=${eventId}`,
+    method: "GET",
+    token,
+    navigation,
+  })
+}
+
+export const PORTAL_ADD_EVENT = ({ token, navigation, formdata }) => {
+  return invokeApi({
+    path: `api/home_event/`,
+    method: "POST",
+    headers: { "content-type": "multipart/form-data" },
+    postData: formdata,
+    token,
+    navigation,
+  })
+}
+
+export const PORTAL_UPDATE_EVENT = ({ token, navigation, eventSlug, formdata }) => {
+  return invokeApi({
+    path: `api/home_event/${eventSlug}`,
+    headers: { "content-type": "multipart/form-data" },
+    method: "PUT",
+    postData: formdata,
+    token,
+    navigation,
+  })
+}
+export const PORTAL_DELETE_EVENT = ({ token, navigation, eventSlug }) => {
+  return invokeApi({
+    path: `api/home_event/${eventSlug}`,
+    method: "DELETE",
+    token,
+    navigation,
+  })
+}
+
+
+export const PORTAL_MEMBER_LISTING = ({ token, navigation, eventId, searchText, page, }) => {
+  return invokeApi({
+    path: `api/member/get_live_dynamite_event_member_by_pagination_for_delegate/${eventId}?search_text=${searchText}&page=${page}&limit=20`,
+    method: "GET",
+    token,
+    navigation,
+  })
+}
+
+
+export const MEMBER_LISTING_ADDING = ({ token, navigation, eventId, searchText }) => {
+  return invokeApi({
+    path: `api/member/get_live_dynamite_event_another_member_for_delegate/${eventId}?search_text=${searchText}`,
+    method: "GET",
+    token,
+    navigation,
+  })
+}
+
+
+export const PORTAL_EVENT_ADD_MEMBER = ({ token, navigation, formdata }) => {
+  return invokeApi({
+    path: `api/member/add_dynamite_event_member`,
+    headers: { "content-type": "multipart/form-data" },
+    method: "POST",
+    postData: formdata,
+    token,
+    navigation,
+  })
+}
+
+export const PORTAL_EVENT_EDIT_MEMBER = ({ token, navigation, formdata }) => {
+  return invokeApi({
+    path: `api/member/edit_dynamite_event_member/`,
+    headers: { "content-type": "multipart/form-data" },
+    method: "PUT",
+    postData: formdata,
+    token,
+    navigation,
+  })
+}
+
+export const PORTAL_EVENT_DELETE_MEMBER = ({ token, navigation, formdata }) => {
+  return invokeApi({
+    path: `api/member/delete_dynamite_event_member/`,
+    method: "POST",
+    headers: { "content-type": "multipart/form-data" },
+    postData: formdata,
+    token,
+    navigation,
+  })
+}

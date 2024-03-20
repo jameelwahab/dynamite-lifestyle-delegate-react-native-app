@@ -110,6 +110,11 @@ const routes = {
   portalLockSettings: "PORTAL_LOCK_SETTINGS",
   portalTimerSettings: "PORTAL_TIMER_SETTINGS",
   portalAddMembers: "PORTAL_UPLOAD_MEMBERS",
+  portalMembersList: "PORTAL_UPLOAD_MEMBERS_LIST",
+  portalAddEditMembers: "PORTAL_ADD_EDIT_MEMBERS",
+  portalEventsList: "PORTAL_UPLOAD_EVENT_LIST",
+  portalAddEditEvents: "PORTAL_ADD_EDIT_EVENT",
+  
 }
 
 export default routes;

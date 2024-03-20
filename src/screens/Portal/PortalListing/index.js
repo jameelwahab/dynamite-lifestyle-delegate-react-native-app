@@ -74,6 +74,16 @@ const EventListing = ({ navigation, route }) => {
         navigation.navigate(routes.portalAddMembers, {
           eventId: item?._id
         })
+      } else if (opt.type == "event") {
+        navigation.navigate(routes.portalEventsList, {
+          eventId: item?._id,
+          slug: item?.event_slug
+        })
+      } else if (opt.type == "members") {
+        navigation.navigate(routes.portalMembersList, {
+          eventId: item?._id,
+          slug: item?.event_slug
+        })
       }
     }, 200);
   }
@@ -277,16 +287,16 @@ const options = [
   //   title: "Categories",
   //   type: "categories"
   // },
-  // {
-  //   icon: () => icons.members(colors.primary, 17),
-  //   title: "Members",
-  //   type: "members"
-  // },
-  // {
-  //   icon: () => icons.calendar(colors.primary, 17),
-  //   title: "Events",
-  //   type: "event"
-  // },
+  {
+    icon: () => icons.members(colors.primary, 17),
+    title: "Members",
+    type: "members"
+  },
+  {
+    icon: () => icons.calendar(colors.primary, 17),
+    title: "Events",
+    type: "event"
+  },
   {
     icon: () => icons.copy(colors.primary, 17),
     title: "Dublicate",

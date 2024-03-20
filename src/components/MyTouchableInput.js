@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import { fonts } from '../utilities/fonts'
 import { colors } from '../utilities/colors'
 import { closeEye, icons, openEye } from '../utilities/icons'
+import MyText from './MyText'
 
 const MyTouchableInput = ({
   label = "",
@@ -13,7 +14,9 @@ const MyTouchableInput = ({
   noSpace = false,
   view = null,
   iconOnPress,
-  subTextView
+  subTextView,
+  clearbutton,
+  onClearButtonPress = () => { }
 }) => {
   const [isFocused, setFocused] = useState(false)
   return (
@@ -22,7 +25,13 @@ const MyTouchableInput = ({
       style={{ marginBottom: noSpace ? 0 : 15 }}>
       <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
         <Text pointerEvents={!!iconOnPress ? "auto" : "none"} style={[__MyInputStyles.labelText, isFocused ? __MyInputStyles.focusedLabelText : undefined]}>{label}</Text>
-        {!!subTextView ? subTextView() : <View />}
+        {!!clearbutton ?
+          <Pressable
+            style={__MyInputStyles.clearbtnView}
+            onPress={onClearButtonPress}>
+            <MyText color={colors.primary} >Clear</MyText>
+          </Pressable> :
+          !!subTextView ? subTextView() : <View />}
       </View>
       <View pointerEvents={!!iconOnPress ? "auto" : "none"} style={[__MyInputStyles.inputView, isFocused ? __MyInputStyles.focusedView : undefined, !!view && { height: null, }]}>
         {!!view ? view() :
@@ -101,5 +110,8 @@ const __MyInputStyles = StyleSheet.create({
     height: 25,
     width: 25,
     tintColor: colors.disableText
-  }
+  },
+  clearbtnView: {
+    paddingBottom: 5, paddingLeft: 10, paddingRight: 5
+  },
 })
