@@ -118,3 +118,42 @@ export const UPLDATE_PORTAL_LOCK_EVENT = ({ token, navigation, eventSlug, body: 
     navigation,
   })
 }
+
+export const UPLDATE_PORTAL_TIMER_CONGIF = ({ token, navigation, eventSlug, body: {
+  button_link, button_text, event_date, event_logo, event_time,
+  is_enable, show_for, title,
+} }) => {
+  return invokeApi({
+    path: `api/dynamite_event/update/event_timer_configration/${eventSlug}`,
+    method: "PUT",
+    postData: {
+      event_timer_configration: {
+        button_link, button_text, event_date, event_logo, event_time,
+        is_enable, show_for, title,
+      },
+    },
+    token,
+    navigation,
+  })
+}
+
+
+export const PORTAL_PROGRAM_LIST = ({ token, navigation, type }) => {
+  return invokeApi({
+    path: `api/consultant/list_main_portal_program/delegate`,
+    postData: { filter_array: [type] },
+    method: "POST",
+    token,
+    navigation,
+  })
+}
+
+export const ASSIGN_PROGRAM_MEMBERS_TO_PORTAL = ({ token, navigation, event_id, program_id }) => {
+  return invokeApi({
+    path: `api/consultant/list_main_portal_program/delegate`,
+    postData: { event_id, program_id },
+    method: "POST",
+    token,
+    navigation,
+  })
+}

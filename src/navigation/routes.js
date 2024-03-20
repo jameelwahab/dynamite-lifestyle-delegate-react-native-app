@@ -108,6 +108,8 @@ const routes = {
   portalChatList: "PORTAL_CHAT_LIST",
   portalAddEdit: "PORTAL_ADD_EDIT",
   portalLockSettings: "PORTAL_LOCK_SETTINGS",
+  portalTimerSettings: "PORTAL_TIMER_SETTINGS",
+  portalAddMembers: "PORTAL_UPLOAD_MEMBERS",
 }
 
 export default routes;

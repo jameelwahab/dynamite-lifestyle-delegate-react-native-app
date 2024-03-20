@@ -15,7 +15,6 @@ import routes from '../../../navigation/routes'
 
 const LockEventSettings = ({ route, navigation }) => {
   let { config, slug } = route.params;
-  console.log(config, 'config')
   let { token } = useSelector(selectUser);
   const [loader, setLoader] = useState(false);
   const [data, updateData] = useState({
@@ -70,6 +69,7 @@ const LockEventSettings = ({ route, navigation }) => {
       <KeyboardAwareScrollView
         showsVerticalScrollIndicator={false}
         enableResetScrollToCoords={false}
+        contentContainerStyle={{ paddingBottom: 50 }}
       >
         <MyInputs
           label='Lock Button Text'

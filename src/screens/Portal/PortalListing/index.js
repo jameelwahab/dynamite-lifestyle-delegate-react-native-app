@@ -65,6 +65,15 @@ const EventListing = ({ navigation, route }) => {
           config: item?.lock_configration,
           slug: item?.event_slug
         })
+      } else if (opt.type == "timer") {
+        navigation.navigate(routes.portalTimerSettings, {
+          config: item?.event_timer_configration,
+          slug: item?.event_slug
+        })
+      } else if (opt.type == "import") {
+        navigation.navigate(routes.portalAddMembers, {
+          eventId: item?._id
+        })
       }
     }, 200);
   }
@@ -253,16 +262,16 @@ const options = [
     title: "Lock Event Content",
     type: "lock"
   },
-  // {
-  //   icon: () => icons.download(colors.primary, 17),
-  //   title: "Import Members",
-  //   type: "import"
-  // },
-  // {
-  //   icon: () => icons.clock(colors.primary, 17),
-  //   title: "Event Timer Configuration",
-  //   type: "timer"
-  // },
+  {
+    icon: () => icons.download(colors.primary, 17),
+    title: "Import Members",
+    type: "import"
+  },
+  {
+    icon: () => icons.clock(colors.primary, 17),
+    title: "Event Timer Configuration",
+    type: "timer"
+  },
   // {
   //   icon: () => icons.category(colors.primary, 17),
   //   title: "Categories",

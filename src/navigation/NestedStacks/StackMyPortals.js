@@ -13,6 +13,8 @@ import PortalChat from '../../screens/Portal/PortalChat';
 
 import LockEventSettings from '../../screens/Portal/PortalAction/LockEventSettings';
 import AddEditPortal from '../../screens/Portal/PortalAction/AddEditPortal';
+import TimerEventSettings from '../../screens/Portal/PortalAction/TimerEventSettings';
+import AddMembers from '../../screens/Portal/PortalAction/AddMembers';
 
 
 const MyPortals = createNativeStackNavigator();
@@ -29,6 +31,8 @@ const StackMyPortals = ({ route }) => {
         <MyPortals.Screen name={routes.portalChatList} component={PortalChat} />
         <MyPortals.Screen name={routes.portalAddEdit} component={AddEditPortal} />
         <MyPortals.Screen name={routes.portalLockSettings} component={LockEventSettings} />
+        <MyPortals.Screen name={routes.portalTimerSettings} component={TimerEventSettings} />
+        <MyPortals.Screen name={routes.portalAddMembers} component={AddMembers} />
 
         {/*//? Default Screens Start */}
         {defaultScreens.map((x, i) => (

@@ -53,6 +53,7 @@ const MenuButton = ({ size = 25, onPress = () => { }, style }) => {
   return (
     <TouchableOpacity
       onPress={onPress}
+      hitSlop={{ top: 15, left: 15, right: 15, bottom: 15 }}
       style={[{
         height: size, width: size, borderRadius: size / 2, alignItems: "center", justifyContent: "center",
         backgroundColor: colors.lightPrimary3,
@@ -60,7 +61,7 @@ const MenuButton = ({ size = 25, onPress = () => { }, style }) => {
       }, style]}
 
     >
-      {icons.threeDots(colors.primary, size - 7)}
+      {icons.threeDots(colors.primary, size - 10)}
     </TouchableOpacity>
   )
 }
