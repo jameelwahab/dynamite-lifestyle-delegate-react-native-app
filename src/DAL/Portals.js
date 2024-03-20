@@ -251,3 +251,50 @@ export const PORTAL_EVENT_DELETE_MEMBER = ({ token, navigation, formdata }) => {
     navigation,
   })
 }
+
+
+
+
+
+export const PORTAL_CATEGORY_LISTING = ({ token, navigation, eventId, }) => {
+  return invokeApi({
+    path: `api/dynamite_event_category/dynamite_event_category_list_by_event/${eventId}`,
+    method: "GET",
+    token,
+    navigation,
+  })
+}
+
+
+
+
+export const PORTAL_CATEGORY_ADD= ({ token, navigation, formdata }) => {
+  return invokeApi({
+    path: `api/dynamite_event_category`,
+    headers: { "content-type": "multipart/form-data" },
+    method: "POST",
+    postData: formdata,
+    token,
+    navigation,
+  })
+}
+
+export const PORTAL_CATEGORY_EDIT= ({ token, navigation, formdata,slug }) => {
+  return invokeApi({
+    path: `api/dynamite_event_category/${slug}`,
+    headers: { "content-type": "multipart/form-data" },
+    method: "PUT",
+    postData: formdata,
+    token,
+    navigation,
+  })
+}
+
+export const PORTAL_CATEGORY_DELETE= ({ token, navigation, slug }) => {
+  return invokeApi({
+    path: `api/dynamite_event_category/${slug}`,
+    method: "DELETE",
+    token,
+    navigation,
+  })
+}

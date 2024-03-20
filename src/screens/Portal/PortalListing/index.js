@@ -84,7 +84,14 @@ const EventListing = ({ navigation, route }) => {
           eventId: item?._id,
           slug: item?.event_slug
         })
+      } else if (opt.type == "categories") {
+        navigation.navigate(routes.portalCategoryList, {
+          eventId: item?._id,
+          slug: item?.event_slug
+        })
       }
+
+
     }, 200);
   }
 
@@ -282,11 +289,11 @@ const options = [
     title: "Event Timer Configuration",
     type: "timer"
   },
-  // {
-  //   icon: () => icons.category(colors.primary, 17),
-  //   title: "Categories",
-  //   type: "categories"
-  // },
+  {
+    icon: () => icons.category(colors.primary, 17),
+    title: "Categories",
+    type: "categories"
+  },
   {
     icon: () => icons.members(colors.primary, 17),
     title: "Members",

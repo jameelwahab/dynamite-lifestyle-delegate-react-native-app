@@ -114,7 +114,13 @@ const routes = {
   portalAddEditMembers: "PORTAL_ADD_EDIT_MEMBERS",
   portalEventsList: "PORTAL_UPLOAD_EVENT_LIST",
   portalAddEditEvents: "PORTAL_ADD_EDIT_EVENT",
-  
+
+  portalCategoryList: "PORTAL_EVENT_CATEGORY_LIST",
+  portalAddEditCategory: "PORTAL_EVENT_ADD_EDIT_CATEGORY",
+
+  portalVideoList: "PORTAL_EVENT_CATEGORY_VIDEO_LIST",
+  portalAddEditVideo: "PORTAL_EVENT_ADD_EDIT_VIDEO",
+
 }
 
 export default routes;

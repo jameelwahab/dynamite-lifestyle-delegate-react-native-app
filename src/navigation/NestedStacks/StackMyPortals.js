@@ -19,6 +19,8 @@ import MembersAddEdit from '../../screens/Portal/PortalMembers/MembersAddEdit';
 import MembersList from '../../screens/Portal/PortalMembers/MembersList';
 import EevntList from '../../screens/Portal/PortalEvents/EevntList';
 import EventAddEdit from '../../screens/Portal/PortalEvents/EventAddEdit';
+import CategoryList from '../../screens/Portal/PortalCategory/CategoryList';
+import CategoryAddEdit from '../../screens/Portal/PortalCategory/CategoryAddEdit';
 
 
 const MyPortals = createNativeStackNavigator();
@@ -43,6 +45,9 @@ const StackMyPortals = ({ route }) => {
 
         <MyPortals.Screen name={routes.portalEventsList} component={EevntList} />        
         <MyPortals.Screen name={routes.portalAddEditEvents} component={EventAddEdit} />
+
+        <MyPortals.Screen name={routes.portalCategoryList} component={CategoryList} />        
+        <MyPortals.Screen name={routes.portalAddEditCategory} component={CategoryAddEdit} />
 
         {/*//? Default Screens Start */}
         {defaultScreens.map((x, i) => (
