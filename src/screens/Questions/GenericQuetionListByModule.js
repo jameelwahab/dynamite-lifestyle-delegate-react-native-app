@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import RootView from '../../components/RootView'
 import MyText from '../../components/MyText'
 import MyLoader from '../../components/MyLoader'
-import { QUESTIONS_LIST } from '../../DAL'
+import { QUESTIONS_LIST, QUESTIONS_LIST_BY_MODULE } from '../../DAL'
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../redux/reducers/userSlice'
 import EmptyView from '../../components/EmptyView'
@@ -19,8 +19,11 @@ import openUrl from '../../functions/openUrl'
 import { S3_URL } from '../../utilities/constants'
 import MemberView from '../../components/MemberView'
 import QuestionComponent from './QuestionComponent'
+import { useNavigation, useRoute } from '@react-navigation/native'
 
-const GenericQuetionList = ({ navigation, route }) => {
+const GenericQuetionListByModule = ({ module, moduleId }) => {
+  const navigation = useNavigation();
+  const route = useRoute();
   const { token } = useSelector(selectUser)
   const { created_for, id: createdForId, memberId } = route?.params
   const [loader, setLoader] = useState(false);
@@ -30,17 +33,13 @@ const GenericQuetionList = ({ navigation, route }) => {
 
 
   const getQuestionsListFromServer = async () => {
-    let res = await QUESTIONS_LIST({
-      token, navigation, body: {
-        created_for: created_for,
-        created_for_id: createdForId,
-        member_id: memberId
-      }
+    let res = await QUESTIONS_LIST_BY_MODULE({
+      token, navigation, id: moduleId, module
     })
     if (res.code == 200) {
 
       setList(res?.questionnaire)
-      setMember(res?.member)
+      // setMember(res?.member)
       // setList(firstTime ? res.questionnaire_list : [...list, ...res.questionnaire_list])
       setLoader(false)
     } else {
@@ -68,7 +67,7 @@ const GenericQuetionList = ({ navigation, route }) => {
 
 
   return (
-    <RootView titleView={topView}>
+    <View style={{ flex: 1 }}>
       <View style={{ flex: 1 }}>
 
         <FlatList
@@ -79,9 +78,9 @@ const GenericQuetionList = ({ navigation, route }) => {
         />
       </View>
       <MyLoader enable={loader} />
-    </RootView>
+    </View>
   )
 }
 
-export default GenericQuetionList;
+export default GenericQuetionListByModule;
 

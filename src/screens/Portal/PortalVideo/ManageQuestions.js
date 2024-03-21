@@ -5,11 +5,12 @@ import MyText from '../../../components/MyText'
 import GenericQuetionListByModule from '../../Questions/GenericQuetionListByModule'
 
 const ManageQuestions = ({ navigation, route }) => {
+  let { eventId, slug, videoId } = route.params;
   return (
     <RootView title={"Dynamite Event Video Questions"}>
       <GenericQuetionListByModule
         module={"dynamite_event_video"}
-        moduleId={moduleId}
+        moduleId={videoId}
       />
     </RootView>
   )
