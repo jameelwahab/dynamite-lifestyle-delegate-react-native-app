@@ -268,7 +268,7 @@ export const PORTAL_CATEGORY_LISTING = ({ token, navigation, eventId, }) => {
 
 
 
-export const PORTAL_CATEGORY_ADD= ({ token, navigation, formdata }) => {
+export const PORTAL_CATEGORY_ADD = ({ token, navigation, formdata }) => {
   return invokeApi({
     path: `api/dynamite_event_category`,
     headers: { "content-type": "multipart/form-data" },
@@ -279,7 +279,7 @@ export const PORTAL_CATEGORY_ADD= ({ token, navigation, formdata }) => {
   })
 }
 
-export const PORTAL_CATEGORY_EDIT= ({ token, navigation, formdata,slug }) => {
+export const PORTAL_CATEGORY_EDIT = ({ token, navigation, formdata, slug }) => {
   return invokeApi({
     path: `api/dynamite_event_category/${slug}`,
     headers: { "content-type": "multipart/form-data" },
@@ -290,10 +290,73 @@ export const PORTAL_CATEGORY_EDIT= ({ token, navigation, formdata,slug }) => {
   })
 }
 
-export const PORTAL_CATEGORY_DELETE= ({ token, navigation, slug }) => {
+export const PORTAL_CATEGORY_DELETE = ({ token, navigation, slug }) => {
   return invokeApi({
     path: `api/dynamite_event_category/${slug}`,
     method: "DELETE",
+    token,
+    navigation,
+  })
+}
+
+
+export const PORTAL_VIDEO_LISTING = ({ token, navigation, catId, }) => {
+  return invokeApi({
+    path: `api/dynamite_event_category_video/dynamite_event_category_video_list_by_category/${catId}`,
+    method: "GET",
+    token,
+    navigation,
+  })
+}
+
+export const PORTAL_VIDEO_ADD = ({ token, navigation, formdata }) => {
+  return invokeApi({
+    path: `api/dynamite_event_category_video/`,
+    headers: { "content-type": "multipart/form-data" },
+    method: "POST",
+    postData: formdata,
+    token,
+    navigation,
+  })
+}
+
+export const PORTAL_VIDEO_EDIT = ({ token, navigation, formdata, catId }) => {
+  return invokeApi({
+    path: `api/dynamite_event_category_video/${catId}`,
+    headers: { "content-type": "multipart/form-data" },
+    method: "PUT",
+    postData: formdata,
+    token,
+    navigation,
+  })
+}
+
+export const PORTAL_VIDEO_DELETE = ({ token, navigation, videoId }) => {
+  return invokeApi({
+    path: `api/dynamite_event_category_video/${videoId}`,
+    method: "DELETE",
+    token,
+    navigation,
+  })
+}
+
+
+export const PORTAL_VIDEO_DETAIL = ({ token, navigation, videoId }) => {
+  return invokeApi({
+    path: `api/dynamite_event_category_video/${videoId}`,
+    method: "GET",
+    token,
+    navigation,
+  })
+}
+
+export const PORTAL_VIDEO_QUESTION_CONFIG = ({ token, navigation, videoId, body: {
+  module_type, question_configration
+}, }) => {
+  return invokeApi({
+    path: `api/dynamite_event/question_configration/update/${videoId}`,
+    method: "PUT",
+    postData: { module_type, question_configration },
     token,
     navigation,
   })

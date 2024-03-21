@@ -21,6 +21,11 @@ import EevntList from '../../screens/Portal/PortalEvents/EevntList';
 import EventAddEdit from '../../screens/Portal/PortalEvents/EventAddEdit';
 import CategoryList from '../../screens/Portal/PortalCategory/CategoryList';
 import CategoryAddEdit from '../../screens/Portal/PortalCategory/CategoryAddEdit';
+import VideoList from '../../screens/Portal/PortalVideo/VideoList';
+import VideoAddEdit from '../../screens/Portal/PortalVideo/VideoAddEdit';
+import QuestionSettings from '../../screens/Portal/PortalVideo/QuestionSettings';
+import ManageQuestions from '../../screens/Portal/PortalVideo/ManageQuestions';
+import QuestionAnswers from '../../screens/Portal/PortalVideo/QuestionAnswers';
 
 
 const MyPortals = createNativeStackNavigator();
@@ -39,15 +44,19 @@ const StackMyPortals = ({ route }) => {
         <MyPortals.Screen name={routes.portalLockSettings} component={LockEventSettings} />
         <MyPortals.Screen name={routes.portalTimerSettings} component={TimerEventSettings} />
         <MyPortals.Screen name={routes.portalAddMembers} component={AddMembers} />
-
         <MyPortals.Screen name={routes.portalAddEditMembers} component={MembersAddEdit} />
         <MyPortals.Screen name={routes.portalMembersList} component={MembersList} />
-
-        <MyPortals.Screen name={routes.portalEventsList} component={EevntList} />        
+        <MyPortals.Screen name={routes.portalEventsList} component={EevntList} />
         <MyPortals.Screen name={routes.portalAddEditEvents} component={EventAddEdit} />
-
-        <MyPortals.Screen name={routes.portalCategoryList} component={CategoryList} />        
+        <MyPortals.Screen name={routes.portalCategoryList} component={CategoryList} />
         <MyPortals.Screen name={routes.portalAddEditCategory} component={CategoryAddEdit} />
+        <MyPortals.Screen name={routes.portalVideoList} component={VideoList} />
+        <MyPortals.Screen name={routes.portalAddEditVideo} component={VideoAddEdit} />
+
+        <MyPortals.Screen name={routes.portalVideoQuestionSettings} component={QuestionSettings} />
+        <MyPortals.Screen name={routes.portalVideoQuestionManage} component={ManageQuestions} />
+        <MyPortals.Screen name={routes.portalVideoQuestionAnswers} component={QuestionAnswers} />
+
 
         {/*//? Default Screens Start */}
         {defaultScreens.map((x, i) => (

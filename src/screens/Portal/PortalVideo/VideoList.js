@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import RootView from '../../../components/RootView'
 import { selectUser } from '../../../redux/reducers/userSlice';
 import { useSelector } from 'react-redux';
-import { PORTAL_CATEGORY_DELETE, PORTAL_CATEGORY_LISTING, } from '../../../DAL';
+import { PORTAL_CATEGORY_DELETE, PORTAL_CATEGORY_LISTING, PORTAL_VIDEO_DELETE, PORTAL_VIDEO_LISTING, } from '../../../DAL';
 import MyLoader from '../../../components/MyLoader';
 import MyText from '../../../components/MyText';
 import StatView from '../../Members/Components/StatView';
@@ -21,8 +21,8 @@ import ImageZoomer from '../../../components/ImageZoomer';
 
 
 
-const CategoryList = ({ navigation, route }) => {
-  const { eventId, slug } = route?.params;
+const VideoList = ({ navigation, route }) => {
+  const { eventId, slug, catId } = route?.params;
   const { token } = useSelector(selectUser);
   const [loader, setLoader] = useState(true);
   const [list, setList] = useState([]);
@@ -46,34 +46,39 @@ const CategoryList = ({ navigation, route }) => {
     let item = optionModal?.selectedItem;
     setOptionModal({ isVisible: false, selectedItem: null });
     setTimeout(() => {
-      if (opt.type == "video") {
-        onVideoScreen(item)
-      }
-      else if (opt.type == "edit") {
+
+      if (opt.type == "edit") {
         onAddEditScreen(item)
       } else if (opt.type == "delete") {
         setTimeout(() => {
           setConfirmModal({
             isVisible: true,
             selectedItem: item,
-            title: "Are you sure you want to delete this event?",
+            title: "Are you sure you want to delete this video?",
             type: opt.type
           })
         }, 200);
+      }
+      else if (opt.type == "q_setting") {
+        onQuestionsScreen(routes.portalVideoQuestionSettings, item)
+      } else if (opt.type == "q_manage") {
+        onQuestionsScreen(routes.portalVideoQuestionManage, item)
+      } else if (opt.type == "q_answer") {
+        onQuestionsScreen(routes.portalVideoQuestionAnswers, item)
       }
     }, 200);
   }
 
 
-  const onVideoScreen = (item) => {
-    navigation.navigate(routes?.portalVideoList, {
-      eventId, slug, catId: item?._id
+  const onQuestionsScreen = (screen, item) => {
+    navigation.navigate(screen, {
+      eventId, slug, videoId: item?._id
     })
   }
 
   const onAddEditScreen = (item) => {
-    navigation.navigate(routes?.portalAddEditCategory, {
-      eventId, slug, item,
+    navigation.navigate(routes?.portalAddEditVideo, {
+      eventId, slug, item, catId,
       backScreenFunc: ammendList
     })
   }
@@ -92,28 +97,27 @@ const CategoryList = ({ navigation, route }) => {
     let { selectedItem: item, type } = confirmModal;
     console.log(item, "item")
     if (type == "delete") {
-      deleteCategoryFromServer(item.dynamite_event_category_slug);
+      deleteCategoryFromServer(item);
     }
     setConfirmModal({ isVisible: false, selectedItem: null, title: "", type: "" })
   }
 
   const getDataFromServer = async () => {
-    let res = await PORTAL_CATEGORY_LISTING({ navigation, token, eventId });
+    let res = await PORTAL_VIDEO_LISTING({ navigation, token, catId });
     if (res.code == 200) {
-      setList(res?.dynamite_event_category_list);
+      setList(res?.dynamite_event_category_video_list);
       setLoader(false)
     } else {
       setLoader(false)
     }
   }
 
-  const deleteCategoryFromServer = async (slug) => {
+  const deleteCategoryFromServer = async (item) => {
     setLoader(true);
-    let res = await PORTAL_CATEGORY_DELETE({ navigation, token, slug });
+    let res = await PORTAL_VIDEO_DELETE({ navigation, token, videoId: item?._id });
     if (res.code == 200) {
-
       setList((list) => {
-        return list.filter(x => x.dynamite_event_category_slug != slug)
+        return list.filter(x => x._id != item?._id)
       });
       setLoader(false)
     } else {
@@ -128,6 +132,19 @@ const CategoryList = ({ navigation, route }) => {
       </View>)
   }
 
+  const ImageView = (image) => {
+    return (
+      <Pressable
+        onPress={() => setImageForZoom(image?.thumbnail_1)}
+        style={__styles.itemImage}>
+        <MyImage
+          source={{ uri: S3_URL + image?.thumbnail_3 }}
+          style={{ height: "100%", width: "100%" }}
+        />
+      </Pressable>
+    )
+  }
+
   const renderList = ({ item, index }) => {
     return (
       <View style={__styles.itemRootView}>
@@ -138,17 +155,19 @@ const CategoryList = ({ navigation, route }) => {
           />
         </View>
         <StatView title={"Title"} value={item?.title} />
+        <StatView title={"Image"} view={() => ImageView(item?.image)} />
         <StatView title={"Order"} value={item?.order} />
+        <StatView title={"Is Feature"} value={item?.is_feature ? "Yes" : "No"} />
+        <StatView title={"Is Chat Enable"} value={item?.is_chat_enable ? "Yes" : "No"} />
         <StatView title={"Status"} view={() => statusView(item?.status)} />
       </View>)
   }
 
 
   return (
-    <RootView title='Dynamite Event Categories' >
+    <RootView title='Dynamite Event Videos' >
       <View style={{ flex: 1 }}>
         <FlatList
-        
           data={list}
           renderItem={renderList}
           showsVerticalScrollIndicator={false}
@@ -162,7 +181,6 @@ const CategoryList = ({ navigation, route }) => {
       <FAB onPress={() => onAddEditScreen()} />
 
       <OptionModal
-
         optionList={options}
         isVisible={optionModal?.isVisible}
         onSelected={onOptionSelected}
@@ -188,7 +206,7 @@ const CategoryList = ({ navigation, route }) => {
   )
 }
 
-export default CategoryList
+export default VideoList
 
 const __styles = StyleSheet.create({
   itemRootView: {
@@ -218,6 +236,25 @@ const options = [
   },
   {
     icon: () => icons.edit(colors.primary, 17),
-    title: "Videos",
-    type: "video"
-  }]
+    title: "Question Configuration",
+    id: "questionConfig",
+    list: [
+      {
+        icon: () => icons.edit(colors.primary, 17),
+        title: "Questions Setting",
+        type: "q_setting"
+      },
+      {
+        icon: () => icons.edit(colors.primary, 17),
+        title: "Manage Questions",
+        type: "q_manage"
+      },
+      {
+        icon: () => icons.edit(colors.primary, 17),
+        title: "Questions Answers",
+        type: "q_answer"
+      },
+    ]
+  },
+
+]

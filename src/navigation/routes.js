@@ -120,7 +120,9 @@ const routes = {
 
   portalVideoList: "PORTAL_EVENT_CATEGORY_VIDEO_LIST",
   portalAddEditVideo: "PORTAL_EVENT_ADD_EDIT_VIDEO",
-
+  portalVideoQuestionSettings: "PORTAL_VIDEO_QUESTION_SETTINGS",
+  portalVideoQuestionManage: "PORTAL_VIDEO_MANAGE_QUESTION",
+  portalVideoQuestionAnswers: "PORTAL_VIDEO_QUESTION_ANSWERS",
 }
 
 export default routes;
