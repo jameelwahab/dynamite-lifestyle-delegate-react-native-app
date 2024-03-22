@@ -1,5 +1,5 @@
 import { View, StyleSheet, Pressable, } from 'react-native'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import MyText from '../../../components/MyText'
 import RootView from '../../../components/RootView'
 import { useSelector } from 'react-redux'
@@ -19,9 +19,12 @@ import EventVideos from './EventVideos'
 import { icons } from '../../../utilities/icons'
 import { colors } from '../../../utilities/colors'
 import routes from '../../../navigation/routes'
+import MyImage from '../../../components/MyImage'
+import AudioPlayerForList from '../../../components/AudioPlayerForList'
 
 
-const EventListing = ({ navigation, route }) => {
+const PortalDetail = (props) => {
+  const { navigation, route } = props;
   const { eventId } = route?.params
   const { token, user } = useSelector(selectUser);
   const timezone = useSelector(selectTimeZone);
@@ -86,11 +89,16 @@ const EventListing = ({ navigation, route }) => {
   const bannerView = () => {
     return (
       <>
+        <View style={{ marginTop: 10 }}>
+          {!!event?.feature_video && event?.feature_video?.video_type == "audio" && event?.feature_video?.audio_file_url &&
+            <AudioPlayerForList url={event?.feature_video?.audio_file_url} id={event?.feature_video?._id} />
+          }
+        </View>
         <View style={__style.bannerImagesView}>
 
           {!!event?.banner1_image?.thumbnail_1 &&
             <Pressable
-            onPress={() => openUrl(event?.banner1_link)}
+              onPress={() => openUrl(event?.banner1_link)}
               style={__style.bannerImageView}>
               <ResponsiveImage2 uri={S3_URL + event?.banner1_image?.thumbnail_1} />
             </Pressable>}
@@ -120,17 +128,17 @@ const EventListing = ({ navigation, route }) => {
   const titleView = () => {
     return (
       <View style={{ flexDirection: "row" }}>
-        <View style={{ flex: 1,justifyContent:"center" }}>
+        <View style={{ flex: 1, justifyContent: "center" }}>
           <MyText fontSize={18} type='medium' color={colors.primary} >{event?.title}</MyText>
         </View>
         {user?.is_chat_allow && !!event &&
-        <Pressable
-          onPress={onEventsChatScreen}
-          style={__style.chatBtn}>
-          <View style={__style.chatBtnIcon}>
-            {icons.chat(colors.black, 15)}
-          </View>
-        </Pressable>}
+          <Pressable
+            onPress={onEventsChatScreen}
+            style={__style.chatBtn}>
+            <View style={__style.chatBtnIcon}>
+              {icons.chat(colors.black, 15)}
+            </View>
+          </Pressable>}
       </View>
     )
   }
@@ -170,13 +178,13 @@ const EventListing = ({ navigation, route }) => {
 
         <View style={{ flex: 1, marginHorizontal: 10 }}>
           <FeedScreen
-            navigation={navigation}
-            route={route}
+
             CustomHeader={bannerView}
             CustomTabs={eventTabs}
             showTabView={showTabView}
             upcomingEvents={upcomingEvents}
             currentEvents={currentEvents}
+            {...props}
           />
         </View>
       </View>
@@ -201,7 +209,7 @@ const EventListing = ({ navigation, route }) => {
   )
 }
 
-export default EventListing
+export default PortalDetail
 
 const __style = StyleSheet.create({
   bannerImagesView: {

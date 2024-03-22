@@ -498,7 +498,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
 
 
   const changeTab = (newTab) => {
-    // console.log(newTab,"newTab")
+    console.log(newTab,"newTab")
     setTab(newTab);
   }
 
@@ -754,6 +754,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
   // !  VIEWS /////////////////
 
   const footerView = () => {
+
     if (tab == 0) {
       return (
         <View style={{ height: 50, alignItems: "center", justifyContent: "center" }}>
@@ -808,6 +809,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
             <MyText fontSize={18} type='bold' color={colors.primary} >{route?.params?.title}</MyText></View>
         }
         {!!CustomHeader && CustomHeader()}
+
         <FeedTabs
           CustomTabs={CustomTabs}
           isCosmos={isCosmos}
@@ -880,7 +882,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           viewabilityConfig={viewConfigRef.current}
           showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item?._id}
-          ListHeaderComponent={!!!feedId && headerView}
+          ListHeaderComponent={!!!feedId && headerView()}
           ListEmptyComponent={!loader && tab == 0 && <EmptyView label={"Posts not found"} />}
           onEndReached={() => {
             console.log("onEndReached", feedVar)

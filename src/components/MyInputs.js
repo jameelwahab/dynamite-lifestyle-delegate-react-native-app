@@ -4,6 +4,7 @@ import { fonts } from '../utilities/fonts'
 import { colors } from '../utilities/colors'
 // import { closeEye, openEye } from '../utilities/icons'
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import MyText from './MyText';
 
 
 
@@ -23,7 +24,8 @@ const MyInputs = ({
   noSpace = false,
   editable = true,
   isSearch = false,
-  onSubmitEditing
+  onSubmitEditing,
+  limited = false,
 }) => {
   const [isFocused, setFocused] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
@@ -49,7 +51,7 @@ const MyInputs = ({
           selectionColor={colors.selection}
           autoCorrect={false}
           multiline={multiline}
-          maxLength={maxLength}
+          maxLength={!!limited ? 500 : maxLength}
           placeholder={placeholder}
           placeholderTextColor={colors.placeholder}
           secureTextEntry={isPassword ? !showPassword : false}
@@ -71,6 +73,11 @@ const MyInputs = ({
           </TouchableHighlight>
         }
       </View>
+      {limited && <MyText
+        color={colors.lightText+"AA"}
+        fontSize={12}
+        style={{ marginTop: 5 }}
+      >Maximum limit 500 charachters</MyText>}
     </View>
   )
 }

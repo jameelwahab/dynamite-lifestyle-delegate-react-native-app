@@ -13,15 +13,15 @@ const FeedTabs = ({ isCosmos, changeTab, tab, CustomTabs }) => {
   const { settings } = useSelector(selectSettings);
   const { user } = useSelector(selectUser);
 
-  useEffect(() => {
-    setTimeout(() => {
-      menuRef?.current?.scrollToIndex({
-        index: tab,
-        animated: true
-      })
-    }, 200);
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     menuRef?.current?.scrollToIndex({
+  //       index: tab,
+  //       animated: true
+  //     })
+  //   }, 200);
 
-  }, [tab])
+  // }, [tab])
 
 
   return (
@@ -40,15 +40,15 @@ const FeedTabs = ({ isCosmos, changeTab, tab, CustomTabs }) => {
             return (
               <TouchableOpacity
                 onPress={() => {
-                  // menuRef?.current?.scrollToIndex({
-                  //   index: index,
-                  //   animated: true
-                  // })
+                  menuRef?.current?.scrollToIndex({
+                    index: index,
+                    animated: true
+                  })
                   // setTimeout(() => {
                   changeTab(index)
                   // }, 100);
                 }}
-                style={{ justifyContent: "center", paddingHorizontal: 10 }}>
+                style={{ justifyContent: "center", paddingHorizontal:10 }}>
                 <MyText fontSize={15} type={index == tab ? 'medium' : 'regular'} color={index == tab ? colors.primary2 : colors.lightText} >
                   {item.title}
                 </MyText>

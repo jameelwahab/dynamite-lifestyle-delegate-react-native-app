@@ -17,7 +17,7 @@ import { MenuButton } from '../../../components/MyButton'
 import { icons } from '../../../utilities/icons'
 import ConfirmationModal from '../../../components/ConfirmationModal'
 
-const EventListing = ({ navigation, route }) => {
+const PortalListing = ({ navigation, route }) => {
   const { key } = route?.params;
   const isDelegatePortals = key == "my_portals";
   const { navbar } = useSelector(selectNavbar);
@@ -237,7 +237,7 @@ const EventListing = ({ navigation, route }) => {
   )
 }
 
-export default EventListing
+export default PortalListing
 
 const __style = StyleSheet.create({
   itemView: {

@@ -942,7 +942,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
   return (
     <View>
-      {tab == 0 &&
+      {tab == 0 ?
         <View >
           {!hideLevelView &&
             <Pressable
@@ -1002,10 +1002,10 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
             {/* <View style={__style.divider} /> */}
 
 
-            {Modal_addPost()}
 
           </View>
 
+            
           <LevelModal
             selectFeedlevel={selectFeedlevel}
             feedLevel={feedLevel}
@@ -1013,7 +1013,9 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
             isCosmos={isCosmos}
           />
 
-        </View>}
+        </View> : undefined}
+
+        {Modal_addPost()}
     </View>
 
   )

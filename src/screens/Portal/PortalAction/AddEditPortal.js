@@ -40,8 +40,8 @@ const AddEditPortal = ({ navigation, route }) => {
     isPurchaseLinkEnabled: !!item?.is_purchase_link ? true : false,
     image: !!item?.images?.thumbnail_1 ? item?.images?.thumbnail_1 : "",
     logo: !!item?.event_logo?.thumbnail_1 ? item?.event_logo?.thumbnail_1 : "",
-    banner1: !!item?.banner1_image ? item?.banner1_image : "",
-    banner2: !!item?.banner2_image ? item?.banner2_image : "",
+    banner1: !!item?.banner1_image?.thumbnail_1 ? item?.banner1_image?.thumbnail_1 : "",
+    banner2: !!item?.banner2_image?.thumbnail_1 ? item?.banner2_image?.thumbnail_1 : "",
     embedCode: !!item?.video_url ? item?.video_url : "",
     shortDesc: !!item?.short_description ? item?.short_description : "",
     longDesc: !!item?.detail_description ? item?.detail_description : "",
@@ -261,7 +261,7 @@ const AddEditPortal = ({ navigation, route }) => {
 
 
         <View style={__styles.radioRootView}>
-          <MyText isLabel>Is Purchased link Enable*</MyText>
+          <MyText isLabel>Is Purchase link Enable*</MyText>
           <View style={__styles.radioView}>
             <View style={__styles.radioItem}>
               <MyCheckBox
@@ -343,6 +343,7 @@ const AddEditPortal = ({ navigation, route }) => {
           multiline
           value={data?.shortDesc}
           onChangeText={(text) => setData({ shortDesc: text })}
+          limited
         />
 
         <Editor

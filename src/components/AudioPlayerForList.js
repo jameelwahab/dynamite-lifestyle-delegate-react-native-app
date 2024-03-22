@@ -14,12 +14,14 @@ import { SimpleLoader } from './MyLoader';
 
 
 
-const AudioPlayer = ({ stop = "", url,  }) => {
+const AudioPlayerForList = ({ stop = "", url, id }) => {
   const [duration, setDuration] = useState(0);
   const [position, setPosition] = useState(0);
   const [loading, setLoading] = useState(false)
   const progress = useProgress();
   const [isPlaying, setPlaying] = useState(false);
+  const active = useActiveTrack();
+  const isCurrent = !!active ? active?.id == id : false;
 
   useEffect(() => {
     if (!!stop) {
@@ -30,15 +32,16 @@ const AudioPlayer = ({ stop = "", url,  }) => {
 
   useEffect(() => {
 
+    if (active?.id == id) {
       let duration = parseInt(progress.duration);
       let position = progress.position;
       setDuration(duration);
       setPosition(position);
-    
+    }
   }, [progress]);
 
+
   const { state: playerState } = usePlaybackState();
-  
   if (playerState === "ready" && loading == true) {
     setLoading(false)
   }
@@ -51,13 +54,7 @@ const AudioPlayer = ({ stop = "", url,  }) => {
 
   useEffect(() => {
 
-    if (!!url) {
-      setLoading(true)
-      setTimeout(() => {
-        load()
-      }, 500);
-    }
-
+    
 
     return () => {
       console.log("playerState dead")
@@ -67,9 +64,12 @@ const AudioPlayer = ({ stop = "", url,  }) => {
 
   }, [url])
 
+ 
+
   const load = async () => {
+    setLoading(true);
     await TrackPlayer.add({
-      id: index,
+      id: id,
       url: !!url.uri ? url.uri : S3_URL + url,
       title: "",
       artist: "",
@@ -77,6 +77,7 @@ const AudioPlayer = ({ stop = "", url,  }) => {
       genre: '',
       artwork: "",
     });
+    TrackPlayer.play();
 
   }
 
@@ -86,21 +87,30 @@ const AudioPlayer = ({ stop = "", url,  }) => {
 
   const playPauseFunction = async () => {
     const status = await TrackPlayer.getState();
-    console.log(status, "track player")
-    if (status == State.Playing) {
-      TrackPlayer.pause()
-      setPlaying(false)
-    } else {
-      TrackPlayer.play()
-      setPlaying(true)
+    if (!!!active) {
+
+      load()
+    } else if (!!active) {
+      if (active.id == id) {
+        if (status == State.Playing) {
+          TrackPlayer.pause()
+          setPlaying(false)
+        } else {
+          TrackPlayer.play()
+          setPlaying(true)
+        }
+      } else {
+        await  TrackPlayer.reset()
+        load()
+      }
     }
   }
+
 
   const pausePlayer = () => {
     TrackPlayer.pause()
     setPlaying(false)
   }
-
 
   return (
     <View style={{ backgroundColor: colors.secondaryVariant, paddingVertical: 3, borderRadius: 40, flexDirection: "row", alignItems: "center", paddingHorizontal: 12, }} >
@@ -109,7 +119,8 @@ const AudioPlayer = ({ stop = "", url,  }) => {
         style={{ height: 50, width: 50, alignItems: "center", justifyContent: "center", }} >
         {loading ?
           <SimpleLoader />
-          : isPlaying ? icons.pause() : icons.play()}
+          : !isCurrent ? icons.play() :
+            isPlaying ? icons.pause() : icons.play()}
       </TouchableOpacity>
       <View style={styles.container}>
         <Text style={styles.position}>{formatTime(position)}</Text>
@@ -131,7 +142,7 @@ const AudioPlayer = ({ stop = "", url,  }) => {
             },
           }}
           animationType='timing'
-          maximumValue={duration}
+          maximumValue={!isCurrent ? 0 : duration}
 
           onSlidingComplete={val => {
             TrackPlayer.seekTo(val)
@@ -147,7 +158,7 @@ const AudioPlayer = ({ stop = "", url,  }) => {
 };
 
 
-export default AudioPlayer;
+export default AudioPlayerForList;
 
 const styles = StyleSheet.create({
   container: {

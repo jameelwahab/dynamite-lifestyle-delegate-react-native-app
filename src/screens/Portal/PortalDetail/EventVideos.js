@@ -9,6 +9,7 @@ import { colors } from '../../../utilities/colors'
 import MyText from '../../../components/MyText'
 import routes from '../../../navigation/routes'
 import EmptyView from '../../../components/EmptyView'
+import AudioPlayerForList from '../../../components/AudioPlayerForList'
 const EventVideos = ({ selectedEvent: event, navigation }) => {
 
 
@@ -17,7 +18,7 @@ const EventVideos = ({ selectedEvent: event, navigation }) => {
       video: video
     })
   }
-console.log(event,"event")
+  console.log(event, "event")
   return (
     <View>
       {!!event && (
@@ -25,23 +26,27 @@ console.log(event,"event")
 
           {(!!event?.dynamite_event_category_video && event?.dynamite_event_category_video.length > 0) ?
             event?.dynamite_event_category_video.map((x, i) =>
-              <View>
-                <View >
-                  <View style={__style.titleView}>
-                    <MyText color={colors.primary} fontSize={16} type='medium' >{x?.title}</MyText>
-                  </View>
+              <View style={{ width: "100%" }}>
+
+                <View style={__style.titleView}>
+                  <MyText color={colors.primary} fontSize={16} type='medium' >{x?.title}</MyText>
+                </View>
+                {x.video_type == "audio" && x?.audio_file_url &&
+                  <View style={{ margin: 10 }}>
+                    <AudioPlayerForList url={x?.audio_file_url} id={x._id} />
+                  </View>}
+                {x.video_type == "video" && x?.video_url &&
                   <MyWebview
                     html={x?.video_url}
                     width={utilities.screenWidth() - 40}
-                  />
-                  {x?.is_chat_enable &&
-                    <View style={__style.btnRow}>
-                      <MyButton
-                        onPress={() => onVideoDetailScreen(x)}
-                        title={"Show Chat"}
-                        invert style={__style.btnStyle} />
-                    </View>}
-                </View>
+                  />}
+                {x?.is_chat_enable &&
+                  <View style={__style.btnRow}>
+                    <MyButton
+                      onPress={() => onVideoDetailScreen(x)}
+                      title={"Show Chat"}
+                      invert style={__style.btnStyle} />
+                  </View>}
               </View>) :
 
 
@@ -57,7 +62,7 @@ console.log(event,"event")
                   uri={S3_URL + event?.images?.thumbnail_1}
                   width={utilities.screenWidth() - 40}
                 />
-                : <EmptyView/>
+                : <EmptyView />
           }
 
         </View>
