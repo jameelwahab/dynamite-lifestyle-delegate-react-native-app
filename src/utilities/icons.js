@@ -43,7 +43,7 @@ export const icons = {
 
   user: () => { return (<FontAwesome6 name="user-large" color={colors.primary} size={17} />) },
   backMajor: (color = colors.primary, size = 20) => { return (<Ionicons name="arrow-back-outline" color={color} size={size} />) },
-  copy: () => { return (<Ionicons name="copy" color={colors.primary} size={17} />) },
+  copy: (color = colors.primary, size = 17) => { return (<Ionicons name="copy" color={color} size={size} />) },
   copyOulined: (size = 20, color = colors.primary) => { return (<Ionicons name="copy-outline" color={color} size={size} />) },
   lock: (color = colors.primary, size = 17) => { return (<Fontisto name="locked" color={color} size={size} />) },
   gear: () => { return (<Ionicons name="settings" color={colors.primary} size={17} />) },
