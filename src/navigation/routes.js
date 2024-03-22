@@ -19,7 +19,9 @@ const routes = {
   paymentRquesNavigator: "PAYMENT_REQUEST_NAVIGATOR",
   portalNavigator: "PORTAL_NAVIGATOR",
   myPortalNavigator: "MY_PORTAL_NAVIGATOR",
-
+  linksNavigator: "LINKS_NAVIGATOR",
+  subscriptionNavigator: "SUBSCRIPTION_NAVIGATOR",
+  membersAnswersNavigator: "MEMBERS_ANSWERS_NAVIGATOR",
 
   //! ///    Screens'
   login: "LOGIN_SCREEN",
@@ -119,12 +121,22 @@ const routes = {
 
   portalCategoryList: "PORTAL_EVENT_CATEGORY_LIST",
   portalAddEditCategory: "PORTAL_EVENT_ADD_EDIT_CATEGORY",
-
   portalVideoList: "PORTAL_EVENT_CATEGORY_VIDEO_LIST",
   portalAddEditVideo: "PORTAL_EVENT_ADD_EDIT_VIDEO",
   portalVideoQuestionSettings: "PORTAL_VIDEO_QUESTION_SETTINGS",
   portalVideoQuestionManage: "PORTAL_VIDEO_MANAGE_QUESTION",
-  portalVideoQuestionAnswers: "PORTAL_VIDEO_QUESTION_ANSWERS",
+
+  //? Links
+  linksListing: "LINKS_LISTING_SCREEN",
+
+  //? Subscription
+  subscriptionList: "SUBSCRIPTION_LISTING_SCREEN",
+
+  //? Member Answer
+  memberAnswersList: "MEMBER_ANSWER_LISTING_SCREEN",
+
+
+
 }
 
 export default routes;

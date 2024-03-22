@@ -15,6 +15,9 @@ import StackCommissions from "../NestedStacks/StackCommissions";
 import StackPaymentsRequest from "../NestedStacks/StackPaymentsRequest";
 import StackPortals from "../NestedStacks/StackPortals";
 import StackMyPortals from "../NestedStacks/StackMyPortals";
+import StackLinks from "../NestedStacks/StackLinks";
+import StackSubscription from "../NestedStacks/StackSubscription";
+import StackMembersAnswer from "../NestedStacks/StackMemberAnswer";
 
 export const drawerMenuList = [
   {
@@ -158,6 +161,8 @@ export const drawerMenuList = [
     ]
   },
 
+
+
 ];
 
 
@@ -255,7 +260,30 @@ export const ParentComponents = {
     params: {
       key: "my_portals"
     }
-  }
+  },
+  links: {
+    key: routes.linksNavigator,
+    component: StackLinks,
+    params: {
+      key: "links"
+    }
+  },
+
+  member_answers_list: {
+    key: routes.membersAnswersNavigator,
+    component: StackMembersAnswer,
+    params: {
+      key: "member_answers_list"
+    }
+  },
+
+  subscription_list: {
+    key: routes.subscriptionNavigator,
+    component: StackSubscription,
+    params: {
+      key: "subscription_list"
+    }
+  },
 }
 
 export const ChildComponents = {
