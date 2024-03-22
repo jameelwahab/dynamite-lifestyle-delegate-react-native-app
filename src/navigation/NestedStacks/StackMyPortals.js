@@ -25,7 +25,9 @@ import VideoList from '../../screens/Portal/PortalVideo/VideoList';
 import VideoAddEdit from '../../screens/Portal/PortalVideo/VideoAddEdit';
 import QuestionSettings from '../../screens/Portal/PortalVideo/QuestionSettings';
 import ManageQuestions from '../../screens/Portal/PortalVideo/ManageQuestions';
-import QuestionAnswers from '../../screens/Portal/PortalVideo/QuestionAnswers';
+import AddEditQuestionScreen from '../../screens/Questions/AddEditQuestionScreen';
+import AnsweredUserList from '../../screens/Questions/AnsweredUserList';
+import GenericQuetionList from '../../screens/Questions/GenericQuetionList';
 
 
 const MyPortals = createNativeStackNavigator();
@@ -55,7 +57,9 @@ const StackMyPortals = ({ route }) => {
 
         <MyPortals.Screen name={routes.portalVideoQuestionSettings} component={QuestionSettings} />
         <MyPortals.Screen name={routes.portalVideoQuestionManage} component={ManageQuestions} />
-        <MyPortals.Screen name={routes.portalVideoQuestionAnswers} component={QuestionAnswers} />
+        <MyPortals.Screen name={routes.addEditQuestions} component={AddEditQuestionScreen} />
+        <MyPortals.Screen name={routes.answeredUserListing} component={AnsweredUserList} />
+        <MyPortals.Screen name={routes.genericQestionListing} component={GenericQuetionList} />
 
 
         {/*//? Default Screens Start */}

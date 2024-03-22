@@ -18,7 +18,7 @@ import { MyButton } from '../../components/MyButton'
 import openUrl from '../../functions/openUrl'
 import { S3_URL } from '../../utilities/constants'
 import MemberView from '../../components/MemberView'
-import QuestionComponent from './QuestionComponent'
+import QuestionComponent from './Components/QuestionComponent'
 
 const GenericQuetionList = ({ navigation, route }) => {
   const { token } = useSelector(selectUser)

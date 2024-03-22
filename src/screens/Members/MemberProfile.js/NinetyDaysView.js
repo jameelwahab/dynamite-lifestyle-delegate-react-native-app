@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { __styles } from './style'
 import MyText from '../../../components/MyText'
 import { colors } from '../../../utilities/colors'
-import QuestionComponent from '../../Questions/QuestionComponent'
+import QuestionComponent from '../../Questions/Components/QuestionComponent'
 import { LineChart } from 'react-native-chart-kit';
 import utilities from '../../../utilities'
 import moment from 'moment'

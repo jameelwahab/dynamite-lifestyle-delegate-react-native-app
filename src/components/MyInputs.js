@@ -35,7 +35,7 @@ const MyInputs = ({
         <TextInput
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
-          style={[__MyInputStyles.input, multiline ? __MyInputStyles.multilineView : undefined, !!rightIcon && { paddingLeft: !!leftIcon ? 0 : 10 }]}
+          style={[__MyInputStyles.input, multiline ? __MyInputStyles.multilineView : undefined, !!rightIcon && { paddingLeft: !!leftIcon ? 0 : 10 }, { color: !editable ? colors.lightText : colors.white }]}
           value={value}
           onChangeText={onChangeText}
           scrollEnabled={multiline}
@@ -45,7 +45,7 @@ const MyInputs = ({
           returnKeyType={isSearch ? "search" : "default"}
           onSubmitEditing={onSubmitEditing}
           editable={editable}
-          
+
           selectionColor={colors.selection}
           autoCorrect={false}
           multiline={multiline}

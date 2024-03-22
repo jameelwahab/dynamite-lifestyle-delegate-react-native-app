@@ -46,7 +46,7 @@ const VideoList = ({ navigation, route }) => {
     let item = optionModal?.selectedItem;
     setOptionModal({ isVisible: false, selectedItem: null });
     setTimeout(() => {
-
+console.log(opt.type,"opt.type")
       if (opt.type == "edit") {
         onAddEditScreen(item)
       } else if (opt.type == "delete") {
@@ -64,15 +64,23 @@ const VideoList = ({ navigation, route }) => {
       } else if (opt.type == "q_manage") {
         onQuestionsScreen(routes.portalVideoQuestionManage, item)
       } else if (opt.type == "q_answer") {
-        onQuestionsScreen(routes.portalVideoQuestionAnswers, item)
+        onUserAnswerScreen(item)
       }
     }, 200);
+  }
+
+  const onUserAnswerScreen = (item) => {
+    console.log("onUserAnswerScreen")
+    navigation.navigate(routes.answeredUserListing, {
+      _id: item?._id,
+      module: "dynamite_event_video"
+    })
   }
 
 
   const onQuestionsScreen = (screen, item) => {
     navigation.navigate(screen, {
-      eventId, slug, videoId: item?._id
+      _id: item?._id
     })
   }
 

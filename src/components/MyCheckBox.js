@@ -23,9 +23,10 @@ const MyCheckBox = ({ value, title = "", onPress, circle = false, size = 20, col
         tintColors={{ true: color, false: color }}
         value={value}
       />
-      <View style={{ marginLeft: Platform.OS == "ios" ? 10 : 20, flex: 1 }}>
-        <MyText color={textColor}  >{title}</MyText>
-      </View>
+      {!!title &&
+        <View style={{ marginLeft: Platform.OS == "ios" ? 10 : 20, flex: 1 }}>
+          <MyText color={textColor}  >{title}</MyText>
+        </View>}
 
     </Pressable>
   )

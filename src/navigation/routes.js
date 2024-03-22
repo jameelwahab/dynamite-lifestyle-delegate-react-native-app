@@ -80,6 +80,8 @@ const routes = {
 
   //? Questions
   genericQestionListing: "QUESTION_LISTING",
+  addEditQuestions: "ADD_EDIT_QUESTIONS",
+  answeredUserListing: "USER_LIST_WHO_ANSWERED",
 
 
   //? chat
