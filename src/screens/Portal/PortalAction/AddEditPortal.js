@@ -23,7 +23,7 @@ import { selectUser } from '../../../redux/reducers/userSlice'
 
 const AddEditPortal = ({ navigation, route }) => {
   const { item, backScreenFunc } = route.params;
-
+console.log(item,"item")
   let { token } = useSelector(selectUser)
   const [loader, setLoader] = useState(false);
   const calendarRef = useRef();
@@ -350,6 +350,7 @@ const AddEditPortal = ({ navigation, route }) => {
           label='Detailed Description *'
           height={150}
           initialValue={data?.longDesc}
+
           onChange={(text) => setData({ longDesc: text })}
         />
 

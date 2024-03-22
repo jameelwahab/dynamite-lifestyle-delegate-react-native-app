@@ -46,7 +46,7 @@ const Editor = ({
   const [isImageModalVisible, setIsImageModalVisible] = useState(false)
   const [loader, setLoader] = useState(false);
   //? Fore Color
-
+console.log(initialValue,"initialValue")
   const updateColor = () => {
 
   }
@@ -242,11 +242,11 @@ const Editor = ({
                 }}
                 selectedIconTint={colors.primary}
                 iconTint={colors.primary}
-                initialContentHTML={initialValue}
+                initialContentHTML={`<div>${initialValue}</div>`}
                 useContainer={true}
                 placeholder={'Type a message...'}
                 onChange={text => onChange(text)}
-                androidLayerType="software"
+                androidLayerType="hardware"
                 androidHardwareAccelerationDisabled
                 scrollEnabled={true}
               />
