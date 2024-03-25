@@ -81,7 +81,7 @@ const __MyButtonStyles = StyleSheet.create({
     height: 50, aspectRatio: 1, alignItems: "center", justifyContent: "center",
   },
   titleText: {
-    color: colors.text,
+    color: colors.black,
     fontFamily: fonts.medium,
     includeFontPadding: false,
     fontSize: 16,

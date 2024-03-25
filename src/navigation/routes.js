@@ -131,6 +131,7 @@ const routes = {
 
   //? Subscription
   subscriptionList: "SUBSCRIPTION_LISTING_SCREEN",
+  subscriptionFilter: "SUBSCRIPTION_FILTER_SCREEN",
 
   //? Member Answer
   memberAnswersList: "MEMBER_ANSWER_LISTING_SCREEN",

@@ -222,6 +222,7 @@ const MembersList = ({ navigation, route }) => {
           contentContainerStyle={{ paddingBottom: 50 }}
           onEndReached={loadMore}
           ListFooterComponent={<FooterLoader isVisible={footerLoader} />}
+          keyExtractor={(item)=>item?._id}
         />
 
       </View>

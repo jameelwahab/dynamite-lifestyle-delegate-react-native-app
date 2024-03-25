@@ -6,6 +6,7 @@ import routes from '../routes'
 import { defaultScreens } from './defaultScreens'
 import { colors } from '../../utilities/colors'
 import SubscriptionList from '../../screens/Subscriptions/SubscriptionList'
+import Filter from '../../screens/Subscriptions/Filter'
 
 
 
@@ -18,6 +19,7 @@ const StackSubscription = ({ route }) => {
         initialRouteName={routes.sourceFeedScreen}
         screenOptions={{ headerShown: false }}>
         <SubscriptionStack.Screen initialParams={route.params} name={routes.subscriptionList} component={SubscriptionList} />
+        <SubscriptionStack.Screen name={routes.subscriptionFilter} component={Filter} />
         {/*//? Default Screens Start */}
         {defaultScreens.map((x, i) => (
           <SubscriptionStack.Screen key={x.name} name={x.name} component={x.component} />

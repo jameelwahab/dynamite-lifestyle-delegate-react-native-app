@@ -23,13 +23,13 @@ const LinksList = ({ navigation, route }) => {
   const { token, user } = useSelector(selectUser);
   const title = useState(navbar?.find(x => x.value == key)?.title);
   const [list, setList] = useState([]);
-  const [affiliate, setAffiliate] = useState(null)
   const [loader, setLoader] = useState(true);
+  const [affiliate, setAffiliate] = useState(null)
   const [optionModal, setOptionModal] = useState({
     isVisible: false,
     selectedItem: null,
   })
-  console.log(user, "user")
+
   useEffect(() => {
     getDataFromServer()
   }, [])
@@ -57,7 +57,7 @@ const LinksList = ({ navigation, route }) => {
     let link = ""
     let msg = ""
     if (type == "appointment") {
-      link = websiteBaseUrl + item?.sale_page_title_slug + "/appointment/" + affiliate;
+      link = websiteBaseUrl + item?.sale_page_title_slug + "/appointment";
       msg = "Appointment URL copied to clipboard"
     } else if (type == "main") {
       link = websiteBaseUrl + item?.sale_page_title_slug
@@ -73,7 +73,7 @@ const LinksList = ({ navigation, route }) => {
       link = websiteBaseUrl + item?.sale_page_title_slug + "/appointment/" + affiliate;
       msg = "Appointment URL copied to clipboard"
     } else if (item?.type_of_page == "sale_page") {
-      link = websiteBaseUrl + item?.sale_page_title_slug
+      link = websiteBaseUrl + item?.sale_page_title_slug + "/" + affiliate;
       msg = "Preview URL copied to clipboard"
     }
 

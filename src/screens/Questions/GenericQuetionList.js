@@ -75,6 +75,7 @@ const GenericQuetionList = ({ navigation, route }) => {
           data={list}
           renderItem={({ item, index }) => <QuestionComponent item={item} index={index} />}
           showsVerticalScrollIndicator={false}
+          keyExtractor={(item) => item?._id}
           ListEmptyComponent={!loader && <EmptyView />}
         />
       </View>
