@@ -1,0 +1,75 @@
+import { View, Text } from 'react-native'
+import React from 'react'
+import ReactNativeBlobUtil from "react-native-blob-util"
+import showToast from './showToast';
+const downloadFile = (url, path) => {
+
+
+
+  if (Platform.OS === "android") {
+
+
+    let ext = extention(url);
+    ext = "." + ext[0];
+    const config = ReactNativeBlobUtil.config;
+    const fs = ReactNativeBlobUtil.fs;
+    let DownloadDir = fs.dirs.DownloadDir;
+    let options = {
+      fileCache: true,
+      addAndroidDownloads: {
+        useDownloadManager: true,
+        notification: true,
+        description: 'Downloading file.',
+        path: DownloadDir + "/" + path + ext,
+      }
+    }
+
+    config(options).fetch('GET', url).then(async (res) => {
+      console.log(res, "res")
+      showToast({ title: "Downloaded", body: "Recources downloaded", type: "success" });
+    }).catch((errorMessage, statusCode) => {
+
+      alert("error in dowload!")
+      console.log(errorMessage, "error in download")
+
+    });
+
+
+
+
+  }
+
+  else {
+    console.log(url, Platform.OS)
+
+    let ext = extention(url);
+    ext = "." + ext[0];
+    const config = ReactNativeBlobUtil.config;
+    let options = {
+      fileCache: true,
+      path: ReactNativeBlobUtil.fs.dirs.DocumentDir + "/" + path + ext,
+    }
+
+    config(options).fetch('GET', url).then(async (res) => {
+
+
+      console.log(res, "res")
+      showToast({ title: "Downloaded", body: "Recources downloaded", type: "success" });
+
+    }).catch((errorMessage,) => {
+
+
+      console.log(errorMessage, "error in download")
+
+    });
+
+  }
+
+}
+
+export default downloadFile
+
+
+const extention = (filename) => {
+  return (/[.]/.exec(filename)) ? /[^.]+$/.exec(filename) : undefined;
+}

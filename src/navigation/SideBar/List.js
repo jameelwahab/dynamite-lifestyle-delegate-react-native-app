@@ -18,6 +18,7 @@ import StackMyPortals from "../NestedStacks/StackMyPortals";
 import StackLinks from "../NestedStacks/StackLinks";
 import StackSubscription from "../NestedStacks/StackSubscription";
 import StackMembersAnswer from "../NestedStacks/StackMemberAnswer";
+import StackTraining from "../NestedStacks/StackTraining";
 
 export const drawerMenuList = [
   {
@@ -276,12 +277,18 @@ export const ParentComponents = {
       key: "member_answers_list"
     }
   },
-
   subscription_list: {
     key: routes.subscriptionNavigator,
     component: StackSubscription,
     params: {
       key: "subscription_list"
+    }
+  },
+  delegate_training: {
+    key: routes.trainingNavigator,
+    component: StackTraining,
+    params: {
+      key: "delegate_training"
     }
   },
 }

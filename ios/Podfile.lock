@@ -505,6 +505,12 @@ PODS:
   - react-native-track-player (4.0.1):
     - React-Core
     - SwiftAudioEx (= 1.0.0)
+  - react-native-video (6.0.0-beta.6):
+    - React-Core
+    - react-native-video/Video (= 6.0.0-beta.6)
+  - react-native-video/Video (6.0.0-beta.6):
+    - PromisesSwift
+    - React-Core
   - react-native-webview (13.6.2):
     - React-Core
   - React-perflogger (0.71.11)
@@ -793,6 +799,7 @@ DEPENDENCIES:
   - "react-native-slider (from `../node_modules/@react-native-community/slider`)"
   - react-native-splash-screen (from `../node_modules/react-native-splash-screen`)
   - react-native-track-player (from `../node_modules/react-native-track-player`)
+  - react-native-video (from `../node_modules/react-native-video`)
   - react-native-webview (from `../node_modules/react-native-webview`)
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
@@ -942,6 +949,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-splash-screen"
   react-native-track-player:
     :path: "../node_modules/react-native-track-player"
+  react-native-video:
+    :path: "../node_modules/react-native-video"
   react-native-webview:
     :path: "../node_modules/react-native-webview"
   React-perflogger:
@@ -1077,6 +1086,7 @@ SPEC CHECKSUMS:
   react-native-slider: 1cdd6ba29675df21f30544253bf7351d3c2d68c4
   react-native-splash-screen: 4312f786b13a81b5169ef346d76d33bc0c6dc457
   react-native-track-player: 97d76dbbd35f27cc709e5f04540615e54264b3f9
+  react-native-video: dc3118548cf8864a83f57df4345cf6c692402e8f
   react-native-webview: 8fc09f66a1a5b16bbe37c3878fda27d5982bb776
   React-perflogger: e706562ab7eb8eb590aa83a224d26fa13963d7f2
   React-RCTActionSheet: 57d4bd98122f557479a3359ad5dad8e109e20c5a

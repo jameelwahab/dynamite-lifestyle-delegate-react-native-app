@@ -52,7 +52,7 @@ export class MyWebview extends Component {
       <RenderHTML
         WebView={WebView}
         contentWidth={this.props.fullWidth ? Dimensions.get("window").width - 40 : !!this.props.width ? this.props.width : Dimensions.get("window").width / 1.5}
-        source={{ html: "<div>" + html.replace(/padding/g,"") + "</div>" }}
+        source={{ html: "<div>" + html.replace(/padding/g, "") + "</div>" }}
         customHTMLElementModels={this.customHTMLElementModels}
         renderers={this.renderers}
         enableExperimentalMarginCollapsing={true}
@@ -70,7 +70,7 @@ export class MyWebview extends Component {
           div: {
             color: colors.white,
             fontFamily: this.props.html.includes("<b>") ? undefined : fonts.regular,
-            // margin: 0,
+            margin: 0,
             // padding: 0,
           },
           p: {
@@ -80,7 +80,8 @@ export class MyWebview extends Component {
             margin: 0
           },
           h2: {
-            margin: 0
+            margin: 0,
+            color:colors.primary
           },
           h3: {
             margin: 0
@@ -93,6 +94,9 @@ export class MyWebview extends Component {
           },
           h6: {
             margin: 0
+          },
+          img: {
+            marginTop: 5,
           },
           ...style
         }}

@@ -1,7 +1,9 @@
-import { View, Text, Image } from 'react-native'
+import { View, Text, Image, StyleProp } from 'react-native'
 import React, { memo, useEffect, useState } from 'react'
 import FastImage from 'react-native-fast-image';
 import utilities from '../utilities';
+
+
 
 const ResponsiveImage2 = memo(({ uri, style, width }) => {
   const [size, setSize] = useState({ height: 0, width: 0 });
@@ -28,5 +30,6 @@ const ResponsiveImage2 = memo(({ uri, style, width }) => {
     )
   } else return null;
 });
+
 
 export default ResponsiveImage2;

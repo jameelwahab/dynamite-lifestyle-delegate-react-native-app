@@ -22,6 +22,7 @@ const routes = {
   linksNavigator: "LINKS_NAVIGATOR",
   subscriptionNavigator: "SUBSCRIPTION_NAVIGATOR",
   membersAnswersNavigator: "MEMBERS_ANSWERS_NAVIGATOR",
+  trainingNavigator: "TRAINING_NAVIGATOR",
 
   //! ///    Screens'
   login: "LOGIN_SCREEN",
@@ -136,6 +137,13 @@ const routes = {
   //? Member Answer
   memberAnswersList: "MEMBER_ANSWER_LISTING_SCREEN",
 
+  //? Training 
+
+  traininglist: "TRAINING_LISTING_SCREEN",
+  trainingDetail: "TRAINING_DETAIL_SCREEN",
+  trainingLessonsList: "TRAINING_LESSONS_LISTING_SCREEN",
+  trainingLessonDetail: "TRAINING_LESSON_DETAIL_SCREEN",
+  trainingLessonRecording: "TRAINING_LESSON_RECORDING_SCREEN",
 
 
 }
