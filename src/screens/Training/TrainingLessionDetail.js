@@ -1,4 +1,4 @@
-import { View, Text, FlatList, Pressable, StyleSheet, ScrollView, TouchableOpacity } from 'react-native'
+import { View, Text, FlatList, Pressable, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import RootView from '../../components/RootView'
 import MyText from '../../components/MyText'
@@ -62,11 +62,27 @@ const TrainingLessonDetail = ({ navigation, route }) => {
   }
 
   const onTrainingDetail = (item) => {
-    navigation.navigate(routes.trainingLessonDetail, {
-      slug: item?.lesson_slug
+    navigation.navigate(routes.trainingLessonRecording, {
+      slug: item?.recording_slug
     })
   }
+  const getFileIconByType = (uri) => {
+    let ext = uri.split(".").pop();
 
+    if (ext == "xls" || ext == "xlsx") {
+      return icons.file_xls
+    } else if (ext == "doc" || ext == "docx") {
+      return icons.file_doc
+    } else if (ext == "pdf") {
+      return icons.file_pdf
+    } else if (ext == "csv") {
+      return icons.file_csv
+    } else if (ext == "mp3") {
+      return icons.file_mp3
+    }
+
+
+  }
 
   const headerView = () => {
     return (
@@ -118,7 +134,9 @@ const TrainingLessonDetail = ({ navigation, route }) => {
   const lessonView = () => {
     return recordings.map((item, index) => {
       return (
-        <View style={[__styles.cardView]}>
+        <Pressable
+          onPress={() => onTrainingDetail(item)}
+          style={[__styles.cardView]}>
           <ResponsiveImage2
             uri={S3_URL + item?.recording_image?.thumbnail_1}
           />
@@ -129,7 +147,7 @@ const TrainingLessonDetail = ({ navigation, route }) => {
                 <MyText>{item?.short_description}</MyText>
               </View>}
           </View>
-        </View>
+        </Pressable>
       )
     })
   }
@@ -137,40 +155,49 @@ const TrainingLessonDetail = ({ navigation, route }) => {
   const recourcesView = () => {
     return recources.map((item, index) => {
       return (
-        <View style={[__styles.cardView]}>
-          <View style={{ alignItems: "center" }}>
-            <ResponsiveImage
-              uri={!!item?.document_thumbnail ? S3_URL + item?.document_thumbnail : S3_URL + item?.document_images_url?.thumbnail_1}
-            />
+        <View style={[__styles.cardView,]}>
+          <View style={{alignSelf: "flex-start", marginTop: 10, marginLeft: 10 }}>
+            {(!!item?.document_thumbnail || item?.document_images_url?.thumbnail_1) ?
+              <ResponsiveImage2
+                uri={!!item?.document_thumbnail ? S3_URL + item?.document_thumbnail : S3_URL + item?.document_images_url?.thumbnail_1}
+                width={((utilities.screenWidth()-40)/2)}
+              /> :
+
+              <Image
+                source={getFileIconByType(item?.document_file_url)}
+              // style={{ width: 50, height: 50 }}
+              />
+            }
           </View>
 
 
-          <View style={__styles.textView}>
-            <MyText type='medium' fontSize={16} color={colors.primary} >{item?.title}</MyText>
-            {!!item?.detailed_description &&
-              <View style={{ marginTop: 5 }}>
-                <MyWebview html={item?.detailed_description} />
-              </View>}
+          <View style={{ }}>
+            <View style={__styles.textView}>
+              <MyText type='medium' fontSize={16} color={colors.primary} >{item?.title}</MyText>
+              {!!item?.detailed_description &&
+                <View style={{ marginTop: 5 }}>
+                  <MyWebview html={item?.detailed_description} />
+                </View>}
+            </View>
+
+
+
+
+
+
+            <TouchableOpacity
+              onPress={() => {
+                if (item?.document_type == "image") {
+                  downloadFile(S3_URL + item?.document_images_url?.thumbnail_1, `Delegate Training/${data?.title}/${item?.title}`)
+                } else {
+                  downloadFile(S3_URL + item?.document_file_url, `Delegate Training/${data?.title}/${item?.title}`)
+                }
+              }}
+              style={__styles.downloadButton}
+            >
+              {icons.download(colors.primary, 25)}
+            </TouchableOpacity>
           </View>
-
-          <View>
-
-
-
-          </View>
-
-          <TouchableOpacity
-            onPress={() => {
-              if (item?.document_type == "image") {
-                downloadFile(S3_URL + item?.document_images_url?.thumbnail_1, `Delegate Training/${data?.title}/${item?.title}`)
-              } else {
-                downloadFile(S3_URL + item?.document_file_url, `Delegate Training/${data?.title}/${item?.title}`)
-              }
-            }}
-            style={__styles.downloadButton}
-          >
-            {icons.download(colors.primary, 25)}
-          </TouchableOpacity>
         </View>
       )
     })
@@ -180,18 +207,18 @@ const TrainingLessonDetail = ({ navigation, route }) => {
     <RootView title={data?.title} >
       <View style={{ flex: 1 }}>
         {!!data &&
-        <ScrollView showsVerticalScrollIndicator={false}>
-          {headerView()}
-          <View style={{ marginTop: 10 }}>
-            <Tabs
-              tab={selectedTabIndex}
-              changeTab={setSelectedTabIndex}
-              list={tabs} />
-          </View>
+          <ScrollView showsVerticalScrollIndicator={false}>
+            {headerView()}
+            <View style={{ marginTop: 10 }}>
+              <Tabs
+                tab={selectedTabIndex}
+                changeTab={setSelectedTabIndex}
+                list={tabs} />
+            </View>
 
-          {selectedTabIndex == 0 ? lessonView() : recourcesView()}
+            {selectedTabIndex == 0 ? lessonView() : recourcesView()}
 
-        </ScrollView>}
+          </ScrollView>}
       </View>
       <MyLoader enable={loader} />
     </RootView>
@@ -205,7 +232,8 @@ const __styles = StyleSheet.create({
     backgroundColor: colors.secondary,
     borderRadius: 10,
     overflow: 'hidden',
-    marginTop: 10
+    marginTop: 10,
+
   },
   textView: {
     padding: 10

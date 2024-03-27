@@ -15,6 +15,7 @@ const MyText = ({
   isLabel = false,
   capitalize = false,
   uppercase = false,
+  isHeading = false,
   ...props
 }) => {
   return (
@@ -26,8 +27,13 @@ const MyText = ({
         fontSize,
         color,
         textAlign: align,
-        textTransform: capitalize ? "capitalize": uppercase ? "uppercase" :"none",
+        textTransform: capitalize ? "capitalize" : uppercase ? "uppercase" : "none",
 
+      },
+      isHeading && {
+        fontFamily: fonts.bold,
+        fontSize: 18,
+        color: colors.primary
       },
         style,
       underlined && {

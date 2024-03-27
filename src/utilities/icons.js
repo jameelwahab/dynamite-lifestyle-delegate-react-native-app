@@ -31,6 +31,13 @@ export const icons = {
   wheelOfLife: require('../assets/icons/wheel-icon.webp'),
   checked: require('../assets/icons/checked.png'),
   csv: require('../assets/icons/csv.png'),
+
+  file_csv: require('../assets/icons/csv1.png'),
+  file_pdf: require('../assets/icons/pdf.png'),
+  file_doc: require('../assets/icons/doc.png'),
+  file_xls: require('../assets/icons/xls.png'),
+  file_mp3: require('../assets/icons/mp3.png'),
+  
   //todo:   sideBar Icons
 
   sidebar: {

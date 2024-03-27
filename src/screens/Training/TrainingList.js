@@ -96,7 +96,7 @@ const TrainingList = ({ navigation, route }) => {
     <RootView
       title={title}
       hideBackBottomButton>
-      <View style={{ flex: 0 }}>
+      <View style={{ flex: 1}}>
         <FlatList
           data={list}
           renderItem={renderTraining}

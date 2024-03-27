@@ -16,6 +16,8 @@ import Tabs from '../../components/Tabs'
 import { colors } from '../../utilities/colors'
 import routes from '../../navigation/routes'
 import { icons } from '../../utilities/icons'
+import { MyButton } from '../../components/MyButton'
+import openUrl from '../../functions/openUrl'
 
 const TrainingDetail = ({ navigation, route }) => {
   let { slug } = route?.params;
@@ -53,6 +55,12 @@ const TrainingDetail = ({ navigation, route }) => {
     })
   }
 
+  const onTrainingLessonList = () => {
+    navigation.navigate(routes.trainingLessonsList, {
+      slug: slug
+    })
+  }
+
 
   const headerView = () => {
     return (
@@ -85,6 +93,36 @@ const TrainingDetail = ({ navigation, route }) => {
     )
   }
 
+  const footerView = () => {
+    let data = selectedTabIndex > 0 ? tabs[selectedTabIndex] : null
+    return (
+      <View>
+        {!!data &&
+          <View style={__styles.cardView}>
+            {!!data?.video_url &&
+              <WebPlayer url={data?.video_url}
+                width={utilities.screenWidth() - 20}
+              />}
+            <View style={{ padding: 10 }}>
+              {!!data?.detailed_description &&
+                <MyWebview html={data?.detailed_description} />
+              }
+
+              {!!data?.button_text && !!data?.button_url &&
+                <View style={{ marginTop: 10 }}>
+                  <MyButton
+                    onPress={() => openUrl(data?.button_url)}
+                    invert title={data?.button_text}
+                  />
+                </View>
+              }
+            </View>
+          </View>
+        }
+      </View>
+    )
+  }
+
   const renderlessons = ({ item, index }) => {
     return (
       <Pressable
@@ -109,11 +147,12 @@ const TrainingDetail = ({ navigation, route }) => {
   const titleView = () => {
     return (
       <View style={__styles.topViewRoot}>
-        {/* <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={__styles.backButtton}>
-          {icons.back(colors.primary, 25)}
-        </TouchableOpacity> */}
+        <MyText isHeading  >{program?.title}</MyText>
+        <TouchableOpacity
+          onPress={onTrainingLessonList}
+          style={__styles.rightButtton}>
+          {icons.list_circle(colors.primary, 25)}
+        </TouchableOpacity>
       </View>
     )
   }
@@ -122,9 +161,11 @@ const TrainingDetail = ({ navigation, route }) => {
     <RootView titleView={titleView}  >
       <View style={{ flex: 1 }}>
         <FlatList
+          showsVerticalScrollIndicator={false}
           ListHeaderComponent={headerView()}
           data={lessons}
-          renderItem={renderlessons}
+          renderItem={selectedTabIndex == 0 ? renderlessons : null}
+          ListFooterComponent={footerView()}
         />
 
       </View>
@@ -136,8 +177,8 @@ const TrainingDetail = ({ navigation, route }) => {
 export default TrainingDetail
 
 const __styles = StyleSheet.create({
-  topViewRoot: { flexDirection: "row", alignItems: "center",flex:1 },
-  backButtton: { height: 50, width: 30, justifyContent: "center" },
+  topViewRoot: { flexDirection: "row", alignItems: "center", flex: 1, justifyContent: "space-between" },
+  rightButtton: { height: 50, width: 30, justifyContent: "center" },
   cardView: {
     backgroundColor: colors.secondary,
     borderRadius: 10,
