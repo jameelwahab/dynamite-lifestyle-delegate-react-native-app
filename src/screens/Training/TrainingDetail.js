@@ -18,6 +18,7 @@ import routes from '../../navigation/routes'
 import { icons } from '../../utilities/icons'
 import { MyButton } from '../../components/MyButton'
 import openUrl from '../../functions/openUrl'
+import VimeoWithPip from '../../components/VimeoWithPip'
 
 const TrainingDetail = ({ navigation, route }) => {
   let { slug } = route?.params;
@@ -64,11 +65,15 @@ const TrainingDetail = ({ navigation, route }) => {
 
   const headerView = () => {
     return (
-      <>
+      <View style={{}}>
         {!!program &&
-          <View>
+          <View style={{}}>
             {!!program?.video_url ?
-              <WebPlayer width={utilities.screenWidth() - 20} url={program?.video_url} /> :
+              <>
+                {program?.video_url.includes("vimeo") ?
+                  <VimeoWithPip id={program?._id} url={program?.video_url} focused={true}  /> :
+                  <WebPlayer width={utilities.screenWidth() - 20} url={program?.video_url} />}
+              </> :
               <ResponsiveImage2 uri={S3_URL + program?.program_images?.thumbnail_1} />}
 
             {!!program?.audio_file &&
@@ -89,7 +94,7 @@ const TrainingDetail = ({ navigation, route }) => {
               list={tabs} />
           </View>
         }
-      </>
+      </View>
     )
   }
 
@@ -159,7 +164,7 @@ const TrainingDetail = ({ navigation, route }) => {
 
   return (
     <RootView titleView={titleView}  >
-      <View style={{ flex: 1 }}>
+      <View style={{ flex: 1 ,  }}>
         <FlatList
           showsVerticalScrollIndicator={false}
           ListHeaderComponent={headerView()}

@@ -9,8 +9,6 @@ const WebPlayer = ({ url, width, height, borderRadius }) => {
 
 
   getUrl = () => {
-
-
     let encodedurl = "https://thesourcedev.dynamitelifestyle.com/mobile-player/" + encodeURIComponent(url);
     console.log(url, "url")
     return encodedurl

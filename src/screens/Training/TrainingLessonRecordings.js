@@ -14,6 +14,7 @@ import { S3_URL } from '../../utilities/constants'
 import utilities from '../../utilities'
 import { colors } from '../../utilities/colors'
 import { icons } from '../../utilities/icons'
+import VimeoWithPip from '../../components/VimeoWithPip'
 
 const TrainingLessonRecordings = ({ navigation, route }) => {
   let { slug } = route?.params;
@@ -56,7 +57,11 @@ const TrainingLessonRecordings = ({ navigation, route }) => {
         {!!recording &&
           <ScrollView>
             {!!recording?.video_url ?
-              <WebPlayer width={utilities.screenWidth() - 20} url={recording?.video_url} /> :
+              <>
+                {recording?.video_url.includes("vimeo") ?
+                  <VimeoWithPip url={recording?.video_url} /> :
+                  <WebPlayer width={utilities.screenWidth() - 20} url={recording?.video_url} />}
+              </> :
               <ResponsiveImage2 uri={S3_URL + recording?.recording_image?.thumbnail_1} />}
 
 

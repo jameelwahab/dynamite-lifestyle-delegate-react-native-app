@@ -16,17 +16,18 @@ export default async function invokeApi({
   token = "",
   noAlerts = false,
   navigation = null,
+  excludeBaseURL = false
 }) {
   const reqObj = {
     method,
-    url: domain + path,
+    url: excludeBaseURL ? path : domain + path,
     headers: {
       ...headers,
       "x-sh-auth": token
     },
   };
 
- 
+
   reqObj.params = queryParams;
 
   if (method === 'POST') {

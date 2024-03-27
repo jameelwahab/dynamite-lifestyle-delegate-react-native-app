@@ -19,6 +19,7 @@ import ResponsiveImage from '../../components/ResponsiveImage'
 import { icons } from '../../utilities/icons'
 import downloadImage from '../../functions/downloadImage'
 import downloadFile from '../../functions/downloadFile'
+import VimeoWithPip from '../../components/VimeoWithPip'
 
 const TrainingLessonDetail = ({ navigation, route }) => {
   let { slug } = route?.params;
@@ -90,7 +91,11 @@ const TrainingLessonDetail = ({ navigation, route }) => {
         {!!data &&
           <View>
             {!!data?.video_url ?
-              <WebPlayer width={utilities.screenWidth() - 20} url={data?.video_url} /> :
+              <>
+                {data?.video_url.includes("vimeo") ?
+                  <VimeoWithPip url={data?.video_url} /> :
+                  <WebPlayer width={utilities.screenWidth() - 20} url={data?.video_url} />}
+              </> :
               <ResponsiveImage2 uri={S3_URL + data?.lesson_images?.thumbnail_1} />}
 
             {!!data?.audio_file &&
@@ -156,11 +161,11 @@ const TrainingLessonDetail = ({ navigation, route }) => {
     return recources.map((item, index) => {
       return (
         <View style={[__styles.cardView,]}>
-          <View style={{alignSelf: "flex-start", marginTop: 10, marginLeft: 10 }}>
+          <View style={{ alignSelf: "flex-start", marginTop: 10, marginLeft: 10 }}>
             {(!!item?.document_thumbnail || item?.document_images_url?.thumbnail_1) ?
               <ResponsiveImage2
                 uri={!!item?.document_thumbnail ? S3_URL + item?.document_thumbnail : S3_URL + item?.document_images_url?.thumbnail_1}
-                width={((utilities.screenWidth()-40)/2)}
+                width={((utilities.screenWidth() - 40) / 2)}
               /> :
 
               <Image
@@ -171,7 +176,7 @@ const TrainingLessonDetail = ({ navigation, route }) => {
           </View>
 
 
-          <View style={{ }}>
+          <View style={{}}>
             <View style={__styles.textView}>
               <MyText type='medium' fontSize={16} color={colors.primary} >{item?.title}</MyText>
               {!!item?.detailed_description &&

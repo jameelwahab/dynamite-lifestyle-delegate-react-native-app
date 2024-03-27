@@ -1,16 +1,14 @@
 import React, { Component, createRef } from 'react';
-import { AppState, ActivityIndicator, View, Platform, Image, Text, Pressable, ImageBackground, TouchableOpacity, Button, Dimensions, } from 'react-native';
-
+import { AppState, ActivityIndicator, View, Platform, Image, Text, Pressable, ImageBackground, } from 'react-native';
 import { NativeModules } from 'react-native';
-
 import Video from 'react-native-video';
+import { icons } from '../utilities/icons';
+import { colors } from '../utilities/colors';
 import invokeApi from '../functions/invokeAPI';
-import getDataFromlocalStorage from './getDataFromlocalStorage';
+
 
 const { PipModule } = NativeModules;
 
-// const ic_Hplaceholder = require("../../assets/h_placeholder1.png")
-const ic_playButton = require("../assets/icons/play-button.png")
 export default class VimeoWithPip extends Component {
 
   constructor(props) {
@@ -28,51 +26,34 @@ export default class VimeoWithPip extends Component {
       haveToSeek: false
     }
 
-    // this.player = React.createRef()
     this.isPlaying = false;
     this.playedTime = 0;
     this.totalTime = 0;
     this.firstTime = true;
     this.player = createRef();
     this.stateEvent = null;
-    // this.navigationEventListener = Navigation.events().bindComponent(this);
   }
 
   componentDidMount() {
+    console.log(PipModule, "PipModule")
     this.stateEvent = AppState.addEventListener("change", (appstate) => {
-
-      if (Platform.OS === "android" && !!this.player?.current) {
+      console.log(appstate, "appstate")
+      console.log(this.player, "Player")
+      console.log(this.isPlaying, "isPlaying")
+      // return
+      if (Platform.OS === "android" && !!this.player) {
         if (appstate == "background" && this.isPlaying) {
-
           this.setState({ isInPipMode: true });
-          this.player?.current?.presentFullscreenPlayer();
+          this.player?.current?.presentFullscreenPlayer?.();
           PipModule.enterPipMode();
-          // Navigation.mergeOptions(this.props.componentId, {
-          //   statusBar: {
-          //     drawBehind: true,
-          //     translucent: true,
-          //     visible: false,
-          //   }
-          // })
-
 
         } else if (appstate == "active" && this.state.isInPipMode) {
           setTimeout(() => {
             this.setState({ isInPipMode: false });
             try {
-              this.player.current.dismissFullscreenPlayer();
+              this.player?.current?.dismissFullscreenPlayer?.();
             } catch (e) {
             }
-
-            // Navigation.mergeOptions(this.props.componentId, {
-            //   statusBar: {
-            //     drawBehind: false,
-            //     translucent: false,
-            //     visible: true,
-            //     backgroundColor: colors.backgorund2,
-            //     style: "light"
-            //   }
-            // })
 
           }, 500);
 
@@ -110,9 +91,9 @@ export default class VimeoWithPip extends Component {
 
     try {
       let res = await invokeApi({
-        path: "https://vimeo.com/api/oembed.json?url=" + url,
+        path: "https://vimeo.com/api/oembed.json?url=" + encodeURIComponent(url),
         excludeBaseURL: true,
-        showConsole: false
+        // showConsole: false
       });
 
       return res?.video_id;
@@ -122,12 +103,12 @@ export default class VimeoWithPip extends Component {
   }
 
   componentWillUnmount() {
-    if (this.stateEvent) {
-      this.stateEvent.remove()
-    }
-    if (this.isPlaying) {
-      this.sendTheTimeToServer()
-    }
+    // if (this.stateEvent) {
+    //   this.stateEvent.remove()
+    // }
+    // if (this.isPlaying) {
+    //   this.sendTheTimeToServer()
+    // }
 
   }
 
@@ -162,6 +143,7 @@ export default class VimeoWithPip extends Component {
           minHeight: !this.state.isInPipMode ? 260 : undefined,
           flex: this.state.isInPipMode ? 1 : undefined,
           position: this.state.isInPipMode ? "absolute" : "relative",
+          marginHorizontal: Platform.OS == "ios" ? -20 : 0
         }}>
         <View style={{ flex: 1 }}>
           {((!!this.state.videoUrl && Platform.OS == "ios") || (Platform.OS == "android" && this.props.focused && !!this.state.videoUrl)) ?
@@ -171,9 +153,7 @@ export default class VimeoWithPip extends Component {
               source={{ uri: this.state.videoUrl }}   // Can be a URL or a local file.
               ref={this.player}
               poster={!!this.props.noPoster == false && this.state.poster}
-              paused={this.props.focused ? !this.state.started : true}
-              // disableFocus={true}
-              // fullscreen={this.state.isInPipMode}
+              paused={(this.props.focused && Platform.OS == "android") ? !this.state.started : Platform.OS == "ios" ? !this.state.started : true}
               onError={this.videoError}
               playInBackground={true}
               resizeMode='cover'
@@ -182,26 +162,27 @@ export default class VimeoWithPip extends Component {
               pictureInPicture={!!this.props.pip ? this.props.pip : true}
               controls={Platform.OS == "android" ? true : true}
               onReadyForDisplay={(res) => {
-                if (this.firstTime) {
-                  this.firstTime = false
-                  if (Number(this.props.startFrom) > 0) {
-                    this.player?.current?.seek((this.props.startFrom - 1))
-                  }
-                  this.setState({ loading: false })
-                } else if (this.state.haveToSeek && Platform.OS == "android") {
-                  this.setState({ haveToSeek: false })
-                  if (Number(this.playedTime) > 0) {
-                    console.log(this.playedTime, "playedTime")
-                    this.player?.current?.seek((this.playedTime - 1))
-                  }
-                }
+                this.setState({ loading: false })
+                // if (this.firstTime) {
+                //   this.firstTime = false
+                //   if (Number(this.props.startFrom) > 0) {
+                //     this.player?.current?.seek((this.props.startFrom - 1))
+                //   }
+                //   this.setState({ loading: false })
+                // } else if (this.state.haveToSeek && Platform.OS == "android") {
+                //   this.setState({ haveToSeek: false })
+                //   if (Number(this.playedTime) > 0) {
+                //     console.log(this.playedTime, "playedTime")
+                //     this.player?.current?.seek((this.playedTime - 1))
+                //   }
+                // }
               }}
 
               onPlaybackStateChanged={(e) => {
                 this.isPlaying = e.isPlaying;
-                if (!e.isPlaying) {
-                  this.sendTheTimeToServer();
-                }
+                // if (!e.isPlaying) {
+                //   this.sendTheTimeToServer();
+                // }
               }}
 
 
@@ -242,7 +223,9 @@ export default class VimeoWithPip extends Component {
             }} /> :
             !this.state.started && this.state.error == false &&
             <Pressable
-              onPress={() => this.setState({ started: true, controls: true, paused: false })}
+              onPress={() => {
+                this.setState({ started: true, controls: true, paused: false });
+              }}
               style={{
                 position: 'absolute',
                 // alignItems: "center",
@@ -256,7 +239,8 @@ export default class VimeoWithPip extends Component {
 
               <ImageBackground style={{ flex: 1, alignItems: "center", justifyContent: "center", }} source={{ uri: this.state.poster }} >
                 <View style={{ height: 50, width: 50, borderRadius: 25, backgroundColor: "#FFF" }}>
-                  <Image style={{ height: 50, width: 50, tintColor: colors.golden }} source={ic_playButton} />
+                  {/* <Image style={{ height: 50, width: 50, tintColor: colors.golden }} source={ic_playButton} /> */}
+                  {icons.playCircle(colors.primary, 50)}
                 </View>
               </ImageBackground>
 
@@ -280,15 +264,15 @@ export default class VimeoWithPip extends Component {
     this.setState({ loading: false })
   }
 
-  storeTime = async (obj) => {
-    let { token } = await getDataFromlocalStorage();
-    await invokeApi({
-      path: "api/member/activity/video_activity",
-      method: "POST",
-      postData: obj,
-      headers: {
-        'x-sh-auth': token
-      }
-    })
-  }
+  // storeTime = async (obj) => {
+  //   let { token } = await getDataFromlocalStorage();
+  //   await invokeApi({
+  //     path: "api/member/activity/video_activity",
+  //     method: "POST",
+  //     postData: obj,
+  //     headers: {
+  //       'x-sh-auth': token
+  //     }
+  //   })
+  // }
 }
