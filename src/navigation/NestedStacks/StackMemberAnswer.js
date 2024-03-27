@@ -8,6 +8,7 @@ import { colors } from '../../utilities/colors'
 
 import List from '../../screens/MemberAnswerList/List'
 import GenericQuetionList from '../../screens/Questions/GenericQuetionList'
+import Filter from '../../screens/MemberAnswerList/Filter'
 
 
 
@@ -22,6 +23,7 @@ const StackMembersAnswer = ({ route }) => {
         initialRouteName={routes.sourceFeedScreen}
         screenOptions={{ headerShown: false }}>
         <MemberAnswersStack.Screen initialParams={route.params} name={routes.memberAnswersList} component={List} />
+        <MemberAnswersStack.Screen name={routes.memberAnswersFilter} component={Filter} />
         <MemberAnswersStack.Screen name={routes.genericQestionListing} component={GenericQuetionList} />
         {/*//? Default Screens Start */}
         {defaultScreens.map((x, i) => (

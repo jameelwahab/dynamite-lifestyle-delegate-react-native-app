@@ -136,6 +136,7 @@ const routes = {
 
   //? Member Answer
   memberAnswersList: "MEMBER_ANSWER_LISTING_SCREEN",
+  memberAnswersFilter: "MEMBER_ANSWER_FILTER_SCREEN",
 
   //? Training 
 

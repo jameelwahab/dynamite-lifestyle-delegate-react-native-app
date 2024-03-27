@@ -14,7 +14,7 @@ import SearchView from '../../components/SearchView'
 import UserImage from '../../components/UserImage'
 import StatView from '../Members/Components/StatView'
 import moment from 'moment'
-import { dateTimeFormat } from '../../utilities/constants'
+import { dateTimeFormat, isDev } from '../../utilities/constants'
 import { MenuButton } from '../../components/MyButton'
 import routes from '../../navigation/routes'
 import OptionModal from '../../components/OptionModal'
@@ -38,7 +38,10 @@ const List = ({ navigation, route }) => {
     isVisible: false,
     selectedItem: null,
   });
-  const [filters, setFilters] = useState({ mode: null, page: null, plan: null });
+  const [filters, setFilters] = useState({
+    mode: isDev ? { title: "SandBox", key: "sandBox", } : { title: "Live", key: "live", }
+    , page: null, plan: null
+  });
 
   const clearFilter = () => {
     setFilters({ mode: null, page: null, plan: null });
@@ -135,7 +138,7 @@ const List = ({ navigation, route }) => {
     return (
       <View style={__styles.headerView}>
         <View style={__styles.filterView}>
-          <View style={[__styles.filterView, { flex: 1, paddingBottom: 5 }]}>
+          <View style={[__styles.filterView, __styles.filterViewWithbtn]}>
 
             {!!filters?.page &&
               <MyChip
@@ -155,15 +158,15 @@ const List = ({ navigation, route }) => {
 
 
           </View>
-
+          {(!!filters?.mode || !!filters?.plan || !!filters?.page) &&
+            <TouchableOpacity
+              onPress={clearFilter}
+              style={{ marginRight: 10, borderWidth: 1, borderColor: colors.delete, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 5, backgroundColor: colors.heart + "33", alignSelf: "flex-end", marginBottom: 5 }}>
+              <MyText color={colors.delete}>{"Clear Filter"}</MyText>
+            </TouchableOpacity>}
 
         </View>
-        {(!!filters?.mode || !!filters?.plan || !!filters?.page) &&
-          <TouchableOpacity
-            onPress={clearFilter}
-            style={{ marginRight: 10, borderWidth: 1, borderColor: colors.delete, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 5, backgroundColor: colors.heart + "33", alignSelf: "flex-end", marginBottom: 5 }}>
-            <MyText color={colors.delete}>{"Clear Filter"}</MyText>
-          </TouchableOpacity>}
+
         <View>
           <SearchView
             loader={searchLoader}
@@ -289,6 +292,13 @@ const __styles = StyleSheet.create({
   filterView: {
     flexDirection: "row",
     flexWrap: "wrap",
+  },
+  filterViewWithbtn: {
+    flex: 1,
+    alignItems: "center",
+    paddingBottom: 5,
+    flexWrap: "wrap",
+    alignContent: "space-between"
   },
   titleView: {
     flexDirection: "row",

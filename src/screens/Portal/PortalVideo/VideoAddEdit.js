@@ -25,9 +25,9 @@ const VideoAddEdit = ({ route, navigation }) => {
   const [loader, setLoader] = useState(false);
   const [data, updateData] = useState({
     title: !!item?.title ? item?.title : "",
-    status: !!item?.status == false ? false : true,
-    isFeature: !!item?.is_feature ? item?.is_feature : false,
-    chatEnable: !!item?.is_chat_enable == false ? false : true,
+    status: item?.status == false ? false : true,
+    isFeature: item?.is_feature ? true : false,
+    chatEnable: item?.is_chat_enable == false ? false : true,
     type: !!item?.video_type ? item?.video_type : "video",
     videoCode: !!item?.video_url ? item?.video_url : "",
     shortDesc: !!item?.short_description ? item?.short_description : "",
@@ -85,11 +85,11 @@ const VideoAddEdit = ({ route, navigation }) => {
       token, navigation, formdata: fd, catId: item?._id
     })
     if (res.code == 200) {
-      backScreenFunc?.(res?.dynamite_event_category_video)
-      navigation.goBack()
-      // navigation.navigate(routes.portalCategoryList, {
-      //   eventId, slug
-      // })
+      // backScreenFunc?.(res?.dynamite_event_category_video)
+      // navigation.goBack()
+      navigation.navigate(routes.portalVideoList, {
+        eventId, slug,catId
+      })
       setLoader(false);
     } else {
       setLoader(false);

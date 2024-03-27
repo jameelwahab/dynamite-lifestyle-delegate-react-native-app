@@ -23,7 +23,7 @@ const CategoryAddEdit = ({ route, navigation }) => {
   const [loader, setLoader] = useState(false);
   const [data, updateData] = useState({
     title: !!item?.title ? item?.title : "",
-    status: !!item?.status == false ? false : true,
+    status: item?.status == false ? false : true,
     shortDesc: !!item?.short_description ? item?.short_description : "",
     desc: !!item?.detail_description ? item?.detail_description : "",
     order: !!item?.order ? String(item?.order) : "",
@@ -43,7 +43,7 @@ const CategoryAddEdit = ({ route, navigation }) => {
     fd.append("short_description", data.shortDesc.trim());
     fd.append("detail_description", data.desc.trim());
     fd.append("dynamite_event", eventId);
-    if (!!data) {
+    if (!!item) {
       fd.append("order", data.order);
     }
 
@@ -60,11 +60,11 @@ const CategoryAddEdit = ({ route, navigation }) => {
       token, navigation, slug: item?.dynamite_event_category_slug, formdata: fd,
     })
     if (res.code == 200) {
-      backScreenFunc?.(res?.dynamite_event_category)
-      navigation.goBack()
-      // navigation.navigate(routes.portalCategoryList, {
-      //   eventId, slug
-      // })
+      // backScreenFunc?.(res?.dynamite_event_category)
+      // navigation.goBack()
+      navigation.navigate(routes.portalCategoryList, {
+        eventId, slug
+      })
       setLoader(false);
     } else {
       setLoader(false);

@@ -1,4 +1,4 @@
-import { View, Text, RootTagContext, ScrollView } from 'react-native'
+import { View, Text, RootTagContext, ScrollView, StyleSheet } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import RootView from '../../components/RootView'
 import MyText from '../../components/MyText'
@@ -11,6 +11,8 @@ import { selectUser } from '../../redux/reducers/userSlice'
 import OptionModalWithSearch from '../../components/OptionModalWithSearch'
 import { MyButton } from '../../components/MyButton'
 import routes from '../../navigation/routes'
+import { colors } from '../../utilities/colors'
+
 
 const Filter = ({ navigation, route }) => {
   const { filters } = route?.params
@@ -38,13 +40,23 @@ const Filter = ({ navigation, route }) => {
     })
   }
 
+  const onClear = () => {
+    navigation.navigate(routes.subscriptionList, {
+      appliedFilters: {
+        mode: null,
+        page: null,
+        plan: null
+      }
+    })
+  }
+
   const onOptionSelected = (opt) => {
     let { titleKey } = optionModal;
     console.log(opt, "check")
     closeOptionModal()
     setTimeout(() => {
       if (titleKey == "sale_page_title") {
-        setAppliedFilters({ ...appliedFilters, page: opt,plan:null })
+        setAppliedFilters({ ...appliedFilters, page: opt, plan: null })
       } else if (titleKey == "plan_title") {
         setAppliedFilters({ ...appliedFilters, plan: opt })
       }
@@ -114,10 +126,26 @@ const Filter = ({ navigation, route }) => {
         />
 
 
-        <MyButton
-          title='Submit'
-          onPress={onSubmit}
-        />
+        <View style={{ flexDirection: "row", marginTop: 10 }}>
+          {(!!appliedFilters?.plan || !!appliedFilters?.page || !!appliedFilters?.mode ) ?
+            <MyButton
+              style={[__styles.clearBtn, __styles.btn]}
+              textStyle={__styles.clearBtnText}
+              invert
+              title='Clear Filter'
+              onPress={onClear}
+            /> :
+            <View style={[{marginRight:11}, __styles.btn]} />}
+
+
+          <MyButton
+            style={__styles.btn}
+            title='Submit'
+            onPress={onSubmit}
+          />
+
+
+        </View>
       </ScrollView>
 
 
@@ -170,3 +198,18 @@ const modes = [
     key: "all",
   },
 ]
+
+const __styles = StyleSheet.create({
+  clearBtn: {
+    // marginTop: 20,
+    borderColor: colors.delete,
+    backgroundColor: colors.delete + "22",
+    marginRight: 10
+  },
+  clearBtnText: {
+    color: colors.delete
+  },
+  btn: {
+    flex: 1
+  }
+})

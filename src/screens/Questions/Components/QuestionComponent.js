@@ -42,6 +42,7 @@ const QuestionComponent = ({ item, index }) => {
         {Array((item.scaling_max - item.scaling_min) + 1).fill((item.scaling_max - item.scaling_min) + 1).map((y, j) => {
           return (
             <View
+              key={"scaling" + j}
               style={{
                 height: 25, width: 25, borderRadius: 15, borderWidth: 1, borderColor: colors.beige, alignItems: "center", justifyContent: "center", margin: 3,
                 backgroundColor: item?.answer?.answer_statement >= item.scaling_min + j ? colors.beige : colors.transparent
@@ -60,7 +61,7 @@ const QuestionComponent = ({ item, index }) => {
         {item.options.map((item2, index2) => {
           let isCheck = item?.answer?.answer_statement == item2;
           return (
-            <View style={{ paddingTop: 10, justifyContent: "center", backgroundColor: isCheck ? colors.lightPrimary3 : colors.transparent }}>
+            <View key={"radio" + index2} style={{ paddingTop: 10, justifyContent: "center", backgroundColor: isCheck ? colors.lightPrimary3 : colors.transparent }}>
               <MyCheckBox
                 value={isCheck}
                 size={15}
@@ -81,7 +82,7 @@ const QuestionComponent = ({ item, index }) => {
         {item.options.map((item2, index2) => {
           let isCheck = !!item.answer?.answer_statement && Array.isArray(item.answer?.answer_statement) && item.answer?.answer_statement.findIndex(x => x == item2) > -1;
           return (
-            <View style={{ paddingTop: 10, justifyContent: "center", }}>
+            <View key={"checkbox" + index2} style={{ paddingTop: 10, justifyContent: "center", }}>
               <MyCheckBox
                 value={isCheck}
                 size={15} title={item2} textColor={colors.lightText2} />
@@ -95,7 +96,7 @@ const QuestionComponent = ({ item, index }) => {
   const textAreaView = (item, index) => {
     return (
       <View >
-        <View style={{ }}>
+        <View style={{}}>
           {/* <MyInputs
             placeholder={item?.question_placeholder}
             multiline
@@ -103,8 +104,8 @@ const QuestionComponent = ({ item, index }) => {
             editable={false}
             noSpace
           /> */}
-          <View style={{ borderWidth: 1/2, borderRadius: 10, borderColor: colors.white,minHeight:100,padding:10 }}>
-              <MyText color={colors.white} >{item?.answer?.answer_statement}</MyText>
+          <View style={{ borderWidth: 1 / 2, borderRadius: 10, borderColor: colors.white, minHeight: 100, padding: 10 }}>
+            <MyText color={colors.white} >{item?.answer?.answer_statement}</MyText>
           </View>
         </View>
       </View>

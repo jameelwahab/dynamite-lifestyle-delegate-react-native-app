@@ -1,4 +1,4 @@
-import { View, Text, FlatList, StyleSheet } from 'react-native'
+import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import RootView from '../../components/RootView'
 import MyText from '../../components/MyText'
@@ -19,11 +19,12 @@ import { MenuButton } from '../../components/MyButton'
 import routes from '../../navigation/routes'
 import OptionModal from '../../components/OptionModal'
 import { icons } from '../../utilities/icons'
+import MyChip from '../../components/MyChip'
 
 let page = 0;
 let canLoadMore = false;
 const List = ({ navigation, route }) => {
-  const { key } = route?.params;
+  const { key, appliedFilters } = route?.params;
   const { navbar } = useSelector(selectNavbar);
   const { token } = useSelector(selectUser);
   const title = useState(navbar?.find(x => x.value == key)?.title);
@@ -37,7 +38,7 @@ const List = ({ navigation, route }) => {
     isVisible: false,
     selectedItem: null,
   })
-
+  const [filters, setFilters] = useState({ createdFor: null });
 
   const onOptionSelected = (opt) => {
     let item = optionModal?.selectedItem;
@@ -57,15 +58,31 @@ const List = ({ navigation, route }) => {
     })
   }
 
+  const onFilterScreen = () => {
+    navigation.navigate(routes?.memberAnswersFilter, {
+      filters,
+    })
+  }
+
+
 
 
   useEffect(() => {
     callAPI()
-  }, [])
+  }, [JSON.stringify(filters)])
+
+  useEffect(() => {
+    if (!!appliedFilters) {
+      setFilters(appliedFilters)
+    }
+  }, [route])
 
 
 
   const callAPI = () => {
+    setLoader(true);
+    setList([])
+    setTotal(0)
     page = 0;
     canLoadMore = false;
     getDataFromServer()
@@ -86,7 +103,7 @@ const List = ({ navigation, route }) => {
   }
 
   const getDataFromServer = async () => {
-    let res = await GET_MEMBERS_ANSWERS_LIST({ navigation, token, page, created_for: null, search_text: searchText });
+    let res = await GET_MEMBERS_ANSWERS_LIST({ navigation, token, page, created_for: filters?.createdFor?.created_for, search_text: searchText });
     if (res.code == 200) {
       let isFirstTime = page == 0;
       let totalItems = isFirstTime ? res?.members.length : (list.length + res?.members.length);
@@ -112,12 +129,36 @@ const List = ({ navigation, route }) => {
   const headerView = () => {
     return (
       <View style={__styles.headerView}>
-        <SearchView
-          loader={searchLoader}
-          onChangeText={(text) => setSearchText(text)}
-          search={searchText}
-          onSearchPress={onSerachPress}
-        />
+        <View style={__styles.filterView}>
+          <View style={[__styles.filterView, { flex: 1, paddingBottom: 5, alignItems: "center", justifyContent: "space-between" }]}>
+
+            {!!filters?.createdFor &&
+              <MyChip
+                title={filters?.createdFor?.title}
+                onPress={() => setFilters({ ...filters, createdFor: null })}
+              />
+            }
+            {(!!filters?.createdFor) &&
+              <TouchableOpacity
+                onPress={() => setFilters({ ...filters, createdFor: null })}
+                style={{ marginLeft: 10, borderWidth: 1, borderColor: colors.delete, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 5, backgroundColor: colors.heart + "33", alignSelf: "flex-end", }}>
+                <MyText color={colors.delete}>{"Clear Filter"}</MyText>
+              </TouchableOpacity>}
+
+          </View>
+
+
+        </View>
+
+
+        <View>
+          <SearchView
+            loader={searchLoader}
+            onChangeText={(text) => setSearchText(text)}
+            search={searchText}
+            onSearchPress={onSerachPress}
+          />
+        </View>
       </View>
     )
   }
@@ -143,7 +184,10 @@ const List = ({ navigation, route }) => {
           />
         </View>
         <View style={{ marginTop: 10 }}>
-          <StatView title={"Question Created For"} value={item.created_for.replace(/[_-]/g, " ")} />
+          <TouchableOpacity
+            onPress={() => onAnswerScreen(item)} >
+            <StatView title={"Question Created For"} value={item.created_for.replace(/[_-]/g, " ")} />
+          </TouchableOpacity>
           <StatView title={"Module Title"} value={item?.title} />
           <StatView title={"Answered Date"} value={moment(item.reply_date).format(dateTimeFormat.date)} />
 
@@ -152,10 +196,26 @@ const List = ({ navigation, route }) => {
       </View>)
   }
 
+  const topView = () => {
+    return (
+      <View style={__styles.titleView}>
+        <View style={{ flex: 1 }}>
+          <MyText fontSize={18} type='bold' color={colors.primary} >{title}</MyText>
+          <MyText fontSize={10} type='medium' color={colors.lightText2}>{`Showing ${list.length} of ${total}`}</MyText>
+        </View>
+
+        <TouchableOpacity
+          onPress={onFilterScreen}
+          hitSlop={{ top: 10, left: 10, right: 10, bottom: 10 }}
+          style={{ flex: 0 }} >
+          {icons.filterCircle(colors.primary, 25)}
+        </TouchableOpacity>
+      </View>
+    )
+  }
+
   return (
-    <RootView hideBackBottomButton
-      title={title}
-      subTitle={`Showing ${list.length} of ${total}`} >
+    <RootView hideBackBottomButton titleView={topView} >
       <View style={{ flex: 1 }}>
         <FlatList
           ListHeaderComponent={headerView()}
@@ -211,5 +271,14 @@ const __styles = StyleSheet.create({
   headerView: {
     paddingBottom: 10,
     backgroundColor: colors.darkSecondary
+  },
+  titleView: {
+    flexDirection: "row",
+    paddingHorizontal: 10,
+    alignItems: "center"
+  },
+  filterView: {
+    flexDirection: "row",
+    flexWrap: "wrap",
   }
 })

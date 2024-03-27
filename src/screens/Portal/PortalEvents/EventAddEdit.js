@@ -17,7 +17,7 @@ import MyCheckBox from '../../../components/MyCheckBox'
 
 const EventAddEdit = ({ route, navigation }) => {
   let { item, slug, eventId } = route.params;
-
+console.log("hi")
   let { token } = useSelector(selectUser);
   const [loader, setLoader] = useState(false);
   const [data, updateData] = useState({
@@ -46,7 +46,9 @@ const EventAddEdit = ({ route, navigation }) => {
     if (!!data.image?.uri) {
       fd.append("image", data.image);
     }
+    console.log(!!item,"checking order") 
     if (!!item) {
+      console.log("checking order") 
       fd.append("order", item?.order);
     }
     if (!!item) {
@@ -72,7 +74,7 @@ const EventAddEdit = ({ route, navigation }) => {
   }
 
   const addDataToServer = async (fd) => {
-    let res = await PORTAL_ADD_EVENT({
+    let res = await PORTAL_ADD_EVENT({   
       token, navigation, formdata: fd
     })
     if (res.code == 200) {

@@ -46,7 +46,7 @@ const Editor = ({
   const [isImageModalVisible, setIsImageModalVisible] = useState(false)
   const [loader, setLoader] = useState(false);
   //? Fore Color
-console.log(initialValue,"initialValue")
+
   const updateColor = () => {
 
   }
