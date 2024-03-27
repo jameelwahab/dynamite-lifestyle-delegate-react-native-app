@@ -20,6 +20,7 @@ import { MyButton } from '../../components/MyButton'
 import openUrl from '../../functions/openUrl'
 import VimeoWithPip from '../../components/VimeoWithPip'
 import { useFocusEffect } from '@react-navigation/native'
+import EmptyView from '../../components/EmptyView'
 
 const TrainingDetail = ({ navigation, route }) => {
   let { slug } = route?.params;
@@ -27,26 +28,46 @@ const TrainingDetail = ({ navigation, route }) => {
   const [loader, setLoader] = useState(true);
   const [program, setProgram] = useState(null);
   const [lessons, setLessons] = useState([])
-  const [modules, setModules] = useState([]);
   const [tabs, setTabs] = useState([]);
   const [isFocused, setIsFocused] = useState(false);
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
+  const [mySlug, setSlug] = useState(slug)
   useEffect(() => {
+    setLessons([])
+    setTabs([])
+    setProgram(null);
+    setLoader(true)
     getDataFromServer()
-  }, [])
+  }, [mySlug])
 
 
   useFocusEffect(useCallback(() => {
-    console.log(true, "isFocused")
     setIsFocused(true);
     return () => {
-      console.log(false, "isFocused")
       setIsFocused(false);
     }
   }, []))
 
+
+  const onTabClick = (index) => {
+    console.log(index, "index")
+    let link = tabs[index]?.button_url;
+
+    console.log(link, "Link")
+    if (!!link) {
+      if (link.includes("dynamitelifestyle.com") && link.includes("delegates")) {
+        if (link.includes("delegate-training")) {
+          let slug = link.split("/").pop();
+          setSlug(slug)
+        }
+      } else {
+        openUrl(link)
+      }
+    }
+  }
+
   const getDataFromServer = async () => {
-    let res = await GET_TRAINING_DETAIL({ navigation, token, slug });
+    let res = await GET_TRAINING_DETAIL({ navigation, token, slug: mySlug });
     if (res.code == 200) {
       setProgram(res?.program);
       setLessons(res?.lesson);
@@ -70,7 +91,7 @@ const TrainingDetail = ({ navigation, route }) => {
 
   const onTrainingLessonList = () => {
     navigation.navigate(routes.trainingLessonsList, {
-      slug: slug
+      slug: mySlug
     })
   }
 
@@ -105,10 +126,7 @@ const TrainingDetail = ({ navigation, route }) => {
 
             <Tabs
               tab={selectedTabIndex}
-              changeTab={(index) => {
-                let link = tabs[index]?.button_url
-                if (!!link) { openUrl(link) }
-              }}
+              changeTab={onTabClick}
               list={tabs} />
           </View>
         }
@@ -171,11 +189,12 @@ const TrainingDetail = ({ navigation, route }) => {
     return (
       <View style={__styles.topViewRoot}>
         <MyText isHeading  >{program?.title}</MyText>
-        <TouchableOpacity
-          onPress={onTrainingLessonList}
-          style={__styles.rightButtton}>
-          {icons.list_circle(colors.primary, 25)}
-        </TouchableOpacity>
+        {!!program &&
+          <TouchableOpacity
+            onPress={onTrainingLessonList}
+            style={__styles.rightButtton}>
+            {icons.list_circle(colors.primary, 25)}
+          </TouchableOpacity>}
       </View>
     )
   }
@@ -183,12 +202,16 @@ const TrainingDetail = ({ navigation, route }) => {
   return (
     <RootView titleView={titleView}  >
       <View style={{ flex: 1, }}>
-        <FlatList
-          showsVerticalScrollIndicator={false}
-          ListHeaderComponent={headerView()}
-          data={lessons}
-          renderItem={ renderlessons }
-        />
+        {!!program ?
+          <FlatList
+            showsVerticalScrollIndicator={false}
+            ListHeaderComponent={headerView()}
+            data={lessons}
+            renderItem={renderlessons}
+          /> :
+          loader == false &&
+          <EmptyView label={`Nothing Found`} />
+        }
 
       </View>
       <MyLoader enable={loader} />
