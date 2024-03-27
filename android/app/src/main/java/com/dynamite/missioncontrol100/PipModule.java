@@ -62,14 +62,14 @@ public class PipModule extends ReactContextBaseJavaModule{
 
 
             RemoteAction seekForwardAction = new RemoteAction(
-                    Icon.createWithResource("com.dynamite.digital", R.drawable.forward5),
+                    Icon.createWithResource(getReactApplicationContext(), R.drawable.forward5),
                     "Seek forward",
                     "SEEK_FORWARD",
                     forwardPendindIntent);
 
 
             RemoteAction seekBackwardAction = new RemoteAction(
-                    Icon.createWithResource("com.dynamite.digital", R.drawable.backward5),
+                    Icon.createWithResource(getReactApplicationContext(), R.drawable.backward5),
                     "Seek backward",
                     "SEEK_BACKWARD",
                     backwardIntent);
