@@ -59,7 +59,7 @@ const TrainingLessonRecordings = ({ navigation, route }) => {
             {!!recording?.video_url ?
               <>
                 {recording?.video_url.includes("vimeo") ?
-                  <VimeoWithPip url={recording?.video_url} /> :
+                  <VimeoWithPip url={recording?.video_url} focused={true} id={recording?._id} /> :
                   <WebPlayer width={utilities.screenWidth() - 20} url={recording?.video_url} />}
               </> :
               <ResponsiveImage2 uri={S3_URL + recording?.recording_image?.thumbnail_1} />}

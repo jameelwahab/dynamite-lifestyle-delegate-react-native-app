@@ -1,5 +1,5 @@
 import { View, Text, FlatList, Pressable, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import RootView from '../../components/RootView'
 import MyText from '../../components/MyText'
 import { useSelector } from 'react-redux'
@@ -20,6 +20,7 @@ import { icons } from '../../utilities/icons'
 import downloadImage from '../../functions/downloadImage'
 import downloadFile from '../../functions/downloadFile'
 import VimeoWithPip from '../../components/VimeoWithPip'
+import { useFocusEffect } from '@react-navigation/native'
 
 const TrainingLessonDetail = ({ navigation, route }) => {
   let { slug } = route?.params;
@@ -32,6 +33,15 @@ const TrainingLessonDetail = ({ navigation, route }) => {
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
   const [prevlesson, setPrevlesson] = useState(null);
   const [nextLesson, setNextLesson] = useState(null);
+  const [isFocused, setIsFocused] = useState(false);
+
+  useFocusEffect(useCallback(() => {
+    setIsFocused(true);
+    return () => {
+      setIsFocused(false);
+    }
+  }, []))
+
 
   useEffect(() => {
     setLoader(true);
@@ -93,7 +103,7 @@ const TrainingLessonDetail = ({ navigation, route }) => {
             {!!data?.video_url ?
               <>
                 {data?.video_url.includes("vimeo") ?
-                  <VimeoWithPip url={data?.video_url} /> :
+                  <VimeoWithPip focused={isFocused} url={data?.video_url} id={data?._id} /> :
                   <WebPlayer width={utilities.screenWidth() - 20} url={data?.video_url} />}
               </> :
               <ResponsiveImage2 uri={S3_URL + data?.lesson_images?.thumbnail_1} />}

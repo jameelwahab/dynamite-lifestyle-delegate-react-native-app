@@ -65,6 +65,9 @@ export default class VimeoWithPip extends Component {
 
 
   }
+
+
+
   getLink = async () => {
 
     let Id = await this.getVimeoId(this.props.url)
@@ -127,9 +130,9 @@ export default class VimeoWithPip extends Component {
 
 
   componentDidUpdate(prevProp) {
-    if (prevProp.focused == true && this.props.focused == false && Platform.OS == "android") {
+    if (prevProp.focused == true && this.props.focused == false) {
       console.log('not focused');
-      this.setState({ haveToSeek: true })
+      this.setState({ started: false })
     }
   }
 

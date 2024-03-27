@@ -1,5 +1,5 @@
 import { View, Text, ScrollView, FlatList, StyleSheet, Pressable, TouchableOpacity } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import RootView from '../../components/RootView'
 import MyText from '../../components/MyText'
 import { useSelector } from 'react-redux'
@@ -19,6 +19,7 @@ import { icons } from '../../utilities/icons'
 import { MyButton } from '../../components/MyButton'
 import openUrl from '../../functions/openUrl'
 import VimeoWithPip from '../../components/VimeoWithPip'
+import { useFocusEffect } from '@react-navigation/native'
 
 const TrainingDetail = ({ navigation, route }) => {
   let { slug } = route?.params;
@@ -28,10 +29,21 @@ const TrainingDetail = ({ navigation, route }) => {
   const [lessons, setLessons] = useState([])
   const [modules, setModules] = useState([]);
   const [tabs, setTabs] = useState([]);
+  const [isFocused, setIsFocused] = useState(false);
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
   useEffect(() => {
     getDataFromServer()
   }, [])
+
+
+  useFocusEffect(useCallback(() => {
+    console.log(true, "isFocused")
+    setIsFocused(true);
+    return () => {
+      console.log(false, "isFocused")
+      setIsFocused(false);
+    }
+  }, []))
 
   const getDataFromServer = async () => {
     let res = await GET_TRAINING_DETAIL({ navigation, token, slug });
@@ -71,7 +83,10 @@ const TrainingDetail = ({ navigation, route }) => {
             {!!program?.video_url ?
               <>
                 {program?.video_url.includes("vimeo") ?
-                  <VimeoWithPip id={program?._id} url={program?.video_url} focused={true}  /> :
+                  <VimeoWithPip
+                    id={program?._id}
+                    url={program?.video_url}
+                    focused={isFocused} /> :
                   <WebPlayer width={utilities.screenWidth() - 20} url={program?.video_url} />}
               </> :
               <ResponsiveImage2 uri={S3_URL + program?.program_images?.thumbnail_1} />}
@@ -90,7 +105,10 @@ const TrainingDetail = ({ navigation, route }) => {
 
             <Tabs
               tab={selectedTabIndex}
-              changeTab={setSelectedTabIndex}
+              changeTab={(index) => {
+                let link = tabs[index]?.button_url
+                if (!!link) { openUrl(link) }
+              }}
               list={tabs} />
           </View>
         }
@@ -164,13 +182,12 @@ const TrainingDetail = ({ navigation, route }) => {
 
   return (
     <RootView titleView={titleView}  >
-      <View style={{ flex: 1 ,  }}>
+      <View style={{ flex: 1, }}>
         <FlatList
           showsVerticalScrollIndicator={false}
           ListHeaderComponent={headerView()}
           data={lessons}
-          renderItem={selectedTabIndex == 0 ? renderlessons : null}
-          ListFooterComponent={footerView()}
+          renderItem={ renderlessons }
         />
 
       </View>
