@@ -21,6 +21,7 @@ import downloadImage from '../../functions/downloadImage'
 import downloadFile from '../../functions/downloadFile'
 import VimeoWithPip from '../../components/VimeoWithPip'
 import { useFocusEffect } from '@react-navigation/native'
+import EmptyView from '../../components/EmptyView'
 
 const TrainingLessonDetail = ({ navigation, route }) => {
   let { slug } = route?.params;
@@ -100,11 +101,11 @@ const TrainingLessonDetail = ({ navigation, route }) => {
       <>
         {!!data &&
           <View>
-            {!!data?.video_url ?
+            {!!data?.landing_lesson_video_url ?
               <>
-                {data?.video_url.includes("vimeo") ?
-                  <VimeoWithPip focused={isFocused} url={data?.video_url} id={data?._id} /> :
-                  <WebPlayer width={utilities.screenWidth() - 20} url={data?.video_url} />}
+                {data?.landing_lesson_video_url.includes("vimeo") ?
+                  <VimeoWithPip focused={isFocused} url={data?.landing_lesson_video_url} id={data?._id} /> :
+                  <WebPlayer width={utilities.screenWidth() - 20} url={data?.landing_lesson_video_url} />}
               </> :
               <ResponsiveImage2 uri={S3_URL + data?.lesson_images?.thumbnail_1} />}
 
@@ -147,75 +148,80 @@ const TrainingLessonDetail = ({ navigation, route }) => {
   }
 
   const lessonView = () => {
-    return recordings.map((item, index) => {
-      return (
-        <Pressable
-          onPress={() => onTrainingDetail(item)}
-          style={[__styles.cardView]}>
-          <ResponsiveImage2
-            uri={S3_URL + item?.recording_image?.thumbnail_1}
-          />
-          <View style={__styles.textView}>
-            <MyText type='medium' fontSize={16} color={colors.primary} >{item?.title}</MyText>
-            {!!item?.short_description &&
-              <View style={{ marginTop: 5 }}>
-                <MyText>{item?.short_description}</MyText>
-              </View>}
-          </View>
-        </Pressable>
-      )
-    })
+    if (recordings.length > 0) {
+      return recordings.map((item, index) => {
+        return (
+          <Pressable
+            onPress={() => onTrainingDetail(item)}
+            style={[__styles.cardView]}>
+            <ResponsiveImage2
+              uri={S3_URL + item?.recording_image?.thumbnail_1}
+            />
+            <View style={__styles.textView}>
+              <MyText type='medium' fontSize={16} color={colors.primary} >{item?.title}</MyText>
+              {!!item?.short_description &&
+                <View style={{ marginTop: 5 }}>
+                  <MyText>{item?.short_description}</MyText>
+                </View>}
+            </View>
+          </Pressable>
+        )
+      })
+    } else return <EmptyView label={"No Lessons Available"} />
   }
 
   const recourcesView = () => {
-    return recources.map((item, index) => {
-      return (
-        <View style={[__styles.cardView,]}>
-          <View style={{ alignSelf: "flex-start", marginTop: 10, marginLeft: 10 }}>
-            {(!!item?.document_thumbnail || item?.document_images_url?.thumbnail_1) ?
-              <ResponsiveImage2
-                uri={!!item?.document_thumbnail ? S3_URL + item?.document_thumbnail : S3_URL + item?.document_images_url?.thumbnail_1}
-                width={((utilities.screenWidth() - 40) / 2)}
-              /> :
+    if (recources.length > 0) {
+      return recources.map((item, index) => {
+        return (
+          <View style={[__styles.cardView,]}>
+            <View style={{ alignSelf: "flex-start", marginTop: 10, marginLeft: 10 }}>
+              {(!!item?.document_thumbnail || item?.document_images_url?.thumbnail_1) ?
+                <ResponsiveImage2
+                  uri={!!item?.document_thumbnail ? S3_URL + item?.document_thumbnail : S3_URL + item?.document_images_url?.thumbnail_1}
+                  width={((utilities.screenWidth() - 40) / 2)}
+                /> :
 
-              <Image
-                source={getFileIconByType(item?.document_file_url)}
-              // style={{ width: 50, height: 50 }}
-              />
-            }
-          </View>
-
-
-          <View style={{}}>
-            <View style={__styles.textView}>
-              <MyText type='medium' fontSize={16} color={colors.primary} >{item?.title}</MyText>
-              {!!item?.detailed_description &&
-                <View style={{ marginTop: 5 }}>
-                  <MyWebview html={item?.detailed_description} />
-                </View>}
+                <Image
+                  source={getFileIconByType(item?.document_file_url)}
+                // style={{ width: 50, height: 50 }}
+                />
+              }
             </View>
 
 
+            <View style={{}}>
+              <View style={__styles.textView}>
+                <MyText type='medium' fontSize={16} color={colors.primary} >{item?.title}</MyText>
+                {!!item?.detailed_description &&
+                  <View style={{ marginTop: 5 }}>
+                    <MyWebview html={item?.detailed_description} />
+                  </View>}
+              </View>
 
 
 
 
-            <TouchableOpacity
-              onPress={() => {
-                if (item?.document_type == "image") {
-                  downloadFile(S3_URL + item?.document_images_url?.thumbnail_1, `Delegate Training/${data?.title}/${item?.title}`)
-                } else {
-                  downloadFile(S3_URL + item?.document_file_url, `Delegate Training/${data?.title}/${item?.title}`)
-                }
-              }}
-              style={__styles.downloadButton}
-            >
-              {icons.download(colors.primary, 25)}
-            </TouchableOpacity>
+
+
+              <TouchableOpacity
+                onPress={() => {
+                  if (item?.document_type == "image") {
+                    downloadFile(S3_URL + item?.document_images_url?.thumbnail_1, `Delegate Training/${data?.title}/${item?.title}`)
+                  } else {
+                    downloadFile(S3_URL + item?.document_file_url, `Delegate Training/${data?.title}/${item?.title}`)
+                  }
+                }}
+                style={__styles.downloadButton}
+              >
+                {icons.download(colors.primary, 25)}
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      )
-    })
+        )
+      })
+    }
+    else return <EmptyView label={"No Recources Available"} />
   }
 
   return (

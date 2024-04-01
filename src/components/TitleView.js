@@ -8,8 +8,9 @@ import { fonts } from '../utilities/fonts'
 const TitleView = ({
   onBackButtonPress,
   title,
+  subTitle,
   titleView,
-  hideBackBottomButton = false
+  hideBackBottomButton = false,
 }) => {
   const navigation = useNavigation()
   return (
@@ -24,6 +25,8 @@ const TitleView = ({
           <View style={__header.titleView}>
             <Text style={__header.titleText}>{<Text style={__header.titleText}>{title}</Text>
             }</Text>
+
+            {!!subTitle && <Text style={__header.subTitle}>{subTitle}</Text>}
           </View>
 
           :
@@ -44,7 +47,8 @@ const __header = StyleSheet.create({
     // backgroundColor: "green",
     flexDirection: "row",
     alignItems: "center",
-    marginHorizontal:-10
+    marginHorizontal: -10,
+    flex:1
   },
   titleView: {
     flex: 1,
@@ -58,6 +62,12 @@ const __header = StyleSheet.create({
     includeFontPadding: false,
     textTransform: "capitalize",
     fontFamily: fonts.bold,
+    includeFontPadding: false
+  },
+  subTitle: {
+    fontSize: 10,
+    color: colors.lightText2,
+    fontFamily: fonts.medium,
     includeFontPadding: false
   },
   leftButtonView: {

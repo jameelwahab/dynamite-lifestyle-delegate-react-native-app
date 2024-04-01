@@ -1,4 +1,4 @@
-import { View, Text, FlatList, StyleSheet } from 'react-native'
+import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import RootView from '../../../components/RootView'
 import { useSelector } from 'react-redux'
@@ -22,6 +22,9 @@ import ConfirmationModal from '../../../components/ConfirmationModal'
 import MyRefreshControl from '../../../components/MyRefreshControl'
 import copyText from '../../../functions/copyText'
 import BankOptionModal from './components/BankOptionModal'
+import TitleView from '../../../components/TitleView'
+import MyChip from '../../../components/MyChip'
+
 
 
 let page = 0;
@@ -39,10 +42,11 @@ const PaymentRequest = ({ navigation, route }) => {
   const [footerLoader, setFooterLoader] = useState(false);
   const [confirmationModal, setConfirmation] = useState({ isVisible: false, item: null })
   const [optionModal, setOptionModal] = useState({ isVisible: false, selectedItem: null, list: [] })
+  const [sort, setSort] = useState({ isVisible: false, selected: sortList[1] })
 
   const api_payment_request_list = async (newArray = false) => {
     let res = await GET_PAYMENT_REQUEST_LIST({
-      navigation, token, page,
+      navigation, token, page, sort: sort?.selected?.key
     })
     if (res.code == 200) {
       console.log(list.length, "list.length");
@@ -151,7 +155,7 @@ const PaymentRequest = ({ navigation, route }) => {
       page = 0;
       canLoadMore = false;
     }
-  }, [])
+  }, [sort?.selected?.key])
 
   const onAddPaymentRequest = () => {
     navigation.navigate(routes.addEditPaymenyRequestScreen, {
@@ -237,12 +241,31 @@ const PaymentRequest = ({ navigation, route }) => {
     )
   }
 
+  const topView = () => {
+    return (
+      <View style={__styles.topView}>
+        <TitleView
+          title={title}
+          hideBackBottomButton
+          subTitle={`Showing ${list.length} of ${total}`}
+        />
+        <View style={__styles.topBtnsView}>
+
+          <MyChip title={sort?.selected?.title} />
+          <TouchableOpacity
+            onPress={() => setSort({ ...sort, isVisible: true })}
+            style={__styles.sortBtn} >
+            {icons.sort(colors.black, 15)}
+          </TouchableOpacity>
+        </View >
+      </View >
+    )
+  }
+
 
   return (
-    <RootView
-      title={title}
-      subTitle={`Showing ${list.length} of ${total}`}
-      hideBackBottomButton>
+    <RootView hideSubHeader>
+      {topView()}
       <View style={{ flex: 1, }}>
         <FlatList
           data={list}
@@ -264,6 +287,14 @@ const PaymentRequest = ({ navigation, route }) => {
         isVisible={optionModal?.isVisible}
         onSelected={onSelectedOption}
         closeModal={() => setOptionModal({ selectedItem: null, isVisible: false, list: [] })}
+      />
+
+      <OptionModal
+        optionList={sortList}
+        isVisible={sort?.isVisible}
+        onSelected={(opt) => setSort({ isVisible: false, selected: opt })}
+        closeModal={() => setSort({ ...sort, isVisible: false })}
+        checkSelected={(opt) => sort.selected.key === opt?.key}
       />
 
       <ConfirmationModal
@@ -301,8 +332,44 @@ const optionsList = [
   },
 ]
 
+const sortList = [
+  {
+    title: "All",
+    key: "all",
+  },
+  {
+    title: "Pending",
+    key: "pending",
+  },
+  {
+    title: "Paid",
+    key: "paid",
+  },
+  {
+    title: "Processing",
+    key: "processing",
+  },
+]
+
 const bankOpt = {
   title: "Copy Bank Payment Link",
   key: "bank",
   icon: icons.bank
 }
+
+const __styles = StyleSheet.create({
+  topView: {
+    flexDirection: "row", alignItems: "center", backgroundColor: colors.darkSecondary, paddingBottom: 5
+  },
+  topBtnsView: { flexDirection: "row", alignItems: "flex-end", },
+
+  sortBtn: {
+    height: 25,
+    width: 25,
+    borderRadius: 25 / 2,
+    backgroundColor: colors.primary,
+    justifyContent: 'center',
+    alignItems: "center",
+    marginLeft:5
+  }
+})

@@ -26,14 +26,17 @@ const MyInputs = ({
   isSearch = false,
   onSubmitEditing,
   limited = false,
+  customView
 }) => {
   const [isFocused, setFocused] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   return (
     <View pointerEvents={editable ? "auto" : "none"} style={{ marginBottom: noSpace ? 0 : 15 }}>
       <Text style={[__MyInputStyles.labelText, isFocused ? __MyInputStyles.focusedLabelText : undefined]}>{label}</Text>
-      <View style={[__MyInputStyles.inputView, multiline ? __MyInputStyles.multilineView : undefined, isFocused ? __MyInputStyles.focusedView : undefined]}>
+      {!!customView && customView()}
+      <View style={[__MyInputStyles.inputView, multiline ? __MyInputStyles.multilineView : undefined, isFocused ? __MyInputStyles.focusedView : undefined,]}>
         {!!leftIcon && <View style={[__MyInputStyles.leftButton]} >{leftIcon()}</View>}
+        
         <TextInput
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
@@ -74,7 +77,7 @@ const MyInputs = ({
         }
       </View>
       {limited && <MyText
-        color={colors.lightText+"AA"}
+        color={colors.lightText + "AA"}
         fontSize={12}
         style={{ marginTop: 5 }}
       >Maximum limit 500 charachters</MyText>}

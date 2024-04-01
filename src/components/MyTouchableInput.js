@@ -16,7 +16,7 @@ const MyTouchableInput = ({
   iconOnPress,
   subTextView,
   clearbutton,
-  onClearButtonPress = () => { }
+  onClearButtonPress = () => { },
 }) => {
   const [isFocused, setFocused] = useState(false)
   return (
@@ -39,7 +39,7 @@ const MyTouchableInput = ({
             pointerEvents="none"
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
-            style={[__MyInputStyles.input, !!view && { height: undefined }]}
+            style={[__MyInputStyles.input, !!view && { height: undefined },]}
             value={value}
             keyboardAppearance="dark"
             selectionColor={colors.text}
@@ -91,7 +91,7 @@ const __MyInputStyles = StyleSheet.create({
     includeFontPadding: false,
     flex: 1,
     paddingHorizontal: 10,
-    color: colors.text
+    color: colors.text,
   },
   focusedView: {
     borderColor: colors.primary,

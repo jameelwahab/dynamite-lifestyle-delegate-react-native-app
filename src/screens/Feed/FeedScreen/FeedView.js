@@ -17,16 +17,16 @@ import utilities from '../../../utilities'
 import openUrl from '../../../functions/openUrl'
 import DropShadow from "react-native-drop-shadow";
 
-export const FeedView = ({ item, index, user, token, isInView, timezone, settings, openComments, showLikes, openOptions, onLikebtnPress, isCosmos, sourceLevelIcons, isScheduledFeed, openScheduleTimeModal, onFeedDetail,isEventFeed }) => {
+export const FeedView = ({ item, index, user, token, isInView, timezone, settings, openComments, showLikes, openOptions, onLikebtnPress, isCosmos, sourceLevelIcons, isScheduledFeed, openScheduleTimeModal, onFeedDetail, isEventFeed }) => {
   const [animationState, setAnimationState] = useState(0)
 
   useEffect(() => {
     if (index == 1)
-    if (isInView) {
-      startAnimation()
-    } else {
-      setAnimationState(0)
-    }
+      if (isInView) {
+        startAnimation()
+      } else {
+        setAnimationState(0)
+      }
   }, [isInView])
 
   const startAnimation = () => {
@@ -79,22 +79,21 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
             style={{ tintColor: colors.primary, height: 25, width: 25 }}
           />
         </TouchableOpacity>}
-        {!(!!isEventFeed) &&
-      <View >
-        <MyImage
-          indicatorProps={{ color: colors.secondaryVariant }}
-          source={{
-            uri:
-              isCosmos || isScheduledFeed ?
-                item?.created_for_level_or_type == "delegate" ?
-                  S3_URL + settings?.delegate_feed_icon :
-                  S3_URL + settings?.consultant_feed_icon
-                :
-                S3_URL + sourceLevelIcons?.[`${item?.created_for_level_or_type}_badge`]
-          }}
-          style={__style.feedTypeIcon}
-        />
-      </View>}
+      {!(!!isEventFeed) &&
+        <View >
+          <MyImage
+            indicatorProps={{ color: colors.secondaryVariant }}
+            source={{
+              uri:
+                isCosmos || isScheduledFeed ?
+                  item?.created_for_level_or_type == "delegate" ?
+                    S3_URL + settings?.delegate_feed_icon :
+                    S3_URL + settings?.consultant_feed_icon :
+                  S3_URL + sourceLevelIcons?.[`${item?.created_for_level_or_type}_badge`]
+            }}
+            style={__style.feedTypeIcon}
+          />
+        </View>}
       {(((isCosmos || isScheduledFeed) && user?._id == item?.action_info?.action_id) ||
         (!isCosmos && !isScheduledFeed)) &&
         <TouchableOpacity
@@ -158,7 +157,10 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
           </View>
           <TouchableOpacity
             onPress={() => openUrl(item?.event_info?.button_link)}
-            style={[__style.eventBtnView, { backgroundColor: item?.event_info?.button_background_color, }]}>
+            style={[__style.eventBtnView, {
+              backgroundColor: item?.event_info?.button_background_color,
+              alignSelf: btnAligmnet[item?.event_info?.button_alignment]
+            }]}>
             <MyText
               color={item?.event_info?.button_text_color}
               type='medium'
@@ -266,6 +268,11 @@ function areEqual(prevProps, nextProps) {
 
 export default React.memo(FeedView)
 
+const btnAligmnet = {
+  "center": "center",
+  "left": "flex-start",
+  "right": "flex-end"
+}
 
 const __style = StyleSheet.create({
   shadow: {
@@ -319,14 +326,14 @@ const __style = StyleSheet.create({
   eventBtnView: {
     flexGrow: 1,
     minHeight: 35,
-
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 5,
     paddingVertical: 3,
     marginVertical: 3,
-    flex: 1,
-    minWidth: 50
+    // alignSelf:"center"
+    // flex: 1,
+    // minWidth: 50
   },
   liveSteamStatus: {
     borderRadius: 999, height: 10, width: 10,

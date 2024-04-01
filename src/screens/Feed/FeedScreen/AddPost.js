@@ -32,6 +32,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import MyWebview from '../../../components/MyWebview'
 import openUrl from '../../../functions/openUrl'
 import { isUrl } from '../../../functions/regex'
+import MyCheckBox from '../../../components/MyCheckBox'
 
 
 const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, selectFeedlevel, feedLevel, tab, isCosmos, isScheduledFeed, timezone, removeFromList, isSuperDelegate, hideLevelView, isEventFeed, eventId }, ref) => {
@@ -62,6 +63,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   const [eventBtnLink, setEventBtnLink] = useState("");
   const [eventBtnTextColor, setEventBtnTextColor] = useState(colors.white)
   const [eventBtnColor, setEventBtnColor] = useState(colors.primary2);
+  const [eventBtnAligment, setEventBtnAligment] = useState("center");
 
 
 
@@ -94,12 +96,15 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     setEmbededCode(item?.embed_code)
     setPostModalVisibilty(true);
     if (!!item?.event_info && Object.keys(item?.event_info).length > 0) {
+      let alignment = !!item?.event_info?.button_alignment ? item?.event_info?.button_alignment : "center";
+      console.log(alignment, "alignment")
       setEventComplete(true);
       setEventTitle(item?.event_info?.event_title)
       setEventBtnText(item?.event_info?.button_text);
       setEventBtnLink(item?.event_info?.button_link);
       setEventBtnColor(item?.event_info?.button_background_color);
       setEventBtnTextColor(item?.event_info?.button_text_color)
+      setEventBtnAligment(alignment)
     }
     if (!!item?.schedule_date_time && !item?.is_publish) {
       setPublishDate(moment(item?.schedule_date_time).tz(timezone.admin).format(dateTimeFormat.date));
@@ -135,6 +140,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     setEventBtnText("");
     setEventBtnLink("");
     setEventBtnColor(colors.primary2);
+    setEventBtnAligment("center")
     setEventBtnTextColor(colors.white);
     setPublishDate(moment().format(dateTimeFormat.date));
     setPublishTime("12:00 AM");
@@ -275,6 +281,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
         button_link: eventBtnLink.trim(),
         button_background_color: eventBtnColor,
         button_text_color: eventBtnTextColor,
+        button_alignment: eventBtnAligment,
         is_event_info: true
       }
       fd.append("event_info", JSON.stringify(eventObj));
@@ -340,6 +347,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     setEventBtnText("");
     setEventBtnLink("");
     setEventBtnColor(colors.primary2);
+    setEventBtnAligment("center")
     setEventBtnTextColor(colors.white);
     setEventComplete(false);
     setEventModalVisible(false)
@@ -387,6 +395,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
         setEventBtnLink(link);
         setEventBtnTextColor(textColor);
         setEventBtnColor(btnColor)
+        setEventBtnAligment("center")
         setEventComplete(true);
         setEventModalVisible(false)
       }
@@ -469,7 +478,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                         onPress={() => setColorModal({ visibility: true, for: 1 })}
                         label='Button Text event*'
                         view={() => (
-                          <View style={{ flex: 1, }}>
+                          <View style={__style.eventColorViewRoot}>
                             <View style={[__style.eventColorView, { backgroundColor: textColor, }]} />
                           </View>
                         )}
@@ -480,14 +489,45 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                         onPress={() => setColorModal({ visibility: true, for: 2 })}
                         label='Button background color*'
                         view={() => (
-                          <View style={{ flex: 1, }}>
+                          <View style={__style.eventColorViewRoot}>
                             <View style={[__style.eventColorView, { backgroundColor: btnColor, }]} />
                           </View>
                         )}
                       />
                     </View>
+
+                    <View>
+                      <MyText isLabel>Button Alignment</MyText>
+                      <View style={__style.alignBtnsRow}>
+                        <Pressable
+                          onPress={() => setEventBtnAligment("left")}
+                          style={[__style.alignBtnView, eventBtnAligment == "left" && __style.alignSelectedBtnView]}>
+                          <MyText
+                            type='medium'
+                            color={eventBtnAligment == "left" ? colors.black : colors.white} >Left</MyText>
+                        </Pressable>
+                        <View style={__style.verticalDivider} />
+                        <Pressable
+                          onPress={() => setEventBtnAligment("center")}
+                          style={[__style.alignBtnView, eventBtnAligment == "center" && __style.alignSelectedBtnView]}>
+                          <MyText
+                            type='medium'
+                            color={eventBtnAligment == "center" ? colors.black : colors.white}
+                          >Center</MyText>
+                        </Pressable>
+                        <View style={__style.verticalDivider} />
+                        <Pressable
+                          onPress={() => setEventBtnAligment("right")}
+                          style={[__style.alignBtnView, eventBtnAligment == "right" && __style.alignSelectedBtnView]}>
+                          <MyText
+                            type='medium'
+                            color={eventBtnAligment == "right" ? colors.black : colors.white}
+                          >Right</MyText>
+                        </Pressable>
+                      </View>
+                    </View>
                   </View>
-                  <View style={{ justifyContent: "flex-end", flexDirection: "row", marginTop: 10 }}>
+                  <View style={{ justifyContent: "flex-end", flexDirection: "row", marginTop: 20 }}>
                     <MyButton style={{ paddingHorizontal: 20 }} invert title={isEventViewComplete ? "Remove" : 'CANCEL'}
                       onPress={() => {
                         btn_cancelEvent()
@@ -683,7 +723,10 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                       </View>
                       <TouchableOpacity
                         onPress={() => openUrl(eventBtnLink)}
-                        style={[__style.eventBtnView, { backgroundColor: eventBtnColor, }]}>
+                        style={[__style.eventBtnView, {
+                          backgroundColor: eventBtnColor,
+                          alignSelf: btnAligmnet[eventBtnAligment]
+                        }]}>
                         <MyText
                           color={eventBtnTextColor}
                           type='medium'
@@ -1005,7 +1048,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
           </View>
 
-            
+
           <LevelModal
             selectFeedlevel={selectFeedlevel}
             feedLevel={feedLevel}
@@ -1015,13 +1058,19 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
         </View> : undefined}
 
-        {Modal_addPost()}
+      {Modal_addPost()}
     </View>
 
   )
 })
 
 export default AddPost;
+
+const btnAligmnet = {
+  "center": "center",
+  "left": "flex-start",
+  "right": "flex-end"
+}
 
 const PostCategory = [
   {
@@ -1092,7 +1141,12 @@ const __style = StyleSheet.create({
     borderColor: colors.white + "11"
   },
   eventColorView: {
-    height: "70%", width: "90%", alignSelf: "center", borderRadius: 5
+    height: 35, width: "95%", alignSelf: "center", borderRadius: 5
+  },
+  eventColorViewRoot: {
+    height: 50,
+    flex: 1,
+    justifyContent: "center",
   },
   divider: {
     height: 1,
@@ -1246,4 +1300,30 @@ const __style = StyleSheet.create({
     flex: 1,
     minWidth: 50
   },
+  alignBtnView: {
+    flex: 1,
+    height: "85%",
+    borderRadius: 5,
+    backgroundColor: colors.transparent,
+    alignItems: "center",
+    justifyContent: "center",
+    marginHorizontal: 5
+  },
+  alignSelectedBtnView: {
+    backgroundColor: colors.primary,
+  },
+  alignBtnsRow: {
+    flexDirection: 'row',
+    alignItems: "center",
+    height: 50,
+    borderWidth: 1,
+    borderColor: colors.lightText,
+    borderRadius: 5
+  },
+  verticalDivider: {
+    height: 20,
+    width: 1,
+    backgroundColor: colors.lightText
+  }
+
 })

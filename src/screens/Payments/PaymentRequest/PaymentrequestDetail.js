@@ -1,5 +1,5 @@
-import { View, Text, FlatList, ScrollView } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import { View, Text, FlatList, ScrollView, StyleSheet } from 'react-native'
+import React, { useEffect, useRef, useState } from 'react'
 import RootView from '../../../components/RootView'
 import MyText from '../../../components/MyText'
 import { CHANGE_ONETIME_PAYMNET_STATUS_TO_PAID, GET_CLIENT_SECRET_FOR_PAY_ONETIME, GET_PAYMENT_REQUEST_DETAIL, PAY_RECURRING } from '../../../DAL'
@@ -16,19 +16,37 @@ import { dateTimeFormat } from '../../../utilities/constants'
 import EmptyView from '../../../components/EmptyView'
 import { CardField, initStripe, confirmPayment, createToken, } from '@stripe/stripe-react-native';
 import { fonts } from '../../../utilities/fonts'
-import { MyButton } from '../../../components/MyButton'
+import { MyButton, TransparentButton } from '../../../components/MyButton'
 import { selectSettings } from '../../../redux/reducers/settingSlice'
 import showToast from '../../../functions/showToast'
+import MyCheckBox from '../../../components/MyCheckBox'
+import EmailModal from '../../../components/ReminderModals/EmailModal'
+import ConfirmationModal from '../../../components/ConfirmationModal'
+import { selectSocket } from '../../../redux/reducers/socketSlice'
+import NotificationModal from '../../../components/ReminderModals/NotificationModal'
+import MessageModal from '../../../components/ReminderModals/MessageModal'
+import WhatsappModal from '../../../components/ReminderModals/WhatsappModal'
 
 
 const PaymentrequestDetail = ({ navigation, route }) => {
   const { slug, backScreenFunc } = route?.params;
+  const refEmailModal = useRef();
+  const refNotificationModal = useRef();
+  const refMessageModal = useRef();
+  const refWhatsappModal = useRef();
   const { token } = useSelector(selectUser);
   const { settings } = useSelector(selectSettings);
+  const { socket } = useSelector(selectSocket);
+  const [isConfirmationVisible, setIsConfirmationVisible] = useState(false);
   const [loader, setLoader] = useState(false);
   const [data, setData] = useState(null);
   const [isComplete, setIsComplete] = useState(false);
-
+  const [reminders, setReminders] = useState({
+    isEmailChecked: true,
+    isNotificationChecked: true,
+    isMessageChecked: true,
+    isWhatsappChecked: true,
+  })
 
 
   const getPaymentRequestDeatil = async (isPayment) => {
@@ -36,6 +54,12 @@ const PaymentrequestDetail = ({ navigation, route }) => {
     let res = await GET_PAYMENT_REQUEST_DETAIL({ navigation, token, slug });
     if (res.code == 200) {
       setData(res)
+      setReminders({
+        isEmailChecked: res?.notification_action?.email_notification_access,
+        isNotificationChecked: res?.notification_action?.push_notification_access,
+        isMessageChecked: res?.notification_action?.message_notification_access,
+        isWhatsappChecked: res?.notification_action?.whatsapp_notification_access,
+      })
       setLoader(false);
       if (isPayment) {
         backScreenFunc?.(res?.payment_request, slug);
@@ -65,6 +89,7 @@ const PaymentrequestDetail = ({ navigation, route }) => {
       payRecurring()
     }
   }
+
 
   const payRecurring = async () => {
 
@@ -131,6 +156,29 @@ const PaymentrequestDetail = ({ navigation, route }) => {
     }
   }
 
+  const onReminderSavePress = (newData) => {
+    let newObj = {
+      ...data,
+      notification_action: {
+        ...data?.notification_action,
+        ...newData
+      }
+    };
+    setData(newObj)
+  }
+
+
+
+  const sendReminder = () => {
+    setIsConfirmationVisible(false)
+    socket.emit('send_payment_request_reminder_reciever', {
+      payment_request_id: data?.payment_request?._id,
+      notification_action: data?.notification_action,
+    })
+    showToast({ title: "Reminder sent successfully", type: "success" })
+
+  }
+
   const paymentView = () => {
     return (
       <View>
@@ -186,12 +234,95 @@ const PaymentrequestDetail = ({ navigation, route }) => {
     </View>)
   }
 
+
+  const reminderView = () => {
+    return (
+      <View>
+        <View style={{ marginTop: 10 }}>
+          <MyText color={colors.primary} fontSize={18} type='medium' >Reminder</MyText>
+        </View>
+        <View style={[__styles.cardView, { marginTop: 10 }]}>
+          {reminders?.isEmailChecked &&
+            <View style={__styles.checkView}>
+              <View style={__styles.checkboxVIew}>
+                <MyCheckBox
+                  value={data?.notification_action?.email_notification_access}
+                  onPress={() => onReminderSavePress({ email_notification_access: !data?.notification_action?.email_notification_access })}
+                  title='Email' />
+              </View>
+              <View style={__styles.cardViewEditBtn}>
+                <TransparentButton
+                  onPress={() => refEmailModal?.current?.openModal(data?.notification_action?.email_notification_info)}
+                  icon={() => icons.editpencil()} />
+              </View>
+            </View>}
+
+          {reminders?.isNotificationChecked &&
+            <View style={__styles.checkView}>
+              <View style={__styles.checkboxVIew}>
+                <MyCheckBox
+                  value={data?.notification_action?.push_notification_access}
+                  onPress={() => onReminderSavePress({ push_notification_access: !data?.notification_action?.push_notification_access })}
+                  title='Notification' />
+              </View>
+              <View style={__styles.cardViewEditBtn}>
+                <TransparentButton
+                  onPress={() => refNotificationModal?.current?.openModal(data?.notification_action?.push_notification_info)}
+                  icon={() => icons.editpencil()} />
+              </View>
+            </View>}
+
+          {reminders?.isMessageChecked &&
+            <View style={__styles.checkView}>
+              <View style={__styles.checkboxVIew}>
+                <MyCheckBox
+                  value={data?.notification_action?.message_notification_access}
+                  onPress={() => onReminderSavePress({ message_notification_access: !data?.notification_action?.message_notification_access })}
+                  title='Message' />
+              </View>
+              <View style={__styles.cardViewEditBtn}>
+                <TransparentButton
+                  onPress={() => refMessageModal?.current?.openModal(data?.notification_action?.message_notification_info)}
+                  icon={() => icons.editpencil()} />
+              </View>
+            </View>}
+
+          {reminders?.isWhatsappChecked &&
+            <View style={__styles.checkView}>
+              <View style={__styles.checkboxVIew}>
+                <MyCheckBox
+                  value={data?.notification_action?.whatsapp_notification_access}
+                  onPress={() => onReminderSavePress({ whatsapp_notification_access: !data?.notification_action?.whatsapp_notification_access })}
+                  title='Whatsapp' />
+              </View>
+              <View style={__styles.cardViewEditBtn}>
+                <TransparentButton
+                  onPress={() => refWhatsappModal?.current?.openModal(data?.notification_action?.whatsapp_notification_info)}
+                  icon={() => icons.editpencil()} />
+              </View>
+            </View>}
+
+          <View style={{ marginTop: 10 }}>
+            <MyButton
+              invert
+              style={{ marginHorizontal: 0, height: 35 }}
+              title='Send Reminder'
+              onPress={() => setIsConfirmationVisible(true)}
+            />
+          </View>
+        </View>
+
+
+      </View>
+    )
+  }
+
   const headerView = () => {
     let payment = data?.payment_request;
     if (!!payment) {
       return (
         <View>
-          <View style={{ backgroundColor: colors.secondary, padding: 10, borderRadius: 10 }}>
+          <View style={__styles.cardView}>
             <MyText fontSize={16} type='medium'>{payment?.request_title}</MyText>
             <View style={{ flexDirection: "row", alignItems: "center", marginTop: 10 }}>
               {icons.calendar(colors.lightText, 18)}
@@ -209,6 +340,7 @@ const PaymentrequestDetail = ({ navigation, route }) => {
                 </>}
             </View>
           </View>
+          {Object.values(reminders).some(x => x == true) && reminderView()}
           <View>
           </View>
           {(payment?.is_first_paid == false) && paymentView()}
@@ -216,6 +348,8 @@ const PaymentrequestDetail = ({ navigation, route }) => {
           <View style={{ marginTop: 10 }}>
             <MyText color={colors.primary} fontSize={18} type='medium' >Transactions</MyText>
           </View>
+
+
         </View>
       )
     }
@@ -241,8 +375,43 @@ const PaymentrequestDetail = ({ navigation, route }) => {
         </ScrollView>
       </View>
       <MyLoader enable={loader} />
+      <EmailModal
+        ref={refEmailModal}
+        onReminderSavePress={onReminderSavePress}
+      />
+
+      <NotificationModal
+        ref={refNotificationModal}
+        onReminderSavePress={onReminderSavePress}
+      />
+
+      <MessageModal
+        ref={refMessageModal}
+        onReminderSavePress={onReminderSavePress}
+      />
+
+      <WhatsappModal
+        ref={refWhatsappModal}
+        onReminderSavePress={onReminderSavePress}
+      />
+
+      <ConfirmationModal
+        title={"Are you sure you want to send reminder ?"}
+        isVisible={isConfirmationVisible}
+        onAgree={sendReminder} />
+
     </RootView>
   )
 }
 
 export default PaymentrequestDetail
+
+const __styles = StyleSheet.create({
+  cardView: { backgroundColor: colors.secondary, padding: 10, borderRadius: 10 },
+  checkView: {
+    flexDirection: "row",
+    alignItems: "center"
+  },
+  checkboxVIew: { flex: 1 },
+  cardViewEditBtn: { marginBottom: 0 }
+})

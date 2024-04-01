@@ -10,11 +10,11 @@ export const WHATSAPP_CHATLIST = ({ token, navigation, page, searchText, filter 
 }
 
 
-export const GET_WHATSAPP_MEMBER_LIST = ({ token, navigation, searchText}) => {
+export const GET_WHATSAPP_MEMBER_LIST = ({ token, navigation, searchText }) => {
   return invokeApi({
     path: `api/whatsapp_chat/member_list_delegate/whatsapp_chat`,
     method: "POST",
-    postData:{search_text:searchText},
+    postData: { search_text: searchText },
     token,
     navigation,
   })
@@ -34,6 +34,16 @@ export const INITIATE_WHATSAPP_CHAT = ({ token, navigation, receiver_id }) => {
 export const WHATSAPP_MESSAGE_LIST = ({ token, navigation, userId }) => {
   return invokeApi({
     path: `api/whatsapp_chat/list_whatsapp_messages/${userId}`,
+    method: "GET",
+    token,
+    navigation,
+  })
+}
+
+
+export const WHATSAPP_TEMPLATES_LIST = ({ token, navigation }) => {
+  return invokeApi({
+    path: `api/whatsapp_chat/list_templates/`,
     method: "GET",
     token,
     navigation,

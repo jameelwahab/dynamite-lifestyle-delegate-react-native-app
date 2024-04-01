@@ -486,13 +486,13 @@ const ChatList = ({ navigation }) => {
                       item.message_type == "video" ? icons.playCircle(colors.white, 18) : ""}
                 </View>
               }
-              <View style={{ flexDirection: "row", flex: 1 }}>
+              <View style={{ flexDirection: "row", flex: 1,height:18 }}>
                 <MyText fontSize={12} type='light' numberOfLines={1} style={{ marginTop: 3, flex: 1 }}>
                   {!!item?.last_message ?
                     isHtml(item?.last_message) ?
                       decode(item.last_message.replace(/<[^>]+>/g, '').replace(/\*/g, "").replace(/[\])}[{(]/g, " ").slice(0, 70), { level: "html5" }) :
-                      <Markdown style={markdownStyleOther}>
-                        {item?.last_message.slice(0, 70)}
+                      <Markdown  style={markdownStyleOther}>
+                        {item?.last_message.replace(/\n/g,"").slice(0, 100)}
                       </Markdown> :
                     item.message_type == "image" ? "Photo" :
                       item.message_type == 'audio' ? "Audio" :

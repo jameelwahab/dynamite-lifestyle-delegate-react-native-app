@@ -154,7 +154,6 @@ const SubscriptionList = ({ navigation, route }) => {
 
   const topView = () => {
     return (
-
       <View style={{ backgroundColor: colors.darkSecondary }}>
         <TitleView title={"Member Subscriptions"} />
         <View style={{ flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", paddingBottom: 5 }}>
@@ -176,6 +175,7 @@ const SubscriptionList = ({ navigation, route }) => {
       </View>
     )
   }
+
   return (
     <RootView hideSubHeader>
       {topView()}

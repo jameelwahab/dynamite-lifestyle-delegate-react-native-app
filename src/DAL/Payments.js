@@ -22,9 +22,9 @@ export const GET_COMMISSION_LIST = ({ token, navigation, type, page }) => {
   })
 }
 
-export const GET_PAYMENT_REQUEST_LIST = ({ token, navigation, page }) => {
+export const GET_PAYMENT_REQUEST_LIST = ({ token, navigation, page, sort }) => {
   return invokeApi({
-    path: `api/payment_request/list/consultant?page=${page}&limit=50`,
+    path: `api/payment_request/list/consultant?page=${page}&limit=50&payment_status=${sort}`,
     method: "GET",
     token,
     navigation

@@ -34,16 +34,17 @@ const MyButton = ({
 
 const TransparentButton = ({
   title = "",
+  icon = () => { },
   onPress = () => { },
-
 }) => {
   return (
     <TouchableHighlight
-      style={{ borderRadius: 10 }}
+      style={{ borderRadius: 10, }}
       underlayColor={colors.lightPrimary2}
       onPress={onPress}>
       <View style={__tarsparentButtonStyle.root} >
-        <Text style={__tarsparentButtonStyle.text} >{title}</Text>
+        {icon?.()}
+        {!!title && <Text style={__tarsparentButtonStyle.text} >{title}</Text>}
       </View>
     </TouchableHighlight>
   )
@@ -87,7 +88,7 @@ const __MyButtonStyles = StyleSheet.create({
     fontSize: 16,
     textTransform: "uppercase"
   },
-  rootInvertView: {
+  _rootInvertView: {
     height: 45,
     backgroundColor: colors.darkSecondary,
     borderWidth: 1,
@@ -95,7 +96,13 @@ const __MyButtonStyles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
     flexDirection: "row",
-    justifyContent: "center"
+    justifyContent: "center",
+  },
+  get rootInvertView() {
+    return this._rootInvertView
+  },
+  set rootInvertView(value) {
+    this._rootInvertView = value
   },
   invertTitleText: {
     color: colors.primary,
@@ -110,12 +117,14 @@ const __tarsparentButtonStyle = StyleSheet.create({
   root: {
     paddingHorizontal: 15,
     paddingVertical: 10,
-
+    flexDirection: "row",
+    alignItems: "center"
   },
   text: {
     color: colors.primary,
     fontSize: 15,
     fontFamily: fonts.regular,
-    includeFontPadding: false
+    includeFontPadding: false,
+    marginLeft: 5
   }
 })

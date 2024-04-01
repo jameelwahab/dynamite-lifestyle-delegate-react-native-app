@@ -70,7 +70,8 @@ export default OptionModal
 
 const RenderList = ({ item, index, isChild, titleKey, onSelected, renderText, noIcon, checkSelected, multiple }) => {
   const [isCollapsed, setIsCollapsed] = useState(true)
-  let isChecked = multiple && checkSelected?.(item);
+  // let isChecked = multiple && checkSelected?.(item);
+  let isChecked = checkSelected?.(item);
   return (
     <>
       <TouchableHighlight
@@ -112,7 +113,7 @@ const RenderList = ({ item, index, isChild, titleKey, onSelected, renderText, no
             }}>
               {icons.downwardArrow()}
             </View> :
-            isChecked &&
+            isChecked && multiple &&
             <View style={{ paddingRight: 15 }}>
               {icons.crosssWithCircle(colors.white, 20)}
             </View>

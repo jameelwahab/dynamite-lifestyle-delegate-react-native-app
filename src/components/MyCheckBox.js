@@ -22,6 +22,7 @@ const MyCheckBox = ({ value, title = "", onPress, circle = false, size = 20, col
         style={{ height: size, width: size, }}
         tintColors={{ true: color, false: color }}
         value={value}
+        animationDuration={0}
       />
       {!!title &&
         <View style={{ marginLeft: Platform.OS == "ios" ? 10 : 20, flex: 1 }}>
