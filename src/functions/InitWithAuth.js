@@ -15,7 +15,7 @@ const InitWithAuth = async (token, navigation, setLoader, dispatch) => {
     let isChatAllowed = false;
     let isWhatsappChatAllowed = false;
     res?.nav_items.forEach(item => {
-      // console.table(item.title + "  --->  ", item.value)
+      console.table(item.title + "  --->  ", item.value,item)
       if (item.value == "chat") {
         isChatAllowed = true;
       } else if (item.value == "whatsapp_chat") {

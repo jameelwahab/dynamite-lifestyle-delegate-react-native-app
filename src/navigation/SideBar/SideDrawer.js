@@ -20,9 +20,9 @@ const SideDrawer = () => {
       backBehavior="firstRoute"
       screenOptions={{
         headerShown: false, drawerType: 'front',
-        drawerStyle: { backgroundColor: colors.secondary },
+        drawerStyle: { backgroundColor: colors.secondary,},
         drawerActiveTintColor: colors.primary,
-        unmountOnBlur: true,
+        unmountOnBlur: true, 
       }}
       initialRouteName={ParentComponents[navbar[0]?.value]?.key}
       drawerContent={props => <SideBar {...props} />}

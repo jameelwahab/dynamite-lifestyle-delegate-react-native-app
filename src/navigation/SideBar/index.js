@@ -241,7 +241,7 @@ const index = (props) => {
         <MyImage
           source={{ uri: S3_URL + item?.icon }}
           style={__styles.itemIcon} />
-        <View style={{ flex: 1, flexWrap: "wrap" }}>
+        <View style={{ flex: 1,  }}>
           <MyText
             fontSize={14}
             color={isSelected && isCollaseable == false ? colors.primary : colors.text}
@@ -268,11 +268,11 @@ const index = (props) => {
             onPress={() => changeSideBarChildScreen(item)}
             style={[{ backgroundColor: isSelected ? colors.lightPrimary3 : undefined, }, __styles.itemRootView, __styles.nestedView]}>
             <MyImage source={{ uri: S3_URL + item?.icon }} style={__styles.itemIcon} />
-            <View style={{ flex: 1, flexWrap: "wrap" }}>
+            <View style={{ flex: 1, }}>
               <MyText
                 fontSize={14}
                 color={isSelected ? colors.primary : colors.text}
-                style={{ marginLeft: 20 }} >{item.title}</MyText>
+                style={{ marginLeft: 20, }} >{item.title}</MyText>
             </View>
           </Pressable>
         </Collapsible>
@@ -314,20 +314,16 @@ const index = (props) => {
         contentContainerStyle={{ paddingBottom: inset.bottom + 20 }}
         keyboardShouldPersistTaps="handled"
         {...props}>
-
-        {
-          searchableList().map((x, i) => {
-            if (!!ParentComponents[x.value]) {
-              let isCollaseable = Array.isArray(x.child_options);
-              return (
-                <View key={x.value}>
-                  {optionView(x, i, isCollaseable, user[showDotArray[x.value]])}
-                  {isCollaseable && x?.child_options.map((y, j) => nestedOptionView(y, i, x))}
-                </View >
-              )
-            }
-          })
-        }
+        {searchableList().map((x, i) => {
+          if (!!ParentComponents[x.value]) {
+            let isCollaseable = Array.isArray(x.child_options);
+            return (
+              <View key={x.value}>
+                {optionView(x, i, isCollaseable, user[showDotArray[x.value]])}
+                {isCollaseable && x?.child_options.map((y, j) => nestedOptionView(y, i, x))}
+              </View>)
+          }
+        })}
       </ScrollView >
     </View>
   )

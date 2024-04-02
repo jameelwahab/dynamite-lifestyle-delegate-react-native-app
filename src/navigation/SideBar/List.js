@@ -19,10 +19,12 @@ import StackLinks from "../NestedStacks/StackLinks";
 import StackSubscription from "../NestedStacks/StackSubscription";
 import StackMembersAnswer from "../NestedStacks/StackMemberAnswer";
 import StackTraining from "../NestedStacks/StackTraining";
+import StackBookings from "../NestedStacks/StackBookings";
+import StackBookingConfiguration from "../NestedStacks/StackBookingConfiguration";
 
 export const drawerMenuList = [
   {
-    value: "",
+    value: "mission_control",
     collapsible: false,
     key: routes.dasboardNavigator,
     component: StackMissionControl,
@@ -164,6 +166,11 @@ export const drawerMenuList = [
 
 
 
+
+
+
+
+
 ];
 
 
@@ -291,6 +298,12 @@ export const ParentComponents = {
       key: "delegate_training"
     }
   },
+
+  appointment: {
+    key: null,
+    component: null,
+    params: { key: "appointment" }
+  },
 }
 
 export const ChildComponents = {
@@ -328,5 +341,15 @@ export const ChildComponents = {
     key: routes.paymentRquesNavigator,
     component: StackPaymentsRequest,
     params: { key: "payment_request", parentKey: "payments" }
+  },
+  bookings: {
+    key: routes.bookingNavigator,
+    component: StackBookings,
+    params: { key: "bookings", parentKey: "appointment" }
+  },
+  schedule_appointment: {
+    key: routes.bookingConfigurationsNavigator,
+    component: StackBookingConfiguration,
+    params: { key: "schedule_appointment", parentKey: "appointment" }
   },
 }

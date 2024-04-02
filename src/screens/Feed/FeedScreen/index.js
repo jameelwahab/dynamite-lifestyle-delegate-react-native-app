@@ -898,6 +898,9 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           ListFooterComponent={footerView}
           removeClippedSubviews={true}
           updateCellsBatchingPeriod={10}
+          maxToRenderPerBatch={10}
+          windowSize={5}
+          initialNumToRender={10} 
         />
       </View>
 

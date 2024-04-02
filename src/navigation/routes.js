@@ -23,6 +23,8 @@ const routes = {
   subscriptionNavigator: "SUBSCRIPTION_NAVIGATOR",
   membersAnswersNavigator: "MEMBERS_ANSWERS_NAVIGATOR",
   trainingNavigator: "TRAINING_NAVIGATOR",
+  bookingNavigator: "BOOKING_NAVIGATOR",
+  bookingConfigurationsNavigator: "BOOKING_CONFIGURATION_NAVIGATOR",
 
   //! ///    Screens'
   login: "LOGIN_SCREEN",
@@ -146,6 +148,13 @@ const routes = {
   trainingLessonDetail: "TRAINING_LESSON_DETAIL_SCREEN",
   trainingLessonRecording: "TRAINING_LESSON_RECORDING_SCREEN",
 
+  //? Bookings
+  bookingList: "BOOKINGS_LIST_SCREEN",
+  bookingFilter: "BOOKINGS_FILTER_SCREEN",
+  bookingAdd: "BOOKINGS_ADD_SCREEN",
+
+  //? Bookings Configutaion
+  bookingConfigurationScreen: "BOOKINGS_CONFIGURATION_SCREEN",
 
 }
 

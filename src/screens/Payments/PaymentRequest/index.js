@@ -269,12 +269,13 @@ const PaymentRequest = ({ navigation, route }) => {
       <View style={{ flex: 1, }}>
         <FlatList
           data={list}
-          onEndReached={loadMore}
           showsVerticalScrollIndicator={false}
+          keyExtractor={(item) => item?._id}
           // ListHeaderComponent={topView()}
           // stickyHeaderIndices={[0]}
           // stickyHeaderHiddenOnScroll={true}
           renderItem={itemView}
+          onEndReached={loadMore}
           ListEmptyComponent={!loader && !refreshing && <EmptyView label={'No Payment Requests Found'} />}
           ListFooterComponent={<FooterLoader isVisible={footerLoader} />}
         />
@@ -369,6 +370,6 @@ const __styles = StyleSheet.create({
     backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: "center",
-    marginLeft:5
+    marginLeft: 5
   }
 })
