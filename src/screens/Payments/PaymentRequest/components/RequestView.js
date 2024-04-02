@@ -7,6 +7,7 @@ import { colors } from '../../../../utilities/colors'
 import prependCurency from '../../../../functions/prependCurency'
 import { fonts } from '../../../../utilities/fonts'
 import { MenuButton } from '../../../../components/MyButton'
+import MemberView from '../../../../components/MemberView'
 
 
 
@@ -18,11 +19,7 @@ const RequestView = ({ item, index, openOptionModal, onDetail }) => {
         <Pressable
           onPress={() => onDetail(item?.payment_request_slug)}
           style={[__styles.profileView, { flex: 1, marginRight: 10 }]} >
-          <UserImage image={item?.member?.profile_image} name={item?.member?.first_name}
-            backgroundTransparent size={35} />
-          <View style={__styles.profileNameView}>
-            <MyText type='medium' >{item?.member?.first_name + " " + item?.member?.last_name}</MyText>
-          </View>
+            <MemberView member={item?.member} marginLeft={0} size={35} titleSize={14}/>
         </Pressable>
         <MenuButton
           onPress={() => openOptionModal(item)}

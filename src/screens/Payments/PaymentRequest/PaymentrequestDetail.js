@@ -26,6 +26,7 @@ import { selectSocket } from '../../../redux/reducers/socketSlice'
 import NotificationModal from '../../../components/ReminderModals/NotificationModal'
 import MessageModal from '../../../components/ReminderModals/MessageModal'
 import WhatsappModal from '../../../components/ReminderModals/WhatsappModal'
+import MemberView from '../../../components/MemberView'
 
 
 const PaymentrequestDetail = ({ navigation, route }) => {
@@ -359,7 +360,9 @@ const PaymentrequestDetail = ({ navigation, route }) => {
 
   return (
     <RootView title={"Payment Request Transaction"} >
-      <View style={{ flex: 1 }}>
+      {!!data?.member_info &&
+      <MemberView member={data?.member_info} />}
+      <View style={{ flex: 1,marginTop:10 }}>
         <ScrollView
           showsVerticalScrollIndicator={false}
           automaticallyAdjustKeyboardInsets={true}
@@ -398,7 +401,8 @@ const PaymentrequestDetail = ({ navigation, route }) => {
       <ConfirmationModal
         title={"Are you sure you want to send reminder ?"}
         isVisible={isConfirmationVisible}
-        onAgree={sendReminder} />
+        onAgree={sendReminder}
+        closeModal={() => setIsConfirmationVisible(false)} />
 
     </RootView>
   )

@@ -19,7 +19,7 @@ const EmailModal = forwardRef(({ onReminderSavePress }, ref) => {
   const [ccText, setCcText] = useState("")
   const [cc, setCc] = useState("");
   const [message, setMessage] = useState("")
-
+  const [body, setBody] = useState("")
   useImperativeHandle(ref, () => {
     return {
       openModal
@@ -29,8 +29,8 @@ const EmailModal = forwardRef(({ onReminderSavePress }, ref) => {
   const onSaveBtnPress = () => {
     let obj = {
       cc_emails: cc,
-      email_body: email.trim(),
-      email_message: message,
+      email_body: body,
+      email_message: message.trim(),
       email_subject: subject.trim(),
       main_email: email.trim(),
       status: "",
@@ -55,6 +55,7 @@ const EmailModal = forwardRef(({ onReminderSavePress }, ref) => {
       setEmail(!!data?.main_email ? data?.main_email : "");
       setCc(!!data?.cc_emails ? data?.cc_emails : "");
       setMessage(!!data?.email_message ? data?.email_message : "")
+      setBody(!!data?.email_body ? data?.email_body : "")
     }
 
   }

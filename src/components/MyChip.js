@@ -36,6 +36,7 @@ const __styles = StyleSheet.create({
     alignItems: "center",
     margin: 2,
     maxWidth: utilities.screenWidth() - 40,
+    minHeight:22
     // marginLeft: 10
   },
   chipBtn: {

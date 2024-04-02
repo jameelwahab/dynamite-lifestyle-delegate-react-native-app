@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="bootsplash_background">#1F2536</color>
-<!--    <color name="notification">#131825</color>-->
+    <color name="darkSecondary">#131825</color>
+
     <color name="notification">#1F2536</color>
 </resources>

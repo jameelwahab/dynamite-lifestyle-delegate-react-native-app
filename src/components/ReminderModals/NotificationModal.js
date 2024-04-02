@@ -104,11 +104,12 @@ const NotificationModal = forwardRef(({ onReminderSavePress }, ref) => {
               />
 
 
-              <Editor
+              <MyInputs
                 label='Notification Statement*'
                 height={150}
-                initialValue={message}
-                onChange={(text) => setMessage(text)}
+                value={message}
+                onChangeText={(text) => setMessage(text)}
+                multiline
               />
 
               <MyButton

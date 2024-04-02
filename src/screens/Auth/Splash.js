@@ -1,4 +1,4 @@
-import { View, Text, Image, SafeAreaView, Alert, StatusBar } from 'react-native'
+import { View, Text, Image, SafeAreaView, Alert, StatusBar, StyleSheet, Easing, Vibration } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -22,11 +22,25 @@ import { io } from 'socket.io-client'
 import { socketUrl } from '../../utilities/constants'
 import notifee from '@notifee/react-native';
 import InitWithAuth from '../../functions/InitWithAuth'
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+  withTiming,
+  delay,
+  ReduceMotion,
+} from 'react-native-reanimated';
+
 
 
 const Splash = ({ navigation }) => {
 
   const dispatch = useDispatch()
+
+  const translateY = useSharedValue(400); // Initial position off-screen
+  const scale = useSharedValue(1); // Initial scale
+  const showText = useSharedValue(false); // Show text flag
+  const hideImg = useSharedValue(true); // Hide
 
 
   checkAuth = async () => {
@@ -35,6 +49,7 @@ const Splash = ({ navigation }) => {
       console.log(token, "token")
       if (token != null) {
         // with_Auth(token);
+
         await InitWithAuth(token, navigation, () => { }, dispatch);
 
 
@@ -47,8 +62,6 @@ const Splash = ({ navigation }) => {
     }
 
   }
-
-
 
   const without_auth = async () => {
     let res = await INIT_WITHOUT_TOKEN();
@@ -73,21 +86,74 @@ const Splash = ({ navigation }) => {
 
 
 
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ translateY: translateY.value }, { scale: scale.value }],
+    };
+  });
 
+
+  const textOpacity = useAnimatedStyle(() => {
+    return {
+      opacity: showText.value ? withTiming(1, { duration: 500 }) : 0,
+    };
+  });
+
+
+  const imgOpacity = useAnimatedStyle(() => {
+    return {
+      opacity: hideImg.value ? 1 : withTiming(0, { duration: 500 }),
+    };
+  });
 
   useEffect(() => {
     SplashScreen.hide()
-    checkAuth()
 
+
+    // Animation sequence
+    translateY.value = withSpring(-400, {
+      duration:1500,
+      dampingRatio: 3,
+      stiffness: 1,
+    });
+    // scale.value = withTiming(1, { duration: 1000 });
+
+    //  setTimeout(() => {
+    //  }, 500);
+
+    Vibration.vibrate([1000]);
+    // After a delay, hide the logo and show the text
+    setTimeout(() => {
+    
+
+      showText.value = true;
+      hideImg.value = false;
+      // translateY.value = withSpring(-400, { damping: 20, stiffness: 80 });
+      scale.value = withTiming(10, { duration: 1000 });
+    }, 1000); // Adjust the delay time as needed
+
+    setTimeout(() => {
+      checkAuth()
+    }, 1000);
   }, [])
-
 
   return (
 
-    <SafeAreaView style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: colors.secondary }}>
-      <StatusBar backgroundColor={colors.secondary} barStyle={"light-content"} />
-      <Image source={icons.logo} style={{ height: 200, width: 200 }} />
-      <View style={{ position: "absolute", top: (utilities.screenHeight() / 2) + 120 }}>
+    <SafeAreaView style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: colors.darkSecondary }}>
+      {/* <StatusBar backgroundColor={colors.secondary} barStyle={"light-content"} /> */}
+      <Animated.View
+        style={[{
+          position: 'absolute',
+          bottom: 0,
+          alignItems: 'center',
+        }, animatedStyle, imgOpacity]} >
+        <Image source={icons.logo} style={{ height: 200, width: 200 }} />
+      </Animated.View>
+      <Animated.View style={[{ marginHorizontal: 40, alignItems: "center" }, textOpacity]}>
+        <Image source={icons.missionControl} style={{ width: utilities.screenWidth() - 80, }}
+          resizeMode="contain" />
+
+
         <View style={{ height: 40, width: 40, backgroundColor: colors.lightPrimary3, borderRadius: 40 / 2 }}>
           <LottieView
             source={require("../../assets/animations/loader1.json")}
@@ -99,7 +165,9 @@ const Splash = ({ navigation }) => {
             loop
           />
         </View>
-      </View>
+
+      </Animated.View>
+
     </SafeAreaView>
 
   )
@@ -107,252 +175,9 @@ const Splash = ({ navigation }) => {
 
 export default Splash
 
-const DELEGATE_NAV_ITEMS = [
-  {
-    option_label: "Mission Contral",
-    option_value: "mission_control",
+const __styles = StyleSheet.create({
+  text: {
+    fontSize: 20,
+    marginTop: 20,
   },
-  {
-    option_label: "The Cosmos",
-    option_value: "the_cosmos",
-  },
-  {
-    option_label: "Members",
-    option_value: "members",
-  },
-  {
-    option_label: "Certification",
-    option_value: "certification",
-  },
-  {
-    option_label: "Assessments / Study",
-    option_value: "assessment_study",
-  },
-  {
-    option_label: "Member Goal Statement",
-    option_value: "member_goal_statement",
-  },
-  {
-    option_label: "Complete",
-    option_value: "complete",
-  },
-  {
-    option_label: "Incomplete",
-    option_value: "incomplete",
-  },
-  {
-    option_label: "Responded",
-    option_value: "responded",
-  },
-  {
-    option_label: "Delegate Pods",
-    option_value: "delegate_pods",
-  },
-  {
-    option_label: "Dynamite Pods",
-    option_value: "dynamite_pods",
-  },
-  {
-    option_label: "Delegate Events",
-    option_value: "delegate_events",
-  },
-  {
-    option_label: "Delegate Training",
-    option_value: "delegate_training",
-  },
-  {
-    option_label: "Your Recordings",
-    option_value: "your_recordings",
-  },
-  {
-    option_label: "Study Session",
-    option_value: "study_session",
-  },
-  {
-    option_label: "Your Vault",
-    option_value: "your_vault",
-  },
-  {
-    option_label: "Templates",
-    option_value: "templates",
-  },
-  {
-    option_label: "Links",
-    option_value: "links",
-  },
-  {
-    option_label: "Payments",
-    option_value: "payments",
-  },
-  {
-    option_label: "Payment Request",
-    option_value: "payment_request",
-  },
-  {
-    option_label: "Transactions",
-    option_value: "transactions",
-  },
-  {
-    option_label: "Commission Detail",
-    option_value: "commission_detail",
-  },
-  {
-    option_label: "Calendar",
-    option_value: "calendar",
-  },
-  {
-    option_label: "Groups",
-    option_value: "groups",
-  },
-  {
-    option_label: "Calendar Events",
-    option_value: "calendar_events",
-  },
-  {
-    option_label: "Support Ticket",
-    option_value: "support_ticket",
-  },
-  {
-    option_label: "Help",
-    option_value: "support",
-  },
-  {
-    option_label: "Contact Support",
-    option_value: "contact_support",
-  },
-  {
-    option_label: "Help Tech",
-    option_value: "help_tech",
-  },
-  {
-    option_label: "Digital Assets",
-    option_value: "digital_assets",
-  },
-  {
-    option_label: "90 Day Plan",
-    option_value: "90_day_plan",
-  },
-  {
-    option_label: "90 Day Tracker",
-    option_value: "90_day_tracker",
-  },
-  {
-    option_label: "Appointments",
-    option_value: "appointment",
-  },
-  {
-    option_label: "Appointments Configuration",
-    option_value: "schedule_appointment",
-  },
-  {
-    option_label: "Bookings",
-    option_value: "bookings",
-  },
-
-  {
-    option_label: "Attitude Assessment",
-    option_value: "attitude_assessment",
-  },
-  {
-    option_label: "Auto Responded Messages",
-    option_value: "auto_responded_messages",
-  },
-  {
-    option_label: "Sale Leads",
-    option_value: "sale_leads",
-  },
-  {
-    option_label: "Sections",
-    option_value: "sections",
-  },
-  {
-    option_label: "Leads",
-    option_value: "leads",
-  },
-  {
-    option_label: "Progress",
-    option_value: "progress",
-  },
-  {
-    option_label: "Nurture Members",
-    option_value: "nurture_members",
-  },
-  {
-    option_label: "Member Answers List",
-    option_value: "member_answers_list",
-  },
-  {
-    option_label: "Chat",
-    option_value: "chat",
-  },
-  {
-    option_label: "Portals",
-    option_value: "portals",
-  },
-  {
-    option_label: "My Portals",
-    option_value: "my_portals",
-  },
-  {
-    option_label: "The Source Feed",
-    option_value: "the_source_feed",
-  },
-  {
-    option_label: "All Source Feed",
-    option_value: "all_source_feed",
-  },
-  {
-    option_label: "Subscription List",
-    option_value: "subscription_list",
-  },
-  {
-    option_label: "All Member List",
-    option_value: "all_member_list",
-  },
-  {
-    option_label: "Self Image",
-    option_value: "self_image",
-  },
-
-  {
-    option_label: "Completed",
-    option_value: "completed",
-  },
-  {
-    option_label: "Incompleted",
-    option_value: "incompleted",
-  },
-  {
-    option_label: "Responded",
-    option_value: "self_image_responded",
-  },
-  // {
-  //   option_label: "Shop",
-  //   option_value: "shop",
-  // },
-  {
-    option_label: "Internal Tickets",
-    option_value: "internal-tickets",
-  },
-  {
-    option_label: "Welcome Reminder Settings",
-    option_value: "welcome_reminder_settings",
-  },
-  {
-    option_label: "Scheduled Feeds",
-    option_value: "scheduled_feeds",
-  },
-
-  {
-    option_label: "Whatsapp Chat",
-    option_value: "whatsapp_chat",
-  },
-  {
-    option_label: "Daily Dynamite Accountabalility Tracker",
-    option_value: "daily_dynamite_accountabalility_tracker",
-  },
-  {
-    option_label: "Daily Streak Performance",
-    option_value: "daily_streak_performance",
-  },
-];
+})

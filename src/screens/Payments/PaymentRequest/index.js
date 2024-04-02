@@ -300,7 +300,6 @@ const PaymentRequest = ({ navigation, route }) => {
       <ConfirmationModal
         title={"Are you sure you want to delete this Payment Request ?"}
         closeModal={() => setConfirmation({ isVisible: false, item: null })}
-
         onAgree={onConfirmationAgree}
         isVisible={confirmationModal?.isVisible} />
 

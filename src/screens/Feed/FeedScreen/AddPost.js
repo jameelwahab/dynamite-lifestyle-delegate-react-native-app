@@ -361,6 +361,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     const [link, setLink] = useState("");
     const [textColor, setTextColor] = useState(colors.white)
     const [btnColor, setBtnColor] = useState(colors.primary2);
+    const [buttonAlignment, setButtonAlignment] = useState("center");
     const [colorModal, setColorModal] = useState({
       visibility: false,
       for: 0
@@ -373,6 +374,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
         setLink(eventBtnLink);
         setBtnColor(eventBtnColor);
         setTextColor(eventBtnTextColor);
+        setButtonAlignment(eventBtnAligment)
       }
     }, [eventModalVisible])
 
@@ -395,7 +397,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
         setEventBtnLink(link);
         setEventBtnTextColor(textColor);
         setEventBtnColor(btnColor)
-        setEventBtnAligment("center")
+        setEventBtnAligment(buttonAlignment)
         setEventComplete(true);
         setEventModalVisible(false)
       }
@@ -407,6 +409,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
       setLink("");
       setBtnColor(colors.primary2);
       setTextColor(colors.white);
+      setButtonAlignment("center");
     }
     return (
       <Modal
@@ -500,28 +503,28 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                       <MyText isLabel>Button Alignment</MyText>
                       <View style={__style.alignBtnsRow}>
                         <Pressable
-                          onPress={() => setEventBtnAligment("left")}
-                          style={[__style.alignBtnView, eventBtnAligment == "left" && __style.alignSelectedBtnView]}>
+                          onPress={() => setButtonAlignment("left")}
+                          style={[__style.alignBtnView, buttonAlignment == "left" && __style.alignSelectedBtnView]}>
                           <MyText
                             type='medium'
-                            color={eventBtnAligment == "left" ? colors.black : colors.white} >Left</MyText>
+                            color={buttonAlignment == "left" ? colors.black : colors.white} >Left</MyText>
                         </Pressable>
                         <View style={__style.verticalDivider} />
                         <Pressable
-                          onPress={() => setEventBtnAligment("center")}
-                          style={[__style.alignBtnView, eventBtnAligment == "center" && __style.alignSelectedBtnView]}>
+                          onPress={() => setButtonAlignment("center")}
+                          style={[__style.alignBtnView, buttonAlignment == "center" && __style.alignSelectedBtnView]}>
                           <MyText
                             type='medium'
-                            color={eventBtnAligment == "center" ? colors.black : colors.white}
+                            color={buttonAlignment == "center" ? colors.black : colors.white}
                           >Center</MyText>
                         </Pressable>
                         <View style={__style.verticalDivider} />
                         <Pressable
-                          onPress={() => setEventBtnAligment("right")}
-                          style={[__style.alignBtnView, eventBtnAligment == "right" && __style.alignSelectedBtnView]}>
+                          onPress={() => setButtonAlignment("right")}
+                          style={[__style.alignBtnView, buttonAlignment == "right" && __style.alignSelectedBtnView]}>
                           <MyText
                             type='medium'
-                            color={eventBtnAligment == "right" ? colors.black : colors.white}
+                            color={buttonAlignment == "right" ? colors.black : colors.white}
                           >Right</MyText>
                         </Pressable>
                       </View>

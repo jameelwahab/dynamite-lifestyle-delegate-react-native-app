@@ -878,14 +878,13 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
         <FlatList
           data={tab == 0 ? feed : []}
           onViewableItemsChanged={onViewableItemsChanged}
-          // onViewableItemsChanged={(e) => console.log("onViewableItemsChanged", e)}
           viewabilityConfig={viewConfigRef.current}
           showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item?._id}
           ListHeaderComponent={!!!feedId && headerView()}
           ListEmptyComponent={!loader && tab == 0 && <EmptyView label={"Posts not found"} />}
           onEndReached={() => {
-            console.log("onEndReached", feedVar)
+            console.log("onEndReached", feedVar,!!!feedId,tab)
             if (!!!feedId && feedVar?.canLoadMore && tab == 0) {
               feedVar = {
                 ...feedVar,
@@ -897,6 +896,8 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           }}
           renderItem={tab == 0 && feedRenderView}
           ListFooterComponent={footerView}
+          removeClippedSubviews={true}
+          updateCellsBatchingPeriod={10}
         />
       </View>
 
@@ -954,6 +955,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
         isVisible={confirmation.isVisible}
         onAgree={confirmationAction}
         title={confirmation.title}
+  
       />
 
       <ScheduleModal ref={scheduleModalRef} />

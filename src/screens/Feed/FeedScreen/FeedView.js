@@ -18,6 +18,8 @@ import openUrl from '../../../functions/openUrl'
 import DropShadow from "react-native-drop-shadow";
 
 export const FeedView = ({ item, index, user, token, isInView, timezone, settings, openComments, showLikes, openOptions, onLikebtnPress, isCosmos, sourceLevelIcons, isScheduledFeed, openScheduleTimeModal, onFeedDetail, isEventFeed }) => {
+  console.log("updated", index);
+
   const [animationState, setAnimationState] = useState(0)
 
   useEffect(() => {
@@ -237,21 +239,20 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
 
 
   return (
-    <DropShadow style={[__style.shadow, __style.rootView,
-    item?.is_reward_feed ? __style.rewardBorderView : null,
+    <DropShadow style={[__style.shadow, __style.rootShadowView,
     { shadowColor: item?.is_reward_feed ? colors.primary : colors.darkSecondary, }]}>
-      <View style={[]}>
-        {animationView()}
-        <View >
-          {profileView()}
-          {descriptionView()}
-          {item?.is_publish &&
-            <>
-              {statsView()}
-              {actionView()}
-            </>}
+      <View style={[__style.rootView, item?.is_reward_feed ? __style.rewardBorderView : null]}>
+          {animationView()}
+          <View >
+            {profileView()}
+            {descriptionView()}
+            {item?.is_publish &&
+              <>
+                {statsView()}
+                {actionView()}
+              </>}
+          </View>
         </View>
-      </View>
     </DropShadow>
   )
 };
@@ -259,14 +260,14 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
 function areEqual(prevProps, nextProps) {
   console.log(prevProps, "prevProps");
   console.log(nextProps, "nextProps");
-  if (JSON.stringify(prevProps) !== JSON.stringify(nextProps)) {
+  if (JSON.stringify(prevProps) == JSON.stringify(nextProps)) {
     return true
   }
   return false
 }
 
 
-export default React.memo(FeedView)
+export default React.memo(FeedView);
 
 const btnAligmnet = {
   "center": "center",
@@ -286,20 +287,23 @@ const __style = StyleSheet.create({
   },
   rewardBorderView: {
     borderWidth: 1,
-    borderColor: colors.primary
+    borderColor: colors.primary,
+    borderRadius: 10,
+  },
+  rootShadowView: {
+    marginTop: 15,
+    marginHorizontal: 10,
   },
   rootView: {
-    marginTop: 15,
-    backgroundColor: colors.secondary,
     padding: 10,
+    backgroundColor: colors.secondary,
     borderRadius: 10,
-    marginHorizontal: 10,
-
   },
+
+
   animationView: {
     width: "100%",
     height: "100%",
-    // height: 900,
     position: 'absolute',
     zIndex: -1,
     overflow: "hidden",
