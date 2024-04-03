@@ -1,5 +1,5 @@
 import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import RootView from '../../../components/RootView'
 import MyText from '../../../components/MyText'
 import { useSelector } from 'react-redux'
@@ -24,12 +24,14 @@ import MyChip from '../../../components/MyChip'
 import SearchView from '../../../components/SearchView'
 import OptionModal from '../../../components/OptionModal'
 import ConfirmationModal from '../../../components/ConfirmationModal'
+import ChangeStatusModal from './Component/ChangeStatusModal'
 
 
 
 let page = 0;
 let canLoadMore = false;
 const Bookings = ({ navigation, route }) => {
+  const ref_changeStatusModal = useRef();
   const { key, parentKey } = route.params
   const { navbar } = useSelector(selectNavbar);
   const { token } = useSelector(selectUser);
@@ -77,9 +79,13 @@ const Bookings = ({ navigation, route }) => {
     } else if (opt.key == "detail") {
       navigation.navigate(routes.genericQestionListing, {
         created_for: "page",
-        id: item?._id,
+        id: item?.page?._id,
         memberId: item?.user_info?._id
       })
+    } else if (opt.key == "status") {
+      setTimeout(() => {
+        ref_changeStatusModal?.current?.openModal(item);
+      }, 500);
     }
   }
 
@@ -105,6 +111,7 @@ const Bookings = ({ navigation, route }) => {
     setSearchLoader(true);
     getBookingsFromServer(true)
   }
+  
   const clearSalePage = (index) => {
     filters.sale_page.splice(index, 1);
     setFilters({ ...filters })
@@ -249,7 +256,7 @@ const Bookings = ({ navigation, route }) => {
 
   const headerView = () => {
     return (
-      <View>
+      <View style={{backgroundColor:colors.darkSecondary}}>
         {isFilterApplied() &&
           <View style={{ flexDirection: "row", flexWrap: "wrap", paddingBottom: 5 }}>
             {!!filters?.booking_status &&
@@ -295,6 +302,10 @@ const Bookings = ({ navigation, route }) => {
       <View style={{ flex: 1 }}>
         <FlatList
           keyExtractor={(item) => item?._id}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 70 }}
+          stickyHeaderIndices={[0]}
+          stickyHeaderHiddenOnScroll={true}
           ListHeaderComponent={headerView()}
           data={list}
           renderItem={renderBookings}
@@ -320,6 +331,18 @@ const Bookings = ({ navigation, route }) => {
         onAgree={onConfirmPress}
         title={"Are you sure you want to delete this Booking?"}
       />
+
+      <ChangeStatusModal
+        ref={ref_changeStatusModal}
+        navigation={navigation} token={token}
+        onStatusChange={(item) => setList((list) => {
+          let index = list.findIndex(x => x._id === item._id)
+          if (index > -1) {
+            list.splice(index, 1, item)
+          }
+          return [...list]
+        })}
+      />
     </RootView>
   )
 }
@@ -341,11 +364,11 @@ const optionsList = [
     key: "delete",
     icon: icons.trash
   },
-  // {
-  //   title: "Change Status",
-  //   key: "stats",
-  //   icon: icons.edit
-  // },
+  {
+    title: "Change Status",
+    key: "status",
+    icon: icons.edit
+  },
 ]
 const __styles = StyleSheet.create({
   itemView: {

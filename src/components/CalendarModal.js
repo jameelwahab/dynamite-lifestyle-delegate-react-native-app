@@ -14,7 +14,8 @@ const CalendarModal = forwardRef(({ onDateSelected }, ref) => {
   const flatlistRef = useRef()
   const [isVisible, setIsVisible] = useState(false)
   const [date, setDate] = useState(moment().format("YYYY-MM-DD"));
-  const [showYearView, setShowYearView] = useState(false)
+  const [showYearView, setShowYearView] = useState(false);
+  const [type, setType] = useState("")
 
   useImperativeHandle(ref, () => {
     return {
@@ -22,8 +23,9 @@ const CalendarModal = forwardRef(({ onDateSelected }, ref) => {
     }
   }, [])
 
-  const openModal = (date) => {
+  const openModal = (date, type = "") => {
     setDate(!!date ? moment(date).format("YYYY-MM-DD") : moment().format("YYYY-MM-DD"));
+    setType(type);
     setIsVisible(true)
   }
 
@@ -192,7 +194,7 @@ const CalendarModal = forwardRef(({ onDateSelected }, ref) => {
                   }}
                   onDayPress={(day) => {
                     setIsVisible(false);
-                    onDateSelected?.(moment(day.dateString, "YYYY-MM-DD"));
+                    onDateSelected?.(moment(day.dateString, "YYYY-MM-DD"), type);
                   }}
                   renderHeader={() => null}
                   hideArrows

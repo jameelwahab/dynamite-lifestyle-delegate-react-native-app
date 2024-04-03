@@ -31,10 +31,43 @@ export const GET_BOOKING_STATUSES = ({ token, navigation, }) => {
 }
 
 
-export const GET_BOOKING_TIME_SLOTS = ({ token, navigation, }) => {
+export const GET_BOOKING_TIME_SLOTS = ({ token, navigation, date }) => {
   return invokeApi({
     path: `api/consultant/slots/list/`,
-    method: "GET",
+    method: "POST",
+    postData: { date },
+    token,
+    navigation,
+  })
+}
+
+
+export const BOOKING_ADD = ({ token, navigation, data }) => {
+  return invokeApi({
+    path: `api/consultant/booking/add/`,
+    method: "POST",
+    postData: data,
+    token,
+    navigation,
+  })
+}
+
+
+export const BOOKING_DELETE = ({ token, navigation, id }) => {
+  return invokeApi({
+    path: `api/consultant/booking/delete/${id}`,
+    method: "DELETE",
+    token,
+    navigation,
+  })
+}
+
+
+export const BOOKING_UPDATE_STATUS = ({ token, navigation, id, data }) => {
+  return invokeApi({
+    path: `api/consultant/update_booking_status/${id}`,
+    method: "PUT",
+    postData: data,
     token,
     navigation,
   })

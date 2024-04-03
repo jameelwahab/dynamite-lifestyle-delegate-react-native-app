@@ -10,6 +10,7 @@ import { colors } from '../../utilities/colors'
 import Bookings from '../../screens/Appointments/Bookings/Bookings'
 import AddBooking from '../../screens/Appointments/Bookings/AddBooking'
 import BookingFilter from '../../screens/Appointments/Bookings/BookingFilter'
+import GenericQuetionList from '../../screens/Questions/GenericQuetionList'
 
 
 
@@ -25,6 +26,7 @@ const StackBookings = ({ route }) => {
         <BookingsStack.Screen initialParams={route?.params} name={routes.bookingList} component={Bookings} />
         <BookingsStack.Screen name={routes.bookingAdd} component={AddBooking} />
         <BookingsStack.Screen name={routes.bookingFilter} component={BookingFilter} />
+        <BookingsStack.Screen name={routes.genericQestionListing} component={GenericQuetionList} />
 
 
         {/*//? Default Screens Start */}
