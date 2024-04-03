@@ -5,7 +5,7 @@ import MyText from '../../../components/MyText'
 import { useSelector } from 'react-redux'
 import { selectNavbar } from '../../../redux/reducers/navbarSlice'
 import { selectUser } from '../../../redux/reducers/userSlice'
-import { GET_BOOKINGS_LIST } from '../../../DAL'
+import { BOOKING_DELETE, GET_BOOKINGS_LIST } from '../../../DAL'
 import MyLoader from '../../../components/MyLoader'
 import { colors } from '../../../utilities/colors'
 import MemberView from '../../../components/MemberView'
@@ -20,6 +20,10 @@ import FAB from '../../../components/FAB'
 import routes from '../../../navigation/routes'
 import TitleView from '../../../components/TitleView'
 import { icons } from '../../../utilities/icons'
+import MyChip from '../../../components/MyChip'
+import SearchView from '../../../components/SearchView'
+import OptionModal from '../../../components/OptionModal'
+import ConfirmationModal from '../../../components/ConfirmationModal'
 
 
 
@@ -35,6 +39,10 @@ const Bookings = ({ navigation, route }) => {
   const [loader, setLoader] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [footerLoader, setFooterLoader] = useState(false);
+  const [searchText, setSearchText] = useState("");
+  const [searchLoader, setSearchLoader] = useState(false);
+  const [optionModal, setOptionModal] = useState({ isVisible: false, item: null });
+  const [confirmModal, setConfirmModal] = useState({ isVisible: false, item: null });
   const [filters, setFilters] = useState({
     booking_status: null,
     end_date: null,
@@ -45,9 +53,41 @@ const Bookings = ({ navigation, route }) => {
     start_date: null,
   })
 
+
+
   useEffect(() => {
     callAPi()
-  }, [])
+  }, [JSON.stringify(filters)])
+
+  useEffect(() => {
+    if (route?.params?.filters) {
+      setFilters(route?.params?.filters);
+    } else if (route?.params?.callList) {
+      callAPi()
+    }
+  }, [route])
+
+  const onSelected = (opt) => {
+    let { item } = optionModal;
+    setOptionModal({ isVisible: false, item: null })
+    if (opt.key == "delete") {
+      setTimeout(() => {
+        setConfirmModal({ isVisible: true, item: item });
+      }, 500);
+    } else if (opt.key == "detail") {
+      navigation.navigate(routes.genericQestionListing, {
+        created_for: "page",
+        id: item?._id,
+        memberId: item?.user_info?._id
+      })
+    }
+  }
+
+  const onConfirmPress = (opt) => {
+    let { item } = confirmModal;
+    setConfirmModal({ isVisible: false, item: null })
+    deleteBookingFromServer(item?._id)
+  }
 
   const onAddScreen = () => {
     navigation.navigate(routes.bookingAdd)
@@ -59,8 +99,36 @@ const Bookings = ({ navigation, route }) => {
     })
   }
 
+  const onSearchPress = () => {
+    canLoadMore = false;
+    page = 0;
+    setSearchLoader(true);
+    getBookingsFromServer(true)
+  }
+  const clearSalePage = (index) => {
+    filters.sale_page.splice(index, 1);
+    setFilters({ ...filters })
+  }
+
+  const clearFilter = () => {
+    setSearchText('')
+    setFilters({
+      booking_status: null,
+      end_date: null,
+      filter_by_dates: false,
+      sale_page: [],
+      search_text: "",
+      sort_by: "",
+      start_date: null,
+    })
+  }
+
+  const isFilterApplied = () => {
+    return (filters.sale_page.length > 0 || !!filters?.booking_status || !!filters?.booking_status
+      || (filters?.filter_by_dates && (!!filters?.start_date || !!filters?.end_date)) || !!filters?.sort_by);
+  }
+
   const callAPi = () => {
-    console.log("callAPi")
     canLoadMore = false;
     page = 0;
     setList([])
@@ -84,8 +152,18 @@ const Bookings = ({ navigation, route }) => {
   }
 
   const getBookingsFromServer = async (newArray = false) => {
+    let filterObj = {
+      booking_status: !!filters?.booking_status ? filters?.booking_status?._id : null,
+      end_date: !!filters?.end_date ? moment(filters?.end_date).format("YYYY-MM-DD") : null,
+      filter_by_dates: filters?.filter_by_dates,
+      sale_page: filters?.sale_page.map(x => x?._id),
+      search_text: searchText.trim(),
+      sort_by: !!filters?.sort_by ? filters?.sort_by?.key : "",
+      start_date: !!filters?.start_date ? moment(filters?.start_date).format("YYYY-MM-DD") : null,
+    }
+
     let res = await GET_BOOKINGS_LIST({
-      navigation, token, page, filters
+      navigation, token, page, filters: filterObj,
     })
     if (res.code == 200) {
       let length = newArray ? res?.bookings.length : list.length + res?.bookings.length;
@@ -100,10 +178,24 @@ const Bookings = ({ navigation, route }) => {
       setLoader(false);
       setFooterLoader(false);
       setRefreshing(false);
+      setSearchLoader(false);
     } else {
       setLoader(false)
       setFooterLoader(false);
       setRefreshing(false);
+      setSearchLoader(false);
+    }
+  }
+
+  const deleteBookingFromServer = async (id) => {
+    setLoader(true)
+    let res = await BOOKING_DELETE({ navigation, token, id })
+    if (res.code == 200) {
+      let nlist = list.slice().filter(x => x._id != id)
+      setList([...nlist])
+      setLoader(false)
+    } else {
+      setLoader(false)
     }
   }
 
@@ -120,7 +212,9 @@ const Bookings = ({ navigation, route }) => {
       <View style={__styles.itemView}>
         <View style={__styles.headerView}>
           <MemberView member={item?.user_info} marginLeft={0} size={35} titleSize={14} />
-          <MenuButton />
+          <MenuButton
+            onPress={() => setOptionModal({ isVisible: true, item: item })}
+          />
         </View>
         <View>
           <StatView title={"Booking Page"} value={!!item?.page?.sale_page_title ? item?.page?.sale_page_title : "N/A"} />
@@ -133,22 +227,67 @@ const Bookings = ({ navigation, route }) => {
 
   const topView = () => {
     return (
-      <View style={__styles.topView}>
-        <TitleView
-          title={title}
-          hideBackBottomButton
-          subTitle={`Showing ${list.length} of ${total}`}
-        />
-        <View style={__styles.topBtnsView}>
+      <View>
+        <View style={__styles.topView}>
+          <TitleView
+            title={title}
+            hideBackBottomButton
+            subTitle={`Showing ${list.length} of ${total}`}
+          />
+          <View style={__styles.topBtnsView}>
 
-          <TouchableOpacity onPress={onFilterScreen}>
-            {icons.filterCircle(colors.primary,25)}
-          </TouchableOpacity>
-        </View >
-      </View >
+            <TouchableOpacity onPress={onFilterScreen}>
+              {icons.filterCircle(colors.primary, 25)}
+            </TouchableOpacity>
+          </View>
+        </View>
+
+      </View>
     )
   }
 
+
+  const headerView = () => {
+    return (
+      <View>
+        {isFilterApplied() &&
+          <View style={{ flexDirection: "row", flexWrap: "wrap", paddingBottom: 5 }}>
+            {!!filters?.booking_status &&
+              <MyChip title={filters?.booking_status?.title}
+                onPress={() => setFilters({ ...filters, booking_status: null })} />}
+
+            {!!filters?.sale_page && filters?.sale_page.map((x, i) =>
+              <MyChip title={x?.sale_page_title}
+                onPress={() => clearSalePage(i)} />)}
+
+            {!!filters?.sort_by &&
+              <MyChip title={filters?.sort_by?.sort_title}
+                onPress={() => setFilters({ ...filters, sort_by: null })} />}
+
+
+            {(!!filters?.filter_by_dates && (!!filters?.start_date || !!filters?.end_date)) &&
+              <MyChip title={`${!!filters?.start_date ? "Start Date: " + moment(filters?.start_date).format(dateTimeFormat?.date) : ""}${!!filters?.end_date ? " End Date: " + moment(filters?.end_date).format(dateTimeFormat?.date) : ""}`}
+                onPress={() => setFilters({ ...filters, filter_by_dates: false, start_date: null, end_date: null })} />}
+
+            {/* <View style={{ width: "100%", marginVertical: 5, alignItems: "flex-end" }}> */}
+            <TouchableOpacity
+              onPress={clearFilter}
+              style={{ marginLeft: 5, marginTop: 2, marginRight: 10, borderWidth: 1, borderColor: colors.delete, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 5, backgroundColor: colors.heart + "33" }}>
+              <MyText color={colors.delete}>{"Clear Filter"}</MyText>
+            </TouchableOpacity>
+            {/* </View> */}
+
+          </View>}
+
+        <SearchView
+          onChangeText={(text) => setSearchText(text)}
+          onSearchPress={onSearchPress}
+          loader={searchLoader}
+          search={searchText}
+        />
+      </View>
+    )
+  }
 
   return (
     <RootView hideSubHeader>
@@ -156,6 +295,7 @@ const Bookings = ({ navigation, route }) => {
       <View style={{ flex: 1 }}>
         <FlatList
           keyExtractor={(item) => item?._id}
+          ListHeaderComponent={headerView()}
           data={list}
           renderItem={renderBookings}
           onEndReached={loadMore}
@@ -166,18 +306,53 @@ const Bookings = ({ navigation, route }) => {
       </View>
       <FAB onPress={onAddScreen} />
       <MyLoader enable={loader} />
+
+      <OptionModal
+        isVisible={optionModal?.isVisible}
+        onSelected={onSelected}
+        optionList={optionsList}
+        closeModal={() => setOptionModal({ isVisible: false, item: null })}
+      />
+
+      <ConfirmationModal
+        isVisible={confirmModal?.isVisible}
+        closeModal={() => setConfirmModal({ isVisible: false, item: null })}
+        onAgree={onConfirmPress}
+        title={"Are you sure you want to delete this Booking?"}
+      />
     </RootView>
   )
 }
 
 export default Bookings
-
+const optionsList = [
+  {
+    title: "Question Answers Detail",
+    key: "detail",
+    icon: icons.threeLinesMenu
+  },
+  // {
+  //   title: "Booking Notes",
+  //   key: "notes",
+  //   icon: icons.notes
+  // },
+  {
+    title: "Delete",
+    key: "delete",
+    icon: icons.trash
+  },
+  // {
+  //   title: "Change Status",
+  //   key: "stats",
+  //   icon: icons.edit
+  // },
+]
 const __styles = StyleSheet.create({
   itemView: {
     backgroundColor: colors.secondary,
     padding: 10,
     borderRadius: 10,
-    marginBottom: 10
+    marginTop: 10
   },
   headerView: {
     flexDirection: "row",
