@@ -72,3 +72,45 @@ export const BOOKING_UPDATE_STATUS = ({ token, navigation, id, data }) => {
     navigation,
   })
 }
+
+
+export const BOOKING_NOTES_LIST = ({ token, navigation, id }) => {
+  return invokeApi({
+    path: `api/booking_note/${id}`,
+    method: "GET",
+    token,
+    navigation,
+  })
+}
+
+export const BOOKING_NOTES_DELETE = ({ token, navigation, id }) => {
+  return invokeApi({
+    path: `api/booking_note/${id}`,
+    method: "DELETE",
+    token,
+    navigation,
+  })
+}
+
+export const BOOKING_NOTES_ADD = ({ token, navigation, body: {
+  add_as_personal_note, booking_id, note
+} }) => {
+  
+  return invokeApi({
+    path: `api/booking_note/`,
+    method: "POST",
+    postData: { add_as_personal_note, booking_id, note },
+    token,
+    navigation,
+  })
+}
+
+export const BOOKING_NOTES_UPDATE = ({ token, navigation, id, note }) => {
+  return invokeApi({
+    path: `api/booking_note/${id}`,
+    method: "PUT",
+    postData: { note },
+    token,
+    navigation,
+  })
+}

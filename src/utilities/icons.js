@@ -37,7 +37,7 @@ export const icons = {
   file_doc: require('../assets/icons/doc.png'),
   file_xls: require('../assets/icons/xls.png'),
   file_mp3: require('../assets/icons/mp3.png'),
-  
+
   //todo:   sideBar Icons
 
   sidebar: {
@@ -72,12 +72,12 @@ export const icons = {
   download: (color = colors.primary, size = 17) => { return (<Feather name="download" color={color} size={size} />) },
   edit: (color = colors.primary, size = 17) => { return (<Feather name="edit" color={color} size={size} />) },
   trash: () => { return (<Feather name="trash" color={colors.primary} size={17} />) },
-  trashFilled: () => { return (<Fontisto name="trash" color={colors.primary} size={17} />) },
+  trashFilled: (color = colors.primary, size = 17) => { return (<Fontisto name="trash" color={color} size={size} />) },
   reply: (color = colors.primary, size = 17) => { return (<Octicons name="reply" color={color} size={size} />) },
   upload: () => { return (<FontAwesome name="cloud-upload" color={colors.primary} size={25} />) },
   upload2: (color = colors.primary, size = 17) => { return (<Feather name="upload" color={color} size={size} />) },
   clock: (color = colors.primary, size = 17) => { return (<Octicons name="clock" color={color} size={size} />) },
-  minusCircle: () => { return (<Feather name="minus-circle" color={colors.primary} size={25} />) },
+  minusCircle: (color = colors.primary, size = 25) => { return (<Feather name="minus-circle" color={color} size={size} />) },
   plusCircle: (color = colors.primary, size = 25) => { return (<Feather name="plus-circle" color={color} size={size} />) },
   back: (color = colors.white, size = 20) => { return (<MaterialIcons name="arrow-back" color={color} size={size} />) },
   downArrow: (color = colors.white, size = 20) => { return (<AntDesign name="arrowdown" color={color} size={size} />) },
@@ -121,4 +121,6 @@ export const icons = {
   category: (color = colors.white, size = 20) => { return (<MaterialIcons name="category" color={color} size={size} />) },
   members: (color = colors.white, size = 20) => { return (<FontAwesome5 name="user-friends" color={color} size={size} />) },
   list_circle: (color = colors.white, size = 20) => { return (<Ionicons name="list-circle" color={color} size={size} />) },
+  duplicate: (color = colors.white, size = 20) => { return (<Ionicons name="duplicate" color={color} size={size} />) },
+  drag: (color = colors.white, size = 20) => { return (<MaterialIcons name="drag-indicator" color={color} size={size} />) },
 }

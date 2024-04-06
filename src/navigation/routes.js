@@ -152,6 +152,8 @@ const routes = {
   bookingList: "BOOKINGS_LIST_SCREEN",
   bookingFilter: "BOOKINGS_FILTER_SCREEN",
   bookingAdd: "BOOKINGS_ADD_SCREEN",
+  bookingNotesList: "BOOKINGS_NOTES_LIST_SCREEN",
+  bookingAddNote: "BOOKINGS_ADD_NOTE_SCREEN",
 
   //? Bookings Configutaion
   bookingConfigurationScreen: "BOOKINGS_CONFIGURATION_SCREEN",

@@ -11,6 +11,8 @@ import Bookings from '../../screens/Appointments/Bookings/Bookings'
 import AddBooking from '../../screens/Appointments/Bookings/AddBooking'
 import BookingFilter from '../../screens/Appointments/Bookings/BookingFilter'
 import GenericQuetionList from '../../screens/Questions/GenericQuetionList'
+import BookingNotesList from '../../screens/Appointments/Bookings/Notes/BookingNotesList'
+import AddNote from '../../screens/Appointments/Bookings/Notes/AddNote'
 
 
 
@@ -27,6 +29,8 @@ const StackBookings = ({ route }) => {
         <BookingsStack.Screen name={routes.bookingAdd} component={AddBooking} />
         <BookingsStack.Screen name={routes.bookingFilter} component={BookingFilter} />
         <BookingsStack.Screen name={routes.genericQestionListing} component={GenericQuetionList} />
+        <BookingsStack.Screen name={routes.bookingNotesList} component={BookingNotesList} />
+        <BookingsStack.Screen name={routes.bookingAddNote} component={AddNote} />
 
 
         {/*//? Default Screens Start */}

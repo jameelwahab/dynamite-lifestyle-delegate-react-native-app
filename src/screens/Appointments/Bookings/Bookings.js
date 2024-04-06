@@ -37,8 +37,8 @@ const Bookings = ({ navigation, route }) => {
   const { token } = useSelector(selectUser);
   const title = useState(navbar?.find(x => x.value == parentKey)?.child_options?.find(y => y.value == key)?.title);
   const [list, setList] = useState([]);
-  const [total, setTotal] = useState(0);
   const [loader, setLoader] = useState(false);
+  const [total, setTotal] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
   const [footerLoader, setFooterLoader] = useState(false);
   const [searchText, setSearchText] = useState("");
@@ -86,6 +86,11 @@ const Bookings = ({ navigation, route }) => {
       setTimeout(() => {
         ref_changeStatusModal?.current?.openModal(item);
       }, 500);
+    } else if (opt.key == "notes") {
+      navigation.navigate(routes.bookingNotesList, {
+        bookingId: item?._id,
+        userInfo: item?.user_info
+      })
     }
   }
 
@@ -111,7 +116,7 @@ const Bookings = ({ navigation, route }) => {
     setSearchLoader(true);
     getBookingsFromServer(true)
   }
-  
+
   const clearSalePage = (index) => {
     filters.sale_page.splice(index, 1);
     setFilters({ ...filters })
@@ -209,7 +214,7 @@ const Bookings = ({ navigation, route }) => {
   const statusView = (info) => {
     return (
       <View style={[__styles.statusView, { backgroundColor: info?.background_color }]}>
-        <MyText color={info?.text_color} fontSize={14} >{info?.title}</MyText>
+        <MyText color={info?.text_color} fontSize={14} type='medium' >{info?.title}</MyText>
       </View>
     )
   }
@@ -256,7 +261,7 @@ const Bookings = ({ navigation, route }) => {
 
   const headerView = () => {
     return (
-      <View style={{backgroundColor:colors.darkSecondary}}>
+      <View style={{ backgroundColor: colors.darkSecondary }}>
         {isFilterApplied() &&
           <View style={{ flexDirection: "row", flexWrap: "wrap", paddingBottom: 5 }}>
             {!!filters?.booking_status &&
@@ -354,11 +359,11 @@ const optionsList = [
     key: "detail",
     icon: icons.threeLinesMenu
   },
-  // {
-  //   title: "Booking Notes",
-  //   key: "notes",
-  //   icon: icons.notes
-  // },
+  {
+    title: "Booking Notes",
+    key: "notes",
+    icon: icons.notes
+  },
   {
     title: "Delete",
     key: "delete",
@@ -386,7 +391,8 @@ const __styles = StyleSheet.create({
     // paddingVertical: 5,
     // paddingHorizontal: 15,
     height: 25,
-    minWidth: 80,
+    paddingHorizontal: 10,
+    // minWidth: 80,
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 30,

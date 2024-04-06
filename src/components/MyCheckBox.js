@@ -4,11 +4,16 @@ import CheckBox from '@react-native-community/checkbox'
 import MyText from './MyText'
 import { colors } from '../utilities/colors'
 
-const MyCheckBox = ({ value, title = "", onPress, circle = false, size = 20, color = colors.primary, textColor = colors.white }) => {
+const MyCheckBox = ({ value, title = "", onPress, circle = false, size = 20, color = colors.primary, textColor = colors.white, row = true,  }) => {
   return (
     <Pressable
       onPress={onPress}
-      style={{ flexDirection: "row", alignItems: "center", paddingLeft: 1, paddingBottom: 10, }}>
+      style={{
+        flexDirection: row ? "row" : "column",
+        alignItems: "center",
+        paddingLeft: 1,
+        paddingBottom: 10,
+      }}>
       <CheckBox
         onAnimationType="bounce"
         offAnimationType="bounce"
@@ -25,8 +30,8 @@ const MyCheckBox = ({ value, title = "", onPress, circle = false, size = 20, col
         animationDuration={0}
       />
       {!!title &&
-        <View style={{ marginLeft: Platform.OS == "ios" ? 10 : 20, flex: 1 }}>
-          <MyText color={textColor}  >{title}</MyText>
+        <View style={{ marginLeft: row ? Platform.OS == "ios" ? 10 : 20 : 0, flex: row ? 1 : undefined, marginTop: row ? 0 : 5 }}>
+          <MyText color={textColor} capitalize  >{title}</MyText>
         </View>}
 
     </Pressable>
