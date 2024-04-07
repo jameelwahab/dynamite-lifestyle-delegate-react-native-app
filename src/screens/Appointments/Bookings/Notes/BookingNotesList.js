@@ -36,7 +36,7 @@ const BookingNotesList = ({ navigation, route }) => {
   const optionsAction = (opt) => {
     if (opt.type == "edit") {
       navigation.navigate(routes.bookingAddNote, {
-        bookingId:bookingId,
+        bookingId: bookingId,
         refresh: getDataFromServer,
         note: optionModal?.for,
       });
@@ -77,6 +77,7 @@ const BookingNotesList = ({ navigation, route }) => {
   }, [])
 
   const renderList = ({ item, index }) => {
+    console.log(item?.user_info?.action_by)
     return (
       <View style={__styles.itemRootView}>
         <View style={__styles.itemUserView}>
@@ -89,7 +90,7 @@ const BookingNotesList = ({ navigation, route }) => {
           <View style={__styles.itemNameAndDateView} >
             <View style={{ flex: 1 }}>
               <MyText color={colors.primary} fontSize={14} >
-                {`${item?.user_info?.first_name} ${item?.user_info?.action_by == "admin_user" ? "(Admin)" : "(Delegate)"} `}
+                {`${item?.user_info?.first_name} ${item?.user_info?.last_name} ${item?.user_info?.action_by == "admin_user" ? "(Admin)" : "(Consultant)"} `}
               </MyText>
               <MyText fontSize={10} color={colors.lightText2} >{"Created at: " + convertTimezone(item?.createdAt, timezone).fromNow()}</MyText>
             </View>
@@ -151,7 +152,7 @@ const BookingNotesList = ({ navigation, route }) => {
         <FAB
           onPress={() =>
             navigation.navigate(routes.bookingAddNote, {
-              bookingId:bookingId,
+              bookingId: bookingId,
               refresh: getDataFromServer,
               note: optionModal?.for,
             })}

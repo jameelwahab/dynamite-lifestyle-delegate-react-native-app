@@ -13,7 +13,7 @@ const MyDateTimePicker = ({
   return (
     <DateTimePicker
       isVisible={isVisible}
-      date={date()}
+      date={date}
       accentColor={colors.primary}
       onCancel={onCancel}
       onConfirm={onConfirm}

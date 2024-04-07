@@ -1,11 +1,11 @@
-import { View, Text, StyleSheet, FlatList, TouchableNativeFeedbackComponent, TouchableOpacity, Pressable } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import { View, Text, StyleSheet, FlatList, TouchableNativeFeedbackComponent, TouchableOpacity, Pressable, Animated, TouchableHighlight, Vibration } from 'react-native'
+import React, { useEffect, useRef, useState } from 'react'
 import RootView from '../../../components/RootView'
 import MyText from '../../../components/MyText'
 import { useSelector } from 'react-redux'
 import { selectNavbar } from '../../../redux/reducers/navbarSlice'
 import { selectUser } from '../../../redux/reducers/userSlice'
-import { GET_APPOINTMENT_CONFIG_LIST } from '../../../DAL'
+import { APPOINTMENT_CONFIG_ADD, GET_APPOINTMENT_CONFIG_LIST } from '../../../DAL'
 import { colors } from '../../../utilities/colors'
 import MyCheckBox from '../../../components/MyCheckBox'
 import MyTouchableInput from '../../../components/MyTouchableInput'
@@ -15,15 +15,32 @@ import uuid from 'react-native-uuid';
 import moment from 'moment'
 import { dateTimeFormat } from '../../../utilities/constants'
 import MyInputs from '../../../components/MyInputs'
+import CalendarModal from '../../../components/CalendarModal'
+import MyDateTimePicker from '../../../components/MyDateTimePicker'
+import ConfirmationModal from '../../../components/ConfirmationModal'
+import FAB from '../../../components/FAB'
+import { MyButton } from '../../../components/MyButton'
+import showToast from '../../../functions/showToast'
+import MyLoader from '../../../components/MyLoader'
 
 
 const Configurations = ({ navigation, route }) => {
   const { key, parentKey } = route.params
+  const ref_calendar = useRef();
+  const ref_scroller = useRef();
   const { navbar } = useSelector(selectNavbar);
   const title = useState(navbar?.find(x => x.value == parentKey)?.child_options?.find(y => y.value == key)?.title);
   const { token } = useSelector(selectUser);
   const [list, setList] = useState([]);
-  const [loader, setLoader] = useState(false);
+  const [loader, setLoader] = useState(true);
+  const [confirm, setConfirm] = useState({ isVisible: false, text: "", index: -1, type: "" });
+  const [timePicker, setTimePicker] = useState({
+    isVisible: false,
+    pIndex: -1,
+    cIndex: -1,
+    date: moment().toDate(),
+    type: "",
+  })
 
   const slot = () => {
     let id = uuid.v4();
@@ -33,6 +50,111 @@ const Configurations = ({ navigation, route }) => {
       start_time: "00:00"
     }
   }
+
+  const interval = () => {
+    let mSlot = slot();
+    let id = uuid.v4();
+    return {
+      appointment_configration_name: "",
+      days: [],
+      end_date: moment(),
+      interval_id: id,
+      slot_duration: "",
+      slot_type: "",
+      slots: [mSlot],
+      start_date: moment(),
+      _id: ""
+    }
+  }
+
+  const onDateSelected = (date, type) => {
+    handler({ [type.type]: date }, type?.index);
+  }
+
+  const closeConfirmModal = () => {
+    setConfirm({ isVisible: false, text: "", item: null, index: -1 })
+  }
+  const closeTimePicker = () => {
+    setTimePicker({
+      isVisible: false,
+      pIndex: -1,
+      cIndex: -1,
+      date: moment().toDate(),
+      type: "",
+    })
+  }
+
+  const onTimeSelected = (time) => {
+    let { pIndex, cIndex, type } = timePicker;
+    closeTimePicker();
+    list[pIndex].slots[cIndex][type] = moment(time).format("HH:mm");
+    setList([...list])
+
+  }
+
+  const onAgree = () => {
+    let { type, index } = confirm;
+    closeConfirmModal();
+    if (type == "duplicate") {
+      dublicateTheInterval(index)
+    } else if (type == "delete") {
+      deleteTheInterval(index)
+    }
+  }
+
+
+  const dublicateTheInterval = (index) => {
+    let interval = { ...list[index] };
+    list.push(interval);
+    setList([...list]);
+  }
+
+  const deleteTheInterval = (index) => {
+    list.splice(index, 1);
+    setList([...list]);
+  }
+
+  const addNew = () => {
+    let obj = interval();
+    setList([...list, obj]);
+  }
+
+  const onDragEnd = (data, index) => {
+    list[index].slots = data;
+    setList([...list]);
+
+  }
+  const onSubmit = () => {
+    for (let i = 0; i < list.length; i++) {
+      let interval = list[i];
+      let inteval_number = i + 1;
+      if (interval?.slot_type == "") {
+        showToast({ title: "Alert", body: `Please Select Interval type of Interval ${inteval_number}` })
+        return
+      } else if (interval?.slot_duration == "") {
+        showToast({ title: "Alert", body: `Please enter slot duration of Interval ${inteval_number}` })
+        return
+      } else if (interval?.days.length == 0) {
+        showToast({ title: "Alert", body: `Please select weekdays of Interval ${inteval_number}` })
+        return
+      }
+    }
+
+    addIntervalsToServer();
+  }
+
+  const addIntervalsToServer = async () => {
+    setLoader(true);
+    let res = await APPOINTMENT_CONFIG_ADD({ navigation, token, body: { appointments: list } })
+    if (res.code == 200) {
+      showToast({ title: res?.message, type: "success" })
+      setLoader(false)
+    } else {
+      setLoader(false)
+
+    }
+  }
+
 
   useEffect(() => {
     getConfigListFromServer()
@@ -58,8 +180,6 @@ const Configurations = ({ navigation, route }) => {
 
   const handlerWeekdays = (day, index) => {
     let days = list[index].days;
-    console.log(days, "days")
-
     let dINDEX = days.findIndex(x => x == day.fullName)
     if (dINDEX > -1) {
       days.splice(dINDEX, 1);
@@ -71,28 +191,28 @@ const Configurations = ({ navigation, route }) => {
 
   const removeSlot = (pIndex, cIndex) => {
     list[pIndex].slots.splice(cIndex, 1);
-    console.log(list[pIndex].slots, "slots")
     setList([...list]);
   }
 
   const addSlot = (pIndex) => {
     list[pIndex].slots = [...list[pIndex].slots, slot()];
-    console.log(list[pIndex].slots, "slots")
     setList([...list]);
   }
 
 
   const renderSlots = ({ item, drag, total, cIndex, pIndex }) => {
+
     return (
       <ScaleDecorator activeScale={1.05}>
         <OpacityDecorator activeOpacity={0.6}>
           <View style={{ backgroundColor: colors.secondarySelect, marginTop: 5, padding: 10, borderRadius: 10, marginBottom: 10, marginHorizontal: 10 }}>
             <View style={{ flexDirection: "row", }}>
-              <View pointerEvents='none' style={{ flex: 1 }}>
+              <View style={{ flex: 1 }}>
                 <MyTouchableInput
                   label='From*'
                   icon={() => icons.clock(colors.lightText)}
                   value={moment(item?.start_time, "HH:mm").format("hh:mm A")}
+                  onPress={() => setTimePicker({ isVisible: true, pIndex, cIndex, date: moment(item?.start_time, "HH:mm").toDate(), type: "start_time" })}
                 />
               </View>
               <View style={{ flex: 1, marginLeft: 10 }}>
@@ -100,6 +220,7 @@ const Configurations = ({ navigation, route }) => {
                   label='To*'
                   icon={() => icons.clock(colors.lightText)}
                   value={moment(item?.end_time, "HH:mm").format("hh:mm A")}
+                  onPress={() => setTimePicker({ isVisible: true, pIndex, cIndex, type: "end_time", date: moment(item?.end_time, "HH:mm").toDate(), })}
                 />
               </View>
             </View>
@@ -116,12 +237,19 @@ const Configurations = ({ navigation, route }) => {
                 style={__styles.btn}>
                 {icons.plusCircle()}
               </TouchableOpacity>
+              {total > 1 &&
 
-              <TouchableOpacity
-                onLongPress={drag}
-                style={[__styles.btn, { marginLeft: 30 }]}>
-                {icons.drag(colors.primary, 25)}
-              </TouchableOpacity>
+                <TouchableHighlight
+                  hitSlop={{ top: 5, bottom: 5, left: 5, right: 5 }}
+                  delayLongPress={300}
+                  underlayColor={colors.lightPrimary2}
+                  onLongPress={() => {
+                    Vibration.vibrate(10)
+                    drag()
+                  }}
+                  style={[__styles.btn, { marginLeft: 30, height: 30, width: 30, borderRadius: 30 / 2, alignItems: "center", justifyContent: "center", marginTop: -2 }]}>
+                  {icons.drag(colors.primary, 25)}
+                </TouchableHighlight>}
             </View>
 
 
@@ -137,7 +265,9 @@ const Configurations = ({ navigation, route }) => {
         <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
           <MyText type='bold' >{(index + 1) + "."}</MyText>
 
-          <TouchableOpacity style={{ flexDirection: "row", paddingVertical: 5, alignItems: "center" }}>
+          <TouchableOpacity
+            onPress={() => setConfirm({ isVisible: true, text: "Are you sure you want to duplicate this interval?", index, type: "duplicate" })}
+            style={{ flexDirection: "row", paddingVertical: 5, alignItems: "center" }}>
             {icons.duplicate()}
             <MyText type='bold'> Duplicate</MyText>
           </TouchableOpacity>
@@ -223,6 +353,7 @@ const Configurations = ({ navigation, route }) => {
               label='Start Date*'
               icon={() => icons.calendar(colors.lightText)}
               value={moment(item?.start_date).format(dateTimeFormat.date)}
+              onPress={() => ref_calendar?.current?.openModal(item?.start_date, { type: "start_date", index: index })}
             />
           </View>
           <View style={{ flex: 1, marginLeft: 10 }} >
@@ -230,17 +361,20 @@ const Configurations = ({ navigation, route }) => {
               label='End Date*'
               icon={() => icons.calendar(colors.lightText)}
               value={moment(item?.end_date).format(dateTimeFormat.date)}
+              onPress={() => ref_calendar?.current?.openModal(item?.end_date, { type: "end_date", index: index })}
             />
           </View>
         </View>
 
         <View style={{ marginHorizontal: -10 }} >
           <NestableDraggableFlatList
+            ref={ref_scroller}
             data={item?.slots}
-            renderItem={({ item: item2, drag, index: cIndex }) =>
-              renderSlots({ item: item2, drag, cIndex, pIndex: index, total: item?.slots.length })}
+            renderItem={({ item: item2, drag, getIndex }) =>
+              renderSlots({ item: item2, drag, cIndex: getIndex(), pIndex: index, total: item?.slots.length })}
             keyExtractor={(item2) => item2.slot_id}
             scrollEnabled={false}
+            onDragEnd={({ data }) => onDragEnd(data, index)}
           />
         </View>
 
@@ -265,6 +399,7 @@ const Configurations = ({ navigation, route }) => {
         </View>
 
         <TouchableOpacity
+          onPress={() => setConfirm({ isVisible: true, text: "Are you sure you want to delete this interval?", index, type: "delete" })}
           style={{ alignSelf: "flex-end", padding: 5 }}
           hitSlop={{ left: 5, top: 5, right: 5, bottom: 5 }}>
           {icons.trashFilled(colors.primary, 20)}
@@ -278,13 +413,44 @@ const Configurations = ({ navigation, route }) => {
     <RootView title={title} hideBackBottomButton>
 
       <NestableScrollContainer
+        contentContainerStyle={{ paddingBottom: 70 }}
         showsVerticalScrollIndicator={false}>
         {list.map(renderConfig)}
-        {/* <FlatList
-          data={[0, 1, 2]}
-          renderItem={renderConfig}
-        /> */}
+        {list.length > 0 &&
+          <View style={{ marginTop: 20 }}>
+            <MyButton
+              invert
+              title='Submit'
+              onPress={onSubmit}
+            />
+          </View>}
       </NestableScrollContainer>
+
+      <FAB
+        onPress={addNew}
+      />
+
+      <CalendarModal
+        ref={ref_calendar}
+        onDateSelected={onDateSelected}
+      />
+
+      <MyDateTimePicker
+        isVisible={timePicker.isVisible}
+        onCancel={closeTimePicker}
+        onConfirm={onTimeSelected}
+        date={timePicker?.date}
+        mode='time'
+      />
+
+      <ConfirmationModal
+        isVisible={confirm?.isVisible}
+        closeModal={closeConfirmModal}
+        title={confirm?.text}
+        onAgree={onAgree}
+      />
+
+      <MyLoader enable={loader} />
     </RootView>
   )
 }
@@ -320,23 +486,7 @@ const weekdays = [{
   shortName: "Sun",
 }]
 
-let obj = {
-  appointment_configration_name: "",
-  days: [],
-  end_date: "",
-  interval_id: uuid.v4(),
-  slot_duration: "",
-  slot_type: "",
-  slots: [{ ...slot }],
-  start_date: "",
-  _id: ""
-}
 
-let slot = {
-  end_time: "00:00",
-  slot_id: uuid.v4(),
-  start_time: "00:00"
-}
 
 const __styles = StyleSheet.create({
   itemView: {

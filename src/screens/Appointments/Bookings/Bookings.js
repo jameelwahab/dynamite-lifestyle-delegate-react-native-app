@@ -179,7 +179,7 @@ const Bookings = ({ navigation, route }) => {
     })
     if (res.code == 200) {
       let length = newArray ? res?.bookings.length : list.length + res?.bookings.length;
-      if (length < res?.bookings) {
+      if (length < res?.total_count) {
         page++;
         canLoadMore = true;
       } else {

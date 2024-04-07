@@ -163,7 +163,7 @@ const BookingFilter = ({ navigation, route }) => {
             <View style={__styles.rowItem}>
               <MyTouchableInput
                 label='From'
-                icon={icons.calendar}
+                icon={() => icons.calendar(colors.primary)}
                 onPress={() => ref_calendar?.current?.openModal(filters?.start_date, "start_date")}
                 value={!!filters?.start_date ? moment(filters?.start_date).format(dateTimeFormat.date) : ""}
               />
@@ -171,7 +171,7 @@ const BookingFilter = ({ navigation, route }) => {
             <View style={[__styles.rowItem, { marginLeft: 10 }]}>
               <MyTouchableInput
                 label='To'
-                icon={icons.calendar}
+                icon={() => icons.calendar(colors.primary)}
                 onPress={() => ref_calendar?.current?.openModal(filters?.end_date, "end_date")}
                 value={!!filters?.end_date ? moment(filters?.end_date).format(dateTimeFormat.date) : ""}
               />
