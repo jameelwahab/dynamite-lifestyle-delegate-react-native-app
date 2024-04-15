@@ -4,7 +4,7 @@ import LinearGradient from 'react-native-linear-gradient'
 
 import { colors } from '../../../../utilities/colors'
 import MyText from '../../../../components/MyText'
-import numFormatter from '../../../../DAL/numFormatter'
+import numFormatter from '../../../../functions/numFormatter'
 import { icons } from '../../../../utilities/icons'
 
 const CounterBox = ({

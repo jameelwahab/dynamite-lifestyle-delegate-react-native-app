@@ -3,7 +3,7 @@ import React from 'react'
 import LinearGradient from 'react-native-linear-gradient'
 import { colors } from '../../utilities/colors'
 import MyText from '../../components/MyText'
-import numFormatter from '../../DAL/numFormatter'
+import numFormatter from '../../functions/numFormatter'
 import { icons } from '../../utilities/icons'
 
 const CounterBox = ({
@@ -23,7 +23,10 @@ const CounterBox = ({
       </LinearGradient>
 
       <MyText style={{ marginTop: 10, textAlign: "center" }} fontSize={20} type='medium' >{"£" + numFormatter(count, 1)}</MyText>
-      <MyText fontSize={12} style={{ marginTop: 2, textAlign: "center",paddingHorizontal:3 }}>{subTitle}</MyText>
+      <MyText fontSize={12}
+        style={{ marginTop: 2, textAlign: "center", paddingHorizontal: 3 }}>
+        {subTitle}
+      </MyText>
     </View>
   )
 }

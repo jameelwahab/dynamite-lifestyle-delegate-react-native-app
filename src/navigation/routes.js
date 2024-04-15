@@ -25,6 +25,9 @@ const routes = {
   trainingNavigator: "TRAINING_NAVIGATOR",
   bookingNavigator: "BOOKING_NAVIGATOR",
   bookingConfigurationsNavigator: "BOOKING_CONFIGURATION_NAVIGATOR",
+  _90daysPlanNavigator: "90_DAYS_PLAN_NAVIGATOR",
+  _90daysTrackerNavigator: "90_DAYS_TRACKER_NAVIGATOR",
+
 
   //! ///    Screens'
   login: "LOGIN_SCREEN",
@@ -158,6 +161,11 @@ const routes = {
   //? Bookings Configutaion
   bookingConfigurationScreen: "BOOKINGS_CONFIGURATION_SCREEN",
 
+
+  //? 90 days
+  _90daysPlan: "90_DAYS_PLAN_SCREEN",
+  _90daysTracker: "90_DAYS_TRACKER_SCREEN",
+  addEditEarnings: "ADD_EDIT_90_DAYS_PLAN_EARNING",
 }
 
 export default routes;

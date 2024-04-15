@@ -2,7 +2,7 @@ import { View, Text } from 'react-native'
 import React from 'react'
 import { colors } from '../../../utilities/colors'
 import MyText from '../../../components/MyText'
-import numFormatter from '../../../DAL/numFormatter'
+import numFormatter from '../../../functions/numFormatter'
 
 const StatView = ({ member }) => {
 

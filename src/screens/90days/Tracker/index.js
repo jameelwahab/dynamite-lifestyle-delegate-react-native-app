@@ -1,0 +1,353 @@
+import { View, Text, StyleSheet, Pressable } from 'react-native'
+import React, { useEffect, useRef, useState } from 'react'
+import RootView from '../../../components/RootView'
+import { useSelector } from 'react-redux'
+import MyText from '../../../components/MyText'
+import { selectNavbar } from '../../../redux/reducers/navbarSlice'
+import { DELETE_EARNING, GET_NINTY_DAY_DETAIL, SET_90_DAYS_TARGET } from '../../../DAL'
+import MyLoader from '../../../components/MyLoader'
+import { selectUser } from '../../../redux/reducers/userSlice'
+import { KeyboardAwareFlatList } from 'react-native-keyboard-aware-scroll-view'
+import Collapsible from 'react-native-collapsible';
+import { colors } from '../../../utilities/colors'
+import { icons } from '../../../utilities/icons'
+import { MenuButton, MyButton } from '../../../components/MyButton'
+import FAB from '../../../components/FAB'
+import routes from '../../../navigation/routes'
+import moment from 'moment'
+import { dateTimeFormat } from '../../../utilities/constants'
+import OptionModal from '../../../components/OptionModal'
+import ConfirmationModal from '../../../components/ConfirmationModal'
+import showToast from '../../../functions/showToast'
+import MyInputs from '../../../components/MyInputs'
+import MyTouchableInput from '../../../components/MyTouchableInput'
+import CalendarModal from '../../../components/CalendarModal'
+import { Slider } from '@rneui/themed';
+
+
+const _90daysTracker = ({ navigation, route }) => {
+  const { key, parentKey } = route?.params
+  const ref_calendar = useRef();
+  const { navbar } = useSelector(selectNavbar);
+  const title = useState(navbar?.find(x => x.value == parentKey)?.child_options?.find(y => y.value == key)?.title);
+  const { token } = useSelector(selectUser);
+  const [loader, setLoader] = useState(true);
+  const [data, setData] = useState(null);
+  const [collapsed, setCollapsed] = useState({});
+  const [options, setOptions] = useState({ isVisible: false, item: null });
+  const [confirmation, setConfirmation] = useState({ isVisible: false, item: null })
+  const [targetAmount, setTargetAmount] = useState("");
+  const [startDate, setStartDate] = useState(moment())
+  const [latestDay, setLatestDay] = useState(null);
+  useEffect(() => {
+    if (!loader) {
+      setLoader(true)
+    }
+    get90daysEarningsfromServer()
+  }, [route])
+
+  const onAgree = () => {
+    let { item } = confirmation;
+    setConfirmation({ isVisible: false, item: null })
+    setTimeout(() => {
+      delete90daysEarningsfromServer(item?._id)
+    }, 350);
+  }
+
+  const onSelected = (opt) => {
+    let { item } = options;
+    setOptions({ isVisible: false, item: null });
+    setTimeout(() => {
+
+      if (opt.key == "edit") {
+        navigation.navigate(routes.addEditEarnings, { earning: item })
+      } else if (opt.key == "delete") {
+        setConfirmation({ isVisible: true, item: item })
+      }
+    }, 350);
+  }
+
+  const toggleCollpasible = (id) => {
+    if (!collapsed[id]) {
+      collapsed[id] = true;
+    } else {
+      delete collapsed[id];
+    }
+    setCollapsed({ ...collapsed })
+  }
+
+  //! APIs
+
+  const get90daysEarningsfromServer = async () => {
+    let res = await GET_NINTY_DAY_DETAIL({ navigation, token, });
+    setLoader(false);
+    if (res.code == 200) {
+      let latest = res?.delegate_earning_app.reduce((a, b) => {
+        return new Date(a.date) > new Date(b.date) ? a : b;
+      });
+      let diff = moment(latest.date).diff(moment(res?.ninteen_day_vision_start_date), "days");
+
+      setData(res)
+      setLatestDay(++diff);
+      setTargetAmount(String(res?.target_amount));
+      setStartDate(res?.ninteen_day_vision_start_date);
+    }
+  }
+
+  const delete90daysEarningsfromServer = async (id) => {
+    setLoader(true);
+    let res = await DELETE_EARNING({ navigation, token, earningId: id });
+    setLoader(false);
+    if (res.code == 200) {
+      showToast({ title: res?.message, type: "success" });
+      get90daysEarningsfromServer();
+    }
+  }
+
+
+  const settarget90daysEarnings = async (id) => {
+    setLoader(true);
+    let res = await SET_90_DAYS_TARGET({
+      navigation, token, body: {
+        tracker_start_date: moment(startDate).format('YYYY-MM-DD'),
+        tracker_target_amount: targetAmount
+      }
+    });
+    setLoader(false);
+    if (res.code == 200) {
+      showToast({ title: res?.message, type: "success" });
+      get90daysEarningsfromServer();
+    }
+  }
+
+
+  const header = (
+    <View>
+      <View style={__styles.earningView}>
+        <MyTouchableInput
+          label='90 Days Start Date*'
+          value={moment(startDate).format(dateTimeFormat.date)}
+          onPress={() => ref_calendar?.current?.openModal(startDate)}
+          icon={() => icons.calendar(colors.primary)}
+        />
+
+        <MyInputs
+          label='Target Amount*'
+          value={targetAmount}
+          onChangeText={(text) => setTargetAmount(text)}
+          keyboardType='number-pad'
+          leftIcon={() => icons.cuurency_gbp(colors.primary, 18)}
+        />
+
+        <View style={{ marginTop: 10 }}>
+          <MyButton invert
+            title='Save target'
+            onPress={settarget90daysEarnings}
+          />
+        </View>
+
+        <View style={{ marginTop: 30, marginBottom: 10 }}>
+          <MyText fontSize={16} align='center'>
+            {`YOUR 90 GOAL WILL BE ACHIEVED BY : \n`}
+            <MyText
+              fontSize={18}
+              type='medium'
+              color={colors.primary} >{moment(startDate).add({ days: 89 }).format(dateTimeFormat.date)}</MyText>
+          </MyText>
+        </View>
+      </View>
+
+
+      <View style={__styles.earningView}>
+        {/* <MyText isHeading>Days</MyText> */}
+        <View style={__styles.sliderView}>
+          <Slider
+            minimumValue={1}
+            maximumValue={90}
+            minimumTrackTintColor={colors.primary}
+            maximumTrackTintColor={colors.lightPrimary2}
+            thumbTintColor={colors.primary}
+            thumbStyle={{ height: 20, width: 20 }}
+            value={latestDay}
+            step={1}
+            thumbProps={{
+              children: (
+                <View style={__styles.slideRootView}>
+                  <View style={__styles.sliderUpperView}>
+                    <MyText color={colors.primary}>{`Day ${latestDay}`}</MyText>
+                  </View>
+                  <View style={__styles.sliderUpperViewarrow} />
+                </View>
+              ),
+            }}
+          />
+          <View style={__styles.sliderPoints}>
+            <MyText color={colors.primary} >Day 1</MyText>
+            <MyText color={colors.primary}>Day 90</MyText>
+
+          </View>
+        </View>
+      </View>
+
+      <View style={__styles.earningView}>
+      {/* <MyText isHeading>Earning</MyText> */}
+        <View style={__styles.sliderView}>
+          <Slider
+            minimumValue={0}
+            maximumValue={data?.target_amount}
+            minimumTrackTintColor={colors.primary}
+            maximumTrackTintColor={colors.lightPrimary2}
+            thumbTintColor={colors.primary}
+            thumbStyle={{ height: 20, width: 20 }}
+            value={data?.total_earning}
+            step={1}
+            thumbProps={{
+              children: (
+                <View style={__styles.slideRootView}>
+                  <View style={__styles.sliderUpperView}>
+                    <MyText color={colors.primary}>{`£ ${data?.total_earning}`}</MyText>
+                  </View>
+                  <View style={__styles.sliderUpperViewarrow} />
+                </View>
+              ),
+            }}
+          />
+          <View style={__styles.sliderPoints}>
+            <MyText color={colors.primary} ></MyText>
+            <MyText color={colors.primary}>{data?.target_amount}</MyText>
+
+          </View>
+        </View>
+      </View>
+    </View>
+  )
+  const renderEarnings = ({ item, index }) => {
+    return (
+      <View style={__styles.earningView}>
+        <Pressable
+          onPress={() => toggleCollpasible(item?._id)}
+          style={{ flexDirection: "row", paddingVertical: 5 }}>
+          <View style={{ flex: 1 }}>
+            <MyText
+              fontSize={16}
+              type='medium'>{`Earning Date: ${moment(item?.date).format(dateTimeFormat.date)} : ${item?.earning}`}</MyText>
+          </View>
+          {!collapsed[item?._id] ? icons.upwardArrow() : icons.downwardArrow()}
+        </Pressable>
+        <Collapsible collapsed={!!collapsed[item?._id]}>
+          <View style={{ flexDirection: "row", paddingVertical: 5, alignItems: "center" }}>
+            <View style={{ flex: 1 }}>
+              <MyText>{item?.description}</MyText>
+            </View>
+            <MenuButton
+              onPress={() => setOptions({ isVisible: true, item: item })}
+            />
+          </View>
+        </Collapsible>
+      </View>
+    )
+  }
+
+
+  return (
+    <RootView
+      hideBackBottomButton
+      title={title}
+    >
+      {!!data &&
+      <View style={{ flex: 1 }}>
+        <KeyboardAwareFlatList
+          enableResetScrollToCoords={false}
+          showsVerticalScrollIndicator={false}
+          keyExtractor={(item) => item?._id}
+          data={!!data ? data?.delegate_earning_app : []}
+          renderItem={renderEarnings}
+          ListHeaderComponent={header}
+        // ListFooterComponent={footer}
+        />
+
+      </View>}
+      <FAB
+        onPress={() => navigation.navigate(routes.addEditEarnings, { earning: undefined })}
+      />
+
+      <OptionModal
+        isVisible={options.isVisible}
+        onSelected={onSelected}
+        optionList={optionsList}
+        closeModal={() => setOptions({ isVisible: false, item: null })}
+      />
+
+      <ConfirmationModal
+        title={"Are you sure you want to delete this earning?"}
+        isVisible={confirmation.isVisible}
+        onAgree={onAgree}
+        closeModal={() => setConfirmation({ isVisible: false, item: null })}
+      />
+
+      <CalendarModal
+        onDateSelected={(date) => setStartDate(date)}
+        ref={ref_calendar}
+      />
+
+      <MyLoader enable={loader} />
+    </RootView>
+  )
+}
+
+export default _90daysTracker
+
+const optionsList = [
+
+  {
+    title: "Edit",
+    key: "edit",
+    icon: icons.edit
+  },
+  {
+    title: "Delete",
+    key: "delete",
+    icon: icons.trash
+  },
+
+]
+
+const __styles = StyleSheet.create({
+  earningView: {
+    backgroundColor: colors.secondary,
+    padding: 10,
+    marginTop: 10,
+    borderRadius: 10
+  },
+  slideRootView: {
+    position: "absolute",
+    top: -45,
+    left: -30
+  },
+  sliderUpperView: {
+    width: 80,
+    height: 30,
+    backgroundColor: colors.secondarySelect,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 10
+  },
+  sliderUpperViewarrow: {
+    width: 0,
+    height: 0,
+    borderLeftWidth: 6,
+    borderRightWidth: 6,
+    borderBottomWidth: 6,
+    borderTopWidth: 6,
+    borderStyle: 'solid',
+    backgroundColor: 'transparent',
+    borderLeftColor: 'transparent',
+    borderRightColor: "transparent",
+    borderBottomColor: "transparent",
+    borderTopColor: colors.secondarySelect,
+    alignSelf: "center"
+  },
+  sliderView: { marginTop: 40, paddingHorizontal: 30 },
+  sliderPoints: { flexDirection: "row", justifyContent: "space-between" }
+
+})

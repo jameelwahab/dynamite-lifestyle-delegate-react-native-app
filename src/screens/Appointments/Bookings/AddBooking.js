@@ -1,10 +1,10 @@
-import { View, Text, ScrollView } from 'react-native'
+import { View, Text, ScrollView, StyleSheet } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import RootView from '../../../components/RootView'
 import MyText from '../../../components/MyText'
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../../redux/reducers/userSlice'
-import { BOOKING_ADD, GET_BOOKING_TIME_SLOTS, GET_SALE_PAGE_LIST_FOR_BOOKING } from '../../../DAL'
+import { BOOKING_ADD, BOOKING_CONSULTANT_LIST, BOOKING_PASS, BOOKING_UPDATE, GET_BOOKING_TIME_SLOTS, GET_SALE_PAGE_LIST_FOR_BOOKING } from '../../../DAL'
 import MyTouchableInput from '../../../components/MyTouchableInput'
 import { MyButton } from '../../../components/MyButton'
 import OptionModalWithSearch from '../../../components/OptionModalWithSearch'
@@ -15,28 +15,47 @@ import { dateTimeFormat } from '../../../utilities/constants'
 import showToast from '../../../functions/showToast'
 import routes from '../../../navigation/routes'
 import MyLoader from '../../../components/MyLoader'
+import { icons } from '../../../utilities/icons'
+import { colors } from '../../../utilities/colors'
+import MyCheckBox from '../../../components/MyCheckBox'
 
 const AddBooking = ({ navigation, route }) => {
   const ref_calendar = useRef();
   const { token } = useSelector(selectUser);
+  const { editableItem, type } = route?.params;
+  const isEdit = type == "edit";
+  const isPass = type == "pass";
+  const isAdd = type == "add";
   const [memberlist, setMemberlist] = useState([]);
   const [pageList, setPageList] = useState([]);
-  const [timeSlotlist, setTimeSlotlist] = useState([]);
+  const [timeSlotlist, setTimeSlotlist] = useState([])
+  const [consultantList, setConsultantList] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [optionModal, setOptionModal] = useState({ isVisble: false, list: [], type: "", titleKey: "" });
   const [member, setMember] = useState(null);
-  const [bookingPage, setBookingPage] = useState(null);
-  const [date, setDate] = useState(moment());
+  const [consultant, setConsultant] = useState(null);
+  const [bookingPage, setBookingPage] = useState(!isAdd ? editableItem?.page : null);
+  const [date, setDate] = useState(!isAdd ? moment(editableItem?.date) : moment());
   const [loader, setLoader] = useState(false);
-  const [timeSlot, setTimeSlot] = useState(null)
+  const [timeSlot, setTimeSlot] = useState(isEdit ? {
+    end_time: moment(editableItem?.time, "hh:mm A").add({ minutes: editableItem?.slot_duration }).format("hh:mm A"),
+    start_time: editableItem?.time,
+    slot_id: editableItem?.slot_id,
+    slot_duration: editableItem?.slot_duration,
+  } : null)
+  const [isNotifyUser, setIsNotifyUser] = useState(false);
 
   useEffect(() => {
-    getBookingsPagesFromServer();
+    if (isPass) {
+      getBookingConsutantFromServer();
+    } else {
+      getBookingsPagesFromServer();
+    }
   }, [searchText])
 
   useEffect(() => {
     getBookingsTimeSlotsFromServer();
-  }, [date])
+  }, [date, consultant?._id])
 
   const onSearchTextChange = (text) => {
     if (optionModal.type == "Member")
@@ -51,6 +70,8 @@ const AddBooking = ({ navigation, route }) => {
 
     if (type == "Member") {
       setMember(opt);
+    } else if (type == "Delegate") {
+      setConsultant(opt)
     } else if (type == "Booking Page") {
       setBookingPage(opt)
     } else if (type == "Time Slot") {
@@ -64,6 +85,17 @@ const AddBooking = ({ navigation, route }) => {
   const filterTheList = (list, text) => {
     if (optionModal.type == "Member") {
       return list
+    } else if (optionModal.type == "Delegate") {
+      if (text.trim() == "") {
+        return list
+      } else {
+        return list?.slice().filter(x => {
+          let nameText = (x?.first_name + " " + x?.last_name + " (" + x?.email + ")").toLowerCase();
+          let searchText = text?.toLowerCase().trim();
+          return nameText.includes(searchText)
+
+        })
+      }
     } else if (optionModal.type == "Booking Page") {
       if (text.trim() == "") {
         return list
@@ -83,9 +115,9 @@ const AddBooking = ({ navigation, route }) => {
 
 
   const onSubmit = () => {
-    if (!member) {
+    if (!member && isAdd) {
       showToast({ body: "Member's name can not be empty !", title: "Alert", type: "info" })
-    } else if (!bookingPage) {
+    } else if (!bookingPage && !isPass) {
       showToast({ body: "Booking Page can not be empty !", title: "Alert", type: "info" })
     } else if (!date) {
       showToast({ body: "Date can not be empty !", title: "Alert", type: "info" })
@@ -100,7 +132,19 @@ const AddBooking = ({ navigation, route }) => {
         time: timeSlot?.start_time,
       }
       setLoader(true);
-      addBookingToServer(data)
+      if (isPass) {
+        data["consultant_id"] = consultant?._id;
+        delete data['member_id'];
+        delete data['page_id'];
+        passBookingToOtherDelegate(data);
+      }
+      else if (isEdit) {
+        data["is_notify"] = isNotifyUser;
+        delete data['member_id'];
+        updateBookingToServer(data);
+      } else {
+        addBookingToServer(data)
+      }
     }
   }
 
@@ -115,6 +159,25 @@ const AddBooking = ({ navigation, route }) => {
     }
   }
 
+  const updateBookingToServer = async (obj) => {
+    let res = await BOOKING_UPDATE({ navigation, token, data: obj, bookingId: editableItem?._id });
+    setLoader(false);
+    if (res.code == 200) {
+      navigation.navigate(routes?.bookingList, {
+        callList: true
+      })
+    }
+  }
+
+  const passBookingToOtherDelegate = async (obj) => {
+    let res = await BOOKING_PASS({ navigation, token, data: obj, bookingId: editableItem?._id });
+    setLoader(false);
+    if (res.code == 200) {
+      navigation.navigate(routes?.bookingList, {
+        callList: false
+      })
+    }
+  }
 
   const getBookingsPagesFromServer = async () => {
     let res = await GET_SALE_PAGE_LIST_FOR_BOOKING({ navigation, token, search: searchText.trim() });
@@ -127,6 +190,12 @@ const AddBooking = ({ navigation, route }) => {
     }
   }
 
+  const getBookingConsutantFromServer = async () => {
+    let res = await BOOKING_CONSULTANT_LIST({ navigation, token, });
+    if (res.code == 200) {
+      setConsultantList(res?.consultant_list);
+    }
+  }
 
   const getBookingsTimeSlotsFromServer = async () => {
     let res = await GET_BOOKING_TIME_SLOTS({ navigation, token, date: moment(date).format("YYYY/MM/DD") });
@@ -136,32 +205,43 @@ const AddBooking = ({ navigation, route }) => {
   }
 
   return (
-    <RootView title='Add New Booking' >
+    <RootView title={isPass ? "Pass Booking" : isEdit ? "Edit Booking" : 'Add New Booking'} >
       <ScrollView
         contentContainerStyle={{ paddingHorizontal: 10 }}
         showsVerticalScrollIndicator={false}
       >
+        {!isEdit && !isPass &&
+          <MyTouchableInput
+            label='Member*'
+            onPress={() => setOptionModal({ isVisble: true, list: memberlist, type: "Member", titleKey: "" })}
+            value={!!member ? `${member?.first_name} ${member?.last_name} (${member?.email})` : ""}
+            clearbutton={!!member}
+            onClearButtonPress={() => setMember(null)}
+          />}
+
+        {isPass &&
+          <MyTouchableInput
+            label='Delegate*'
+            onPress={() => setOptionModal({ isVisble: true, list: consultantList, type: "Delegate", titleKey: "" })}
+            value={!!consultant ? `${consultant?.first_name} ${consultant?.last_name} (${consultant?.email})` : ""}
+            clearbutton={!!consultant}
+            onClearButtonPress={() => setConsultant(null)}
+          />}
 
         <MyTouchableInput
-          label='Member*'
-          onPress={() => setOptionModal({ isVisble: true, list: memberlist, type: "Member", titleKey: "" })}
-          value={!!member ? `${member?.first_name} ${member?.last_name} (${member?.email})` : ""}
-          clearbutton={!!member}
-          onClearButtonPress={() => setMember(null)}
-        />
-
-        <MyTouchableInput
-          label='Booking Page*'
+          label={isPass ? "Page Title*" : 'Booking Page*'}
           onPress={() => setOptionModal({ isVisble: true, list: pageList, type: "Booking Page", titleKey: "sale_page_title" })}
           value={!!bookingPage ? bookingPage?.sale_page_title : ''}
           clearbutton={!!bookingPage}
           onClearButtonPress={() => setBookingPage(null)}
+          disabled={isPass}
         />
 
         <MyTouchableInput
           label='Date*'
           onPress={() => ref_calendar?.current?.openModal(date)}
           value={!!date ? moment(date).format(dateTimeFormat.date) : ""}
+          icon={() => icons.calendar(colors.primary)}
         />
 
         <MyTouchableInput
@@ -171,6 +251,32 @@ const AddBooking = ({ navigation, route }) => {
           clearbutton={!!timeSlot}
           onClearButtonPress={() => setTimeSlot(null)}
         />
+        {isPass && !!consultant &&
+          <View style={{ paddingBottom: 15 }}>
+            <MyText>{consultant?.time_zone}</MyText>
+          </View>}
+        {isEdit &&
+          <View style={__styles.radioRootView}>
+            <MyText isLabel>Is Notify User</MyText>
+            <View style={__styles.radioView}>
+              <View style={__styles.radioItem}>
+                <MyCheckBox
+                  title='Yes'
+                  onPress={() => setIsNotifyUser(true)}
+                  value={isNotifyUser}
+                />
+              </View>
+              <View style={__styles.radioItem}>
+                <MyCheckBox
+                  title='No'
+                  onPress={() => setIsNotifyUser(false)}
+                  value={!isNotifyUser}
+                />
+              </View>
+            </View>
+          </View>
+        }
+
 
         <View>
           <MyButton title='Save' onPress={onSubmit} />
@@ -191,7 +297,7 @@ const AddBooking = ({ navigation, route }) => {
         onSearchTextChange={onSearchTextChange}
         renderText={!optionModal?.titleKey ? ({ item, index }) =>
           <MyText fontSize={16} >
-            {optionModal?.type == "Member" ? item?.first_name + " " + item?.last_name + " (" + item?.email + ")" :
+            {optionModal?.type == "Member" || optionModal?.type == "Delegate" ? item?.first_name + " " + item?.last_name + " (" + item?.email + ")" :
               optionModal?.type == "Time Slot" ? `${item?.start_time}  -  ${item?.end_time}` : ""}
           </MyText> : undefined}
       />
@@ -205,3 +311,23 @@ const AddBooking = ({ navigation, route }) => {
 }
 
 export default AddBooking
+
+
+const __styles = StyleSheet.create({
+  radioRootView: {
+    marginBottom: 15
+  },
+  radioView: {
+    flexDirection: "row",
+    borderWidth: 1,
+    borderColor: colors.lightText,
+    borderRadius: 5,
+    // padding: 2
+    paddingHorizontal: 10,
+    paddingTop: 10,
+  },
+  radioItem: {
+    flex: 1,
+
+  },
+})

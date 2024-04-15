@@ -123,4 +123,6 @@ export const icons = {
   list_circle: (color = colors.white, size = 20) => { return (<Ionicons name="list-circle" color={color} size={size} />) },
   duplicate: (color = colors.white, size = 20) => { return (<Ionicons name="duplicate" color={color} size={size} />) },
   drag: (color = colors.white, size = 20) => { return (<MaterialIcons name="drag-indicator" color={color} size={size} />) },
+  document: (color = colors.white, size = 20) => { return (<Ionicons name="document-text" color={color} size={size} />) },
+  cuurency_gbp : (color = colors.white, size = 20) => { return (<MaterialIcons name="currency-pound" color={color} size={size} />) },
 }

@@ -28,9 +28,9 @@ let canLoadMore = false;
 const Transactions = ({ navigation, route }) => {
   const { key, parentKey } = route?.params
   const { navbar } = useSelector(selectNavbar);
+  const [title] = useState(navbar?.find(x => x.value == parentKey)?.child_options?.find(y => y.value == key)?.title);
   const { token } = useSelector(selectUser);
   const timezone = useSelector(selectTimeZone)
-  const [title] = useState(navbar?.find(x => x.value == parentKey)?.child_options?.find(y => y.value == key)?.title);
   const [loader, setLoader] = useState(false);
   const [footerLoader, setFooterLoader] = useState(false);
   const [searchText, setSearchText] = useState("")

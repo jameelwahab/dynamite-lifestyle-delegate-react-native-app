@@ -4,7 +4,7 @@ import Modal from 'react-native-modal'
 import { colors } from '../utilities/colors'
 import ImageCropPicker from 'react-native-image-crop-picker'
 import showToast from '../functions/showToast'
-
+import DocumentPicker from 'react-native-document-picker'
 
 import MyText from './MyText'
 import { icons } from '../utilities/icons'
@@ -16,7 +16,8 @@ const ImageUploadModal = ({
   mediaType = "photo",
   cropping = false,
   removeImage = false,
-  multiple = false
+  multiple = false,
+  enableDocument = false
 }) => {
 
   const openCamera = async () => {
@@ -107,6 +108,19 @@ const ImageUploadModal = ({
       });
 
   }
+
+  const openDocument = async () => {
+    try {
+      let res = await DocumentPicker.pick();
+      onImagePicked(res[0])
+    } catch (e) {
+      console.log(e, "e")
+    }
+    setTimeout(() =>
+      closeModal(),
+      500)
+  }
+
   const makeImageObject = (image) => {
     let obj = {
       uri:
@@ -166,6 +180,15 @@ const ImageUploadModal = ({
                 {icons.images()}
               </View>
               <MyText>Gallery</MyText>
+            </Pressable>
+
+            <Pressable
+              onPress={openDocument}
+              style={{ alignItems: 'center', marginLeft: 30 }}>
+              <View style={__modalStyle.bigIconView}>
+                {icons.document(colors.primary, 20)}
+              </View>
+              <MyText>Files</MyText>
             </Pressable>
             {!!removeImage && (
               <Pressable

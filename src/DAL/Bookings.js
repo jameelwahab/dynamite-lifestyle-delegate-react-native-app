@@ -52,6 +52,17 @@ export const BOOKING_ADD = ({ token, navigation, data }) => {
   })
 }
 
+export const BOOKING_UPDATE = ({ token, navigation, data, bookingId }) => {
+  return invokeApi({
+    path: `api/consultant/booking/update/${bookingId}`,
+    method: "PUT",
+    postData: data,
+    token,
+    navigation,
+  })
+}
+
+
 
 export const BOOKING_DELETE = ({ token, navigation, id }) => {
   return invokeApi({
@@ -62,6 +73,24 @@ export const BOOKING_DELETE = ({ token, navigation, id }) => {
   })
 }
 
+export const BOOKING_PASS = ({ token, navigation, data, bookingId }) => {
+  return invokeApi({
+    path: `api/consultant/pass_booking/${bookingId}`,
+    method: "PUT",
+    postData: data,
+    token,
+    navigation,
+  })
+}
+
+export const BOOKING_CONSULTANT_LIST = ({ token, navigation }) => {
+  return invokeApi({
+    path: `api/consultant/list/for_delegate/`,
+    method: "GET",
+    token,
+    navigation,
+  })
+}
 
 export const BOOKING_UPDATE_STATUS = ({ token, navigation, id, data }) => {
   return invokeApi({
@@ -95,7 +124,7 @@ export const BOOKING_NOTES_DELETE = ({ token, navigation, id }) => {
 export const BOOKING_NOTES_ADD = ({ token, navigation, body: {
   add_as_personal_note, booking_id, note
 } }) => {
-  
+
   return invokeApi({
     path: `api/booking_note/`,
     method: "POST",

@@ -8,7 +8,7 @@ import prependCurency from '../../../../functions/prependCurency';
 import openUrl from '../../../../functions/openUrl'
 import { S3_URL, dateTimeFormat } from '../../../../utilities/constants'
 import { convertTimezone } from '../../../../functions/convertTime'
-import numFormatter from '../../../../DAL/numFormatter'
+import numFormatter from '../../../../functions/numFormatter'
 
 
 const TransactionView = ({ item, index, timezone, isCredit }) => {

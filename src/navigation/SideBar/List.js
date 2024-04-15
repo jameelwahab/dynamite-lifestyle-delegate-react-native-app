@@ -21,6 +21,8 @@ import StackMembersAnswer from "../NestedStacks/StackMemberAnswer";
 import StackTraining from "../NestedStacks/StackTraining";
 import StackBookings from "../NestedStacks/StackBookings";
 import StackBookingConfiguration from "../NestedStacks/StackBookingConfiguration";
+import Stack90DaysPlan from "../NestedStacks/Stack90DaysPlan";
+import Stack90DaysTracker from "../NestedStacks/Stack90DaysTracker";
 
 export const drawerMenuList = [
   {
@@ -298,11 +300,15 @@ export const ParentComponents = {
       key: "delegate_training"
     }
   },
-
   appointment: {
     key: null,
     component: null,
     params: { key: "appointment" }
+  },
+  "90_day_plan": {
+    key: null,
+    component: null,
+    params: { key: "90_day_plan" }
   },
 }
 
@@ -351,5 +357,15 @@ export const ChildComponents = {
     key: routes.bookingConfigurationsNavigator,
     component: StackBookingConfiguration,
     params: { key: "schedule_appointment", parentKey: "appointment" }
+  },
+  "90_day_plan": {
+    key: routes._90daysPlanNavigator,
+    component: Stack90DaysPlan,
+    params: { key: "90_day_plan", parentKey: "90_day_plan", type: "delegate-90-day-questions" }
+  },
+  "90_day_tracker": {
+    key: routes._90daysTrackerNavigator,
+    component: Stack90DaysTracker,
+    params: { key: "90_day_tracker", parentKey: "90_day_plan" }
   },
 }

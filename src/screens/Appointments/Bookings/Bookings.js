@@ -28,6 +28,7 @@ import ChangeStatusModal from './Component/ChangeStatusModal'
 
 
 
+
 let page = 0;
 let canLoadMore = false;
 const Bookings = ({ navigation, route }) => {
@@ -43,7 +44,7 @@ const Bookings = ({ navigation, route }) => {
   const [footerLoader, setFooterLoader] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [searchLoader, setSearchLoader] = useState(false);
-  const [optionModal, setOptionModal] = useState({ isVisible: false, item: null });
+  const [optionModal, setOptionModal] = useState({ isVisible: false, item: null, list: [] });
   const [confirmModal, setConfirmModal] = useState({ isVisible: false, item: null });
   const [filters, setFilters] = useState({
     booking_status: null,
@@ -71,7 +72,7 @@ const Bookings = ({ navigation, route }) => {
 
   const onSelected = (opt) => {
     let { item } = optionModal;
-    setOptionModal({ isVisible: false, item: null })
+    setOptionModal({ isVisible: false, item: null, list: [] })
     if (opt.key == "delete") {
       setTimeout(() => {
         setConfirmModal({ isVisible: true, item: item });
@@ -91,7 +92,31 @@ const Bookings = ({ navigation, route }) => {
         bookingId: item?._id,
         userInfo: item?.user_info
       })
+    } else if (opt.key == "edit") {
+      navigation.navigate(routes.bookingAdd, {
+        editableItem: item,
+        type: "edit",
+      })
+    } else if (opt.key == "pass") {
+      navigation.navigate(routes.bookingAdd, {
+        editableItem: item,
+        type: "pass",
+      })
     }
+  }
+
+  const openOptions = (item) => {
+    let opt = [...optionsList];
+    let status = item?.booking_status_info?.title.toLowerCase();
+    if (status != "complete" && status != "cancel") {
+      let date = moment(item.date).format(dateTimeFormat.date);
+      let bookingTime = moment(date + " " + item?.time, dateTimeFormat.dateTime);
+      let diff = moment(bookingTime).diff(moment(), "hours");
+      if (diff > 1) {
+        opt = [...optionsList, ...extraOptions];
+      }
+    }
+    setOptionModal({ isVisible: true, item: item, list: opt })
   }
 
   const onConfirmPress = (opt) => {
@@ -101,7 +126,7 @@ const Bookings = ({ navigation, route }) => {
   }
 
   const onAddScreen = () => {
-    navigation.navigate(routes.bookingAdd)
+    navigation.navigate(routes.bookingAdd, { editableItem: undefined, type: "add" })
   }
 
   const onFilterScreen = () => {
@@ -225,7 +250,7 @@ const Bookings = ({ navigation, route }) => {
         <View style={__styles.headerView}>
           <MemberView member={item?.user_info} marginLeft={0} size={35} titleSize={14} />
           <MenuButton
-            onPress={() => setOptionModal({ isVisible: true, item: item })}
+            onPress={() => openOptions(item, index)}
           />
         </View>
         <View>
@@ -326,8 +351,8 @@ const Bookings = ({ navigation, route }) => {
       <OptionModal
         isVisible={optionModal?.isVisible}
         onSelected={onSelected}
-        optionList={optionsList}
-        closeModal={() => setOptionModal({ isVisible: false, item: null })}
+        optionList={optionModal?.list}
+        closeModal={() => setOptionModal({ isVisible: false, item: null, list: [] })}
       />
 
       <ConfirmationModal
@@ -343,7 +368,7 @@ const Bookings = ({ navigation, route }) => {
         onStatusChange={(item) => setList((list) => {
           let index = list.findIndex(x => x._id === item._id)
           if (index > -1) {
-            list.splice(index, 1, item)
+            list.splice(index, 1, { ...list[index], booking_status_info: item?.booking_status_info })
           }
           return [...list]
         })}
@@ -374,7 +399,19 @@ const optionsList = [
     key: "status",
     icon: icons.edit
   },
+
 ]
+
+const extraOptions = [{
+  title: "Edit",
+  key: "edit",
+  icon: icons.edit
+}, {
+  title: "Pass Booking",
+  key: "pass",
+  icon: icons.edit
+}];
+
 const __styles = StyleSheet.create({
   itemView: {
     backgroundColor: colors.secondary,

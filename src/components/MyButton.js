@@ -79,7 +79,10 @@ const __MyButtonStyles = StyleSheet.create({
     justifyContent: "center"
   },
   iconView: {
-    height: 50, aspectRatio: 1, alignItems: "center", justifyContent: "center",
+    height: 45,
+    aspectRatio: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
   titleText: {
     color: colors.black,

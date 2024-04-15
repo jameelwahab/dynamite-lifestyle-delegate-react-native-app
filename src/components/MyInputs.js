@@ -26,17 +26,19 @@ const MyInputs = ({
   isSearch = false,
   onSubmitEditing,
   limited = false,
-  customView
+  customView,
+  noLable = false
 }) => {
   const [isFocused, setFocused] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   return (
     <View pointerEvents={editable ? "auto" : "none"} style={{ marginBottom: noSpace ? 0 : 15 }}>
-      <Text style={[__MyInputStyles.labelText, isFocused ? __MyInputStyles.focusedLabelText : undefined]}>{label}</Text>
+      {!noLable &&
+        <Text style={[__MyInputStyles.labelText, isFocused ? __MyInputStyles.focusedLabelText : undefined]}>{label}</Text>}
       {!!customView && customView()}
       <View style={[__MyInputStyles.inputView, multiline ? __MyInputStyles.multilineView : undefined, isFocused ? __MyInputStyles.focusedView : undefined,]}>
         {!!leftIcon && <View style={[__MyInputStyles.leftButton]} >{leftIcon()}</View>}
-        
+
         <TextInput
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}

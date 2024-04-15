@@ -17,15 +17,18 @@ const MyTouchableInput = ({
   subTextView,
   clearbutton,
   onClearButtonPress = () => { },
+  disabled = false
 }) => {
   const [isFocused, setFocused] = useState(false)
   return (
     <Pressable
       onPress={onPress}
+      disabled={disabled}
+      opacity={disabled ? 0.6 : 1}
       style={{ marginBottom: noSpace ? 0 : 15 }}>
-      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+      <View pointerEvents={disabled ? "none" : "auto"} style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
         <Text pointerEvents={!!iconOnPress ? "auto" : "none"} style={[__MyInputStyles.labelText, isFocused ? __MyInputStyles.focusedLabelText : undefined]}>{label}</Text>
-        {!!clearbutton ?
+        {!!clearbutton && !disabled ?
           <Pressable
             style={__MyInputStyles.clearbtnView}
             onPress={onClearButtonPress}>
@@ -49,10 +52,11 @@ const MyTouchableInput = ({
             textAlignVertical={"center"}
             editable={false}
           />}
-        <Pressable onPress={iconOnPress}
-          style={{ paddingHorizontal: 10, height: 45, justifyContent: "center" }}>
-          {icon()}
-        </Pressable>
+        {!disabled &&
+          <Pressable onPress={iconOnPress}
+            style={{ paddingHorizontal: 10, height: 45, justifyContent: "center" }}>
+            {icon()}
+          </Pressable>}
       </View>
 
     </Pressable>

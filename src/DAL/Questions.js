@@ -18,7 +18,7 @@ export const GET_USER_LISTING_WHO_ASNWERED_BY_MODULE = ({ token, navigation, cre
   return invokeApi({
     path: `api/questionnaire/list_member_replies_against_module?page=${page}&limit=20`,
     method: "POST",
-    postData:{
+    postData: {
       created_for, created_for_id, search_text,
     },
     token,
@@ -61,6 +61,40 @@ export const DELETE_QUESTIONS = ({ token, navigation, questionId }) => {
   return invokeApi({
     path: `api/questionnaire/${questionId}`,
     method: "DELETE",
+    token,
+    navigation,
+  })
+}
+
+
+export const GET_QUESTIONS_CONFIGURRATION = ({ token, navigation,created_for, created_for_id, }) => {
+  return invokeApi({
+    path: `api/questionnaire/get_configration`,
+    method:"POST",
+    postData:{created_for, created_for_id,},
+    token,
+    navigation,
+  })
+}
+
+export const ADD_ANSWER_FOR_SPECIFIC_QUESTION = ({ token, navigation,
+  created_for, created_for_id, question_answer_array
+}) => {
+  return invokeApi({
+    path: `api/questionnaire/add_comment_on_questionare`,
+    method: "POST",
+    postData: { created_for, created_for_id, question_answer_array },
+    token,
+    navigation,
+  })
+}
+
+export const UPLOAD_FILE_QUESTIONS = ({ token, navigation, file }) => {
+  return invokeApi({
+    path: `app/upload_csv_file_on_s3`,
+    method: "POST",
+    headers: { "Content-Type": "multipart/form-data" },
+    postData: file,
     token,
     navigation,
   })
