@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Pressable } from 'react-native'
+import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import RootView from '../../../components/RootView'
 import { useSelector } from 'react-redux'
@@ -23,6 +23,10 @@ import MyInputs from '../../../components/MyInputs'
 import MyTouchableInput from '../../../components/MyTouchableInput'
 import CalendarModal from '../../../components/CalendarModal'
 import { Slider } from '@rneui/themed';
+import { LineChart } from 'react-native-chart-kit';
+import utilities from '../../../utilities'
+import { fonts } from '../../../utilities/fonts'
+import numFormatter from '../../../functions/numFormatter'
 
 
 const _90daysTracker = ({ navigation, route }) => {
@@ -39,6 +43,9 @@ const _90daysTracker = ({ navigation, route }) => {
   const [targetAmount, setTargetAmount] = useState("");
   const [startDate, setStartDate] = useState(moment())
   const [latestDay, setLatestDay] = useState(null);
+  const [chartData, setChartData] = useState(null);
+  const [chartWidth, setChartWidth] = useState(0);
+
   useEffect(() => {
     if (!loader) {
       setLoader(true)
@@ -58,13 +65,12 @@ const _90daysTracker = ({ navigation, route }) => {
     let { item } = options;
     setOptions({ isVisible: false, item: null });
     setTimeout(() => {
-
       if (opt.key == "edit") {
         navigation.navigate(routes.addEditEarnings, { earning: item })
       } else if (opt.key == "delete") {
         setConfirmation({ isVisible: true, item: item })
       }
-    }, 350);
+    }, 400);
   }
 
   const toggleCollpasible = (id) => {
@@ -87,10 +93,78 @@ const _90daysTracker = ({ navigation, route }) => {
       });
       let diff = moment(latest.date).diff(moment(res?.ninteen_day_vision_start_date), "days");
 
-      setData(res)
+
+      let startDate = moment(res?.ninteen_day_vision_start_date, "YYYY-MM-DD");
+      let date = moment(startDate);
+      let filteredData = {};
+      let iAmount = 0
+      let arr = res?.delegate_earning_app.reverse()
+      let number = 1;
+      for (let x of arr) {
+        let bDate = moment(x.date);
+        let diff = moment(bDate).diff(startDate, "days") + 1;
+        if (bDate.isSameOrAfter(startDate, "date") && bDate.isSameOrBefore(moment(startDate).add({ days: 90 }))) {
+          let iDate = bDate.format("DD.MM.YYYY")
+          iAmount += x.earning;
+          if (filteredData[iDate]) {
+            filteredData[iDate].earning += x.earning;
+            filteredData[iDate].tillAmount = iAmount
+          } else {
+            filteredData[iDate] = {
+              date: iDate,
+              earning: x.earning,
+              tillAmount: iAmount,
+              number: number,
+              day: diff,
+            }
+            number++
+          }
+        } else {
+          let iDate = moment(date).format("DD.MM.YYYY");
+          iAmount += x.earning;
+          if (filteredData[iDate]) {
+            filteredData[iDate].earning += x.earning;
+            filteredData[iDate].tillAmount += x.tillAmount
+          } else {
+            filteredData[iDate] = {
+              date: iDate,
+              earning: x.earning,
+              tillAmount: iAmount,
+              number: 1,
+              day: diff,
+            }
+            number++
+          }
+        }
+      }
+
+      filteredData = Object.values(filteredData)
+
+
+      filteredData.map(x => console.log(numFormatter(x?.day),"format"))
+      let chartData = {
+        labels: filteredData.length <= 0 ? [0] : filteredData.map(x => numFormatter(x?.day)),
+        datasets: [
+          {
+            data: filteredData.length <= 0 ? [0] : filteredData.map(x => x?.tillAmount),
+          },
+          {
+            data: [res?.target_amount],
+            withDots: false,
+          }
+        ],
+        legend: ["Earnings"]
+      };
+      let screenWidth = utilities.screenWidth();
+      let width = (screenWidth / 10) * chartData.labels.length;
+      let chartBlockWidth = width < screenWidth ? screenWidth : width;
+
+      setChartData(chartData);
+      setChartWidth(chartBlockWidth);
       setLatestDay(++diff);
       setTargetAmount(String(res?.target_amount));
       setStartDate(res?.ninteen_day_vision_start_date);
+      setData(res);
     }
   }
 
@@ -123,6 +197,39 @@ const _90daysTracker = ({ navigation, route }) => {
 
   const header = (
     <View>
+      <View style={[__styles.earningView]}>
+        {!!chartData &&
+          <ScrollView horizontal={true} >
+            <LineChart
+              data={chartData}
+              width={chartWidth}
+              height={250}
+              segments={4}
+              yAxisLabel={''}
+              yAxisSuffix=""
+              bezier
+              chartConfig={{
+                decimalPlaces: 0,
+                backgroundColor: colors.secondary,
+                backgroundGradientFrom: colors.secondary,
+                backgroundGradientTo: colors.secondary,
+                // fillShadowGradientFromOpacity:1,
+                // fillShadowGradientToOpacity:1,
+                color: (opacity = 1) => colors.lightPrimary,
+                labelColor: (opacity = 1) => colors.white,
+                style: {},
+                propsForDots: {
+                  stroke: colors.primary,
+                },
+                propsForLabels: {
+                  fontFamily: fonts.medium,
+                },
+
+              }}
+            />
+          </ScrollView>}
+      </View>
+
       <View style={__styles.earningView}>
         <MyTouchableInput
           label='90 Days Start Date*'
@@ -147,12 +254,13 @@ const _90daysTracker = ({ navigation, route }) => {
         </View>
 
         <View style={{ marginTop: 30, marginBottom: 10 }}>
-          <MyText fontSize={16} align='center'>
+          <MyText fontSize={14} align='center'>
             {`YOUR 90 GOAL WILL BE ACHIEVED BY : \n`}
             <MyText
-              fontSize={18}
+              fontSize={20}
               type='medium'
-              color={colors.primary} >{moment(startDate).add({ days: 89 }).format(dateTimeFormat.date)}</MyText>
+              align='center'
+              color={colors.primary}>{moment(startDate).add({ days: 89 }).format(dateTimeFormat.date)}</MyText>
           </MyText>
         </View>
       </View>
@@ -170,6 +278,7 @@ const _90daysTracker = ({ navigation, route }) => {
             thumbStyle={{ height: 20, width: 20 }}
             value={latestDay}
             step={1}
+
             thumbProps={{
               children: (
                 <View style={__styles.slideRootView}>
@@ -190,7 +299,7 @@ const _90daysTracker = ({ navigation, route }) => {
       </View>
 
       <View style={__styles.earningView}>
-      {/* <MyText isHeading>Earning</MyText> */}
+        {/* <MyText isHeading>Earning</MyText> */}
         <View style={__styles.sliderView}>
           <Slider
             minimumValue={0}
@@ -255,18 +364,19 @@ const _90daysTracker = ({ navigation, route }) => {
       title={title}
     >
       {!!data &&
-      <View style={{ flex: 1 }}>
-        <KeyboardAwareFlatList
-          enableResetScrollToCoords={false}
-          showsVerticalScrollIndicator={false}
-          keyExtractor={(item) => item?._id}
-          data={!!data ? data?.delegate_earning_app : []}
-          renderItem={renderEarnings}
-          ListHeaderComponent={header}
-        // ListFooterComponent={footer}
-        />
+        <View style={{ flex: 1 }}>
+          <KeyboardAwareFlatList
+          contentContainerStyle={{paddingBottom:80}}
+            enableResetScrollToCoords={false}
+            showsVerticalScrollIndicator={false}
+            keyExtractor={(item) => item?._id}
+            data={!!data ? data?.delegate_earning_app : []}
+            renderItem={renderEarnings}
+            ListHeaderComponent={header}
+          // ListFooterComponent={footer}
+          />
 
-      </View>}
+        </View>}
       <FAB
         onPress={() => navigation.navigate(routes.addEditEarnings, { earning: undefined })}
       />

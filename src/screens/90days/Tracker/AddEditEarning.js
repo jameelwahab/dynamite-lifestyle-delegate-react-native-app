@@ -18,6 +18,7 @@ import routes from '../../../navigation/routes'
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../../redux/reducers/userSlice'
 
+
 const AddEditEarning = ({ navigation, route }) => {
   const { token } = useSelector(selectUser)
   const { earning } = route?.params;
