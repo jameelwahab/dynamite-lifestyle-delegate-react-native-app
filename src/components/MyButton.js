@@ -13,7 +13,7 @@ const MyButton = ({
   style = {},
   textStyle = {},
   leftIcon = null,
-
+  noSpace = false
 }) => {
   return (
     <TouchableOpacity
@@ -25,7 +25,7 @@ const MyButton = ({
             <Image source={leftIcon} style={{ height: 17, width: 17, tintColor: colors.primary }} />}
         </View>}
       <Text style={[invert ? __MyButtonStyles.invertTitleText : __MyButtonStyles.titleText, textStyle]}>{title}</Text>
-      {!!leftIcon &&
+      {!!leftIcon && noSpace == false &&
         <View style={__MyButtonStyles.iconView} />}
     </TouchableOpacity>
   )
@@ -79,8 +79,9 @@ const __MyButtonStyles = StyleSheet.create({
     justifyContent: "center"
   },
   iconView: {
-    height: 45,
-    aspectRatio: 1,
+    // height: 15,
+    // aspectRatio: 1,
+    marginRight:5,
     alignItems: "center",
     justifyContent: "center",
   },

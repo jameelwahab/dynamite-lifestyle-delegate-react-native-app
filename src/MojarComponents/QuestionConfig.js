@@ -219,6 +219,7 @@ const QuestionConfig = ({
             value={getAnswers(item) == item2}
             onPress={() => AnswerTheQuestions(item, item2)}
             pb={15}
+            isNormalText={true}
           />
         ))}
       </View>
@@ -236,6 +237,7 @@ const QuestionConfig = ({
             value={!!getAnswers(item)?.find(x => x == item2)}
             onPress={() => AnswerTheQuestions(item, item2)}
             pb={15}
+            isNormalText={true}
           />
         ))}
       </View>
@@ -295,13 +297,15 @@ const QuestionConfig = ({
                   invert
                   style={__styles.btn}
                   title={document ? 'View Document' : "upload Document"}
-                  leftIcon={document ? icons.upload2 : undefined}
+                  leftIcon={!document ? icons.upload2 : undefined}
+                  noSpace
                 />
                 {document &&
                   <TouchableOpacity
+                    hitSlop={{ left: 10, right: 10, top: 10, bottom: 10 }}
                     onPress={() => removeDocument(item)}
                     style={__styles.cancelBtn}>
-                    {icons.crosss(colors.white, 22)}
+                    {icons.crosss(colors.white, 18)}
                   </TouchableOpacity>}
               </View>}
 
@@ -314,7 +318,7 @@ const QuestionConfig = ({
     <View style={{ alignSelf: "center", paddingVertical: 30 }}>
       {list.length > 0 &&
         <MyButton
-        onPress={saveAnswerAPI}
+          onPress={saveAnswerAPI}
           title='Submit'
           style={{ paddingHorizontal: 50, }}
         />}
@@ -366,9 +370,9 @@ const __styles = StyleSheet.create({
     top: -15,
     right: 0,
     backgroundColor: colors.delete,
-    borderRadius: 30 / 2,
-    height: 30,
-    width: 30,
+    borderRadius: 25 / 2,
+    height: 25,
+    width: 25,
     alignItems: "center",
     justifyContent: "center",
   }

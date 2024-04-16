@@ -4,7 +4,7 @@ import CheckBox from '@react-native-community/checkbox'
 import MyText from './MyText'
 import { colors } from '../utilities/colors'
 
-const MyCheckBox = ({ value, title = "", onPress, circle = false, size = 20, color = colors.primary, textColor = colors.white, row = true,pb=10 }) => {
+const MyCheckBox = ({ value, title = "", onPress, circle = false, size = 20, color = colors.primary, textColor = colors.white, row = true, pb = 10, isNormalText = false }) => {
   return (
     <Pressable
       onPress={onPress}
@@ -58,7 +58,7 @@ const MyCheckBox = ({ value, title = "", onPress, circle = false, size = 20, col
             (Platform.OS == "android" && circle) ? 14 :
               20 : 0, flex: row ? 1 : undefined, marginTop: row ? 0 : 5
         }}>
-          <MyText color={textColor} capitalize  >{title}</MyText>
+          <MyText color={textColor} capitalize={!isNormalText}  >{title}</MyText>
         </View>}
 
     </Pressable>

@@ -31,9 +31,9 @@ import numFormatter from '../../../functions/numFormatter'
 
 const _90daysTracker = ({ navigation, route }) => {
   const { key, parentKey } = route?.params
-  const ref_calendar = useRef();
   const { navbar } = useSelector(selectNavbar);
   const title = useState(navbar?.find(x => x.value == parentKey)?.child_options?.find(y => y.value == key)?.title);
+  const ref_calendar = useRef();
   const { token } = useSelector(selectUser);
   const [loader, setLoader] = useState(true);
   const [data, setData] = useState(null);
@@ -42,7 +42,7 @@ const _90daysTracker = ({ navigation, route }) => {
   const [confirmation, setConfirmation] = useState({ isVisible: false, item: null })
   const [targetAmount, setTargetAmount] = useState("");
   const [startDate, setStartDate] = useState(moment())
-  const [latestDay, setLatestDay] = useState(null);
+  const [latestDay, setLatestDay] = useState(1);
   const [chartData, setChartData] = useState(null);
   const [chartWidth, setChartWidth] = useState(0);
 
@@ -88,82 +88,108 @@ const _90daysTracker = ({ navigation, route }) => {
     let res = await GET_NINTY_DAY_DETAIL({ navigation, token, });
     setLoader(false);
     if (res.code == 200) {
-      let latest = res?.delegate_earning_app.reduce((a, b) => {
-        return new Date(a.date) > new Date(b.date) ? a : b;
-      });
-      let diff = moment(latest.date).diff(moment(res?.ninteen_day_vision_start_date), "days");
+      let chartData;
+      let chartBlockWidth;
+      let diff;
+      let targetAmount = 0;
+      let startDate = moment();
+      if (!!res?.ninteen_day_vision_start_date && !!res?.target_amount) {
+        targetAmount = res?.target_amount;
+        startDate = res?.ninteen_day_vision_start_date;
+        let latest = res?.delegate_earning_app.reduce((a, b) => {
+          return new Date(a.date) > new Date(b.date) ? a : b;
+        });
+        diff = moment(latest.date).diff(moment(res?.ninteen_day_vision_start_date), "days") + 1;
 
 
-      let startDate = moment(res?.ninteen_day_vision_start_date, "YYYY-MM-DD");
-      let date = moment(startDate);
-      let filteredData = {};
-      let iAmount = 0
-      let arr = res?.delegate_earning_app.reverse()
-      let number = 1;
-      for (let x of arr) {
-        let bDate = moment(x.date);
-        let diff = moment(bDate).diff(startDate, "days") + 1;
-        if (bDate.isSameOrAfter(startDate, "date") && bDate.isSameOrBefore(moment(startDate).add({ days: 90 }))) {
-          let iDate = bDate.format("DD.MM.YYYY")
-          iAmount += x.earning;
-          if (filteredData[iDate]) {
-            filteredData[iDate].earning += x.earning;
-            filteredData[iDate].tillAmount = iAmount
-          } else {
-            filteredData[iDate] = {
-              date: iDate,
-              earning: x.earning,
-              tillAmount: iAmount,
-              number: number,
-              day: diff,
+        let startDate = moment(res?.ninteen_day_vision_start_date, "YYYY-MM-DD");
+        let date = moment(startDate);
+        let filteredData = {};
+        let iAmount = 0
+        let arr = res?.delegate_earning_app.reverse()
+        let number = 1;
+        for (let x of arr) {
+          let bDate = moment(x.date);
+          let diff = moment(bDate).diff(startDate, "days") + 1;
+          if (bDate.isSameOrAfter(startDate, "date") && bDate.isSameOrBefore(moment(startDate).add({ days: 90 }))) {
+            let iDate = bDate.format("DD.MM.YYYY")
+            iAmount += x.earning;
+            if (filteredData[iDate]) {
+              filteredData[iDate].earning += x.earning;
+              filteredData[iDate].tillAmount = iAmount
+            } else {
+              filteredData[iDate] = {
+                date: iDate,
+                earning: x.earning,
+                tillAmount: iAmount,
+                number: number,
+                day: diff,
+              }
+              number++
             }
-            number++
-          }
-        } else {
-          let iDate = moment(date).format("DD.MM.YYYY");
-          iAmount += x.earning;
-          if (filteredData[iDate]) {
-            filteredData[iDate].earning += x.earning;
-            filteredData[iDate].tillAmount += x.tillAmount
           } else {
-            filteredData[iDate] = {
-              date: iDate,
-              earning: x.earning,
-              tillAmount: iAmount,
-              number: 1,
-              day: diff,
+            let iDate = moment(date).format("DD.MM.YYYY");
+            iAmount += x.earning;
+            if (filteredData[iDate]) {
+              filteredData[iDate].earning += x.earning;
+              filteredData[iDate].tillAmount += x.tillAmount
+            } else {
+              filteredData[iDate] = {
+                date: iDate,
+                earning: x.earning,
+                tillAmount: iAmount,
+                number: 1,
+                day: diff,
+              }
+              number++
             }
-            number++
           }
         }
+
+        filteredData = Object.values(filteredData)
+
+
+
+        chartData = {
+          labels: filteredData.length <= 0 ? [0] : filteredData.map(x => numFormatter(x?.day)),
+          datasets: [
+            {
+              data: filteredData.length <= 0 ? [0] : filteredData.map(x => x?.tillAmount),
+            },
+            {
+              data: [res?.target_amount],
+              withDots: false,
+            }
+          ],
+          legend: ["Earnings"]
+        };
+        let screenWidth = utilities.screenWidth();
+        let width = (screenWidth / 10) * chartData.labels.length;
+        chartBlockWidth = width < screenWidth ? screenWidth : width;
+      } else {
+        chartData = {
+          labels: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+          datasets: [
+            {
+              data: [0]
+            },
+            {
+              data: [5011],
+              withDots: false,
+            }
+          ],
+          legend: ["Earnings"]
+        };
+        chartBlockWidth = utilities.screenWidth();
+        diff = 1;
       }
 
-      filteredData = Object.values(filteredData)
-
-
-      filteredData.map(x => console.log(numFormatter(x?.day),"format"))
-      let chartData = {
-        labels: filteredData.length <= 0 ? [0] : filteredData.map(x => numFormatter(x?.day)),
-        datasets: [
-          {
-            data: filteredData.length <= 0 ? [0] : filteredData.map(x => x?.tillAmount),
-          },
-          {
-            data: [res?.target_amount],
-            withDots: false,
-          }
-        ],
-        legend: ["Earnings"]
-      };
-      let screenWidth = utilities.screenWidth();
-      let width = (screenWidth / 10) * chartData.labels.length;
-      let chartBlockWidth = width < screenWidth ? screenWidth : width;
-
+      console.log(chartData, "chartData")
       setChartData(chartData);
       setChartWidth(chartBlockWidth);
-      setLatestDay(++diff);
-      setTargetAmount(String(res?.target_amount));
-      setStartDate(res?.ninteen_day_vision_start_date);
+      setLatestDay(diff);
+      setTargetAmount(String(targetAmount));
+      setStartDate(startDate);
       setData(res);
     }
   }
@@ -199,7 +225,7 @@ const _90daysTracker = ({ navigation, route }) => {
     <View>
       <View style={[__styles.earningView]}>
         {!!chartData &&
-          <ScrollView horizontal={true} >
+          <ScrollView showsHorizontalScrollIndicator={false} horizontal={true} >
             <LineChart
               data={chartData}
               width={chartWidth}
@@ -278,7 +304,7 @@ const _90daysTracker = ({ navigation, route }) => {
             thumbStyle={{ height: 20, width: 20 }}
             value={latestDay}
             step={1}
-
+            disabled={true}
             thumbProps={{
               children: (
                 <View style={__styles.slideRootView}>
@@ -303,18 +329,19 @@ const _90daysTracker = ({ navigation, route }) => {
         <View style={__styles.sliderView}>
           <Slider
             minimumValue={0}
-            maximumValue={data?.target_amount}
+            maximumValue={!!data?.target_amount ? data?.target_amount : 0}
             minimumTrackTintColor={colors.primary}
             maximumTrackTintColor={colors.lightPrimary2}
             thumbTintColor={colors.primary}
             thumbStyle={{ height: 20, width: 20 }}
-            value={data?.total_earning}
+            value={!!data?.total_earning ? data?.total_earning : 0}
             step={1}
+            disabled={true}
             thumbProps={{
               children: (
                 <View style={__styles.slideRootView}>
                   <View style={__styles.sliderUpperView}>
-                    <MyText color={colors.primary}>{`£ ${data?.total_earning}`}</MyText>
+                    <MyText color={colors.primary}>{`£ ${!!data?.total_earning ? data?.total_earning : 0}`}</MyText>
                   </View>
                   <View style={__styles.sliderUpperViewarrow} />
                 </View>
@@ -366,7 +393,7 @@ const _90daysTracker = ({ navigation, route }) => {
       {!!data &&
         <View style={{ flex: 1 }}>
           <KeyboardAwareFlatList
-          contentContainerStyle={{paddingBottom:80}}
+            contentContainerStyle={{ paddingBottom: 80 }}
             enableResetScrollToCoords={false}
             showsVerticalScrollIndicator={false}
             keyExtractor={(item) => item?._id}

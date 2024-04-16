@@ -10,7 +10,7 @@ import { TransparentButton } from './MyButton'
 import { icons } from '../utilities/icons'
 import MyText from './MyText'
 import Yearlist from '../assets/data/yearlist.json'
-const CalendarModal = forwardRef(({ onDateSelected }, ref) => {
+const CalendarModal = forwardRef(({ onDateSelected, minimum }, ref) => {
   const flatlistRef = useRef()
   const [isVisible, setIsVisible] = useState(false)
   const [date, setDate] = useState(moment().format("YYYY-MM-DD"));
@@ -164,7 +164,7 @@ const CalendarModal = forwardRef(({ onDateSelected }, ref) => {
               <View style={{ backgroundColor: colors.secondaryVariant, borderRadius: 10, overflow: "hidden" }}>
                 <Calendar
                   initialDate={date}
-
+                  minDate={!!minimum ? moment(minimum).format("YYYY-MM-DD") : undefined}
                   // date={date}
                   markedDates={{
                     [date]: { selected: true }

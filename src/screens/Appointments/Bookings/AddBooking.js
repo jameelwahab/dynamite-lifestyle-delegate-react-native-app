@@ -4,7 +4,7 @@ import RootView from '../../../components/RootView'
 import MyText from '../../../components/MyText'
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../../redux/reducers/userSlice'
-import { BOOKING_ADD, BOOKING_CONSULTANT_LIST, BOOKING_PASS, BOOKING_UPDATE, GET_BOOKING_TIME_SLOTS, GET_SALE_PAGE_LIST_FOR_BOOKING } from '../../../DAL'
+import { BOOKING_ADD, BOOKING_CONSULTANT_LIST, BOOKING_PASS, BOOKING_UPDATE, GET_BOOKING_TIME_SLOTS, GET_BOOKING_TIME_SLOTS_BY_CONSULTANT, GET_SALE_PAGE_LIST_FOR_BOOKING } from '../../../DAL'
 import MyTouchableInput from '../../../components/MyTouchableInput'
 import { MyButton } from '../../../components/MyButton'
 import OptionModalWithSearch from '../../../components/OptionModalWithSearch'
@@ -58,8 +58,9 @@ const AddBooking = ({ navigation, route }) => {
   }, [date, consultant?._id])
 
   const onSearchTextChange = (text) => {
-    if (optionModal.type == "Member")
+    if (optionModal.type == "Member") {
       setSearchText(text);
+    }
   }
 
   const closeOptionModal = () => { setOptionModal({ isVisble: false, list: [], type: "", titleKey: "" }) }
@@ -72,6 +73,7 @@ const AddBooking = ({ navigation, route }) => {
       setMember(opt);
     } else if (type == "Delegate") {
       setConsultant(opt)
+      setTimeSlot(null)
     } else if (type == "Booking Page") {
       setBookingPage(opt)
     } else if (type == "Time Slot") {
@@ -198,11 +200,18 @@ const AddBooking = ({ navigation, route }) => {
   }
 
   const getBookingsTimeSlotsFromServer = async () => {
-    let res = await GET_BOOKING_TIME_SLOTS({ navigation, token, date: moment(date).format("YYYY/MM/DD") });
+    let res;
+    if (isPass) {
+      res = await GET_BOOKING_TIME_SLOTS_BY_CONSULTANT({ navigation, token, date: moment(date).format("YYYY/MM/DD"), consultant_id: consultant?._id });
+    } else {
+      res = await GET_BOOKING_TIME_SLOTS({ navigation, token, date: moment(date).format("YYYY/MM/DD") });
+    }
     if (res.code == 200) {
       setTimeSlotlist(res?.slots)
     }
   }
+
+
 
   return (
     <RootView title={isPass ? "Pass Booking" : isEdit ? "Edit Booking" : 'Add New Booking'} >
@@ -216,7 +225,7 @@ const AddBooking = ({ navigation, route }) => {
             onPress={() => setOptionModal({ isVisble: true, list: memberlist, type: "Member", titleKey: "" })}
             value={!!member ? `${member?.first_name} ${member?.last_name} (${member?.email})` : ""}
             clearbutton={!!member}
-            onClearButtonPress={() => setMember(null)}
+            onClearButtonPress={() => { setMember(null); }}
           />}
 
         {isPass &&
@@ -225,7 +234,7 @@ const AddBooking = ({ navigation, route }) => {
             onPress={() => setOptionModal({ isVisble: true, list: consultantList, type: "Delegate", titleKey: "" })}
             value={!!consultant ? `${consultant?.first_name} ${consultant?.last_name} (${consultant?.email})` : ""}
             clearbutton={!!consultant}
-            onClearButtonPress={() => setConsultant(null)}
+            onClearButtonPress={() => { setConsultant(null); setTimeSlot(null); }}
           />}
 
         <MyTouchableInput
@@ -304,7 +313,8 @@ const AddBooking = ({ navigation, route }) => {
 
       <CalendarModal
         ref={ref_calendar}
-        onDateSelected={(date) => setDate(date)}
+        onDateSelected={(date) => { setDate(date); setTimeSlot(null) }}
+        minimum={moment()}
       />
     </RootView>
   )

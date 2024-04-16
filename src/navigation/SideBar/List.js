@@ -23,6 +23,9 @@ import StackBookings from "../NestedStacks/StackBookings";
 import StackBookingConfiguration from "../NestedStacks/StackBookingConfiguration";
 import Stack90DaysPlan from "../NestedStacks/Stack90DaysPlan";
 import Stack90DaysTracker from "../NestedStacks/Stack90DaysTracker";
+import StackDynamitePod from "../NestedStacks/StackDynamitePods";
+import StackSourcePod from "../NestedStacks/StackSourcePods";
+import StackBookCallPod from "../NestedStacks/StackBookCallPods";
 
 export const drawerMenuList = [
   {
@@ -310,6 +313,16 @@ export const ParentComponents = {
     component: null,
     params: { key: "90_day_plan" }
   },
+  // delegate_pods: {
+  //   key: null,
+  //   component: null,
+  //   params: { key: "delegate_pods" }
+  // },
+  // dynamite_pods: {
+  //   key: routes.dynamitePodNavigator,
+  //   component: StackDynamitePod,
+  //   params: { key: "dynamite_pods" }
+  // },
 }
 
 export const ChildComponents = {
@@ -368,4 +381,14 @@ export const ChildComponents = {
     component: Stack90DaysTracker,
     params: { key: "90_day_tracker", parentKey: "90_day_plan" }
   },
+  "source_pods": {
+    key: routes.sourcePodNavigator,
+    component: StackSourcePod,
+    params: { key: "source_pods", parentKey: "delegate_pods" }
+  },
+  "book_call_pods": {
+    key: routes.bookcallPodNavigator,
+    component: StackBookCallPod,
+    params: { key: "book_call_pods", parentKey: "delegate_pods" }
+  }
 }

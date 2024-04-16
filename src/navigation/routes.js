@@ -27,7 +27,9 @@ const routes = {
   bookingConfigurationsNavigator: "BOOKING_CONFIGURATION_NAVIGATOR",
   _90daysPlanNavigator: "90_DAYS_PLAN_NAVIGATOR",
   _90daysTrackerNavigator: "90_DAYS_TRACKER_NAVIGATOR",
-
+  sourcePodNavigator: "SOURCE_POD_NAVIGATOR",
+  dynamitePodNavigator: "DYNAMITE_POD_NAVIGATOR",
+  bookcallPodNavigator: "BOOKCALL_POD_NAVIGATOR",
 
   //! ///    Screens'
   login: "LOGIN_SCREEN",
@@ -166,6 +168,16 @@ const routes = {
   _90daysPlan: "90_DAYS_PLAN_SCREEN",
   _90daysTracker: "90_DAYS_TRACKER_SCREEN",
   addEditEarnings: "ADD_EDIT_90_DAYS_PLAN_EARNING",
+
+  //? Source pod
+  sourcePodScreen: "SOURCE_POD_SCREEN",
+  podAddScreen: "ADD_POD_SCREEN",
+  podFilterScreen: "POD_FILTER_SCREEN",
+  //? Dynamite pod
+  dynamitePodScreen: "DYNAMITE_POD_SCREEN",
+  //? Book call pod
+  bookcallPodScreen: "BOOKCALL_POD_SCREEN",
+
 }
 
 export default routes;
