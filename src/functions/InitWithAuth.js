@@ -8,6 +8,7 @@ import showToast from './showToast';
 import routes from '../navigation/routes';
 import { io } from 'socket.io-client';
 import { socketUrl } from '../utilities/constants';
+import { Alert } from 'react-native';
 
 const InitWithAuth = async (token, navigation, setLoader, dispatch) => {
   let res = await INIT_WITH_TOKEN({ token: token });
@@ -15,7 +16,7 @@ const InitWithAuth = async (token, navigation, setLoader, dispatch) => {
     let isChatAllowed = false;
     let isWhatsappChatAllowed = false;
     res?.nav_items.forEach(item => {
-      console.table(item.title + "  --->  ", item.value,item)
+      console.table(item.title + "  --->  ", item.value, item)
       if (item.value == "chat") {
         isChatAllowed = true;
       } else if (item.value == "whatsapp_chat") {
@@ -43,9 +44,14 @@ const InitWithAuth = async (token, navigation, setLoader, dispatch) => {
       index: 0,
       routes: [{ name: routes.mainScreen }]
     })
+    return res
   } else {
-    showToast({ title: "Something went wrong", body: res?.message })
+    // showToast({ title: "Something went wrong", body: res?.message })
     setLoader(false);
+    return {
+      ...res,
+      code: "error"
+    }
   }
 }
 

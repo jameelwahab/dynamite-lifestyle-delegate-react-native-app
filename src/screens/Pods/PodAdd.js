@@ -51,7 +51,8 @@ const PodAdd = ({ navigation, route }) => {
     startTime: "00:00",
     hours: hourslist[0],
     minutes: minsList[0],
-    recurrenceType: [],
+    recurrenceType: null,
+    recurrenceDays: [],
     recurrenceEndDate: moment(),
     groups: [],
     members: [],
@@ -297,13 +298,13 @@ const PodAdd = ({ navigation, route }) => {
           value={password}
           onChangeText={(text) => setCred({ password: text })}
         />
-
-        <MyInputs
-          label='Order'
-          value={order}
-          onChangeText={(text) => setOrder(text)}
-          keyboardType='number-pad'
-        />
+        {isEdit &&
+          <MyInputs
+            label='Order'
+            value={order}
+            onChangeText={(text) => setOrder(text)}
+            keyboardType='number-pad'
+          />}
 
         <View style={__styles.radioRootView}>
           <MyText isLabel>Recurring</MyText>
@@ -342,7 +343,8 @@ const PodAdd = ({ navigation, route }) => {
                   label='Start Date*'
                   icon={() => icons.calendar(colors.primary, 20)}
                   value={moment(startDate).format(dateTimeFormat.date)}
-                  onPress={() => ref_calendar?.current?.openModal(startDate, "startDate")}
+                  onPress={() => ref_calendar?.current?.openModal(startDate, "startDate", moment().toDate())}
+                  error={moment(startDate).isBefore(moment(), "day")}
                 />
               </View>
               <View style={{ flex: 1, marginLeft: 10 }}>
@@ -402,13 +404,12 @@ const PodAdd = ({ navigation, route }) => {
                     label='End Date*'
                     icon={() => icons.calendar(colors.primary, 20)}
                     value={moment(recurrenceEndDate).format(dateTimeFormat.date)}
-                    onPress={() => ref_calendar?.current?.openModal(recurrenceEndDate, "recurrenceEndDate")}
+                    onPress={() => ref_calendar?.current?.openModal(recurrenceEndDate, "recurrenceEndDate", !!startDate ? moment(startDate).toDate() : moment().toDate())}
+                    error={!!startDate ? moment(recurrenceEndDate).isBefore(moment(startDate), "day") : false}
                   />
                 </View>
               </View>
-              {/* <MyTouchableInput
-              label='Select Day'
-            /> */}
+              
 
               {recurrenceType?.key == "weekly" &&
                 <View style={__styles.radioRootView}>
@@ -422,6 +423,7 @@ const PodAdd = ({ navigation, route }) => {
                           title={day.shortName}
                           row={false}
                           value={recurrenceDays.includes(day.key)}
+                          size={30}
                         />
                       </View>
                     )}
@@ -527,7 +529,6 @@ const PodAdd = ({ navigation, route }) => {
         onSelected={onMemberSelect}
         filterTheList={filterTheList}
         title='Member'
-
 
 
       />

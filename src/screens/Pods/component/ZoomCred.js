@@ -5,8 +5,9 @@ import { colors } from '../../../utilities/colors'
 import StatView from '../../Members/Components/StatView'
 import openUrl from '../../../functions/openUrl'
 import { icons } from '../../../utilities/icons'
+import EmptyView from '../../../components/EmptyView'
 
-const ZoomCred = ({ list }) => {
+const ZoomCred = ({ list, loader }) => {
   const linkView = (link) => {
     return (
       <TouchableOpacity
@@ -39,6 +40,7 @@ const ZoomCred = ({ list }) => {
         data={list}
         renderItem={itemView}
         showsVerticalScrollIndicator={false}
+        // ListEmptyComponent={!loader && <EmptyView />}
       />
     </View>
   )

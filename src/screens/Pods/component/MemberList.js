@@ -5,10 +5,11 @@ import StatView from '../../Members/Components/StatView'
 import { colors } from '../../../utilities/colors'
 import MemberView from '../../../components/MemberView'
 import FooterLoader from '../../../components/FooterLoader'
+import EmptyView from '../../../components/EmptyView'
 
 
 
-const MemberList = ({ list, loadmore, footerLoader }) => {
+const MemberList = ({ list, loadmore, footerLoader, loader }) => {
   const itemView = ({ item, index }) => {
     return (
       <View style={__styles.rootView}>
@@ -25,6 +26,7 @@ const MemberList = ({ list, loadmore, footerLoader }) => {
         onEndReached={loadmore}
         showsVerticalScrollIndicator={false}
         ListFooterComponent={<FooterLoader isVisible={footerLoader} />}
+        // ListEmptyComponent={!loader && <EmptyView />}
       />
     </View>
   )

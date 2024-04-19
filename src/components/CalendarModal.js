@@ -11,11 +11,13 @@ import { icons } from '../utilities/icons'
 import MyText from './MyText'
 import Yearlist from '../assets/data/yearlist.json'
 const CalendarModal = forwardRef(({ onDateSelected, minimum }, ref) => {
+  console.log(minimum,"minimum")
   const flatlistRef = useRef()
   const [isVisible, setIsVisible] = useState(false)
   const [date, setDate] = useState(moment().format("YYYY-MM-DD"));
   const [showYearView, setShowYearView] = useState(false);
-  const [type, setType] = useState("")
+  const [type, setType] = useState("");
+  const [minDate, setMinDate] = useState(!!minimum ? minimum : null);
 
   useImperativeHandle(ref, () => {
     return {
@@ -23,9 +25,13 @@ const CalendarModal = forwardRef(({ onDateSelected, minimum }, ref) => {
     }
   }, [])
 
-  const openModal = (date, type = "") => {
+  const openModal = (date, type = "", minimimDate = undefined) => {
+    console.log(minimimDate,"minimimDate")
     setDate(!!date ? moment(date).format("YYYY-MM-DD") : moment().format("YYYY-MM-DD"));
     setType(type);
+    if(!!minimimDate && !minimum){
+      setMinDate(minimimDate);
+    }
     setIsVisible(true)
   }
 
@@ -137,6 +143,7 @@ const CalendarModal = forwardRef(({ onDateSelected, minimum }, ref) => {
   }
 
   const modalCalendar = () => {
+    console.log(minDate,"minDate")
     return (
       <Modal
         isVisible={isVisible}
@@ -164,7 +171,7 @@ const CalendarModal = forwardRef(({ onDateSelected, minimum }, ref) => {
               <View style={{ backgroundColor: colors.secondaryVariant, borderRadius: 10, overflow: "hidden" }}>
                 <Calendar
                   initialDate={date}
-                  minDate={!!minimum ? moment(minimum).format("YYYY-MM-DD") : undefined}
+                  minDate={!!minDate ? moment(minDate).format("YYYY-MM-DD") : undefined}
                   // date={date}
                   markedDates={{
                     [date]: { selected: true }

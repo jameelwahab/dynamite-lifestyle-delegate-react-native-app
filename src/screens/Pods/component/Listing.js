@@ -319,7 +319,7 @@ const Listing = ({ navigation, route }) => {
           data={list}
           renderItem={renderBookings}
           onEndReached={loadMore}
-          ListEmptyComponent={!loader && !refreshing && <EmptyView label={`No ${title} Found`} />}
+          ListEmptyComponent={!loader && !refreshing && <EmptyView label={`No Pods Found`} />}
           ListFooterComponent={<FooterLoader isVisible={footerLoader} />}
           refreshControl={<MyRefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         />

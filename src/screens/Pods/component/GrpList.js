@@ -3,8 +3,9 @@ import React from 'react'
 import MyText from '../../../components/MyText'
 import StatView from '../../Members/Components/StatView'
 import { colors } from '../../../utilities/colors'
+import EmptyView from '../../../components/EmptyView'
 
-const GrpList = ({ list }) => {
+const GrpList = ({ list,loader }) => {
   const itemView = ({ item, index }) => {
     return (
       <View style={__styles.rootView}>
@@ -20,6 +21,8 @@ const GrpList = ({ list }) => {
       <FlatList
         data={list}
         renderItem={itemView}
+        showsVerticalScrollIndicator={false}
+        // ListEmptyComponent={!loader && <EmptyView />}
       />
     </View>
   )

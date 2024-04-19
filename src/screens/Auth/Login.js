@@ -46,10 +46,10 @@ const Login = ({ navigation }) => {
   }
 
   const onMainScreen = async () => {
+
     let fcm_token = "";
     try {
       fcm_token = await messaging().getToken();
-      console.log("fcm_token \n", fcm_token)
     } catch (err) {
       console.log("fcm_token error", err)
     }
@@ -61,6 +61,7 @@ const Login = ({ navigation }) => {
       showToast({ body: "Please enter password" });
     } else {
       setLoader(true);
+
       let fd = new FormData();
       fd.append("fcm_token", fcm_token)
       fd.append("platform", "app")
@@ -70,9 +71,11 @@ const Login = ({ navigation }) => {
       let res = await LOGIN({ body: fd });
       if (res.code == 200) {
         let savedTOken = await AsyncStorage.setItem("@token", res?.token);
-        console.log(savedTOken, "savedTOken")
-        // await with_Auth(res)
-        await InitWithAuth(res?.token, navigation, setLoader, dispatch);
+        let resp = await InitWithAuth(res?.token, navigation, setLoader, dispatch);
+        if (resp.code == "error") {
+          await AsyncStorage.removeItem("@token");
+          showToast("Login Error", "Please try again")
+        }
       }
 
       setLoader(false);

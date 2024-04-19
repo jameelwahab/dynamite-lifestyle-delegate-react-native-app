@@ -17,7 +17,8 @@ const MyTouchableInput = ({
   subTextView,
   clearbutton,
   onClearButtonPress = () => { },
-  disabled = false
+  disabled = false,
+  error = false
 }) => {
   const [isFocused, setFocused] = useState(false)
   return (
@@ -27,7 +28,7 @@ const MyTouchableInput = ({
       opacity={disabled ? 0.6 : 1}
       style={{ marginBottom: noSpace ? 0 : 15 }}>
       <View pointerEvents={disabled ? "none" : "auto"} style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-        <Text pointerEvents={!!iconOnPress ? "auto" : "none"} style={[__MyInputStyles.labelText, isFocused ? __MyInputStyles.focusedLabelText : undefined]}>{label}</Text>
+        <Text pointerEvents={!!iconOnPress ? "auto" : "none"} style={[__MyInputStyles.labelText, isFocused ? __MyInputStyles.focusedLabelText : undefined, error ? __MyInputStyles.TextError : undefined,]}>{label}</Text>
         {!!clearbutton && !disabled ?
           <Pressable
             style={__MyInputStyles.clearbtnView}
@@ -36,7 +37,7 @@ const MyTouchableInput = ({
           </Pressable> :
           !!subTextView ? subTextView() : <View />}
       </View>
-      <View pointerEvents={!!iconOnPress ? "auto" : "none"} style={[__MyInputStyles.inputView, isFocused ? __MyInputStyles.focusedView : undefined, !!view && { height: null, }]}>
+      <View pointerEvents={!!iconOnPress ? "auto" : "none"} style={[__MyInputStyles.inputView, isFocused ? __MyInputStyles.focusedView : undefined, error ? __MyInputStyles.borderError : undefined, !!view && { height: null, }]}>
         {!!view ? view() :
           <TextInput
             pointerEvents="none"
@@ -109,6 +110,12 @@ const __MyInputStyles = StyleSheet.create({
     justifyContent: "center",
     alignSelf: "center",
     marginRight: 5
+  },
+  borderError:{
+    borderColor:colors.delete
+  },
+  TextError:{
+    color:colors.delete
   },
   eyeIcon: {
     height: 25,

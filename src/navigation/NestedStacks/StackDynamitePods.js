@@ -6,6 +6,7 @@ import { colors } from '../../utilities/colors';
 import { defaultScreens } from './defaultScreens';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import DynamitePods from '../../screens/Pods/DynamitePods';
+import DynamitePodDetail from '../../screens/Pods/DynamitePodDetail';
 
 const DynamitePodStack = createNativeStackNavigator();
 
@@ -16,7 +17,7 @@ const StackDynamitePod = ({ route }) => {
         screenOptions={{ headerShown: false }}>
         <DynamitePodStack.Screen initialParams={route.params}
           name={routes.dynamitePodScreen} component={DynamitePods} />
-
+        <DynamitePodStack.Screen name={routes.dynamitePodDetailScreen} component={DynamitePodDetail} />
 
         {/*//? Default Screens Start */}
         {defaultScreens.map((x, i) => (

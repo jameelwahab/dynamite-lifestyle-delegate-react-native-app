@@ -178,17 +178,18 @@ const PodDetail = ({ navigation, route }) => {
 
     switch (route.key) {
       case 'grplist':
-        return <GrpList list={searchInListGrp(pod?.room_groups)} />
+        return <GrpList list={searchInListGrp(pod?.room_groups)} loader={loader} />
       case 'zoom':
         return <ZoomCred
+          loader={loader}
           list={searchInListZoom([{
             link: pod?.room?.zoom_link,
             password: pod?.room?.password,
           }])} />
       case 'members':
-        return <MemberList list={members} loadmore={loadMore} footerLoader={footerLoader} />
+        return <MemberList list={members} loadmore={loadMore} footerLoader={footerLoader} loader={loader} />
       case 'users':
-        return <MemberList list={roomUser} loadmore={loadMore} footerLoader={footerLoader} />
+        return <MemberList list={roomUser} loadmore={loadMore} footerLoader={footerLoader} loader={loader} />
     }
 
 
@@ -217,6 +218,15 @@ const PodDetail = ({ navigation, route }) => {
             setIndex(index);
             setMembers([])
             setRoomUsers([]);
+            if (isBookCall) {
+              if (index == 1) {
+                setLoader(true)
+              }
+            } else {
+              if (index == 2 || index == 3) {
+                setLoader(true)
+              }
+            }
           }}
           initialLayout={{ width: layout.width }}
         />

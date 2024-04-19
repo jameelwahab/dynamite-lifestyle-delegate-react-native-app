@@ -13,6 +13,7 @@ const MyCheckBox = ({ value, title = "", onPress, circle = false, size = 20, col
         alignItems: "center",
         paddingLeft: 1,
         paddingBottom: pb,
+
       }}>
       {(Platform.OS == "android" && circle) ?
         <View
@@ -56,7 +57,9 @@ const MyCheckBox = ({ value, title = "", onPress, circle = false, size = 20, col
         <View style={{
           marginLeft: row ? Platform.OS == "ios" ? 10 :
             (Platform.OS == "android" && circle) ? 14 :
-              20 : 0, flex: row ? 1 : undefined, marginTop: row ? 0 : 5
+              20 : 0, flex: row ? 1 : undefined,
+               marginTop: row ? 0 : 5,
+               
         }}>
           <MyText color={textColor} capitalize={!isNormalText}  >{title}</MyText>
         </View>}

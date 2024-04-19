@@ -6,7 +6,7 @@ import MyText from './MyText'
 import { TransparentButton } from './MyButton'
 import { colors } from '../utilities/colors'
 
-const ConfirmationModal = ({ isVisible, closeModal, title, onAgree }) => {
+const ConfirmationModal = ({ isVisible, closeModal, title, subtitle = "", onAgree, showAgreeBtnOnly = false }) => {
   return (
     <Modal
       isVisible={isVisible}
@@ -24,11 +24,16 @@ const ConfirmationModal = ({ isVisible, closeModal, title, onAgree }) => {
             <MyText fontSize={18} type='medium' color={colors.primary}>
               {title}
             </MyText>
+            {!!subtitle &&
+              <MyText fontSize={18} type='medium' color={colors.primary}>
+                {subtitle}
+              </MyText>}
           </View>
 
 
           <View style={{ flexDirection: "row", justifyContent: "flex-end", marginTop: 10 }}>
-            <TransparentButton title='CANCEL' onPress={closeModal} />
+            {!showAgreeBtnOnly &&
+              <TransparentButton title='CANCEL' onPress={closeModal} />}
             <TransparentButton title='AGREE' onPress={onAgree} />
           </View>
 

@@ -1,25 +1,15 @@
-import { View, Text, Image, SafeAreaView, Alert, StatusBar, StyleSheet, Easing, Vibration } from 'react-native'
+import { View, Text, Image, SafeAreaView, Alert, StatusBar, StyleSheet, Easing, Vibration, Dimensions } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import RootView from '../../components/RootView'
-import MyText from '../../components/MyText'
 import SplashScreen from 'react-native-splash-screen'
 import { icons } from '../../utilities/icons'
-import MyLoader from '../../components/MyLoader'
 import LottieView from 'lottie-react-native'
 import utilities from '../../utilities'
 import { colors } from '../../utilities/colors'
-import { INIT_WITHOUT_TOKEN, INIT_WITH_TOKEN } from '../../DAL'
+import { INIT_WITHOUT_TOKEN, } from '../../DAL'
 import { setSettings } from '../../redux/reducers/settingSlice'
 import routes from '../../navigation/routes'
-import { setUserAndToken } from '../../redux/reducers/userSlice'
-import { setTimeZone } from '../../redux/reducers/timezoneSlice'
-import { setNavbar } from '../../redux/reducers/navbarSlice'
-import { drawerMenuList } from '../../navigation/SideBar/List'
-import { setSocket } from '../../redux/reducers/socketSlice'
-import { io } from 'socket.io-client'
-import { socketUrl } from '../../utilities/constants'
 import notifee from '@notifee/react-native';
 import InitWithAuth from '../../functions/InitWithAuth'
 import Animated, {
@@ -27,30 +17,31 @@ import Animated, {
   useAnimatedStyle,
   withSpring,
   withTiming,
-  delay,
-  ReduceMotion,
 } from 'react-native-reanimated';
+import ConfirmationModal from '../../components/ConfirmationModal'
 
 
 
 const Splash = ({ navigation }) => {
-
+  const height = Dimensions.get("window").height
   const dispatch = useDispatch()
 
-  const translateY = useSharedValue(400); // Initial position off-screen
+  const translateY = useSharedValue((0)); // Initial position off-screen
   const scale = useSharedValue(1); // Initial scale
   const showText = useSharedValue(false); // Show text flag
   const hideImg = useSharedValue(true); // Hide
 
 
-  checkAuth = async () => {
+  const checkAuth = async () => {
     try {
       let token = await AsyncStorage.getItem("@token");
-      console.log(token, "token")
       if (token != null) {
-        // with_Auth(token);
-
-        await InitWithAuth(token, navigation, () => { }, dispatch);
+        let resp = await InitWithAuth(token, navigation, () => { }, dispatch);
+        if (resp?.code == "error") {
+          Alert.alert("Something went wrong",
+            resp?.message,
+            [{ text: "Retry", onPress: checkAuth }])
+        }
 
 
       } else {
@@ -69,6 +60,7 @@ const Splash = ({ navigation }) => {
       dispatch(setSettings(res?.consultant_setting));
       moveTo(routes.login)
     } else {
+      setShowAlert(true);
       Alert.alert("Something went wrong",
         res?.message,
         [{ text: "Retry", onPress: checkAuth }])
@@ -111,10 +103,10 @@ const Splash = ({ navigation }) => {
 
 
     // Animation sequence
-    translateY.value = withSpring(-400, {
-      duration:1500,
-      dampingRatio: 3,
-      stiffness: 1,
+    translateY.value = withSpring(-((height / 2) - 100), {
+      mass: 0.7,
+      damping: 8,
+      stiffness: 50,
     });
     // scale.value = withTiming(1, { duration: 1000 });
 
@@ -124,14 +116,18 @@ const Splash = ({ navigation }) => {
     Vibration.vibrate([1000]);
     // After a delay, hide the logo and show the text
     setTimeout(() => {
-    
 
-      showText.value = true;
-      hideImg.value = false;
+
       // translateY.value = withSpring(-400, { damping: 20, stiffness: 80 });
-      scale.value = withTiming(10, { duration: 1000 });
+      scale.value = withTiming(100, { duration: 1000 });
     }, 1000); // Adjust the delay time as needed
 
+
+    setTimeout(() => {
+      
+      showText.value = true;
+      hideImg.value = false;
+    }, 1200);
     setTimeout(() => {
       checkAuth()
     }, 1000);

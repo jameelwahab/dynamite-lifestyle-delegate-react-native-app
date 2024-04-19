@@ -8,7 +8,7 @@ import { SimpleLoader } from './MyLoader'
 const SearchView = ({ search = "", onChangeText, onSearchPress, loader = false, hideBtn = false }) => {
   return (
     <View style={{ flexDirection: "row", alignItems: "center" }}>
-      <View style={{ flex: 1, marginTop: -15 }}>
+      <View style={{ flex: 1, marginTop: -15, }}>
         <MyInputs
           rightIcon={search.length > 0 ? icons.crosssWithCircle_20 : icons.noIcon}
           value={search}
