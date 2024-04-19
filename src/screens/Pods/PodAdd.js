@@ -167,7 +167,7 @@ const PodAdd = ({ navigation, route }) => {
         password: !!room?.password ? room?.password : "",
         isRecurring: !!room?.is_recurring ? true : false,
         communityLvl: !!room?.community_level ? communityLevels.find(x => x.key == room?.community_level) : communityLevels[0],
-        startDate: !!room?.start_date ? moment(room?.start_date) : moment(),
+        startDate: !!room?.start_date ? moment(room?.start_date, "YYYY/MM/DD") : moment(),
         startTime: !!room?.start_time ? room?.start_time : "00:00",
         hours: !!room?.duration_hour ? hourslist.find(x => x.key == room?.duration_hour) : hourslist[0],
         minutes: !!room?.duration_minute ? minsList.find(x => x.key == room?.duration_minute) : minsList[0],
@@ -409,7 +409,7 @@ const PodAdd = ({ navigation, route }) => {
                   />
                 </View>
               </View>
-              
+
 
               {recurrenceType?.key == "weekly" &&
                 <View style={__styles.radioRootView}>
