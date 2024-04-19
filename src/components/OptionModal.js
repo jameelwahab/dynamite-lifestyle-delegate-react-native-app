@@ -17,7 +17,8 @@ const OptionModal = ({
   renderText,
   noIcon = false,
   multiple = false,
-  checkSelected
+  checkSelected,
+  multipleLabel = ""
 }) => {
 
 
@@ -35,7 +36,7 @@ const OptionModal = ({
         {multiple &&
           <View style={{ flexDirection: "row", paddingTop: 15, paddingHorizontal: 15 }}>
             <View style={{ flex: 1 }} >
-              <MyText color={colors.primary} fontSize={16} type='medium' >Select level</MyText>
+              <MyText color={colors.primary} fontSize={16} type='medium' >{!!multipleLabel ? multipleLabel : "Select Level"}</MyText>
             </View>
             <Pressable
               onPress={closeModal}

@@ -181,15 +181,15 @@ const ImageUploadModal = ({
               </View>
               <MyText>Gallery</MyText>
             </Pressable>
-
-            <Pressable
-              onPress={openDocument}
-              style={{ alignItems: 'center', marginLeft: 30 }}>
-              <View style={__modalStyle.bigIconView}>
-                {icons.document(colors.primary, 20)}
-              </View>
-              <MyText>Files</MyText>
-            </Pressable>
+            {enableDocument &&
+              <Pressable
+                onPress={openDocument}
+                style={{ alignItems: 'center', marginLeft: 30 }}>
+                <View style={__modalStyle.bigIconView}>
+                  {icons.document(colors.primary, 20)}
+                </View>
+                <MyText>Files</MyText>
+              </Pressable>}
             {!!removeImage && (
               <Pressable
                 onPress={() =>

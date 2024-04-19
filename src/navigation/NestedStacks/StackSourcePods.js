@@ -6,16 +6,24 @@ import { colors } from '../../utilities/colors';
 import { defaultScreens } from './defaultScreens';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import SourcePod from '../../screens/Pods/SourcePod';
+import Filter from '../../screens/Pods/Filter';
+import PodAdd from '../../screens/Pods/PodAdd';
+import PodDetail from '../../screens/Pods/PodDetail';
 
 const SourcePodStack = createNativeStackNavigator();
 
-const StackSourcePod= ({ route }) => {
+const StackSourcePod = ({ route }) => {
   return (
     <View style={{ flex: 1, backgroundColor: colors.darkSecondary }}>
       <SourcePodStack.Navigator
         screenOptions={{ headerShown: false }}>
         <SourcePodStack.Screen initialParams={route.params}
-         name={routes.sourcePodScreen} component={SourcePod} />
+          name={routes.sourcePodScreen} component={SourcePod} />
+
+        <SourcePodStack.Screen name={routes.podFilterScreen} component={Filter} />
+        <SourcePodStack.Screen name={routes.podAddScreen} component={PodAdd} />
+        <SourcePodStack.Screen initialParams={route.params}
+          name={routes.podDetailScreen} component={PodDetail} />
 
 
         {/*//? Default Screens Start */}

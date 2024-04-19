@@ -35,7 +35,6 @@ const OPTscreen = ({ navigation, route }) => {
           email: route.params?.email
         })
       }
-
     }
   }
 

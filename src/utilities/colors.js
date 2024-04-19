@@ -27,5 +27,6 @@ export const colors = {
   lightGrey:"#A2A1A1",
   online: "#337447",
   green:"#4B9831",
-  chip: "#343b4b"
+  chip: "#343b4b",
+  link:"#316BF2"
 }

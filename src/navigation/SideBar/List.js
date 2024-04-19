@@ -313,16 +313,16 @@ export const ParentComponents = {
     component: null,
     params: { key: "90_day_plan" }
   },
-  // delegate_pods: {
-  //   key: null,
-  //   component: null,
-  //   params: { key: "delegate_pods" }
-  // },
-  // dynamite_pods: {
-  //   key: routes.dynamitePodNavigator,
-  //   component: StackDynamitePod,
-  //   params: { key: "dynamite_pods" }
-  // },
+  delegate_pods: {
+    key: null,
+    component: null,
+    params: { key: "delegate_pods" }
+  },
+  dynamite_pods: {
+    key: routes.dynamitePodNavigator,
+    component: StackDynamitePod,
+    params: { key: "dynamite_pods" }
+  },
 }
 
 export const ChildComponents = {
@@ -384,11 +384,11 @@ export const ChildComponents = {
   "source_pods": {
     key: routes.sourcePodNavigator,
     component: StackSourcePod,
-    params: { key: "source_pods", parentKey: "delegate_pods" }
+    params: { key: "source_pods", parentKey: "delegate_pods", type: "general" }
   },
   "book_call_pods": {
     key: routes.bookcallPodNavigator,
     component: StackBookCallPod,
-    params: { key: "book_call_pods", parentKey: "delegate_pods" }
+    params: { key: "book_call_pods", parentKey: "delegate_pods", type: "booking" }
   }
 }

@@ -2,7 +2,7 @@ import { View, Text, TouchableOpacity, Image, ActivityIndicator } from 'react-na
 import React, { useEffect, useState } from 'react'
 import { colors } from '../../../utilities/colors'
 import { icons } from '../../../utilities/icons'
-import { ProgressBar, MD3Colors } from 'react-native-paper';
+import { ProgressBar } from 'react-native-paper';
 import moment from 'moment';
 import MyText from '../../../components/MyText';
 import utilities from '../../../utilities';

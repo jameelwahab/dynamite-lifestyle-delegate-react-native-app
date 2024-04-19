@@ -173,6 +173,7 @@ const routes = {
   sourcePodScreen: "SOURCE_POD_SCREEN",
   podAddScreen: "ADD_POD_SCREEN",
   podFilterScreen: "POD_FILTER_SCREEN",
+  podDetailScreen: "POD_DETAIL_SCREEN",
   //? Dynamite pod
   dynamitePodScreen: "DYNAMITE_POD_SCREEN",
   //? Book call pod

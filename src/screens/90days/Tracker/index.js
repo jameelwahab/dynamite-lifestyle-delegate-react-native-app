@@ -96,6 +96,10 @@ const _90daysTracker = ({ navigation, route }) => {
       if (!!res?.ninteen_day_vision_start_date && !!res?.target_amount) {
         targetAmount = res?.target_amount;
         startDate = res?.ninteen_day_vision_start_date;
+      }
+
+      if (res?.delegate_earning_app.length > 0) {
+
         let latest = res?.delegate_earning_app.reduce((a, b) => {
           return new Date(a.date) > new Date(b.date) ? a : b;
         });
@@ -397,7 +401,7 @@ const _90daysTracker = ({ navigation, route }) => {
             enableResetScrollToCoords={false}
             showsVerticalScrollIndicator={false}
             keyExtractor={(item) => item?._id}
-            data={!!data ? data?.delegate_earning_app : []}
+            data={!!data ? data?.delegate_earning_app.slice().reverse() : []}
             renderItem={renderEarnings}
             ListHeaderComponent={header}
           // ListFooterComponent={footer}
