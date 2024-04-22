@@ -23,7 +23,6 @@ const StackTraining = ({ route }) => {
   return (
     <View style={{ flex: 1, backgroundColor: colors.darkSecondary }}>
       <TrainingStack.Navigator
-        initialRouteName={routes.sourceFeedScreen}
         screenOptions={{ headerShown: false }}>
         <TrainingStack.Screen initialParams={route.params} name={routes.traininglist} component={TrainingList} />
         <TrainingStack.Screen name={routes.trainingDetail} component={TrainingDetail} />

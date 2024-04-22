@@ -16,7 +16,6 @@ const StackSubscription = ({ route }) => {
   return (
     <View style={{ flex: 1, backgroundColor: colors.darkSecondary }}>
       <SubscriptionStack.Navigator
-        initialRouteName={routes.sourceFeedScreen}
         screenOptions={{ headerShown: false }}>
         <SubscriptionStack.Screen initialParams={route.params} name={routes.subscriptionList} component={SubscriptionList} />
         <SubscriptionStack.Screen name={routes.subscriptionFilter} component={Filter} />

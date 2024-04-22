@@ -20,7 +20,6 @@ const StackRecordings = ({ route }) => {
   return (
     <View style={{ flex: 1, backgroundColor: colors.darkSecondary }}>
       <RecordingStack.Navigator
-        initialRouteName={routes.sourceFeedScreen}
         screenOptions={{ headerShown: false }}>
         <RecordingStack.Screen initialParams={route.params} name={routes.myRecordingsList} component={RecordingList} />
         <RecordingStack.Screen name={routes.myRecordingsAddEdit} component={RecordingAddEdit} />

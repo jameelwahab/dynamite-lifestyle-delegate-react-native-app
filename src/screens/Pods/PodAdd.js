@@ -272,14 +272,14 @@ const PodAdd = ({ navigation, route }) => {
           <View style={__styles.radioView}>
             <View style={__styles.radioItem}>
               <MyCheckBox
-                title='Yes'
+                title='Active'
                 onPress={() => setCred({ status: true })}
                 value={status}
               />
             </View>
             <View style={__styles.radioItem}>
               <MyCheckBox
-                title='No'
+                title='Inactive'
                 onPress={() => setCred({ status: false })}
                 value={!status}
               />

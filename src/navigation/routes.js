@@ -31,7 +31,8 @@ const routes = {
   dynamitePodNavigator: "DYNAMITE_POD_NAVIGATOR",
   bookcallPodNavigator: "BOOKCALL_POD_NAVIGATOR",
   myRecordingNavigator: "MY_RECORDING_NAVIGATOR",
-  vaultNavigator: "Vault_NAVIGATOR",
+  vaultNavigator: "VAULT_NAVIGATOR",
+  assessmentNavigator: "ASSESSMENT_NAVIGATOR",
 
   //! ///    Screens'
   login: "LOGIN_SCREEN",
@@ -191,6 +192,12 @@ const routes = {
 
   //? Vault
   vaultList: "VAULT_LIST_SCREEN",
+
+  //? Assessment
+  assessmentList: "ASSESSMENT_LIST_SCREEN",
+  assessmentDetail: "ASSESSMENT_DETAIL_SCREEN",
+  assessmentNotesList: "ASSESSMENT_NOTES_LIST_SCREEN",
+  assessmentNotesAddEdit: "ASSESSMENT_NOTES_ADD_EDIT_SCREEN",
 }
 
 export default routes;

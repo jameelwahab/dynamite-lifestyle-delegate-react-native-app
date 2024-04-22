@@ -28,6 +28,7 @@ import StackSourcePod from "../NestedStacks/StackSourcePods";
 import StackBookCallPod from "../NestedStacks/StackBookCallPods";
 import StackRecordings from "../NestedStacks/StackRecordings";
 import StackVault from "../NestedStacks/StackVault";
+import StackAssessment from "../NestedStacks/StackAssessment";
 
 export const drawerMenuList = [
   {
@@ -334,6 +335,11 @@ export const ParentComponents = {
     key: routes.vaultNavigator,
     component: StackVault,
     params: { key: "your_vault" }
+  },
+  attitude_assessment: {
+    key: routes.assessmentNavigator,
+    component: StackAssessment,
+    params: { key: "attitude_assessment" }
   },
 }
 

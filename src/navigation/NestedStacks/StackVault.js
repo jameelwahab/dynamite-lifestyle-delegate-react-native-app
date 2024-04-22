@@ -6,9 +6,6 @@ import routes from '../routes'
 import { defaultScreens } from './defaultScreens'
 import { colors } from '../../utilities/colors'
 
-import RecordingList from '../../screens/Recordings/RecordingList'
-import RecordingAddEdit from '../../screens/Recordings/RecordingAddEdit'
-import RecordingDetail from '../../screens/Recordings/RecordingDetail'
 import VaultList from '../../screens/Vault/VaultList'
 
 
@@ -21,7 +18,6 @@ const StackVault = ({ route }) => {
   return (
     <View style={{ flex: 1, backgroundColor: colors.darkSecondary }}>
       <VaultStack.Navigator
-        initialRouteName={routes.sourceFeedScreen}
         screenOptions={{ headerShown: false }}>
         <VaultStack.Screen initialParams={route.params} name={routes.vaultList} component={VaultList} />
 

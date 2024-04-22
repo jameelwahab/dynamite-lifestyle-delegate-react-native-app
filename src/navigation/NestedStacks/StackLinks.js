@@ -18,7 +18,6 @@ const StackLinks = ({ route }) => {
   return (
     <View style={{ flex: 1, backgroundColor: colors.darkSecondary }}>
       <LinksStack.Navigator
-        initialRouteName={routes.sourceFeedScreen}
         screenOptions={{ headerShown: false }}>
         <LinksStack.Screen initialParams={route.params} name={routes.linksListing} component={LinksList} />
         

@@ -20,7 +20,6 @@ const StackMembersAnswer = ({ route }) => {
   return (
     <View style={{ flex: 1, backgroundColor: colors.darkSecondary }}>
       <MemberAnswersStack.Navigator
-        initialRouteName={routes.sourceFeedScreen}
         screenOptions={{ headerShown: false }}>
         <MemberAnswersStack.Screen initialParams={route.params} name={routes.memberAnswersList} component={List} />
         <MemberAnswersStack.Screen name={routes.memberAnswersFilter} component={Filter} />
