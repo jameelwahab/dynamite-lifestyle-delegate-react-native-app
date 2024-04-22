@@ -29,7 +29,7 @@ const Configurations = ({ navigation, route }) => {
   const ref_calendar = useRef();
   const ref_scroller = useRef();
   const { navbar } = useSelector(selectNavbar);
-  const title = useState(navbar?.find(x => x.value == parentKey)?.child_options?.find(y => y.value == key)?.title);
+  const [title] = useState(navbar?.find(x => x.value == parentKey)?.child_options?.find(y => y.value == key)?.title);
   const { token } = useSelector(selectUser);
   const [list, setList] = useState([]);
   const [loader, setLoader] = useState(true);

@@ -174,8 +174,6 @@ const PodDetail = ({ navigation, route }) => {
   }
 
   const renderScene1 = ({ route, }) => {
-
-
     switch (route.key) {
       case 'grplist':
         return <GrpList list={searchInListGrp(pod?.room_groups)} loader={loader} />
@@ -240,14 +238,14 @@ export default PodDetail
 
 
 const bookCalltabs = [
-  { key: 'zoom', title: 'ZOOM CREDENTIAL', index: 0 },
+  { key: 'zoom', title: 'ZOOM CREDENTIALS', index: 0 },
   { key: 'members', title: 'INDIVIDUAL MEMBER', index: 1 },
 
 ]
 
 const podtabs = [
   { key: 'grplist', title: 'GROUP LIST', index: 0 },
-  { key: 'zoom', title: 'ZOOM CREDENTIAL', index: 1 },
+  { key: 'zoom', title: 'ZOOM CREDENTIALS', index: 1 },
   { key: 'members', title: 'INDIVIDUAL MEMBER', index: 2 },
   { key: 'users', title: 'ROOM USERS', index: 3 },
 ]

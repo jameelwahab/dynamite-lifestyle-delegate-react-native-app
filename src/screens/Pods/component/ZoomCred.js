@@ -6,6 +6,7 @@ import StatView from '../../Members/Components/StatView'
 import openUrl from '../../../functions/openUrl'
 import { icons } from '../../../utilities/icons'
 import EmptyView from '../../../components/EmptyView'
+import { MyButton } from '../../../components/MyButton'
 
 const ZoomCred = ({ list, loader }) => {
   const linkView = (link) => {
@@ -16,7 +17,7 @@ const ZoomCred = ({ list, loader }) => {
         onPress={() => openUrl(link)}>
         {!!link ?
           <>
-            <MyText color={colors.primary} type='medium' >Join </MyText>
+            <MyText color={colors.primary} type='medium' >Click here </MyText>
             {icons.goto(colors.primary, 18)}
           </> :
           <MyText type='medium' >N/A</MyText>
@@ -27,8 +28,7 @@ const ZoomCred = ({ list, loader }) => {
   const itemView = ({ item, index }) => {
     return (
       <View style={__styles.rootView}>
-        <MyText type='medium' >1. </MyText>
-        <StatView title={"Url"} view={() => linkView(item.link)} />
+        <StatView title={"Join Meeting"} view={() => linkView(item.link)} />
         <StatView title={"Password"} value={!!item?.password ? item?.password : "N/A"} />
       </View>
     )
@@ -36,12 +36,13 @@ const ZoomCred = ({ list, loader }) => {
 
   return (
     <View style={{ flex: 1 }}>
-      <FlatList
-        data={list}
-        renderItem={itemView}
-        showsVerticalScrollIndicator={false}
+      {!loader &&
+        <FlatList
+          data={list}
+          renderItem={itemView}
+          showsVerticalScrollIndicator={false}
         // ListEmptyComponent={!loader && <EmptyView />}
-      />
+        />}
     </View>
   )
 }
@@ -53,5 +54,6 @@ const __styles = StyleSheet.create({
     marginHorizontal: 10, marginTop: 10,
     backgroundColor: colors.secondary, borderRadius: 10,
     padding: 10,
+    // flexDirection:"row"
   }
 })

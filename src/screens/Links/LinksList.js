@@ -21,7 +21,7 @@ const LinksList = ({ navigation, route }) => {
   const { key } = route?.params;
   const { navbar } = useSelector(selectNavbar);
   const { token, user } = useSelector(selectUser);
-  const title = useState(navbar?.find(x => x.value == key)?.title);
+  const [title] = useState(navbar?.find(x => x.value == key)?.title);
   const [list, setList] = useState([]);
   const [loader, setLoader] = useState(true);
   const [affiliate, setAffiliate] = useState(null)

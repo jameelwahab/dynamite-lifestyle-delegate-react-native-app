@@ -6766,7 +6766,7 @@ react-native-ratings@^8.1.0:
   dependencies:
     lodash "^4.17.15"
 
-react-native-reanimated@2.17.0:
+react-native-reanimated@^2.17.0:
   version "2.17.0"
   resolved "https://registry.yarnpkg.com/react-native-reanimated/-/react-native-reanimated-2.17.0.tgz#eae2308235961cdd79810e01dfdd7e88b1ae5b5c"
   integrity sha512-bVy+FUEaHXq4i+aPPqzGeor1rG4scgVNBbBz21ohvC7iMpB9IIgvGsmy1FAoodZhZ5sa3EPF67Rcec76F1PXlQ==
@@ -6899,6 +6899,11 @@ react-native-video@^6.0.0-beta.6:
   version "6.0.0-beta.6"
   resolved "https://registry.yarnpkg.com/react-native-video/-/react-native-video-6.0.0-beta.6.tgz#6529f44b779d85f3fa1ac6a70dc81716701ee792"
   integrity sha512-uVfDfZ8N7mL1wdeN7/6GTSYhVXk3k2LLBlKaSJznwxtLx+yDxfGuNNRsYzkjHyvtz9XUswy+16pdHPaebV4hHA==
+
+react-native-vimeo-iframe@^1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/react-native-vimeo-iframe/-/react-native-vimeo-iframe-1.2.1.tgz#e1f11350cd6c906dda0cc5ad1320988e38e0de07"
+  integrity sha512-+LBbjSpzn5z6Olx41pOk3n2bq1t8KWJKjHwdVIxUUGdijr+cOvDhS3IKErtwmPdnzLTpB2YdRmMFoUwV2X17Vw==
 
 react-native-webview@^13.6.2:
   version "13.6.2"

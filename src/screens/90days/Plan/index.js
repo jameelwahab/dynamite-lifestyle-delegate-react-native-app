@@ -12,7 +12,7 @@ const _90daysPlan = ({ navigation, route }) => {
   console.log(type,"type")
   const { navbar } = useSelector(selectNavbar);
   const { token } = useSelector(selectUser);
-  const title = useState(navbar?.find(x => x.value == parentKey)?.child_options?.find(y => y.value == key)?.title);
+  const [title] = useState(navbar?.find(x => x.value == parentKey)?.child_options?.find(y => y.value == key)?.title);
 
   return (
     <RootView

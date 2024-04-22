@@ -26,6 +26,8 @@ import Stack90DaysTracker from "../NestedStacks/Stack90DaysTracker";
 import StackDynamitePod from "../NestedStacks/StackDynamitePods";
 import StackSourcePod from "../NestedStacks/StackSourcePods";
 import StackBookCallPod from "../NestedStacks/StackBookCallPods";
+import StackRecordings from "../NestedStacks/StackRecordings";
+import StackVault from "../NestedStacks/StackVault";
 
 export const drawerMenuList = [
   {
@@ -322,6 +324,16 @@ export const ParentComponents = {
     key: routes.dynamitePodNavigator,
     component: StackDynamitePod,
     params: { key: "dynamite_pods" }
+  },
+  your_recordings: {
+    key: routes.myRecordingNavigator,
+    component: StackRecordings,
+    params: { key: "your_recordings" }
+  },
+  your_vault: {
+    key: routes.vaultNavigator,
+    component: StackVault,
+    params: { key: "your_vault" }
   },
 }
 

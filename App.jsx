@@ -18,8 +18,8 @@ import notifee, { AndroidImportance } from '@notifee/react-native';
 
 
 const toastConfig = {
-  success: props => <SuccessToast {...props} text2NumberOfLines={2} />,
-  error: props => <ErrorToast {...props} text2NumberOfLines={2} />,
+  success: props => <SuccessToast {...props} text1NumberOfLines={2} text2NumberOfLines={2} />,
+  error: props => <ErrorToast {...props} text1NumberOfLines={2} text2NumberOfLines={2} />,
 };
 
 const App = () => {

@@ -69,7 +69,7 @@ const AudioPlayer = ({ stop = "", url,  }) => {
 
   const load = async () => {
     await TrackPlayer.add({
-      id: index,
+      id: "1",
       url: !!url.uri ? url.uri : S3_URL + url,
       title: "",
       artist: "",

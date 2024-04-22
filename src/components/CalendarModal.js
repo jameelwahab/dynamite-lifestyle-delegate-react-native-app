@@ -11,7 +11,6 @@ import { icons } from '../utilities/icons'
 import MyText from './MyText'
 import Yearlist from '../assets/data/yearlist.json'
 const CalendarModal = forwardRef(({ onDateSelected, minimum }, ref) => {
-  console.log(minimum,"minimum")
   const flatlistRef = useRef()
   const [isVisible, setIsVisible] = useState(false)
   const [date, setDate] = useState(moment().format("YYYY-MM-DD"));
@@ -26,7 +25,6 @@ const CalendarModal = forwardRef(({ onDateSelected, minimum }, ref) => {
   }, [])
 
   const openModal = (date, type = "", minimimDate = undefined) => {
-    console.log(minimimDate,"minimimDate")
     setDate(!!date ? moment(date).format("YYYY-MM-DD") : moment().format("YYYY-MM-DD"));
     setType(type);
     if(!!minimimDate && !minimum){

@@ -20,7 +20,7 @@ const DynamitePods = ({ navigation, route }) => {
   const { key } = route?.params
   const { token } = useSelector(selectUser);
   const { navbar } = useSelector(selectNavbar);
-  const title = useState(navbar?.find(x => x.value == key)?.title);
+  const [title] = useState(navbar?.find(x => x.value == key)?.title);
   const [list, setList] = useState([]);
   const [loader, setLoader] = useState(true);
   const [searchText, setSearchText] = useState("")
@@ -73,7 +73,7 @@ const DynamitePods = ({ navigation, route }) => {
         style={__styles.itemView}>
         <View style={{}}>
           <ResponsiveImage2
-            uri={S3_URL + item?.room_image?.thumbnail_1}
+            uri={S3_URL + item?.room_image?.thumbnail_2}
             width={utilities.screenWidth() - 20}
           />
 

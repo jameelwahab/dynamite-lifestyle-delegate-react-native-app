@@ -26,17 +26,6 @@ const WebPlayer = ({ url, width, height, borderRadius }) => {
       {!!url &&
         <WebView
           ref={player}
-          // onMessage={(event) => {
-          //   if (!!event.nativeEvent.data) {
-          //     let data = JSON.parse(event.nativeEvent.data);
-          //     if (data?.type == "onProgress") {
-          //       this.played = data?.playedSeconds
-          //     }
-          //     if (data?.type == "onPause") {
-          //       this.onPause?.(data)
-          //     }
-          //   }
-          // }}
           id={url}
           cacheEnabled={false}
           startInLoadingState={true}

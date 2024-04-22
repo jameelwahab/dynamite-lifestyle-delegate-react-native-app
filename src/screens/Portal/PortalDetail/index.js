@@ -91,7 +91,9 @@ const PortalDetail = (props) => {
       <>
         <View style={{ marginTop: 10 }}>
           {!!event?.feature_video && event?.feature_video?.video_type == "audio" && event?.feature_video?.audio_file_url &&
-            <AudioPlayerForList url={event?.feature_video?.audio_file_url} id={event?.feature_video?._id} />
+            <AudioPlayerForList
+              url={event?.feature_video?.audio_file_url}
+              id={event?.feature_video?._id} />
           }
         </View>
         <View style={__style.bannerImagesView}>

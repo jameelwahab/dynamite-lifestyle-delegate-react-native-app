@@ -32,7 +32,7 @@ import numFormatter from '../../../functions/numFormatter'
 const _90daysTracker = ({ navigation, route }) => {
   const { key, parentKey } = route?.params
   const { navbar } = useSelector(selectNavbar);
-  const title = useState(navbar?.find(x => x.value == parentKey)?.child_options?.find(y => y.value == key)?.title);
+  const [title] = useState(navbar?.find(x => x.value == parentKey)?.child_options?.find(y => y.value == key)?.title);
   const ref_calendar = useRef();
   const { token } = useSelector(selectUser);
   const [loader, setLoader] = useState(true);

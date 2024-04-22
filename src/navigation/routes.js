@@ -30,6 +30,8 @@ const routes = {
   sourcePodNavigator: "SOURCE_POD_NAVIGATOR",
   dynamitePodNavigator: "DYNAMITE_POD_NAVIGATOR",
   bookcallPodNavigator: "BOOKCALL_POD_NAVIGATOR",
+  myRecordingNavigator: "MY_RECORDING_NAVIGATOR",
+  vaultNavigator: "Vault_NAVIGATOR",
 
   //! ///    Screens'
   login: "LOGIN_SCREEN",
@@ -182,6 +184,13 @@ const routes = {
   dynamitePodScreen: "DYNAMITE_POD_SCREEN",
   dynamitePodDetailScreen: "DYNITE_POD_DETAIL_SCREEN",
 
+  //? My Recordings
+  myRecordingsList: "MY_RECORDINGS_LIST_SCREEN",
+  myRecordingsAddEdit: "MY_RECORDINGS_ADD_EDIT_SCREEN",
+  myRecordingsDetail: "MY_RECORDING_DETAIL_SCREEN",
+
+  //? Vault
+  vaultList: "VAULT_LIST_SCREEN",
 }
 
 export default routes;

@@ -41,7 +41,7 @@ const Listing = ({ navigation, route }) => {
   const isBookCall = type == "booking";
   const { navbar } = useSelector(selectNavbar);
   const { token } = useSelector(selectUser);
-  const title = useState(navbar?.find(x => x.value == parentKey)?.child_options?.find(y => y.value == key)?.title);
+  const [title] = useState(navbar?.find(x => x.value == parentKey)?.child_options?.find(y => y.value == key)?.title);
   const [list, setList] = useState([]);
   const [loader, setLoader] = useState(false);
   const [total, setTotal] = useState(0);
@@ -378,7 +378,9 @@ const __styles = StyleSheet.create({
   menuBtn: {
     position: "absolute",
     top: 5,
-    right: 5
+    right: 5,
+    zIndex:1
+    // alignSelf:"flex-end"
   },
   headerView: {
     flexDirection: "row",
