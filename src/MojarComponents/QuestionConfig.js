@@ -214,6 +214,7 @@ const QuestionConfig = ({
       <View >
         {item.options.map((item2, index2) => (
           <MyCheckBox
+            key={"RadioBtnOptions" + index2}
             title={item2}
             circle
             value={getAnswers(item) == item2}
@@ -233,6 +234,7 @@ const QuestionConfig = ({
       <View >
         {item.options.map((item2, index2) => (
           <MyCheckBox
+            key={"checkboxOptions" + index2}
             title={item2}
             value={!!getAnswers(item)?.find(x => x == item2)}
             onPress={() => AnswerTheQuestions(item, item2)}

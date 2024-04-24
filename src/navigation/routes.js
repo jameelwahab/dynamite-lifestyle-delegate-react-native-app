@@ -34,6 +34,7 @@ const routes = {
   vaultNavigator: "VAULT_NAVIGATOR",
   assessmentNavigator: "ASSESSMENT_NAVIGATOR",
   progressNavigator: "PROGRESS_NAVIGATOR",
+  studyAssessmentNavigator: "STUDY_ASSESSMENT_NAVIGATOR",
 
   //! ///    Screens'
   login: "LOGIN_SCREEN",
@@ -206,6 +207,11 @@ const routes = {
   progresssAddEdit: "PROGRESS_ADD_EDIT_SCREEN",
   progresssNotesList: "PROGRESS_NOTES_LIST_SCREEN",
   progresssAddNote: "PROGRESS_ADD_NOTE_SCREEN",
+
+
+  //? Study Assessment
+  studyAssessmentList: "STUDY_ASSESSMENT_LIST_SCREEN",
+  studyAssessmentQuestionList: "STUDY_ASSESSMENT_QUESTION_SCREEN",
 
 }
 

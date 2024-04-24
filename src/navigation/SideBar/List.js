@@ -30,6 +30,7 @@ import StackRecordings from "../NestedStacks/StackRecordings";
 import StackVault from "../NestedStacks/StackVault";
 import StackAssessment from "../NestedStacks/StackAssessment";
 import StackProgress from "../NestedStacks/StackProgress";
+import StackStudyAssessment from "../NestedStacks/StackStudyAssessment";
 
 export const drawerMenuList = [
   {
@@ -347,6 +348,11 @@ export const ParentComponents = {
     component: StackProgress,
     params: { key: "progress" }
   },
+  "certification": {
+    key: null,
+    component: null,
+    params: { key: "certification" }
+  },
 }
 
 export const ChildComponents = {
@@ -414,5 +420,10 @@ export const ChildComponents = {
     key: routes.bookcallPodNavigator,
     component: StackBookCallPod,
     params: { key: "book_call_pods", parentKey: "delegate_pods", type: "booking" }
-  }
+  },
+  assessment_study: {
+    key: routes.studyAssessmentNavigator,
+    component: StackStudyAssessment,
+    params: { key: "assessment_study", parentKey: "certification", }
+  },
 }
