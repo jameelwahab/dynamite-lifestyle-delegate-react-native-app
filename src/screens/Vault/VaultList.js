@@ -48,7 +48,8 @@ const VaultList = ({ navigation, route }) => {
             <MyText fontSize={16} type='bold' >{item.title}</MyText>
           </View>
           <View style={{ alignItems: "flex-end" }}>
-            <MyText>{moment(item.upload_date).format(dateTimeFormat.date)}</MyText>
+            <MyText color={colors.lightText} type='medium' >{item?.recording_date}</MyText>
+            {/* <MyText>{moment(item.recording_date).format(dateTimeFormat.date)}</MyText> */}
           </View>
         </View>
         {item?.video_url.includes("vimeo") ?

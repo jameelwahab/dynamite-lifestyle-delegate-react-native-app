@@ -51,7 +51,7 @@ const PodAdd = ({ navigation, route }) => {
     startTime: "00:00",
     hours: hourslist[0],
     minutes: minsList[0],
-    recurrenceType: null,
+    recurrenceType: recurrencelist[1],
     recurrenceDays: [],
     recurrenceEndDate: moment(),
     groups: [],
@@ -171,9 +171,9 @@ const PodAdd = ({ navigation, route }) => {
         startTime: !!room?.start_time ? room?.start_time : "00:00",
         hours: !!room?.duration_hour ? hourslist.find(x => x.key == room?.duration_hour) : hourslist[0],
         minutes: !!room?.duration_minute ? minsList.find(x => x.key == room?.duration_minute) : minsList[0],
-        recurrenceType: !!room ? null : recurrencelist[1],
-        recurrenceDays: [],
-        recurrenceEndDate: moment(),
+        recurrenceType: !!room?.recurring_type ? recurrencelist.find(x => x.key == room?.recurring_type) : recurrencelist[1],
+        recurrenceDays: !!room?.weekdays ? room?.weekdays : [],
+        recurrenceEndDate: !!room?.end_date ? moment(room?.end_date, "YYYY-MM-DD") : moment(),
         groups: !!room?.group ? room?.group.map(x => x._id) : [],
         members: res.room_members,
         logo: !!room?.room_image?.thumbnail_1 ? room?.room_image?.thumbnail_1 : null,
@@ -192,7 +192,6 @@ const PodAdd = ({ navigation, route }) => {
 
   const onSubmit = () => {
     let fd = new FormData();
-    console.log(recurrenceDays, "recurrenceDays")
     fd.append("title", title)
     if (!!logo?.uri) {
       fd.append("image", logo)
@@ -208,6 +207,7 @@ const PodAdd = ({ navigation, route }) => {
     fd.append("duration_hour", hours.key)
     fd.append("duration_minute", minutes.key)
     fd.append("community_level", communityLvl?.key)
+    fd.append("recurring_type", recurrenceType?.key)
     fd.append("weekdays", JSON.stringify(recurrenceDays))
     fd.append("start_date", moment(startDate).format("YYYY-MM-DD"))
     fd.append("end_date", moment(recurrenceEndDate).format("YYYY-MM-DD"))
@@ -343,7 +343,10 @@ const PodAdd = ({ navigation, route }) => {
                   label='Start Date*'
                   icon={() => icons.calendar(colors.primary, 20)}
                   value={moment(startDate).format(dateTimeFormat.date)}
-                  onPress={() => ref_calendar?.current?.openModal(startDate, "startDate", moment().toDate())}
+                  onPress={() => ref_calendar?.current?.openModal(
+                    moment(startDate).isSameOrAfter(moment(), "days") ? startDate : moment(),
+                    "startDate",
+                    moment().toDate())}
                   error={moment(startDate).isBefore(moment(), "day")}
                 />
               </View>
@@ -404,8 +407,15 @@ const PodAdd = ({ navigation, route }) => {
                     label='End Date*'
                     icon={() => icons.calendar(colors.primary, 20)}
                     value={moment(recurrenceEndDate).format(dateTimeFormat.date)}
-                    onPress={() => ref_calendar?.current?.openModal(recurrenceEndDate, "recurrenceEndDate", !!startDate ? moment(startDate).toDate() : moment().toDate())}
-                    error={!!startDate ? moment(recurrenceEndDate).isBefore(moment(startDate), "day") : false}
+                    onPress={() => ref_calendar?.current?.openModal(
+                      moment(recurrenceEndDate).isSameOrAfter(moment(startDate), "day") && moment(recurrenceEndDate).isSameOrAfter(moment(), "day") ? recurrenceEndDate : moment(),
+                      "recurrenceEndDate",
+                      !!startDate && moment(startDate).isSameOrAfter(moment(), "day") ? moment(startDate).toDate() : moment().toDate())}
+                    error={!!startDate ?
+                      moment(recurrenceEndDate).isBefore(moment(), "day") ? true :
+                        moment(recurrenceEndDate).isBefore(moment(startDate), "day") ? true :
+                          false :
+                      false}
                   />
                 </View>
               </View>

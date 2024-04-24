@@ -16,7 +16,8 @@ export default async function invokeApi({
   token = "",
   noAlerts = false,
   navigation = null,
-  excludeBaseURL = false
+  excludeBaseURL = false,
+  showConsole = __DEV__
 }) {
   const reqObj = {
     method,
@@ -41,18 +42,20 @@ export default async function invokeApi({
   }
 
   let results;
-
-  console.log(`<===REQUEST-OBJECT===>\t %c${path} \n`, 'background:#FF0; color: #000', reqObj,);
-
+  if (showConsole) {
+    console.log(`<===REQUEST-OBJECT===>\t %c${path} \n`, 'background:#FF0; color: #000', reqObj,);
+  }
   try {
     results = await axios(reqObj);
-
-    console.log(`<===Api-Success-Result===>\t %c${path} \n`, 'background:#0F0; color: #000', results);
+    if (showConsole) {
+      console.log(`<===Api-Success-Result===>\t %c${path} \n`, 'background:#0F0; color: #000', results);
+    }
     return results.data;
 
   } catch (error) {
-
-    console.log(`<===Api-Error===>\t %c${path} \n`, 'background:#F00; color: #FFF', error);
+    if (showConsole) {
+      console.log(`<===Api-Error===>\t %c${path} \n`, 'background:#F00; color: #FFF', error);
+    }
     if (error.code == 'ERR_NETWORK') {
       if (!noAlerts) {
         showToast({ body: "No Internet Connection", title: "Network Error" });

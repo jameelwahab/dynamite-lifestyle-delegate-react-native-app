@@ -156,14 +156,14 @@ const RecordingAddEdit = ({ navigation, route }) => {
             <View style={__styles.radioView}>
               <View style={__styles.radioItem}>
                 <MyCheckBox
-                  title='Yes'
+                  title='Active'
                   onPress={() => setData({ status: true })}
                   value={status}
                 />
               </View>
               <View style={__styles.radioItem}>
                 <MyCheckBox
-                  title='No'
+                  title='Inactive'
                   onPress={() => setData({ status: false })}
                   value={!status}
                 />

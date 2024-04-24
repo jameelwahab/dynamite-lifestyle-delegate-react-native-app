@@ -26,7 +26,7 @@ export class VimeoIFrame extends Component {
       let res = await invokeApi({
         path: "https://vimeo.com/api/oembed.json?url=" + url,
         excludeBaseURL: true,
-        showConsole: false
+        showConsole: false,
       });
 
 

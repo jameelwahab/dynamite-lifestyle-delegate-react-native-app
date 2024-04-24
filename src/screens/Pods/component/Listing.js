@@ -339,7 +339,7 @@ const Listing = ({ navigation, route }) => {
         isVisible={confirmModal?.isVisible}
         closeModal={() => setConfirmModal({ isVisible: false, item: null })}
         onAgree={onConfirmPress}
-        title={"Are you sure you want to delete this Booking?"}
+        title={"Are you sure you want to delete this Pod?"}
       />
 
     </View>
