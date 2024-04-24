@@ -14,7 +14,7 @@ export const convertTimezone = (dateTime, timezone) => {
 }
 
 export const convertTimezoneFrom = (dateTime, user, admin) => {
-  console.log(dateTime, user, admin,"convertTimezoneFrom")
+  console.log(dateTime, user, admin, "convertTimezoneFrom")
   if (!(!!dateTime)) {
     return moment();
   }

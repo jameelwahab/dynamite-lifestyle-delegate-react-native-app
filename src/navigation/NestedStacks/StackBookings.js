@@ -21,8 +21,7 @@ const BookingsStack = createNativeStackNavigator()
 const StackBookings = ({ route }) => {
   return (
     <View style={{ flex: 1, backgroundColor: colors.darkSecondary }}>
-      <BookingsStack.Navigator
-        initialRouteName={routes.bookingList}
+      <BookingsStack.Navigator initialRouteName={routes.bookingList}
         screenOptions={{ headerShown: false }}>
 
         <BookingsStack.Screen initialParams={route?.params} name={routes.bookingList} component={Bookings} />

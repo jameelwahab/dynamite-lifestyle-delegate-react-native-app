@@ -5,12 +5,12 @@ import { colors } from '../utilities/colors'
 import utilities from '../utilities'
 import MyText from './MyText'
 
-const MyChip = ({ title, onPress }) => {
+const MyChip = ({ title, onPress, isCapitalize = false }) => {
 
   return (
     <View style={__styles.chipView}>
       <View style={{}}>
-        <MyText fontSize={12} color={colors.white} >{title}</MyText>
+        <MyText capitalize={isCapitalize} fontSize={12} color={colors.white} >{title}</MyText>
       </View>
       {!!onPress &&
         <TouchableOpacity
@@ -36,7 +36,7 @@ const __styles = StyleSheet.create({
     alignItems: "center",
     margin: 2,
     maxWidth: utilities.screenWidth() - 40,
-    minHeight:22
+    minHeight: 22
     // marginLeft: 10
   },
   chipBtn: {

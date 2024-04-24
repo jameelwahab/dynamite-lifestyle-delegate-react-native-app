@@ -50,11 +50,11 @@ const TransparentButton = ({
   )
 }
 
-const MenuButton = ({ size = 25, onPress = () => { }, style }) => {
+const MenuButton = ({ size = 25, onPress = () => { }, style, touchgap = 15 }) => {
   return (
     <TouchableOpacity
       onPress={onPress}
-      hitSlop={{ top: 15, left: 15, right: 15, bottom: 15 }}
+      hitSlop={{ top: touchgap, left: touchgap, right: touchgap, bottom: touchgap }}
       style={[{
         height: size, width: size, borderRadius: size / 2, alignItems: "center", justifyContent: "center",
         backgroundColor: colors.lightPrimary3,
@@ -81,7 +81,7 @@ const __MyButtonStyles = StyleSheet.create({
   iconView: {
     // height: 15,
     // aspectRatio: 1,
-    marginRight:5,
+    marginRight: 5,
     alignItems: "center",
     justifyContent: "center",
   },

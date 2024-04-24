@@ -33,6 +33,7 @@ const routes = {
   myRecordingNavigator: "MY_RECORDING_NAVIGATOR",
   vaultNavigator: "VAULT_NAVIGATOR",
   assessmentNavigator: "ASSESSMENT_NAVIGATOR",
+  progressNavigator: "PROGRESS_NAVIGATOR",
 
   //! ///    Screens'
   login: "LOGIN_SCREEN",
@@ -198,6 +199,14 @@ const routes = {
   assessmentDetail: "ASSESSMENT_DETAIL_SCREEN",
   assessmentNotesList: "ASSESSMENT_NOTES_LIST_SCREEN",
   assessmentNotesAddEdit: "ASSESSMENT_NOTES_ADD_EDIT_SCREEN",
+
+  //? Progress
+  progresssList: "PROGRESS_LIST_SCREEN",
+  progresssFilter: "PROGRESS_FILTER_SCREEN",
+  progresssAddEdit: "PROGRESS_ADD_EDIT_SCREEN",
+  progresssNotesList: "PROGRESS_NOTES_LIST_SCREEN",
+  progresssAddNote: "PROGRESS_ADD_NOTE_SCREEN",
+
 }
 
 export default routes;
