@@ -103,7 +103,7 @@ const ProgressFilter = ({ navigation, route }) => {
             {typeList.map((item, index) => {
               return (
                 <MyCheckBox
-                key={"checkbox" + index}
+                  key={"checkbox" + index}
                   pb={15}
                   title={item.title}
                   onPress={() => setFilters({ ...filters, filter_by: item?.key })}
