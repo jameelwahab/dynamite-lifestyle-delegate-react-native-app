@@ -21,6 +21,7 @@ import MyCheckBox from '../../components/MyCheckBox'
 import Editor from '../../components/Editor'
 import UploadFileInput from '../../components/UploadFileInput'
 import { PROGRESS_UPDATE } from '../../DAL/Progress'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 
 const AddProgress = ({ navigation, route }) => {
@@ -141,7 +142,8 @@ const AddProgress = ({ navigation, route }) => {
 
   return (
     <RootView title={!!editableItem ? "Edit Progress" : 'Add New Progress'} >
-      <ScrollView
+      <KeyboardAwareScrollView
+        enableResetScrollToCoords={false}
         contentContainerStyle={{ paddingHorizontal: 10 }}
         showsVerticalScrollIndicator={false}
       >
@@ -161,13 +163,13 @@ const AddProgress = ({ navigation, route }) => {
           value={!!startDate ? moment(startDate).format(dateTimeFormat.date) : ""}
           icon={() => icons.calendar(colors.primary)}
         />
-
-        <MyTouchableInput
-          label='End Date *'
-          onPress={() => ref_calendar?.current?.openModal(endDate, "endDate")}
-          value={!!endDate ? moment(endDate).format(dateTimeFormat.date) : ""}
-          icon={() => icons.calendar(colors.primary)}
-        />
+        {AddType?.key != "daily" &&
+          <MyTouchableInput
+            label='End Date *'
+            onPress={() => ref_calendar?.current?.openModal(endDate, "endDate")}
+            value={!!endDate ? moment(endDate).format(dateTimeFormat.date) : ""}
+            icon={() => icons.calendar(colors.primary)}
+          />}
 
         <MyTouchableInput
           label='Progress Categories *'
@@ -198,7 +200,7 @@ const AddProgress = ({ navigation, route }) => {
           <MyButton title='Save' onPress={onSubmit} />
         </View>
 
-      </ScrollView>
+      </KeyboardAwareScrollView>
 
       <MyLoader enable={loader} />
 

@@ -36,7 +36,7 @@ const RecordingAddEdit = ({ navigation, route }) => {
     title: !!item?.title ? item?.title : "",
     date: !!item?.recording_date ? moment(item?.recording_date, "DD MMM, YYYY") : moment(),
     videoUrl: !!item?.video_url ? item?.video_url : "",
-    status: !!!item?.status ? false : true,
+    status: typeof (item?.status) == "boolean" ? item?.status : true,
     programme: !!item?.program ? item?.program : null,
     category: !!item?.vault_category ? item?.vault_category : null,
     audio: !!item?.audio_recording ? item?.audio_recording : null,

@@ -249,6 +249,14 @@ const Editor = ({
                 androidLayerType="hardware"
                 androidHardwareAccelerationDisabled
                 scrollEnabled={true}
+                enterKeyHint="done"
+                // onSin
+                onKeyDown={(data) => {
+                  if (data?.keyCode == 13) {
+                    RichText?.current?.dismissKeyboard()
+
+                  }
+                }}
               />
             </ScrollView>
 
