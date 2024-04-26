@@ -35,6 +35,9 @@ const routes = {
   assessmentNavigator: "ASSESSMENT_NAVIGATOR",
   progressNavigator: "PROGRESS_NAVIGATOR",
   studyAssessmentNavigator: "STUDY_ASSESSMENT_NAVIGATOR",
+  goalStatementCompleteNavigator: "GOAL_STATEMENT_COMPLETE_NAVIGATOR",
+  goalStatementIncompleteNavigator: "GOAL_STATEMENT_INCOMPLETE_NAVIGATOR",
+  goalStatementResponedNavigator: "GOAL_STATEMENT_RESPONDED_NAVIGATOR",
 
   //! ///    Screens'
   login: "LOGIN_SCREEN",
@@ -213,6 +216,11 @@ const routes = {
   studyAssessmentList: "STUDY_ASSESSMENT_LIST_SCREEN",
   studyAssessmentQuestionList: "STUDY_ASSESSMENT_QUESTION_SCREEN",
 
+  //? Goal Statement
+  goalStatementCompleteScreen: "GOAL_STATEMENT_COMPLETE_SCREEN",
+  goalStatementIncompleteScreen: "GOAL_STATEMENT_INCOMPLETE_SCREEN",
+  goalStatementResponedScreen: "GOAL_STATEMENT_RESPONDED_SCREEN",
+  goalStatmentDetail: "GOAL_STATEMENT_DETAIL_SCREEN",
 }
 
 export default routes;

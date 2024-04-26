@@ -242,7 +242,7 @@ const Editor = ({
                 }}
                 selectedIconTint={colors.primary}
                 iconTint={colors.primary}
-                initialContentHTML={`<div>${initialValue}</div>`}
+                initialContentHTML={!!initialValue ? `<div>${initialValue}</div>` : ""}
                 useContainer={true}
                 placeholder={'Type a message...'}
                 onChange={text => onChange(text)}
@@ -315,7 +315,7 @@ const Editor = ({
               // ),
               ["newline"]: ({ tintColor }) => (
                 <TouchableOpacity
-                   onPress={() => {RichText?.current?.insertHTML("<br/>")}}
+                  onPress={() => { RichText?.current?.insertHTML("<br/>") }}
                   style={{ alignItems: "center", marginBottom: -1 }}>
                   {icons.reply(tintColor, 20)}
                 </TouchableOpacity>

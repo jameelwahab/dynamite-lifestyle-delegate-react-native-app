@@ -31,6 +31,9 @@ import StackVault from "../NestedStacks/StackVault";
 import StackAssessment from "../NestedStacks/StackAssessment";
 import StackProgress from "../NestedStacks/StackProgress";
 import StackStudyAssessment from "../NestedStacks/StackStudyAssessment";
+import StackGoalStatementCompleted from "../NestedStacks/StackGoalStatementCompleted";
+import StackGoalStatementIncompleted from "../NestedStacks/StackGoalStatementIncompleted";
+import StackGoalStatementResponded from "../NestedStacks/StackGoalStatementResponded";
 
 export const drawerMenuList = [
   {
@@ -353,6 +356,11 @@ export const ParentComponents = {
     component: null,
     params: { key: "certification" }
   },
+  "member_goal_statement": {
+    key: null,
+    component: null,
+    params: { key: "member_goal_statement" }
+  },
 }
 
 export const ChildComponents = {
@@ -425,5 +433,20 @@ export const ChildComponents = {
     key: routes.studyAssessmentNavigator,
     component: StackStudyAssessment,
     params: { key: "assessment_study", parentKey: "certification", }
+  },
+  "complete": {
+    key: routes.goalStatementCompleteNavigator,
+    component: StackGoalStatementCompleted,
+    params: { key: "complete", parentKey: "member_goal_statement", type: "complete" }
+  },
+  "incomplete": {
+    key: routes.goalStatementIncompleteNavigator,
+    component: StackGoalStatementIncompleted,
+    params: { key: "incomplete", parentKey: "member_goal_statement", type: "incomplete" }
+  },
+  "responded": {
+    key: routes.goalStatementResponedNavigator,
+    component: StackGoalStatementResponded,
+    params: { key: "responded", parentKey: "member_goal_statement", type: "responded" }
   },
 }
