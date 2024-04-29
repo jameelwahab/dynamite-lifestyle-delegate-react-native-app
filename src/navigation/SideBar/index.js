@@ -259,7 +259,6 @@ const index = (props) => {
   }
 
   const nestedOptionView = (item, index, parentItem) => {
-    console.log(props)
     if (!!ChildComponents[item._id]) {
       let isSelected = ChildComponents[item._id].key == props.state.routeNames[props.state.index]
       return (

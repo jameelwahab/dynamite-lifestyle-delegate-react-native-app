@@ -42,7 +42,7 @@ const ProgressList = ({ navigation, route }) => {
   const { key } = route.params
   const { navbar } = useSelector(selectNavbar);
   const { user, token } = useSelector(selectUser);
-  const [title] = useState(navbar?.find(x => x.value == key)?.title);
+  const [title] = useState(navbar?.find(x => x._id == key)?.title);
   const [list, setList] = useState([]);
   const [loader, setLoader] = useState(false);
   const [total, setTotal] = useState(0);

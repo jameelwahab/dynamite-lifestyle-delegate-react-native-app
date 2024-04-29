@@ -37,6 +37,8 @@ import StackGoalStatementResponded from "../NestedStacks/StackGoalStatementRespo
 import StackSelfImageCompleted from "../NestedStacks/StackSelfImgeCompleted";
 import StackSelfImageIncomplete from "../NestedStacks/StackSelfImgeIncomplete";
 import StackSelfImageResponded from "../NestedStacks/StackSelfImgeResponded";
+import StackDigitalAssets from "../NestedStacks/StackDigitalAsset";
+import StackHelpTech from "../NestedStacks/StackHelpTech";
 
 export const drawerMenuList = [
   {
@@ -458,6 +460,24 @@ export const ChildComponents = {
     params: {
       value: "contact_support", parentValue: "support",
       key: "26ddb8b0-31d9-4154-b3a9-81619fd1b49c",
+      parentKey: "c351eb22-6d51-4187-9111-f05872a6d4b8",
+    }
+  },
+  "96eadc59-d4a6-44f3-b99e-14a87136de90": {
+    key: routes.digitalAssetNavigator,
+    component: StackDigitalAssets,
+    params: {
+      value: "digital_assets", parentValue: "support",
+      key: "96eadc59-d4a6-44f3-b99e-14a87136de90",
+      parentKey: "c351eb22-6d51-4187-9111-f05872a6d4b8",
+    }
+  },
+  "50dc0ed7-7b87-4955-b1ad-13cb8a2fd52b": {
+    key: routes.helpTechNavigator,
+    component: StackHelpTech,
+    params: {
+      value: "help_tech", parentValue: "support",
+      key: "50dc0ed7-7b87-4955-b1ad-13cb8a2fd52b",
       parentKey: "c351eb22-6d51-4187-9111-f05872a6d4b8",
     }
   },

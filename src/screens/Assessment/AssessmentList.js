@@ -38,7 +38,7 @@ const Bookings = ({ navigation, route }) => {
   const { navbar } = useSelector(selectNavbar);
   const { token } = useSelector(selectUser);
   const timezone = useSelector(selectTimeZone)
-  const [title] = useState(navbar?.find(x => x.value == key)?.title);
+  const [title] = useState(navbar?.find(x => x._id == key)?.title);
   const [list, setList] = useState([]);
   const [loader, setLoader] = useState(false);
   const [total, setTotal] = useState(0);

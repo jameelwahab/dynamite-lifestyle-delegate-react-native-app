@@ -41,6 +41,8 @@ const routes = {
   selfImageCompleteNavigator: "SELF_IMAGE_COMPLETE_NAVIGATOR",
   selfImageIncompleteNavigator: "SELF_IMAGE_INCOMPLETE_NAVIGATOR",
   selfImageResponedNavigator: "SELF_IMAGE_RESPONDED_NAVIGATOR",
+  digitalAssetNavigator: "DIGITAL_ASSET_NAVIGATOR",
+  helpTechNavigator: "HELP_TECH_NAVIGATOR",
 
 
   //! ///    Screens'
@@ -233,6 +235,14 @@ const routes = {
   selfImageResponedScreen: "SELF_IMAGE_RESPONDED_SCREEN",
   selfImageDetail: "SELF_IMAGE_DETAIL_SCREEN",
   selfImageAddReply: "SELF_IMAGE_DETAIL_ADD_REPLY_SCREEN",
+
+  //? Help tech
+  helptechListScreen: "HELP_TECH_LIST_SCREEN",
+  helptechDetailScreen: "HELP_TECH_DETAIL_SCREEN",
+
+  //? Digitall Assets
+  digitalAssetCategoryListScreen: "DIGITALL_ASSETMENT_CATEGORY_LIST_SCREEN",
+  digitalAssetByCategoryScreen: "DIGITALL_ASSETMENT_LIST_BY_CATEGORY_SCREEN",
 }
 
 export default routes;

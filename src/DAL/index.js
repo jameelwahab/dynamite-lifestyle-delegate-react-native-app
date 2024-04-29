@@ -97,3 +97,5 @@ export {
 } from './GoalStatement'
 
 export { SELF_IMAGE_INCOMPLETE, SELF_IMAGE_SAVE_AND_CLOSE } from './SelfImage'
+export { GET_ASSETS_CATEGORY_LIST, GET_ASSETS_LIST_BY_CATEGORY } from './DigitalAssets';
+export { GET_TECH_CATEGORY_LIST } from './HelpTech';

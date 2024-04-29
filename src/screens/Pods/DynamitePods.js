@@ -20,7 +20,7 @@ const DynamitePods = ({ navigation, route }) => {
   const { key } = route?.params
   const { token } = useSelector(selectUser);
   const { navbar } = useSelector(selectNavbar);
-  const [title] = useState(navbar?.find(x => x.value == key)?.title);
+  const [title] = useState(navbar?.find(x => x._id == key)?.title);
   const [list, setList] = useState([]);
   const [loader, setLoader] = useState(true);
   const [searchText, setSearchText] = useState("")

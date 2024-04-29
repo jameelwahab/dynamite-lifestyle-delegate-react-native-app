@@ -22,7 +22,7 @@ const PortalListing = ({ navigation, route }) => {
   const isDelegatePortals = key == "my_portals";
   const { navbar } = useSelector(selectNavbar);
   const { token } = useSelector(selectUser);
-  const [title] = useState(navbar?.find(x => x.value == key)?.title);
+  const [title] = useState(navbar?.find(x => x._id == key)?.title);
   const [loader, setLoader] = useState(true);
   const [list, setList] = useState([])
   const [optionModal, setOptionModal] = useState({
