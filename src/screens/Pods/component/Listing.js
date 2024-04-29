@@ -41,7 +41,7 @@ const Listing = ({ navigation, route }) => {
   const isBookCall = type == "booking";
   const { navbar } = useSelector(selectNavbar);
   const { token } = useSelector(selectUser);
-  const [title] = useState(navbar?.find(x => x.value == parentKey)?.child_options?.find(y => y.value == key)?.title);
+  const [title] = useState(navbar?.find(x => x._id == parentKey)?.child_options?.find(y => y._id == key)?.title);
   const [list, setList] = useState([]);
   const [loader, setLoader] = useState(false);
   const [total, setTotal] = useState(0);

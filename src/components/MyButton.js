@@ -13,7 +13,8 @@ const MyButton = ({
   style = {},
   textStyle = {},
   leftIcon = null,
-  noSpace = false
+  noSpace = false,
+  noCapitalize = false,
 }) => {
   return (
     <TouchableOpacity
@@ -24,7 +25,9 @@ const MyButton = ({
           {typeof (leftIcon) == "function" ? leftIcon() :
             <Image source={leftIcon} style={{ height: 17, width: 17, tintColor: colors.primary }} />}
         </View>}
-      <Text style={[invert ? __MyButtonStyles.invertTitleText : __MyButtonStyles.titleText, textStyle]}>{title}</Text>
+      <Text style={[invert ? __MyButtonStyles.invertTitleText : __MyButtonStyles.titleText, textStyle,
+      { textTransform: noCapitalize ? "none" : "uppercase" }
+      ]}>{title}</Text>
       {!!leftIcon && noSpace == false &&
         <View style={__MyButtonStyles.iconView} />}
     </TouchableOpacity>
@@ -113,7 +116,7 @@ const __MyButtonStyles = StyleSheet.create({
     fontFamily: fonts.medium,
     includeFontPadding: false,
     fontSize: 16,
-    textTransform: "uppercase"
+
   }
 })
 

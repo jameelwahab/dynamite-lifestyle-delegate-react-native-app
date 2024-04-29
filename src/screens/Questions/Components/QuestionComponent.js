@@ -19,7 +19,7 @@ import openUrl from '../../../functions/openUrl'
 import { S3_URL } from '../../../utilities/constants'
 
 
-const QuestionComponent = ({ item, index }) => {
+const QuestionComponent = ({ item, index, showRepliesbtns = false, onShowReplyPress, onRelpyBtnPress }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const findCollapsed = (id) => {
@@ -112,6 +112,27 @@ const QuestionComponent = ({ item, index }) => {
     )
   }
 
+
+  const repliesBtns = (item) => {
+    return (
+      <View style={__styles.btnView}>
+        <MyButton
+          onPress={() => onRelpyBtnPress?.(item)}
+          invert={true}
+          title={`Replies (${Array.isArray(item?.answer?.comments) ? item?.answer?.comments?.length : 0})`}
+          style={__styles.btn}
+          noCapitalize
+        />
+
+        <MyCheckBox
+          title='Show Replies to Client'
+          onPress={() => onShowReplyPress?.(item)}
+          pb={0}
+          value={!!item?.answer?.show_replies}
+        />
+      </View>)
+  }
+
   return (
     <View style={{ backgroundColor: colors.secondary, padding: 10, marginTop: 10, borderRadius: 10 }}>
       <Pressable
@@ -159,6 +180,7 @@ const QuestionComponent = ({ item, index }) => {
                 invert title='View Document' />
             </View>
           )}
+          {showRepliesbtns && repliesBtns(item)}
         </Collapsible>
       </View>
     </View>
@@ -180,6 +202,16 @@ const __styles = StyleSheet.create({
     textTransform: "capitalize",
     textDecorationLine: "underline",
     textDecorationColor: colors.primary
+  },
+  btnView: {
+    marginTop: 10,
+    flexDirection: "row",
+    alignItems: "center"
+  },
+  btn: {
+    paddingHorizontal: 10,
+    height: 35,
+    marginRight: 20
   }
 })
 

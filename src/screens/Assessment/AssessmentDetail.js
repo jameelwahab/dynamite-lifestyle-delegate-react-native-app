@@ -34,6 +34,7 @@ const AssessmentDetail = ({ navigation, route }) => {
       })
     }
   }
+
   const renderTabBar = props => (
 
     <TabBar
@@ -71,8 +72,6 @@ const AssessmentDetail = ({ navigation, route }) => {
       case 'action':
         return <Ratinglist list={item?.assessment_results?.action_result} />
     }
-
-
   }
 
   const topView = () => {

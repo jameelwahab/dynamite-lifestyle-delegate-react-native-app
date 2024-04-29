@@ -38,6 +38,10 @@ const routes = {
   goalStatementCompleteNavigator: "GOAL_STATEMENT_COMPLETE_NAVIGATOR",
   goalStatementIncompleteNavigator: "GOAL_STATEMENT_INCOMPLETE_NAVIGATOR",
   goalStatementResponedNavigator: "GOAL_STATEMENT_RESPONDED_NAVIGATOR",
+  selfImageCompleteNavigator: "SELF_IMAGE_COMPLETE_NAVIGATOR",
+  selfImageIncompleteNavigator: "SELF_IMAGE_INCOMPLETE_NAVIGATOR",
+  selfImageResponedNavigator: "SELF_IMAGE_RESPONDED_NAVIGATOR",
+
 
   //! ///    Screens'
   login: "LOGIN_SCREEN",
@@ -221,6 +225,14 @@ const routes = {
   goalStatementIncompleteScreen: "GOAL_STATEMENT_INCOMPLETE_SCREEN",
   goalStatementResponedScreen: "GOAL_STATEMENT_RESPONDED_SCREEN",
   goalStatmentDetail: "GOAL_STATEMENT_DETAIL_SCREEN",
+
+
+  //? Self Image
+  selfImageCompleteScreen: "SELF_IMAGE_COMPLETE_SCREEN",
+  selfImageIncompleteScreen: "SELF_IMAGE_INCOMPLETE_SCREEN",
+  selfImageResponedScreen: "SELF_IMAGE_RESPONDED_SCREEN",
+  selfImageDetail: "SELF_IMAGE_DETAIL_SCREEN",
+  selfImageAddReply: "SELF_IMAGE_DETAIL_ADD_REPLY_SCREEN",
 }
 
 export default routes;

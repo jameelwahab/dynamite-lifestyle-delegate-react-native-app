@@ -41,7 +41,6 @@ let isFirst = true;
 let controller;
 const MemberList = ({ navigation, route }) => {
   const { type } = route?.params;
-  console.log(type, "type")
   const isAllMembers = type == "all-member";
   const isMembers = type == "member";
   const isNurture = type == "nurture";

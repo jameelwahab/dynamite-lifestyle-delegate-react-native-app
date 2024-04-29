@@ -1,4 +1,4 @@
-import { View, Text, FlatList, StyleSheet } from 'react-native'
+import { View, Text, FlatList, StyleSheet, Pressable } from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react'
 import RootView from '../../../components/RootView'
 import MyText from '../../../components/MyText'
@@ -30,7 +30,7 @@ const GoalStatementList = ({ navigation, route }) => {
   const { navbar } = useSelector(selectNavbar);
   const { token } = useSelector(selectUser);
   const { socket } = useSelector(selectSocket);
-  const [title] = useState(navbar?.find(x => x.value == parentKey)?.child_options?.find(y => y.value == key)?.title);
+  const [title] = useState(navbar?.find(x => x._id == parentKey)?.child_options?.find(y => y._id == key)?.title);
   const [list, setList] = useState([]);
   const [loader, setLoader] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -159,9 +159,11 @@ const GoalStatementList = ({ navigation, route }) => {
     return (
       <View style={__styles.itemView}>
         <View style={{ flexDirection: "row", }}>
-          <View style={{ flex: 1 }}>
+          <Pressable
+            onPress={() => onDetailScreen(item)}
+            style={{ flex: 1 }}>
             <MemberView member={item} />
-          </View>
+          </Pressable>
           <View style={{ marginTop: 2 }}>
             <MenuButton
               onPress={() => setOptionModal({ isVisible: true, item: item, })}

@@ -3,23 +3,23 @@ import invokeApi from "../functions/invokeAPI";
 
 
 export const QUESTIONS_LIST = ({ token, navigation, body: {
-  created_for, created_for_id, member_id
+  created_for, created_for_id, member_id, check_user = undefined
 } }) => {
   return invokeApi({
     path: `api/questionnaire/list_question_reply_against/lesson`,
     method: "POST",
-    postData: { created_for, created_for_id, member_id },
+    postData: { created_for, created_for_id, member_id, check_user },
     token,
     navigation,
   })
 }
 
-export const GET_USER_LISTING_WHO_ASNWERED_BY_MODULE = ({ token, navigation, created_for, created_for_id, search_text, page }) => {
+export const GET_USER_LISTING_WHO_ASNWERED_BY_MODULE = ({ token, navigation, created_for, created_for_id, search_text, page, type = undefined }) => {
   return invokeApi({
     path: `api/questionnaire/list_member_replies_against_module?page=${page}&limit=20`,
     method: "POST",
     postData: {
-      created_for, created_for_id, search_text,
+      created_for, created_for_id, search_text, type
     },
     token,
     navigation,
@@ -67,11 +67,11 @@ export const DELETE_QUESTIONS = ({ token, navigation, questionId }) => {
 }
 
 
-export const GET_QUESTIONS_CONFIGURRATION = ({ token, navigation,created_for, created_for_id, }) => {
+export const GET_QUESTIONS_CONFIGURRATION = ({ token, navigation, created_for, created_for_id, }) => {
   return invokeApi({
     path: `api/questionnaire/get_configration`,
-    method:"POST",
-    postData:{created_for, created_for_id,},
+    method: "POST",
+    postData: { created_for, created_for_id, },
     token,
     navigation,
   })
@@ -100,3 +100,86 @@ export const UPLOAD_FILE_QUESTIONS = ({ token, navigation, file }) => {
   })
 }
 
+
+export const QUESTION_REPLY_LIST = ({ token, navigation, body: {
+  check_user, created_for, created_for_id, member_id
+} }) => {
+  return invokeApi({
+    path: `api/questionnaire/list_question_reply_against/lesson`,
+    method: "POST",
+    postData: {
+      check_user, created_for, created_for_id, member_id
+    },
+    token,
+    navigation,
+  })
+}
+
+export const QUESTION_ADD_REPLY = ({ token, navigation, body: {
+  comment, member, question_id
+} }) => {
+  return invokeApi({
+    path: `api/questionnaire/add_comment_on_member_replies`,
+    method: "POST",
+    postData: {
+      comment, member, question_id
+    },
+    token,
+    navigation,
+  })
+}
+
+
+export const QUESTION_EDIT_REPLY = ({ token, navigation, body: {
+  comment, comment_id, member, question_id
+} }) => {
+  return invokeApi({
+    path: `api/questionnaire/edit_reply_by/admin`,
+    method: "POST",
+    postData: {
+      comment, comment_id, member, question_id
+    },
+    token,
+    navigation,
+  })
+}
+
+
+
+export const QUESTION_DELETE_REPLY = ({ token, navigation, body: {
+  comment, comment_id, member, question_id
+} }) => {
+  return invokeApi({
+    path: `api/questionnaire/delete_reply_by/admin`,
+    method: "POST",
+    postData: {
+      comment_id, member, question_id
+    },
+    token,
+    navigation,
+  })
+}
+
+
+export const QUESTIONS_ADD_DYNAMIYE_REPLY = ({ token, navigation, formData }) => {
+  return invokeApi({
+    path: `api/questionnaire/reply_on_member/answers`,
+    method: "POST",
+    headers: { "content-type": "multipart/form-data" },
+    postData: formData,
+    token,
+    navigation,
+  })
+}
+
+export const QUESTIONS_DELETE_DYNAMIYE_REPLY = ({ token, navigation, body: {
+  created_for, message_id
+} }) => {
+  return invokeApi({
+    path: `api/questionnaire/delete_reply_on_member/answers`,
+    method: "POST",
+    postData: { created_for, message_id },
+    token,
+    navigation,
+  })
+}

@@ -153,17 +153,17 @@ const index = (props) => {
   }, [])
 
   const toggleCollapse = (item) => {
-    let index = isCollapsed.findIndex(x => x == item.value);
+    let index = isCollapsed.findIndex(x => x == item._id);
     if (index > -1) {
       isCollapsed.splice(index, 1);
     } else {
-      isCollapsed.push(item.value);
+      isCollapsed.push(item._id);
     }
     setCollapsed([...isCollapsed])
   }
 
   const findCollapsed = (item) => {
-    return isCollapsed.includes(item.value)
+    return isCollapsed.includes(item._id)
   }
 
   const changeSideBarScreen = async (screen) => {
@@ -172,13 +172,13 @@ const index = (props) => {
     Keyboard.dismiss()
     navigation.closeDrawer()
     setTimeout(() => {
-      navigation.jumpTo(ParentComponents[screen.value].key)
+      navigation.jumpTo(ParentComponents[screen._id].key)
     }, 200);
 
   }
 
   const onOptionClick = async (screen, isCollpasable) => {
-
+    console.log(screen, "screen")
     if (isCollpasable) {
       toggleCollapse(screen)
     } else {
@@ -191,7 +191,7 @@ const index = (props) => {
     Keyboard.dismiss()
     navigation.closeDrawer()
     setTimeout(() => {
-      navigation.jumpTo(ChildComponents[screen.value].key)
+      navigation.jumpTo(ChildComponents[screen._id].key)
     }, 200);
 
   }
@@ -231,7 +231,7 @@ const index = (props) => {
 
 
   const optionView = (item, index, isCollaseable, showDot) => {
-    let isSelected = ParentComponents[item.value].key == props.state.routeNames[props.state.index];
+    let isSelected = ParentComponents[item._id].key == props.state.routeNames[props.state.index];
 
     return (
       <Pressable
@@ -241,7 +241,7 @@ const index = (props) => {
         <MyImage
           source={{ uri: S3_URL + item?.icon }}
           style={__styles.itemIcon} />
-        <View style={{ flex: 1,  }}>
+        <View style={{ flex: 1, }}>
           <MyText
             fontSize={14}
             color={isSelected && isCollaseable == false ? colors.primary : colors.text}
@@ -259,8 +259,9 @@ const index = (props) => {
   }
 
   const nestedOptionView = (item, index, parentItem) => {
-    if (!!ChildComponents[item.value]) {
-      let isSelected = ChildComponents[item.value].key == props.state.routeNames[props.state.index]
+    console.log(props)
+    if (!!ChildComponents[item._id]) {
+      let isSelected = ChildComponents[item._id].key == props.state.routeNames[props.state.index]
       return (
         <Collapsible key={item.value} collapsed={findCollapsed(parentItem)}>
           <Pressable
@@ -315,11 +316,11 @@ const index = (props) => {
         keyboardShouldPersistTaps="handled"
         {...props}>
         {searchableList().map((x, i) => {
-          if (!!ParentComponents[x.value]) {
+          if (!!ParentComponents[x._id]) {
             let isCollaseable = Array.isArray(x.child_options);
             return (
               <View key={x.value}>
-                {optionView(x, i, isCollaseable, user[showDotArray[x.value]])}
+                {optionView(x, i, isCollaseable, user[showDotArray[x._id]])}
                 {isCollaseable && x?.child_options.map((y, j) => nestedOptionView(y, i, x))}
               </View>)
           }
