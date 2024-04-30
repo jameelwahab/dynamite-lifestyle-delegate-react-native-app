@@ -21,6 +21,7 @@ import { dateTimeFormat } from '../../../utilities/constants'
 import AudioPlayerForList from '../../../components/AudioPlayerForList'
 import { QUESTIONS_DELETE_DYNAMIYE_REPLY } from '../../../DAL/Questions'
 import showToast from '../../../functions/showToast'
+import { GOAL_STATEMENT_DELETE_DYNAMITE_REPLY } from '../../../DAL/GoalStatement'
 const List = ({ list, refresh, }) => {
   const navigation = useNavigation();
   const { token } = useSelector(selectUser);
@@ -34,7 +35,7 @@ const List = ({ list, refresh, }) => {
   const optionsAction = (opt) => {
     if (opt.type == "delete") {
       setTimeout(() => {
-        setConfirmationModal({ isVisible: true, title: "Are you sure you want to delete this note?" });
+        setConfirmationModal({ isVisible: true, title: "Are you sure you want to delete this reply?" });
       }, 400);
       setOptionModal({ ...optionModal, isVisible: false, })
     }
@@ -42,11 +43,8 @@ const List = ({ list, refresh, }) => {
 
   const deleteNote = async (item) => {
     setLoader(true);
-    let res = await QUESTIONS_DELETE_DYNAMIYE_REPLY({
-      token, navigation, body: {
-        created_for: "self_image",
-        message_id: item?._id
-      }
+    let res = await GOAL_STATEMENT_DELETE_DYNAMITE_REPLY({
+      token, navigation, replyId: item?._id
     });
     if (res.code == 200) {
       showToast({ title: res.message, type: "success" });
@@ -63,14 +61,11 @@ const List = ({ list, refresh, }) => {
   const renderList = ({ item, index }) => {
     return (
       <View style={__styles.itemRootView}>
-        <View style={{ flexDirection: "row" }}>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
           <View style={{ flex: 1 }}>
-            <MyText fontSize={12} color={colors.primary} >{item?.action_by_info}</MyText>
-            <View style={{ marginTop: 5 }}>
-              <MyText fontSize={10} color={colors.white} >{moment(item?.message_date_time).format(dateTimeFormat.dateTime)}</MyText>
-            </View>
+            <MyText fontSize={10} color={colors.white} >{moment(item?.message_date_time).format(dateTimeFormat.date)}</MyText>
           </View>
-          <View style={{ marginTop: 5 }}>
+          <View style={{}}>
             <MenuButton
               onPress={() => setOptionModal({ isVisible: true, for: item })}
             />
@@ -78,10 +73,13 @@ const List = ({ list, refresh, }) => {
         </View>
 
         {!!item?.message &&
-          <View style={{ paddingVertical: 5, }}>
-            <MyWebview
-              html={item?.message}
-            />
+          <View style={{ paddingVertical: 5, flexDirection: "row" }}>
+            <View style={__styles.dot} />
+            <View style={{ flex: 1 }}>
+              <MyWebview
+                html={item?.message}
+              />
+            </View>
           </View>}
 
         {!!item?.audio_file &&
@@ -112,14 +110,6 @@ const List = ({ list, refresh, }) => {
 
 
         <MyLoader enable={loader} />
-        <FAB
-          onPress={() =>
-            navigation.navigate(routes.selfImageAddReply, {
-              // ticketId: ticket?._id,
-              refresh: refresh
-            })}
-          icon={() => icons.plus(colors.black, 20)}
-        />
         <OptionModal
           closeModal={() => setOptionModal({ isVisible: false, for: "" })}
           isVisible={optionModal?.isVisible}
@@ -196,5 +186,13 @@ const __styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginLeft: 10
+  },
+  dot: {
+    width: 10,
+    height: 10,
+    borderRadius: 10 / 2,
+    backgroundColor: colors.primary,
+    marginRight: 5,
+    marginTop: 4
   }
 })

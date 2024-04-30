@@ -17,27 +17,28 @@ import MyText from '../../../components/MyText'
 
 
 const SelfImageDetail = ({ navigation, route }) => {
-  const { token } = useSelector(selectUser);
+  const { token, user } = useSelector(selectUser);
   const layout = useWindowDimensions();
   const { created_for, id: createdForId, memberId } = route?.params
   const [loader, setLoader] = useState(false);
   const [list, setList] = useState([])
   const [member, setMember] = useState(null)
-  const [myTabs] = useState(tabs);
+  const [myTabs] = useState([
+    { key: 'questions', title: 'Questions', index: 0 },
+    { key: 'replies', title: `${user?.first_name}'s Reply`, index: 1 }]);
   const [index, setIndex] = useState(0);
   const [replies, setReplies] = useState([])
 
   const onShowReplyPress = async (question) => {
     setLoader(true);
     let val = !!!question?.answer?.show_replies;
-    let res = await TOGGLE_SHOW_REPLIES({
-      token, navigation, body: {
-        created_for: created_for,
-        question_id: question?._id,
-        member_id: memberId,
-        show_replies: val
-      }
-    })
+    let body = {
+      created_for: created_for,
+      question_id: question?._id,
+      member_id: memberId,
+      show_replies: val
+    }
+    let res = await TOGGLE_SHOW_REPLIES({ token, navigation, body });
     if (res.code == 200) {
 
       setLoader(false);
@@ -91,7 +92,6 @@ const SelfImageDetail = ({ navigation, route }) => {
 
 
   const renderTabBar = props => (
-
     <TabBar
       {...props}
       scrollEnabled={true}
@@ -167,7 +167,3 @@ const SelfImageDetail = ({ navigation, route }) => {
 
 export default SelfImageDetail;
 
-const tabs = [
-  { key: 'questions', title: 'Qustions', index: 0 },
-  { key: 'replies', title: "Dynamite's Reply", index: 1 },
-]

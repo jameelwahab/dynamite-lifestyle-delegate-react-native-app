@@ -61,7 +61,7 @@ const CategoryList = ({ navigation, route }) => {
 
   return (
     <RootView
-      title={title}
+      title={title +" Categories"}
       subTitle={`Total : ${list.length}`}
       hideBackBottomButton
     >

@@ -218,9 +218,10 @@ const ReplyModal = forwardRef(({ member, question, refresh, list, onClose }, ref
       animationOut="slideOutRight"
       animationInTiming={300}
       animationOutTiming={300}
+      avoidKeyboard
       style={{ margin: 0 }}>
       <SafeAreaView style={{ flex: 1, backgroundColor: colors.secondaryVariant }}>
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1 ,paddingBottom:10}}>
           <View style={__styles.header}>
             <MyText isHeading>Replies</MyText>
             <MyText>{member?.first_name + " " + member?.last_name}</MyText>
@@ -246,9 +247,10 @@ const ReplyModal = forwardRef(({ member, question, refresh, list, onClose }, ref
               />
             </View>
 
-            <View style={{ paddingHorizontal: 10 }}>
+            <View style={{ paddingHorizontal: 10,marginTop:5 }}>
               {editor &&
                 <Editor
+                label='Reply'
                   height={120}
                   initialValue={desc}
                   onChange={(text) => setDesc(text)}
@@ -266,7 +268,7 @@ const ReplyModal = forwardRef(({ member, question, refresh, list, onClose }, ref
                   <MyButton
                     onPress={editCommnent}
                     invert
-                    title='Save'
+                    title='Update'
                     style={{ paddingHorizontal: 20, marginLeft: 10 }}
                   />
                 </View> :
@@ -339,9 +341,7 @@ const __styles = StyleSheet.create({
   },
   itemView: {
     // padding: 10,
-    borderRadius: 10,
     marginTop: 20,
-    overflow: 'hidden',
   },
   questionView: {
     marginTop: 10,

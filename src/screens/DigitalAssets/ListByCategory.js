@@ -39,21 +39,32 @@ const ListByCategory = ({ navigation, route }) => {
     }
   }
 
+  const openFile = (item) => {
+    let link = "";
+    if (item?.file_type == "image") {
+      link = S3_URL + item?.assets_images_url?.thumbnail_1
+    } else if (item?.file_type == "url") {
+      link = item?.video_url
+    } else {
+      link = S3_URL + item?.assets_file_url
+    }
+    openUrl(link)
+  }
+
   const renderRecordings = ({ item, index }) => {
     return (
       <View style={__styles.itemView}>
         <MyText fontSize={16} type='bold' >{item?.title}</MyText>
-        {!!item?.detailed_description &&
+
+        {!!item?.short_description &&
           <View style={{ marginTop: 5 }}>
-            <MyWebview
-              html={item?.detailed_description}
-            />
+            <MyText fontSize={12} >{item?.short_description}</MyText>
           </View>}
-        <View style={{ alignSelf: "flex-end",overflow:"hidden" }}>
-          <TouchableHighlight 
-          underlayColor={colors.lightPrimary3}
-          onPress={() => openUrl(S3_URL + item?.assets_file_url)}>
-            <View style={{padding: 5 ,borderRadius:20,paddingHorizontal:10}}>
+        <View style={{ alignSelf: "flex-end", overflow: "hidden" }}>
+          <TouchableHighlight
+            underlayColor={colors.lightPrimary3}
+            onPress={() => openFile(item)}>
+            <View style={{ padding: 5, borderRadius: 20, paddingHorizontal: 10 }}>
               <MyText type='medium' color={colors.primary} >View</MyText>
             </View>
           </TouchableHighlight>
@@ -76,6 +87,7 @@ const ListByCategory = ({ navigation, route }) => {
           renderItem={renderRecordings}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 80 }}
+          keyExtractor={(item) => item?._id}
         />
 
       </View>

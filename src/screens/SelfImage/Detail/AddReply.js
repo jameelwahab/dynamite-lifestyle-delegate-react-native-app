@@ -88,15 +88,15 @@ const AddReply = ({ navigation, route }) => {
               </View>
               <View style={{ flexDirection: "row", justifyContent: "flex-end", marginTop: 10 }}>
 
-                <MyButton
+                {/* <MyButton
                   onPress={() => navigation.goBack()}
                   invert
                   title='Cancel'
-                  style={{ paddingHorizontal: 10, marginRight: 10 }} />
+                  style={{ paddingHorizontal: 10, marginRight: 10 }} /> */}
 
                 <MyButton
                   invert
-                  title={'Save'}
+                  title={'Submit'}
                   onPress={btn_save}
                   style={{ paddingHorizontal: 10, }} />
               </View>

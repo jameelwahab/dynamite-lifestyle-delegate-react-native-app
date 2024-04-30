@@ -75,3 +75,13 @@ export const GOAL_STATEMENT_DELETE_REPLY = ({ token, navigation, replyId }) => {
     navigation,
   })
 }
+
+
+export const GOAL_STATEMENT_DELETE_DYNAMITE_REPLY = ({ token, navigation, replyId }) => {
+  return invokeApi({
+    path: `api/goal_statement_reply/delete_reply/${replyId}`,
+    method: "DELETE",
+    token,
+    navigation,
+  })
+}

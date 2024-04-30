@@ -183,3 +183,16 @@ export const QUESTIONS_DELETE_DYNAMIYE_REPLY = ({ token, navigation, body: {
     navigation,
   })
 }
+
+
+export const TOGGLE_SHOW_REPLIES = ({ token, navigation, body: {
+  created_for, question_id, member_id, show_replies,
+} }) => {
+  return invokeApi({
+    path: `api/questionnaire/set/show_replies`,
+    method: "POST",
+    postData: { created_for, question_id, member_id, show_replies, },
+    token,
+    navigation,
+  })
+}
