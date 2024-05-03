@@ -6,7 +6,7 @@ import { createDrawerNavigator } from '@react-navigation/drawer'
 import { icons } from '../../utilities/icons';
 import SideBar from '.'
 import { colors } from '../../utilities/colors';
-import { ChildComponents, ParentComponents, drawerMenuList } from './List';
+import { ChildComponents, ParentComponents,  } from './List';
 import { useSelector } from 'react-redux';
 import { selectNavbar } from '../../redux/reducers/navbarSlice';
 

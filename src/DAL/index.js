@@ -99,3 +99,7 @@ export {
 export { SELF_IMAGE_INCOMPLETE, SELF_IMAGE_SAVE_AND_CLOSE } from './SelfImage'
 export { GET_ASSETS_CATEGORY_LIST, GET_ASSETS_LIST_BY_CATEGORY } from './DigitalAssets';
 export { GET_TECH_CATEGORY_LIST } from './HelpTech';
+export {
+  GET_DAILY_STREAK, ADD_DAILY_STREAK, UPDATE_DAILY_STREAK, SET_DAILY_STREAK_REMINDER,
+  GET_DAILY_STREAK_LIST
+} from './DailyStreakPerformance'

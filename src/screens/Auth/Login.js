@@ -22,7 +22,6 @@ import FastImage from 'react-native-fast-image';
 import MyImage2 from '../../components/MyImage2';
 import { setTimeZone } from '../../redux/reducers/timezoneSlice';
 import { setNavbar } from '../../redux/reducers/navbarSlice';
-import { drawerMenuList } from '../../navigation/SideBar/List';
 import { setSocket } from '../../redux/reducers/socketSlice';
 import { io } from 'socket.io-client';
 import MyInputs from '../../components/MyInputs';
@@ -126,42 +125,7 @@ const Login = ({ navigation }) => {
   }
 
 
-  const makeArrayOfSidebar = (list, user) => {
-    let newArray = [];
-
-    newArray.push({ ...drawerMenuList[0], title: "Mission Control" });
-    drawerMenuList.forEach((item) => {
-
-      let index = DELEGATE_NAV_ITEMS.findIndex(x => x.option_value == item.value)
-      if (index > -1) {
-
-        if (!item.collapsible) {
-          if (item?.value == "chat" && !user?.is_chat_allow) {
-
-          } else {
-            newArray.push({ ...item, title: DELEGATE_NAV_ITEMS[index].option_label });
-          }
-        } else {
-
-          let nestedArray = [];
-
-          item?.nestedmenu.forEach((z) => {
-            let nestedIndex = DELEGATE_NAV_ITEMS.findIndex(x => x.option_value == z.value);
-            if (nestedIndex > -1) {
-              nestedArray.push({ ...z, title: DELEGATE_NAV_ITEMS[nestedIndex].option_label });
-            }
-          })
-
-          newArray.push({ ...item, title: DELEGATE_NAV_ITEMS[index].option_label, nestedmenu: nestedArray });
-
-        }
-
-      }
-    });
-
-    return newArray;
-
-  }
+ 
 
   return (
     <RootView hideHeader>

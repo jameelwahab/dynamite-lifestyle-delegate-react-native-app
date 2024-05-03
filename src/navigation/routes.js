@@ -43,7 +43,7 @@ const routes = {
   selfImageResponedNavigator: "SELF_IMAGE_RESPONDED_NAVIGATOR",
   digitalAssetNavigator: "DIGITAL_ASSET_NAVIGATOR",
   helpTechNavigator: "HELP_TECH_NAVIGATOR",
-
+  dailyStreakPerformerNavigator: "DAYLY_STREAK_PERFORMANCE_NAVIGATOR",
 
   //! ///    Screens'
   login: "LOGIN_SCREEN",
@@ -243,6 +243,10 @@ const routes = {
   //? Digitall Assets
   digitalAssetCategoryListScreen: "DIGITALL_ASSETMENT_CATEGORY_LIST_SCREEN",
   digitalAssetByCategoryScreen: "DIGITALL_ASSETMENT_LIST_BY_CATEGORY_SCREEN",
+
+  //? daily Streak Performance
+  performanceStreakScreen: "PERFORMANCE_STREAK_SCREEN",
+  performanceAnalysisScreen: "PERFORMANCE_ANALYSIS_SCREEN",
 }
 
 export default routes;

@@ -4,7 +4,7 @@ import { DrawerContentScrollView, useDrawerStatus } from '@react-navigation/draw
 import MyText from '../../components/MyText';
 import { colors } from '../../utilities/colors';
 import { icons } from '../../utilities/icons';
-import { ChildComponents, ParentComponents, drawerMenuList } from './List';
+import { ChildComponents, ParentComponents, } from './List';
 import Collapsible from 'react-native-collapsible';
 import { selectNavbar } from '../../redux/reducers/navbarSlice';
 import { useSelector } from 'react-redux';
