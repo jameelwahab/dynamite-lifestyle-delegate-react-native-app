@@ -247,6 +247,7 @@ const routes = {
   //? daily Streak Performance
   performanceStreakScreen: "PERFORMANCE_STREAK_SCREEN",
   performanceAnalysisScreen: "PERFORMANCE_ANALYSIS_SCREEN",
+  performanceAnalysisFilterScreen: "PERFORMANCE_ANALYSIS_FILTER_SCREEN",
 }
 
 export default routes;

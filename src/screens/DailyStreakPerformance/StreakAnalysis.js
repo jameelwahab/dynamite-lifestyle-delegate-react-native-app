@@ -14,10 +14,13 @@ import { Slider } from '@rneui/themed';
 import MyRefreshControl from '../../components/MyRefreshControl'
 import EmptyView from '../../components/EmptyView'
 import Collapsible from 'react-native-collapsible'
+import routes from '../../navigation/routes'
+import MyChip from '../../components/MyChip'
 
 let page = 0;
 let canLoadMore = false;
 const StreakAnalysis = ({ navigation, route }) => {
+
   const { token } = useSelector(selectUser);
   const [list, setList] = useState([]);
 
@@ -26,13 +29,32 @@ const StreakAnalysis = ({ navigation, route }) => {
   const [footerLoader, setFooterLoader] = useState(false);
   const [settings, setSettings] = useState(null);
   const [collapsed, setCollapsed] = useState([]);
-
+  const [streakScore, setStreakScore] = useState(0);
+  const [filter, setFilter] = useState({
+    date_from: "", date_to: ""
+  })
 
 
   useEffect(() => {
+    console.log(route?.params)
+    if (route?.params?.filters) {
+      setFilter(route.params.filters)
+    } else {
+      page = 0;
+      getStreakList(true)
+    }
+  }, [route])
+
+  useEffect(() => {
+    setLoader(true)
     page = 0;
     getStreakList(true)
-  }, [])
+  }, [JSON.stringify(filter)])
+
+
+  const onFilterScreen = () => {
+    navigation.navigate(routes.performanceAnalysisFilterScreen, { filter, screen: route.name, })
+  }
 
 
 
@@ -72,13 +94,12 @@ const StreakAnalysis = ({ navigation, route }) => {
   }
 
   const getStreakList = async (newArray = false) => {
-
     let res = await GET_DAILY_STREAK_LIST({
       navigation, token, page: page, body: {
-        date_from: "", date_to: ""
+        date_from: !!filter?.date_from ? moment(filter?.date_from).format(dateTimeFormat.date) : "",
+        date_to: !!filter?.date_to ? moment(filter?.date_to).format(dateTimeFormat.date) : "",
       }
     });
-
     if (res.code == 200) {
       let length = newArray ? res?.past_activities.length : list.length + res?.past_activities.length;
       if (length < res?.total_past_activities) {
@@ -89,6 +110,7 @@ const StreakAnalysis = ({ navigation, route }) => {
       }
       setList(newArray ? res?.past_activities : [...list, ...res?.past_activities]);
       setSettings(res?.streak_performance_setting)
+      setStreakScore(res?.streak_count);
       setLoader(false);
       setFooterLoader(false);
       setRefreshing(false);
@@ -178,19 +200,46 @@ const StreakAnalysis = ({ navigation, route }) => {
 
   const topview = () => {
     return (
+
       <View style={{ flexDirection: "row", alignItems: "center", paddingRight: 10 }}>
         <View style={{ flex: 1 }}>
           <MyText isHeading >Streak Analytics</MyText>
         </View>
-        <TouchableOpacity>
+        <TouchableOpacity
+          onPress={onFilterScreen}
+        >
           {icons.filterCircle(colors.primary, 25)}
         </TouchableOpacity>
+
+
       </View>
+    )
+  }
+
+  const filterView = () => {
+    return (
+      <>
+        {(!!filter?.date_from || !!filter?.date_to) &&
+          <View style={{ flexDirection: "row" }}>
+            <MyChip
+              onPress={() => setFilter({ date_from: "", date_to: "" })}
+              title={`${!!filter?.date_from ? "From : " + moment(filter?.date_from).format(dateTimeFormat.date) : ""} - ${!!filter?.date_to ? "To : " + moment(filter?.date_to).format(dateTimeFormat.date) : ""}`} />
+          </View>}
+        {!!streakScore &&
+          <View style={{alignItems:"flex-end"}}>
+            <MyText color={colors.primary} >{`${settings["streack_count_text"]} : `}
+              <MyText>{streakScore}</MyText>
+            </MyText>
+          </View>}
+      </>
+
+
     )
   }
 
   return (
     <RootView titleView={topview}>
+      {filterView()}
       <View style={{ flex: 1 }}>
         {!!settings &&
           <FlatList
@@ -202,7 +251,7 @@ const StreakAnalysis = ({ navigation, route }) => {
               refreshing={refreshing}
               onRefresh={onRefresh}
             />}
-            ListEmptyComponent={!loader && <EmptyView />}
+            ListEmptyComponent={!loader && <EmptyView label={"Activities not found"} />}
           />}
       </View>
       <MyLoader enable={loader} />

@@ -132,7 +132,7 @@ const PerformanceStreak = ({ navigation, route }) => {
             view={() => (
               <View style={__styles.daysView}>
                 {reminder.days.map(day => (
-                  <MyText>{daysName[day] + ", "}</MyText>
+                  <MyText key={`day${day}`} >{daysName[day] + ", "}</MyText>
                 ))}
               </View>
             )}

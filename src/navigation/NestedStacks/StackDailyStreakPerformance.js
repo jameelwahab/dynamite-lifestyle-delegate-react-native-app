@@ -8,6 +8,7 @@ import { colors } from '../../utilities/colors'
 
 import PerformanceStreak from '../../screens/DailyStreakPerformance/PerformanceStreak'
 import StreakAnalysis from '../../screens/DailyStreakPerformance/StreakAnalysis'
+import Filter from '../../screens/DailyStreakPerformance/Filter'
 
 
 
@@ -22,6 +23,7 @@ const StackDailyStreakPerformance = ({ route }) => {
         screenOptions={{ headerShown: false }}>
         <PerformanceStack.Screen initialParams={route.params} name={routes.performanceStreakScreen} component={PerformanceStreak} />
         <PerformanceStack.Screen name={routes.performanceAnalysisScreen} component={StreakAnalysis} />
+        <PerformanceStack.Screen name={routes.performanceAnalysisFilterScreen} component={Filter} />
 
         {/*//? Default Screens Start */}
         {defaultScreens.map((x, i) => (
