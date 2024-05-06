@@ -40,6 +40,7 @@ import StackSelfImageResponded from "../NestedStacks/StackSelfImgeResponded";
 import StackDigitalAssets from "../NestedStacks/StackDigitalAsset";
 import StackHelpTech from "../NestedStacks/StackHelpTech";
 import StackDailyStreakPerformance from "../NestedStacks/StackDailyStreakPerformance";
+import StackMonthReport from "../NestedStacks/StackMonthyReport";
 
 
 
@@ -276,6 +277,15 @@ export const ParentComponents = {
     params: {
       value: "daily_streak_performance",
       key: "aadbd7a3-91c1-40dd-bf24-532fc288d2659"
+    }
+  },
+
+  "aadbd7a3-91c1-40dd-bf24-8987688566hhh": {
+    key: routes.monthlyReportNavigator,
+    component: StackMonthReport,
+    params: {
+      value: "performance_stats",
+      key: "aadbd7a3-91c1-40dd-bf24-8987688566hhh"
     }
   },
 }

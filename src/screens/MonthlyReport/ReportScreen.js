@@ -1,0 +1,305 @@
+import { View, Text, processColor, ScrollView } from 'react-native'
+import React, { useEffect, useRef, useState } from 'react'
+import RootView from '../../components/RootView'
+import MyText from '../../components/MyText'
+import { useSelector } from 'react-redux'
+import { selectUser } from '../../redux/reducers/userSlice'
+import { selectNavbar } from '../../redux/reducers/navbarSlice'
+import MyLoader from '../../components/MyLoader'
+import { GET_MONTHLY_REPORT } from '../../DAL'
+// import PieChart from 'react-native-pie-chart'
+import { PieChart, } from 'react-native-charts-wrapper';
+import { LineChart } from 'react-native-chart-kit'
+import { colors } from '../../utilities/colors'
+import utilities from '../../utilities'
+import moment from 'moment'
+import { Picker } from 'react-native-wheel-pick'
+import MonthYearPicker from '../../components/MonthYearPicker'
+import MyTouchableInput from '../../components/MyTouchableInput'
+import { icons } from '../../utilities/icons'
+import { fonts } from '../../utilities/fonts'
+
+
+
+const ReportScreen = ({ navigation, route }) => {
+  const { key } = route?.params
+  const ref_monthPicker = useRef();
+  const { token } = useSelector(selectUser);
+  const { navbar } = useSelector(selectNavbar);
+  const [title] = useState(navbar?.find(x => x._id == key)?.title);
+  const [loader, setLoader] = useState(true);
+  const [data, setData] = useState(null);
+  const [currentMonYear, setCurrentMonYear] = useState(moment().subtract({ month: 1 }).format("MM-YYYY"))
+  const [width] = useState(utilities.screenWidth())
+  const [linechartDate, setLinechartDate] = useState(null);
+  useEffect(() => {
+    setLoader(true)
+    getDataFromServer()
+
+  }, [currentMonYear])
+
+  const getLabels = (res) => {
+    let totalDays = moment(currentMonYear, "MM-YYYY").daysInMonth();
+    let labels = [""];
+    let attitudeArray = [0,];
+    let desireArray = [0,];
+    let displineArray = [0,];
+    let focusArray = [0,];
+    let winArray = [0,];
+    for (let i = 0; i < totalDays; i++) {
+      let date = moment(currentMonYear, "MM-YYYY").startOf('month').add({ days: i }).format("DD-MM-YYYY");
+      labels.push(moment(date, "DD-MM-YYYY").format("DD-MMM"));
+
+      let attitude = res?.attitude_performance_rate_array.find(x => x.date == date);
+      if (attitude) {
+        attitudeArray.push(attitude.rate);
+      } else {
+        attitudeArray.push(0);
+      }
+
+      let desire = res?.desire_performance_rate_array.find(x => x.date == date);
+      if (desire) {
+        desireArray.push(desire.rate);
+      } else {
+        desireArray.push(0);
+      }
+
+      let displine = res?.discipline_performance_rate_array.find(x => x.date == date);
+      if (displine) {
+        displineArray.push(displine.rate);
+      } else {
+        displineArray.push(0);
+      }
+
+      let focus = res?.focus_performance_rate_array.find(x => x.date == date);
+      if (focus) {
+        focusArray.push(focus.rate);
+      } else {
+        focusArray.push(0);
+      }
+
+
+      let win = res?.win_note_performance_rate_array.find(x => x.date == date);
+      if (win) {
+        winArray.push(win.rate);
+      } else {
+        winArray.push(0);
+      }
+
+    }
+    let gdata = {
+      labels: labels,
+      datasets: [
+        {
+          data: attitudeArray,
+          color: (opacity = 1) => "#EDBF60"
+        },
+        {
+          data: focusArray,
+          color: (opacity = 1) => "#72B64A"
+        },
+        {
+          data: desireArray,
+          color: (opacity = 1) => "#932CE7"
+        },
+        {
+          data: displineArray,
+          color: (opacity = 1) => "#0000F5"
+        },
+        {
+          data: winArray,
+          color: (opacity = 1) => "#B6263D"
+        },
+
+        {
+          data: [10],
+          withDots: false,
+        }
+      ]
+    }
+
+    setLinechartDate(gdata)
+  }
+
+  const getDataFromServer = async () => {
+    let res = await GET_MONTHLY_REPORT({ navigation, token, monthYear: currentMonYear });
+    if (res.code == 200) {
+      getLabels(res)
+      setData(res);
+
+      setLoader(false)
+    } else {
+      setLoader(false)
+    }
+  }
+
+
+
+
+  //? Views
+
+  const graphView = () => {
+
+    return (
+      <View style={{}}>
+        {!!data?.default_setting?.intentions_heading &&
+          <View style={{ marginVertical: 10, width }}>
+            <MyText align='center' fontSize={18} type='bold'>{data?.default_setting?.intentions_heading}</MyText>
+          </View>}
+
+        <View style={{ width: width, alignItems: "center", }}>
+          <PieChart
+            style={{
+              width: 370,
+              height: 200,
+            }}
+            data={{
+              dataSets: [
+                {
+                  values: [
+                    { value: Number(data?.complete_accountability_avg), label: 'Complete' },
+                    { value: Number(data?.incomplete_accountability_avg), label: 'Not Completed' },
+                  ],
+                  config: {
+                    colors: [
+                      processColor('#EDBF60'),
+                      processColor('#574C37'),
+                    ],
+
+                    valueTextSize: 20,
+                    // selectionShift: width * 1.3,
+                    valueFormatter: "#.#'%'",
+                    valueLineColor: processColor('#EDBF60'),
+                    valueLinePart1Length: 0.5,
+                  },
+                },
+              ],
+            }}
+            maxAngle={180}
+            rotationAngle={180}
+            // chartBackgroundColor={processColor('pink')}
+            legend={{
+              enabled: false,
+              // textSize: 12,
+              // form: 'CIRCLE',
+              // horizontalAlignment: 'RIGHT',
+              // verticalAlignment: 'CENTER',
+              // orientation: 'VERTICAL',
+              // wordWrapEnabled: true,
+              // textColor: processColor('#EDBF60'),
+            }}
+            rotationEnabled={false}
+            holeRadius={50}
+            holeColor={processColor(colors.darkSecondary)}
+            transparentCircleRadius={0}
+            centerText={""}
+          // onSelect={() => { }}
+
+          // highlights={[{ x: 2 }]}
+          />
+        </View>
+      </View>
+    )
+  }
+
+  const LineChartView = () => {
+    return (
+      <View style={{ width, alignItems: "center", backgroundColor: colors.secondary, marginTop: 50, borderRadius: 10, }}>
+        {!!data?.default_setting?.intentions_heading &&
+          <View style={{ marginVertical: 10, width }}>
+            <MyText align='center' fontSize={18} type='bold'>{data?.default_setting?.intentions_heading}</MyText>
+          </View>}
+        <View style={{ marginTop: 20, height: 450 }}>
+          {!!linechartDate &&
+            <ScrollView horizontal>
+              <LineChart
+                data={linechartDate}
+                width={(utilities.screenWidth() * 0.2) * moment(currentMonYear, "MM-YYYY").daysInMonth()}
+                height={500}
+
+                segments={10}
+                yAxisLabel={''}
+                yAxisSuffix={""}
+                bezier
+                chartConfig={{
+                  decimalPlaces: 0,
+                  backgroundColor: colors.secondary,
+                  backgroundGradientFrom: colors.secondary,
+                  backgroundGradientTo: colors.secondary,
+                  color: (opacity = 1) => colors.white,
+                  labelColor: (opacity = 1) => colors.white,
+                  style: {},
+                  propsForDots: {
+                    stroke: colors.white,
+                  },
+                }}
+              />
+            </ScrollView>}
+
+
+        </View>
+
+        <View style={{ paddingBottom: 20, width: "80%" }}>
+          <View style={{ flexDirection: "row", }}>
+            {label("#EDBF60", "Attitude")}
+            {label("#72B64A", "Focus")}
+          </View>
+          <View style={{ flexDirection: "row", }}>
+            {label("#932CE7", "Desire")}
+            {label("#0000F5", "Discipline")}
+          </View>
+          {label("#B6263D", "Win")}
+
+
+        </View>
+      </View>
+    )
+  }
+
+  const label = (bgColor, label) => {
+    return (
+      <View style={{ flex: 1, flexDirection: "row", alignItems: "center", margin: 5 }}>
+        <View style={{ marginRight: 5, height: 10, width: 10, borderRadius: 2, backgroundColor: bgColor }} />
+        <MyText>{label}</MyText>
+      </View>
+    )
+  }
+
+
+  return (
+    <RootView title={!!data ? data?.default_setting?.main_heading : ""} hideBackBottomButton>
+      <View style={{ flex: 1 }}>
+        {!!data &&
+          <View style={{ flex: 1 }}>
+            <MyTouchableInput
+              label='Month & Year *'
+              icon={() => icons.calendar(colors.primary)}
+              onPress={() => ref_monthPicker?.current?.openModal(currentMonYear)}
+              value={moment(currentMonYear, "MM-YYYY").format("MMMM YYYY")}
+            />
+
+            <View style={{ flex: 1 }}>
+              <ScrollView showsVerticalScrollIndicator={false}
+                contentContainerStyle={{ paddingBottom: 80 }}
+              >
+
+
+                {graphView()}
+
+                {LineChartView()}
+              </ScrollView>
+            </View>
+          </View>}
+      </View>
+      <MonthYearPicker
+        ref={ref_monthPicker}
+        onAgree={(res) => setCurrentMonYear(res)}
+      />
+      <MyLoader enable={loader} />
+    </RootView>
+  )
+}
+
+
+export default ReportScreen
+

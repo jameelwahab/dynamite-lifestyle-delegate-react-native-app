@@ -4,6 +4,9 @@ PODS:
   - BVLinearGradient (2.8.3):
     - React-Core
   - CocoaAsyncSocket (7.6.5)
+  - DGCharts (5.0.0):
+    - DGCharts/Core (= 5.0.0)
+  - DGCharts/Core (5.0.0)
   - DoubleConversion (1.1.6)
   - FBLazyVector (0.71.11)
   - FBReactNativeSpec (0.71.11):
@@ -499,6 +502,10 @@ PODS:
     - React-Core
   - react-native-cameraroll (7.0.0):
     - React-Core
+  - react-native-charts-wrapper (0.6.0):
+    - DGCharts (= 5.0.0)
+    - React
+    - SwiftyJSON (= 5.0)
   - react-native-date-picker (4.3.5):
     - React-Core
   - react-native-document-picker (9.1.1):
@@ -508,6 +515,11 @@ PODS:
   - react-native-render-html (6.3.4):
     - React-Core
   - react-native-safe-area-context (4.7.2):
+    - React-Core
+  - react-native-skia (1.2.3):
+    - RCT-Folly (= 2021.07.22.00)
+    - React
+    - React-callinvoker
     - React-Core
   - react-native-slider (4.4.3):
     - React-Core
@@ -617,9 +629,9 @@ PODS:
     - React-Core
   - RNCClipboard (1.12.1):
     - React-Core
-  - RNCPicker (2.5.1):
+  - RNCPicker (2.7.5):
     - React-Core
-  - RNDateTimePicker (7.6.1):
+  - RNDateTimePicker (8.0.0):
     - React-Core
   - RNFastImage (8.6.3):
     - React-Core
@@ -738,6 +750,7 @@ PODS:
   - StripeUICore (23.18.3):
     - StripeCore (= 23.18.3)
   - SwiftAudioEx (1.0.0)
+  - SwiftyJSON (5.0.0)
   - TOCropViewController (2.7.2)
   - Yoga (1.14.0)
   - YogaKit (1.18.1):
@@ -800,11 +813,13 @@ DEPENDENCIES:
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - react-native-blob-util (from `../node_modules/react-native-blob-util`)
   - "react-native-cameraroll (from `../node_modules/@react-native-camera-roll/camera-roll`)"
+  - react-native-charts-wrapper (from `../node_modules/react-native-charts-wrapper`)
   - react-native-date-picker (from `../node_modules/react-native-date-picker`)
   - react-native-document-picker (from `../node_modules/react-native-document-picker`)
   - react-native-pager-view (from `../node_modules/react-native-pager-view`)
   - react-native-render-html (from `../node_modules/react-native-render-html`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
+  - "react-native-skia (from `../node_modules/@shopify/react-native-skia`)"
   - "react-native-slider (from `../node_modules/@react-native-community/slider`)"
   - react-native-splash-screen (from `../node_modules/react-native-splash-screen`)
   - react-native-track-player (from `../node_modules/react-native-track-player`)
@@ -849,6 +864,7 @@ SPEC REPOS:
   trunk:
     - BEMCheckBox
     - CocoaAsyncSocket
+    - DGCharts
     - Firebase
     - FirebaseAnalytics
     - FirebaseCore
@@ -890,6 +906,7 @@ SPEC REPOS:
     - StripePaymentsUI
     - StripeUICore
     - SwiftAudioEx
+    - SwiftyJSON
     - TOCropViewController
     - YogaKit
 
@@ -942,6 +959,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-blob-util"
   react-native-cameraroll:
     :path: "../node_modules/@react-native-camera-roll/camera-roll"
+  react-native-charts-wrapper:
+    :path: "../node_modules/react-native-charts-wrapper"
   react-native-date-picker:
     :path: "../node_modules/react-native-date-picker"
   react-native-document-picker:
@@ -952,6 +971,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-render-html"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
+  react-native-skia:
+    :path: "../node_modules/@shopify/react-native-skia"
   react-native-slider:
     :path: "../node_modules/@react-native-community/slider"
   react-native-splash-screen:
@@ -1036,6 +1057,7 @@ SPEC CHECKSUMS:
   boost: 57d2868c099736d80fcd648bf211b4431e51a558
   BVLinearGradient: 880f91a7854faff2df62518f0281afb1c60d49a3
   CocoaAsyncSocket: 065fd1e645c7abab64f7a6a2007a48038fdc6a99
+  DGCharts: 6e0cf2644e8f81ad13f04caa8bc18502870a1c54
   DoubleConversion: 5189b271737e1565bdce30deb4a08d647e3f5f54
   FBLazyVector: c511d4cd0210f416cb5c289bd5ae6b36d909b048
   FBReactNativeSpec: a911fb22def57aef1d74215e8b6b8761d25c1c54
@@ -1087,11 +1109,13 @@ SPEC CHECKSUMS:
   React-logger: 186dd536128ae5924bc38ed70932c00aa740cd5b
   react-native-blob-util: 30a6c9fd067aadf9177e61a998f2c7efb670598d
   react-native-cameraroll: b474e88bc3d27a85315115d26c796cef4586c5ab
+  react-native-charts-wrapper: cd83d9b1acb8e06ebd18bf297de597906e1cc87d
   react-native-date-picker: 90d1d60802a20085125657940b944f2bb4e5c113
   react-native-document-picker: 3599b238843369026201d2ef466df53f77ae0452
   react-native-pager-view: 02a5c4962530f7efc10dd51ee9cdabeff5e6c631
   react-native-render-html: 984dfe2294163d04bf5fe25d7c9f122e60e05ebe
   react-native-safe-area-context: 7aa8e6d9d0f3100a820efb1a98af68aa747f9284
+  react-native-skia: d368ae81d61c0253df36106ea76324b5a5519ddc
   react-native-slider: 1cdd6ba29675df21f30544253bf7351d3c2d68c4
   react-native-splash-screen: 4312f786b13a81b5169ef346d76d33bc0c6dc457
   react-native-track-player: 97d76dbbd35f27cc709e5f04540615e54264b3f9
@@ -1114,8 +1138,8 @@ SPEC CHECKSUMS:
   RNCAsyncStorage: c913ede1fa163a71cea118ed4670bbaaa4b511bb
   RNCCheckbox: a3ca9978cb0846b981d28da4e9914bd437403d77
   RNCClipboard: d77213bfa269013bf4b857b7a9ca37ee062d8ef1
-  RNCPicker: 529d564911e93598cc399b56cc0769ce3675f8c8
-  RNDateTimePicker: 8fb39263b721223e095248acaf6f406d5b7f6713
+  RNCPicker: 3e2c37a8328f368ce14da050cdc8231deb5fc9f9
+  RNDateTimePicker: cd42eda5f315fc320f0b359413bd598957f7e601
   RNFastImage: 5c9c9fed9c076e521b3f509fe79e790418a544e8
   RNFBAnalytics: 991772a4cd8c90de9a5eec33ef24dbba6e028c5b
   RNFBApp: a4f5b074984cf612e4c97d68b42be690c59e2638
@@ -1142,6 +1166,7 @@ SPEC CHECKSUMS:
   StripePaymentsUI: c12de264eda974d91e43a769f53a6c6afc9a1715
   StripeUICore: 090c4fe916d039616ce8f8de30392f4aeb33dd16
   SwiftAudioEx: 6f511018b7a0fdfd14ed1bb4081f953588245cc0
+  SwiftyJSON: 36413e04c44ee145039d332b4f4e2d3e8d6c4db7
   TOCropViewController: bf38459e9da6efe414de22087ebd5c530640f4bd
   Yoga: f7decafdc5e8c125e6fa0da38a687e35238420fa
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a

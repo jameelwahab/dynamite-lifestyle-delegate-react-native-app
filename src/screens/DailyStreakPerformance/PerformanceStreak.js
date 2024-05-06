@@ -89,7 +89,10 @@ const PerformanceStreak = ({ navigation, route }) => {
         })
       }
       setSettings(res?.streak_performance_setting);
-      setReminder({ ...res?.dynamite_streak_performance_reminder_time })
+      setReminder({
+        time: !!res?.dynamite_streak_performance_reminder_time.time ? res?.dynamite_streak_performance_reminder_time.time : "00:00",
+        days: res?.dynamite_streak_performance_reminder_time.days ? res?.dynamite_streak_performance_reminder_time.days : []
+      })
       // showToast({ title: res?.message, type: "success" });
     }
   }
@@ -131,7 +134,7 @@ const PerformanceStreak = ({ navigation, route }) => {
             onPress={() => setOptionModalVisibility(true)}
             view={() => (
               <View style={__styles.daysView}>
-                {reminder.days.map(day => (
+                {!!reminder.days && reminder.days.map(day => (
                   <MyText key={`day${day}`} >{daysName[day] + ", "}</MyText>
                 ))}
               </View>

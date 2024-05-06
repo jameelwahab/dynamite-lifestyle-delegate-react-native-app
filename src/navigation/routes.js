@@ -44,7 +44,7 @@ const routes = {
   digitalAssetNavigator: "DIGITAL_ASSET_NAVIGATOR",
   helpTechNavigator: "HELP_TECH_NAVIGATOR",
   dailyStreakPerformerNavigator: "DAYLY_STREAK_PERFORMANCE_NAVIGATOR",
-
+  monthlyReportNavigator: "MONTHLY_REPORT_NAVIGATOR",
   //! ///    Screens'
   login: "LOGIN_SCREEN",
   splash: "SPLASH_SCREEN",
@@ -248,6 +248,9 @@ const routes = {
   performanceStreakScreen: "PERFORMANCE_STREAK_SCREEN",
   performanceAnalysisScreen: "PERFORMANCE_ANALYSIS_SCREEN",
   performanceAnalysisFilterScreen: "PERFORMANCE_ANALYSIS_FILTER_SCREEN",
+
+  //? Montly Report 
+  monthyReportScreen: "MONTHY_REPORT_SCREEN",
 }
 
 export default routes;
