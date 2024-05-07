@@ -154,8 +154,8 @@ const SubscriptionList = ({ navigation, route }) => {
 
   const topView = () => {
     return (
-      <View style={{ backgroundColor: colors.darkSecondary }}>
-        <TitleView title={"Member Subscriptions"} />
+      <View style={{ backgroundColor: colors.darkSecondary}}>
+        {/* <TitleView title={""} /> */}
         <View style={{ flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", paddingBottom: 5 }}>
           {!!member ?
             <View style={{ marginLeft: 5, height: 35, flexDirection: "row", alignItems: "center", }}>
@@ -177,8 +177,8 @@ const SubscriptionList = ({ navigation, route }) => {
   }
 
   return (
-    <RootView hideSubHeader>
-      {topView()}
+    <RootView titleView={topView}>
+
       <View style={{ flex: 1 }}>
         <View style={{ flex: 1 }}>
           <FlatList

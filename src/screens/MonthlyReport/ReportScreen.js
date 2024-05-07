@@ -1,4 +1,4 @@
-import { View, Text, processColor, ScrollView } from 'react-native'
+import { View, Text, processColor, ScrollView, Platform } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import RootView from '../../components/RootView'
 import MyText from '../../components/MyText'
@@ -7,17 +7,14 @@ import { selectUser } from '../../redux/reducers/userSlice'
 import { selectNavbar } from '../../redux/reducers/navbarSlice'
 import MyLoader from '../../components/MyLoader'
 import { GET_MONTHLY_REPORT } from '../../DAL'
-// import PieChart from 'react-native-pie-chart'
 import { PieChart, } from 'react-native-charts-wrapper';
 import { LineChart } from 'react-native-chart-kit'
 import { colors } from '../../utilities/colors'
 import utilities from '../../utilities'
 import moment from 'moment'
-import { Picker } from 'react-native-wheel-pick'
 import MonthYearPicker from '../../components/MonthYearPicker'
 import MyTouchableInput from '../../components/MyTouchableInput'
 import { icons } from '../../utilities/icons'
-import { fonts } from '../../utilities/fonts'
 
 
 
@@ -147,11 +144,14 @@ const ReportScreen = ({ navigation, route }) => {
             <MyText align='center' fontSize={18} type='bold'>{data?.default_setting?.intentions_heading}</MyText>
           </View>}
 
-        <View style={{ width: width, alignItems: "center", }}>
+        <View style={{ width: width, alignItems: "center",  marginBottom: Platform.OS == "ios" ? 0 : -80 }}>
           <PieChart
-            style={{
-              width: 370,
-              height: 200,
+            style={Platform.OS == "ios" ? {
+              width: width * 0.8,
+              height: width * 0.4,
+            } : {
+              width: width * 0.9,
+              height: 250
             }}
             data={{
               dataSets: [
@@ -165,8 +165,8 @@ const ReportScreen = ({ navigation, route }) => {
                       processColor('#EDBF60'),
                       processColor('#574C37'),
                     ],
-
-                    valueTextSize: 20,
+                    valueTextColor: processColor(colors.white),
+                    valueTextSize: 12,
                     // selectionShift: width * 1.3,
                     valueFormatter: "#.#'%'",
                     valueLineColor: processColor('#EDBF60'),
@@ -206,7 +206,7 @@ const ReportScreen = ({ navigation, route }) => {
     return (
       <View style={{ width, alignItems: "center", backgroundColor: colors.secondary, marginTop: 50, borderRadius: 10, }}>
         {!!data?.default_setting?.intentions_heading &&
-          <View style={{ marginVertical: 10, width }}>
+          <View style={{ marginVertical: 10,marginTop:30, width }}>
             <MyText align='center' fontSize={18} type='bold'>{data?.default_setting?.intentions_heading}</MyText>
           </View>}
         <View style={{ marginTop: 20, height: 450 }}>
