@@ -20,11 +20,14 @@ import moment, { weekdays } from 'moment'
 import { dateTimeFormat } from '../../utilities/constants'
 import DateTimePicker from 'react-native-modal-datetime-picker'
 import showToast from '../../functions/showToast'
+import { convertTimezone } from '../../functions/convertTime'
+import { selectTimeZone } from '../../redux/reducers/timezoneSlice'
 
 const PerformanceStreak = ({ navigation, route }) => {
   const { key } = route?.params
   const { token } = useSelector(selectUser);
   const { navbar } = useSelector(selectNavbar);
+  const timezone = useSelector(selectTimeZone);
   const [title] = useState(navbar?.find(x => x._id == key)?.title);
   const [loader, setLoader] = useState(true);
   const [streak, updateStreak] = useState({
@@ -59,6 +62,10 @@ const PerformanceStreak = ({ navigation, route }) => {
   }
 
   const onReminderSave = () => {
+    if (reminder.days.length == 0) {
+      showToast({ title: "Select at least one day for reminder" })
+      return
+    }
     setStreakReminderToServer()
   }
 
@@ -90,7 +97,7 @@ const PerformanceStreak = ({ navigation, route }) => {
       }
       setSettings(res?.streak_performance_setting);
       setReminder({
-        time: !!res?.dynamite_streak_performance_reminder_time.time ? res?.dynamite_streak_performance_reminder_time.time : "00:00",
+        time: !!res?.dynamite_streak_performance_reminder_time.time ? moment(res?.dynamite_streak_performance_reminder_time.time).format("HH:mm") : "00:00",
         days: res?.dynamite_streak_performance_reminder_time.days ? res?.dynamite_streak_performance_reminder_time.days : []
       })
       // showToast({ title: res?.message, type: "success" });

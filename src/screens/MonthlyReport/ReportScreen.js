@@ -15,6 +15,7 @@ import moment from 'moment'
 import MonthYearPicker from '../../components/MonthYearPicker'
 import MyTouchableInput from '../../components/MyTouchableInput'
 import { icons } from '../../utilities/icons'
+import showToast, { showToastCustom } from '../../functions/showToast'
 
 
 
@@ -26,7 +27,7 @@ const ReportScreen = ({ navigation, route }) => {
   const [title] = useState(navbar?.find(x => x._id == key)?.title);
   const [loader, setLoader] = useState(true);
   const [data, setData] = useState(null);
-  const [currentMonYear, setCurrentMonYear] = useState(moment().subtract({ month: 1 }).format("MM-YYYY"))
+  const [currentMonYear, setCurrentMonYear] = useState(moment().format("MM-YYYY"))
   const [width] = useState(utilities.screenWidth())
   const [linechartDate, setLinechartDate] = useState(null);
   useEffect(() => {
@@ -89,11 +90,12 @@ const ReportScreen = ({ navigation, route }) => {
       datasets: [
         {
           data: attitudeArray,
-          color: (opacity = 1) => "#EDBF60"
+          color: (opacity = 1) => "#EDBF60",
+
         },
         {
           data: focusArray,
-          color: (opacity = 1) => "#72B64A"
+          color: (opacity = 1) => "#72B64A",
         },
         {
           data: desireArray,
@@ -144,7 +146,7 @@ const ReportScreen = ({ navigation, route }) => {
             <MyText align='center' fontSize={18} type='bold'>{data?.default_setting?.intentions_heading}</MyText>
           </View>}
 
-        <View style={{ width: width, alignItems: "center",  marginBottom: Platform.OS == "ios" ? 0 : -80 }}>
+        <View style={{ width: width, alignItems: "center", marginBottom: Platform.OS == "ios" ? 0 : -80 }}>
           <PieChart
             style={Platform.OS == "ios" ? {
               width: width * 0.8,
@@ -205,14 +207,17 @@ const ReportScreen = ({ navigation, route }) => {
   const LineChartView = () => {
     return (
       <View style={{ width, alignItems: "center", backgroundColor: colors.secondary, marginTop: 50, borderRadius: 10, }}>
-        {!!data?.default_setting?.intentions_heading &&
-          <View style={{ marginVertical: 10,marginTop:30, width }}>
-            <MyText align='center' fontSize={18} type='bold'>{data?.default_setting?.intentions_heading}</MyText>
+        {!!data?.default_setting?.performance_heading &&
+          <View style={{ marginVertical: 10, marginTop: 30, width }}>
+            <MyText align='center' fontSize={18} type='bold'>{data?.default_setting?.performance_heading}</MyText>
           </View>}
         <View style={{ marginTop: 20, height: 450 }}>
           {!!linechartDate &&
             <ScrollView horizontal>
               <LineChart
+                onDataPointClick={({ value, getColor }) => {
+                  showToastCustom({ title: `${lebels[getColor()]} : ${value}`, bgColor: getColor() });
+                }}
                 data={linechartDate}
                 width={(utilities.screenWidth() * 0.2) * moment(currentMonYear, "MM-YYYY").daysInMonth()}
                 height={500}
@@ -301,5 +306,14 @@ const ReportScreen = ({ navigation, route }) => {
 }
 
 
+
+
 export default ReportScreen
+let lebels = {
+  "#EDBF60": "Attitude",
+  "#72B64A": "Focus",
+  "#932CE7": "Desire",
+  "#0000F5": "Descipline",
+  "#B6263D": "Win"
+}
 

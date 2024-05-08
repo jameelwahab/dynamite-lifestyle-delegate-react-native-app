@@ -16,6 +16,7 @@ import EmptyView from '../../components/EmptyView'
 import Collapsible from 'react-native-collapsible'
 import routes from '../../navigation/routes'
 import MyChip from '../../components/MyChip'
+import FooterLoader from '../../components/FooterLoader'
 
 let page = 0;
 let canLoadMore = false;
@@ -36,18 +37,16 @@ const StreakAnalysis = ({ navigation, route }) => {
 
 
   useEffect(() => {
-    console.log(route?.params)
+
     if (route?.params?.filters) {
       setFilter(route.params.filters)
-    } else {
-      page = 0;
-      getStreakList(true)
     }
   }, [route])
 
   useEffect(() => {
-    setLoader(true)
+    canLoadMore = false;
     page = 0;
+    setLoader(true)
     getStreakList(true)
   }, [JSON.stringify(filter)])
 
@@ -183,7 +182,7 @@ const StreakAnalysis = ({ navigation, route }) => {
             {SliderView(item, "your_focus_text", "focus_performance_rate")}
             {SliderView(item, "your_desire_text", "desire_performance_rate")}
             {SliderView(item, "your_discipline_text", "discipline_performance_rate")}
-            {SliderView(item, "rate_your_performance_streak_heading", "win_note_performance_rate")}
+            {SliderView(item, "rate_this_win_text", "win_note_performance_rate")}
             {!!item?.win_note &&
               <View style={{ padding: 10 }}>
                 <MyText type='bold' fontSize={18} >Win Info</MyText>
@@ -225,8 +224,8 @@ const StreakAnalysis = ({ navigation, route }) => {
               onPress={() => setFilter({ date_from: "", date_to: "" })}
               title={`${!!filter?.date_from ? "From : " + moment(filter?.date_from).format(dateTimeFormat.date) : ""} - ${!!filter?.date_to ? "To : " + moment(filter?.date_to).format(dateTimeFormat.date) : ""}`} />
           </View>}
-        {!!streakScore &&
-          <View style={{alignItems:"flex-end"}}>
+        {(streakScore != undefined || streakScore != null) &&
+          <View style={{ alignItems: "flex-end" }}>
             <MyText color={colors.primary} >{`${settings["streack_count_text"]} : `}
               <MyText>{streakScore}</MyText>
             </MyText>
@@ -251,6 +250,7 @@ const StreakAnalysis = ({ navigation, route }) => {
               refreshing={refreshing}
               onRefresh={onRefresh}
             />}
+            ListFooterComponent={<FooterLoader isVisible={footerLoader} />}
             ListEmptyComponent={!loader && <EmptyView label={"Activities not found"} />}
           />}
       </View>

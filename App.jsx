@@ -14,12 +14,26 @@ import TrackPlayer, {
   AppKilledPlaybackBehavior,
   Capability,
 } from 'react-native-track-player';
-import notifee, { AndroidImportance } from '@notifee/react-native';
-
+import notifee, {AndroidImportance} from '@notifee/react-native';
+import { fonts } from './src/utilities/fonts';
 
 const toastConfig = {
-  success: props => <SuccessToast {...props} text1NumberOfLines={2} text2NumberOfLines={2} />,
-  error: props => <ErrorToast {...props} text1NumberOfLines={2} text2NumberOfLines={2} />,
+  success: props => (
+    <SuccessToast {...props} text1NumberOfLines={2} text2NumberOfLines={2} />
+  ),
+  error: props => (
+    <ErrorToast {...props} text1NumberOfLines={2} text2NumberOfLines={2} />
+  ),
+  custom: props => (
+    <SuccessToast
+      {...props}
+      text1NumberOfLines={2}
+      text2NumberOfLines={2}
+      style={{backgroundColor: props.props.bgColor, borderLeftWidth: 0}}
+      text1Style={{color: colors.white,fontFamily:fonts.bold,fontSize:16}}
+      text2Style={{color: colors.white,fontFamily:fonts.bold}}
+    />
+  ),
 };
 
 const App = () => {
@@ -45,17 +59,17 @@ const App = () => {
     const channelId = await notifee.createChannel({
       id: 'default',
       name: 'Default Channel',
-      importance: AndroidImportance.HIGH
+      importance: AndroidImportance.HIGH,
     });
   };
-  
+
   useEffect(() => {
     createChannel();
     setupPlayer();
     LogBox.ignoreLogs([
       `You seem to update the renderers prop(s) of the "RenderHTML" component in short periods of time`,
       'Non-serializable values were found in the navigation state',
-      'The player has already been initialized via setupPlayer.'
+      'The player has already been initialized via setupPlayer.',
     ]);
   }, []);
   return (

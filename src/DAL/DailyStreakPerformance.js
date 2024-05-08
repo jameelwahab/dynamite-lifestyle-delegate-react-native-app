@@ -11,7 +11,7 @@ export const GET_DAILY_STREAK = ({ token, navigation, }) => {
 
 export const GET_DAILY_STREAK_LIST = ({ token, navigation, page, body: { date_from, date_to } }) => {
   return invokeApi({
-    path: `api/dynamite_streak/get_dynamite_streak_list?page=${page}&limit=10`,
+    path: `api/dynamite_streak/get_dynamite_streak_list?page=${page}&limit=20`,
     method: "POST",
     postData: { date_from, date_to },
     token,
