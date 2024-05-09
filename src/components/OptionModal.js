@@ -31,6 +31,7 @@ const OptionModal = ({
       useNativeDriverForBackdrop={true}
       animationInTiming={300}
       animationOutTiming={300}
+      hideModalContentWhileAnimating={true}
       style={{ margin: 0 }}>
       <SafeAreaView style={{ backgroundColor: colors.secondaryVariant, marginTop: "auto", borderTopLeftRadius: 10, borderTopRightRadius: 10, maxHeight: 500 }} >
         {multiple &&

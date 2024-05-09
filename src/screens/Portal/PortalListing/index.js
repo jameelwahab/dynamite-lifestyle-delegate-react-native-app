@@ -18,8 +18,8 @@ import { icons } from '../../../utilities/icons'
 import ConfirmationModal from '../../../components/ConfirmationModal'
 
 const PortalListing = ({ navigation, route }) => {
-  const { key } = route?.params;
-  const isDelegatePortals = key == "my_portals";
+  const { key ,value} = route?.params;
+  const isDelegatePortals = value == "my_portals";
   const { navbar } = useSelector(selectNavbar);
   const { token } = useSelector(selectUser);
   const [title] = useState(navbar?.find(x => x._id == key)?.title);

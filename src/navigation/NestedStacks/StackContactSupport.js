@@ -27,7 +27,7 @@ const StackContactSupport = ({ route }) => {
         ))}
         {/*//? Default Screens End */}
         <SupportStack.Screen name={routes.supportTicketDeatail} component={Detail} />
-        <SupportStack.Screen name={routes.ticketList} component={List} />
+        <SupportStack.Screen initialParams={route.params} name={routes.ticketList} component={List} />
         <SupportStack.Screen name={routes.addTicket} component={AddTicket} />
         <SupportStack.Screen name={routes.supportTicketReply} component={TicketReply} />
 

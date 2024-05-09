@@ -20,10 +20,15 @@ import { MyButton, TransparentButton } from '../../../components/MyButton'
 import OptionModal from '../../../components/OptionModal'
 import ConfirmationModal from '../../../components/ConfirmationModal'
 import showToast from '../../../functions/showToast'
+import TitleView from '../../../components/TitleView'
+import { selectNavbar } from '../../../redux/reducers/navbarSlice'
 
-const List = ({ navigation }) => {
+const List = ({ navigation, route }) => {
+  const { key, parentKey,  } = route?.params
   const { token } = useSelector(selectUser);
   const timezone = useSelector(selectTimeZone);
+  const { navbar } = useSelector(selectNavbar)
+  const [title] = useState(navbar?.find(x => x._id == parentKey)?.child_options?.find(y => y._id == key)?.title);
   const [list, setList] = useState([]);
   const [loader, setLoader] = useState(false);
   const [filter, setFilter] = useState({ isModalShown: false, value: "all", temp: "all" });
@@ -286,11 +291,12 @@ const List = ({ navigation }) => {
 
   const titleView = () => {
     return (
-      <View style={{ paddingHorizontal: 20, flexDirection: "row", alignItems: 'center' }}>
+      <View style={{ marginHorizontal: 10, flexDirection: "row", alignItems: 'center' }}>
         <View style={{ flex: 1 }}>
-          <MyText color={colors.primary} type="bold" fontSize={18}>
-            Support Tickets
-          </MyText>
+          <TitleView hideBackBottomButton
+            title={title}
+            subTitle={`Total : ${list.length}`}
+          />
         </View>
         {filter.value != 'all' &&
           <TouchableOpacity
@@ -341,6 +347,7 @@ const List = ({ navigation }) => {
           // ItemSeparatorComponent={<View style={{ height: 1 / 3, backgroundColor: colors.lightText }} />}
           ListEmptyComponent={!loader && <EmptyView label={"No Tickets!"} />}
           contentContainerStyle={{ paddingBottom: 70 }}
+          keyExtractor={(item) => item?._id}
         />
 
       </View>

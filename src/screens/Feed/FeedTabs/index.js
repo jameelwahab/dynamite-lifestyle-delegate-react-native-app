@@ -8,7 +8,7 @@ import { selectSettings } from '../../../redux/reducers/settingSlice';
 import HeaderBanner from './HeaderBanner';
 import { selectUser } from '../../../redux/reducers/userSlice';
 
-const FeedTabs = ({ isCosmos, changeTab, tab, CustomTabs }) => {
+const FeedTabs = ({ isCosmos, changeTab, tab, CustomTabs, isScheduleFeedTabAllowed }) => {
   const menuRef = useRef();
   const { settings } = useSelector(selectSettings);
   const { user } = useSelector(selectUser);
@@ -31,7 +31,10 @@ const FeedTabs = ({ isCosmos, changeTab, tab, CustomTabs }) => {
       <View style={{ height: 50, marginTop: 10 }}>
         <FlatList
           contentContainerStyle={{ paddingHorizontal: 10 }}
-          data={!!CustomTabs ? tabsForEvents.concat(CustomTabs) : isCosmos ? tabsForCosmos : tabsForSource}
+          data={!!CustomTabs ?
+            isScheduleFeedTabAllowed ? tabsForEventsWithSchedule.concat(CustomTabs) :
+              tabsForEvents.concat(CustomTabs)
+            : isCosmos ? tabsForCosmos : tabsForSource}
           horizontal
           showsHorizontalScrollIndicator={false}
           ref={menuRef}
@@ -45,15 +48,15 @@ const FeedTabs = ({ isCosmos, changeTab, tab, CustomTabs }) => {
                     animated: true
                   })
                   // setTimeout(() => {
-                  changeTab(index)
+                  changeTab(item.index)
                   // }, 100);
                 }}
-                style={{ justifyContent: "center", paddingHorizontal:10 }}>
-                <MyText fontSize={15} type={index == tab ? 'medium' : 'regular'} color={index == tab ? colors.primary2 : colors.lightText} >
+                style={{ justifyContent: "center", paddingHorizontal: 10 }}>
+                <MyText fontSize={15} type={item.index == tab ? 'medium' : 'regular'} color={item.index == tab ? colors.primary2 : colors.lightText} >
                   {item.title}
                 </MyText>
 
-                <View style={{ borderRadius: 10, marginTop: 3, height: 3, backgroundColor: index == tab ? colors.primary : colors.transparent }} />
+                <View style={{ borderRadius: 10, marginTop: 3, height: 3, backgroundColor: item.index == tab ? colors.primary : colors.transparent }} />
               </TouchableOpacity>
             )
           }}
@@ -79,5 +82,10 @@ const tabsForSource = [
 
 const tabsForEvents = [
   { title: 'FEEDS', key: 'feed', index: 0 },
+  { title: 'EVENTS', key: 'events', index: 1 },
+];
+const tabsForEventsWithSchedule = [
+  { title: 'FEEDS', key: 'feed', index: 0 },
+  { title: 'YOUR SCHEDULED FEEDS', key: 'schedule_feed', index: 2 },
   { title: 'EVENTS', key: 'events', index: 1 },
 ];

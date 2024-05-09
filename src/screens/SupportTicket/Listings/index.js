@@ -170,7 +170,7 @@ const TicketsList = ({ navigation, route }) => {
 
   const searchView = useCallback(() => {
     return (
-      <View style={{ marginHorizontal: 10, backgroundColor: colors.darkSecondary }}>
+      <View style={{marginVertical:-10, marginHorizontal: 10, backgroundColor: colors.darkSecondary }}>
         <MyInputs
           leftIcon={icons.search}
           placeholder='Search...'

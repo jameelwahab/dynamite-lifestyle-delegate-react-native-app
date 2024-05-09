@@ -361,3 +361,25 @@ export const PORTAL_VIDEO_QUESTION_CONFIG = ({ token, navigation, videoId, body:
     navigation,
   })
 }
+
+export const GET_MEMBER_LIST_FOR_PERSONAL_NOTES = ({ token, navigation,searchText}) => {
+  return invokeApi({
+    path: `app/list_member_for_persoal_note/delegate?search_text=${searchText}`,
+    method: "GET",
+    token,
+    navigation,
+  })
+}
+
+export const ADD_PERSONAL_NOTE_FOR_PORTAL = ({ token, navigation,memberId,note}) => {
+  return invokeApi({
+    path: `api/member/update_personal_note`,
+    method: "POST",
+    postData:{
+      member_id:memberId,
+      personal_note:note
+    },
+    token,
+    navigation,
+  })
+}

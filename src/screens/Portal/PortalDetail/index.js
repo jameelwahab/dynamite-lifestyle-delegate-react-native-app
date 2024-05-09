@@ -25,6 +25,7 @@ import AudioPlayerForList from '../../../components/AudioPlayerForList'
 
 const PortalDetail = (props) => {
   const { navigation, route } = props;
+  console.log(props, "props")
   const { eventId } = route?.params
   const { token, user } = useSelector(selectUser);
   const timezone = useSelector(selectTimeZone);
@@ -34,7 +35,7 @@ const PortalDetail = (props) => {
   const [eventTabs, setEventTabs] = useState([]);
   const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [currentEvents, setCurrentEvents] = useState([]);
-
+  const [isScheduledFeedAllowd, setIsScheduledFeedAllowd] = useState(false)
 
   const onEventsChatScreen = () => {
     navigation.navigate(routes.portalChatList, {
@@ -46,14 +47,26 @@ const PortalDetail = (props) => {
     let res = await GET_PORTAL_DETAIL({ navigation, token, eventId: eventId });
     if (res.code == 200) {
       let eventTabs = [];
+      let incrementer = 2;
+      if (res?.scheduled_feed) {
+        incrementer = 3;
+        // eventTabs.push({
+        //   title: "Your Scheduled Feed",
+        //   key: "your_scheduled_feed",
+        //   index: 2
+        // })
+      }
+
       res?.member_dynamite_event.dynamite_event_category.forEach((x, i) => {
         eventTabs.push({
           title: x?.title,
           key: x?.dynamite_event_category_slug,
-          index: i + 2
+          index: i + incrementer
         })
 
       })
+      console.log(eventTabs, "eventTabs")
+      setIsScheduledFeedAllowd(res?.scheduled_feed)
       setEventTabs(eventTabs)
       setEvent(res?.member_dynamite_event);
       setUpcomingEvents(res?.upcoming_events_array);
@@ -70,8 +83,9 @@ const PortalDetail = (props) => {
   }
 
   const showTabView = (tab) => {
+    let incrementer = isScheduledFeedAllowd ? 3 : 2
     return <EventVideos
-      selectedEvent={event?.dynamite_event_category[tab - 2]}
+      selectedEvent={event?.dynamite_event_category[tab - incrementer]}
       navigation={navigation}
     />
   }
@@ -180,7 +194,7 @@ const PortalDetail = (props) => {
 
         <View style={{ flex: 1, marginHorizontal: 10 }}>
           <FeedScreen
-
+            isScheduleFeedTabAllowed={isScheduledFeedAllowd}
             CustomHeader={bannerView}
             CustomTabs={eventTabs}
             showTabView={showTabView}

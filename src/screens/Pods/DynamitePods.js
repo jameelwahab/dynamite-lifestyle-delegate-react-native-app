@@ -104,7 +104,8 @@ const DynamitePods = ({ navigation, route }) => {
   }
 
   return (
-    <RootView hideBackBottomButton title={title}>
+    <RootView hideBackBottomButton title={title}
+      subTitle={`Total : ${list.length}`}>
       <View style={{ flex: 1 }}>
         <FlatList
           stickyHeaderIndices={[0]}

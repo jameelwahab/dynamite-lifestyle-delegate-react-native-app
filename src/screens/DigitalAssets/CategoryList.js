@@ -21,7 +21,7 @@ const CategoryList = ({ navigation, route }) => {
   const { navbar } = useSelector(selectNavbar)
   const [title] = useState(navbar?.find(x => x._id == parentKey)?.child_options?.find(y => y._id == key)?.title);
   const [list, setList] = useState([])
-  const [loader, setLoader] = useState(false)
+  const [loader, setLoader] = useState(true)
   const [width] = useState(utilities.screenWidth())
   useEffect(() => {
     getDataFromServer()

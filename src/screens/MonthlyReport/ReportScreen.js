@@ -1,4 +1,4 @@
-import { View, Text, processColor, ScrollView, Platform } from 'react-native'
+import { View, Text, processColor, ScrollView, Platform, TouchableOpacity } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import RootView from '../../components/RootView'
 import MyText from '../../components/MyText'
@@ -29,12 +29,18 @@ const ReportScreen = ({ navigation, route }) => {
   const [data, setData] = useState(null);
   const [currentMonYear, setCurrentMonYear] = useState(moment().format("MM-YYYY"))
   const [width] = useState(utilities.screenWidth())
-  const [linechartDate, setLinechartDate] = useState(null);
+  const [lineChartLabels, setLineChartLabels] = useState([]);
+  const [linechartDate, setLinechartDate] = useState([]);
+  const [shownCharts, setShownCharts] = useState({ ...lebels });
+
   useEffect(() => {
     setLoader(true)
     getDataFromServer()
-
   }, [currentMonYear])
+
+  useEffect(() => {
+    console.log(shownCharts, "shownCharts")
+  }, [shownCharts])
 
   const getLabels = (res) => {
     let totalDays = moment(currentMonYear, "MM-YYYY").daysInMonth();
@@ -85,39 +91,38 @@ const ReportScreen = ({ navigation, route }) => {
       }
 
     }
-    let gdata = {
-      labels: labels,
-      datasets: [
-        {
-          data: attitudeArray,
-          color: (opacity = 1) => "#EDBF60",
 
-        },
-        {
-          data: focusArray,
-          color: (opacity = 1) => "#72B64A",
-        },
-        {
-          data: desireArray,
-          color: (opacity = 1) => "#932CE7"
-        },
-        {
-          data: displineArray,
-          color: (opacity = 1) => "#0000F5"
-        },
-        {
-          data: winArray,
-          color: (opacity = 1) => "#B6263D"
-        },
+    let dataArr = [
+      {
+        data: attitudeArray,
+        color: (opacity = 1) => "#EDBF60",
 
-        {
-          data: [10],
-          withDots: false,
-        }
-      ]
-    }
+      },
+      {
+        data: focusArray,
+        color: (opacity = 1) => "#72B64A",
+      },
+      {
+        data: desireArray,
+        color: (opacity = 1) => "#932CE7"
+      },
+      {
+        data: displineArray,
+        color: (opacity = 1) => "#0000F5"
+      },
+      {
+        data: winArray,
+        color: (opacity = 1) => "#B6263D"
+      },
 
-    setLinechartDate(gdata)
+      {
+        data: [10],
+        withDots: false,
+      }
+    ]
+
+    setLineChartLabels(labels)
+    setLinechartDate(dataArr)
   }
 
   const getDataFromServer = async () => {
@@ -132,13 +137,30 @@ const ReportScreen = ({ navigation, route }) => {
     }
   }
 
+  const toggleType = (color) => {
+    if (!!shownCharts[color]) {
+      delete shownCharts[color];
+    } else {
+      shownCharts[color] = true;
+    }
+    setShownCharts({ ...shownCharts });
+  }
 
 
+  const filterTheLineGraphData = () => {
+    let arr = linechartDate.slice().filter(x => {
+      if (x?.color) {
+        return !!shownCharts[x.color()]
+      }else{
+        return true
+      }
+    })
+    return arr
+  }
 
   //? Views
 
   const graphView = () => {
-
     return (
       <View style={{}}>
         {!!data?.default_setting?.intentions_heading &&
@@ -212,13 +234,16 @@ const ReportScreen = ({ navigation, route }) => {
             <MyText align='center' fontSize={18} type='bold'>{data?.default_setting?.performance_heading}</MyText>
           </View>}
         <View style={{ marginTop: 20, height: 450 }}>
-          {!!linechartDate &&
+          {lineChartLabels.length > 0 &&
             <ScrollView horizontal>
               <LineChart
                 onDataPointClick={({ value, getColor }) => {
                   showToastCustom({ title: `${lebels[getColor()]} : ${value}`, bgColor: getColor() });
                 }}
-                data={linechartDate}
+                data={{
+                  labels: lineChartLabels,
+                  datasets: filterTheLineGraphData()
+                }}
                 width={(utilities.screenWidth() * 0.2) * moment(currentMonYear, "MM-YYYY").daysInMonth()}
                 height={500}
 
@@ -254,8 +279,6 @@ const ReportScreen = ({ navigation, route }) => {
             {label("#0000F5", "Discipline")}
           </View>
           {label("#B6263D", "Win")}
-
-
         </View>
       </View>
     )
@@ -263,10 +286,12 @@ const ReportScreen = ({ navigation, route }) => {
 
   const label = (bgColor, label) => {
     return (
-      <View style={{ flex: 1, flexDirection: "row", alignItems: "center", margin: 5 }}>
-        <View style={{ marginRight: 5, height: 10, width: 10, borderRadius: 2, backgroundColor: bgColor }} />
+      <TouchableOpacity
+        onPress={() => toggleType(bgColor)}
+        style={{ flex: 1, flexDirection: "row", alignItems: "center", padding: 10 }}>
+        <View opacity={!!shownCharts[bgColor] ? 1 : 0.3} style={{ marginRight: 5, height: 10, width: 10, borderRadius: 2, backgroundColor: bgColor }} />
         <MyText>{label}</MyText>
-      </View>
+      </TouchableOpacity>
     )
   }
 

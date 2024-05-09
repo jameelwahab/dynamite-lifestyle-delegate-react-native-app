@@ -26,6 +26,7 @@ import { colors } from '../../../utilities/colors'
 import routes from '../../../navigation/routes'
 import ScheduleModal from './ScheduleModal'
 import Header from '../../../components/Header'
+import AddPersonalNoteModal from '../AddPersonalNoteModal'
 
 
 
@@ -46,14 +47,17 @@ let likeVar = {
   id: "",
   actionType: ""
 }
-const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, upcomingEvents, currentEvents }) => {
+const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, upcomingEvents, currentEvents, hideTabs = false, isScheduleFeedTabAllowed = false, schedulePost = false }) => {
   const addPostRef = useRef()
   const scheduleModalRef = useRef();
+  const ref_personalNoteModal = useRef();
+
   const { feedFor, feedId, eventId = "" } = route?.params;
   const isCosmos = feedFor == "the_cosmos";
   const isScheduledFeed = feedFor == "scheduled";
   const isAllSourceFeed = feedFor == "all_source";
   const isEventFeed = feedFor == "event";
+  console.log(feedFor, "feedFor")
   const { token, user } = useSelector(selectUser);
   const { socket } = useSelector(selectSocket);
   const timezone = useSelector(selectTimeZone);
@@ -86,6 +90,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
     loader: false,
 
   });
+
 
 
 
@@ -190,7 +195,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
   }
 
   const getFeedList = async () => {
-    let res = await GET_FEED_LIST({ navigation, token, type: feedFor, level: feedLevel, page: feedVar.page, eventId: eventId });
+    let res = await GET_FEED_LIST({ navigation, token, type: schedulePost ? "scheduled" : feedFor, level: feedLevel, page: feedVar.page, eventId: eventId });
     if (res.code == 200) {
       if (res?.total_pages > (1 + feedVar.page)) {
         feedVar = {
@@ -498,7 +503,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
 
 
   const changeTab = (newTab) => {
-    console.log(newTab,"newTab")
+    console.log(newTab, "newTab")
     setTab(newTab);
   }
 
@@ -603,9 +608,8 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
   }
 
   const actionOfFeedOptions = (selectedOpt) => {
-    console.log(selectedOpt, "selectedOpt");
-    let item = feedOptionModal.selectedItem;
 
+    let item = feedOptionModal.selectedItem;
     setFeedOptionModal({
       isVisible: false,
       selectedItem: null
@@ -634,6 +638,10 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       }, 500);
     } else if (selectedOpt?.type == "message") {
       onChatScreen(item?.action_info?.action_id)
+    } else if (selectedOpt?.type == "notes") {
+      setTimeout(() => {
+        ref_personalNoteModal?.current?.openModal(item?.description)
+      }, 500);
     }
   }
 
@@ -708,29 +716,37 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
   }
 
   const filterTheOptions = (options) => {
-    let newList = [...options];
+    if (feedOptionModal.isVisible) {
+      let newList = [...options];
 
-    if ((isEventFeed && feedOptionModal?.selectedItem?.action_info?.action_id == user?._id) || !isEventFeed) {
-      if (feedOptionModal?.selectedItem?.is_feature)
-        newList = newList.slice().filter(x => x.type != "pin" && x.type != "notes");
-      else if (!feedOptionModal?.selectedItem?.is_feature)
-        newList = newList.slice().filter(x => x.type != "unpin" && x.type != "notes");
-      else
-        newList = newList.slice().filter(x => x.type != "notes");
-    } else if (isEventFeed) {
-      newList = newList.slice().filter(x => x.type == "notes");
-    }
-
-    if (!isCosmos || !isScheduledFeed || !isEventFeed) {
-      newList = newList.slice().filter(x => {
-        if (x.type == "message" && user?._id == feedOptionModal?.selectedItem?.action_info?.action_id) {
-          return false
+      if ((isEventFeed && feedOptionModal?.selectedItem?.action_info?.action_id == user?._id) || !isEventFeed) {
+        if (user?.is_super_delegate) {
+          if (feedOptionModal?.selectedItem?.is_feature)
+            newList = newList.slice().filter(x => x.type != "pin");
+          else if (!feedOptionModal?.selectedItem?.is_feature)
+            newList = newList.slice().filter(x => x.type != "unpin");
+        } else {
+          newList = newList.slice().filter(x => x.type != "pin" && x.type != "unpin");
         }
-        return true
-      });
-    }
+      }
+      if (!isEventFeed) {
+        newList = newList.slice().filter(x => x.type != "notes");
+      }
+      console.log(!isEventFeed, !user?.is_super_delegate, !isEventFeed || !user?.is_super_delegate, "isEventFeed && user?.is_super_delegate")
 
-    return newList
+      if (!isCosmos || !isScheduledFeed || !isEventFeed) {
+        newList = newList.slice().filter(x => {
+          if (x.type == "message" && user?._id == feedOptionModal?.selectedItem?.action_info?.action_id) {
+            return false
+          }
+          return true
+        });
+      }
+
+      return newList
+    } else {
+      return []
+    }
   }
 
   const onLikebtnPress = async (feedId, isLike) => {
@@ -754,7 +770,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
   // !  VIEWS /////////////////
 
   const footerView = () => {
-
+    console.log(tab, "FFooter Tab")
     if (tab == 0) {
       return (
         <View style={{ height: 50, alignItems: "center", justifyContent: "center" }}>
@@ -771,6 +787,19 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           isEventFeed={isEventFeed}
           noticeboard={feedData?.notice_board}
         />)
+    }
+    else if (tab == 2 && isScheduleFeedTabAllowed) {
+      return (
+        <View style={{ flex: 1, paddingHorizontal: 10 }}>
+          <FeedScreen
+            navigation={navigation}
+            route={route}
+            hideTabs={true}
+            isScheduleFeedTabAllowed={true}
+            schedulePost={true}
+          />
+        </View>)
+
     }
     else if (isEventFeed) {
       return showTabView(tab)
@@ -809,12 +838,13 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
             <MyText fontSize={18} type='bold' color={colors.primary} >{route?.params?.title}</MyText></View>
         }
         {!!CustomHeader && CustomHeader()}
-
-        <FeedTabs
-          CustomTabs={CustomTabs}
-          isCosmos={isCosmos}
-          tab={tab}
-          changeTab={changeTab} />
+        {!hideTabs &&
+          <FeedTabs
+            CustomTabs={CustomTabs}
+            isCosmos={isCosmos}
+            tab={tab}
+            changeTab={changeTab}
+            isScheduleFeedTabAllowed={isScheduleFeedTabAllowed} />}
 
         <AddPost
           ref={addPostRef}
@@ -836,7 +866,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
             return [...feeds];
           })}
           isCosmos={isCosmos}
-          isScheduledFeed={isScheduledFeed}
+          isScheduledFeed={isScheduledFeed || schedulePost}
           isEventFeed={isEventFeed}
           eventId={isEventFeed ? eventId : ""}
           timezone={timezone}
@@ -877,14 +907,13 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       <View style={{ flex: 1, marginHorizontal: -10 }}>
         <FlatList
           data={tab == 0 ? feed : []}
-          onViewableItemsChanged={onViewableItemsChanged}
-          viewabilityConfig={viewConfigRef.current}
+          // onViewableItemsChanged={onViewableItemsChanged}
+          // viewabilityConfig={viewConfigRef.current}
           showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item?._id}
           ListHeaderComponent={!!!feedId && headerView()}
           ListEmptyComponent={!loader && tab == 0 && <EmptyView label={"Posts not found"} />}
           onEndReached={() => {
-            console.log("onEndReached", feedVar,!!!feedId,tab)
             if (!!!feedId && feedVar?.canLoadMore && tab == 0) {
               feedVar = {
                 ...feedVar,
@@ -900,7 +929,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           updateCellsBatchingPeriod={10}
           maxToRenderPerBatch={10}
           windowSize={5}
-          initialNumToRender={10} 
+          initialNumToRender={10}
         />
       </View>
 
@@ -958,10 +987,14 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
         isVisible={confirmation.isVisible}
         onAgree={confirmationAction}
         title={confirmation.title}
-  
+
       />
 
       <ScheduleModal ref={scheduleModalRef} />
+
+      <AddPersonalNoteModal
+        ref={ref_personalNoteModal}
+      />
 
       <MyLoader enable={loader} />
     </View >

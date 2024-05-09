@@ -355,8 +355,8 @@ export const ChildComponents = {
     key: routes.transactionNavigator,
     component: StackTransactions,
     params: {
-      value: "transactions", parentValue: "payments"
-      , key: "",
+      value: "transactions", parentValue: "payments", 
+      key: "558ec2ba-49ca-4740-bb81-a0a29296d69d",
       parentKey: "455ccc75-c8d3-41b3-856b-5a133a185c5b",
     }
   },
@@ -441,7 +441,7 @@ export const ChildComponents = {
     params: {
       value: "assessment_study", parentValue: "certification",
       key: "3bbea0ca-7d66-4225-9950-9ecec741637d",
-      parentKey: "3bbea0ca-7d66-4225-9950-9ecec741637d",
+      parentKey: "9ebb9563-c76c-42d0-b2e5-de7a88bbf3c9",
     }
   },
   "f18f9630-2dc1-4e42-a498-0a0e7e9407be": {
