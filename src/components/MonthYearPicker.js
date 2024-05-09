@@ -88,6 +88,7 @@ const MonthYearPicker = forwardRef(({ onAgree }, ref) => {
                 selectedValue={month}
                 pickerData={monthList}
                 onValueChange={value => setMonth(value)}
+                
               />
               {icons.downward(colors.primary)}
             </View>

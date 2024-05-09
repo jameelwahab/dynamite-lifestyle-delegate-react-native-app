@@ -45,7 +45,11 @@ const routes = {
   helpTechNavigator: "HELP_TECH_NAVIGATOR",
   dailyStreakPerformerNavigator: "DAYLY_STREAK_PERFORMANCE_NAVIGATOR",
   monthlyReportNavigator: "MONTHLY_REPORT_NAVIGATOR",
+  broadcastNavigator: "BROADCAST_NAVIGATOR",
+
   //! ///    Screens'
+
+  //? AUth
   login: "LOGIN_SCREEN",
   splash: "SPLASH_SCREEN",
   forgotPassword: "FORGOT_PASSWORD_SCREEN",
@@ -251,6 +255,12 @@ const routes = {
 
   //? Montly Report 
   monthyReportScreen: "MONTHY_REPORT_SCREEN",
+
+  //? Broadcast Chat
+  broadcastChatList: "BROADCAST_CHAT_LIST_SCREEN",
+  broadcastChatMessageList: "BROADCAST_CHAT_MESSAGE_LIST_SCREEN",
+  broadcastStartNewChat: "BROADCAST_START_NEW_CHAT_SCREEN",
+
 }
 
 export default routes;

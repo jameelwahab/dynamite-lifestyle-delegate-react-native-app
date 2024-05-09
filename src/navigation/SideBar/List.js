@@ -41,6 +41,7 @@ import StackDigitalAssets from "../NestedStacks/StackDigitalAsset";
 import StackHelpTech from "../NestedStacks/StackHelpTech";
 import StackDailyStreakPerformance from "../NestedStacks/StackDailyStreakPerformance";
 import StackMonthReport from "../NestedStacks/StackMonthyReport";
+import StackBroadcast from "../NestedStacks/StackBroadcastChat";
 
 
 
@@ -286,6 +287,15 @@ export const ParentComponents = {
     params: {
       value: "performance_stats",
       key: "aadbd7a3-91c1-40dd-bf24-8987688566hhh"
+    }
+  },
+
+  "aadbd7a3-91c1-40dd-bf24-898768876hhh": {
+    key: routes.broadcastNavigator,
+    component: StackBroadcast,
+    params: {
+      value: "broadcast_chats",
+      key: "aadbd7a3-91c1-40dd-bf24-898768876hhh"
     }
   },
 }
