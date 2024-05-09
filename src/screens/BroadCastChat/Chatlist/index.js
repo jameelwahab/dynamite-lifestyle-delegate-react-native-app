@@ -1,9 +1,9 @@
-import { View, Text, FlatList, StyleSheet, TouchableHighlight, Keyboard, SafeAreaView, Pressable, TouchableOpacity, Platform } from 'react-native'
+import { View, Text, FlatList, StyleSheet, TouchableHighlight, Keyboard, SafeAreaView, Pressable, TouchableOpacity, Platform, Image } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import RootView from '../../../components/RootView'
 import MyLoader, { SimpleLoader } from '../../../components/MyLoader'
 import MyText from '../../../components/MyText'
-import { CHAT_LIST, PORTAL_LIST } from '../../../DAL'
+import { CHAT_LIST, GET_BROADCAST_CHAT_LIST, PORTAL_LIST } from '../../../DAL'
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../../redux/reducers/userSlice'
 import UserImage from '../../../components/UserImage'
@@ -68,15 +68,11 @@ const ChatList = ({ navigation, route }) => {
   }
 
   const api_ChatList = async (newArray = false) => {
-    let res = await CHAT_LIST({
-      navigation, body: {
-        event_id: eventId?._id,
-        search_text: searchText,
-        chat_type: tab
-      }, token, page
+    let res = await GET_BROADCAST_CHAT_LIST({
+      navigation, body: { search_text: searchText, }, token, page
     })
     if (res.code == 200) {
-      if ((chatList.length + res?.chat.length) < res?.total_chat_count) {
+      if ((chatList.length + res?.broadcasts.length) < res?.total_count) {
         page++;
         canLoadMore = true;
       } else {
@@ -84,7 +80,7 @@ const ChatList = ({ navigation, route }) => {
       }
       setLoader(false);
       setFooterLoader(false);
-      setChatList(newArray ? res?.chat : [...chatList, ...res?.chat]);
+      setChatList(newArray ? res?.broadcasts : [...chatList, ...res?.broadcasts]);
       firstTime = false;
     } else {
       setLoader(false)
@@ -107,12 +103,7 @@ const ChatList = ({ navigation, route }) => {
 
   }
 
-  const api_portalList = async () => {
-    let res = await PORTAL_LIST({ navigation, token })
-    if (res.code == 200) {
-      setPortalList([{ ...noneObj }, ...res?.member_dynamite_event]);
-    }
-  }
+
 
   useEffect(() => {
     if (!firstTime) {
@@ -139,8 +130,7 @@ const ChatList = ({ navigation, route }) => {
     page = 0;
     canLoadMore = false;
     api_ChatList()
-    api_portalList()
-    socketEvents();
+    // socketEvents();
 
     return () => {
       page = 0;
@@ -458,22 +448,25 @@ const ChatList = ({ navigation, route }) => {
         onPress={() => onChatScreen(member, item)}
         underlayColor={colors.secondary}>
         <View style={__style.itemRootView}>
-          <View>
-            <UserImage
+          <View style={__style.itemImage}>
+            <Image source={icons.broadcast}
+              style={{ height: 30, width: 30, }}
+            />
+            {/* <UserImage
               image={member?.profile_image}
               name={member?.first_name}
             />
             <View style={[__style.status, {
               backgroundColor: member?._id?.is_online ? colors.online : colors.primary2
-            }]} />
+            }]} /> */}
           </View>
 
           <View style={__style.seondViewRow}>
             <View style={__style.headerView}>
               <View style={{ flex: 1 }}>
-                <MyText fontSize={14} type='medium' >{member?.first_name + " " + member?.last_name}</MyText>
+                <MyText fontSize={14} type='medium' >{item?.broadcast_title}</MyText>
               </View>
-              <MyText fontSize={10} color={colors.lightText} >{convertTimezone(item?.last_message_date_time, timezone).format(dateTimeFormat.dateTime)}</MyText>
+              <MyText fontSize={10} color={colors.lightText} >{convertTimezone(item?.latest_message?.createdAt, timezone).format(dateTimeFormat.dateTime)}</MyText>
             </View>
             <View style={{ marginTop: 3, flexDirection: "row", alignItems: "center" }}>
 
@@ -484,24 +477,30 @@ const ChatList = ({ navigation, route }) => {
                     icons.seen(item?.last_message_status == "read" ? colors.primary : colors.white, 20)}
                 </View>}
 
-              {item.message_type != "general" &&
+              {item?.latest_message.message_type == "schedule" &&
                 <View style={{ marginRight: 5 }}>
-                  {item.message_type == "image" ? icons.camera(colors.white, 12) :
-                    item.message_type == "audio" ? icons.mic(colors.white, 15) :
-                      item.message_type == "video" ? icons.playCircle(colors.white, 18) : ""}
+                  {icons.clock(colors.white, 12)}
+                </View>
+              }
+
+              {item?.latest_message.message_content_type != "general" &&
+                <View style={{ marginRight: 5 }}>
+                  {item?.latest_message.message_content_type == "image" ? icons.camera(colors.white, 12) :
+                    item?.latest_message.message_content_type == "audio" ? icons.mic(colors.white, 15) :
+                      item?.latest_message.message_content_type == "video" ? icons.playCircle(colors.white, 18) : ""}
                 </View>
               }
               <View style={{ flexDirection: "row", flex: 1, height: 18 }}>
                 <MyText fontSize={12} type='light' numberOfLines={1} style={{ marginTop: 3, flex: 1 }}>
-                  {!!item?.last_message ?
-                    isHtml(item?.last_message) ?
+                  {!!item?.latest_message?.message ?
+                    isHtml(item?.latest_message?.message) ?
                       decode(item.last_message.replace(/<[^>]+>/g, '').replace(/\*/g, "").replace(/[\])}[{(]/g, " ").slice(0, 70), { level: "html5" }) :
                       <Markdown style={markdownStyleOther}>
-                        {item?.last_message.replace(/\n/g, "").slice(0, 100)}
+                        {item?.latest_message?.message.replace(/\n/g, "").slice(0, 100)}
                       </Markdown> :
-                    item.message_type == "image" ? "Photo" :
-                      item.message_type == 'audio' ? "Audio" :
-                        item.message_type == 'video' ? "Video" : ""}
+                    item?.latest_message?.message_content_type == "image" ? "Photo" :
+                      item?.latest_message?.message_content_type == 'audio' ? "Audio" :
+                        item?.latest_message?.message_content_type == 'video' ? "Video" : ""}
 
                 </MyText>
                 {otherUser?.unread_message_count > 0 &&
@@ -593,6 +592,14 @@ const __style = StyleSheet.create({
     paddingVertical: 20,
     paddingHorizontal: 10,
 
+  },
+  itemImage: {
+    height: 40,
+    width: 40,
+    borderRadius: 40 / 2,
+    backgroundColor: colors.secondary,
+    alignItems: "center",
+    justifyContent: "center"
   },
   headerView: {
     flexDirection: "row",

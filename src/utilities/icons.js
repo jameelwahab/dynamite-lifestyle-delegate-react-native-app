@@ -31,6 +31,7 @@ export const icons = {
   wheelOfLife: require('../assets/icons/wheel-icon.webp'),
   checked: require('../assets/icons/checked.png'),
   csv: require('../assets/icons/csv.png'),
+  broadcast: require('../assets/icons/broadcast.png'),
 
   file_csv: require('../assets/icons/csv1.png'),
   file_pdf: require('../assets/icons/pdf.png'),
@@ -124,5 +125,5 @@ export const icons = {
   duplicate: (color = colors.white, size = 20) => { return (<Ionicons name="duplicate" color={color} size={size} />) },
   drag: (color = colors.white, size = 20) => { return (<MaterialIcons name="drag-indicator" color={color} size={size} />) },
   document: (color = colors.white, size = 20) => { return (<Ionicons name="document-text" color={color} size={size} />) },
-  cuurency_gbp : (color = colors.white, size = 20) => { return (<MaterialIcons name="currency-pound" color={color} size={size} />) },
+  cuurency_gbp: (color = colors.white, size = 20) => { return (<MaterialIcons name="currency-pound" color={color} size={size} />) },
 }
