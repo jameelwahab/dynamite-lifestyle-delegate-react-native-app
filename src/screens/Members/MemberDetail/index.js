@@ -22,6 +22,8 @@ import OptionModal from '../../../components/OptionModal'
 import { optionList } from '../Components/list'
 import { MenuButton } from '../../../components/MyButton'
 import { selectNavbar } from '../../../redux/reducers/navbarSlice'
+import MyCheckBox from '../../../components/MyCheckBox'
+import CallHistoryNoteModal from '../Components/CallHistoryNoteModal'
 
 const MemberDetail = ({ navigation, route }) => {
   const { type } = route?.params;
@@ -31,17 +33,16 @@ const MemberDetail = ({ navigation, route }) => {
   const leadModalRef = useRef();
   const hitoryModalRef = useRef();
   const notesModalRef = useRef();
+  const ref_callHistoryModal = useRef();
   const timezone = useSelector(selectTimeZone)
   const { token, user } = useSelector(selectUser)
   const [member, setMember] = useState(route?.params?.member);
   const [showMorePages, setShowMorePages] = useState(false);
   const [showMorePrograms, setShowMorePrograms] = useState(false);
   const [isOptionModalVisible, setIsOptionModalVisible] = useState(false);
-  const { navbar } = useSelector(selectNavbar);
-  const [isChatAllowed] = useState(!!navbar.find(x => x.value == 'chat'));
+
 
   const onOptSelected = (opt) => {
-    console.log(opt, "onOptSelected");
     setIsOptionModalVisible(false)
     if (opt?.key == "notes") {
       navigation.navigate(routes.memberNotesListing, {
@@ -68,6 +69,11 @@ const MemberDetail = ({ navigation, route }) => {
   const updateTheNotes = (notes, memberId) => {
     route?.params?.updateNotes?.(notes, memberId);
     setMember({ ...member, personal_note: notes });
+  }
+
+  const updateCallNotes = (notes, memberId) => {
+    route?.params?.updateCallNote?.(notes, memberId);
+    setMember({ ...member, call_history: notes });
   }
 
 
@@ -179,7 +185,7 @@ const MemberDetail = ({ navigation, route }) => {
           <TouchableOpacity style={{ marginRight: 10 }} onPress={() => onChatScreen(member?._id)}>
             {icons.message(colors.primary, 20)}
           </TouchableOpacity>
-          
+
           <MenuButton
             size={22}
             onPress={() => setIsOptionModalVisible(true)}
@@ -266,9 +272,10 @@ const MemberDetail = ({ navigation, route }) => {
             {member?.event_subscriber.map((x, i) => {
               if ((showMorePages == false && i < 2) || showMorePages) {
                 return (
-                  <MyText style={{ marginTop: 3 }} fontSize={12} type='medium' >{
-                    x?.page_info?.sale_page_title + " | " + x?.plan_info?.plan_title
-                  }</MyText>
+                  <MyText key={`event_subscriber${i}`}
+                    style={{ marginTop: 3 }} fontSize={12} type='medium' >{
+                      x?.page_info?.sale_page_title + " | " + x?.plan_info?.plan_title
+                    }</MyText>
                 )
               }
             })}
@@ -294,7 +301,7 @@ const MemberDetail = ({ navigation, route }) => {
             {member?.program.map((x, i) => {
               if ((showMorePrograms == false && i < 2) || showMorePrograms) {
                 return (
-                  <MyText fontSize={12} type='medium' >{
+                  <MyText key={`program${i}`} fontSize={12} type='medium' >{
                     x?._id?.title
                   }</MyText>
                 )
@@ -314,6 +321,22 @@ const MemberDetail = ({ navigation, route }) => {
     )
   }
 
+  const contactNumberView = (phone, isChecked) => {
+    return (
+      <View style={{ flexDirection: 'row', alignItems: "center" }}>
+        <View style={{ marginRight: 10 }}>
+          <MyText type='medium' fontSize={12}>{phone}</MyText>
+        </View>
+        <View pointerEvents={isChecked ? "none" : "auto"}>
+          <MyCheckBox
+            pb={0}
+            value={isChecked}
+            onPress={() => ref_callHistoryModal?.current?.openModal()}
+          />
+        </View>
+      </View>)
+  }
+
 
   const memberStatView = () => {
     return (
@@ -326,7 +349,7 @@ const MemberDetail = ({ navigation, route }) => {
         <StatView title={"Community Level"} value={member?.community_level} uppercase={member?.community_level == 'pta'} />
         <StatView title={"Wheel of life"} view={wheelOfLifeStatus} />
         <StatView title={"Last Login Activity"} uppercase value={convertTimezone(member?.last_login_activity, timezone).format(dateTimeFormat.dateTime)} />
-        <StatView title={"Phone Number"} value={member?.contact_number} />
+        <StatView title={"Phone Number"} view={() => contactNumberView(member?.contact_number, !!member?.call_history?.is_checked)} />
         <StatView title={"Lead Status"} view={leadStatusView} />
         {isMembers && <StatView title={"Wheel of Life Completed Date"} value={!!member?.wheel_of_life_completed_date ? moment(member?.wheel_of_life_completed_date).format(dateTimeFormat.date) : "N/A"} />}
         <StatView title={"Client Note"} view={noteView} />
@@ -391,6 +414,12 @@ const MemberDetail = ({ navigation, route }) => {
         navigation={navigation}
         ref={notesModalRef}
         updateNotes={updateTheNotes}
+      />
+
+      <CallHistoryNoteModal
+        ref={ref_callHistoryModal}
+        memberId={member?._id}
+        updateCallNotes={updateCallNotes}
       />
     </RootView>
   )

@@ -241,3 +241,16 @@ export const GET_EVENT_DETAIL = ({ token, navigation, slug }) => {
     navigation,
   })
 }
+
+export const ADD_CALL_HISTORY_NOTE = ({ token, navigation, memberId, body: {
+  date, is_add_to_personal_notes, is_checked, notes
+} }) => {
+  return invokeApi({
+    path: `api/member/call_history_note/add/${memberId}`,
+    method: "POST",
+    postData: { date, is_add_to_personal_notes, is_checked, notes },
+    token,
+    navigation,
+  })
+}
+

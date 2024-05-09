@@ -368,6 +368,16 @@ const MemberList = ({ navigation, route }) => {
     }
   }
 
+  const updateCallNote = (notes, MemberId) => {
+    let newList = [...list]
+    let index = list.findIndex(x => x._id === MemberId);
+    if (index > -1) {
+      let obj = { ...list[index], call_history: notes }
+      newList.splice(index, 1, obj)
+      setList(newList)
+    }
+  }
+
   useEffect(() => {
 
     page = 0;
@@ -388,7 +398,8 @@ const MemberList = ({ navigation, route }) => {
   const onMemberDetail = (item) => {
     navigation.navigate(routes.memberDetails, {
       member: item,
-      updateNotes: updateNotes
+      updateNotes: updateNotes,
+      updateCallNote:updateCallNote
     })
   }
 
@@ -429,7 +440,7 @@ const MemberList = ({ navigation, route }) => {
 
   const chip = (title, onPress) => {
     return (
-      <View style={__styles.chipView}>
+      <View key={"chip"+title} style={__styles.chipView}>
         <View style={{}}>
           <MyText fontSize={12} color={colors.white} >{title}</MyText>
         </View>
@@ -756,6 +767,7 @@ const MemberList = ({ navigation, route }) => {
     <RootView hideBackBottomButton titleView={topView}>
       <View style={{ flex: 1 }}>
         <FlatList
+          keyExtractor={(item) => item?._id}
           keyboardShouldPersistTaps="handled"
           ListHeaderComponent={headerView()}
           stickyHeaderHiddenOnScroll={true}
