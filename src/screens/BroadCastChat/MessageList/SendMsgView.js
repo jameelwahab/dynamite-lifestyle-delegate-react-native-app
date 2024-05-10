@@ -1,5 +1,5 @@
 import { View, Text, TouchableHighlight, Image, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Pressable, Platform } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { colors } from '../../../utilities/colors'
 import Collapsible from 'react-native-collapsible'
 import { icons } from '../../../utilities/icons'
@@ -15,8 +15,8 @@ import { fonts } from '../../../utilities/fonts'
 import { useSelector } from 'react-redux'
 import { selectSocket } from '../../../redux/reducers/socketSlice'
 import { selectUser } from '../../../redux/reducers/userSlice'
-import { UPLOAD_FILE_FOR_CHAT } from '../../../DAL'
-import { S3_URL, appName } from '../../../utilities/constants'
+import { EDIT_SCHEDULE_BROADCAST_MESSAGE, SEND_BROADCAST_MESSAGE, UPLOAD_FILE_FOR_CHAT } from '../../../DAL'
+import { S3_URL, appName, dateTimeFormat } from '../../../utilities/constants'
 import { ProgressBar } from 'react-native-paper'
 import AudioRecorderPlayer, {
   AudioEncoderAndroidType,
@@ -32,11 +32,17 @@ import { PERMISSIONS, request, requestMultiple } from 'react-native-permissions'
 import { SimpleLoader } from '../../../components/MyLoader'
 import { isUrl } from '../../../functions/regex'
 import MyInputs from '../../../components/MyInputs'
+import MyCheckBox from '../../../components/MyCheckBox'
+import MyTouchableInput from '../../../components/MyTouchableInput'
+import CalendarModal from '../../../components/CalendarModal'
+import TimePicker from '../../../components/TimePicker'
 let selection;
 
-const SendMsgView = ({ receiver, navigation, edit, clearEdit }) => {
+const SendMsgView = ({ receiver, navigation, edit, clearEdit, chatId, setChat }) => {
   const { socket } = useSelector(selectSocket);
   const { user, token } = useSelector(selectUser);
+  const ref_timePicker = useRef()
+  const ref_calendar = useRef()
   const [audioRecorderPlayer] = useState(new AudioRecorderPlayer());
   const [isEditorVisible, setEditorVisiblity] = useState(true);
   const [imageZommer, setImageZommer] = useState("")
@@ -54,15 +60,29 @@ const SendMsgView = ({ receiver, navigation, edit, clearEdit }) => {
     audio: "",
     audioTime: ""
   });
+  const [recordedAudio, setRecordedAudio] = useState(null)
+  const [broadcastType, setBroadcastType] = useState({
+    isVisible: false,
+    type: 1,
+    scheduleDate: moment(),
+    scheduleTime: "00:00"
+  })
+
+  const [sendMsgLoader, setSendMsgLoader] = useState(false);
 
   const setMsg = (updation) => updateMsg({ ...msg, ...updation })
 
   useEffect(() => {
-    if (!!edit?.id) {
+    if (!!edit?._id) {
       setMsg({
-        image: edit?.image,
-        text: edit?.msg,
-      })
+        image: !!edit?.image ? edit?.image : "",
+        text: !!edit?.message ? edit?.message : "",
+        audio: !!edit?.audio ? edit?.audio : "",
+        audioTime: !!edit?.audio_duration ? edit?.audio_duration : "",
+      });
+      if (edit?.status == "schedule") {
+        setBroadcastType({ ...broadcastType, type: 2, scheduleDate: moment(edit?.schedule_date, "YYYY-MM-DD"), scheduleTime: edit?.schedule_time })
+      }
     }
   }, [edit])
 
@@ -199,15 +219,16 @@ const SendMsgView = ({ receiver, navigation, edit, clearEdit }) => {
 
   const sendAudioMsg = async () => {
     let audio = await stopReorder();
-
-    sendMsgButton({
+    let audioObj = {
       audio: {
         uri: audio.uri,
         name: audio.uri.split("/").pop(),
         type: "audio/aac"
       },
       audioTime: audio.time
-    })
+    }
+    setRecordedAudio(audioObj)
+    sendMsgButton(audioObj)
   }
 
 
@@ -223,59 +244,137 @@ const SendMsgView = ({ receiver, navigation, edit, clearEdit }) => {
 
   }
 
-  const sendMsgButton = async (audioObj = null) => {
-    if (msg.text.trim() == "" && !!msg.image == false && !!audioObj == false) {
-      showToast({ title: "Please write something" })
+  const sendMsgButton = async (audioObj) => {
+    if (msg.text.trim() == "" && !!msg?.image == false && !!audioObj == false) {
+      showToast({ title: "Please write something", type: "info" })
     } else {
-      let imagePath = msg.image;
-      let audioPath = '';
-      if (!!msg.image?.uri) {
-        imagePath = await uplaodFileOnS3(msg.image, 'image').then((res) => res.image_path);
-        if (!!imagePath == false) {
-          return
-        }
-      } else if (!!audioObj.audio) {
-        audioPath = await uplaodFileOnS3(audioObj.audio, 'audio').then((res) => res.image_path);
-        if (!!audioPath == false) {
-          return
-        }
-      }
-
-
-      if (!!edit?.id) {
-
-        const postData = {
-          message: msg.text.trim(),
-          message_id: edit?.id,
-          image: imagePath
-        };
-        console.log('update_chat_message', postData)
-        socket.emit('update_chat_message', postData)
-        setMsg({ text: "", image: "" })
-        clearEdit?.()
-      } else {
-
-        let postData = {
-          receiver_id: receiver?.memberId,
-          receiver_type: "member_user",
-          message: msg.text.trim(),
-          image: imagePath,
-          x_sh_auth: token,
-        }
-        if (!!audioPath) {
-          postData['audio_duration'] = audioObj.audioTime;
-          postData['audio_url'] = audioPath;
-        }
-
-
-        console.log('send_chat_message', postData)
-        socket.emit('send_chat_message', postData)
-        setMsg({ text: "", image: "" })
-
-      }
-
+      setBroadcastType({ ...broadcastType, isVisible: true });
     }
   }
+
+  const sendMessage = async () => {
+    setSendMsgLoader(true);
+    let imagePath = msg.image;
+    let audioPath = '';
+    if (!!msg.image?.uri) {
+
+      imagePath = await uplaodFileOnS3(msg.image, 'image').then((res) => res.image_path);
+      if (!!imagePath == false) {
+        setSendMsgLoader(false);
+        return
+      }
+    } else if (!!recordedAudio?.audio) {
+      audioPath = await uplaodFileOnS3(recordedAudio.audio, 'audio').then((res) => res.image_path);
+      if (!!audioPath == false) {
+        setSendMsgLoader(false);
+        return
+      }
+    }
+
+
+
+    if (!!edit?._id) {
+
+      let postData = {
+        broadcast_id: chatId,
+        message: msg.text.trim(),
+        image: imagePath,
+        message_content_type: "text",
+        message_type: broadcastType.type == 1 ? "publish" : "schedule"
+      }
+      if (broadcastType.type == 2) {
+        postData['schedule_time'] = moment(moment(broadcastType.scheduleDate).format(dateTimeFormat.date) + " " + broadcastType.scheduleTime, "DD-MM-YYYY HH:mm").toISOString();
+        postData['schedule_date'] = moment(moment(broadcastType.scheduleDate).format(dateTimeFormat.date), "DD-MM-YYYY").toISOString();
+        postData['schedule_date_time'] = moment(moment(broadcastType.scheduleDate).format(dateTimeFormat.date) + " " + broadcastType.scheduleTime, "DD-MM-YYYY HH:mm").format("DD-MM-YYYY HH:mm");
+      }
+
+
+      if (!!audioPath) {
+        postData['audio_duration'] = String(recordedAudio?.audioTime);
+        postData['audio_url'] = audioPath;
+        postData['message_content_type'] = "audio";
+      }
+
+
+
+      updateMsgToServer(postData, edit?._id)
+
+      // const postData = {
+      //   message: msg.text.trim(),
+      //   message_id: edit?.id,
+      //   image: imagePath
+      // };
+      // console.log('update_chat_message', postData)
+      // socket.emit('update_chat_message', postData)
+      // setMsg({ text: "", image: "" })
+      // setRecordedAudio(null)
+      // clearEdit?.()
+    } else {
+
+      let postData = {
+        broadcast_id: chatId,
+        message: msg.text.trim(),
+        image: imagePath,
+        message_content_type: "text",
+        message_type: broadcastType.type == 1 ? "publish" : "schedule"
+      }
+      if (broadcastType.type == 2) {
+        postData['schedule_time'] = moment(moment(broadcastType.scheduleDate).format(dateTimeFormat.date) + " " + broadcastType.scheduleTime, "DD-MM-YYYY HH:mm").toDate();
+        postData['schedule_date'] = moment(moment(broadcastType.scheduleDate).format(dateTimeFormat.date), "DD-MM-YYYY").toDate();
+        postData['schedule_date_time'] = moment(moment(broadcastType.scheduleDate).format(dateTimeFormat.date) + " " + broadcastType.scheduleTime, "DD-MM-YYYY HH:mm").format("YYYY-MM-DD HH:mm");
+      }
+
+
+      if (!!audioPath) {
+        postData['audio_duration'] = String(recordedAudio?.audioTime);
+        postData['audio_url'] = audioPath;
+        postData['message_content_type'] = "audio";
+      }
+
+
+      sendMesgToServer(postData)
+    }
+
+
+  }
+
+
+  const sendMesgToServer = async (data) => {
+
+    let res = await SEND_BROADCAST_MESSAGE({ token, navigation, body: data });
+    if (res.code == 200) {
+      showToast({ type: "success", title: res?.message });
+      setMsg({ text: "", image: "" })
+      setRecordedAudio(null)
+      setSendMsgLoader(false);
+      closeBroadcastModal?.();
+      setChat((list) => [res?.broadcast_message, ...list])
+    } else {
+      setSendMsgLoader(false);
+    }
+  }
+
+
+  const updateMsgToServer = async (data, messageId) => {
+    let res = await EDIT_SCHEDULE_BROADCAST_MESSAGE({ token, navigation, body: data, chatId, messageId });
+    if (res.code == 200) {
+      showToast({type:"success",title:res?.message});
+      setChat((list) => {
+        let index = list.findIndex(x => x._id == messageId);
+        if (index > -1) {
+          list.splice(index, 1, res?.broadcast_message);
+        }
+        return [...list]
+      })
+      clearEdit?.()
+      setSendMsgLoader(false);
+      setBroadcastType({ isVisible: false, type: 1, scheduleDate: moment(), scheduleTime: "00:00" });
+    } else {
+      setSendMsgLoader(false);
+    }
+  }
+
+ 
 
   const modifyText = (type, linkTitle = "", url = "") => {
 
@@ -395,6 +494,100 @@ const SendMsgView = ({ receiver, navigation, edit, clearEdit }) => {
     )
   };
 
+  // Broadcast Modal 
+  const closeBroadcastModal = () => {
+    if (!!edit?._id) {
+      setBroadcastType({ ...broadcastType, isVisible: false });
+    } else {
+      setBroadcastType({ isVisible: false, type: 1, scheduleDate: moment(), scheduleTime: "00:00" });
+    }
+  }
+
+  const broadcastTypeModal = () => {
+    return (
+      <Modal
+        isVisible={broadcastType.isVisible}
+        onBackButtonPress={closeBroadcastModal}
+        onBackdropPress={closeBroadcastModal}
+        useNativeDriverForBackdrop={true}
+        animationIn={"zoomIn"}
+        animationOut={"zoomOut"}
+        avoidKeyboard={true}
+        style={{ margin: 10 }}
+      >
+        <SafeAreaView>
+          <View style={{ backgroundColor: colors.secondary, paddingHorizontal: 20, borderRadius: 10, paddingTop: 20, paddingBottom: 10 }}>
+            <View style={{ alignItems: "center", paddingBottom: 20 }}>
+              <MyText isHeading>Broadcast</MyText>
+            </View>
+            <View style={__style.radioRootView}>
+              <MyText isLabel>Message Schedule</MyText>
+              <View style={__style.radioView}>
+                <View style={__style.radioItem}>
+                  <MyCheckBox
+                    title='Send Now'
+                    onPress={() => setBroadcastType({ ...broadcastType, type: 1 })}
+                    value={broadcastType?.type == 1}
+                  />
+                </View>
+                <View style={__style.radioItem}>
+                  <MyCheckBox
+                    title='Schedule'
+                    onPress={() => setBroadcastType({ ...broadcastType, type: 2 })}
+                    value={broadcastType?.type == 2}
+                  />
+                </View>
+              </View>
+            </View>
+
+            <Collapsible collapsed={broadcastType.type == 1}>
+              <View style={{ flexDirection: "row", alignItems: "center", }}>
+                <View style={{ flex: 1 }}>
+                  <MyTouchableInput
+                    label='Publish Date *'
+                    icon={() => icons.calendar(colors.primary)}
+                    onPress={() => ref_calendar?.current?.openModal(broadcastType.scheduleDate)}
+                    value={moment(broadcastType?.scheduleDate).format(dateTimeFormat.date)}
+                  />
+                </View>
+                <View style={{ flex: 1, marginLeft: 10 }}>
+                  <MyTouchableInput
+                    label='Publish Time *'
+                    icon={icons.clock}
+                    onPress={() => ref_timePicker?.current?.openModal(broadcastType.scheduleTime)}
+                    value={moment(broadcastType?.scheduleTime, "HH:mm").format(dateTimeFormat.time)}
+                  />
+                </View>
+              </View>
+              <View style={{ marginTop: -10 }}>
+                <MyText fontSize={12} isLabel>{"Publish date and time is in Europe/Dublin timezone"}</MyText>
+              </View>
+            </Collapsible>
+
+            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "flex-end" }}>
+              <TransparentButton title='CANCEL' onPress={closeBroadcastModal} />
+              {sendMsgLoader ?
+                <SimpleLoader size={20} />
+                : <TransparentButton title='SEND' onPress={sendMessage} />}
+            </View>
+
+            <CalendarModal
+              ref={ref_calendar}
+              onDateSelected={(date) => setBroadcastType({ ...broadcastType, scheduleDate: date })}
+            />
+
+            <TimePicker
+              ref={ref_timePicker}
+              onAgree={(time) => setBroadcastType({ ...broadcastType, scheduleTime: time })}
+            />
+
+          </View>
+        </SafeAreaView>
+        {broadcastType.isVisible && <Toast />}
+      </Modal>
+    )
+  };
+
 
   let displayImage = !!msg.image?.uri ? msg?.image?.uri : !!msg?.image ? S3_URL + msg?.image : "";
   return (
@@ -485,10 +678,12 @@ const SendMsgView = ({ receiver, navigation, edit, clearEdit }) => {
                   icons.mic(colors.primary, 18)
               }
             </TouchableOpacity>
-            {!!edit?.id &&
+            {!!edit?._id &&
               <TouchableOpacity
                 onPress={() => {
+                  setBroadcastType({ isVisible: false, type: 1, scheduleDate: moment(), scheduleTime: "00:00" });
                   setMsg({ text: "", image: "" })
+                  setRecordedAudio(null)
                   clearEdit?.()
                 }}
                 style={__style.sendButtonView}>
@@ -499,6 +694,7 @@ const SendMsgView = ({ receiver, navigation, edit, clearEdit }) => {
         </>}
 
       {modalLink()}
+      {broadcastTypeModal()}
       <ImageUploadModal
         isVisible={isImageModalShown}
         closeModal={() => setImageModalVisiblity(false)}
@@ -612,5 +808,22 @@ const __style = StyleSheet.create({
   recorderProgressView: {
     paddingHorizontal: 15,
     flex: 1
-  }
+  },
+
+  radioRootView: {
+    marginBottom: 15
+  },
+  radioView: {
+    flexDirection: "row",
+    borderWidth: 1,
+    borderColor: colors.lightText,
+    borderRadius: 5,
+    // padding: 2
+    paddingHorizontal: 10,
+    paddingTop: 10,
+  },
+  radioItem: {
+    flex: 1,
+
+  },
 })

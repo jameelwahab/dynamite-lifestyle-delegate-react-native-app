@@ -8,6 +8,7 @@ import { colors } from '../../utilities/colors'
 import ChatList from '../../screens/BroadCastChat/Chatlist'
 import MessageList from '../../screens/BroadCastChat/MessageList'
 import StartNewChat from '../../screens/BroadCastChat/StartNewChat'
+import BroadcastDetail from '../../screens/BroadCastChat/BroadcastDetail'
 
 
 
@@ -24,6 +25,7 @@ const StackBroadcast = ({navigation,route}) => {
         <BroadcastStack.Screen initialParams={route?.params} name={routes.broadcastChatList} component={ChatList} />
         <BroadcastStack.Screen name={routes.broadcastChatMessageList} component={MessageList} />
         <BroadcastStack.Screen name={routes.broadcastStartNewChat} component={StartNewChat} />
+        <BroadcastStack.Screen name={routes.broadcastDetail} component={BroadcastDetail} />
 
 
         {/*//? Default Screens Start */}

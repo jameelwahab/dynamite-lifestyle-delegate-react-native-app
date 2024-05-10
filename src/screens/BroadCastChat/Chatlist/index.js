@@ -53,16 +53,10 @@ const ChatList = ({ navigation, route }) => {
   const [tab, setTab] = useState('all')
 
 
-  const onChatScreen = (member, item) => {
+  const onChatScreen = (item) => {
     navigation.navigate(routes.broadcastChatMessageList, {
-      isOnline: member?._id?.is_online,
-      memberId: member?._id?._id,
-      firstName: member?.first_name,
-      lastName: member?.last_name,
-      lastSeen: member?._id?.last_login_activity,
-      profileImage: member?.profile_image,
+      chatName: item?.broadcast_title,
       chatId: item._id,
-      resetCountToZero,
       refresh
     })
   }
@@ -112,231 +106,29 @@ const ChatList = ({ navigation, route }) => {
       canLoadMore = false;
       debounce(() => api_ChatList(true))
     }
-  }, [searchText, JSON.stringify(eventId)])
+  }, [searchText])
 
-  useEffect(() => {
-    if (!firstTime) {
-      page = 0;
-      canLoadMore = false;
-      setLoader(true);
-      setChatList([])
-      debounce(() => api_ChatList(true))
-    }
-  }, [tab])
+
 
 
   useEffect(() => {
     firstTime = true;
     page = 0;
     canLoadMore = false;
-    api_ChatList()
+    api_ChatList(true)
     // socketEvents();
 
     return () => {
       page = 0;
       canLoadMore = false;
       isNewChat = false;
-      removeSocketEvents()
+
     }
-  }, [])
+  }, [route])
 
 
-  const socketEvents = () => {
-    socket.on("send_chat_message_event_for_sender", newMsgReceive);
-    socket.on("send_chat_message_receiver", newMsgReceive);
-    socket.on("update_chat_message_event_for_sender", editMessageReceiver);
-    socket.on("update_chat_message_receiver", editMessageReceiver);
-    socket.on("delete_chat_message_event_for_sender", deleteMessageReceiver);
-    socket.on("delete_chat_message_receiver", deleteMessageReceiver);
-    socket.on("member_online", memberOnlineSignal);
-    socket.on("member_offline", memberOfflineSignal);
-    socket.on("consultant_offline", memberOfflineSignal);
-    socket.on("chat_message_status", readMsgSingnal);
-  }
+ 
 
-  const removeSocketEvents = () => {
-    socket.off("send_chat_message_event_for_sender", newMsgReceive);
-    socket.off("send_chat_message_receiver", newMsgReceive);
-    socket.off("update_chat_message_event_for_sender", editMessageReceiver);
-    socket.off("update_chat_message_receiver", editMessageReceiver);
-    socket.off("delete_chat_message_event_for_sender", deleteMessageReceiver);
-    socket.off("delete_chat_message_receiver", deleteMessageReceiver);
-    socket.off("member_online", memberOnlineSignal);
-    socket.off("member_offline", memberOfflineSignal);
-    socket.off("consultant_offline", memberOfflineSignal);
-    socket.off("chat_message_status", readMsgSingnal);
-  }
-
-  const readMsgSingnal = (data) => {
-    console.log("chat_message_status", data);
-    if (data.status == "read") {
-      setChatList((chatList) => {
-        let index = chatList.findIndex(chat => chat._id == data.chat_id);
-        if (index > -1) {
-          console.log(chatList[index], "chatObj")
-          if (chatList[index].last_message_sender == user?._id) {
-            chatList[index].last_message_status = "read";
-
-            console.log(chatList, "read 2")
-          }
-        }
-        return [...chatList]
-      })
-    }
-
-  }
-
-  const newMsgReceive = (data) => {
-    console.log(data, "sendMessageReceiver")
-    if (data.code == 200) {
-      setChatList((chatList) => {
-        let index = chatList.findIndex(x => x?._id == data?.chat_obj?.chat?._id);
-        console.log(index, "index")
-        if (index > -1) {
-          let chatobj = { ...chatList[index] };
-          let newChatObj = data?.chat_obj?.chat;
-          chatobj = {
-            ...chatobj,
-            image: newChatObj.image,
-            last_message: newChatObj.last_message,
-            last_message_date_time: newChatObj.last_message_date_time,
-            message_id: newChatObj.message_id,
-            updatedAt: newChatObj.updatedAt,
-            message_type: newChatObj.message_type,
-            member: data?.chat_obj?.member,
-            last_message_sender: data?.message_obj?.sender_id,
-            last_message_status: data?.message_obj?.status,
-          };
-          console.log(chatobj, "newchatobj")
-          chatList.splice(index, 1, chatobj);
-        } else {
-          let newChatObj = data?.chat_obj?.chat;
-          let chatobj = {
-            ...newChatObj,
-            member: data?.chat_obj?.member
-          }
-          chatList.unshift(chatobj);
-          console.log(chatList, "chatList")
-        }
-        return [...chatList]
-
-      })
-    }
-  }
-
-
-
-  const editMessageReceiver = (data) => {
-    console.log(data, "editMessageReceiver")
-    if (data.code == 200) {
-      setChatList((chatList) => {
-        let index = chatList.findIndex(x => x?._id == data?.message_obj?.chat_id);
-        if (index > -1) {
-          let chatobj = { ...chatList[index] };
-          let newChatObj = data?.message_obj;
-          if (chatobj?.message_id == newChatObj?._id) {
-            chatobj = {
-              ...chatobj,
-              image: newChatObj.image,
-              last_message: newChatObj.message,
-              last_message_date_time: newChatObj.message_date_time,
-              message_id: newChatObj._id,
-              updatedAt: newChatObj.updatedAt,
-              message_type: newChatObj.message_type,
-            }
-            chatList.splice(index, 1, chatobj);
-            return [...chatList]
-          }
-          return chatList;
-        }
-      })
-    }
-
-  }
-
-
-
-  const deleteMessageReceiver = (data) => {
-    console.log(data, "deleteMessageReceiver")
-    if (data.code == 200) {
-      if (data.is_last_message) {
-        setChatList((chatList) => {
-          let index = chatList.findIndex(x => x?._id == data?.chat_id);
-          if (index > -1) {
-            let chatobj = { ...chatList[index] };
-            let newChatObj = data?.message_obj;
-            chatobj = {
-              ...chatobj,
-              image: newChatObj.image,
-              last_message: newChatObj.message,
-              last_message_date_time: newChatObj.message_date_time,
-              message_id: newChatObj._id,
-              updatedAt: newChatObj.updatedAt,
-              message_type: newChatObj.message_type,
-            }
-            chatList.splice(index, 1, chatobj);
-            return [...chatList]
-          }
-        })
-      }
-    }
-  }
-
-
-  const memberOnlineSignal = (data) => {
-    console.log(data, "memberOnlineSignal")
-    setChatList((chatList) => {
-      let chatLength = chatList.length;
-      for (let i = 0; i < chatLength; i++) {
-        if (data.user_id == chatList[i].member[0]._id._id) {
-          chatList[i].member[0]._id.is_online = true;
-          chatList[i].last_message_status = "delivered";
-          return [...chatList]
-        }
-        else if (data.user_id == chatList[i].member[1]._id._id) {
-          chatList[i].member[1]._id.is_online = true;
-          chatList[i].last_message_status = "delivered";
-          return [...chatList]
-        }
-      }
-      return [...chatList]
-    })
-  }
-
-  const memberOfflineSignal = (data) => {
-    setChatList((chatList) => {
-      let chatLength = chatList.length;
-      for (let i = 0; i < chatLength; i++) {
-        if (data.user_id == chatList[i].member[0]._id._id) {
-          chatList[i].member[0]._id.is_online = false;
-          return [...chatList]
-        }
-        else if (data.user_id == chatList[i].member[1]._id._id) {
-          chatList[i].member[1]._id.is_online = false
-          return [...chatList]
-        }
-      }
-      return [...chatList]
-    })
-
-  }
-
-
-  const resetCountToZero = (chatId) => {
-    console.log("resetCountToZero",)
-    let index = chatList.findIndex(x => x._id == chatId);
-    console.log(index, "index")
-    if (index > -1) {
-      let chatobj = { ...chatList[index] };
-      let memberIndex = chatobj.member.findIndex(x => x._id?._id == user?._id);
-      console.log(memberIndex, "memberIndex")
-      if (memberIndex > -1) {
-        chatobj.member[memberIndex].unread_message_count = 0;
-        chatList.splice(index, 1, chatobj);
-        setChatList([...chatList])
-      }
-    }
-  }
 
 
 
@@ -445,20 +237,13 @@ const ChatList = ({ navigation, route }) => {
 
     return (
       <TouchableHighlight
-        onPress={() => onChatScreen(member, item)}
+        onPress={() => onChatScreen(item)}
         underlayColor={colors.secondary}>
         <View style={__style.itemRootView}>
           <View style={__style.itemImage}>
             <Image source={icons.broadcast}
               style={{ height: 30, width: 30, }}
             />
-            {/* <UserImage
-              image={member?.profile_image}
-              name={member?.first_name}
-            />
-            <View style={[__style.status, {
-              backgroundColor: member?._id?.is_online ? colors.online : colors.primary2
-            }]} /> */}
           </View>
 
           <View style={__style.seondViewRow}>
@@ -483,7 +268,7 @@ const ChatList = ({ navigation, route }) => {
                 </View>
               }
 
-              {item?.latest_message.message_content_type != "general" &&
+              {!!item?.latest_message?.message_content_type && item?.latest_message?.message_content_type != "general" &&
                 <View style={{ marginRight: 5 }}>
                   {item?.latest_message.message_content_type == "image" ? icons.camera(colors.white, 12) :
                     item?.latest_message.message_content_type == "audio" ? icons.mic(colors.white, 15) :
@@ -500,7 +285,7 @@ const ChatList = ({ navigation, route }) => {
                       </Markdown> :
                     item?.latest_message?.message_content_type == "image" ? "Photo" :
                       item?.latest_message?.message_content_type == 'audio' ? "Audio" :
-                        item?.latest_message?.message_content_type == 'video' ? "Video" : ""}
+                        item?.latest_message?.message_content_type == 'video' ? "Video" : "No Message Yet"}
 
                 </MyText>
                 {otherUser?.unread_message_count > 0 &&
@@ -547,7 +332,6 @@ const ChatList = ({ navigation, route }) => {
 
       <FAB
         onPress={() => navigation.navigate(routes.broadcastStartNewChat, {
-          resetCountToZero,
           refresh
         })}
         icon={() => icons.plus(colors.black, 20)}

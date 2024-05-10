@@ -63,3 +63,23 @@ export const SEND_BROADCAST_MESSAGE = ({ token, navigation, body }) => {
   })
 }
 
+export const EDIT_SCHEDULE_BROADCAST_MESSAGE = ({ token, navigation, chatId, messageId, body }) => {
+  return invokeApi({
+    path: `api/broadcast/edit_broadcast_message/${chatId}/${messageId}`,
+    method: "PUT",
+    postData: body,
+    token: token,
+    navigation: navigation,
+  })
+}
+
+
+export const DELETE_SCHEDULE_BROADCAST_MESSAGE = ({ token, navigation, chatId, messageId,  }) => {
+  return invokeApi({
+    path: `api/broadcast/delete_broadcast_message/${chatId}/${messageId}`,
+    method: "DELETE",
+    token: token,
+    navigation: navigation,
+  })
+}
+

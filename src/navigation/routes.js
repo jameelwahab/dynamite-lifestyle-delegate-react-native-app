@@ -260,6 +260,7 @@ const routes = {
   broadcastChatList: "BROADCAST_CHAT_LIST_SCREEN",
   broadcastChatMessageList: "BROADCAST_CHAT_MESSAGE_LIST_SCREEN",
   broadcastStartNewChat: "BROADCAST_START_NEW_CHAT_SCREEN",
+  broadcastDetail: "BROADCAST_DETAIL_SCREEN",
 
 }
 

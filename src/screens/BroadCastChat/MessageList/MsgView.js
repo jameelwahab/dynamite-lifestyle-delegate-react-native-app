@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, Pressable } from 'react-native'
+import { View, Text, TouchableOpacity, Pressable, StyleSheet } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import utilities from '../../../utilities'
 import MyText from '../../../components/MyText'
@@ -14,10 +14,11 @@ import { fonts } from '../../../utilities/fonts'
 import AudioChatView from './AudioChatView'
 import openUrl from '../../../functions/openUrl';
 import { icons } from '../../../utilities/icons'
+import moment from 'moment'
 
 
-const MsgView = ({ item, index, user, timezone, onMsgLongPress, openImageZommer, playIconClick, stopPlayer, state, setState }) => {
-  console.log(playIconClick, stopPlayer, "checl")
+const MsgView = ({ item, index, user, timezone, onMsgLongPress, openImageZommer, playIconClick, stopPlayer, state, setState, infoRef }) => {
+
 
   const isOtherMember = (id) => {
     return id == user?._id;
@@ -42,7 +43,7 @@ const MsgView = ({ item, index, user, timezone, onMsgLongPress, openImageZommer,
 
           {/*//?   Image View  */}
 
-          {item.message_type == 'image' && !!item.image &&
+          {item.message_content_type == 'image' && !!item.image &&
             <TouchableOpacity
               activeOpacity={0.5}
               pointerEvents='box-only'
@@ -57,7 +58,7 @@ const MsgView = ({ item, index, user, timezone, onMsgLongPress, openImageZommer,
 
           {/*//?   Audio View  */}
 
-          {item?.message_type == 'audio' && !!item?.audio_url &&
+          {item?.message_content_type == 'audio' && !!item?.audio_url &&
             <AudioChatView
               isMine={!isOtherMember(item.receiver_id)}
               currentPlaying={state.isPlaying}
@@ -73,33 +74,58 @@ const MsgView = ({ item, index, user, timezone, onMsgLongPress, openImageZommer,
 
 
           {/*//?   Message View  */}
+          {!!item?.message &&
+            <View style={{ paddingHorizontal: 5 }}>
+              {isHtml(item?.message) ?
+                <MyWebview
+                  style={isOtherMember(item.receiver_id) ? WebviewStyleOther : WebviewStyleMine}
+                  html={item?.message}
 
-          <View style={{ paddingHorizontal: 5 }}>
-            {isHtml(item?.message) ?
-              <MyWebview
-                style={isOtherMember(item.receiver_id) ? WebviewStyleOther : WebviewStyleMine}
-                html={item?.message}
+                /> :
 
-              /> :
+                <Markdown
+                  style={isOtherMember(item.receiver_id) ? markdownStyleOther : markdownStyleMine}
+                  onLinkPress={(url) => {
+                    openUrl(url);
+                    return false
+                  }}>
+                  {item.message}
+                </Markdown>
+              }
+            </View>}
 
-              <Markdown
-                style={isOtherMember(item.receiver_id) ? markdownStyleOther : markdownStyleMine}
-                onLinkPress={(url) => {
-                  openUrl(url);
-                  return false
-                }}>
-                {item.message}
-              </Markdown>
-            }
-          </View>
-
-          <View style={{ marginTop: 5, alignSelf: "flex-end", flexDirection: "row",alignItems:"center" }}>
+          <View style={{ marginTop: 5, alignSelf: "flex-end", flexDirection: "row", alignItems: "center" }}>
             {!isOtherMember(item.receiver_id) &&
-              <View style={{ marginRight: 5 }}>
-                {!!item?.status == false || item?.status == "sent"
-                    ? icons.sent(colors.white, 18) :
-                icons.seen(item?.status == "read" ? colors.primary : colors.white, 18)}
-              </View>}
+              <>
+                {!!item?.publish_date_time && !!item?.schedule_date_time &&
+                  <TouchableOpacity
+                    hitSlop={{ top: 10, left: 10, right: 10, left: 10 }}
+                    onPress={() => {
+                      let str = `This message was published at ${moment(item?.publish_date_time).tz(timezone.admin).format(dateTimeFormat.dateTimeWithText("at"))} (${timezone.admin}) time`
+                      infoRef?.current?.openModal(str)
+                    }}
+                    style={__style.infoIConView}>
+                    {icons.info("#775F30", 12)}
+                  </TouchableOpacity>}
+
+
+
+                {item?.message_type == "schedule" &&
+                  <TouchableOpacity
+                    hitSlop={{ top: 10, left: 10, right: 10, left: 10 }}
+                    onPress={() => {
+                      let str = `This message will be published on ${moment(item?.schedule_date_time).tz(timezone.admin).format(dateTimeFormat.dateTimeWithText("at"))} (${timezone.admin}) time`
+                      infoRef?.current?.openModal(str)
+                    }}
+                    style={{ marginRight: 5 }}>
+                    {icons.clock(colors.primary, 15)}
+                  </TouchableOpacity>}
+
+                {item?.status == "publish" &&
+                  <View style={{ marginRight: 5 }}>
+                    {icons.seen(colors.primary, 18)}
+                  </View>}
+              </>}
             <MyText
               fontSize={10}
               color={isOtherMember(item.receiver_id) ? colors.black : undefined}>
@@ -113,6 +139,20 @@ const MsgView = ({ item, index, user, timezone, onMsgLongPress, openImageZommer,
 }
 
 export default MsgView;
+
+const __style = StyleSheet.create({
+  infoIConView: {
+    height: 18,
+    width: 18,
+    borderWidth: 1,
+    borderColor: "#775F30",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 18 / 2,
+    marginLeft: 10,
+    marginRight: 5
+  },
+})
 
 const markdownStyleMine = {
   body: {
@@ -153,7 +193,8 @@ const markdownStyleOther = {
   paragraph: {
     marginTop: 0,
     marginBottom: 0,
-  }
+  },
+
 }
 
 const WebviewStyleMine = {
@@ -180,4 +221,5 @@ const WebviewStyleOther = {
     color: colors.black,
     fontFamily: fonts.regular
   },
+
 }
