@@ -97,7 +97,7 @@ const CallHistoryNoteModal = forwardRef(({ memberId, updateCallNotes }, ref) => 
       style={{ flex: 1, margin: 0 }}
     >
       <SafeAreaView style={{ flex: 1, backgroundColor: colors.secondaryVariant }}>
-        <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: 10, paddingBottom: 10, borderBottomWidth: 1 / 3, borderBottomColor: colors.lightText }}>
+        <View style={{ flexDirection: "row", justifyContent: "space-between", padding:10, borderBottomWidth: 1 / 3, borderBottomColor: colors.lightText }}>
           <View>
             <MyText fontSize={18} type='medium' >Call History Note</MyText>
           </View>

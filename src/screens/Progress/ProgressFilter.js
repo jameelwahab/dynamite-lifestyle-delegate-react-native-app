@@ -117,7 +117,7 @@ const ProgressFilter = ({ navigation, route }) => {
 
         <View style={{ marginTop: 5 }}>
           <MyTouchableInput
-            label='Progress Categories *'
+            label='Progress Categories'
             value={!!filters?.progress_category ? filters?.progress_category?.title : ""}
             onPress={() => setOptionModalVisibility(true)}
           />

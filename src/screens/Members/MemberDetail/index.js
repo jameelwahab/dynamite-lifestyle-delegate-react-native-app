@@ -24,6 +24,7 @@ import { MenuButton } from '../../../components/MyButton'
 import { selectNavbar } from '../../../redux/reducers/navbarSlice'
 import MyCheckBox from '../../../components/MyCheckBox'
 import CallHistoryNoteModal from '../Components/CallHistoryNoteModal'
+import InfoModal from '../../../components/InfoModal'
 
 const MemberDetail = ({ navigation, route }) => {
   const { type } = route?.params;
@@ -33,6 +34,7 @@ const MemberDetail = ({ navigation, route }) => {
   const leadModalRef = useRef();
   const hitoryModalRef = useRef();
   const notesModalRef = useRef();
+  const ref_info = useRef();
   const ref_callHistoryModal = useRef();
   const timezone = useSelector(selectTimeZone)
   const { token, user } = useSelector(selectUser)
@@ -327,13 +329,22 @@ const MemberDetail = ({ navigation, route }) => {
         <View style={{ marginRight: 10 }}>
           <MyText type='medium' fontSize={12}>{phone}</MyText>
         </View>
-        <View pointerEvents={isChecked ? "none" : "auto"}>
-          <MyCheckBox
-            pb={0}
-            value={isChecked}
-            onPress={() => ref_callHistoryModal?.current?.openModal()}
-          />
-        </View>
+
+        <MyCheckBox
+          pb={0}
+          value={isChecked}
+          onPress={() => {
+            if (isChecked) {
+              let str = member?.call_history?.notes;
+              let str2 = moment(member?.call_history?.date).format(dateTimeFormat.date)
+              
+              ref_info?.current?.openModal(str,str2, true)
+            } else {
+              ref_callHistoryModal?.current?.openModal()
+            }
+          }}
+        />
+
       </View>)
   }
 
@@ -421,6 +432,8 @@ const MemberDetail = ({ navigation, route }) => {
         memberId={member?._id}
         updateCallNotes={updateCallNotes}
       />
+
+      <InfoModal ref={ref_info} />
     </RootView>
   )
 }

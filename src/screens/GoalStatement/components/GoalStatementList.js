@@ -31,6 +31,7 @@ const GoalStatementList = ({ navigation, route }) => {
   const { token } = useSelector(selectUser);
   const { socket } = useSelector(selectSocket);
   const [title] = useState(navbar?.find(x => x._id == parentKey)?.title);
+  const [subTitle] = useState(navbar?.find(x => x._id == parentKey)?.child_options?.find(y => y._id == key)?.title);
   const [list, setList] = useState([]);
   const [loader, setLoader] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -185,7 +186,7 @@ const GoalStatementList = ({ navigation, route }) => {
   }, [JSON.stringify(list)])
   return (
     <RootView title={title}
-      subTitle={`Total : ${list.length}`}
+      subTitle={`${subTitle} | Total : ${list.length}`}
       hideBackBottomButton>
       <View style={{ flex: 1 }}>
         <FlatList

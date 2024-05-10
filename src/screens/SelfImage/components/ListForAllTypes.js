@@ -38,6 +38,7 @@ const ListForAllTypes = ({ navigation, route }) => {
   const isResponded = type == "responded";
   const { navbar } = useSelector(selectNavbar);
   const [title] = useState(navbar?.find(x => x._id == parentKey)?.title);
+  const [subTitle] = useState(navbar?.find(x => x._id == parentKey)?.child_options?.find(y => y._id == key)?.title);
   const { token } = useSelector(selectUser);
   const [loader, setLoader] = useState(true);
   const [list, setList] = useState([]);
@@ -239,7 +240,7 @@ const ListForAllTypes = ({ navigation, route }) => {
   return (
     <RootView
       title={title}
-      subTitle={`Showing ${list.length} of ${total}`}
+      subTitle={`${subTitle} | Showing ${list.length} of ${total}`}
       hideBackBottomButton
     >
       <View style={{ flex: 1 }}>

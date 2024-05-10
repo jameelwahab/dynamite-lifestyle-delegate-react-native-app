@@ -216,6 +216,7 @@ const StreakAnalysis = ({ navigation, route }) => {
   }
 
   const filterView = () => {
+
     return (
       <>
         {(!!filter?.date_from || !!filter?.date_to) &&
@@ -224,7 +225,8 @@ const StreakAnalysis = ({ navigation, route }) => {
               onPress={() => setFilter({ date_from: "", date_to: "" })}
               title={`${!!filter?.date_from ? "From : " + moment(filter?.date_from).format(dateTimeFormat.date) : ""} - ${!!filter?.date_to ? "To : " + moment(filter?.date_to).format(dateTimeFormat.date) : ""}`} />
           </View>}
-        {(streakScore != undefined || streakScore != null) &&
+
+        {!!settings && (streakScore != undefined || streakScore != null) &&
           <View style={{ alignItems: "flex-end" }}>
             <MyText color={colors.primary} >{`${settings["streack_count_text"]} : `}
               <MyText>{streakScore}</MyText>

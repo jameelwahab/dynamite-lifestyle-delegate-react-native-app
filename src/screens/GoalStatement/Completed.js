@@ -7,7 +7,8 @@ import GoalStatementList from './components/GoalStatementList'
 
 const Complete = (props) => {
   return (
-    <GoalStatementList {...props} />
+    <GoalStatementList
+     {...props} />
   )
 }
 

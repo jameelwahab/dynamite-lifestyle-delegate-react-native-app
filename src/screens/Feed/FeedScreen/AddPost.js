@@ -620,6 +620,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                           {postCategory}</MyText>
                         {icons.downwardArrow(17, colors.white)}
                       </TouchableOpacity>
+
                       {(isCosmos || !!editId || !isSuperDelegate) &&
                         <TouchableOpacity
                           onPress={() => openOptionModal("createdFor")}
@@ -642,7 +643,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                           </TouchableOpacity>
                         </View>}
                     </View>
-                    {!isCosmos && !!!editId && isSuperDelegate &&
+                    {!isCosmos && !!!editId && isSuperDelegate && !isEventFeed &&
                       <View style={{ marginTop: 10 }}>
                         <TouchableOpacity
                           onPress={() => setMultipleLevelModalVisiblity(true)}

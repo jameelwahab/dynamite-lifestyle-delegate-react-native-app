@@ -6,11 +6,13 @@ import { selectTimeZone } from '../redux/reducers/timezoneSlice';
 import MyText from './MyText';
 import { icons } from '../utilities/icons';
 import { colors } from '../utilities/colors';
+import MyWebview from './MyWebview';
 
 const InfoModal = forwardRef(({ }, ref) => {
   const [isVisible, setVisiblity] = useState(false);
   const [text, setText] = useState("");
-
+  const [subText, setSubText] = useState("");
+  const [isHtml, setIsHtml] = useState("")
 
   useImperativeHandle(ref, () => {
     return {
@@ -18,12 +20,16 @@ const InfoModal = forwardRef(({ }, ref) => {
     }
   }, [])
 
-  const openModal = (str) => {
+  const openModal = (str, str2 = "", isHtml = false) => {
     setVisiblity(true)
     setText(str)
+    setSubText(str2)
+    setIsHtml(isHtml)
   }
 
   const closeScheduleTimeModal = () => {
+    setText("")
+    setIsHtml(false)
     setVisiblity(false);
   }
 
@@ -41,19 +47,25 @@ const InfoModal = forwardRef(({ }, ref) => {
         animationOutTiming={300}
         // avoidKeyboard={true}
         style={{ margin: 0, marginHorizontal: 5 }}>
-          <View style={__style.rootView}>
-            <View style={__style.headingView}>
-              <Pressable
-                hitSlop={{ top: 10, left: 10, right: 10, left: 10 }}
-                style={{ marginBottom: 10 }}
-                onPress={closeScheduleTimeModal}>
-                {icons.crosssWithCircle(colors.white, 20)}
-              </Pressable>
-            </View>
-            <View style={{ paddingBottom: 10, paddingHorizontal: 10 }}>
-              <MyText>{text}</MyText>
-            </View>
+        <View style={__style.rootView}>
+          <View style={__style.headingView}>
+            <Pressable
+              hitSlop={{ top: 10, left: 10, right: 10, left: 10 }}
+              style={{ marginBottom: 10 }}
+              onPress={closeScheduleTimeModal}>
+              {icons.crosssWithCircle(colors.white, 20)}
+            </Pressable>
           </View>
+          <View style={{ paddingBottom: 10, paddingHorizontal: 10 }}>
+            {isHtml ?
+              <MyWebview html={text} /> :
+              <MyText>{text}</MyText>}
+
+            {!!subText && <View style={{ marginTop: 5 }}>
+              <MyText fontSize={12} type='medium' color={colors.lightGrey} >{subText}</MyText>
+            </View>}
+          </View>
+        </View>
       </Modal>)
   }
 
