@@ -1,3 +1,5 @@
+import AccountabilityTrackerScreen from "../screens/AccountabilityTracker/AccountabilityTrackerScreen";
+
 const routes = {
 
   //! ///    Navigators
@@ -47,6 +49,8 @@ const routes = {
   monthlyReportNavigator: "MONTHLY_REPORT_NAVIGATOR",
   broadcastNavigator: "BROADCAST_NAVIGATOR",
   quaterQuestionNavigator: "QUATER_QUESTION_NAVIGATOR",
+  accountabilityTrackerNavigator: "ACCOUNTABILITY_TRACKER_NAVIGATOR",
+
 
   //! ///    Screens'
 
@@ -266,6 +270,10 @@ const routes = {
   //? Quater Question
   quaterQuestionList: "QUATER_QUESTION_LIST_SCREEN",
   quaterQuestionDetail: "QUATER_QUESTION_DETAIL_SCREEN",
+
+  //? Accountability Tracker
+  accountabilityTrackerScreen: "ACCOUNTABILITY_TRACKER_SCREEN",
+  accountabilityPastActivitesScreen: "ACCOUNTABILITY_PAST_ACTIVITIES_SCREEN",
 }
 
 

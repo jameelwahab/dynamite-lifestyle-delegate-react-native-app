@@ -43,6 +43,7 @@ import StackDailyStreakPerformance from "../NestedStacks/StackDailyStreakPerform
 import StackMonthReport from "../NestedStacks/StackMonthyReport";
 import StackBroadcast from "../NestedStacks/StackBroadcastChat";
 import StackQuaterQuestions from "../NestedStacks/StackQuaterQuestions";
+import StackAcountabilityTracker from "../NestedStacks/StackAcountabilityTracker";
 
 
 
@@ -306,6 +307,15 @@ export const ParentComponents = {
     params: {
       value: "quarter_questions",
       key: "aadbd7a3-91c1-40dd-bf24-7846756776677887"
+    }
+  },
+
+  "aadbd7a3-91c1-40dd-bf24-532fc288d265": {
+    key: routes.accountabilityTrackerNavigator,
+    component: StackAcountabilityTracker,
+    params: {
+      value: "daily_dynamite_accountabalility_tracker",
+      key: "aadbd7a3-91c1-40dd-bf24-532fc288d265"
     }
   },
 }
