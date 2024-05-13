@@ -5,7 +5,7 @@ import MyText from '../../components/MyText'
 import { selectUser } from '../../redux/reducers/userSlice'
 import { selectNavbar } from '../../redux/reducers/navbarSlice'
 import { MenuButton } from '../../components/MyButton'
-import { GET_PAST_ACTIVITIES } from '../../DAL'
+import { DELETE_ACCOUNTABILITY_TRACKER, GET_PAST_ACTIVITIES } from '../../DAL'
 import { useSelector } from 'react-redux'
 import MyLoader from '../../components/MyLoader'
 import { colors } from '../../utilities/colors'
@@ -44,6 +44,20 @@ const PastActivities = ({ navigation, route }) => {
     }
   }
 
+
+  const deleteTrackerToServer = async (id) => {
+    setLoader(true);
+
+    let res = await DELETE_ACCOUNTABILITY_TRACKER({
+      navigation, token, id
+    });
+    setLoader(false);
+    if (res.code == 200) {
+      setList((list) => list.slice().filter(x => x._id != id))
+    }
+  }
+
+
   //* Function
 
   const onSelected = (opt) => {
@@ -51,8 +65,8 @@ const PastActivities = ({ navigation, route }) => {
     setOptions({ isVisible: false, item: null });
     setTimeout(() => {
       if (opt.key == "edit") {
-        navigation.navigate(routes.accountabilityTrackerScreen,{
-          date:moment(item?.date,"YYYY-MM-DD")
+        navigation.navigate(routes.accountabilityTrackerScreen, {
+          date: moment(item?.date, "YYYY-MM-DD")
         })
       } else if (opt.key == "delete") {
         setConfirmation({ isVisible: true, item: item })
@@ -65,7 +79,7 @@ const PastActivities = ({ navigation, route }) => {
     let { item } = confirmation;
     setConfirmation({ isVisible: false, item: null })
     setTimeout(() => {
-      // delete90daysEarningsfromServer(item?._id)
+      deleteTrackerToServer(item?._id)
     }, 350);
   }
 

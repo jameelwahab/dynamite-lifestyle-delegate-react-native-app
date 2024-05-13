@@ -13,7 +13,7 @@ import { colors } from '../../utilities/colors'
 import { icons } from '../../utilities/icons'
 import { dateTimeFormat } from '../../utilities/constants'
 import MyInputs from '../../components/MyInputs'
-import { ADD_ACCOUNTABILITY_TRACKER, GET_ACCOUNTABILITY_TRACKER_BY_DATE, MOVE_TO_TOMMORROW, SET_ACCOUNTABILITY_TRACKER_REMINDER, UPDATE_ACCOUNTABILITY_TRACKER, UPLOAD_FILE_TO_S3 } from '../../DAL'
+import { ADD_ACCOUNTABILITY_TRACKER, DELETE_ACCOUNTABILITY_TRACKER, GET_ACCOUNTABILITY_TRACKER_BY_DATE, MOVE_TO_TOMMORROW, SET_ACCOUNTABILITY_TRACKER_REMINDER, UPDATE_ACCOUNTABILITY_TRACKER, UPLOAD_FILE_TO_S3 } from '../../DAL'
 import MyLoader from '../../components/MyLoader'
 import uuid from 'react-native-uuid';
 import MyCheckBox from '../../components/MyCheckBox'
@@ -83,10 +83,15 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
 
   useEffect(() => {
 
-    if (route?.params?.date) {
+    if (!!route?.params?.date) {
       setSettings(null)
       setDate(route.params.date)
       ref_scrollView?.current?.scrollToPosition(0, 0, true)
+    } else {
+      setLoader(true)
+      setSettings(null)
+      getAccountabilityTracker();
+
     }
   }, [route])
 
@@ -182,7 +187,7 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
   }
 
 
-  const addTrackerToServer = async (id) => {
+  const addTrackerToServer = async () => {
     setLoader(true);
 
 
@@ -203,7 +208,7 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
   }
 
 
-  const updateTrackerToServer = async (id) => {
+  const updateTrackerToServer = async () => {
     setLoader(true);
     let completed = 0;
     let unCompleted = 0;
@@ -228,6 +233,18 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
     setLoader(false);
     if (res.code == 200) {
       showToast({ title: res?.message, type: "success" });
+    }
+  }
+
+  const deleteTrackerToServer = async (id) => {
+    setLoader(true);
+
+    let res = await DELETE_ACCOUNTABILITY_TRACKER({
+      navigation, token, id
+    });
+    setLoader(false);
+    if (res.code == 200) {
+      setList((list) => list.slice().filter(x => x._id != id))
     }
   }
 
@@ -308,7 +325,7 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
     let { item } = confirmation;
     setConfirmation({ isVisible: false, item: null })
     setTimeout(() => {
-      // delete90daysEarningsfromServer(item?._id)
+      deleteTrackerToServer(item?._id)
     }, 350);
   }
 
