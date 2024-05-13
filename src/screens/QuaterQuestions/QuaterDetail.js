@@ -8,7 +8,7 @@ import { selectUser } from '../../redux/reducers/userSlice'
 import QuestionConfig from '../../MojarComponents/QuestionConfig'
 
 const QuaterDetail = ({ navigation, route }) => {
-  const { createdFor, createdForId,title } = route?.params
+  const { createdFor, createdForId, title, description } = route?.params
   const { token } = useSelector(selectUser);
 
 
@@ -20,6 +20,8 @@ const QuaterDetail = ({ navigation, route }) => {
         navigation={navigation}
         created_for={createdFor}
         created_for_id={createdForId}
+        description={description}
+
       />
     </RootView>
   )

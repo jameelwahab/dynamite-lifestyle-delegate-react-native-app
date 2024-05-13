@@ -46,7 +46,8 @@ const QuaterList = ({ navigation, route }) => {
     navigation.navigate(routes.quaterQuestionDetail, {
       createdFor: "quarter",
       createdForId: item?._id,
-      title: item?.title
+      title: item?.title,
+      description: item?.detailed_description
     })
   }
 

@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Keyboard } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import RootView from '../../components/RootView'
 import MyText from '../../components/MyText'
@@ -7,13 +7,13 @@ import { selectUser } from '../../redux/reducers/userSlice'
 import { selectNavbar } from '../../redux/reducers/navbarSlice'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import MyTouchableInput from '../../components/MyTouchableInput'
-import { MyButton, TransparentButton } from '../../components/MyButton'
+import { MenuButton, MyButton, TransparentButton } from '../../components/MyButton'
 import moment from 'moment'
 import { colors } from '../../utilities/colors'
 import { icons } from '../../utilities/icons'
 import { dateTimeFormat } from '../../utilities/constants'
 import MyInputs from '../../components/MyInputs'
-import { GET_ACCOUNTABILITY_TRACKER_BY_DATE } from '../../DAL'
+import { ADD_ACCOUNTABILITY_TRACKER, GET_ACCOUNTABILITY_TRACKER_BY_DATE, MOVE_TO_TOMMORROW, SET_ACCOUNTABILITY_TRACKER_REMINDER, UPDATE_ACCOUNTABILITY_TRACKER, UPLOAD_FILE_TO_S3 } from '../../DAL'
 import MyLoader from '../../components/MyLoader'
 import uuid from 'react-native-uuid';
 import MyCheckBox from '../../components/MyCheckBox'
@@ -24,6 +24,11 @@ import InfoModal from '../../components/InfoModal'
 import OptionModal from '../../components/OptionModal'
 import DateTimePicker from 'react-native-modal-datetime-picker'
 import TimePicker from '../../components/TimePicker'
+import showToast from '../../functions/showToast'
+import { convertTimezone } from '../../functions/convertTime'
+import { selectTimeZone } from '../../redux/reducers/timezoneSlice'
+import ConfirmationModal from '../../components/ConfirmationModal'
+import routes from '../../navigation/routes'
 
 const getNewStatmentObj = () => {
   return {
@@ -35,30 +40,28 @@ const getNewStatmentObj = () => {
 }
 
 const AccountabilityTrackerScreen = ({ navigation, route }) => {
-  const { key } = route?.params
   const { token } = useSelector(selectUser);
-  const { navbar } = useSelector(selectNavbar);
   const ref_calendar = useRef();
   const ref_infoModal = useRef();
   const ref_timePicker = useRef();
+  const ref_inputs = useRef([]);
+  const ref_scrollView = useRef();
 
-  const [title] = useState(navbar?.find(x => x._id == key)?.title);
+  const timezone = useSelector(selectTimeZone);
   const [date, setDate] = useState(moment())
   const [loader, setLoader] = useState(false)
   const [settings, setSettings] = useState(null);
+  const [affirmationText, setAffirmationText] = useState("");
+  const [editId, setEditId] = useState("");
   const [statements, setStatements] = useState([getNewStatmentObj(), getNewStatmentObj(), getNewStatmentObj()])
   const [intentions, setIntentions] = useState([]);
+  const [list, setList] = useState([]);
+  const [options, setOptions] = useState({ isVisible: false, item: null });
+  const [confirmation, setConfirmation] = useState({ isVisible: false, item: null })
+
   const [reminderOptions, setReminderOptions] = useState({
     isVisible: false, key: ""
   })
-  const [reminderTimerPicker, setReminderTimerPicker] = useState({
-    isVisible: false, key: ""
-  })
-  const [reminder, setReminder] = useState({
-    days: [],
-    time: "00:00"
-  })
-
   const [morningReminder, setMorningReminder] = useState({
     days: [],
     time: "00:00"
@@ -72,39 +75,196 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
 
   useEffect(() => {
     setLoader(true)
-    getStreakPerformance()
+    setSettings(null)
+    getAccountabilityTracker();
+
   }, [date])
 
 
+  useEffect(() => {
 
-  const getStreakPerformance = async () => {
+    if (route?.params?.date) {
+      setSettings(null)
+      setDate(route.params.date)
+      ref_scrollView?.current?.scrollToPosition(0, 0, true)
+    }
+  }, [route])
+
+
+  //*
+
+  const validate = () => {
+
+
+    for (let i = 0; i < statements.length; i++) {
+      if (statements[i].option.trim() == "") {
+        ref_inputs?.current[i]?.blur();
+      }
+    }
+    for (let i = 0; i < statements.length; i++) {
+      if (statements[i].option.trim() == "") {
+        // showToast({ title: "", });
+        ref_inputs?.current[i]?.focus();
+        return
+      }
+    }
+
+    for (let i = 0; i < intentions.length; i++) {
+      if (intentions[i].is_required && intentions[i]?.image == "") {
+        showToast({ title: intentions[i].statement });
+        return
+      }
+    }
+    addOrUpdate()
+
+  }
+
+
+  const addOrUpdate = () => {
+    if (!!editId) {
+      updateTrackerToServer()
+    } else {
+      addTrackerToServer()
+    }
+  }
+
+  //todo /////// Navigtaion
+
+  const onPastActivities = () => {
+    navigation.navigate(routes.accountabilityPastActivitesScreen)
+  }
+
+  //! APIs
+
+  const getAccountabilityTracker = async () => {
     setLoader(true);
     let res = await GET_ACCOUNTABILITY_TRACKER_BY_DATE({ navigation, token, date: moment(date).format("DD-MM-YYYY") });
     setLoader(false);
     if (res.code == 200) {
-
-      // setStreakId(res?.strek?._id)
-      //   updateStreak({
-      //     attitude_performance_rate: res?.strek?.attitude_performance_rate,
-      //     desire_performance_rate: res?.strek?.desire_performance_rate,
-      //     discipline_performance_rate: res?.strek?.discipline_performance_rate,
-      //     focus_performance_rate: res?.strek?.focus_performance_rate,
-      //     win_note: res?.strek?.win_note,
-      //     win_note_performance_rate: res?.strek?.win_note_performance_rate
-      //   })
-      // }
-
+      if (!!res?.daily_dynamite && Object.keys(res?.daily_dynamite).length > 0) {
+        setEditId(res?.daily_dynamite?._id)
+        setStatements(res?.daily_dynamite?.statement_array)
+        setIntentions(res?.daily_dynamite?.tracker_intention)
+        setAffirmationText(res?.daily_dynamite?.note ? res?.daily_dynamite?.note : "")
+      } else {
+        setEditId("")
+        setIntentions(res?.delegate_report_setting?.tracker_intentions);
+        setStatements([getNewStatmentObj(), getNewStatmentObj(), getNewStatmentObj()])
+        setAffirmationText("")
+      }
       setSettings(res?.delegate_report_setting);
-      setIntentions(res?.delegate_report_setting?.tracker_intentions);
-      // setReminder({
-      //   time: !!res?.dynamite_streak_performance_reminder_time.time ? moment(res?.dynamite_streak_performance_reminder_time.time).format("HH:mm") : "00:00",
-      //   days: res?.dynamite_streak_performance_reminder_time.days ? res?.dynamite_streak_performance_reminder_time.days : []
-      // })
-      // showToast({ title: res?.message, type: "success" });
-
+      setMorningReminder({
+        time: !!res?.daily_dynamite_morning_reminder_time.time ? moment(res?.daily_dynamite_morning_reminder_time.time).format("HH:mm") : "00:00",
+        days: res?.daily_dynamite_morning_reminder_time.days ? res?.daily_dynamite_morning_reminder_time.days : []
+      })
+      setEveningReminder({
+        time: !!res?.daily_dynamite_evening_reminder_time.time ? moment(res?.daily_dynamite_evening_reminder_time.time).format("HH:mm") : "00:00",
+        days: res?.daily_dynamite_evening_reminder_time.days ? res?.daily_dynamite_evening_reminder_time.days : []
+      });
+      if (res?.past_activities) {
+        setList(res?.past_activities)
+      }
     }
   }
 
+
+  const setStreakReminderToServer = async (isMorning) => {
+    let body = {};
+    if (isMorning) {
+      body = { daily_dynamite_morning_reminder_time: morningReminder }
+    } else {
+      body = { daily_dynamite_evening_reminder_time: morningReminder }
+    }
+    let res = await SET_ACCOUNTABILITY_TRACKER_REMINDER({ navigation, token, body });
+    if (res.code == 200) {
+      showToast({ title: res?.message, type: "success" });
+    }
+  }
+
+
+  const addTrackerToServer = async (id) => {
+    setLoader(true);
+
+
+    let body = {
+      date: moment(date).format("DD-MM-YYYY"),
+      goal_statement_info: { image: "", status: false },
+      gratitude_info: { image: "", status: false },
+      paradigm_info: { image: "", status: false },
+      statement_array: statements,
+      tracker_intention: intentions,
+      note: affirmationText.trim(),
+    }
+    let res = await ADD_ACCOUNTABILITY_TRACKER({ navigation, token, body });
+    setLoader(false);
+    if (res.code == 200) {
+      showToast({ title: res?.message, type: "success" });
+    }
+  }
+
+
+  const updateTrackerToServer = async (id) => {
+    setLoader(true);
+    let completed = 0;
+    let unCompleted = 0;
+    for (let i = 0; i < statements.length; i++) {
+      if (statements[i].complete) {
+        completed++;
+      } else {
+        unCompleted++
+      }
+    }
+    let body = {
+      completed_intention: completed,
+      incomplete_intention: unCompleted,
+      date: moment(date).format("DD-MM-YYYY"),
+      statement_array: statements,
+      tracker_intention: intentions,
+      note: affirmationText.trim(),
+    }
+    let res = await UPDATE_ACCOUNTABILITY_TRACKER({
+      navigation, token, body, id: editId
+    });
+    setLoader(false);
+    if (res.code == 200) {
+      showToast({ title: res?.message, type: "success" });
+    }
+  }
+
+
+  const uploadImageToS3 = async (img, index) => {
+    setLoader(true);
+    let fd = new FormData();
+    fd.append("image", img);
+    fd.append("width", img.width);
+    let res = await UPLOAD_FILE_TO_S3({
+      navigation, token, body: fd
+    });
+    setLoader(false);
+    if (res.code == 200) {
+      intentionHandler(index, { image: res?.image_path })
+    }
+  }
+
+  const moveToTommorrow = async (intention, index) => {
+    if (!intention?.is_moved_to_tomorrow) {
+      setLoader(true);
+      let res = await MOVE_TO_TOMMORROW({
+        navigation, token, body: {
+          date: moment(date).add({ day: 1 }).format("DD-MM-YYYY"),
+          intention_object: intention
+        }
+      });
+      if (res.code == 200) {
+        statementhandler({ is_moved_to_tomorrow: true }, index)
+        addOrUpdate()
+      }
+    }
+  }
+
+
+
+  //* REMNDER 
 
   const onReminderSelected = (item) => {
     if (reminderOptions?.key == "morningReminder") {
@@ -129,8 +289,35 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
 
   //* Function
 
-  const statementhandler = (text, index) => {
-    statements[index].option = text;
+  const onSelected = (opt) => {
+    let { item } = options;
+    setOptions({ isVisible: false, item: null });
+    setTimeout(() => {
+      if (opt.key == "edit") {
+        Keyboard.dismiss()
+        setDate(moment(item.date, "DD-MM-YYYY"))
+        ref_scrollView?.current?.scrollToPosition(0, 0, true)
+      } else if (opt.key == "delete") {
+        setConfirmation({ isVisible: true, item: item })
+      }
+    }, 400);
+  }
+
+
+  const onAgree = () => {
+    let { item } = confirmation;
+    setConfirmation({ isVisible: false, item: null })
+    setTimeout(() => {
+      // delete90daysEarningsfromServer(item?._id)
+    }, 350);
+  }
+
+
+  //* handlers
+
+  const statementhandler = (changes, index) => {
+    let obj = { ...statements[index], ...changes };
+    statements.splice(index, 1, obj);
     setStatements([...statements])
   }
 
@@ -155,7 +342,7 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
     return (
       <View style={__styles.reminderView}>
         <View style={{ marginVertical: 5 }}>
-          <MyText type='bold' fontSize={16}  >Morning Reminderr</MyText>
+          <MyText type='bold' fontSize={16}  >{!!settings?.morning_heading ? settings?.morning_heading : ""}</MyText>
         </View>
         <View style={{}}>
           <MyTouchableInput
@@ -185,7 +372,7 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
             <MyButton title='Save'
               style={{ paddingHorizontal: 5, }}
               invert
-            // onPress={onReminderSave}
+              onPress={() => setStreakReminderToServer(true)}
             />
           </View>
         </View>
@@ -198,7 +385,7 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
     return (
       <View style={__styles.reminderView}>
         <View style={__styles.labelView}>
-          <MyText type='bold' fontSize={16}  >Evening Reminderr</MyText>
+          <MyText type='bold' fontSize={16}  >{!!settings?.evening_heading ? settings?.evening_heading : ""}</MyText>
         </View>
         <View style={{}}>
           <MyTouchableInput
@@ -228,7 +415,7 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
             <MyButton title='Save'
               style={{ paddingHorizontal: 5, }}
               invert
-            // onPress={onReminderSave}
+              onPress={() => setStreakReminderToServer(false)}
             />
           </View>
         </View>
@@ -259,13 +446,17 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
     return (
       <View >
         <View style={__styles.labelView}>
-          <MyText type='bold' fontSize={16}  >Today Affirmation</MyText>
+          <MyText type='bold' fontSize={16}  >{!!settings?.affirm_title ? settings?.affirm_title : ""}</MyText>
         </View>
 
         <View style={{ marginTop: 5 }}>
           <MyInputs
+
             noLable
             multiline={true}
+            placeholder={!!settings?.affirm_placeHolder ? settings?.affirm_placeHolder : ""}
+            value={affirmationText}
+            onChangeText={(text) => setAffirmationText(text)}
           />
         </View>
       </View>
@@ -277,27 +468,30 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
     return (
       <View >
         <View style={__styles.labelView}>
-          <MyText type='bold' fontSize={16}  >List the top 3 intentions you commit to completing today that are Goal-Achievingg
-          </MyText>
+          <MyText type='bold' fontSize={16}  >{!!settings?.intentions_heading ? settings?.intentions_heading : ""}</MyText>
         </View>
         {statements.map((item, index) => (
           <View style={{ marginTop: 10 }}>
             <View style={{ flexDirection: "row", }}>
               <View style={{ flex: 1 }}>
                 <MyInputs
+                  myref={(element) => (ref_inputs.current[index] = element)}
                   noLable
                   value={item?.option}
-                  onChangeText={(text) => statementhandler(text, index)}
+                  onChangeText={(text) => {
+                    statementhandler({ option: text }, index);
+                  }}
                   placeholder={`${index + 1}.`}
                 />
               </View>
 
               <View style={{ marginTop: -5 }}>
-                <TouchableOpacity
-                  style={__styles.addRemoveButton}
-                  onPress={() => removeStatement(index)} >
-                  {icons.minusCircle(colors.delete)}
-                </TouchableOpacity>
+                {statements.length > 1 ?
+                  <TouchableOpacity
+                    style={__styles.addRemoveButton}
+                    onPress={() => removeStatement(index)} >
+                    {icons.minusCircle(colors.delete)}
+                  </TouchableOpacity> : <View />}
 
                 <TouchableOpacity
                   style={[__styles.addRemoveButton, { marginTop: 5 }]}
@@ -311,6 +505,7 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
               <View style={{ flexDirection: "row", }}>
                 <View style={{ flex: 1 }}>
                   <MyCheckBox
+                    onPress={() => moveToTommorrow(item, index)}
                     value={item?.is_moved_to_tomorrow}
                     title={"Move to Tomorrow"}
                   />
@@ -319,6 +514,10 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
                   <MyCheckBox
                     value={item?.complete}
                     title={"Mark Intention Complete"}
+                    onPress={() => {
+                      statementhandler({ complete: !item?.complete }, index,)
+                      addOrUpdate()
+                    }}
                   />
                 </View>
               </View>}
@@ -331,7 +530,9 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
     return (
       <View>
         <View style={__styles.labelView}>
-          <MyText type='bold' color={colors.primary} fontSize={16}  >Have You Completed?</MyText>
+          <MyText type='bold' color={colors.primary} fontSize={16}  >
+            {!!settings?.completed_heading ? settings?.completed_heading : ""}
+          </MyText>
         </View>
 
 
@@ -345,7 +546,8 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
                 checkBoxValue={item?.status}
                 onCheckBoxPress={() => intentionHandler(index, { status: !item?.status })}
                 disable={!item?.status}
-                onImagePicked={(img) => intentionHandler(index, { image: img })}
+                onImagePicked={(img) => uploadImageToS3(img, index)}
+                onRemoveBtnPress={() => intentionHandler(index, { image: "" })}
                 selectedImage={item?.image}
               />
 
@@ -375,57 +577,87 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
   const saveView = () => {
     return (
       <View style={{ marginVertical: 10 }}>
-        <MyButton />
+        <MyButton title='Save' onPress={validate} />
+      </View>
+    )
+  }
+
+  const recentActivities = () => {
+    return (
+      <View>
+        <MyText align='right' fontSize={10} >Most Recent</MyText>
+
+        <View>
+
+          {list.map((item, index) => (
+            <View key={"activities" + index} style={__styles.activityView} >
+              <View style={__styles.activityRow}>
+                <MyText>{item?.date}</MyText>
+                <View style={__styles.activityNestedRow}>
+                  <MyText>{moment(item?.date_time, "YYYY-MM-DD HH:mm").format(dateTimeFormat.time)}</MyText>
+                  <MenuButton
+                    onPress={() => setOptions({ isVisible: true, item, item })}
+                  />
+                </View>
+
+              </View>
+              <View style={{ marginTop: 10 }}>
+                <MyText>{item?.statement_array[0]?.option}</MyText>
+              </View>
+            </View>
+          ))}
+
+
+        </View>
+
+
+        <View style={{ marginVertical: 10, alignItems: "flex-end" }}>
+          <MyButton invert
+            title='Past Activities'
+            style={{ paddingHorizontal: 10, height: 40 }}
+            onPress={onPastActivities}
+          />
+        </View>
       </View>
     )
   }
 
   return (
-    <RootView title={title} hideBackBottomButton >
-      <View style={{ flex: 1 }}>
-        <KeyboardAwareScrollView
-          contentContainerStyle={{ paddingBottom: 50 }}
-          enableAutomaticScroll={true}
-          showsVerticalScrollIndicator={false}>
-          {morningReminderView()}
-          {eveningReminderView()}
-          <View style={__styles.reminderView}>
-            {affirrmationView()}
-            {dateView()}
-            {statementView()}
-          </View>
+    <RootView
+      title={!!settings?.main_heading ? settings?.main_heading : ""}
+      hideBackBottomButton >
+      {!!settings &&
+        <View style={{ flex: 1 }}>
+          <KeyboardAwareScrollView
+            ref={ref_scrollView}
+            keyboardShouldPersistTaps="always"
+            contentContainerStyle={{ paddingTop: 10, paddingBottom: 50 }}
+            enableAutomaticScroll={true}
+            showsVerticalScrollIndicator={false}>
+            {morningReminderView()}
+            {eveningReminderView()}
+            <View style={__styles.reminderView}>
+              {affirrmationView()}
+              {dateView()}
+              {statementView()}
+            </View>
 
-          {intentionView()}
-          {saveView()}
-        </KeyboardAwareScrollView>
-      </View>
+            {intentionView()}
+            {saveView()}
+            {recentActivities()}
+          </KeyboardAwareScrollView>
+        </View>}
       <CalendarModal
         ref={ref_calendar}
         onDateSelected={(slectedDate) => setDate(moment(slectedDate))}
+
+        maximun={moment()}
       />
 
       <InfoModal
         ref={ref_infoModal}
       />
       <MyLoader enable={loader} />
-
-      {/* <DateTimePicker
-        date={reminderTimerPicker?.key == "morningReminder" ?
-          moment(morningReminder?.time, "HH:mm").toDate() :
-          moment(eveningReminder.time, "HH:mm").toDate()}
-        isVisible={reminderTimerPicker?.isVisible}
-        onCancel={() => setReminderOptions({ isVisible: false, key: "" })}
-        onConfirm={(date) => {
-          if (reminderTimerPicker?.key == "morningReminder") {
-            setMorningReminder({ ...morningReminder, time: moment(date).format("HH:mm") })
-          } else {
-            setEveningReminder({ ...eveningReminder, time: moment(date).format("HH:mm") })
-          }
-          setReminderTimerPicker({ isVisible: false, key: "" })
-        }}
-        mode="time"
-
-      /> */}
 
 
       <TimePicker
@@ -456,6 +688,24 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
         }}
 
       />
+
+
+      <OptionModal
+        isVisible={options.isVisible}
+        onSelected={onSelected}
+        optionList={optionsList}
+        closeModal={() => setOptions({ isVisible: false, item: null })}
+      />
+
+
+      <ConfirmationModal
+        title={"Are you sure you want to delete?"}
+        isVisible={confirmation.isVisible}
+        onAgree={onAgree}
+        closeModal={() => setConfirmation({ isVisible: false, item: null })}
+      />
+
+
     </RootView>
   )
 }
@@ -480,9 +730,30 @@ const __styles = StyleSheet.create({
   addRemoveButton: {
     paddingLeft: 5,
 
-  }
+  },
+  activityView: {
+    paddingLeft: 10, paddingVertical: 10, paddingRight: 5,
+    backgroundColor: colors.secondary, marginTop: 10, borderRadius: 10
+  },
+  activityRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+  activityNestedRow: { flexDirection: "row", alignItems: "center" }
 })
 
+
+const optionsList = [
+
+  {
+    title: "Edit",
+    key: "edit",
+    icon: icons.edit
+  },
+  {
+    title: "Delete",
+    key: "delete",
+    icon: icons.trash
+  },
+
+]
 
 
 const daysList = [

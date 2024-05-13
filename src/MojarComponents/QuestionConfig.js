@@ -17,11 +17,13 @@ import { S3_URL } from '../utilities/constants';
 import ImageUploadModal from '../components/ImageUploadModal';
 import showToast from '../functions/showToast';
 import EmptyView from '../components/EmptyView';
+import utilities from '../utilities';
 
 const QuestionConfig = ({
   token, navigation,
   created_for = null,
-  created_for_id = null
+  created_for_id = null,
+  description = ""
 }) => {
   const [loader, setLoader] = useState(true);
   const [list, setList] = useState([])
@@ -317,6 +319,16 @@ const QuestionConfig = ({
       </View>)
   }
 
+  const header = () => {
+    return (
+      <>{!!description &&
+        <View style={{ alignSelf: "center", paddingVertical: 5 }}>
+          <MyWebview width={utilities.screenWidth() - 20} html={description} />
+        </View>}
+      </>
+    )
+  }
+
   const footer = (
     <View style={{ alignSelf: "center", paddingVertical: 30 }}>
       {list.length > 0 &&
@@ -337,8 +349,9 @@ const QuestionConfig = ({
           keyExtractor={(item) => item?._id}
           data={list}
           renderItem={renderQuestion}
+          ListHeaderComponent={header}
           ListFooterComponent={footer}
-          ListEmptyComponent={ !loader && <EmptyView label={"Questions Not Found!"} />}
+          ListEmptyComponent={!loader && <EmptyView label={"Questions Not Found!"} />}
         />
       </View>
 

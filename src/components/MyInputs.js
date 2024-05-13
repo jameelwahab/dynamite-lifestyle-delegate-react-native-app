@@ -27,7 +27,8 @@ const MyInputs = ({
   onSubmitEditing,
   limited = false,
   customView,
-  noLable = false
+  noLable = false,
+  myref = null
 }) => {
   const [isFocused, setFocused] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
@@ -40,6 +41,7 @@ const MyInputs = ({
         {!!leftIcon && <View style={[__MyInputStyles.leftButton]} >{leftIcon()}</View>}
 
         <TextInput
+          ref={myref}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
           style={[__MyInputStyles.input, multiline ? __MyInputStyles.multilineView : undefined, !!rightIcon && { paddingLeft: !!leftIcon ? 0 : 10 }, { color: !editable ? colors.lightText : colors.white }]}
@@ -52,7 +54,6 @@ const MyInputs = ({
           returnKeyType={isSearch ? "search" : "default"}
           onSubmitEditing={onSubmitEditing}
           editable={editable}
-
           selectionColor={colors.selection}
           autoCorrect={false}
           multiline={multiline}

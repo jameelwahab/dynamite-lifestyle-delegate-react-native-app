@@ -279,7 +279,6 @@ const PerformanceStreak = ({ navigation, route }) => {
         isVisible={isTimerPickerVisible}
         onCancel={() => setIsTimerPickerVisible(false)}
         onConfirm={(date) => {
-          // console.log(moment(date).format("HH:mm"))
           setReminder({ ...reminder, time: moment(date).format("HH:mm") })
           setIsTimerPickerVisible(false)
         }}

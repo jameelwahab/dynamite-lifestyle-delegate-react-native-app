@@ -59,3 +59,26 @@ export const SET_ACCOUNTABILITY_TRACKER_REMINDER = ({ token, navigation, body })
   })
 }
 
+export const MOVE_TO_TOMMORROW = ({ token, navigation, body: {
+  date, intention_object
+} }) => {
+  return invokeApi({
+    path: `api/daily_dynamite_tracker/tracker_move_to_tomorrow`,
+    method: "POST",
+    postData: { date, intention_object },
+    token,
+    navigation,
+  })
+}
+
+
+export const GET_PAST_ACTIVITIES = ({ token, navigation }) => {
+  return invokeApi({
+    path: `api/daily_dynamite_tracker/get_daily_dynamite_list`,
+    method: "GET",
+    token,
+    navigation,
+  })
+}
+
+
