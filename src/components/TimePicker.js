@@ -13,7 +13,8 @@ const TimePicker = forwardRef(({ onAgree }, ref) => {
   const [isVisible, setIsVisible] = useState(false)
   const [hours, setHours] = useState("12")
   const [mins, setMins] = useState("00");
-  const [amPm, setAmPm] = useState("AM")
+  const [amPm, setAmPm] = useState("AM");
+  const [type, setType] = useState("");
 
   useImperativeHandle(ref, () => {
     return {
@@ -26,21 +27,24 @@ const TimePicker = forwardRef(({ onAgree }, ref) => {
   const onAgreeClick = () => {
     let result = moment(hours + ":" + mins + " " + amPm, "hh:mm A").format("HH:mm");
     console.log(result, "result")
-    onAgree?.(result);
+    onAgree?.(result,type);
     closeModal?.()
   }
 
-  const openModal = (time) => {
+  const openModal = (time, type = "") => {
     if (time) {
       setMins(moment(time, "HH:mm").format("mm"))
       setHours(moment(time, "HH:mm").format("hh"))
       setAmPm(moment(time, "HH:mm").format("A"))
     }
-
+    if (type) {
+      setType(type)
+    }
     setIsVisible(true)
   }
 
   const closeModal = () => {
+    setType("")
     setIsVisible(false)
   }
   return (

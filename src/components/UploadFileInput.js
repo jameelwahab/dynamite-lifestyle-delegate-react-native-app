@@ -8,6 +8,7 @@ import { icons } from '../utilities/icons'
 import ImageUploadModal from './ImageUploadModal'
 import ImageZoomer from './ImageZoomer'
 import EmptyView from './EmptyView'
+import MyCheckBox from './MyCheckBox'
 
 const UploadFileInput = ({
   label = "",
@@ -15,7 +16,11 @@ const UploadFileInput = ({
   selectedImage,
   onImagePicked,
   onRemoveBtnPress,
+  disable = false,
   hideRemoveButton = false,
+  showCheckbox = false,
+  checkBoxValue = false,
+  onCheckBoxPress = () => { },
 
 }) => {
   const [isImagePickerVisible, setIsImagePickerVisible] = useState(false);
@@ -26,19 +31,27 @@ const UploadFileInput = ({
     <>
       <View style={__styles.rootView}>
         <View style={__styles.headerView}>
+          {showCheckbox &&
+            <View style={__styles.checkBoxView}>
+              <MyCheckBox
+                onPress={onCheckBoxPress}
+                value={checkBoxValue} />
+            </View>
+          }
           <View style={__styles.headingView}>
             <MyText type='medium' >{label}</MyText>
             <View style={{ marginTop: 2 }}>
               <MyText fontSize={11} color={colors.lightText} >{subLabel}</MyText>
             </View>
           </View>
-          <TouchableOpacity
-            style={__styles.btnView}
-            hitSlop={{ top: 5, left: 5, right: 5, bottom: 5 }}
-            onPress={() => setIsImagePickerVisible(true)}
-          >
-            {icons.upload2(colors.primary, 20)}
-          </TouchableOpacity>
+          {!disable &&
+            <TouchableOpacity
+              style={__styles.btnView}
+              hitSlop={{ top: 5, left: 5, right: 5, bottom: 5 }}
+              onPress={() => setIsImagePickerVisible(true)}
+            >
+              {icons.upload2(colors.primary, 20)}
+            </TouchableOpacity>}
         </View>
 
         <View style={__styles.imageBox}>
@@ -71,12 +84,12 @@ const UploadFileInput = ({
         </View>
       </View>
 
-        <ImageUploadModal
-          isVisible={isImagePickerVisible}
-          onImagePicked={onImagePicked}
-          closeModal={() => setIsImagePickerVisible(false)}
-          
-        /> 
+      <ImageUploadModal
+        isVisible={isImagePickerVisible}
+        onImagePicked={onImagePicked}
+        closeModal={() => setIsImagePickerVisible(false)}
+
+      />
 
       <ImageZoomer
         visible={!!imageForZoom}
@@ -94,6 +107,9 @@ export default UploadFileInput;
 const __styles = StyleSheet.create({
   rootView: {
     marginBottom: 15
+  },
+  checkBoxView: {
+    marginRight: 10
   },
   dummyImage: {
     alignItems: "center",

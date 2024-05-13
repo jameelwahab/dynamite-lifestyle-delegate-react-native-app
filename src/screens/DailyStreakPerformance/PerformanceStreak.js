@@ -170,6 +170,7 @@ const PerformanceStreak = ({ navigation, route }) => {
       </View>
     )
   }
+  
   const sliderView = (label, stateKey) => {
     return (
       <View style={__styles.sliderView}>
