@@ -16,6 +16,7 @@ import openUrl from '../functions/openUrl';
 import { S3_URL } from '../utilities/constants';
 import ImageUploadModal from '../components/ImageUploadModal';
 import showToast from '../functions/showToast';
+import EmptyView from '../components/EmptyView';
 
 const QuestionConfig = ({
   token, navigation,
@@ -337,6 +338,7 @@ const QuestionConfig = ({
           data={list}
           renderItem={renderQuestion}
           ListFooterComponent={footer}
+          ListEmptyComponent={ !loader && <EmptyView label={"Questions Not Found!"} />}
         />
       </View>
 

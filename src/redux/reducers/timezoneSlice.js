@@ -9,7 +9,6 @@ const timezoneSlice = createSlice({
   initialState: initialState,
   reducers: {
     setTimeZone: (state, action) => {
-      console.log(state, action, "timezoneSlice")
       state.user = action.payload.user
       state.admin = action.payload.admin
     },

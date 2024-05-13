@@ -907,8 +907,8 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       <View style={{ flex: 1, marginHorizontal: -10 }}>
         <FlatList
           data={tab == 0 ? feed : []}
-          // onViewableItemsChanged={onViewableItemsChanged}
-          // viewabilityConfig={viewConfigRef.current}
+          onViewableItemsChanged={onViewableItemsChanged}
+          viewabilityConfig={viewConfigRef.current}
           showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item?._id}
           ListHeaderComponent={!!!feedId && headerView()}

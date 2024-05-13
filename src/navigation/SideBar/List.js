@@ -42,6 +42,7 @@ import StackHelpTech from "../NestedStacks/StackHelpTech";
 import StackDailyStreakPerformance from "../NestedStacks/StackDailyStreakPerformance";
 import StackMonthReport from "../NestedStacks/StackMonthyReport";
 import StackBroadcast from "../NestedStacks/StackBroadcastChat";
+import StackQuaterQuestions from "../NestedStacks/StackQuaterQuestions";
 
 
 
@@ -298,6 +299,15 @@ export const ParentComponents = {
       key: "aadbd7a3-91c1-40dd-bf24-898768876hhh"
     }
   },
+
+  "aadbd7a3-91c1-40dd-bf24-7846756776677887": {
+    key: routes.quaterQuestionNavigator,
+    component: StackQuaterQuestions,
+    params: {
+      value: "quarter_questions",
+      key: "aadbd7a3-91c1-40dd-bf24-7846756776677887"
+    }
+  },
 }
 
 export const ChildComponents = {
@@ -365,7 +375,7 @@ export const ChildComponents = {
     key: routes.transactionNavigator,
     component: StackTransactions,
     params: {
-      value: "transactions", parentValue: "payments", 
+      value: "transactions", parentValue: "payments",
       key: "558ec2ba-49ca-4740-bb81-a0a29296d69d",
       parentKey: "455ccc75-c8d3-41b3-856b-5a133a185c5b",
     }

@@ -46,6 +46,7 @@ const routes = {
   dailyStreakPerformerNavigator: "DAYLY_STREAK_PERFORMANCE_NAVIGATOR",
   monthlyReportNavigator: "MONTHLY_REPORT_NAVIGATOR",
   broadcastNavigator: "BROADCAST_NAVIGATOR",
+  quaterQuestionNavigator: "QUATER_QUESTION_NAVIGATOR",
 
   //! ///    Screens'
 
@@ -262,6 +263,10 @@ const routes = {
   broadcastStartNewChat: "BROADCAST_START_NEW_CHAT_SCREEN",
   broadcastDetail: "BROADCAST_DETAIL_SCREEN",
 
+  //? Quater Question
+  quaterQuestionList: "QUATER_QUESTION_LIST_SCREEN",
+  quaterQuestionDetail: "QUATER_QUESTION_DETAIL_SCREEN",
 }
+
 
 export default routes;

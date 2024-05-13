@@ -18,7 +18,7 @@ import openUrl from '../../../functions/openUrl'
 import DropShadow from "react-native-drop-shadow";
 
 export const FeedView = ({ item, index, user, token, isInView, timezone, settings, openComments, showLikes, openOptions, onLikebtnPress, isCosmos, sourceLevelIcons, isScheduledFeed, openScheduleTimeModal, onFeedDetail, isEventFeed }) => {
-  console.log("updated", index);
+
 
   const [animationState, setAnimationState] = useState(0)
 
@@ -238,10 +238,12 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
   )
 
 
-  return (
-    <DropShadow style={[__style.shadow, __style.rootShadowView,
-    { shadowColor: item?.is_reward_feed ? colors.primary : colors.darkSecondary, }]}>
-      <View style={[__style.rootView, item?.is_reward_feed ? __style.rewardBorderView : null]}>
+
+  if (item?.is_reward_feed) {
+    return (
+      <DropShadow style={[__style.shadow, __style.rootShadowView,
+      { shadowColor: item?.is_reward_feed ? colors.primary : colors.darkSecondary, }]}>
+        <View style={[__style.rootView, item?.is_reward_feed ? __style.rewardBorderView : null]}>
           {animationView()}
           <View >
             {profileView()}
@@ -253,8 +255,26 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
               </>}
           </View>
         </View>
-    </DropShadow>
-  )
+      </DropShadow>
+    )
+  } else {
+    return (
+      <View style={__style.rootShadowView}>
+        <View style={[__style.rootView,]}>
+          {animationView()}
+          <View >
+            {profileView()}
+            {descriptionView()}
+            {item?.is_publish &&
+              <>
+                {statsView()}
+                {actionView()}
+              </>}
+          </View>
+        </View>
+      </View>
+    )
+  }
 };
 
 function areEqual(prevProps, nextProps) {

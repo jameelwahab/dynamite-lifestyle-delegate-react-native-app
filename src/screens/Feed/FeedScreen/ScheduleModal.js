@@ -9,6 +9,7 @@ import moment from 'moment';
 import { dateTimeFormat } from '../../../utilities/constants';
 import { useSelector } from 'react-redux';
 import { selectTimeZone } from '../../../redux/reducers/timezoneSlice';
+import { convertTimezone, convertTimezoneFrom } from '../../../functions/convertTime';
 const ScheduleModal = forwardRef(({ }, ref) => {
   const [isVisible, setVisiblity] = useState(false);
   const [time, setTime] = useState(null);
@@ -42,21 +43,22 @@ const ScheduleModal = forwardRef(({ }, ref) => {
         animationOutTiming={400}
         avoidKeyboard={true}
         style={{ margin: 0, marginHorizontal: 5 }}>
-        <SafeAreaView style={{ flex: 1 }} >
-          <View style={__style.rootView}>
-            <View style={__style.headingView}>
-              <Pressable
-                hitSlop={{ top: 10, left: 10, right: 10, left: 10 }}
-                onPress={closeScheduleTimeModal}>
-                {icons.crosssWithCircle(colors.white, 20)}
-              </Pressable>
-            </View>
-            {!!time &&
-            <View style={{ paddingBottom: 10, paddingHorizontal: 10 }}>
-              <MyText>{`Post will be pushlished on ${moment(time).tz(timezone.admin).format(dateTimeFormat.dateTimeWithText("at"))} (Europe/Dublin)`}</MyText>
-            </View>}
+
+        <View style={__style.rootView}>
+          <View style={__style.headingView}>
+            <Pressable
+              hitSlop={{ top: 10, left: 10, right: 10, left: 10 }}
+              onPress={closeScheduleTimeModal}>
+              {icons.crosssWithCircle(colors.white, 20)}
+            </Pressable>
           </View>
-        </SafeAreaView>
+          {!!time &&
+            <View style={{ paddingBottom: 10, paddingHorizontal: 10 }}>
+              {/* <MyText>{`Post will be pushlished on ${moment(time).tz(timezone.admin).format(dateTimeFormat.dateTimeWithText("at"))} (Europe/Dublin)`}</MyText> */}
+              <MyText>{`Post will be pushlished on ${moment(time).tz(timezone.admin).subtract({ hour: 1 }).format(dateTimeFormat.dateTimeWithText("at"))} (Europe/Dublin)`}</MyText>
+            </View>}
+        </View>
+
       </Modal>)
   }
 
