@@ -22,6 +22,9 @@ import { S3_URL, dateTimeFormat } from '../../utilities/constants'
 import ResponsiveImage2 from '../../components/ResponsiveImage2'
 import { selectTimeZone } from '../../redux/reducers/timezoneSlice'
 import MyChip from '../../components/MyChip'
+import Tabs from '../../components/Tabs'
+import prependCurency from '../../functions/prependCurency'
+import { TransparentButton } from '../../components/MyButton'
 
 const Dasboard = ({ navigation }) => {
   const { token } = useSelector(selectUser);
@@ -30,7 +33,7 @@ const Dasboard = ({ navigation }) => {
   const [data, setData] = useState(null);
   const [loader, setLoader] = useState(true);
   const [filter, setFilter] = useState({});
-  const [bookingTab, setBookingTab] = useState(1);
+  const [bookingTab, setBookingTab] = useState(0);
 
 
   const getDashboarddata = async () => {
@@ -41,6 +44,10 @@ const Dasboard = ({ navigation }) => {
     } else {
       setLoader(false)
     }
+  }
+
+  const onCommissionlist = () => {
+    navigation.jumpTo(routes.commissionNavigator)
   }
 
 
@@ -116,8 +123,12 @@ const Dasboard = ({ navigation }) => {
             color={"#3A2737"} />
         </View>
 
-
-        <View style={__style.tabsView}>
+        <Tabs
+          changeTab={(index) => setBookingTab(index)}
+          list={tabs}
+          tab={bookingTab}
+        />
+        {/* <View style={__style.tabsView}>
           <TouchableOpacity
             onPress={() => setBookingTab(1)}
             style={[__style.tabView, bookingTab == 1 && __style.tabSelectedView]}>
@@ -135,31 +146,49 @@ const Dasboard = ({ navigation }) => {
             </MyText>
             <View style={[__style.selectline, { backgroundColor: bookingTab == 2 ? colors.primary : colors.transparent }]} />
           </TouchableOpacity>
-        </View>
+        </View> */}
       </View>
     )
   }
 
   const bookingView = ({ item, index }) => {
-    return (
-      <View style={{ marginTop: index != 0 ? 10 : 0, backgroundColor: colors.secondary, padding: 10, borderRadius: 10, }}>
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <UserImage
-            image={item?.user_info?.profile_image}
-            name={item?.user_info?.first_name}
-            size={30}
-          />
-          <View style={{ marginLeft: 10 }}>
-            <MyText fontSize={14} type='medium' >{item?.user_info?.first_name + " " + item?.user_info?.last_name}</MyText>
-            <MyText fontSize={12} type='light'>{item?.user_info?.email}</MyText>
+    if (bookingTab == 2) {
+      return (
+        <View style={{ marginTop: index != 0 ? 10 : 0, backgroundColor: colors.secondary, padding: 10, borderRadius: 10, }}>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <UserImage
+              image={item?.member_info?.profile_image}
+              name={item?.member_info?.first_name}
+              size={30}
+            />
+            <View style={__style.nameAndAmountView}>
+              <MyText fontSize={14} type='medium' >{item?.member_info?.first_name + " " + item?.member_info?.last_name}</MyText>
+              <MyText fontSize={14} type='medium'>{prependCurency(item?.currency) + " " + item?.amount}</MyText>
+            </View>
           </View>
         </View>
-        {itemView("Booking page", item?.page?.sale_page_title)}
-        {itemView("Date", moment(item?.start_date_time).format("DD-MM-YYYY") + " (" + moment(item?.time, "hh:mm A").format("hh:mm A") + " - " + moment(item?.time, "hh:mm A").add({ minutes: item?.slot_duration }).format("hh:mm A") + ")")}
-        {itemView("Booking Status", item?.booking_status_info?.title, item?.booking_status_info?.background_color)}
+      )
+    } else {
+      return (
+        <View style={{ marginTop: index != 0 ? 10 : 0, backgroundColor: colors.secondary, padding: 10, borderRadius: 10, }}>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <UserImage
+              image={item?.user_info?.profile_image}
+              name={item?.user_info?.first_name}
+              size={30}
+            />
+            <View style={{ marginLeft: 10 }}>
+              <MyText fontSize={14} type='medium' >{item?.user_info?.first_name + " " + item?.user_info?.last_name}</MyText>
+              <MyText fontSize={12} type='light'>{item?.user_info?.email}</MyText>
+            </View>
+          </View>
+          {itemView("Booking page", item?.page?.sale_page_title)}
+          {itemView("Date", moment(item?.start_date_time).format("DD-MM-YYYY") + " (" + moment(item?.time, "hh:mm A").format("hh:mm A") + " - " + moment(item?.time, "hh:mm A").add({ minutes: item?.slot_duration }).format("hh:mm A") + ")")}
+          {itemView("Booking Status", item?.booking_status_info?.title, item?.booking_status_info?.background_color)}
 
-      </View>
-    )
+        </View>
+      )
+    }
   }
 
   const itemView = (title, value, color = null) => {
@@ -183,11 +212,24 @@ const Dasboard = ({ navigation }) => {
     )
   }
 
-  const sectionFooter = ({ section }) => {
+  const sectionEmpty = () => {
     if (!loader) {
       return (
         <View style={{ marginVertical: 10 }}>
           <EmptyView label={"No Data Exist"} />
+        </View>
+      )
+    } else return null;
+  }
+
+
+  const sectionFooter = () => {
+    if (!loader && bookingTab == 2) {
+      return (
+        <View style={{ marginVertical: 10, alignItems: "flex-end" }}>
+          <TransparentButton
+            onPress={onCommissionlist}
+            title='View All' />
         </View>
       )
     } else return null;
@@ -238,17 +280,20 @@ const Dasboard = ({ navigation }) => {
         <FlatList
           contentContainerStyle={{ paddingBottom: 50 }}
           data={!!data ?
-            bookingTab == 1 ?
+            bookingTab == 0 ?
               data?.latest_booking_list :
-              bookingTab == 2 ?
+              bookingTab == 1 ?
                 data?.upcomming_booking_list :
-                [] :
+                bookingTab == 2 ?
+                  data?.transaction.slice().reverse() :
+                  [] :
             []
           }
-          ListHeaderComponent={!!data && view_commissionCounters}
+          ListHeaderComponent={!!data && view_commissionCounters()}
           renderItem={bookingView}
-          renderSectionHeader={sectionHeader}
-          ListEmptyComponent={sectionFooter}
+          // renderSectionHeader={sectionHeader}
+          ListEmptyComponent={sectionEmpty}
+          ListFooterComponent={sectionFooter()}
           showsVerticalScrollIndicator={false}
         />
       </View>
@@ -258,6 +303,22 @@ const Dasboard = ({ navigation }) => {
 }
 
 export default Dasboard;
+
+const tabs = [{
+  title: "Latest Booking",
+  index: 0,
+  key: "latest_booking_list"
+},
+{
+  title: "Upcoming Booking",
+  index: 1,
+  key: "upcoming_booking_list"
+},
+{
+  title: "Latest Transactions",
+  index: 2,
+  key: "latest_transactions"
+}]
 
 const __style = StyleSheet.create({
   chip: {
@@ -295,6 +356,13 @@ const __style = StyleSheet.create({
     borderRadius: 10,
     marginTop: 10,
 
+  },
+  nameAndAmountView: {
+    flex: 1,
+    justifyContent: "space-between",
+    marginLeft: 10,
+    flexDirection: "row",
+    alignItems: "center"
   },
   tabSelectedView: {
     // borderColor: colors.primary,
