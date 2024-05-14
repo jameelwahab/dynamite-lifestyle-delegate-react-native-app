@@ -38,9 +38,7 @@ const ReportScreen = ({ navigation, route }) => {
     getDataFromServer()
   }, [currentMonYear])
 
-  useEffect(() => {
-    console.log(shownCharts, "shownCharts")
-  }, [shownCharts])
+
 
   const getLabels = (res) => {
     let totalDays = moment(currentMonYear, "MM-YYYY").daysInMonth();

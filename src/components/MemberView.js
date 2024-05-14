@@ -4,10 +4,12 @@ import MyText from './MyText'
 import UserImage from './UserImage'
 import { colors } from '../utilities/colors'
 
-const MemberView = ({ member, showPhoneNumber = false, marginLeft = 5, size = 30,titleSize=12 }) => {
+const MemberView = ({ member, showPhoneNumber = false, marginLeft = 5, size = 30, titleSize = 12, customImage = "" }) => {
+  let image = !!customImage ? customImage : member?.profile_image
   return (
+
     <View style={{ marginLeft, height: 35, flexDirection: "row", alignItems: "center", }}>
-      <UserImage image={member?.profile_image} name={member?.first_name} size={size} />
+      <UserImage image={image} name={member?.first_name} size={size} />
       <View style={{ marginLeft: 10 }}>
         <MyText type='bold' fontSize={titleSize} >{`${member?.first_name} ${member?.last_name}`}</MyText>
         <MyText type='medium' color={colors.lightText2} fontSize={10} >{`${member?.email}`}</MyText>
