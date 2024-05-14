@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import TrackPlayer, { useProgress, State, usePlaybackState, useActiveTrack } from 'react-native-track-player';
-import { Text, View, StyleSheet, TouchableOpacity, Image, } from 'react-native';
+import TrackPlayer, { RepeatMode, useProgress, State, usePlaybackState, useActiveTrack, } from 'react-native-track-player';
+import { Text, View, StyleSheet, TouchableOpacity, Image, Pressable, } from 'react-native';
 import moment from 'moment';
 import { ActivityIndicator } from 'react-native';
 import Slider from '@react-native-community/slider';
@@ -12,16 +12,18 @@ import { SimpleLoader } from './MyLoader';
 
 
 
+let ended = false;
 
-
-const AudioPlayerForList = ({ stop = "", url, id }) => {
+const AudioPlayerForList = ({ stop = "", url, id, loop = false, onLoopComplete }) => {
   const [duration, setDuration] = useState(0);
   const [position, setPosition] = useState(0);
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState("")
   const progress = useProgress();
   const [isPlaying, setPlaying] = useState(false);
   const active = useActiveTrack();
   const isCurrent = !!active ? active?.id == id : false;
+  const [repeatMode, setRepeatMode] = useState(loop);
+
 
   useEffect(() => {
     if (!!stop) {
@@ -34,40 +36,17 @@ const AudioPlayerForList = ({ stop = "", url, id }) => {
 
     if (active?.id == id) {
       let duration = parseInt(progress.duration);
+      console.log(duration, "duration")
       let position = progress.position;
+      console.log(position, "position")
       setDuration(duration);
       setPosition(position);
     }
   }, [progress]);
 
 
-  const { state: playerState } = usePlaybackState();
-  if (playerState === "ready" && loading == true) {
-    setLoading(false)
-  }
-  if (playerState == "paused" && isPlaying == true) {
-    setPlaying(false)
-  } else if (playerState == "playing" && isPlaying == false) {
-    setPlaying(true)
-  }
-
-
-  useEffect(() => {
-
-    
-
-    return () => {
-      console.log("playerState dead")
-      TrackPlayer.reset();
-    }
-
-
-  }, [url])
-
- 
-
   const load = async () => {
-    setLoading(true);
+    setLoading(id);
     await TrackPlayer.add({
       id: id,
       url: !!url.uri ? url.uri : S3_URL + url,
@@ -78,8 +57,81 @@ const AudioPlayerForList = ({ stop = "", url, id }) => {
       artwork: "",
     });
     TrackPlayer.play();
+    ended = false;
+  }
+
+
+  const repeat = async () => {
+
+    let track = await TrackPlayer.getActiveTrack();
+    setLoading(track.id);
+    onLoopComplete?.(track.id);
+    await TrackPlayer.reset()
+    await TrackPlayer.add(track);
+    setPosition(0);
+    await TrackPlayer.play();
+    ended = false
 
   }
+
+
+  const { state: playerState } = usePlaybackState();
+  console.log(playerState, "playerState")
+  if (playerState === "ready" && loading != "") {
+    setLoading("")
+  }
+  if (playerState == "paused" && isPlaying == true) {
+    setPlaying(false)
+  } else if (playerState == "playing" && isPlaying == false) {
+    setPlaying(true)
+  } else if (playerState == "ended") {
+    console.log(repeatMode, "repeatMode")
+    if (repeatMode && active.id == id && progress != 0 && ended == false) {
+      ended = true;
+      repeat()
+    }
+  }
+
+
+  // useEffect(() => {
+  //   if (loop) {
+  //     TrackPlayer.setRepeatMode(RepeatMode.Track)
+  //     TrackPlayer.getRepeatMode().then((mode) => {
+  //       setRepeatMode(mode);
+  //     })
+  //   } else {
+  //     TrackPlayer.setRepeatMode(RepeatMode.Off)
+  //   }
+  // }, [loop])
+
+
+  const onRepeatPress = () => {
+    setRepeatMode((val) => !val)
+    // TrackPlayer.getRepeatMode().then((mode) => {
+    //   if (mode == RepeatMode.Off) {
+    //     TrackPlayer.setRepeatMode(RepeatMode.Track);
+    //     setRepeatMode(RepeatMode.Track)
+    //   }else{
+    //     TrackPlayer.setRepeatMode(RepeatMode.Off);
+    //     setRepeatMode(RepeatMode.Off)
+    //   }
+    // })
+  }
+
+  useEffect(() => {
+    ended = false;
+    TrackPlayer.setRepeatMode(RepeatMode.Off)
+
+    return () => {
+      TrackPlayer.reset();
+    }
+
+
+  }, [url])
+
+
+
+
 
   const formatTime = timeInSec => {
     return moment(timeInSec * 1000).format('mm:ss');
@@ -100,11 +152,13 @@ const AudioPlayerForList = ({ stop = "", url, id }) => {
           setPlaying(true)
         }
       } else {
-        await  TrackPlayer.reset()
+        await TrackPlayer.reset()
         load()
       }
     }
   }
+
+
 
 
   const pausePlayer = () => {
@@ -115,9 +169,9 @@ const AudioPlayerForList = ({ stop = "", url, id }) => {
   return (
     <View style={{ backgroundColor: colors.secondaryVariant, paddingVertical: 3, borderRadius: 40, flexDirection: "row", alignItems: "center", paddingHorizontal: 12, }} >
       <TouchableOpacity onPress={playPauseFunction}
-        disabled={loading}
+        disabled={!!loading}
         style={{ height: 50, width: 50, alignItems: "center", justifyContent: "center", }} >
-        {loading ?
+        {loading == id ?
           <SimpleLoader />
           : !isCurrent ? icons.play() :
             isPlaying ? icons.pause() : icons.play()}
@@ -134,7 +188,9 @@ const AudioPlayerForList = ({ stop = "", url, id }) => {
           minimumValue={0}
           thumbStyle={{
             backgroundColor: colors.primary,
-            width: 15, height: 15, shadowOpacity: 0.9,
+            width: 15,
+            height: 15,
+            shadowOpacity: 0.9,
             elevation: 1,
             shadowOffset: {
               width: 0,
@@ -152,6 +208,12 @@ const AudioPlayerForList = ({ stop = "", url, id }) => {
         />
 
         <Text style={styles.duration}>{formatTime(duration)}</Text>
+        {loop &&
+          <TouchableOpacity
+            onPress={onRepeatPress}
+            style={styles.repeatBtn} >
+            {repeatMode ? icons.repeat(colors.primary, 20) : icons.noRepeat(colors.primary, 20)}
+          </TouchableOpacity>}
       </View>
     </View>
   );
@@ -161,6 +223,10 @@ const AudioPlayerForList = ({ stop = "", url, id }) => {
 export default AudioPlayerForList;
 
 const styles = StyleSheet.create({
+  repeatBtn: {
+    padding: 5,
+    marginRight: -10
+  },
   container: {
 
     flexDirection: "row",
@@ -198,7 +264,8 @@ const styles = StyleSheet.create({
   slider: {
     marginLeft: 5,
     marginRight: 5,
-    width: "75%",
+    // width: "75%",
+    flex: 1,
 
   }
 });

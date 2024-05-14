@@ -126,4 +126,6 @@ export const icons = {
   drag: (color = colors.white, size = 20) => { return (<MaterialIcons name="drag-indicator" color={color} size={size} />) },
   document: (color = colors.white, size = 20) => { return (<Ionicons name="document-text" color={color} size={size} />) },
   cuurency_gbp: (color = colors.white, size = 20) => { return (<MaterialIcons name="currency-pound" color={color} size={size} />) },
+  noRepeat: (color = colors.white, size = 20) => { return (<MaterialCommunityIcons name="repeat-off" color={color} size={size} />) },
+  repeat: (color = colors.white, size = 20) => { return (<MaterialCommunityIcons name="repeat" color={color} size={size} />) },
 }

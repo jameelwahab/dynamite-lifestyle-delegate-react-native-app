@@ -13,7 +13,12 @@ import { colors } from '../../utilities/colors'
 import { icons } from '../../utilities/icons'
 import { dateTimeFormat } from '../../utilities/constants'
 import MyInputs from '../../components/MyInputs'
-import { ADD_ACCOUNTABILITY_TRACKER, DELETE_ACCOUNTABILITY_TRACKER, GET_ACCOUNTABILITY_TRACKER_BY_DATE, MOVE_TO_TOMMORROW, SET_ACCOUNTABILITY_TRACKER_REMINDER, UPDATE_ACCOUNTABILITY_TRACKER, UPLOAD_FILE_TO_S3 } from '../../DAL'
+import {
+  ADD_ACCOUNTABILITY_TRACKER, DELETE_ACCOUNTABILITY_TRACKER,
+  GET_ACCOUNTABILITY_TRACKER_BY_DATE, MOVE_TO_TOMMORROW,
+  SET_ACCOUNTABILITY_TRACKER_REMINDER, UPDATE_ACCOUNTABILITY_TRACKER,
+  UPLOAD_FILE_TO_S3
+} from '../../DAL'
 import MyLoader from '../../components/MyLoader'
 import uuid from 'react-native-uuid';
 import MyCheckBox from '../../components/MyCheckBox'
@@ -22,10 +27,8 @@ import UploadFileInput from '../../components/UploadFileInput'
 import AudioPlayerForList from '../../components/AudioPlayerForList'
 import InfoModal from '../../components/InfoModal'
 import OptionModal from '../../components/OptionModal'
-import DateTimePicker from 'react-native-modal-datetime-picker'
 import TimePicker from '../../components/TimePicker'
 import showToast from '../../functions/showToast'
-import { convertTimezone } from '../../functions/convertTime'
 import { selectTimeZone } from '../../redux/reducers/timezoneSlice'
 import ConfirmationModal from '../../components/ConfirmationModal'
 import routes from '../../navigation/routes'
@@ -96,6 +99,16 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
   }, [route])
 
 
+  //* Loop incremnt
+
+  const onLoopComplete = (url) => {
+    let index = intentions.findIndex(x => x.content == url);
+    if (index > -1) {
+      intentions[index].listen_count++;
+      setIntentions([...intentions])
+    }
+  }
+
   //*
 
   const validate = () => {
@@ -136,7 +149,7 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
   //todo /////// Navigtaion
 
   const onPastActivities = () => {
-    navigation.navigate(routes.accountabilityPastActivitesScreen,{removeFromList})
+    navigation.navigate(routes.accountabilityPastActivitesScreen, { removeFromList })
   }
 
   const removeFromList = (id) => {
@@ -208,6 +221,7 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
     let res = await ADD_ACCOUNTABILITY_TRACKER({ navigation, token, body });
     setLoader(false);
     if (res.code == 200) {
+      setEditId(res?.dynamite_diary?._id)
       showToast({ title: res?.message, type: "success" });
     }
   }
@@ -578,6 +592,8 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
                   <AudioPlayerForList
                     url={item?.content}
                     id={item.content}
+                    loop={true}
+                    onLoopComplete={(url) => onLoopComplete(url)}
                   /> :
                   <View style={{ alignSelf: "flex-end" }}>
                     <TransparentButton
