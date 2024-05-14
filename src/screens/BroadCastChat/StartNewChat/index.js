@@ -187,16 +187,25 @@ const StartNewChat = ({ navigation, route }) => {
         <MyButton title='Save' onPress={onSavePress} />
 
       </View>
+
       <MyLoader enable={loader} />
+
       <OptionModal
-        optionList={filterList(grpList, selectedGrps)}
+        optionList={grpList}
         isVisible={isGrpModalVisible}
         closeModal={() => setIsGrpModalVisible(false)}
+        checkSelected={(item) => !!selectedGrps.find(x => x._id === item._id)}
+        multiple
         onSelected={(item) => {
-          selectedGrps.push(item);
+          let index = selectedGrps.findIndex(x => x._id === item._id);
+          if (index <= -1) {
+            selectedGrps.push(item);
+          } else {
+            selectedGrps.splice(index, 1);
+          }
           setSelectedGrps([...selectedGrps]);
-          setIsGrpModalVisible(false);
         }}
+
       />
 
       <OptionModalWithSearch
