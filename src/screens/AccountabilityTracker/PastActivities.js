@@ -16,9 +16,11 @@ import { icons } from '../../utilities/icons'
 import { dateTimeFormat } from '../../utilities/constants'
 import EmptyView from '../../components/EmptyView'
 import routes from '../../navigation/routes'
+import showToast from '../../functions/showToast'
 
 
 const PastActivities = ({ navigation, route }) => {
+  const { removeFromList } = route?.params
   const { token } = useSelector(selectUser);
   const [list, setList] = useState([]);
   const [loader, setLoader] = useState(false)
@@ -28,11 +30,12 @@ const PastActivities = ({ navigation, route }) => {
   useEffect(() => {
     setLoader(true)
     getPastActivitiesFromServer();
-
   }, [])
 
 
   //! APIs
+
+
 
   const getPastActivitiesFromServer = async () => {
     let res = await GET_PAST_ACTIVITIES({ navigation, token, });
@@ -47,15 +50,17 @@ const PastActivities = ({ navigation, route }) => {
 
   const deleteTrackerToServer = async (id) => {
     setLoader(true);
-
     let res = await DELETE_ACCOUNTABILITY_TRACKER({
       navigation, token, id
     });
     setLoader(false);
     if (res.code == 200) {
+      showToast({ title: res?.message, type: "success" });
+      removeFromList?.(id);
       setList((list) => list.slice().filter(x => x._id != id))
     }
   }
+
 
 
   //* Function

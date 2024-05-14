@@ -513,7 +513,7 @@ const CommentModal = ({
                   <TouchableOpacity
                     onPress={() => setImageModalVisibility(true)}
                     style={__style.addImageBtn}>
-                    {icons.addImage()}
+                    {icons.addPciture()}
                   </TouchableOpacity>
                   <TextInput
                     ref={cmtTextInputRef}
@@ -698,7 +698,7 @@ const __style = StyleSheet.create({
     fontFamily: fonts.regular,
     margin: 0,
     padding: 0,
-    flex: 1
+    flex: 1,
   },
   btnView: {
     height: 35,

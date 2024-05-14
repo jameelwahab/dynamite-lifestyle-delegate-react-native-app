@@ -117,7 +117,7 @@ export const icons = {
   whatsapp: (color = colors.primary, size = 17) => { return (<MaterialCommunityIcons name="whatsapp" color={color} size={size} />) },
   failed: (color = colors.primary, size = 17) => { return (<MaterialCommunityIcons name="cancel" color={color} size={size} />) },
   bank: (color = colors.primary, size = 17) => { return (<MaterialCommunityIcons name="bank" color={color} size={size} />) },
-  addImage: (color = colors.primary, size = 17) => { return (<MaterialCommunityIcons name="image-plus" color={color} size={size} />) },
+  addPciture: (color = colors.primary, size = 17) => { return (<MaterialCommunityIcons name="image-plus" color={color} size={size} />) },
   attachment: (color = colors.primary, size = 17) => { return (<Entypo name="attachment" color={color} size={size} />) },
   category: (color = colors.white, size = 20) => { return (<MaterialIcons name="category" color={color} size={size} />) },
   members: (color = colors.white, size = 20) => { return (<FontAwesome5 name="user-friends" color={color} size={size} />) },

@@ -136,8 +136,13 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
   //todo /////// Navigtaion
 
   const onPastActivities = () => {
-    navigation.navigate(routes.accountabilityPastActivitesScreen)
+    navigation.navigate(routes.accountabilityPastActivitesScreen,{removeFromList})
   }
+
+  const removeFromList = (id) => {
+    setList((list) => list.slice().filter(x => x._id != id))
+  }
+
 
   //! APIs
 
@@ -488,7 +493,7 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
           <MyText type='bold' fontSize={16}  >{!!settings?.intentions_heading ? settings?.intentions_heading : ""}</MyText>
         </View>
         {statements.map((item, index) => (
-          <View style={{ marginTop: 10 }}>
+          <View key={`statement${index}`} style={{ marginTop: 10 }}>
             <View style={{ flexDirection: "row", }}>
               <View style={{ flex: 1 }}>
                 <MyInputs
@@ -555,7 +560,7 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
 
 
         {intentions.map((item, index) => (
-          <View style={[__styles.reminderView, { marginTop: 5, paddingBottom: 10 }]}>
+          <View key={`intenstions${index}`} style={[__styles.reminderView, { marginTop: 5, paddingBottom: 10 }]}>
             <View style={{ marginTop: 5 }}>
               <UploadFileInput
                 label='Mark the checkbox to complete Your Goal Statement'
