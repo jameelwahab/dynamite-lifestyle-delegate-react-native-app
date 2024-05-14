@@ -50,7 +50,7 @@ const routes = {
   broadcastNavigator: "BROADCAST_NAVIGATOR",
   quaterQuestionNavigator: "QUATER_QUESTION_NAVIGATOR",
   accountabilityTrackerNavigator: "ACCOUNTABILITY_TRACKER_NAVIGATOR",
-
+  delegateReportNavigator: "DELEGATE_REPORT_NAVIGATOR",
 
   //! ///    Screens'
 
@@ -274,6 +274,9 @@ const routes = {
   //? Accountability Tracker
   accountabilityTrackerScreen: "ACCOUNTABILITY_TRACKER_SCREEN",
   accountabilityPastActivitesScreen: "ACCOUNTABILITY_PAST_ACTIVITIES_SCREEN",
+
+  //? Delegate Report
+  delegateReportScreen: "DELEGATE_REPORT_SCREEN",
 }
 
 

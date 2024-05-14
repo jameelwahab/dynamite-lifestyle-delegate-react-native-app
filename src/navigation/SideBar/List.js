@@ -44,6 +44,7 @@ import StackMonthReport from "../NestedStacks/StackMonthyReport";
 import StackBroadcast from "../NestedStacks/StackBroadcastChat";
 import StackQuaterQuestions from "../NestedStacks/StackQuaterQuestions";
 import StackAcountabilityTracker from "../NestedStacks/StackAcountabilityTracker";
+import StackDelegateReport from "../NestedStacks/StackDelegateReport";
 
 
 
@@ -316,6 +317,15 @@ export const ParentComponents = {
     params: {
       value: "daily_dynamite_accountabalility_tracker",
       key: "aadbd7a3-91c1-40dd-bf24-532fc288d265"
+    }
+  },
+
+  "aadbd7a3-91c1-40dd-bf24-532fc288d265555": {
+    key: routes.delegateReportNavigator,
+    component: StackDelegateReport,
+    params: {
+      value: "accountability_tracker_report",
+      key: "aadbd7a3-91c1-40dd-bf24-532fc288d265555"
     }
   },
 }
