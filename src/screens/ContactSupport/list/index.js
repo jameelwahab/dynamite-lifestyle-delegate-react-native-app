@@ -22,9 +22,10 @@ import ConfirmationModal from '../../../components/ConfirmationModal'
 import showToast from '../../../functions/showToast'
 import TitleView from '../../../components/TitleView'
 import { selectNavbar } from '../../../redux/reducers/navbarSlice'
+import MyChip from '../../../components/MyChip'
 
 const List = ({ navigation, route }) => {
-  const { key, parentKey,  } = route?.params
+  const { key, parentKey, } = route?.params
   const { token } = useSelector(selectUser);
   const timezone = useSelector(selectTimeZone);
   const { navbar } = useSelector(selectNavbar)
@@ -194,8 +195,9 @@ const List = ({ navigation, route }) => {
         </View>
 
         <View>
-          {filterList.map((item) => (
+          {filterList.map((item, index) => (
             <Pressable
+              key={item + index}
               onPress={() => setFilter({ ...filter, temp: item })}
               style={{ padding: 15, flexDirection: "row" }}>
               <View style={{ height: 20, width: 20, borderColor: tempSelected == item ? colors.primary : colors.white, borderRadius: 10, borderWidth: 1, alignItems: "center", justifyContent: "center" }}>
@@ -299,15 +301,7 @@ const List = ({ navigation, route }) => {
           />
         </View>
         {filter.value != 'all' &&
-          <TouchableOpacity
-            onPress={() => setFilter({ ...filter, value: "all" })}
-            style={{ paddingVertical: 5, paddingHorizontal: 5, paddingLeft: 10, backgroundColor: colors.secondarySelect, borderRadius: 999, flexDirection: "row", alignItems: "center", marginRight: 10 }}>
-            <MyText fontSize={14} style={{ textTransform: "capitalize" }} >{filter.value}</MyText>
-
-            <View style={{ height: 20, width: 20, borderRadius: 20 / 2, marginLeft: 10, alignItems: "center", justifyContent: "center" }}>
-              {icons.crosss(colors.white, 20)}
-            </View>
-          </TouchableOpacity>
+          <MyChip isCapitalize title={filter.value} onPress={() => setFilter({ ...filter, value: "all" })} />
         }
         <TouchableOpacity onPress={openModal}>
           {icons.filterCircle(colors.primary, 25)}

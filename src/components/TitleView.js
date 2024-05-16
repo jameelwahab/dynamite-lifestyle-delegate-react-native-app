@@ -68,7 +68,8 @@ const __header = StyleSheet.create({
     fontSize: 10,
     color: colors.lightText2,
     fontFamily: fonts.medium,
-    includeFontPadding: false
+    includeFontPadding: false,
+    marginTop:3
   },
   leftButtonView: {
     width: 50,

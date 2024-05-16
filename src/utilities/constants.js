@@ -1,13 +1,25 @@
 import { displayName } from '../../app.json';
 
 
-export const domain = "https://apidev.dynamitelifestyle.com/";
-export const socketUrl = "https://apidev.dynamitelifestyle.com";
-export const S3_URL = "https://dynamite-lifestyle-dev-app-bucket.s3.amazonaws.com/";
-export const appName = displayName;
-export const websiteBaseUrl = "https://sourcedev.dynamitelifestyle.com/"
-export const isDev = true;
+// const isDev = true;
+export const isDev = false;
 
+let domain, socketUrl, S3_URL, appName, websiteBaseUrl
+if (isDev) {
+  domain = "https://apidev.dynamitelifestyle.com/";
+  socketUrl = "https://apidev.dynamitelifestyle.com";
+  S3_URL = "https://dynamite-lifestyle-dev-app-bucket.s3.amazonaws.com/";
+  appName = displayName;
+  websiteBaseUrl = "https://sourcedev.dynamitelifestyle.com/"
+} else {
+  domain = "https://api.dynamitelifestyle.com/";
+  socketUrl = "https://apicron.dynamitelifestyle.com";
+  S3_URL = "https://dynamite-lifestyle-prod-app-bucket.s3.amazonaws.com/";
+  appName = displayName;
+  websiteBaseUrl = "https://source.dynamitelifestyle.com/"
+}
+
+export { domain, socketUrl, S3_URL, appName, websiteBaseUrl }
 
 
 

@@ -277,6 +277,7 @@ const routes = {
 
   //? Delegate Report
   delegateReportScreen: "DELEGATE_REPORT_SCREEN",
+  delegateReportFilterScreen: "DELEGATE_REPORT_FILTER_SCREEN",
 }
 
 

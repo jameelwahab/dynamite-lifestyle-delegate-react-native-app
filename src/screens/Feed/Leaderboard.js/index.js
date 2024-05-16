@@ -95,6 +95,7 @@ const __styles = StyleSheet.create({
     borderRadius: 10,
     padding: 20,
     marginTop: 10,
+    marginHorizontal:10
     // paddingBottom:20
   },
   divider: {

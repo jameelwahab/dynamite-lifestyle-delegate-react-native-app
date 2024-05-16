@@ -20,11 +20,8 @@ import showToast, { showToastCustom } from '../../functions/showToast'
 
 
 const ReportScreen = ({ navigation, route }) => {
-  const { key } = route?.params
   const ref_monthPicker = useRef();
   const { token } = useSelector(selectUser);
-  const { navbar } = useSelector(selectNavbar);
-  const [title] = useState(navbar?.find(x => x._id == key)?.title);
   const [loader, setLoader] = useState(true);
   const [data, setData] = useState(null);
   const [currentMonYear, setCurrentMonYear] = useState(moment().format("MM-YYYY"))
@@ -39,6 +36,19 @@ const ReportScreen = ({ navigation, route }) => {
   }, [currentMonYear])
 
 
+
+ 
+  const getDataFromServer = async () => {
+    let res = await GET_MONTHLY_REPORT({ navigation, token, monthYear: currentMonYear });
+    if (res.code == 200) {
+      getLabels(res)
+      setData(res);
+
+      setLoader(false)
+    } else {
+      setLoader(false)
+    }
+  }
 
   const getLabels = (res) => {
     let totalDays = moment(currentMonYear, "MM-YYYY").daysInMonth();
@@ -121,18 +131,6 @@ const ReportScreen = ({ navigation, route }) => {
 
     setLineChartLabels(labels)
     setLinechartDate(dataArr)
-  }
-
-  const getDataFromServer = async () => {
-    let res = await GET_MONTHLY_REPORT({ navigation, token, monthYear: currentMonYear });
-    if (res.code == 200) {
-      getLabels(res)
-      setData(res);
-
-      setLoader(false)
-    } else {
-      setLoader(false)
-    }
   }
 
   const toggleType = (color) => {

@@ -15,7 +15,7 @@ export const GET_DELEGATE_REPORT_LIST = ({ token, navigation, page, body: {
 }
 
 
-export const GET_SALES_PERDORMANCE = ({ token, navigation, page, body: {
+export const GET_SALES_PERDORMANCE_BY_DELEGATE = ({ token, navigation, page, body: {
   start_date, end_date, created_for, search_text, type
 } }) => {
   return invokeApi({
@@ -29,16 +29,62 @@ export const GET_SALES_PERDORMANCE = ({ token, navigation, page, body: {
   })
 }
 
-export const GET_MONTHY_REPORT_DETAIL = ({ token, navigation, type, page, body: {
-  start_date, end_date, created_for, search_text
+
+export const GET_STREAK_PERFORMANCE_DETAIL_BY_DELEGATE = ({ token, navigation, body: {
+  type, delegate_id, start_date, end_date,
 } }) => {
   return invokeApi({
-    path: `api/daily_dynamite_tracker/${type}?page=${page}&limit=10&search_text=${searchText}`,
+    path: `api/daily_dynamite_tracker/list_and_performance_stats_infor_for_delegate`,
     method: "POST",
     postData: {
-      search_text, start_date, end_date, created_for
+      type, delegate_id, start_date, end_date,
     },
     token,
     navigation,
   })
 }
+
+export const GET_BOOKING_DETAIL_BY_DELEGATE = ({ token, navigation, body: {
+  type, delegate_id, start_date, end_date,
+} }) => {
+  return invokeApi({
+    path: `api/consultant/booking_stats/delegate`,
+    method: "POST",
+    postData: {
+      type, consultant_id: delegate_id, start_date, end_date,
+    },
+    token,
+    navigation,
+  })
+}
+
+export const GET_MONTHY_REPORT_BY_DELEGATE = ({ token, navigation, body: {
+  type, delegate_id, month_with_year,
+} }) => {
+  return invokeApi({
+    path: `api/daily_dynamite_tracker/delegate_performance/stats_with_delegate_id`,
+    method: "POST",
+    postData: {
+      type, delegate_id, month_with_year,
+    },
+    token,
+    navigation,
+  })
+}
+
+
+export const GET_ACCOUNTABILITY_TRACKER_BY_DELEGATE = ({ token, navigation, body: {
+  delegate_id, start_date, end_date,
+} }) => {
+  return invokeApi({
+    path: `api/daily_dynamite_tracker/daily_dynamites_for_delegate`,
+    method: "POST",
+    postData: {
+      delegate_id, start_date, end_date,
+    },
+    token,
+    navigation,
+  })
+}
+
+

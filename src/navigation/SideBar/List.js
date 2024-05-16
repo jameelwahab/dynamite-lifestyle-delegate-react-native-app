@@ -320,14 +320,14 @@ export const ParentComponents = {
     }
   },
 
-  "aadbd7a3-91c1-40dd-bf24-532fc288d265555": {
-    key: routes.delegateReportNavigator,
-    component: StackDelegateReport,
-    params: {
-      value: "accountability_tracker_report",
-      key: "aadbd7a3-91c1-40dd-bf24-532fc288d265555"
-    }
-  },
+  // "aadbd7a3-91c1-40dd-bf24-532fc288d265555": {
+  //   key: routes.delegateReportNavigator,
+  //   component: StackDelegateReport,
+  //   params: {
+  //     value: "accountability_tracker_report",
+  //     key: "aadbd7a3-91c1-40dd-bf24-532fc288d265555"
+  //   }
+  // },
 }
 
 export const ChildComponents = {
