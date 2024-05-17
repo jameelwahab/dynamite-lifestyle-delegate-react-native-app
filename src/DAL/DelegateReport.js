@@ -88,3 +88,26 @@ export const GET_ACCOUNTABILITY_TRACKER_BY_DELEGATE = ({ token, navigation, body
 }
 
 
+
+export const GET_COMMISSION_DETAIL = ({ token, navigation, delegateId, body: {
+  month_and_year, month_name, sale_page, year_name, page, compare_with
+} }) => {
+  return invokeApi({
+    path: `api/consultant/commission_stats/${delegateId}`,
+    method: "POST",
+    postData: {
+      month_and_year, month_name, sale_page, year_name,  page, compare_with
+    },
+    token,
+    navigation,
+  })
+}
+
+export const GET_SALE_PAGES_AND_DELEGATES = ({ token, navigation, delegateId, searchText }) => {
+  return invokeApi({
+    path: `api/consultant/get_pages_for_delegate/sales/${delegateId}?search_text=${searchText}`,
+    method: "GET",
+    token,
+    navigation,
+  })
+}

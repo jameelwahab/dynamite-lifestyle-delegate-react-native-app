@@ -285,11 +285,11 @@ const MainScreen = ({ navigation, route }) => {
     if (selectedTab == 0) {
       return <StreakPerformance data={itemDetail} modalRef={ref_streakPerformanceModal} />
     } else if (selectedTab == 2) {
-      return <Booking data={itemDetail} />
+      return <Booking data={itemDetail} navigation={navigation} />
     } else if (selectedTab == 3) {
       return null
     } else if (selectedTab == 4) {
-      return <AccountablityTracker data={itemDetail} />
+      return <AccountablityTracker navigation={navigation} data={itemDetail} />
     }
   }
 
@@ -357,14 +357,14 @@ const MainScreen = ({ navigation, route }) => {
 
   const renderSaleItem = ({ item, index }) => {
     return (
-      <View style={[__styles.itemView, { backgroundColor: colors.secondary, paddingHorizontal: 5, paddingBottom: 5 }]}>
-        <View
-          onPress={() => onItemPress(item, index)}
-          style={__styles.header}>
-          <View style={{ flex: 1 }}>
-            <MemberView member={item} customImage={item?.image?.thumbnail_1} />
-          </View>
-        </View>
+      <View style={[__styles.itemView, { backgroundColor: colors.secondary, paddingBottom: 5 }]}>
+
+        <Pressable
+          onPress={() => navigation.navigate(routes.delegateReportSalesScreen, { item })}
+          style={{ flex: 1 }}>
+          <MemberView member={item} customImage={item?.image?.thumbnail_1} />
+        </Pressable>
+
         <StatView title={"Total Commission"} value={`${prependCurency("gbp")}${item?.total_commission}`} />
         <StatView title={"Paid Commission"} value={`${prependCurency("gbp")}`} />
         <StatView title={"Due Commission"} value={`${prependCurency("gbp")}`} />

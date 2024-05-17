@@ -30,7 +30,7 @@ const Header = ({
   customBackPress,
   hideSubHeader = false,
   hideUpperHeader = false,
-  subTitle=""
+  subTitle = ""
 }) => {
   const { user, token, isChatAllowed } = useSelector(selectUser)
   const navigation = useNavigation()
@@ -116,7 +116,7 @@ const Header = ({
               <Ionicons name="arrow-back-outline" color={colors.primary} size={25} />
             </Pressable>}
           {!!title ?
-            <View style={__header.titleView}>
+            <View style={[__header.titleView, { paddingLeft: hideBackBottomButton ? 15 : 0 }]}>
               <Text style={__header.titleText}>{title}</Text>
               {!!subTitle && <Text style={__header.subTitle}>{subTitle}</Text>}
             </View>
@@ -149,7 +149,7 @@ const __header = StyleSheet.create({
     color: colors.lightText2,
     fontFamily: fonts.medium,
     includeFontPadding: false,
-    marginTop:3
+    marginTop: 3
   },
   secondView: {
     height: 50,
@@ -162,7 +162,6 @@ const __header = StyleSheet.create({
   titleView: {
     flex: 1,
     justifyContent: "center",
-    marginHorizontal: 15
   },
   titleText: {
     color: colors.primary,
@@ -177,7 +176,7 @@ const __header = StyleSheet.create({
     width: 50,
     height: 50,
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
   },
   leftButtonIcon: {
     width: 25,

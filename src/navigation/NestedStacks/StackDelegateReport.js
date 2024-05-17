@@ -11,6 +11,7 @@ import DelegateMonthlyReport from '../../screens/DelegateReport/DelegateMonthlyR
 import BookingDelegate from '../../screens/DelegateReport/BookingDelegate'
 import AccountablityTracker from '../../screens/DelegateReport/MainScreen/AccountablityTracker'
 import SalesPerformanceDelegate from '../../screens/DelegateReport/SalesPerformanceDelegate'
+import SaleFilter from '../../screens/DelegateReport/SalesPerformanceDelegate/SaleFilter'
 
 
 
@@ -27,11 +28,12 @@ const StackDelegateReport = ({ route }) => {
         screenOptions={{ headerShown: false }}>
         <DelegateReportStack.Screen initialParams={route.params} name={routes.delegateReportScreen} component={MainScreen} />
         <DelegateReportStack.Screen name={routes.delegateReportFilterScreen} component={Filter} />
-        <DelegateReportStack.Screen  name={routes.delegeteMonthlyReportScreen} component={DelegateMonthlyReport} />
+        <DelegateReportStack.Screen name={routes.delegeteMonthlyReportScreen} component={DelegateMonthlyReport} />
 
-        <DelegateReportStack.Screen  name={routes.delegateReportBookingsScreen} component={BookingDelegate} />
-        <DelegateReportStack.Screen  name={routes.delegateReportAccountablityTrackerScreen} component={AccountablityTracker} />
-        <DelegateReportStack.Screen  name={routes.delegateReportSalesScreen} component={SalesPerformanceDelegate} />
+        <DelegateReportStack.Screen name={routes.delegateReportBookingsScreen} component={BookingDelegate} />
+        <DelegateReportStack.Screen name={routes.delegateReportAccountablityTrackerScreen} component={AccountablityTracker} />
+        <DelegateReportStack.Screen name={routes.delegateReportSalesScreen} component={SalesPerformanceDelegate} />
+        <DelegateReportStack.Screen name={routes.delegateReportSalesFilterScreen} component={SaleFilter} />
 
         {/*//? Default Screens Start */}
         {defaultScreens.map((x, i) => (
