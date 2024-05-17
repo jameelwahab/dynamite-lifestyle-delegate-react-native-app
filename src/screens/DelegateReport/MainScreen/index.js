@@ -1,33 +1,34 @@
 import { View, Text, StyleSheet, Pressable, TouchableOpacity } from 'react-native'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import RootView from '../../components/RootView'
-import MyText from '../../components/MyText'
+import RootView from '../../../components/RootView'
+import MyText from '../../../components/MyText'
 import { useSelector } from 'react-redux'
-import { selectUser } from '../../redux/reducers/userSlice'
-import { selectNavbar } from '../../redux/reducers/navbarSlice'
+import { selectUser } from '../../../redux/reducers/userSlice'
+import { selectNavbar } from '../../../redux/reducers/navbarSlice'
 import { FlatList } from 'react-native'
-import EmptyView from '../../components/EmptyView'
-import MyLoader, { SimpleLoader } from '../../components/MyLoader'
-import Tabs from '../../components/Tabs'
-import { GET_ACCOUNTABILITY_TRACKER_BY_DELEGATE, GET_BOOKING_DETAIL_BY_DELEGATE, GET_DELEGATE_REPORT_LIST, GET_MONTHY_REPORT_BY_DELEGATE, GET_SALES_PERDORMANCE, GET_SALES_PERDORMANCE_BY_DELEGATE, GET_STREAK_PERFORMANCE_DETAIL_BY_DELEGATE } from '../../DAL'
-import { colors } from '../../utilities/colors'
-import MemberView from '../../components/MemberView'
-import { icons } from '../../utilities/icons'
-import StatView from '../Members/Components/StatView'
-import prependCurency from '../../functions/prependCurency'
+import EmptyView from '../../../components/EmptyView'
+import MyLoader, { SimpleLoader } from '../../../components/MyLoader'
+import Tabs from '../../../components/Tabs'
+import { GET_ACCOUNTABILITY_TRACKER_BY_DELEGATE, GET_BOOKING_DETAIL_BY_DELEGATE, GET_DELEGATE_REPORT_LIST, GET_MONTHY_REPORT_BY_DELEGATE, GET_SALES_PERDORMANCE, GET_SALES_PERDORMANCE_BY_DELEGATE, GET_STREAK_PERFORMANCE_DETAIL_BY_DELEGATE } from '../../../DAL'
+import { colors } from '../../../utilities/colors'
+import MemberView from '../../../components/MemberView'
+import { icons } from '../../../utilities/icons'
+import StatView from '../../Members/Components/StatView'
+import prependCurency from '../../../functions/prependCurency'
 import Collapsible from 'react-native-collapsible'
-import FooterLoader from '../../components/FooterLoader'
-import MyRefreshControl from '../../components/MyRefreshControl'
-import TitleView from '../../components/TitleView'
-import routes from '../../navigation/routes'
-import SearchView from '../../components/SearchView'
-import MyChip from '../../components/MyChip'
-import { dateTimeFormat } from '../../utilities/constants'
+import FooterLoader from '../../../components/FooterLoader'
+import MyRefreshControl from '../../../components/MyRefreshControl'
+import TitleView from '../../../components/TitleView'
+import routes from '../../../navigation/routes'
+import SearchView from '../../../components/SearchView'
+import MyChip from '../../../components/MyChip'
+import { dateTimeFormat } from '../../../utilities/constants'
 import moment from 'moment'
 import Booking from './Booking'
 import StreakPerformance from './StreakPerformance'
-import MonthlyReport from './DelegateMonthlyReport/MonthlyReport'
+import MonthlyReport from '../DelegateMonthlyReport/MonthlyReport'
 import AccountablityTracker from './AccountablityTracker'
+import StreakPerformanceModal from '../components/StreakPerformanceModal'
 
 
 let page = 0;
@@ -37,6 +38,7 @@ const MainScreen = ({ navigation, route }) => {
   const { key } = route?.params
   const { token } = useSelector(selectUser);
   const { navbar } = useSelector(selectNavbar);
+  const ref_streakPerformanceModal = useRef();
   const [title] = useState(navbar?.find(x => x._id == key)?.title);
   const [list, setList] = useState([]);
   const [loader, setLoader] = useState(false);
@@ -281,7 +283,7 @@ const MainScreen = ({ navigation, route }) => {
 
   const getView = () => {
     if (selectedTab == 0) {
-      return <StreakPerformance data={itemDetail} />
+      return <StreakPerformance data={itemDetail} modalRef={ref_streakPerformanceModal} />
     } else if (selectedTab == 2) {
       return <Booking data={itemDetail} />
     } else if (selectedTab == 3) {
@@ -438,6 +440,7 @@ const MainScreen = ({ navigation, route }) => {
 
       <MyLoader style={{ top: 100 }} enable={loader} />
 
+      <StreakPerformanceModal ref={ref_streakPerformanceModal} />
     </RootView>
   )
 }

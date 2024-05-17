@@ -280,6 +280,7 @@ const routes = {
   delegateReportFilterScreen: "DELEGATE_REPORT_FILTER_SCREEN",
   delegeteMonthlyReportScreen: "DELEGETE_MONTHLY_REPORT_SCREEN",
   delegateReportBookingsScreen: "DELEGATE_REPORT_BOOKINGS_SCREEN",
+  delegateReportSalesScreen: "DELEGATE_REPORT_SALES_SCREEN",
   delegateReportAccountablityTrackerScreen: "DELEGATE_REPORT_ACCOUNTABILTY_TRACKER_SCREEN"
 }
 

@@ -1,8 +1,8 @@
 import { View, Text, StyleSheet } from 'react-native'
 import React from 'react'
-import MyText from '../../components/MyText'
-import { colors } from '../../utilities/colors'
-import { dateTimeFormat } from '../../utilities/constants'
+import MyText from '../../../components/MyText'
+import { colors } from '../../../utilities/colors'
+import { dateTimeFormat } from '../../../utilities/constants'
 import moment from 'moment'
 import { useNavigation } from '@react-navigation/native'
 

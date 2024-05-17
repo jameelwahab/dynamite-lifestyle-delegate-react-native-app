@@ -1,10 +1,10 @@
 import { View, Text, ScrollView } from 'react-native'
 import React from 'react'
-import MyText from '../../components/MyText'
+import MyText from '../../../components/MyText'
 // import { BarChart } from 'react-native-chart-kit'
-import utilities from '../../utilities'
-import { colors } from '../../utilities/colors'
-import { fonts } from '../../utilities/fonts'
+import utilities from '../../../utilities'
+import { colors } from '../../../utilities/colors'
+import { fonts } from '../../../utilities/fonts'
 import { BarChart } from 'react-native-gifted-charts'
 
 const Booking = ({ data }) => {

@@ -6,8 +6,11 @@ import routes from '../routes'
 import { defaultScreens } from './defaultScreens'
 import { colors } from '../../utilities/colors'
 import Filter from '../../screens/DelegateReport/Filter'
-import MainScreen from '../../screens/DelegateReport'
+import MainScreen from '../../screens/DelegateReport/MainScreen'
 import DelegateMonthlyReport from '../../screens/DelegateReport/DelegateMonthlyReport'
+import BookingDelegate from '../../screens/DelegateReport/BookingDelegate'
+import AccountablityTracker from '../../screens/DelegateReport/MainScreen/AccountablityTracker'
+import SalesPerformanceDelegate from '../../screens/DelegateReport/SalesPerformanceDelegate'
 
 
 
@@ -25,6 +28,10 @@ const StackDelegateReport = ({ route }) => {
         <DelegateReportStack.Screen initialParams={route.params} name={routes.delegateReportScreen} component={MainScreen} />
         <DelegateReportStack.Screen name={routes.delegateReportFilterScreen} component={Filter} />
         <DelegateReportStack.Screen  name={routes.delegeteMonthlyReportScreen} component={DelegateMonthlyReport} />
+
+        <DelegateReportStack.Screen  name={routes.delegateReportBookingsScreen} component={BookingDelegate} />
+        <DelegateReportStack.Screen  name={routes.delegateReportAccountablityTrackerScreen} component={AccountablityTracker} />
+        <DelegateReportStack.Screen  name={routes.delegateReportSalesScreen} component={SalesPerformanceDelegate} />
 
         {/*//? Default Screens Start */}
         {defaultScreens.map((x, i) => (
