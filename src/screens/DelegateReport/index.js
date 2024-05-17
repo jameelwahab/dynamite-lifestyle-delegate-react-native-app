@@ -26,7 +26,7 @@ import { dateTimeFormat } from '../../utilities/constants'
 import moment from 'moment'
 import Booking from './Booking'
 import StreakPerformance from './StreakPerformance'
-import MonthlyReport from './MonthlyReport'
+import MonthlyReport from './DelegateMonthlyReport/MonthlyReport'
 import AccountablityTracker from './AccountablityTracker'
 
 
@@ -86,7 +86,11 @@ const MainScreen = ({ navigation, route }) => {
 
 
   const onItemPress = (item, index) => {
-    if (index == selectedIndex) {
+    if (selectedTab == 3) {
+      navigation.navigate(routes.delegeteMonthlyReportScreen, {
+        item: item
+      })
+    } else if (index == selectedIndex) {
       setSelectedIndex(-1)
       setItemDetail(null)
     } else {
@@ -138,8 +142,6 @@ const MainScreen = ({ navigation, route }) => {
       getSteakPerformace(id)
     } else if (selectedTab == 2) {
       getBookingDetail(id)
-    } else if (selectedTab == 3) {
-      getMonthlyReportDetail(id)
     } else if (selectedTab == 4) {
       getAccountabilityDetail(id)
     }
@@ -168,7 +170,7 @@ const MainScreen = ({ navigation, route }) => {
       } else {
         canLoadMore = false;
       }
-      if (newArray && selectedTab != 1) {
+      if (newArray && selectedTab != 1 && selectedTab != 3) {
         getDetail(res?.delegate[0]?._id)
       }
       setTotal(res?.total_count)
@@ -251,22 +253,7 @@ const MainScreen = ({ navigation, route }) => {
     }
   }
 
-  const getMonthlyReportDetail = async (delegateId) => {
-    let res = await GET_MONTHY_REPORT_BY_DELEGATE({
-      navigation, token, page, body: {
-        delegate_id: delegateId,
-        type: "performance_info",
-        month_with_year: !!filter?.monthYear ? filter?.monthYear : undefined,
 
-      },
-    });
-    if (res.code == 200) {
-      setItemDetail(res)
-      setItemLoader(false)
-    } else {
-      setItemLoader(false)
-    }
-  }
 
   const getAccountabilityDetail = async (delegateId) => {
     let res = await GET_ACCOUNTABILITY_TRACKER_BY_DELEGATE({
@@ -298,7 +285,7 @@ const MainScreen = ({ navigation, route }) => {
     } else if (selectedTab == 2) {
       return <Booking data={itemDetail} />
     } else if (selectedTab == 3) {
-      return <MonthlyReport data={itemDetail} currentMonYear={filter?.monthYear} />
+      return null
     } else if (selectedTab == 4) {
       return <AccountablityTracker data={itemDetail} />
     }
@@ -341,9 +328,16 @@ const MainScreen = ({ navigation, route }) => {
 
             </View>
           }
-          <View style={__styles.arrowView}>
-            {selectedIndex == index ? icons.upwardArrow() : icons.downwardArrow()}
-          </View>
+          {selectedTab == 3 ?
+            <View style={[__styles.arrowView, { transform: [{ rotateZ: "90deg" }] }]}>
+              {icons.upwardArrow()}
+            </View> :
+            <View style={[__styles.arrowView,]}>
+              {selectedIndex == index ? icons.upwardArrow() : icons.downwardArrow()}
+            </View>
+          }
+
+
         </Pressable>
         <Collapsible collapsed={selectedIndex != index} >
           {itemLoader ?
@@ -361,7 +355,7 @@ const MainScreen = ({ navigation, route }) => {
 
   const renderSaleItem = ({ item, index }) => {
     return (
-      <View style={[__styles.itemView,{ backgroundColor:colors.secondary,paddingHorizontal:5,paddingBottom:5}]}>
+      <View style={[__styles.itemView, { backgroundColor: colors.secondary, paddingHorizontal: 5, paddingBottom: 5 }]}>
         <View
           onPress={() => onItemPress(item, index)}
           style={__styles.header}>
@@ -394,10 +388,10 @@ const MainScreen = ({ navigation, route }) => {
             subTitle={`Showing ${list.length} of ${total}`}
           />
           <View style={__styles.topBtnsView}>
-
-            <TouchableOpacity onPress={onFilterScreen}>
-              {icons.filterCircle(colors.primary, 25)}
-            </TouchableOpacity>
+            {selectedTab != 3 &&
+              <TouchableOpacity onPress={onFilterScreen}>
+                {icons.filterCircle(colors.primary, 25)}
+              </TouchableOpacity>}
           </View>
         </View>
 
@@ -418,22 +412,11 @@ const MainScreen = ({ navigation, route }) => {
     )
   }
 
-  const filterView = () => {
-    return (
-      <View style={{ alignSelf: "flex-start" }}>
-        {!!filter.end_date && !!filter.start_date &&
-          <MyChip title={`Start Date: ${moment(filter?.start_date).format(dateTimeFormat.date)} - End Date: ${moment(filter?.end_date).format(dateTimeFormat.date)}`}
-            onPress={() => setfilter({ start_date: undefined, end_date: undefined })}
-          />}
-      </View>
-    )
-  }
 
 
   return (
     <RootView hideSubHeader>
       {topView()}
-      {/* {filterView()} */}
       <View style={{ flex: 1 }}>
         <FlatList
           data={list}

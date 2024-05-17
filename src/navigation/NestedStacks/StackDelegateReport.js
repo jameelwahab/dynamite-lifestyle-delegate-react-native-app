@@ -7,6 +7,7 @@ import { defaultScreens } from './defaultScreens'
 import { colors } from '../../utilities/colors'
 import Filter from '../../screens/DelegateReport/Filter'
 import MainScreen from '../../screens/DelegateReport'
+import DelegateMonthlyReport from '../../screens/DelegateReport/DelegateMonthlyReport'
 
 
 
@@ -23,6 +24,7 @@ const StackDelegateReport = ({ route }) => {
         screenOptions={{ headerShown: false }}>
         <DelegateReportStack.Screen initialParams={route.params} name={routes.delegateReportScreen} component={MainScreen} />
         <DelegateReportStack.Screen name={routes.delegateReportFilterScreen} component={Filter} />
+        <DelegateReportStack.Screen  name={routes.delegeteMonthlyReportScreen} component={DelegateMonthlyReport} />
 
         {/*//? Default Screens Start */}
         {defaultScreens.map((x, i) => (

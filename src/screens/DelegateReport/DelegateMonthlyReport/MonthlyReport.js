@@ -1,13 +1,13 @@
 import { View, Text, processColor, ScrollView, Platform, TouchableOpacity } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
-import MyText from '../../components/MyText'
+import MyText from '../../../components/MyText'
 import { PieChart, } from 'react-native-charts-wrapper';
 import { LineChart } from 'react-native-chart-kit'
 // import { LineChart } from "react-native-gifted-charts"
-import { colors } from '../../utilities/colors'
-import utilities from '../../utilities'
+import { colors } from '../../../utilities/colors'
+import utilities from '../../../utilities'
 import moment from 'moment'
-import { showToastCustom } from '../../functions/showToast'
+import { showToastCustom } from '../../../functions/showToast'
 
 const MonthlyReport = ({ data: data1, currentMonYear }) => {
 
@@ -16,6 +16,7 @@ const MonthlyReport = ({ data: data1, currentMonYear }) => {
   const [lineChartLabels, setLineChartLabels] = useState([]);
   const [linechartDate, setLinechartDate] = useState([]);
   const [shownCharts, setShownCharts] = useState({ ...lebels });
+  
 
   useEffect(() => {
     if (!!data1) {

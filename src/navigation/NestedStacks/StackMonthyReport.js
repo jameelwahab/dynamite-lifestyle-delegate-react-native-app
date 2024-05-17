@@ -21,6 +21,7 @@ const StackMonthReport = ({ route }) => {
         screenOptions={{ headerShown: false }}>
         <MonthlyReportStack.Screen initialParams={route.params} name={routes.monthyReportScreen} component={ReportScreen} />
         
+        
         {/*//? Default Screens Start */}
         {defaultScreens.map((x, i) => (
           <MonthlyReportStack.Screen key={x.name} name={x.name} component={x.component} />

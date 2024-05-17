@@ -7,7 +7,6 @@ import moment from 'moment'
 import { useNavigation } from '@react-navigation/native'
 
 const AccountablityTracker = ({ data }) => {
-  const navigation = useNavigation();
   if (!!data) {
     return (
       <View style={__styles.rootView} >

@@ -26,9 +26,9 @@ const Tabs = ({ list, changeTab, tab }) => {
                     index: index,
                     animated: true
                   })
-                  setTimeout(() => {
+                  // setTimeout(() => {
                     changeTab(index)
-                  }, 100);
+                  // }, 100);
                 }}
                 style={{ justifyContent: "center", paddingHorizontal: 10 }}>
                 <MyText fontSize={15} type={index == tab ? 'medium' : 'regular'} color={index == tab ? colors.primary2 : colors.lightText} >
