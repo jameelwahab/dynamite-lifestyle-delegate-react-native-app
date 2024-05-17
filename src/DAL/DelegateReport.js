@@ -1,3 +1,4 @@
+import { bool } from "prop-types";
 import invokeApi from "../functions/invokeAPI";
 
 export const GET_DELEGATE_REPORT_LIST = ({ token, navigation, page, body: {
@@ -19,7 +20,7 @@ export const GET_SALES_PERDORMANCE_BY_DELEGATE = ({ token, navigation, page, bod
   start_date, end_date, created_for, search_text, type
 } }) => {
   return invokeApi({
-    path: `api/consultant/list_sales_performance?page=0&limit=10`,
+    path: `api/consultant/list_sales_performance?page=${page}&limit=10`,
     method: "POST",
     postData: {
       start_date, end_date, created_for, search_text, type
@@ -96,7 +97,7 @@ export const GET_COMMISSION_DETAIL = ({ token, navigation, delegateId, body: {
     path: `api/consultant/commission_stats/${delegateId}`,
     method: "POST",
     postData: {
-      month_and_year, month_name, sale_page, year_name,  page, compare_with
+      month_and_year, month_name, sale_page, year_name, page, compare_with
     },
     token,
     navigation,
@@ -106,6 +107,35 @@ export const GET_COMMISSION_DETAIL = ({ token, navigation, delegateId, body: {
 export const GET_SALE_PAGES_AND_DELEGATES = ({ token, navigation, delegateId, searchText }) => {
   return invokeApi({
     path: `api/consultant/get_pages_for_delegate/sales/${delegateId}?search_text=${searchText}`,
+    method: "GET",
+    token,
+    navigation,
+  })
+}
+
+export const GET_REPORT_BOOKINS_LIST = ({ token, navigation, page, deleagteId }) => {
+  return invokeApi({
+    path: `api/consultant/delegate_booking/list/${deleagteId}?page=${page}&limit=20`,
+    method: "POST",
+    postData: body
+    ,
+    token,
+    navigation,
+  })
+}
+
+export const GET_REPORT_BOOKING_STATUS_LIST = ({ token, navigation, }) => {
+  return invokeApi({
+    path: `api/booking_status/active_booking_status`,
+    method: "GET",
+    token,
+    navigation,
+  })
+}
+
+export const GET_REPORT_BOOKING_PAGES_LIST = ({ token, navigation, }) => {
+  return invokeApi({
+    path: `api/sale_page/booking_page/list_for_consultant?search_text=`,
     method: "GET",
     token,
     navigation,

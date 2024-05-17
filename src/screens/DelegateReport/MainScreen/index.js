@@ -275,6 +275,11 @@ const MainScreen = ({ navigation, route }) => {
   }
 
 
+  const onBookingScreen = (item) => {
+    navigation.navigate(routes.delegateReportBookingsScreen, {
+      item
+    })
+  }
 
 
 
@@ -323,12 +328,14 @@ const MainScreen = ({ navigation, route }) => {
             </View>}
 
           {selectedTab == 2 &&
-            <View style={{ marginTop: 5, height: 25, justifyContent: "center", }}>
+            <TouchableOpacity
+              onPress={() => onBookingScreen(item)}
+              style={{ marginTop: 5, height: 25, justifyContent: "center", }}>
               <MyText fontSize={10} color={colors.primary} >{`Total Bookings: `}
                 <MyText fontSize={12} color={colors.width} type='medium' >{`${item?.total_bookings}`}</MyText>
               </MyText>
 
-            </View>
+            </TouchableOpacity>
           }
           {selectedTab == 3 ?
             <View style={[__styles.arrowView, { transform: [{ rotateZ: "90deg" }] }]}>
@@ -358,13 +365,11 @@ const MainScreen = ({ navigation, route }) => {
   const renderSaleItem = ({ item, index }) => {
     return (
       <View style={[__styles.itemView, { backgroundColor: colors.secondary, paddingBottom: 5 }]}>
-
         <Pressable
           onPress={() => navigation.navigate(routes.delegateReportSalesScreen, { item })}
           style={{ flex: 1 }}>
           <MemberView member={item} customImage={item?.image?.thumbnail_1} />
         </Pressable>
-
         <StatView title={"Total Commission"} value={`${prependCurency("gbp")}${item?.total_commission}`} />
         <StatView title={"Paid Commission"} value={`${prependCurency("gbp")}`} />
         <StatView title={"Due Commission"} value={`${prependCurency("gbp")}`} />
