@@ -75,13 +75,13 @@ export const GET_MONTHY_REPORT_BY_DELEGATE = ({ token, navigation, body: {
 
 
 export const GET_ACCOUNTABILITY_TRACKER_BY_DELEGATE = ({ token, navigation, body: {
-  delegate_id, start_date, end_date,
+  delegate_id, date_from, date_to,
 } }) => {
   return invokeApi({
     path: `api/daily_dynamite_tracker/daily_dynamites_for_delegate`,
     method: "POST",
     postData: {
-      delegate_id, start_date, end_date,
+      delegate_id, date_from, date_to,
     },
     token,
     navigation,
@@ -113,12 +113,11 @@ export const GET_SALE_PAGES_AND_DELEGATES = ({ token, navigation, delegateId, se
   })
 }
 
-export const GET_REPORT_BOOKINS_LIST = ({ token, navigation, page, deleagteId }) => {
+export const GET_REPORT_BOOKINS_LIST = ({ token, navigation, page, deleagteId, body }) => {
   return invokeApi({
     path: `api/consultant/delegate_booking/list/${deleagteId}?page=${page}&limit=20`,
     method: "POST",
-    postData: body
-    ,
+    postData: body,
     token,
     navigation,
   })
@@ -136,6 +135,15 @@ export const GET_REPORT_BOOKING_STATUS_LIST = ({ token, navigation, }) => {
 export const GET_REPORT_BOOKING_PAGES_LIST = ({ token, navigation, }) => {
   return invokeApi({
     path: `api/sale_page/booking_page/list_for_consultant?search_text=`,
+    method: "GET",
+    token,
+    navigation,
+  })
+}
+
+export const GET_ACCOUNTABILITY_TRACKER_BY_DATE_AND_DELEGATE = ({ token, navigation, delegateId, date }) => {
+  return invokeApi({
+    path: `api/daily_dynamite_tracker/daily_dynamite_intention/${delegateId}?date=${date}`,
     method: "GET",
     token,
     navigation,

@@ -1,12 +1,12 @@
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, Pressable } from 'react-native'
 import React from 'react'
 import MyText from '../../../components/MyText'
 import { colors } from '../../../utilities/colors'
 import { dateTimeFormat } from '../../../utilities/constants'
 import moment from 'moment'
-import { useNavigation } from '@react-navigation/native'
+import routes from '../../../navigation/routes'
 
-const AccountablityTracker = ({ data }) => {
+const AccountablityTracker = ({ data, navigation, user }) => {
   if (!!data) {
     return (
       <View style={__styles.rootView} >
@@ -14,7 +14,9 @@ const AccountablityTracker = ({ data }) => {
           {`Accountability Analysis from ${data?.date_from} to ${data?.date_to}`}</MyText>
 
         {!!data?.daily_dynamite && data?.daily_dynamite?.map((item, index) => (
-          <View style={__styles.activityView} >
+          <Pressable
+            onPress={() => navigation.navigate(routes.delegateReportAccountablityTrackerScreen, {item,user})} 
+            key={item?._id} style={__styles.activityView} >
             <View style={__styles.activityRow}>
               <MyText>{item?.date}</MyText>
               <View style={__styles.activityNestedRow}>
@@ -25,7 +27,7 @@ const AccountablityTracker = ({ data }) => {
             <View style={{ marginTop: 10 }}>
               <MyText>{item?.statement_array[0]?.option}</MyText>
             </View>
-          </View>
+          </Pressable>
         ))}
       </View>
     )

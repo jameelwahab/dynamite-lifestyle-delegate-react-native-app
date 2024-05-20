@@ -261,9 +261,8 @@ const MainScreen = ({ navigation, route }) => {
     let res = await GET_ACCOUNTABILITY_TRACKER_BY_DELEGATE({
       navigation, token, page, body: {
         delegate_id: delegateId,
-        type: "performance_info",
-        start_date: !!filter?.start_date ? moment(filter?.start_date).format("DD-MM-YYYY") : undefined,
-        end_date: !!filter?.end_date ? moment(filter?.end_date).format("DD-MM-YYYY") : undefined,
+        date_from: !!filter?.start_date ? moment(filter?.start_date).format("DD-MM-YYYY") : undefined,
+        date_to: !!filter?.end_date ? moment(filter?.end_date).format("DD-MM-YYYY") : undefined,
       },
     });
     if (res.code == 200) {
@@ -286,7 +285,7 @@ const MainScreen = ({ navigation, route }) => {
 
   //* Views
 
-  const getView = () => {
+  const getView = (item) => {
     if (selectedTab == 0) {
       return <StreakPerformance data={itemDetail} modalRef={ref_streakPerformanceModal} />
     } else if (selectedTab == 2) {
@@ -294,7 +293,7 @@ const MainScreen = ({ navigation, route }) => {
     } else if (selectedTab == 3) {
       return null
     } else if (selectedTab == 4) {
-      return <AccountablityTracker navigation={navigation} data={itemDetail} />
+      return <AccountablityTracker user={item}  navigation={navigation} data={itemDetail} />
     }
   }
 
@@ -354,7 +353,7 @@ const MainScreen = ({ navigation, route }) => {
               <SimpleLoader />
             </View> : null}
           {!itemLoader && !!itemDetail ?
-            getView() :
+            getView(item) :
             !itemLoader ? <EmptyView /> : null
           }
         </Collapsible>
