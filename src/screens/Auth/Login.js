@@ -104,7 +104,7 @@ const Login = ({ navigation }) => {
       }
 
       dispatch(setSettings({ ...res?.consultant_setting, stripeKey: stripeKey }));
-      dispatch(setUserAndToken({ user: res?.consultant, token: resp?.token, isChatAllowed, isWhatsappChatAllowed }));
+      dispatch(setUserAndToken({ user: res?.consultant, token: resp?.token, isChatAllowed, isWhatsappChatAllowed, count: res?.unread_notification_count }));
       dispatch(setNavbar(res?.nav_items));
       dispatch(setTimeZone({ user: res?.consultant?.time_zone, admin: res?.time_zone }))
       dispatch(setSocket(io(socketUrl, {
@@ -125,7 +125,7 @@ const Login = ({ navigation }) => {
   }
 
 
- 
+
 
   return (
     <RootView hideHeader>

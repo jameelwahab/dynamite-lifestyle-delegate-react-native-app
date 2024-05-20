@@ -7,7 +7,7 @@ import { icons } from '../../utilities/icons';
 import { ChildComponents, ParentComponents, } from './List';
 import Collapsible from 'react-native-collapsible';
 import { selectNavbar } from '../../redux/reducers/navbarSlice';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { S3_URL } from '../../utilities/constants';
 import { selectSettings } from '../../redux/reducers/settingSlice';
 import MyImage2 from '../../components/MyImage2';
@@ -19,7 +19,7 @@ import messaging from '@react-native-firebase/messaging';
 import notifee, { AndroidBadgeIconType, EventType } from '@notifee/react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import notificationHandler from '../../functions/notificationHandler';
-import { selectUser } from '../../redux/reducers/userSlice';
+import { selectUser, setUnReadCount } from '../../redux/reducers/userSlice';
 import RootView from '../../components/RootView';
 
 
@@ -31,6 +31,7 @@ let sub5 = null;
 const index = (props) => {
   const inset = useSafeAreaInsets();
   const { navigation, state } = props;
+  const dispatch = useDispatch()
   const isDrawerOpen = useDrawerStatus() == "open";
   const { navbar } = useSelector(selectNavbar);
   const { user } = useSelector(selectUser);
@@ -117,14 +118,22 @@ const index = (props) => {
 
   useEffect(() => {
     pushNotificationhandlers()
+
+    enableSocketEvents()
     socket.on("connect_error", () => {
       console.log("%c connect_error", 'background:#0000FF; color: #FFF', socket,)
+      disbaleSocketEvents();
       socket.connect();
     });
 
+    // socket.on("disconnect", () => {
+    //   console.log("%c socket connected ", 'background:#A020F0; color: #FFF', socket)
+    //   disbaleSocketEvents();
+    // });
 
     socket.on("connect", () => {
       console.log("%c socket connected ", 'background:#A020F0; color: #FFF', socket)
+      enableSocketEvents();
     });
 
     const unsubscribe = messaging().onMessage(async remoteMessage => {
@@ -144,6 +153,7 @@ const index = (props) => {
     return () => {
       socket.off("connect");
       socket.off("connect_error");
+      disbaleSocketEvents();
       unsubscribe();
       !!sub2 && sub2();
       !!sub3 && sub3();
@@ -151,6 +161,35 @@ const index = (props) => {
       // !!sub5 && sub5();
     }
   }, [])
+
+  //! Socket Events 
+
+  const enableSocketEvents = () => {
+    socket.on("new_notification_receiver_for_delegate", (data) => handleSocketEvents(data, "new_notification_receiver_for_delegate"))
+    socket.on("goal_stetement_event_reciever", (data) => handleSocketEvents(data, "goal_stetement_event_reciever"))
+    socket.on("new_notification_receiver", (data) => handleSocketEvents(data, "new_notification_receiver"))
+    socket.on("reminder_event_for_delegate", (data) => handleSocketEvents(data, "reminder_event_for_delegate"))
+    socket.on("daily_dynamite_reminder_event", (data) => handleSocketEvents(data, "daily_dynamite_reminder_event"))
+    socket.on("dynamite_streak_event", (data) => handleSocketEvents(data, "dynamite_streak_event"))
+  }
+
+  const disbaleSocketEvents = () => {
+    socket.off("new_notification_receiver_for_delegate");
+    socket.off("goal_stetement_event_reciever");
+    socket.off("new_notification_receiver");
+    socket.off("reminder_event_for_delegate");
+    socket.off("daily_dynamite_reminder_event");
+    socket.off("dynamite_streak_event");
+  }
+
+  const handleSocketEvents = (data, event) => {
+    console.log(data, event)
+    if (data?.action_response?.unread_notification_count != undefined) {
+      dispatch(setUnReadCount(data?.action_response?.unread_notification_count))
+    } else if (data?.unread_notification_count != undefined) {
+      dispatch(setUnReadCount(data?.unread_notification_count))
+    }
+  }
 
   const toggleCollapse = (item) => {
     let index = isCollapsed.findIndex(x => x == item._id);

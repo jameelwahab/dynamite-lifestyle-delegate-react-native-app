@@ -19,7 +19,7 @@ import notifee from '@notifee/react-native';
 const ProfileDropDown = ({ isVisible = false, closeModal = () => { }, user }) => {
   const navigation = useNavigation();
   const { socket } = useSelector(selectSocket);
-  const dispatch = useDispatch()
+  const dispatch = useDispatch()  
 
   const logoutBtn = async () => {
     try {

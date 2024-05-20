@@ -1,4 +1,5 @@
 import MessageList from "../../screens/Chat/MessageList.js";
+import NotificationList from "../../screens/NotificationList";
 import ChangePassword from "../../screens/Profile/ChangePassword";
 import EditProfile from "../../screens/Profile/EditProfile";
 import OtherSettings from "../../screens/Settings/OtherSettings";
@@ -31,6 +32,10 @@ export const defaultScreens = [
   {
     name: routes.chatMessageList,
     component: MessageList
+  },
+  {
+    name: routes.notificationList,
+    component: NotificationList
   }
 
 ]

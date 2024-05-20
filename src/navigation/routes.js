@@ -283,7 +283,10 @@ const routes = {
   delegateReportBookingsFilterScreen: "DELEGATE_REPORT_BOOKINGS_FILTER_SCREEN",
   delegateReportSalesScreen: "DELEGATE_REPORT_SALES_SCREEN",
   delegateReportSalesFilterScreen: "DELEGATE_REPORT_SALES_FILTER_SCREEN",
-  delegateReportAccountablityTrackerScreen: "DELEGATE_REPORT_ACCOUNTABILTY_TRACKER_SCREEN"
+  delegateReportAccountablityTrackerScreen: "DELEGATE_REPORT_ACCOUNTABILTY_TRACKER_SCREEN",
+
+  //? Notifications
+  notificationList: "NOTIFICATION_LIST",
 }
 
 

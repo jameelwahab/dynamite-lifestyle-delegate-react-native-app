@@ -4,11 +4,10 @@ import { setUserAndToken } from '../redux/reducers/userSlice';
 import { setNavbar } from '../redux/reducers/navbarSlice';
 import { setTimeZone } from '../redux/reducers/timezoneSlice';
 import { setSocket } from '../redux/reducers/socketSlice';
-import showToast from './showToast';
 import routes from '../navigation/routes';
 import { io } from 'socket.io-client';
 import { socketUrl } from '../utilities/constants';
-import { Alert } from 'react-native';
+import notifee from '@notifee/react-native';
 
 const InitWithAuth = async (token, navigation, setLoader, dispatch) => {
   let res = await INIT_WITH_TOKEN({ token: token });
@@ -29,9 +28,9 @@ const InitWithAuth = async (token, navigation, setLoader, dispatch) => {
     } else if (res?.site_setting?.stripe_mode == "live") {
       stripeKey = res?.site_setting?.live_publish_key
     }
-
+    notifee.setBadgeCount(res?.unread_notification_count)
     dispatch(setSettings({ ...res?.consultant_setting, stripeKey: stripeKey }));
-    dispatch(setUserAndToken({ user: res?.consultant, token: token, isChatAllowed, isWhatsappChatAllowed }));
+    dispatch(setUserAndToken({ user: res?.consultant, token: token, isChatAllowed, isWhatsappChatAllowed, count: res?.unread_notification_count }));
     dispatch(setNavbar(res?.nav_items));
     dispatch(setTimeZone({ user: res?.consultant?.time_zone, admin: res?.time_zone }))
     dispatch(setSocket(io(socketUrl, {

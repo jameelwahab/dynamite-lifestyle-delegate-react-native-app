@@ -32,7 +32,7 @@ const Header = ({
   hideUpperHeader = false,
   subTitle = ""
 }) => {
-  const { user, token, isChatAllowed } = useSelector(selectUser)
+  const { user, token, isChatAllowed, unreadCount } = useSelector(selectUser)
   const navigation = useNavigation()
   const [isUserModalVisible, setIsUserModalVisible] = useState(false)
 
@@ -53,6 +53,9 @@ const Header = ({
 
   const navigateToChatScreen = () => {
     navigation.jumpTo(routes.chatNavigator)
+  }
+  const navigateToNotificationScreen = () => {
+    navigation.navigate(routes.notificationList)
   }
 
 
@@ -81,12 +84,27 @@ const Header = ({
         <View style={{ flex: 1, justifyContent: "flex-end", alignItems: "center", flexDirection: "row", paddingRight: 10 }}>
 
 
+
           {!hideChatIcon && isChatAllowed &&
             <TouchableOpacity
               onPress={() => navigateToChatScreen()}
               style={__header.RightButtonView}>
               <Ionicons name="chatbox-ellipses" color={colors.primary} size={17} />
             </TouchableOpacity>}
+
+          {!hideNotificaitonIcon &&
+            <TouchableOpacity
+              onPress={() => navigateToNotificationScreen()}
+              style={__header.RightButtonView}>
+              {icons.notification(colors.primary, 17)}
+
+              {unreadCount > 0 ?
+                <View style={__header.badge}>
+                  <Text style={__header.badgeText}> {unreadCount > 99 ? "+99" : unreadCount}</Text>
+                </View> : null}
+            </TouchableOpacity>}
+
+
           {/* 
           {!hideNotificaitonIcon &&
             <TouchableOpacity
@@ -197,4 +215,21 @@ const __header = StyleSheet.create({
     height: 30,
     tintColor: colors.primary
   },
+  badge: {
+    height: 20,
+    width: 20,
+    borderRadius: 20 / 2,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: colors.delete,
+    position: "absolute",
+    top: -5,
+    right: -5
+  },
+  badgeText: {
+    fontSize: 10,
+    fontFamily: fonts.medium,
+    includeFontPadding: false,
+    color: colors.white
+  }
 })

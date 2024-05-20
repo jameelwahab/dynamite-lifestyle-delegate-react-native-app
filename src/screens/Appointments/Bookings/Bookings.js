@@ -340,8 +340,8 @@ const Bookings = ({ navigation, route }) => {
           data={list}
           renderItem={renderBookings}
           onEndReached={loadMore}
-          ListEmptyComponent={!loader && !refreshing && <EmptyView label={'No Payment Requests Found'} />}
           ListFooterComponent={<FooterLoader isVisible={footerLoader} />}
+          ListEmptyComponent={!loader && !refreshing && <EmptyView label={'No Payment Requests Found'} />}
           refreshControl={<MyRefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         />
       </View>
