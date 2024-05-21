@@ -1,5 +1,5 @@
 
-import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native'
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { DELETE_ALL_NOTIFICATION, DELETE_SINGAL_NOTIFICATION, GET_NOTIFICATION_LIST, MARK_ALL_NOTIFICATION_AS_READ, MARK_NOTIFICATION_AS_READ } from '../../DAL';
 import RootView from '../../components/RootView';
@@ -22,6 +22,7 @@ import ConfirmationModal from '../../components/ConfirmationModal';
 import showToast from '../../functions/showToast';
 import routes from '../../navigation/routes';
 import notifee from '@notifee/react-native';
+import { selectNavbar } from '../../redux/reducers/navbarSlice';
 
 let nlpage = 0;
 let nlCanLoadMore = false
@@ -32,6 +33,7 @@ let nlCanLoadMore = false
 const NotificationList = ({ navigation, route }) => {
   const { token } = useSelector(selectUser);
   const timezone = useSelector(selectTimeZone);
+  const { navbar } = useSelector(selectNavbar);
   const dispatch = useDispatch();
   const [loader, setLoader] = useState(true)
   const [list, setList] = useState([]);
@@ -42,6 +44,7 @@ const NotificationList = ({ navigation, route }) => {
   const [confirmationModal, setConfirmationModal] = useState({ isVisible: false, title: "", type: "" })
 
   useEffect(() => {
+    setList([])
     setLoader(true);
     callAPI()
   }, [])
@@ -49,7 +52,6 @@ const NotificationList = ({ navigation, route }) => {
   const callAPI = () => {
     nlpage = 0;
     nlCanLoadMore = false;
-    setList([])
     getNotificationListFromServer(true)
   }
 
@@ -91,54 +93,147 @@ const NotificationList = ({ navigation, route }) => {
 
   const onNextScreen = (item) => {
     let { notification_type } = item;
-    if (
-      notification_type === "commentlike" ||
-      notification_type === "feedlike" ||
-      notification_type === "gratitude" ||
-      notification_type === "add_comment" ||
-      notification_type === "goal_statement_save_and_close_status" ||
-      notification_type === "add_comment_reply"
-    ) {
+    if (feedType.includes(notification_type)) {
+      let navigator = "";
+      if (item?.feed_tab == "the_cosmos" && !!navbar.find(x => x.value == "the_cosmos")) {
+        navigator = routes.feedNavigator;
+      }
+      else {
+        if (!!navbar.find(x => x.value == "all_source_feed"))
+          navigator = routes.allSourcesFeedNavigator;
+        else if (!!navbar.find(x => x.value == "the_source_feed"))
+          navigator = routes.sourceFeedNavigator;
+      }
+
+      if (!!navigator) {
+        let params = { feedId: item?.feeds?._id };
+        if (notification_type == "addcomment" || notification_type == "addcommentreply" || notification_type == "commentlike") {
+          params["openCommentModal"] = true;
+        }
+
+        console.log(params, "params")
+        navigation.reset({
+          routes: [{
+            name: navigator,
+            state: {
+              routes: [{
+                name: routes.feedScreen,
+              },
+              {
+                name: routes.feedDetailScreen,
+                params: params
+              }],
+            }
+          }],
+        })
+      }
 
     } else if (notification_type === "goal_statement_completed") {
-      // navigation.jumpTo({
+      // navigation.reset({
       //   routes: [{
-      //     name: routes.goalStatementCompleteNavigator,
+      //     name: routes.chatNavigator,
       //     state: {
       //       routes: [
       //         {
-      //           name: routes.goalStatementCompleteScreen,
-      //           params: {
-      //             chatId: data?.chat_id,
-      //             isOnline: profile?.is_online,
-      //             memberId: profile?.action_id,
-      //             firstName: profile?.name,
-      //             lastName: "",
-      //             lastSeen: "",
-      //             profileImage: profile?.profile_image,
-      //           }
+      //           name: routes.chatList,
       //         },
       //         {
       //           name: routes.chatMessageList,
       //           params: {
-      //             chatId: data?.chat_id,
-      //             isOnline: profile?.is_online,
-      //             memberId: profile?.action_id,
-      //             firstName: profile?.name,
+      //             chatId: item?.message?.chat_id,
+      //             isOnline: true,
+      //             memberId: item?.user_info_sender?.action_id,
+      //             firstName: item?.user_info_sender?.name,
       //             lastName: "",
       //             lastSeen: "",
-      //             profileImage: profile?.profile_image,
+      //             profileImage: item?.user_info_sender?.profile_image,
       //           }
       //         }],
       //     }
       //   }],
       // })
+    } else if (notification_type == "message" && !!navbar.find(x => x.value == "chat")) {
+      navigation.reset({
+        routes: [{
+          name: routes.chatNavigator,
+          state: {
+            routes: [
+              {
+                name: routes.chatList,
+              },
+              {
+                name: routes.chatMessageList,
+                params: {
+                  chatId: item?.message?.chat_id,
+                  isOnline: true,
+                  memberId: item?.user_info_sender?.action_id,
+                  firstName: item?.user_info_sender?.name,
+                  lastName: "",
+                  lastSeen: "",
+                  profileImage: item?.user_info_sender?.profile_image,
+                }
+              }],
+          }
+        }],
+      })
     } else if (notification_type == "daily_dynamite_reminder") {
-      navigation.jumpTo(routes?.accountabilityTrackerNavigator)
+
+      navigation.reset({
+        routes: [{
+          name: routes?.accountabilityTrackerNavigator,
+        }],
+      })
       markReadSingal(item?._id);
     } else if (notification_type == "dynamite_streak_reminder") {
-      navigation.jumpTo(routes?.dailyStreakPerformerNavigator)
+      navigation.reset({
+        routes: [{
+          name: routes?.dailyStreakPerformerNavigator,
+        }],
+      })
       markReadSingal(item?._id);
+    } else if (SupportTicketType.includes(notification_type)) {
+      let navigator = "";
+      let nestedNavigator = "";
+      let params = {
+        ticket: { _id: data?.support_ticket },
+      }
+
+      if (data?.type == "support_ticket_comment") {
+        params["tab"] = 1
+      } else if (data?.type == "close_support_ticket") {
+        params["route"] = "solved"
+      }
+
+      if (data?.support_ticket_tab == "contact_support" && !!navbar.find(x => x.value == "support")?.child_options.find(x => x.value == "contact_support")) {
+        navigator = routes.contactSupportNavigator;
+        nestedNavigator = routes?.ticketList
+        params["isMine"] = true;
+      } else if (data?.support_ticket_tab == "internal_ticket" && !!navbar.find(x => x.value == "internal-tickets")) {
+        navigator = routes.internalTicketNavigator;
+        nestedNavigator = routes?.supportTicketList
+      } else if (data?.support_ticket_tab == "support_ticket" && !!navbar.find(x => x.value == "support_ticket")) {
+        navigator = routes.supportTicketNavigator;
+        nestedNavigator = routes?.supportTicketList
+      }
+
+      if (navigator != "" && nestedNavigator != "") {
+        navigation.reset({
+          routes: [{
+            name: navigator,
+            state: {
+              index: 1,
+              routes: [{
+                name: nestedNavigator,
+              },
+              {
+                name: routes.supportTicketDeatail,
+                params: params
+              }
+              ],
+            }
+          }],
+        })
+      }
     }
 
   }
@@ -233,10 +328,10 @@ const NotificationList = ({ navigation, route }) => {
           />
           <View style={__styles.typeIcon}>
             {item?.notification_type.includes("like") ?
-              icons.heartFilled(colors.heart,18) :
-              item?.notification_type=="gratitude"?
-              icons.gra
-               null}
+              icons.heartFilled(colors.heart, 18) :
+              item?.notification_type == "gratitude" ?
+                <Image source={icons.gratitude} style={{ height: 18, width: 18 }} /> :
+                icons.messageFilled(colors.white, 18)}
           </View>
         </View>
         <View style={{ marginLeft: 10, flex: 1 }}>
@@ -303,6 +398,7 @@ const NotificationList = ({ navigation, route }) => {
           ListFooterComponent={<FooterLoader isVisible={footerLoader} />}
           ListEmptyComponent={!loader && !refreshing && <EmptyView label={'No Notifications Found'} />}
           refreshControl={<MyRefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+          showsVerticalScrollIndicator={false}
         />
       </View>
       <MyLoader enable={loader} />
@@ -385,3 +481,6 @@ const __styles = StyleSheet.create({
 })
 
 
+
+const feedType = ["commentlike", "addcomment", "feedlike", "gratitude", "addcommentreply"];
+const SupportTicketType = ["send_support_ticket_reminder", "close_support_ticket", "support_ticket_comment", "add_support_ticket"];

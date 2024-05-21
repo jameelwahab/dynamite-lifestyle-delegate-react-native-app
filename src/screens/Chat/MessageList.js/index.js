@@ -32,8 +32,8 @@ import TrackPlayer from 'react-native-track-player'
 import routes from '../../../navigation/routes';
 import showToast from '../../../functions/showToast';
 
-let page = 0;
-let canLoadMore = false;
+let mlpage = 0;
+let mlcanLoadMore = false;
 let isNewChat = false;
 const MessageList = ({ navigation, route }) => {
   console.log(route?.params)
@@ -53,8 +53,8 @@ const MessageList = ({ navigation, route }) => {
 
   useEffect(() => {
     isNewChat = false
-    page = 0;
-    canLoadMore = false;
+    mlpage = 0;
+    mlcanLoadMore = false;
     if (!!member?.chatId) {
       setLoader(true)
       getMemberList();
@@ -190,25 +190,25 @@ const MessageList = ({ navigation, route }) => {
 
   //! //////// APIS
   const loadMore = () => {
-    if (canLoadMore) {
+    if (mlcanLoadMore) {
       console.log("onEndRech")
-      canLoadMore = false;
+      mlcanLoadMore = false;
       setFooterLoader(true);
       getMemberList()
     }
   }
 
   const getMemberList = async () => {
-    let res = await MESSAGE_LIST_BY_CHAT_ID({ navigation, token, chatId: member?.chatId, page })
+    let res = await MESSAGE_LIST_BY_CHAT_ID({ navigation, token, chatId: member?.chatId, page:mlpage })
     setLoader(false);
     setFooterLoader(false)
 
     if (res.code == 200) {
       if ((chat.length + res?.message.length) < res?.count) {
-        page++;
-        canLoadMore = true;
+        mlpage++;
+        mlcanLoadMore = true;
       } else {
-        canLoadMore = false;
+        mlcanLoadMore = false;
       }
 
       setChat([...chat, ...res?.message.reverse()])

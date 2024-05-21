@@ -29,8 +29,8 @@ import { selectTimeZone } from '../../../redux/reducers/timezoneSlice'
 import MyInputs from '../../../components/MyInputs' 
 
 
-let page = 0;
-let canLoadMore = false;
+let clpage = 0;
+let clcanLoadMore = false;
 let firstTime = true;
 let isNewChat = false;
 
@@ -68,14 +68,14 @@ const ChatList = ({ navigation }) => {
         event_id: eventId?._id,
         search_text: searchText,
         chat_type: tab
-      }, token, page
+      }, token, page:clpage
     })
     if (res.code == 200) {
       if ((chatList.length + res?.chat.length) < res?.total_chat_count) {
-        page++;
-        canLoadMore = true;
+        clpage++;
+        clcanLoadMore = true;
       } else {
-        canLoadMore = false;
+        clcanLoadMore = false;
       }
       setLoader(false);
       setFooterLoader(false);
@@ -88,14 +88,14 @@ const ChatList = ({ navigation }) => {
   }
 
   const refresh = () => {
-    page = 0;
-    canLoadMore = false;
+    clpage = 0;
+    clcanLoadMore = false;
     api_ChatList(true);
   }
 
   const loadmore = () => {
-    if (canLoadMore) {
-      canLoadMore = false;
+    if (clcanLoadMore) {
+      clcanLoadMore = false;
       setFooterLoader(true);
       api_ChatList()
     }
@@ -109,19 +109,19 @@ const ChatList = ({ navigation }) => {
     }
   }
 
-  useEffect(() => {
+   useEffect(() => {
     if (!firstTime) {
       console.log("HI")
-      page = 0;
-      canLoadMore = false;
+      clpage = 0;
+      clcanLoadMore = false;
       debounce(() => api_ChatList(true))
     }
   }, [searchText, JSON.stringify(eventId)])
 
   useEffect(() => {
     if (!firstTime) {
-      page = 0;
-      canLoadMore = false;
+      clpage = 0;
+      clcanLoadMore = false;
       setLoader(true);
       setChatList([])
       debounce(() => api_ChatList(true))
@@ -131,15 +131,15 @@ const ChatList = ({ navigation }) => {
 
   useEffect(() => {
     firstTime = true;
-    page = 0;
-    canLoadMore = false;
-    api_ChatList()
+    clpage = 0;
+    clcanLoadMore = false;
+    api_ChatList(true)
     api_portalList()
     socketEvents();
 
     return () => {
-      page = 0;
-      canLoadMore = false;
+      clpage = 0;
+      clcanLoadMore = false;
       isNewChat = false;
       removeSocketEvents()
     }

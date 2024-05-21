@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Pressable, Image, TouchableOpacity, } from 'react-native'
+import { View, Text, StyleSheet, Pressable, Image, TouchableOpacity, Platform, } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import { colors } from '../../utilities/colors'
 // import { backArrow, menu } from '../utilities/icons'
@@ -155,7 +155,7 @@ export default Header
 
 const __header = StyleSheet.create({
   rootView: {
-    height: 40,
+    height: Platform.OS == "ios" ? 40 : 45,
     width: "100%",
     // backgroundColor: colors.darkSecondary,
     // backgroundColor: "dodgerblue",
