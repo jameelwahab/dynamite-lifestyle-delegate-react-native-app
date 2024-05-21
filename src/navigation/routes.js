@@ -1,5 +1,3 @@
-import AccountabilityTrackerScreen from "../screens/AccountabilityTracker/AccountabilityTrackerScreen";
-
 const routes = {
 
   //! ///    Navigators

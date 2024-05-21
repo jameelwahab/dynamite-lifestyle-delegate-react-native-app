@@ -18,7 +18,6 @@ const userSlice = createSlice({
       state.user = null
     },
     setUserAndToken: (state, action) => {
-      console.log(action, "action")
       state.user = action.payload.user;
       state.token = action.payload.token;
       state.isChatAllowed = action.payload.isChatAllowed;
@@ -32,9 +31,7 @@ const userSlice = createSlice({
       };
     },
     setUnReadCount: (state, action,) => {
-      state = {
-        unreadCount: action?.payload?.count
-      };
+      state.unreadCount = action.payload
     }
   }
 })

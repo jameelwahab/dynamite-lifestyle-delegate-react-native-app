@@ -183,10 +183,19 @@ const index = (props) => {
   }
 
   const handleSocketEvents = (data, event) => {
-    console.log(data, event)
     if (data?.action_response?.unread_notification_count != undefined) {
-      dispatch(setUnReadCount(data?.action_response?.unread_notification_count))
-    } else if (data?.unread_notification_count != undefined) {
+      if (typeof (data?.action_response?.unread_notification_count) == "number") {
+        dispatch(setUnReadCount(data?.action_response?.unread_notification_count))
+      } else if (Array.isArray(data?.action_response?.unread_notification_count)) {
+        let count = data?.action_response?.unread_notification_count.find(x => x?._id == user?._id);
+        if (count) {
+          dispatch(setUnReadCount(count))
+        }
+
+      }
+    } if (data?.data?.action_response?.unread_notification_count != undefined && typeof (data?.data?.action_response?.unread_notification_count) == "number") {
+      dispatch(setUnReadCount(data?.data?.action_response?.unread_notification_count))
+    } else if (data?.unread_notification_count != undefined && typeof (data?.unread_notification_count) == "number") {
       dispatch(setUnReadCount(data?.unread_notification_count))
     }
   }

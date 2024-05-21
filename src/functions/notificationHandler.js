@@ -44,8 +44,7 @@ const notificationHandler = (remoteMessage, navigation, navbar) => {
       })
     }
 
-  }
-  else if (data?.type == "message" && !!navbar.find(x => x.value == "chat")) {
+  } else if (data?.type == "message" && !!navbar.find(x => x.value == "chat")) {
     let profile = JSON.parse(data?.sender_info)
     navigation.reset({
       routes: [{
@@ -75,8 +74,7 @@ const notificationHandler = (remoteMessage, navigation, navbar) => {
         }
       }]
     })
-  }
-  else if (SupportTicketType.includes(data?.type)) {
+  } else if (SupportTicketType.includes(data?.type)) {
     let navigator = "";
     let nestedNavigator = "";
     let params = {
@@ -92,7 +90,6 @@ const notificationHandler = (remoteMessage, navigation, navbar) => {
     if (data?.support_ticket_tab == "contact_support" && !!navbar.find(x => x.value == "support")?.child_options.find(x => x.value == "contact_support")) {
       navigator = routes.contactSupportNavigator;
       nestedNavigator = routes?.ticketList
-      params["isMine"] = true;
     } else if (data?.support_ticket_tab == "internal_ticket" && !!navbar.find(x => x.value == "internal-tickets")) {
       navigator = routes.internalTicketNavigator;
       nestedNavigator = routes?.supportTicketList
@@ -124,6 +121,28 @@ const notificationHandler = (remoteMessage, navigation, navbar) => {
         }]
       })
     }
+  } else if (data?.type == "goal_statement_completed") {
+    navigation.reset({
+      routes: [{
+        name: routes.mainScreen,
+        state: {
+          routes: [{
+            name: data?.type == "complete" ? routes.goalStatementCompleteNavigator : routes.goalStatementResponedNavigator,
+            state: {
+              routes: [
+                {
+                  name: data?.type == "complete" ? routes.goalStatementCompleteScreen : routes?.goalStatementResponedScreen,
+                }, {
+                  name: routes.goalStatmentDetail,
+                  params: {
+                    memberId: data?.sender
+                  }
+                }],
+            }
+          }],
+        }
+      }]
+    })
   }
   notifee.decrementBadgeCount();
 }

@@ -27,10 +27,10 @@ import MyInputs from '../../../components/MyInputs';
 
 let autoMessages = [];
 const Detail = ({ navigation, route }) => {
-  const { route: listRoute, refreshList, tab, isMine } = route?.params;
+  const { route: listRoute1, refreshList, tab, isMine } = route?.params;
   const { token, user } = useSelector(selectUser);
   const timezone = useSelector(selectTimeZone);
-
+  const [listRoute, setlistRoute] = useState(listRoute1)
   const layout = useWindowDimensions();
   const [index, setIndex] = useState(!!tab ? tab : 0);
   const [loader, setLoader] = useState(true);
@@ -170,6 +170,9 @@ const Detail = ({ navigation, route }) => {
     });
     if (res.code == 200) {
       autoMessages = res.auto_responder_message;
+      if (res?.support_ticket?.response_status == 0 && res?.support_ticket?.ticket_status == 1) {
+        setlistRoute("solved")
+      }
       setLoader(false)
       setTicket(res?.support_ticket)
       setComments(res?.support_ticket?.comment.reverse())

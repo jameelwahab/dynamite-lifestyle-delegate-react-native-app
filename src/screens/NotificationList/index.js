@@ -31,7 +31,7 @@ let nlCanLoadMore = false
 
 
 const NotificationList = ({ navigation, route }) => {
-  const { token } = useSelector(selectUser);
+  const { token, user } = useSelector(selectUser);
   const timezone = useSelector(selectTimeZone);
   const { navbar } = useSelector(selectNavbar);
   const dispatch = useDispatch();
@@ -92,6 +92,7 @@ const NotificationList = ({ navigation, route }) => {
   //?* navigation
 
   const onNextScreen = (item) => {
+    markReadSingal(item?._id);
     let { notification_type } = item;
     if (feedType.includes(notification_type)) {
       let navigator = "";
@@ -110,8 +111,6 @@ const NotificationList = ({ navigation, route }) => {
         if (notification_type == "addcomment" || notification_type == "addcommentreply" || notification_type == "commentlike") {
           params["openCommentModal"] = true;
         }
-
-        console.log(params, "params")
         navigation.reset({
           routes: [{
             name: navigator,
@@ -129,29 +128,23 @@ const NotificationList = ({ navigation, route }) => {
       }
 
     } else if (notification_type === "goal_statement_completed") {
-      // navigation.reset({
-      //   routes: [{
-      //     name: routes.chatNavigator,
-      //     state: {
-      //       routes: [
-      //         {
-      //           name: routes.chatList,
-      //         },
-      //         {
-      //           name: routes.chatMessageList,
-      //           params: {
-      //             chatId: item?.message?.chat_id,
-      //             isOnline: true,
-      //             memberId: item?.user_info_sender?.action_id,
-      //             firstName: item?.user_info_sender?.name,
-      //             lastName: "",
-      //             lastSeen: "",
-      //             profileImage: item?.user_info_sender?.profile_image,
-      //           }
-      //         }],
-      //     }
-      //   }],
-      // })
+      navigation.reset({
+        routes: [{
+          name: routes.goalStatementCompleteNavigator,
+          state: {
+            routes: [
+              {
+                name: routes.goalStatementCompleteScreen,
+              },
+              {
+                name: routes.goalStatmentDetail,
+                params: {
+                  memberId: item?.user_info_sender?.action_id
+                }
+              }],
+          }
+        }],
+      })
     } else if (notification_type == "message" && !!navbar.find(x => x.value == "chat")) {
       navigation.reset({
         routes: [{
@@ -177,42 +170,41 @@ const NotificationList = ({ navigation, route }) => {
         }],
       })
     } else if (notification_type == "daily_dynamite_reminder") {
-
       navigation.reset({
         routes: [{
           name: routes?.accountabilityTrackerNavigator,
         }],
       })
-      markReadSingal(item?._id);
+
     } else if (notification_type == "dynamite_streak_reminder") {
       navigation.reset({
         routes: [{
           name: routes?.dailyStreakPerformerNavigator,
         }],
       })
-      markReadSingal(item?._id);
+
     } else if (SupportTicketType.includes(notification_type)) {
       let navigator = "";
       let nestedNavigator = "";
       let params = {
-        ticket: { _id: data?.support_ticket },
+        ticket: { _id: item?.support_ticket?._id },
       }
-
-      if (data?.type == "support_ticket_comment") {
+      if (notification_type == "support_ticket_comment") {
         params["tab"] = 1
-      } else if (data?.type == "close_support_ticket") {
-        params["route"] = "solved"
       }
 
-      if (data?.support_ticket_tab == "contact_support" && !!navbar.find(x => x.value == "support")?.child_options.find(x => x.value == "contact_support")) {
+      let isMineTicket = item?.support_ticket?.action_id == user?._id;
+
+      if (item?.support_ticket?.action_by == "member_user" && !!navbar.find(x => x.value == "support_ticket")) {
+        navigator = routes.supportTicketNavigator;
+        nestedNavigator = routes?.supportTicketList
+      } else if (isMineTicket && !!navbar.find(x => x.value == "support")?.child_options.find(x => x.value == "contact_support")) {
         navigator = routes.contactSupportNavigator;
         nestedNavigator = routes?.ticketList
         params["isMine"] = true;
-      } else if (data?.support_ticket_tab == "internal_ticket" && !!navbar.find(x => x.value == "internal-tickets")) {
+      } else if (!isMineTicket && !!navbar.find(x => x.value == "internal-tickets")) {
+        console.log(params, "params", isMineTicket)
         navigator = routes.internalTicketNavigator;
-        nestedNavigator = routes?.supportTicketList
-      } else if (data?.support_ticket_tab == "support_ticket" && !!navbar.find(x => x.value == "support_ticket")) {
-        navigator = routes.supportTicketNavigator;
         nestedNavigator = routes?.supportTicketList
       }
 
@@ -268,8 +260,15 @@ const NotificationList = ({ navigation, route }) => {
   const markReadSingal = async (id) => {
     let res = await MARK_NOTIFICATION_AS_READ({ token, navigation, id })
     if (res.code == 200) {
+      let temp_total = total;
       let index = list.findIndex(x => x._id == id);
       if (index > -1) {
+        if (temp_total > 0) {
+          temp_total--;
+        }
+        notifee.setBadgeCount(temp_total);
+        dispatch(setUnReadCount(temp_total))
+        setTotal(temp_total)
         list[index].is_seen = true;
         setList([...list]);
       }
@@ -281,9 +280,17 @@ const NotificationList = ({ navigation, route }) => {
     if (res.code == 200) {
       showToast({ title: res.message, type: "success" });
       let index = list.findIndex(x => x._id == id);
+      let temp_total = total;
       if (index > -1) {
+        if (temp_total > 0) {
+          temp_total--;
+        }
+        if (!list[index].is_seen) {
+          notifee.setBadgeCount(temp_total);
+          dispatch(setUnReadCount(temp_total))
+        }
         list.splice(index, 1);
-        setTotal((count) => --count)
+        setTotal(temp_total)
         setList([...list]);
       }
     }
@@ -292,11 +299,12 @@ const NotificationList = ({ navigation, route }) => {
   const markAllRead = async () => {
     let res = await MARK_ALL_NOTIFICATION_AS_READ({ token, navigation })
     if (res.code == 200) {
-      let index = list.findIndex(x => x._id == id);
       list.forEach(element => {
         element.is_seen = true;
       });
-      setTotal((count) => --count)
+      notifee.setBadgeCount(0);
+      dispatch(setUnReadCount(0))
+      setTotal(0)
       setList([...list]);
     }
   }
@@ -334,9 +342,9 @@ const NotificationList = ({ navigation, route }) => {
                 icons.messageFilled(colors.white, 18)}
           </View>
         </View>
-        <View style={{ marginLeft: 10, flex: 1 }}>
+        <View style={{ marginLeft: 15, flex: 1 }}>
 
-          <MyText fontSize={14} type={item?.is_seen ? 'light' : 'medium'} color={item?.is_seen ? colors.lightText : colors.white} >
+          <MyText fontSize={14} type={'medium'} color={item?.is_seen ? colors.lightText : colors.white} >
             {item?.notification_title}</MyText>
           <View style={__styles.timeView}>
             <View opacity={item?.is_seen ? 0.5 : 1}>
@@ -483,4 +491,4 @@ const __styles = StyleSheet.create({
 
 
 const feedType = ["commentlike", "addcomment", "feedlike", "gratitude", "addcommentreply"];
-const SupportTicketType = ["send_support_ticket_reminder", "close_support_ticket", "support_ticket_comment", "add_support_ticket"];
+const SupportTicketType = ["send_support_ticket_reminder", "close_support_ticket", "support_ticket_comment", "add_support_ticket", "support_ticket"];
