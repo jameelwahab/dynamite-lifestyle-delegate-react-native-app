@@ -226,6 +226,25 @@ const NotificationList = ({ navigation, route }) => {
           }],
         })
       }
+    } else if (notification_type == "progress_report_internal_note") {
+      navigation.reset({
+        routes: [{
+          name: routes?.progressNavigator,
+          state: {
+            routes: [
+              {
+                name: routes.progresssList,
+              },
+              {
+                name: routes.progresssNotesList,
+                params: {
+                  reportId: item?.progress_report
+                }
+              }],
+          }
+        }],
+      })
+
     }
 
   }

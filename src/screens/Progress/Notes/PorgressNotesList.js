@@ -21,7 +21,7 @@ import { selectUser } from '../../../redux/reducers/userSlice'
 import { useSelector } from 'react-redux'
 
 const PorgressNotesList = ({ navigation, route }) => {
-  const { reportId, userInfo } = route?.params;
+  const { reportId } = route?.params;
   const timezone = useSelector(selectTimeZone);
   const { token } = useSelector(selectUser);
   const [loader, setLoader] = useState(false)
@@ -128,7 +128,6 @@ const PorgressNotesList = ({ navigation, route }) => {
       title='Progress Notes'
       customBackPress={() => navigation.navigate(routes?.progresssList, { callList: true })}
     >
-      {/* {!!userInfo && topView()} */}
       <View style={{ flex: 1, }}>
         <View style={{ flex: 1, marginTop: 10, }}>
           <FlatList
