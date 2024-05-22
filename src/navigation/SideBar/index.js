@@ -21,6 +21,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import notificationHandler from '../../functions/notificationHandler';
 import { selectUser, setUnReadCount } from '../../redux/reducers/userSlice';
 import RootView from '../../components/RootView';
+import { INIT_WITH_TOKEN } from '../../DAL';
 
 
 
@@ -34,7 +35,7 @@ const index = (props) => {
   const dispatch = useDispatch()
   const isDrawerOpen = useDrawerStatus() == "open";
   const { navbar } = useSelector(selectNavbar);
-  const { user } = useSelector(selectUser);
+  const { token, user } = useSelector(selectUser);
   const { settings } = useSelector(selectSettings);
   const { socket } = useSelector(selectSocket);
   const [isCollapsed, setCollapsed] = useState([]);
@@ -122,7 +123,6 @@ const index = (props) => {
     enableSocketEvents()
     socket.on("connect_error", () => {
       console.log("%c connect_error", 'background:#0000FF; color: #FFF', socket,)
-      disbaleSocketEvents();
       socket.connect();
     });
 
@@ -133,7 +133,10 @@ const index = (props) => {
 
     socket.on("connect", () => {
       console.log("%c socket connected ", 'background:#A020F0; color: #FFF', socket)
-      enableSocketEvents();
+      disbaleSocketEvents();
+      setTimeout(() => {
+        enableSocketEvents();
+      }, 200);
     });
 
     const unsubscribe = messaging().onMessage(async remoteMessage => {
@@ -171,33 +174,48 @@ const index = (props) => {
     socket.on("reminder_event_for_delegate", (data) => handleSocketEvents(data, "reminder_event_for_delegate"))
     socket.on("daily_dynamite_reminder_event", (data) => handleSocketEvents(data, "daily_dynamite_reminder_event"))
     socket.on("dynamite_streak_event", (data) => handleSocketEvents(data, "dynamite_streak_event"))
+    socket.on("send_chat_message_receiver", (data) => handleSocketEvents(data, "send_chat_message_receiver"));
+    socket.on("delete_chat_message_receiver", (data) => handleSocketEvents(data, "delete_chat_message_receiver"));
   }
 
   const disbaleSocketEvents = () => {
-    socket.off("new_notification_receiver_for_delegate");
-    socket.off("goal_stetement_event_reciever");
-    socket.off("new_notification_receiver");
-    socket.off("reminder_event_for_delegate");
-    socket.off("daily_dynamite_reminder_event");
-    socket.off("dynamite_streak_event");
+    socket.off("new_notification_receiver_for_delegate", handleSocketEvents);
+    socket.off("goal_stetement_event_reciever", handleSocketEvents);
+    socket.off("new_notification_receiver", handleSocketEvents);
+    socket.off("reminder_event_for_delegate", handleSocketEvents);
+    socket.off("daily_dynamite_reminder_event", handleSocketEvents);
+    socket.off("dynamite_streak_event", handleSocketEvents);
+    socket.on("send_chat_message_receiver", handleSocketEvents);
+    socket.on("delete_chat_message_receiver", handleSocketEvents);
   }
 
-  const handleSocketEvents = (data, event) => {
+  const handleSocketEvents = async (data, event) => {
+    console.log(data, event)
     if (data?.action_response?.unread_notification_count != undefined) {
       if (typeof (data?.action_response?.unread_notification_count) == "number") {
-        dispatch(setUnReadCount(data?.action_response?.unread_notification_count))
+        setCount(data?.action_response?.unread_notification_count)
       } else if (Array.isArray(data?.action_response?.unread_notification_count)) {
         let count = data?.action_response?.unread_notification_count.find(x => x?._id == user?._id);
         if (count) {
-          dispatch(setUnReadCount(count))
+          setCount(count)
         }
 
       }
     } if (data?.data?.action_response?.unread_notification_count != undefined && typeof (data?.data?.action_response?.unread_notification_count) == "number") {
-      dispatch(setUnReadCount(data?.data?.action_response?.unread_notification_count))
+      setCount(data?.data?.action_response?.unread_notification_count)
     } else if (data?.unread_notification_count != undefined && typeof (data?.unread_notification_count) == "number") {
-      dispatch(setUnReadCount(data?.unread_notification_count))
+      setCount(data?.unread_notification_count)
+    } else {
+      let res = await INIT_WITH_TOKEN({ navigation, token });
+      if (res.code == 200) {
+        setCount(res?.unread_notification_count)
+      }
     }
+  }
+
+  const setCount = (count) => {
+    notifee.setBadgeCount(count)
+    dispatch(setUnReadCount(count))
   }
 
   const toggleCollapse = (item) => {

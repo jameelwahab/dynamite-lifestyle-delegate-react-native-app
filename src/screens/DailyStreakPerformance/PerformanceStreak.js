@@ -22,6 +22,7 @@ import DateTimePicker from 'react-native-modal-datetime-picker'
 import showToast from '../../functions/showToast'
 import { convertTimezone } from '../../functions/convertTime'
 import { selectTimeZone } from '../../redux/reducers/timezoneSlice'
+import TimePicker from '../../components/TimePicker'
 
 const PerformanceStreak = ({ navigation, route }) => {
   const { key } = route?.params
@@ -170,7 +171,7 @@ const PerformanceStreak = ({ navigation, route }) => {
       </View>
     )
   }
-  
+
   const sliderView = (label, stateKey) => {
     return (
       <View style={__styles.sliderView}>
@@ -283,7 +284,6 @@ const PerformanceStreak = ({ navigation, route }) => {
           setIsTimerPickerVisible(false)
         }}
         mode="time"
-
       />
 
       <OptionModal
@@ -293,14 +293,14 @@ const PerformanceStreak = ({ navigation, route }) => {
         multiple
         noIcon
         checkSelected={(item) => {
-          return !!reminder.days.find(x => Number(x) == Number(item.key))
+          return reminder.days.find(x => Number(x) == Number(item.key)) > -1
         }}
         onSelected={(item) => {
           let index = reminder.days.findIndex(x => String(x) == String(item.key));
           if (index > -1) {
             reminder.days.splice(index, 1);
           } else {
-            reminder.days.push(item.key);
+            reminder.days.push(item.value);
           }
           setReminder({ ...reminder, days: [...reminder.days] })
         }}
@@ -369,32 +369,39 @@ const __styles = StyleSheet.create({
 const daysList = [
   {
     key: '0',
-    title: "Sunday"
+    title: "Sunday",
+    value: 0,
   },
   {
     key: '1',
-    title: "Monday"
+    title: "Monday",
+    value: 1,
   },
   {
     key: '2',
-    title: "Tuesday"
+    title: "Tuesday",
+    value: 2,
   },
 
   {
     key: '3',
-    title: "Wednesday"
+    title: "Wednesday",
+    value: 3,
   },
   {
     key: '4',
-    title: "Thursday"
+    title: "Thursday",
+    value: 4,
   },
   {
     key: '5',
-    title: "Friday"
+    title: "Friday",
+    value: 5,
   },
   {
     key: '6',
-    title: "Saturday"
+    title: "Saturday",
+    value: 6,
   },
 ]
 

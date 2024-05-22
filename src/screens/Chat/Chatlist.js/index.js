@@ -149,10 +149,10 @@ const ChatList = ({ navigation }) => {
   const socketEvents = () => {
     socket.on("send_chat_message_event_for_sender", newMsgReceive);
     socket.on("send_chat_message_receiver", newMsgReceive);
+    socket.on("delete_chat_message_receiver", deleteMessageReceiver);
     socket.on("update_chat_message_event_for_sender", editMessageReceiver);
     socket.on("update_chat_message_receiver", editMessageReceiver);
     socket.on("delete_chat_message_event_for_sender", deleteMessageReceiver);
-    socket.on("delete_chat_message_receiver", deleteMessageReceiver);
     socket.on("member_online", memberOnlineSignal);
     socket.on("member_offline", memberOfflineSignal);
     socket.on("consultant_offline", memberOfflineSignal);

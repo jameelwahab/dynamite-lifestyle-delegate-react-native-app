@@ -244,7 +244,18 @@ const NotificationList = ({ navigation, route }) => {
           }
         }],
       })
-
+    } else if (notification_type == "appointment_booking") {
+      navigation.reset({
+        routes: [{
+          name: routes?.bookingNavigator,
+          state: {
+            routes: [
+              {
+                name: routes.bookingList,
+              }],
+          }
+        }],
+      })
     }
 
   }
@@ -297,7 +308,7 @@ const NotificationList = ({ navigation, route }) => {
   const deleteSingal = async (id) => {
     let res = await DELETE_SINGAL_NOTIFICATION({ token, navigation, id })
     if (res.code == 200) {
-      showToast({ title: res.message, type: "success" });
+      showToast({ title: "Notification has been deleted successfully", type: "success" });
       let index = list.findIndex(x => x._id == id);
       let temp_total = total;
       if (index > -1) {
@@ -331,7 +342,7 @@ const NotificationList = ({ navigation, route }) => {
   const deleteAllNotification = async () => {
     let res = await DELETE_ALL_NOTIFICATION({ token, navigation })
     if (res.code == 200) {
-      showToast({ title: res.message, type: "success" });
+      showToast({ title: "All Notifications has been deleted successfully", type: "success" });
       setList([]);
       setTotal(0)
     }
@@ -394,23 +405,25 @@ const NotificationList = ({ navigation, route }) => {
             subTitle={`You have ${total} unread messages`}
           />
         </View>
+        {list.length > 0 &&
+          <>
+            {total > 0 &&
+              <TouchableOpacity
+                onPress={markAllRead}
+                style={__styles.btn}>
+                {icons.seen(colors.primary, 18)}
+              </TouchableOpacity>}
 
-        <TouchableOpacity
-          onPress={markAllRead}
-          style={__styles.btn}>
-          {icons.seen(colors.primary, 18)}
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={() => setConfirmationModal({
-            isVisible: true,
-            title: "Are you sure you want to remove all notifications?",
-            type: "delete-all"
-          })}
-          style={__styles.btn}>
-          {icons.trashFilled(colors.primary, 15)}
-        </TouchableOpacity>
-
+            <TouchableOpacity
+              onPress={() => setConfirmationModal({
+                isVisible: true,
+                title: "Are you sure you want to remove all notifications?",
+                type: "delete-all"
+              })}
+              style={__styles.btn}>
+              {icons.trashFilled(colors.primary, 15)}
+            </TouchableOpacity>
+          </>}
       </View>
     )
   }

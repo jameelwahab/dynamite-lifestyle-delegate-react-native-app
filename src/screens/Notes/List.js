@@ -103,10 +103,8 @@ const List = ({ ticket, user, timezone }) => {
   }
 
   return (
-    <RootView hideHeader >
-      
+    <RootView noPadding hideHeader>
       <View style={{ flex: 1, marginHorizontal: -10 }}>
-
 
         <View style={{ flex: 1, marginTop: 10, }}>
           <FlatList

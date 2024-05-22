@@ -49,6 +49,7 @@ import StackSalesTeam from "../NestedStacks/StackSalesTeam";
 import StackSalesPendingCommission from "../NestedStacks/StackSalesPendingCommission";
 import StackSalesPaidCommission from "../NestedStacks/StackSalesPaidCommission";
 import StackSalesTeamTransaction from "../NestedStacks/StackSalesTeamTransaction";
+import StackCalendarGroups from "../NestedStacks/StackCalendarGroups";
 
 
 
@@ -332,6 +333,14 @@ export const ParentComponents = {
       key: "aadbd7a3-91c1-40dd-bf24-532fc288d265555"
     }
   },
+  "79fe1cf4-6cd7-42d0-a855-3fcf5fec045a": {
+    key: null,
+    component: null,
+    params: {
+      value: "calendar",
+      key: "79fe1cf4-6cd7-42d0-a855-3fcf5fec045a"
+    }
+  },
   //? Sales Tab
   // "aadbd7a3-91c1-499dd-bf24-7846756776677887": {
   //   key: null,
@@ -557,6 +566,18 @@ export const ChildComponents = {
       module: "self_image", type: "responded"
     }
   },
+
+  "62c5554e-72cb-4876-98b5-889ecb5e8db7": {
+    key: routes.calendarGroupsNavigator,
+    component: StackCalendarGroups,
+    params: {
+      value: "groups", parentValue: "calendar",
+      key: "62c5554e-72cb-4876-98b5-889ecb5e8db7",
+      parentKey: "79fe1cf4-6cd7-42d0-a855-3fcf5fec045a",
+    }
+  },
+
+
   "hhfhhfhfhf-31d9-4154-b3a9-81619fd1b49c": {
     key: routes.salesTeamNavigator,
     component: StackSalesTeam,

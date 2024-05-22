@@ -207,7 +207,7 @@ const AddTicket = ({ navigation, route }) => {
         />
 
 
-        <MyText isLabel >{"Attachments (1000X670)"}</MyText>
+        <MyText isLabel >{"Image (1000X670)"}</MyText>
       </View>
     )
   }

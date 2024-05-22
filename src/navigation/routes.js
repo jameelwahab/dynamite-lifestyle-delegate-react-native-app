@@ -49,6 +49,9 @@ const routes = {
   quaterQuestionNavigator: "QUATER_QUESTION_NAVIGATOR",
   accountabilityTrackerNavigator: "ACCOUNTABILITY_TRACKER_NAVIGATOR",
   delegateReportNavigator: "DELEGATE_REPORT_NAVIGATOR",
+  calendarGroupsNavigator: "CALENDAR_GROUPS_NAVIGATOR",
+  calendarEventNavigator: "CALENDAR_EVENTS_NAVIGATOR",
+  delegateCalendarEventNavigator: "DELEGATE_CALENDAR_EVENTS_NAVIGATOR",
   salesTeamNavigator: "SALES_TEAM_NAVIGATOR",
   salesPendingCommissionsNavigator: "SALE_PENDING_COMMISSION_NAVIGATOR",
   salesPaidCommissionsNavigator: "SALE_PAID_COMMISSION_NAVIGATOR",
@@ -290,9 +293,14 @@ const routes = {
   //? Notifications
   notificationList: "NOTIFICATION_LIST",
 
+  //? Calendar Groups
+  calendarGroupList: "CALENDAR_GROUP_LIST_SCREEN",
+  calendarGroupAddEdit: "CALENDAR_GROUP_ADD_EDIT_SCREEN",
+  calendarGroupDetail: "CALENDAR_GROUP_DETAIL_SCREEN",
+
   //? Sales Team
   salesTeamListing: "SALES_TEAM_LISTING_SCREEN",
-  salesTeamAddEdit:"SALES_TEAM_ADD_EDIT_SCREEN",
+  salesTeamAddEdit: "SALES_TEAM_ADD_EDIT_SCREEN",
 
   //? Sales Paid
   salePidCommissionScreen: "SALES_PAID_COMMISSIONMENT_SCREEN",

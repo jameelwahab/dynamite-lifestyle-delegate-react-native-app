@@ -32,6 +32,7 @@ import showToast from '../../functions/showToast'
 import { selectTimeZone } from '../../redux/reducers/timezoneSlice'
 import ConfirmationModal from '../../components/ConfirmationModal'
 import routes from '../../navigation/routes'
+import { convertTimezone } from '../../functions/convertTime'
 
 const getNewStatmentObj = () => {
   return {
@@ -196,7 +197,7 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
     if (isMorning) {
       body = { daily_dynamite_morning_reminder_time: morningReminder }
     } else {
-      body = { daily_dynamite_evening_reminder_time: morningReminder }
+      body = { daily_dynamite_evening_reminder_time: eveningReminder }
     }
     let res = await SET_ACCOUNTABILITY_TRACKER_REMINDER({ navigation, token, body });
     if (res.code == 200) {
@@ -308,7 +309,7 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
       if (index > -1) {
         morningReminder.days.splice(index, 1);
       } else {
-        morningReminder.days.push(item.key);
+        morningReminder.days.push(item.value);
       }
       setMorningReminder({ ...morningReminder, days: [...morningReminder.days] })
     } else if (reminderOptions?.key == "eveningReminder") {
@@ -316,7 +317,7 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
       if (index > -1) {
         eveningReminder.days.splice(index, 1);
       } else {
-        eveningReminder.days.push(item.key);
+        eveningReminder.days.push(item.value);
       }
       setEveningReminder({ ...eveningReminder, days: [...eveningReminder.days] })
     }
@@ -400,7 +401,7 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
               icon={icons.clock}
               value={moment(morningReminder.time, "HH:mm").format(dateTimeFormat.time)}
               // onPress={() => setReminderTimerPicker({ isVisible: true, key: "morningReminder" })}
-              onPress={() => ref_timePicker?.current?.openModal(eveningReminder?.time, "morningReminder")}
+              onPress={() => ref_timePicker?.current?.openModal(morningReminder?.time, "morningReminder")}
             />
           </View>
 
@@ -719,9 +720,9 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
         noIcon
         checkSelected={(item) => {
           if (reminderOptions?.key == "morningReminder") {
-            return !!morningReminder.days.find(x => Number(x) == Number(item.key))
+            return morningReminder.days.findIndex(x => Number(x) == Number(item.value)) > -1
           } else if (reminderOptions?.key == "eveningReminder") {
-            return !!eveningReminder.days.find(x => Number(x) == Number(item.key))
+            return eveningReminder.days.findIndex(x => Number(x) == Number(item.value)) > -1
           }
         }}
 
@@ -797,32 +798,39 @@ const optionsList = [
 const daysList = [
   {
     key: '0',
-    title: "Sunday"
+    title: "Sunday",
+    value: 0,
   },
   {
     key: '1',
-    title: "Monday"
+    title: "Monday",
+    value: 1,
   },
   {
     key: '2',
-    title: "Tuesday"
+    title: "Tuesday",
+    value: 2,
   },
 
   {
     key: '3',
-    title: "Wednesday"
+    title: "Wednesday",
+    value: 3,
   },
   {
     key: '4',
-    title: "Thursday"
+    title: "Thursday",
+    value: 4,
   },
   {
     key: '5',
-    title: "Friday"
+    title: "Friday",
+    value: 5,
   },
   {
     key: '6',
-    title: "Saturday"
+    title: "Saturday",
+    value: 6,
   },
 ]
 

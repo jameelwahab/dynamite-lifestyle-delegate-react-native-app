@@ -121,7 +121,7 @@ const Detail = ({ navigation, route }) => {
 
             </View>
             <View style={{ margin: 10 }}>
-              <MyText isLabel>Reson to Solve*</MyText>
+              <MyText isLabel>Reason to Solve*</MyText>
               <View>
                 {optionView("Answered")}
                 {optionView("Solved")}

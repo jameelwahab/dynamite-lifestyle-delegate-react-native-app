@@ -458,7 +458,7 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
 
             </View>
             <View style={{ margin: 10 }}>
-              <MyText isLabel>Reson TO Solve*</MyText>
+              <MyText isLabel>Reason To Solve*</MyText>
               <View>
                 {optionView("Answered")}
                 {optionView("Solved")}

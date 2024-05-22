@@ -23,6 +23,7 @@ import showToast from '../../../functions/showToast'
 import TitleView from '../../../components/TitleView'
 import { selectNavbar } from '../../../redux/reducers/navbarSlice'
 import MyChip from '../../../components/MyChip'
+import { dateTimeFormat } from '../../../utilities/constants'
 
 const List = ({ navigation, route }) => {
   const { key, parentKey, } = route?.params
@@ -100,11 +101,11 @@ const List = ({ navigation, route }) => {
     } else if (opt.key == "delete") {
       setTimeout(() => {
         setConfirmation({ title: "Are you sure you want to delete this Ticket?", action: "delete", isModalVisible: true, selected: ticket });
-      }, 400);
+      }, 500);
     } else if (opt.key == "resolve") {
       setTimeout(() => {
         setConfirmation({ title: "Are you sure you want to mark this ticket as resolved?", action: "resolve", isModalVisible: true, selected: ticket });
-      }, 400);
+      }, 500);
     }
 
 
@@ -250,7 +251,7 @@ const List = ({ navigation, route }) => {
               <MyText numberOfLines={2} fontSize={16} type='medium' style={{ flex: 1 }} >{item?.subject}</MyText>
             </View>
             <MyText fontSize={10} >
-              {convertTimezone(item.createdAt, timezone).fromNow()}
+              {convertTimezone(item.support_ticket_date, timezone).fromNow()}
             </MyText>
             <View style={{ marginRight: -20, marginTop: -4 }}>
               <MenuButton

@@ -12,6 +12,7 @@ const RootView = ({
   rightButtonIcon = null,
   rightButtonOnPress = null,
   hideHeader = false,
+  noPadding = false,
   showBackButtonOnTop = false,
   hideBackBottomButton = false,
   hideNotificaitonIcon = false,
@@ -26,7 +27,7 @@ const RootView = ({
   const { top, bottom, left, right } = useSafeAreaInsets();
   return (
     <View style={[__RootView.root, !!backgroundColor && { backgroundColor },
-    { paddingTop: top, paddingBottom: bottom, paddingLeft: left, paddingRight: right }
+    !noPadding && { paddingTop: top, paddingBottom: bottom, paddingLeft: left, paddingRight: right }
     ]}>
       <StatusBar backgroundColor={!!backgroundColor ? backgroundColor : colors.darkSecondary} barStyle={"light-content"} />
       {!hideHeader &&
