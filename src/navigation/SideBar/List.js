@@ -45,6 +45,10 @@ import StackBroadcast from "../NestedStacks/StackBroadcastChat";
 import StackQuaterQuestions from "../NestedStacks/StackQuaterQuestions";
 import StackAcountabilityTracker from "../NestedStacks/StackAcountabilityTracker";
 import StackDelegateReport from "../NestedStacks/StackDelegateReport";
+import StackSalesTeam from "../NestedStacks/StackSalesTeam";
+import StackSalesPendingCommission from "../NestedStacks/StackSalesPendingCommission";
+import StackSalesPaidCommission from "../NestedStacks/StackSalesPaidCommission";
+import StackSalesTeamTransaction from "../NestedStacks/StackSalesTeamTransaction";
 
 
 
@@ -328,6 +332,15 @@ export const ParentComponents = {
       key: "aadbd7a3-91c1-40dd-bf24-532fc288d265555"
     }
   },
+  //? Sales Tab
+  // "aadbd7a3-91c1-499dd-bf24-7846756776677887": {
+  //   key: null,
+  //   component: null,
+  //   params: {
+  //     value: "/sales",
+  //     key: "aadbd7a3-91c1-499dd-bf24-7846756776677887"
+  //   }
+  // },
 }
 
 export const ChildComponents = {
@@ -544,4 +557,42 @@ export const ChildComponents = {
       module: "self_image", type: "responded"
     }
   },
+  "hhfhhfhfhf-31d9-4154-b3a9-81619fd1b49c": {
+    key: routes.salesTeamNavigator,
+    component: StackSalesTeam,
+    params: {
+      value: "teams", parentValue: "/sales",
+      key: "hhfhhfhfhf-31d9-4154-b3a9-81619fd1b49c",
+      parentKey: "aadbd7a3-91c1-499dd-bf24-7846756776677887",
+    }
+  },
+  "hhfhhfhfhf-31d9-4154-b3a9-81619fd1b49a": {
+    key: routes.salesPendingCommissionsNavigator,
+    component: StackSalesPendingCommission,
+    params: {
+      value: "pending_commission", parentValue: "/sales",
+      key: "hhfhhfhfhf-31d9-4154-b3a9-81619fd1b49a",
+      parentKey: "aadbd7a3-91c1-499dd-bf24-7846756776677887",
+    }
+  },
+  "hhfhhfhfhf-31d9-4154-b3a9-81619fd1b49f": {
+    key: routes.salesPaidCommissionsNavigator,
+    component: StackSalesPaidCommission,
+    params: {
+      value: "paid_commission", parentValue: "/sales",
+      key: "hhfhhfhfhf-31d9-4154-b3a9-81619fd1b49f",
+      parentKey: "aadbd7a3-91c1-499dd-bf24-7846756776677887",
+    }
+  },
+  "hhfhhfhfhf-31d9-4154-b3a9-81619fd1b49g": {
+    key: routes.salesTeamTransactionsNavigator,
+    component: StackSalesTeamTransaction,
+    params: {
+      value: "sales_team_transactions", parentValue: "/sales",
+      key: "hhfhhfhfhf-31d9-4154-b3a9-81619fd1b49g",
+      parentKey: "aadbd7a3-91c1-499dd-bf24-7846756776677887",
+    }
+  },
+
+
 }

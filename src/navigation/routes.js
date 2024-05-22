@@ -49,6 +49,10 @@ const routes = {
   quaterQuestionNavigator: "QUATER_QUESTION_NAVIGATOR",
   accountabilityTrackerNavigator: "ACCOUNTABILITY_TRACKER_NAVIGATOR",
   delegateReportNavigator: "DELEGATE_REPORT_NAVIGATOR",
+  salesTeamNavigator: "SALES_TEAM_NAVIGATOR",
+  salesPendingCommissionsNavigator: "SALE_PENDING_COMMISSION_NAVIGATOR",
+  salesPaidCommissionsNavigator: "SALE_PAID_COMMISSION_NAVIGATOR",
+  salesTeamTransactionsNavigator: "SALES_TEAM_TRANSACTION_NAVIGATOR",
 
   //! ///    Screens'
 
@@ -285,6 +289,20 @@ const routes = {
 
   //? Notifications
   notificationList: "NOTIFICATION_LIST",
+
+  //? Sales Team
+  salesTeamListing: "SALES_TEAM_LISTING_SCREEN",
+  salesTeamAddEdit:"SALES_TEAM_ADD_EDIT_SCREEN",
+
+  //? Sales Paid
+  salePidCommissionScreen: "SALES_PAID_COMMISSIONMENT_SCREEN",
+
+  //? Sales Pending
+  salePendingCommissionScreen: "SALES_PENDING_COMMISSIONMENT_SCREEN",
+
+  //? Sales Team Transactions
+  salesTeamTransactionsListingScreen: "SALES_TEAM_TRANSACTION_LISTING_SCREEN",
+  salesTeamTransactionsAddEditScreen: "SALES_TEAM_TRANSACTION_ADD_EDIT_SCREEN",
 }
 
 

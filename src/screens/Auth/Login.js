@@ -46,12 +46,7 @@ const Login = ({ navigation }) => {
 
   const onMainScreen = async () => {
 
-    let fcm_token = "";
-    try {
-      fcm_token = await messaging().getToken();
-    } catch (err) {
-      console.log("fcm_token error", err)
-    }
+   
     if (email.trim() == "") {
       showToast({ body: "Please enter your email" });
     } else if (!isEmailValid(email.trim())) {
@@ -60,7 +55,12 @@ const Login = ({ navigation }) => {
       showToast({ body: "Please enter password" });
     } else {
       setLoader(true);
-
+      let fcm_token = "";
+      try {
+        fcm_token = await messaging().getToken();
+      } catch (err) {
+        console.log("fcm_token error", err)
+      }
       let fd = new FormData();
       fd.append("fcm_token", fcm_token)
       fd.append("platform", "app")
