@@ -22,7 +22,7 @@ export const icons = {
   photo: require("../assets/icons/photo.png"),
   photo1: require("../assets/icons/genericImage.png"),
   refresh: require('../assets/icons/reload.png'),
-  send: require('../assets/icons/send.png'),
+  send1: require('../assets/icons/send.png'),
   tick: require('../assets/icons/tick.png'),
   emptyBox: require('../assets/icons/empty-box.png'),
   textEdit: require('../assets/icons/textEdit.png'),

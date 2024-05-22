@@ -16,7 +16,7 @@ import EmptyView from '../../../components/EmptyView';
 import MyImage from '../../../components/MyImage';
 import { Calendar } from 'react-native-calendars';
 import { fonts } from '../../../utilities/fonts';
-import { TransparentButton } from '../../../components/MyButton';
+import { MenuButton, TransparentButton } from '../../../components/MyButton';
 import Toast from 'react-native-toast-message';
 import showToast from '../../../functions/showToast';
 import UserImage from '../../../components/UserImage';
@@ -529,7 +529,7 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
     return (
       <TouchableHighlight
         underlayColor={colors.secondary}
-        delayLongPress={400}
+        // delayLongPress={400}
         onPress={() => {
           navigation.navigate(routes.supportTicketDeatail, {
             ticket: item,
@@ -537,9 +537,9 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
             route: route
           })
         }}
-        onLongPress={() => setIsOptionModal({ isVisible: true, for: item })}
+        // onLongPress={() => setIsOptionModal({ isVisible: true, for: item })}
 
-        style={{ padding: 20, flexDirection: "row" }} >
+        style={{ paddingVertical: 20, paddingLeft: 10, paddingRight: 10, flexDirection: "row" }} >
         <>
           <View style={{}}>
             <UserImage
@@ -549,12 +549,20 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
             />
 
           </View>
-          <View style={{ flex: 1, marginHorizontal: 10, }}>
-            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-              <MyText fontSize={14} type='medium' >{!!item?.member?.first_name ? item?.member?.first_name + " " + item?.member?.last_name : "N/A"}</MyText>
-              <MyText fontSize={10} type='light'>{convertTimezone(item.last_action_date, timezone).fromNow()}
-              </MyText>
-
+          <View style={{ flex: 1, marginLeft: 10, }}>
+            <View style={{ flexDirection: "row", alignItems: "center", }}>
+              <View style={{ flex: 1 }}>
+                <MyText fontSize={14} type='medium' >{!!item?.member?.first_name ? item?.member?.first_name + " " + item?.member?.last_name : "N/A"}</MyText>
+              </View>
+              <View style={{ flexDirection: "row", alignItems: "center", }}>
+                <MyText fontSize={10} type='light'>{convertTimezone(item.last_action_date, timezone).fromNow()}
+                </MyText>
+                <MenuButton
+                  // backgroundColor={colors.transparent}
+                  size={22}
+                  onPress={() => setIsOptionModal({ isVisible: true, for: item })}
+                />
+              </View>
             </View>
             <MyText style={{ marginTop: 3 }} fontSize={12} >{item?.subject}</MyText>
             <MyText style={{ marginTop: 3 }} numberOfLines={1} color={colors.lightText} fontSize={12} >
@@ -576,7 +584,7 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
       {departmentModal()}
       {CalendarModal()}
       {ConfirmationModal()}
-      <View style={{ flex: 1,  borderRadius: 20 }}>
+      <View style={{ flex: 1, borderRadius: 20 }}>
         <FlatList
           data={list}
           indicatorStyle="white"
@@ -802,7 +810,7 @@ const options = [{
 {
   title: "Send Reminder",
   key: "send_reminder",
-  icon: icons.send,
+  icon: icons.send1,
   routes: {
     support_ticket: {
       waiting: false,

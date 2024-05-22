@@ -7,7 +7,7 @@ import { selectUser } from '../../../redux/reducers/userSlice'
 import MyTouchableInput from '../../../components/MyTouchableInput'
 import { icons } from '../../../utilities/icons'
 import { colors } from '../../../utilities/colors'
-import { MyButton } from '../../../components/MyButton'
+import { MyButton, MyClearButton } from '../../../components/MyButton'
 import CalendarModal from '../../../components/CalendarModal'
 import moment, { months } from 'moment'
 import { dateTimeFormat } from '../../../utilities/constants'
@@ -101,10 +101,8 @@ const Filter = ({ navigation, route }) => {
 
         <View style={{ flexDirection: "row", marginTop: 10 }}>
           {/* {(!!appliedFilters?.createdFor) ? */}
-          <MyButton
-            style={[__styles.clearBtn, __styles.btn]}
-            textStyle={__styles.clearBtnText}
-            invert
+          <MyClearButton
+            style={{ flex: 1, marginRight: 10 }}
             title='Clear Filter'
             onPress={onClearButtonPress}
           />
@@ -144,15 +142,13 @@ const __styles = StyleSheet.create({
     flex: 1
   },
   clearBtnText: {
-    color: colors.delete
+    color: colors.heart
   },
   btn: {
-    flex: 1
+    flex: 1,
   },
   clearBtn: {
-    // marginTop: 20,
-    borderColor: colors.delete,
-    backgroundColor: colors.delete + "22",
+    flex: 1,
     marginRight: 10
   },
 })

@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import RootView from '../../components/RootView'
 import MyText from '../../components/MyText'
 import MyTouchableInput from '../../components/MyTouchableInput'
-import { MyButton, TransparentButton } from '../../components/MyButton'
+import { MyButton, MyClearButton, TransparentButton } from '../../components/MyButton'
 import { icons } from '../../utilities/icons'
 import { colors } from '../../utilities/colors'
 import moment from 'moment'
@@ -165,19 +165,18 @@ const FilterScreen = ({ navigation, route }) => {
             }}
           />
 
-          <View style={{ marginTop: 10 }}>
-            <MyButton
-              title='Submit'
-              onPress={filterAction}
-            />
-          </View>
-
-          <View style={{ marginTop: 15 }}>
-            <MyButton
-              invert
+          <View style={{ flexDirection: "row", marginTop: 10 }}>
+            <MyClearButton
+              style={{ flex: 1, marginRight: 10 }}
               title='Clear Filter'
               onPress={clearfilterAction}
             />
+            <View style={{ flex: 1 }}>
+              <MyButton
+                title='Submit'
+                onPress={filterAction}
+              />
+            </View>
           </View>
         </ScrollView>
       </View>

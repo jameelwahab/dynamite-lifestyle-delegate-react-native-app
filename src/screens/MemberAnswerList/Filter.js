@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import RootView from '../../components/RootView'
 import MyTouchableInput from '../../components/MyTouchableInput'
 import OptionModal from '../../components/OptionModal'
-import { MyButton } from '../../components/MyButton'
+import { MyButton, MyClearButton } from '../../components/MyButton'
 import routes from '../../navigation/routes'
 import { colors } from '../../utilities/colors'
 
@@ -72,15 +72,12 @@ const Filter = ({ navigation, route }) => {
 
 
         <View style={{ flexDirection: "row", }}>
-          {(!!appliedFilters?.createdFor) ?
-            <MyButton
-              style={[__styles.clearBtn, __styles.btn]}
-              textStyle={__styles.clearBtnText}
-              invert
-              title='Clear Filter'
-              onPress={onClear}
-            /> :
-            <View style={[{ marginRight: 11 }, __styles.btn]} />}
+
+          <MyClearButton
+            style={{ flex: 1, marginRight: 10 }}
+            title='Clear Filter'
+            onPress={onClear}
+          />
 
 
           <MyButton

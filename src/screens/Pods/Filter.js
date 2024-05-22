@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import RootView from '../../components/RootView'
 import MyText from '../../components/MyText'
 import MyTouchableInput from '../../components/MyTouchableInput'
-import { MyButton } from '../../components/MyButton'
+import { MyButton, MyClearButton } from '../../components/MyButton'
 import { colors } from '../../utilities/colors'
 import OptionModal from '../../components/OptionModal'
 import routes from '../../navigation/routes'
@@ -48,10 +48,8 @@ const Filter = ({ navigation, route }) => {
 
 
         <View style={{ flexDirection: "row", marginTop: 10 }}>
-          <MyButton
-            style={[__styles.clearBtn, __styles.btn]}
-            textStyle={__styles.clearBtnText}
-            invert
+          <MyClearButton
+            style={{ flex: 1, marginRight: 10 }}
             title='Clear Filter'
             onPress={onClearButtonPress}
           />

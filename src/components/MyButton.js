@@ -35,6 +35,34 @@ const MyButton = ({
 }
 
 
+const MyClearButton = ({
+  title = "",
+  onPress = () => { },
+  style = {},
+  textStyle = {},
+  leftIcon = null,
+  noSpace = false,
+  noCapitalize = false,
+}) => {
+  return (
+    <TouchableOpacity
+      style={[__MyButtonStyles.rootInvertView, style]}
+      onPress={onPress}>
+      {!!leftIcon &&
+        <View style={__MyButtonStyles.iconView}>
+          {typeof (leftIcon) == "function" ? leftIcon() :
+            <Image source={leftIcon} style={{ height: 17, width: 17, tintColor: colors.primary }} />}
+        </View>}
+      <Text style={[__MyButtonStyles.invertTitleText, textStyle,
+      { textTransform: noCapitalize ? "none" : "uppercase" }
+      ]}>{title}</Text>
+      {!!leftIcon && noSpace == false &&
+        <View style={__MyButtonStyles.iconView} />}
+    </TouchableOpacity>
+  )
+}
+
+
 const TransparentButton = ({
   title = "",
   icon = () => { },
@@ -53,14 +81,14 @@ const TransparentButton = ({
   )
 }
 
-const MenuButton = ({ size = 25, onPress = () => { }, style, touchgap = 15 }) => {
+const MenuButton = ({ backgroundColor = colors.lightPrimary3, size = 25, onPress = () => { }, style, touchgap = 15 }) => {
   return (
     <TouchableOpacity
       onPress={onPress}
       hitSlop={{ top: touchgap, left: touchgap, right: touchgap, bottom: touchgap }}
       style={[{
         height: size, width: size, borderRadius: size / 2, alignItems: "center", justifyContent: "center",
-        backgroundColor: colors.lightPrimary3,
+        backgroundColor: backgroundColor,
         marginHorizontal: 5,
       }, style]}
 
@@ -70,7 +98,7 @@ const MenuButton = ({ size = 25, onPress = () => { }, style, touchgap = 15 }) =>
   )
 }
 
-export { MyButton, TransparentButton, MenuButton }
+export { MyButton, TransparentButton, MenuButton, MyClearButton }
 
 const __MyButtonStyles = StyleSheet.create({
   rootView: {
@@ -95,7 +123,7 @@ const __MyButtonStyles = StyleSheet.create({
     fontSize: 16,
     textTransform: "uppercase"
   },
-  _rootInvertView: {
+  rootInvertView: {
     height: 45,
     backgroundColor: colors.darkSecondary,
     borderWidth: 1,
@@ -105,12 +133,12 @@ const __MyButtonStyles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
   },
-  get rootInvertView() {
-    return this._rootInvertView
-  },
-  set rootInvertView(value) {
-    this._rootInvertView = value
-  },
+  // get rootInvertView() {
+  //   return this._rootInvertView
+  // },
+  // set rootInvertView(value) {
+  //   this._rootInvertView = value
+  // },
   invertTitleText: {
     color: colors.primary,
     fontFamily: fonts.medium,

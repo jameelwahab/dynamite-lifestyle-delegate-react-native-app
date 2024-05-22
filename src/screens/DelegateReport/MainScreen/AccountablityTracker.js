@@ -5,6 +5,7 @@ import { colors } from '../../../utilities/colors'
 import { dateTimeFormat } from '../../../utilities/constants'
 import moment from 'moment'
 import routes from '../../../navigation/routes'
+import EmptyView from '../../../components/EmptyView'
 
 const AccountablityTracker = ({ data, navigation, user }) => {
   if (!!data) {
@@ -12,23 +13,32 @@ const AccountablityTracker = ({ data, navigation, user }) => {
       <View style={__styles.rootView} >
         <MyText fontSize={14} color={colors.primary} >
           {`Accountability Analysis from ${data?.date_from} to ${data?.date_to}`}</MyText>
+        <>
+          {!!data?.daily_dynamite && data?.daily_dynamite?.map((item, index) => (
+            <Pressable
+              onPress={() => navigation.navigate(routes.delegateReportAccountablityTrackerScreen, { item, user })}
+              key={item?._id} style={__styles.activityView} >
+              <View style={__styles.activityRow}>
+                <MyText>{item?.date}</MyText>
+                <View style={__styles.activityNestedRow}>
+                  <MyText>{moment(item?.date_time, "YYYY-MM-DD HH:mm").format(dateTimeFormat.time)}</MyText>
+                </View>
 
-        {!!data?.daily_dynamite && data?.daily_dynamite?.map((item, index) => (
-          <Pressable
-            onPress={() => navigation.navigate(routes.delegateReportAccountablityTrackerScreen, {item,user})} 
-            key={item?._id} style={__styles.activityView} >
-            <View style={__styles.activityRow}>
-              <MyText>{item?.date}</MyText>
-              <View style={__styles.activityNestedRow}>
-                <MyText>{moment(item?.date_time, "YYYY-MM-DD HH:mm").format(dateTimeFormat.time)}</MyText>
               </View>
+              <View style={{ marginTop: 10 }}>
+                <MyText>{item?.statement_array[0]?.option}</MyText>
+              </View>
+            </Pressable>
+          ))}
+        </>
+        <>
+          {!!data?.daily_dynamite && data?.daily_dynamite.length <= 0 && (
+            <View style={{ height: 150 }}>
+              <EmptyView />
+            </View>
+          )}
 
-            </View>
-            <View style={{ marginTop: 10 }}>
-              <MyText>{item?.statement_array[0]?.option}</MyText>
-            </View>
-          </Pressable>
-        ))}
+        </>
       </View>
     )
   } else return null

@@ -308,8 +308,8 @@ const ProgressList = ({ navigation, route }) => {
 
             <TouchableOpacity
               onPress={clearFilter}
-              style={{ marginLeft: 5, marginTop: 2, marginRight: 10, borderWidth: 1, borderColor: colors.delete, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 5, backgroundColor: colors.heart + "33" }}>
-              <MyText color={colors.delete}>{"Clear Filter"}</MyText>
+              style={{ marginRight: 10, borderWidth: 1, borderColor: colors.primary, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 5, backgroundColor: colors.primary + "22", alignSelf: "flex-end",marginLeft:5 }}>
+              <MyText color={colors.primary}>{"Clear Filter"}</MyText>
             </TouchableOpacity>
 
 

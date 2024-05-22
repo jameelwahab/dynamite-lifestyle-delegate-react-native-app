@@ -211,7 +211,7 @@ const SalesPerformanceDelegate = ({ navigation, route }) => {
     });
 
 
-    console.log(max, "max")
+
     dataset.push({ data: [max + 50], withDots: false, })
     dataset2.push({ data: [max + 50], withDots: false, })
 
@@ -330,11 +330,11 @@ const SalesPerformanceDelegate = ({ navigation, route }) => {
 
         </View>
         {(filters.pages.length > 0 || !!filters.compare_with) &&
-          <View style={{ alignItems: "flex-end" }}>
+          <View style={{ alignItems: "flex-end", }}>
             <TouchableOpacity
               onPress={resetFilters}
-              style={{ marginTop: 5, marginRight: 10, borderWidth: 1, borderColor: colors.delete, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 5, backgroundColor: colors.heart + "33" }}>
-              <MyText color={colors.delete}>{"Clear Filter"}</MyText>
+              style={{  borderWidth: 1, borderColor: colors.primary, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 5, backgroundColor: colors.primary + "22", alignSelf: "flex-end", marginTop: 5 }}>
+              <MyText color={colors.primary}>{"Clear Filter"}</MyText>
             </TouchableOpacity>
           </View>}
       </View>

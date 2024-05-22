@@ -399,7 +399,7 @@ const MemberList = ({ navigation, route }) => {
     navigation.navigate(routes.memberDetails, {
       member: item,
       updateNotes: updateNotes,
-      updateCallNote:updateCallNote
+      updateCallNote: updateCallNote
     })
   }
 
@@ -440,7 +440,7 @@ const MemberList = ({ navigation, route }) => {
 
   const chip = (title, onPress) => {
     return (
-      <View key={"chip"+title} style={__styles.chipView}>
+      <View key={"chip" + title} style={__styles.chipView}>
         <View style={{}}>
           <MyText fontSize={12} color={colors.white} >{title}</MyText>
         </View>
@@ -613,8 +613,8 @@ const MemberList = ({ navigation, route }) => {
                   }} >{"Clear Filter"}</MyText> */}
                   <TouchableOpacity
                     onPress={clearFilter}
-                    style={{ marginRight: 10, borderWidth: 1, borderColor: colors.delete, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 5, backgroundColor: colors.heart + "33" }}>
-                    <MyText color={colors.delete}>{"Clear Filter"}</MyText>
+                    style={{ borderWidth: 1, borderColor: colors.primary, borderRadius: 10, paddingHorizontal: 10,marginRight:10, paddingVertical: 5, backgroundColor: colors.lightPrimary3 }}>
+                    <MyText color={colors.primary}>{"Clear Filter"}</MyText>
                   </TouchableOpacity>
                 </Pressable>
 

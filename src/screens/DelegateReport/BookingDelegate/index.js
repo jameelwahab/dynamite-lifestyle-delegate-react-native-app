@@ -152,10 +152,12 @@ const BookingDelegate = ({ navigation, route }) => {
       setLoader(false);
       setFooterLoader(false)
       setRefreshing(false);
+      setSearchLoader(false);
     } else {
       setLoader(false);
       setFooterLoader(false)
       setRefreshing(false);
+      setSearchLoader(false);
     }
   }
 

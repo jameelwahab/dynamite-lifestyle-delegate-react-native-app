@@ -15,7 +15,7 @@ import UserImage from '../../components/UserImage'
 import StatView from '../Members/Components/StatView'
 import moment from 'moment'
 import { dateTimeFormat, isDev } from '../../utilities/constants'
-import { MenuButton } from '../../components/MyButton'
+import { MenuButton, MyClearButton } from '../../components/MyButton'
 import routes from '../../navigation/routes'
 import OptionModal from '../../components/OptionModal'
 import { icons } from '../../utilities/icons'
@@ -161,9 +161,10 @@ const List = ({ navigation, route }) => {
           {(!!filters?.mode || !!filters?.plan || !!filters?.page) &&
             <TouchableOpacity
               onPress={clearFilter}
-              style={{ marginRight: 10, borderWidth: 1, borderColor: colors.delete, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 5, backgroundColor: colors.heart + "33", alignSelf: "flex-end", marginBottom: 5 }}>
-              <MyText color={colors.delete}>{"Clear Filter"}</MyText>
-            </TouchableOpacity>}
+              style={{ marginRight: 10, borderWidth: 1, borderColor: colors.primary, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 5, backgroundColor: colors.primary + "22", alignSelf: "flex-end", marginBottom: 5 }}>
+              <MyText color={colors.primary}>{"Clear Filter"}</MyText>
+            </TouchableOpacity>
+          }
 
         </View>
 

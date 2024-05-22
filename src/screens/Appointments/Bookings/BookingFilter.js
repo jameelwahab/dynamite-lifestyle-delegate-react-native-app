@@ -12,7 +12,7 @@ import MyTouchableInput from '../../../components/MyTouchableInput'
 import { icons } from '../../../utilities/icons'
 import Collapsible from 'react-native-collapsible'
 import { colors } from '../../../utilities/colors'
-import { MyButton } from '../../../components/MyButton'
+import { MyButton, MyClearButton } from '../../../components/MyButton'
 import OptionModalWithSearch from '../../../components/OptionModalWithSearch'
 import MyChip from '../../../components/MyChip'
 import OptionModal from '../../../components/OptionModal'
@@ -204,10 +204,8 @@ const BookingFilter = ({ navigation, route }) => {
 
         <View style={{ flexDirection: "row", marginTop: 10 }}>
           {/* {(!!appliedFilters?.createdFor) ? */}
-          <MyButton
-            style={[__styles.clearBtn, __styles.btn]}
-            textStyle={__styles.clearBtnText}
-            invert
+          <MyClearButton
+            style={{ flex: 1, marginRight: 10 }}
             title='Clear Filter'
             onPress={onClearButtonPress}
           />

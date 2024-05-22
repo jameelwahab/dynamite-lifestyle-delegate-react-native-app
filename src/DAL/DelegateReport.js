@@ -17,13 +17,13 @@ export const GET_DELEGATE_REPORT_LIST = ({ token, navigation, page, body: {
 
 
 export const GET_SALES_PERDORMANCE_BY_DELEGATE = ({ token, navigation, page, body: {
-  start_date, end_date, created_for, search_text, type
+  start_date, end_date, created_for, search_text, 
 } }) => {
   return invokeApi({
     path: `api/consultant/list_sales_performance?page=${page}&limit=10`,
     method: "POST",
     postData: {
-      start_date, end_date, created_for, search_text, type
+      start_date, end_date, created_for, search_text, 
     },
     token,
     navigation,

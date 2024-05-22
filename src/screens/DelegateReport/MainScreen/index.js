@@ -192,11 +192,11 @@ const MainScreen = ({ navigation, route }) => {
   const getPerformance = async (newArray = false) => {
     let res = await GET_SALES_PERDORMANCE_BY_DELEGATE({
       navigation, token, page, body: {
-        created_for: undefined,
+        created_for: null,
         search_text: searchText.trim(),
-        type: tabs[selectedTab].type,
-        start_date: undefined,
-        end_date: undefined,
+        // type: tabs[selectedTab].type,
+        start_date: !!filter?.start_date ? moment(filter?.start_date).format("YYYY-MM-DD") : undefined,
+        end_date: !!filter?.end_date ? moment(filter?.end_date).format("YYYY-MM-DD") : undefined,
       },
     });
     if (res.code == 200) {
@@ -293,7 +293,7 @@ const MainScreen = ({ navigation, route }) => {
     } else if (selectedTab == 3) {
       return null
     } else if (selectedTab == 4) {
-      return <AccountablityTracker user={item}  navigation={navigation} data={itemDetail} />
+      return <AccountablityTracker user={item} navigation={navigation} data={itemDetail} />
     }
   }
 
@@ -370,8 +370,8 @@ const MainScreen = ({ navigation, route }) => {
           <MemberView member={item} customImage={item?.image?.thumbnail_1} />
         </Pressable>
         <StatView title={"Total Commission"} value={`${prependCurency("gbp")}${item?.total_commission}`} />
-        <StatView title={"Paid Commission"} value={`${prependCurency("gbp")}`} />
-        <StatView title={"Due Commission"} value={`${prependCurency("gbp")}`} />
+        <StatView title={"Paid Commission"} value={`${prependCurency("gbp")}${item?.total_commission}`} />
+        <StatView title={"Due Commission"} value={`${prependCurency("gbp")}${item?.commission_paid}`} />
       </View>
     )
   }

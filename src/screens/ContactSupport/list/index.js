@@ -16,7 +16,7 @@ import FAB from '../../../components/FAB'
 import { icons } from '../../../utilities/icons'
 import routes from '../../../navigation/routes'
 import Modal from 'react-native-modal'
-import { MyButton, TransparentButton } from '../../../components/MyButton'
+import { MenuButton, MyButton, TransparentButton } from '../../../components/MyButton'
 import OptionModal from '../../../components/OptionModal'
 import ConfirmationModal from '../../../components/ConfirmationModal'
 import showToast from '../../../functions/showToast'
@@ -239,8 +239,8 @@ const List = ({ navigation, route }) => {
     return (
       <TouchableHighlight
         onPress={() => onTicketDetail(item)}
-        onLongPress={() => setOptions({ isModalVisible: true, selected: item })}
-        delayLongPress={400}
+        // onLongPress={() => setOptions({ isModalVisible: true, selected: item })}
+        // delayLongPress={400}
         style={{ marginTop: 10, borderRadius: 20 }}>
 
         <View style={{ padding: 15, backgroundColor: colors.secondaryVariant, borderRadius: 20 }}>
@@ -252,6 +252,12 @@ const List = ({ navigation, route }) => {
             <MyText fontSize={10} >
               {convertTimezone(item.createdAt, timezone).fromNow()}
             </MyText>
+            <View style={{ marginRight: -20, marginTop: -4 }}>
+              <MenuButton
+                onPress={() => setOptions({ isModalVisible: true, selected: item })}
+                size={22}
+              />
+            </View>
           </View>
 
 
