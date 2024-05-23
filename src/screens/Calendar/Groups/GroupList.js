@@ -1,11 +1,11 @@
-import { View, Text, FlatList, StyleSheet } from 'react-native'
+import { View, Text, FlatList, StyleSheet, Pressable } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import RootView from '../../../components/RootView'
 import MyText from '../../../components/MyText'
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../../redux/reducers/userSlice'
 import { selectNavbar } from '../../../redux/reducers/navbarSlice'
-import { GET_CALENDAR_GROUPS_LIST } from '../../../DAL'
+import { DELETE_CALENDAR_GROUP, GET_CALENDAR_GROUPS_LIST } from '../../../DAL'
 import MyLoader from '../../../components/MyLoader'
 import EmptyView from '../../../components/EmptyView'
 import { colors } from '../../../utilities/colors'
@@ -16,6 +16,9 @@ import OptionModal from '../../../components/OptionModal'
 import ConfirmationModal from '../../../components/ConfirmationModal'
 import routes from '../../../navigation/routes'
 import { icons } from '../../../utilities/icons'
+import MyRefreshControl from '../../../components/MyRefreshControl'
+import showToast from '../../../functions/showToast'
+import SearchView from '../../../components/SearchView'
 
 const GroupList = ({ navigation, route }) => {
   const { key, parentKey } = route?.params
@@ -24,6 +27,7 @@ const GroupList = ({ navigation, route }) => {
   const [title] = useState(navbar?.find(x => x._id == parentKey)?.child_options?.find(y => y._id == key)?.title);
   const [list, setList] = useState([]);
   const [loader, setLoader] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [options, setOptions] = useState({ isVisible: false, item: null });
   const [confirmation, setConfirmation] = useState({ isVisible: false, item: null })
 
@@ -33,14 +37,17 @@ const GroupList = ({ navigation, route }) => {
     getCalendarGroupsLists()
   }, [])
 
-
+  const onRefresh = () => {
+    setRefreshing(true);
+    getCalendarGroupsLists()
+  }
   // * Options functions
 
   const onAgree = () => {
     let { item } = confirmation;
     setConfirmation({ isVisible: false, item: null })
     setTimeout(() => {
-
+      deleteGrpFromServer(item)
     }, 350);
   }
 
@@ -49,22 +56,49 @@ const GroupList = ({ navigation, route }) => {
     setOptions({ isVisible: false, item: null });
     setTimeout(() => {
       if (opt.key == "edit") {
-        navigation.navigate(routes.calendarGroupAddEdit, { group: item })
+        navigation.navigate(routes.calendarGroupAddEdit, { group: item, ammendList })
       } else if (opt.key == "delete") {
         setConfirmation({ isVisible: true, item: item })
+      } else if (opt.key == "detail") {
+        onGrpDetail(item)
       }
     }, 400);
   }
 
 
+  const ammendList = (group) => {
+    let index = list.find(x => x?._id == group._id)
+    if (index > -1) {
+      list.splice(index, 1);
+    } else {
+      list.unshift(group);
+    }
+    setList([...list]);
+  }
+
+
+  const onGrpDetail = (group) => {
+    navigation.navigate(routes.calendarGroupDetail, { group })
+  }
+
   //! APIs
 
   const getCalendarGroupsLists = async () => {
-    setLoader(true);
     let res = await GET_CALENDAR_GROUPS_LIST({ navigation, token });
     setLoader(false);
+    setRefreshing(false)
     if (res.code == 200) {
       setList(res?.group)
+    }
+  }
+
+  const deleteGrpFromServer = async (grp) => {
+    let res = await DELETE_CALENDAR_GROUP({ navigation, token, slug: grp?.group_slug });
+    setLoader(false);
+    setRefreshing(false)
+    if (res.code == 200) {
+      showToast({ title: res?.message, type: "success" })
+      setList((list) => list.slice().filter(x => x._id != grp._id))
     }
   }
 
@@ -81,7 +115,7 @@ const GroupList = ({ navigation, route }) => {
 
   const eventView = (list) => {
     return (
-      <View style={{ paddingHorizontal: 10, paddingVertical: 2, alignSelf: "flex-start", borderRadius: 10 }}>
+      <View style={{ paddingVertical: 2, alignSelf: "flex-start", borderRadius: 10 }}>
         {list.map((x, i) => (
           <MyText>{x?._id?.title},</MyText>
         ))}
@@ -92,7 +126,9 @@ const GroupList = ({ navigation, route }) => {
 
   const renderItem = ({ item, index }) => {
     return (
-      <View style={__styles.itemView}>
+      <Pressable
+        onPress={() => onGrpDetail(item)}
+        style={__styles.itemView}>
         <View style={__styles.titleRow}>
           <View style={__styles.titleView}>
             <MyText type='medium' >
@@ -110,25 +146,31 @@ const GroupList = ({ navigation, route }) => {
           <StatView title={"Members"} value={item?.member.length} />
           <StatView title={"Status"} view={() => statusView(item?.status)} />
         </View>
-      </View>
+      </Pressable>
     )
   }
+
 
 
   return (
     <RootView hideBackBottomButton title={title}>
       <View style={{ flex: 1 }}>
         <FlatList
+
           data={list}
           renderItem={renderItem}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={!loader && <EmptyView data={"No Groups found"} />}
+          refreshControl={<MyRefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+          />}
         />
       </View>
       <MyLoader enable={loader} />
 
       <FAB
-        onPress={() => navigation.navigate(routes.calendarGroupAddEdit, { group: undefined })}
+        onPress={() => navigation.navigate(routes.calendarGroupAddEdit, { group: undefined, ammendList })}
       />
 
       <OptionModal
@@ -166,6 +208,11 @@ const optionsList = [
     title: "Delete",
     key: "delete",
     icon: icons.trash
+  },
+  {
+    title: "View Detail",
+    key: "detail",
+    icon: icons.threeLinesMenu
   },
 
 ]

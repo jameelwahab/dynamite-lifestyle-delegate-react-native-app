@@ -9,16 +9,20 @@ import { colors } from '../../../utilities/colors'
 import MyCheckBox from '../../../components/MyCheckBox'
 import MyTouchableInput from '../../../components/MyTouchableInput'
 import { MyButton } from '../../../components/MyButton'
-import { GET_MEMBERS_AND_PROGRAMMES_LIST_FOR_CALENDAR_GROUP, GET_MEMBER_LIST_FOR_PAYMENT_REQUEST } from '../../../DAL'
+import { ADD_CALENDAR_GROUP, GET_MEMBERS_AND_PROGRAMMES_LIST_FOR_CALENDAR_GROUP, GET_MEMBER_LIST_FOR_PAYMENT_REQUEST, UPDATE_CALENDAR_GROUP } from '../../../DAL'
 import MyKeyboardAvoidingView from '../../../components/MyKeyboardAvoidingView'
 import OptionModalWithSearch from '../../../components/OptionModalWithSearch'
+import MyChip from '../../../components/MyChip'
+import showToast from '../../../functions/showToast'
+import MyLoader from '../../../components/MyLoader'
 
 const GroupAddEdit = ({ navigation, route }) => {
-  const { group } = route?.params
+  const { group, ammendList } = route?.params;
+  console.log(group, "group")
   const isEdit = !!group;
   const { token } = useSelector(selectUser);
   const [list, setList] = useState([]);
-  const [loader, setLoader] = useState(true);
+  const [loader, setLoader] = useState(false);
   const [searchText, setSearchText] = useState("")
   const [memberList, setMemberList] = useState([]);
   const [programmeList, setProgrammeList] = useState([]);
@@ -28,11 +32,12 @@ const GroupAddEdit = ({ navigation, route }) => {
     type: "",
   })
   const [groupData, updateGroupData] = useState({
-    title: "",
-    status: true,
-    groupBy: "program",
-    program: [],
-    members: [],
+    title: !!group?.title ? group?.title : "",
+    status: isEdit && !!group?.status == false ? false : true,
+    groupBy: !!group?.group_by ? group?.group_by : "program",
+    program: !!group?.program ? group?.program.map(x => x?._id) : [],
+    event: !!group?.event ? group?.event.map(x => x?._id) : [],
+    member: !!group?.member ? group?.member.map(x => x?._id) : [],
   })
   const setGroupData = (update) => updateGroupData({ ...groupData, ...update });
 
@@ -65,31 +70,115 @@ const GroupAddEdit = ({ navigation, route }) => {
   }
 
 
-  //Todo /// optoion functions
-
-  const onSelected = () => {
-    let { type } = optionModal;
-    if (type == "event") {
-      
-    } else if (type == "program") {
-
-    } else if (type == "member") {
-
+  const addGroupToServer = async (body) => {
+    let res = await ADD_CALENDAR_GROUP({ navigation, token, body });
+    setLoader(false)
+    if (res.code == 200) {
+      showToast({ title: res.message, type: "success" })
+      ammendList(res?.group)
+      navigation.goBack()
     }
   }
 
+  const updateGroupToServer = async (body) => {
+    let res = await UPDATE_CALENDAR_GROUP({ navigation, token, body, slug: group?.group_slug });
+    setLoader(false)
+    if (res.code == 200) {
+      showToast({ title: res.message, type: "success" })
+      ammendList(res?.group)
+      navigation.goBack()
+    }
+  }
+
+
+  ///todo ....... Submit
+
+  const onSubmit = () => {
+    if (groupData.title.trim() == "") {
+      showToast({ title: "Alert", body: "Please enter group name", type: "info" })
+    } else {
+      setLoader(true)
+      let obj = {
+        group_by: groupData.groupBy,
+        title: groupData.title.trim(),
+        status: groupData.status,
+        member: groupData.member.map(member => ({ member_id: member._id }))
+      };
+      if (obj.group_by == "program") {
+        obj["program"] = groupData.program.map(item => ({ program_slug: item.program_slug }))
+      } else {
+        obj["event"] = groupData.event.map(item => ({ event_slug: item.event_slug }))
+      }
+
+      if (isEdit) {
+        updateGroupToServer(obj)
+      } else {
+        addGroupToServer(obj)
+      }
+    }
+  }
+
+  //Todo /// optoion functions
+
+  const onSelected = (item) => {
+    let { type } = optionModal;
+    closeModal();
+    let sEvents = groupData[type];
+    sEvents.push(item);
+    setGroupData({ [type]: [...sEvents] });
+
+  }
+
   const filterTheList = (list, text) => {
-    if (optionModal?.type == "member") {
-      return list
+    let nList = list.slice().filter(y => {
+      if (!groupData[optionModal?.type].find(x => x?._id == y?._id)) return true
+      else return false
+    });
+    if (optionModal?.type == "member" || text.trim() == "") {
+      return nList
     } else if (optionModal?.type == "event" || optionModal?.type == "program") {
       let stext = text.trim().toLowerCase();
-      return list.slice().filter(x => x.title.toLowerCase().includes(stext))
-    } else return list
+      nList = list.slice().filter(x => x.title.toLowerCase().includes(stext))
+    } else {
+      nList = list
+    }
+  }
+
+  const removeItem = (index, type) => {
+    groupData[type].splice(index, 1);
+    setGroupData({ [type]: [...groupData[type]] })
+  }
+
+
+  const selectedView = (list, type) => {
+    return (
+      <View style={__styles.chipsLisView}>
+        {list.map((item, index) =>
+          <MyChip
+            title={item?.title}
+            onPress={() => removeItem(index, type)}
+          />
+        )}
+      </View>
+    )
+  }
+
+  const selectedMemberView = (list, type) => {
+    return (
+      <View pointerEvents="box-none" style={__styles.chipsLisView}>
+        {list.map((item, index) =>
+          <MyChip
+            title={`${item?.first_name} ${item?.last_name} (${item?.email})`}
+            onPress={() => removeItem(index, type)}
+          />
+        )}
+      </View>
+    )
   }
 
 
   return (
-    <RootView hideBackBottomButton title={isEdit ? "Edit Group" : "Add Group"}>
+    <RootView title={isEdit ? "Edit Group" : "Add Group"}>
       <MyKeyboardAvoidingView>
         <MyInputs
           label='Group Name*'
@@ -127,6 +216,7 @@ const GroupAddEdit = ({ navigation, route }) => {
                 title='Programmme'
                 onPress={() => setGroupData({ groupBy: "program" })}
                 value={groupData?.groupBy == "program"}
+
               />
             </View>
             <View style={__styles.radioItem}>
@@ -143,21 +233,24 @@ const GroupAddEdit = ({ navigation, route }) => {
 
           <MyTouchableInput
             label='Programmes'
-            onPress={() => setOptionModal({ isVisible: true, type: groupData.groupBy })}
+            iconOnPress={() => setOptionModal({ isVisible: true, type: groupData.groupBy })}
+            view={() => selectedView(groupData?.program, "program")}
           /> :
           <MyTouchableInput
             label='Event'
-            onPress={() => setOptionModal({ isVisible: true, type: groupData.groupBy })}
+            view={() => selectedView(groupData?.event, "event")}
+            iconOnPress={() => setOptionModal({ isVisible: true, type: groupData.groupBy })}
           />}
 
         <MyTouchableInput
+          view={() => selectedMemberView(groupData?.member, "member")}
           label='Members'
-          onPress={() => setOptionModal({ isVisible: true, type: "member" })}
+          iconOnPress={() => setOptionModal({ isVisible: true, type: "member" })}
         />
 
 
         <View style={{ marginTop: 10 }}>
-          <MyButton title='Submit' />
+          <MyButton title='Submit' onPress={onSubmit} />
         </View>
       </MyKeyboardAvoidingView>
 
@@ -191,6 +284,8 @@ const GroupAddEdit = ({ navigation, route }) => {
           </MyText>
         )}
       />
+
+      <MyLoader enable={loader} />
     </RootView>
   )
 }
@@ -214,4 +309,10 @@ const __styles = StyleSheet.create({
     flex: 1,
 
   },
+  chipsLisView: {
+    flex: 1,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    paddingVertical: 5
+  }
 })
