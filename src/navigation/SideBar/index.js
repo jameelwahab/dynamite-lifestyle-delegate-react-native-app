@@ -16,12 +16,14 @@ import utilities from '../../utilities';
 import { selectSocket } from '../../redux/reducers/socketSlice';
 import MyImage from '../../components/MyImage';
 import messaging from '@react-native-firebase/messaging';
-import notifee, { AndroidBadgeIconType, EventType } from '@notifee/react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import notificationHandler from '../../functions/notificationHandler';
 import { selectUser, setUnReadCount } from '../../redux/reducers/userSlice';
 import RootView from '../../components/RootView';
 import { INIT_WITH_TOKEN } from '../../DAL';
+import notifee, { AndroidBadgeIconType, EventType } from '@notifee/react-native';
+// import { Notifications } from 'react-native-notifications';
+
 
 
 
@@ -53,18 +55,18 @@ const index = (props) => {
     sub3 = null;
     sub4 = null;
     sub5 = null;
-    let initialNotification = await notifee.getInitialNotification();
+    // let initialNotification = await notifee.getInitialNotification();
 
-    if (!!initialNotification) {
-      console.log('[initialNotification] notifee Notification caused application to open', initialNotification);
-      if (Platform.OS == "ios") {
-        console.log('[initialNotification] notifee Notification caused application to open', initialNotification);
-        // setTimeout(() => {
+    // if (!!initialNotification) {
+    //   console.log('[notifee initialNotification] notifee Notification caused application to open', initialNotification);
+    //   if (Platform.OS == "ios") {
+    //     console.log('[notifee initialNotification] notifee Notification caused application to open', initialNotification);
+    //     // setTimeout(() => {
 
-        // }, 500);
-        notificationHandler(initialNotification, navigation, navbar);
-      }
-    }
+    //     // }, 500);
+    //     notificationHandler(initialNotification, navigation, navbar);
+    //   }
+    // }
 
 
     sub2 = notifee.onForegroundEvent(({ type, detail }) => {
@@ -98,27 +100,26 @@ const index = (props) => {
 
     sub4 = messaging().onNotificationOpenedApp(remoteMessage => {
       console.log('[onNotificationOpenedApp] Notification caused app to open from background state:', remoteMessage)
-      if (remoteMessage) {
-        if (Platform.OS == "android") {
+      if (remoteMessage ) {
           notificationHandler(remoteMessage, navigation, navbar);
-        }
       }
     });
 
 
     messaging().getInitialNotification().then(remoteMessage => {
-      console.log('Notification caused app to open from quit state:', remoteMessage);
-      if (remoteMessage) {
-        if (Platform.OS == "android") {
-          notificationHandler(remoteMessage, navigation, navbar);
-        }
+      console.log('[firebase getInitialNotification] Notification caused app to open from quit state:', remoteMessage);
+      if (remoteMessage ) {
+        notificationHandler(remoteMessage, navigation, navbar);
       }
     });
 
   }
+  const newPushHandler = () => {
 
+  }
   useEffect(() => {
     pushNotificationhandlers()
+
 
     enableSocketEvents()
     socket.on("connect_error", () => {

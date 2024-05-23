@@ -1,4 +1,4 @@
-import { View, Text, Image, SafeAreaView, Alert, StatusBar, StyleSheet, Easing, Vibration, Dimensions } from 'react-native'
+import { View, Text, Image, SafeAreaView, Alert, StatusBar, StyleSheet, Easing, Vibration, Dimensions, Platform, PermissionsAndroid } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -68,8 +68,12 @@ const Splash = ({ navigation }) => {
 
   }
 
-  const moveTo = (screen) => {
-    notifee.requestPermission()
+  const moveTo = async (screen) => {
+    if (Platform.OS == "ios") {
+      notifee.requestPermission()
+    } else {
+      PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS)
+    }
     navigation.reset({
       index: 0,
       routes: [{ name: screen }]
@@ -124,7 +128,7 @@ const Splash = ({ navigation }) => {
 
 
     setTimeout(() => {
-      
+
       showText.value = true;
       hideImg.value = false;
     }, 1200);

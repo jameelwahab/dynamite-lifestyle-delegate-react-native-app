@@ -11,7 +11,7 @@ const notificationHandler = (remoteMessage, navigation, navbar) => {
     if (data?.feed_tab == "the_cosmos" && !!navbar.find(x => x.value == "the_cosmos")) {
       navigator = routes.feedNavigator;
     }
-    else if (data?.feed_tab == "the_source") {
+    else {
       if (!!navbar.find(x => x.value == "all_source_feed"))
         navigator = routes.allSourcesFeedNavigator;
       else if (!!navbar.find(x => x.value == "the_source_feed"))
@@ -54,9 +54,9 @@ const notificationHandler = (remoteMessage, navigation, navbar) => {
             name: routes.chatNavigator,
             state: {
               routes: [
-                //   {
-                //   name: routes.chatList,
-                // },
+                {
+                  name: routes.chatList,
+                },
                 {
                   name: routes.chatMessageList,
                   params: {
