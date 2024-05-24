@@ -50,6 +50,7 @@ import StackSalesPendingCommission from "../NestedStacks/StackSalesPendingCommis
 import StackSalesPaidCommission from "../NestedStacks/StackSalesPaidCommission";
 import StackSalesTeamTransaction from "../NestedStacks/StackSalesTeamTransaction";
 import StackCalendarGroups from "../NestedStacks/StackCalendarGroups";
+import StackCalendarEvents from "../NestedStacks/StackCalendarEvents";
 
 
 
@@ -573,6 +574,16 @@ export const ChildComponents = {
     params: {
       value: "groups", parentValue: "calendar",
       key: "62c5554e-72cb-4876-98b5-889ecb5e8db7",
+      parentKey: "79fe1cf4-6cd7-42d0-a855-3fcf5fec045a",
+    }
+  },
+
+  "38bdd187-f583-4b46-bbb9-20bd784bf241": {
+    key: routes.calendarEventNavigator,
+    component: StackCalendarEvents,
+    params: {
+      value: "calendar_events", parentValue: "calendar",
+      key: "38bdd187-f583-4b46-bbb9-20bd784bf241",
       parentKey: "79fe1cf4-6cd7-42d0-a855-3fcf5fec045a",
     }
   },

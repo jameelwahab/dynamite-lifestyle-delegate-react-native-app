@@ -1,4 +1,4 @@
-import { View, Text, FlatList, StyleSheet, Pressable } from 'react-native'
+import { View, Text, FlatList, StyleSheet, Pressable, TouchableOpacity } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import RootView from '../../../components/RootView'
 import MyText from '../../../components/MyText'
@@ -67,9 +67,10 @@ const GroupList = ({ navigation, route }) => {
 
 
   const ammendList = (group) => {
-    let index = list.find(x => x?._id == group._id)
+    let index = list.findIndex(x => x?._id == group._id);
+    console.log(group,index,"ammendList")
     if (index > -1) {
-      list.splice(index, 1);
+      list.splice(index, 1,group);
     } else {
       list.unshift(group);
     }
@@ -117,8 +118,10 @@ const GroupList = ({ navigation, route }) => {
     return (
       <View style={{ paddingVertical: 2, alignSelf: "flex-start", borderRadius: 10 }}>
         {list.map((x, i) => (
-          <MyText>{x?._id?.title},</MyText>
+          <MyText key={x?._id?._id}>{x?._id?.title},</MyText>
         ))}
+
+       
       </View>)
   }
 

@@ -28,7 +28,8 @@ const __style = StyleSheet.create({
     justifyContent: "center",
     position: "absolute",
     bottom: 10,
-    right: 10
+    right: 10,
+    zIndex:3
   },
   icon: {
     height: 20,

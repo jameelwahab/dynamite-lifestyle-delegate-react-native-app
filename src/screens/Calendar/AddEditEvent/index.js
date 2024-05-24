@@ -1,4 +1,4 @@
-import { View, Text, KeyboardAvoidingView, ScrollView, Platform, StyleSheet } from 'react-native'
+import { View, Text, KeyboardAvoidingView, ScrollView, Platform, StyleSheet, Pressable } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import RootView from '../../../components/RootView'
 import MyText from '../../../components/MyText'
@@ -15,9 +15,13 @@ import OptionModalWithSearch from '../../../components/OptionModalWithSearch'
 import MyChip from '../../../components/MyChip'
 import showToast from '../../../functions/showToast'
 import MyLoader from '../../../components/MyLoader'
+import { icons } from '../../../utilities/icons'
+import Collapsible from 'react-native-collapsible'
 
 const GroupAddEdit = ({ navigation, route }) => {
-  const { group, ammendList } = route?.params;
+  // const { group, ammendList } = route?.params;
+  const group = undefined;
+  const ammendList = () => { }
   console.log(group, "group")
   const isEdit = !!group;
   const { token } = useSelector(selectUser);
@@ -27,6 +31,7 @@ const GroupAddEdit = ({ navigation, route }) => {
   const [memberList, setMemberList] = useState([]);
   const [programmeList, setProgrammeList] = useState([]);
   const [eventsList, setEventsList] = useState([]);
+  const [buttonAlignment, setButtonAlignment] = useState("center");
   const [optionModal, setOptionModal] = useState({
     isVisible: false,
     type: "",
@@ -38,6 +43,8 @@ const GroupAddEdit = ({ navigation, route }) => {
     program: !!group?.program ? group?.program.map(x => x?._id) : [],
     event: !!group?.event ? group?.event.map(x => x?._id) : [],
     member: !!group?.member ? group?.member.map(x => x?._id) : [],
+    recurringType: "daily",
+    
   })
   const setGroupData = (update) => updateGroupData({ ...groupData, ...update });
 
@@ -134,17 +141,14 @@ const GroupAddEdit = ({ navigation, route }) => {
       if (!groupData[optionModal?.type].find(x => x?._id == y?._id)) return true
       else return false
     });
-    console.log(nList,"nList")
     if (optionModal?.type == "member" || text.trim() == "") {
-
+      return nList
     } else if (optionModal?.type == "event" || optionModal?.type == "program") {
       let stext = text.trim().toLowerCase();
-
       nList = list.slice().filter(x => x.title.toLowerCase().includes(stext))
     } else {
       nList = list
     }
-    return nList
   }
 
   const removeItem = (index, type) => {
@@ -181,13 +185,103 @@ const GroupAddEdit = ({ navigation, route }) => {
 
 
   return (
-    <RootView title={isEdit ? "Edit Group" : "Add Group"}>
+    <RootView title={isEdit ? "Edit Event" : "Add Event"}>
       <MyKeyboardAvoidingView>
         <MyInputs
-          label='Group Name*'
+          label='Title*'
           onChangeText={(text) => setGroupData({ title: text })}
           value={groupData?.title}
         />
+
+        <MyTouchableInput
+          label='Color*'
+          view={() => (
+            <View style={{ flex: 1, marginLeft: 10, backgroundColor: 'red', borderWidth: 1, borderColor: colors.white, height: 30, borderRadius: 5 }} />
+          )}
+        />
+
+        {/* //?  Recurring Type */}
+        <View>
+          <MyText isLabel>Recurring Type</MyText>
+          <View style={__styles.alignBtnsRow}>
+            <Pressable
+              onPress={() => setGroupData({ recurringType: "daily" })}
+              style={[__styles.alignBtnView, groupData?.recurringType == "daily" && __styles.alignSelectedBtnView]}
+            >
+              <MyText
+                type='medium'
+                color={groupData?.recurringType == "daily" ? colors.black : colors.white} >Daily</MyText>
+            </Pressable>
+            <View style={__styles.verticalDivider} />
+            <Pressable
+              onPress={() => setGroupData({ recurringType: "weekly" })}
+              style={[__styles.alignBtnView, groupData.recurringType == "weekly" && __styles.alignSelectedBtnView]}>
+              <MyText
+                type='medium'
+                color={groupData?.recurringType == "weekly" ? colors.black : colors.white}
+              >Weekly</MyText>
+            </Pressable>
+            <View style={__styles.verticalDivider} />
+            <Pressable
+              onPress={() => setGroupData({ recurringType: "monthly" })}
+              style={[__styles.alignBtnView, groupData.recurringType == "monthly" && __styles.alignSelectedBtnView]}>
+              <MyText
+                type='medium'
+                color={groupData?.recurringType == "monthly" ? colors.black : colors.white}
+              >Monthly</MyText>
+            </Pressable>
+          </View>
+        </View>
+
+        <Collapsible collapsed={groupData?.recurringType != "weekly"} >
+          <View style={__styles.radioRootView}>
+            <MyText isLabel>Weekdays *</MyText>
+            <View style={[__styles.radioView, { flexWrap: "wrap" }]}>
+
+              {weekdays.map((day, dayIndex) =>
+                <View key={day.shortName} style={{ flex: 1 }}>
+                  <MyCheckBox
+                    // onPress={() => handlerWeekdays(day, index)}
+                    title={day.shortName}
+                    row={false}
+                  // value={item?.days.includes(day.fullName)}
+                  />
+                </View>
+              )}
+
+            </View>
+          </View>
+        </Collapsible>
+
+        <View style={{ flexDirection: "row" }}>
+          <View style={{ flex: 1, marginRight: 10 }}>
+            <MyTouchableInput
+              label='Start Date*'
+              icon={()=>icons.calendar(colors.primary)}
+            />
+          </View>
+          <View style={{ flex: 1, marginRight: 10 }}>
+            <MyTouchableInput
+              label='Start Time*'
+              icon={icons.clock}
+            />
+          </View>
+        </View>
+
+        <View style={{ flexDirection: "row" }}>
+          <View style={{ flex: 1, marginRight: 10 }}>
+            <MyTouchableInput
+              label='End Date*'
+              icon={()=>icons.calendar(colors.primary)}
+            />
+          </View>
+          <View style={{ flex: 1, marginRight: 10 }}>
+            <MyTouchableInput
+              label='End Time*'
+              icon={icons.clock}
+            />
+          </View>
+        </View>
 
         <View style={__styles.radioRootView}>
           <MyText isLabel>Group Status *</MyText>
@@ -211,7 +305,7 @@ const GroupAddEdit = ({ navigation, route }) => {
 
 
 
-        <View style={__styles.radioRootView}>
+        {/* <View style={__styles.radioRootView}>
           <MyText isLabel>Group By *</MyText>
           <View style={__styles.radioView}>
             <View style={__styles.radioItem}>
@@ -230,7 +324,7 @@ const GroupAddEdit = ({ navigation, route }) => {
               />
             </View>
           </View>
-        </View>
+        </View> */}
 
         {groupData.groupBy == "program" ?
 
@@ -295,6 +389,36 @@ const GroupAddEdit = ({ navigation, route }) => {
 
 export default GroupAddEdit
 
+
+const weekdays = [{
+  fullName: "Monday",
+  shortName: "Mon",
+},
+{
+  fullName: "Tuesday",
+  shortName: "Tue",
+},
+{
+  fullName: "Wednesday",
+  shortName: "Wed",
+},
+{
+  fullName: "Thursday",
+  shortName: "Thu",
+},
+{
+  fullName: "Friday",
+  shortName: "Fri",
+},
+{
+  fullName: "Saturday",
+  shortName: "Sat",
+},
+{
+  fullName: "Sunday",
+  shortName: "Sun",
+}]
+
 const __styles = StyleSheet.create({
   radioRootView: {
     marginBottom: 15
@@ -317,5 +441,32 @@ const __styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     paddingVertical: 5
-  }
+  },
+  alignSelectedBtnView: {
+    backgroundColor: colors.primary,
+  },
+  alignBtnsRow: {
+    flexDirection: 'row',
+    alignItems: "center",
+    height: 45,
+    borderWidth: 1,
+    borderColor: colors.lightText,
+    borderRadius: 5,
+    marginBottom: 15
+  },
+  verticalDivider: {
+    height: 20,
+    width: 1,
+    backgroundColor: colors.lightText
+  },
+  alignBtnView: {
+    flex: 1,
+    height: "85%",
+    borderRadius: 5,
+    backgroundColor: colors.transparent,
+    alignItems: "center",
+    justifyContent: "center",
+    marginHorizontal: 5
+  },
+
 })

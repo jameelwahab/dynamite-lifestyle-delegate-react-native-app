@@ -53,7 +53,9 @@ const OptionModalWithSearch = ({
         <View style={{ flexDirection: "row", justifyContent: "space-between", padding: 15, borderBottomWidth: 1 / 3, borderBottomColor: colors.lightText }}>
           <View>
             <MyText fontSize={18} type='medium' >{title + " List"}</MyText>
-            <MyText color={colors.lightText} fontSize={12}>{`Select your ${title.toLowerCase()} from list below`}</MyText>
+            <View style={{ marginTop: 3 }}>
+              <MyText color={colors.lightText} fontSize={12}>{`Select your ${title.toLowerCase()} from list below`}</MyText>
+            </View>
           </View>
           <Pressable onPress={closeTheModal}>
             {icons.crosssWithCircle()}
@@ -89,7 +91,7 @@ const OptionModalWithSearch = ({
         </View>
         <View style={{ flex: 1 }}>
           <FlatList
-            data={!!filterTheList ? filterTheList(optionList,searchText) : optionList}
+            data={!!filterTheList ? filterTheList(optionList, searchText) : optionList}
             // scrollEnabled={false}
             keyExtractor={(item, index) => `OptionWithsearch${index}`}
             contentContainerStyle={{}}

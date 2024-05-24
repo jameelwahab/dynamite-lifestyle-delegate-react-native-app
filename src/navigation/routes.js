@@ -298,6 +298,10 @@ const routes = {
   calendarGroupAddEdit: "CALENDAR_GROUP_ADD_EDIT_SCREEN",
   calendarGroupDetail: "CALENDAR_GROUP_DETAIL_SCREEN",
 
+  //? Calendar Events
+  calendarEventsList: "CALENDAR_EVENTS_SCREEN",
+  calendarEventsAddEdit: "CALENDAR_EVENTS_ADD_EDIT_SCREEN",
+
   //? Sales Team
   salesTeamListing: "SALES_TEAM_LISTING_SCREEN",
   salesTeamAddEdit: "SALES_TEAM_ADD_EDIT_SCREEN",

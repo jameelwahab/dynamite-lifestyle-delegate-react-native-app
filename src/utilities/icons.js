@@ -33,6 +33,7 @@ export const icons = {
   csv: require('../assets/icons/csv.png'),
   broadcast: require('../assets/icons/broadcast.png'),
   gratitude: require('../assets/icons/gratitude.png'),
+  googleCalendar: require('../assets/icons/google-calendar.png'),
 
   file_csv: require('../assets/icons/csv1.png'),
   file_pdf: require('../assets/icons/pdf.png'),
@@ -101,6 +102,7 @@ export const icons = {
   sent: (color = colors.white, size = 20) => { return (<Ionicons name="checkmark" color={color} size={size} />) },
   pound: (color = colors.white, size = 20) => { return (<MaterialIcons name="currency-pound" color={color} size={size} />) },
   calendar: (color = colors.white, size = 20) => { return (<Ionicons name="calendar-outline" color={color} size={size} />) },
+  list: (color = colors.white, size = 20) => { return (<Octicons name="list-unordered" color={color} size={size} />) },
   calendarTick: (color = colors.white, size = 20) => { return (<MaterialCommunityIcons name="calendar-check" color={color} size={size} />) },
   heartUnfilled: (color = colors.white, size = 20) => { return (<MaterialCommunityIcons name="heart-outline" color={color} size={size} />) },
   heartFilled: (color = colors.white, size = 20) => { return (<MaterialCommunityIcons name="heart" color={color} size={size} />) },
