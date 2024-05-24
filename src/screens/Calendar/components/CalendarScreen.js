@@ -266,7 +266,7 @@ const CalendarScreen = ({ navigation, route }) => {
     return (
       <>
         {topView()}
-        {type == "month" && calendarView()}
+        {type == "month"&& !loader && calendarView()}
         {type != "month" && subHeadingView()}
       </>
     )
@@ -387,14 +387,14 @@ const CalendarScreen = ({ navigation, route }) => {
           ListHeaderComponent={headerView()}
           data={type == "week" ? Object.keys(calendarEvents) : calendarEvents[curDate]?.list}
           renderItem={renderItem}
-          keyExtractor={(item) => item}
+          keyExtractor={(item) => type == "week" ?item: item?._id }
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={!loader && <EmptyView label={"No Events Found"} />}
         /> :
         <FlatList
           data={eventList}
           renderItem={renderEventItem}
-          keyExtractor={(item) => item?._id}
+          // keyExtractor={(item) => item?._id}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={!loader && <EmptyView label={"No Events Found"} />}
         />}
@@ -450,8 +450,8 @@ const __styles = StyleSheet.create({
     // justifyContent: "space-between"
   },
   calendarTheme: {
-    backgroundColor: colors.secondaryVariant,
-    calendarBackground: colors.secondaryVariant,
+    backgroundColor: colors.secondary,
+    calendarBackground: colors.secondary,
     textSectionTitleColor: colors.primary,
     textSectionTitleDisabledColor: colors.primary,
     selectedDayBackgroundColor: colors.primary,

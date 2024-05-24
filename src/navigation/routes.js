@@ -301,6 +301,7 @@ const routes = {
   //? Calendar Events
   calendarEventsList: "CALENDAR_EVENTS_SCREEN",
   calendarEventsAddEdit: "CALENDAR_EVENTS_ADD_EDIT_SCREEN",
+  calendarEventsAddEditNotification: "CALENDAR_EVENTS_ADD_EDIT_NOTIFICATIONS",
 
   //? Sales Team
   salesTeamListing: "SALES_TEAM_LISTING_SCREEN",

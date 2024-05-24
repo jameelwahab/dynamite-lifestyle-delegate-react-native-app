@@ -19,7 +19,8 @@ const NotificationModal = forwardRef(({ onReminderSavePress }, ref) => {
   const [title, setTitle] = useState("");
   const [email, setEmail] = useState("");
   const [cc, setCc] = useState("");
-  const [message, setMessage] = useState("")
+  const [message, setMessage] = useState("");
+  const [index, setIndex] = useState(undefined)
 
   useImperativeHandle(ref, () => {
     return {
@@ -40,17 +41,21 @@ const NotificationModal = forwardRef(({ onReminderSavePress }, ref) => {
       description: message,
     }
     onReminderSavePress({
-      push_notification_info: obj
-    });
+      push_notification_info: obj,
+    }, index);
     closeModal();
   }
 
   const closeModal = () => {
     setIsVisible(false);
+    setTitle("");
+    setMessage("");
   }
 
-  const openModal = (data) => {
+  const openModal = (data, dIndex = undefined) => {
     setIsVisible(true);
+    setIndex(dIndex)
+    console.log(data,"data")
     if (!!data) {
       setTitle(!!data?.notification_title ? data?.notification_title : "");
       setMessage(!!data?.description ? data?.description : "")

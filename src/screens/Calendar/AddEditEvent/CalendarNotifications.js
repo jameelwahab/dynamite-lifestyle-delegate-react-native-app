@@ -1,0 +1,309 @@
+import { View, Text, Pressable, StyleSheet, FlatList } from 'react-native'
+import React, { useRef, useState } from 'react'
+import RootView from '../../../components/RootView'
+import MyText from '../../../components/MyText'
+import { colors } from '../../../utilities/colors'
+import MyInputs from '../../../components/MyInputs'
+import MyCheckBox from '../../../components/MyCheckBox'
+import { MyButton, TransparentButton } from '../../../components/MyButton'
+import { icons } from '../../../utilities/icons'
+import MyKeyboardAvoidingView from '../../../components/MyKeyboardAvoidingView'
+import capitalize from '../../../functions/capitalize'
+import breakReference from '../../../functions/breakReference'
+import NotificationModal from '../../../components/ReminderModals/NotificationModal'
+import MessageModal from '../../../components/ReminderModals/MessageModal'
+import moment from 'moment'
+import { ADD_CALENDAR_EVENT } from '../../../DAL'
+import { useSelector } from 'react-redux'
+import { selectUser } from '../../../redux/reducers/userSlice'
+import MyLoader from '../../../components/MyLoader'
+import routes from '../../../navigation/routes'
+
+const CalendarNotifications = ({ navigation, route }) => {
+  const { data } = route?.params;
+  const { token } = useSelector(selectUser);
+  const refNotificationModal = useRef()
+  const refMessageModal = useRef();
+  const [notifications, setnotifications] = useState([{ ...notifyObject }])
+  const [loader, setLoader] = useState(false);
+
+
+
+  //! ///////  APIs
+
+  const onAddEvent = async (body) => {
+    let res = await ADD_CALENDAR_EVENT({ navigation, token, body });
+    if (res.code == 200) {
+      navigation.navigate(routes.calendarEventsList, {
+        refresh: true
+      })
+      setLoader(false)
+    }
+  }
+
+  const onSavePress = () => {
+    let body = {
+      title: data?.title.trim(),
+      color: data?.color,
+      created_for: "",
+      description: data?.desc,
+      start_date: moment(data?.startDate).format("YYYY-MM-DD"),
+      start_time: data?.startTime,
+      end_date: moment(data?.endDate).format("YYYY-MM-DD"),
+      end_time: data?.endTime,
+      group: data?.group.map(x => ({ group_slug: x?.group_slug })),
+      member: data?.member.map(x => ({ member_id: x?._id })),
+      is_notify_user: true,
+      notify_before: notifications,
+      recurring_type: data?.recurringType,
+      status: data?.status,
+      weekday: data?.weekday
+    }
+    setLoader(true)
+    onAddEvent(body)
+
+  }
+
+  const addNotification = () => {
+    notifications.push({ ...notifyObject })
+    setnotifications([...notifications]);
+  }
+
+  const removeNotification = (index) => {
+    notifications.splice(index, 1);
+    setnotifications([...notifications]);
+  }
+
+  const notificationHandler = (update, index) => {
+    notifications[index] = {
+      ...notifications[index],
+      ...update
+    }
+    setnotifications([...notifications]);
+  }
+
+  const notifcationTypeHandler = (type, index) => {
+    let obj = breakReference({ ...notifications[index] })
+    let iindex = obj.notification_send_type.findIndex(x => x.name == type);
+    if (iindex > -1) {
+      obj.notification_send_type.splice(iindex, 1);
+    } else {
+      obj.notification_send_type.push(access[type])
+    }
+    notifications.splice(index, 1, obj);
+    setnotifications([...notifications]);
+  }
+
+  const notifcatioDataTypeHandler = (data, index, type) => {
+    let obj = breakReference({ ...notifications[index] })
+    console.log(obj, index)
+    let iindex = obj.notification_send_type.findIndex(x => x.name == type);
+    if (iindex > -1) {
+      obj.notification_send_type[iindex] = {
+        ...obj.notification_send_type[iindex],
+        ...data
+      }
+      notifications.splice(index, 1, obj);
+      setnotifications([...notifications]);
+    }
+  }
+
+  const notificationView = ({ item, index }) => {
+    let pushNot = item?.notification_send_type.find(x => x.name == "push_notification_access")
+    let messageNot = item?.notification_send_type.find(x => x.name == "message_notification_access")
+    return (
+      <View style={__styles.notificationView} key={"notifcation" + index} >
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <View style={{ flex: 1, paddingVertical: 4 }} >
+            <MyCheckBox
+              value={!!pushNot}
+              onPress={() => notifcationTypeHandler("push_notification_access", index)}
+              title={"Notification"} />
+
+          </View>
+          {!!pushNot &&
+            <View style={__styles.cardViewEditBtn}>
+              <TransparentButton
+                onPress={() => refNotificationModal?.current?.openModal(item?.notification_send_type.find(x => x.name == "push_notification_access")?.push_notification_info, index)}
+                icon={() => icons.editpencil()} />
+            </View>}
+        </View>
+
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <View style={{ flex: 1, paddingVertical: 4 }} >
+            <MyCheckBox
+              value={!!messageNot}
+              onPress={() => notifcationTypeHandler("message_notification_access", index)}
+              title={"Message"} />
+
+          </View>
+          {!!messageNot &&
+            <View style={__styles.cardViewEditBtn}>
+              <TransparentButton
+                onPress={() => refMessageModal?.current?.openModal(item?.notification_send_type.find(x => x.name == "message_notification_access")?.message_notification_info, index)}
+                icon={() => icons.editpencil()} />
+            </View>}
+        </View>
+
+
+
+        <View style={{ marginTop: 10 }}>
+          <MyText isLabel>Notify Before</MyText>
+          {/* Notify Before */}
+          <View style={__styles.alignBtnsRow}>
+            <Pressable
+              onPress={() => notificationHandler({ notify_before_unit: "minutes" }, index)}
+              style={[__styles.alignBtnView, item?.notify_before_unit == "minutes" && __styles.alignSelectedBtnView]}
+            >
+              <MyText
+                type='medium'
+                color={item?.notify_before_unit == "minutes" ? colors.black : colors.white} >Minutes</MyText>
+            </Pressable>
+            <View style={__styles.verticalDivider} />
+            <Pressable
+              onPress={() => notificationHandler({ notify_before_unit: "hours" }, index)}
+              style={[__styles.alignBtnView, item?.notify_before_unit == "hours" && __styles.alignSelectedBtnView]}>
+              <MyText
+                type='medium'
+                color={item?.notify_before_unit == "hours" ? colors.black : colors.white}>Hours</MyText>
+            </Pressable>
+            <View style={__styles.verticalDivider} />
+            <Pressable
+              onPress={() => notificationHandler({ notify_before_unit: "days" }, index)}
+              style={[__styles.alignBtnView, item?.notify_before_unit == "days" && __styles.alignSelectedBtnView]}>
+              <MyText
+                type='medium'
+                color={item?.notify_before_unit == "days" ? colors.black : colors.white}>Days</MyText>
+            </Pressable>
+          </View>
+
+          <MyInputs
+            label={capitalize(item?.notify_before_unit) + "*"}
+            value={String(item?.notify_before_time)}
+            onChangeText={(text) => notificationHandler({ notify_before_time: text }, index)}
+            keyboardType="number-pad"
+          />
+
+        </View>
+        <View style={{ alignSelf: "flex-end" }}>
+          <TransparentButton
+            onPress={() => removeNotification(index)}
+            underlayColor={colors.delete + "22"}
+            style={{ paddingVertical: 5 }}
+            icon={() => icons.minusCircle(colors.delete)}
+          />
+        </View>
+      </View>
+    )
+  }
+
+  return (
+    <RootView title="Event Notification Setting" >
+
+      <View style={{ flex: 1 }}>
+        <MyKeyboardAvoidingView noScrollView >
+          <FlatList
+            data={notifications}
+            renderItem={notificationView}
+            showsVerticalScrollIndicator={false}
+            ListFooterComponent={
+              <View>
+                <View style={{ alignSelf: "flex-end", marginTop: 10 }}>
+                  <TransparentButton
+                    onPress={addNotification}
+                    style={{ paddingVertical: 5 }}
+                    icon={() => icons.plusCircle()}
+                    title='Add Notification'
+                  />
+                </View>
+                <View style={{ marginTop: 10 }}>
+                  <MyButton title='Submit' onPress={onSavePress} />
+                </View>
+              </View>
+            }
+          />
+        </MyKeyboardAvoidingView>
+      </View>
+
+
+      <NotificationModal
+        ref={refNotificationModal}
+        onReminderSavePress={(data, index) => {
+          notifcatioDataTypeHandler(data, index, "push_notification_access");
+        }}
+      />
+
+      <MessageModal
+        ref={refMessageModal}
+        onReminderSavePress={(data, index) => {
+          notifcatioDataTypeHandler(data, index, "message_notification_access");
+        }}
+      />
+      <MyLoader enable={loader} />
+    </RootView>
+  )
+}
+
+export default CalendarNotifications
+
+const notifyObject = {
+  notification_send_type: [],
+  notification_title: "",
+  notify_before_time: 30,
+  notify_before_unit: "minutes"
+}
+
+const access = {
+  push_notification_access: {
+    label: "Notification",
+    name: "push_notification_access"
+  },
+  message_notification_access: {
+    label: "Message",
+    name: "message_notification_access"
+  }
+}
+
+
+
+const __styles = StyleSheet.create({
+  alignSelectedBtnView: {
+    backgroundColor: colors.primary,
+  },
+  alignBtnsRow: {
+    flexDirection: 'row',
+    alignItems: "center",
+    height: 45,
+    borderWidth: 1,
+    borderColor: colors.lightText,
+    borderRadius: 5,
+    marginBottom: 15
+  },
+  verticalDivider: {
+    height: 20,
+    width: 1,
+    backgroundColor: colors.lightText
+  },
+  alignBtnView: {
+    flex: 1,
+    height: "85%",
+    borderRadius: 5,
+    backgroundColor: colors.transparent,
+    alignItems: "center",
+    justifyContent: "center",
+    marginHorizontal: 5
+  },
+  line: {
+    width: "100%",
+    height: 0.5,
+    backgroundColor: colors.white,
+    marginVertical: 10
+  },
+  notificationView: {
+    marginTop: 10,
+    backgroundColor: colors.secondary,
+    borderRadius: 10,
+    padding: 10
+  },
+  cardViewEditBtn: { marginBottom: 0 }
+})

@@ -2,16 +2,19 @@ import { View, Text, ScrollView, KeyboardAvoidingView, Platform } from 'react-na
 import React from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-const MyKeyboardAvoidingView = (props) => {
+const MyKeyboardAvoidingView = ({ noScrollView = false, children }) => {
   const insets = useSafeAreaInsets();
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
       behavior={Platform.OS == "ios" ? "padding" : undefined}
       keyboardVerticalOffset={Platform.OS == "ios" ? (100 + insets.top) : 0}>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {props.children}
-      </ScrollView>
+      {noScrollView ? children :
+        <ScrollView showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 30 }}
+        >
+          {children}
+        </ScrollView>}
     </KeyboardAvoidingView>
   )
 }

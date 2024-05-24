@@ -7,6 +7,7 @@ import { defaultScreens } from './defaultScreens'
 import { colors } from '../../utilities/colors'
 import CalendarEvents from '../../screens/Calendar/CalendarEvents'
 import AddEditEvent from '../../screens/Calendar/AddEditEvent'
+import CalendarNotifications from '../../screens/Calendar/AddEditEvent/CalendarNotifications'
 
 
 
@@ -22,6 +23,7 @@ const StackCalendarEvents = ({ route }) => {
         <CalendarEventsStack.Screen initialParams={route.params}
           name={routes.calendarEventsList} component={CalendarEvents} />
         <CalendarEventsStack.Screen name={routes.calendarEventsAddEdit} component={AddEditEvent} />
+        <CalendarEventsStack.Screen name={routes.calendarEventsAddEditNotification} component={CalendarNotifications} />
 
         {/*//? Default Screens Start */}
         {defaultScreens.map((x, i) => (

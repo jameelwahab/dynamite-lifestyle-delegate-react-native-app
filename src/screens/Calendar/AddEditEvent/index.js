@@ -1,5 +1,5 @@
 import { View, Text, KeyboardAvoidingView, ScrollView, Platform, StyleSheet, Pressable } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import RootView from '../../../components/RootView'
 import MyText from '../../../components/MyText'
 import { useSelector } from 'react-redux'
@@ -9,7 +9,7 @@ import { colors } from '../../../utilities/colors'
 import MyCheckBox from '../../../components/MyCheckBox'
 import MyTouchableInput from '../../../components/MyTouchableInput'
 import { MyButton } from '../../../components/MyButton'
-import { ADD_CALENDAR_GROUP, GET_MEMBERS_AND_PROGRAMMES_LIST_FOR_CALENDAR_GROUP, GET_MEMBER_LIST_FOR_PAYMENT_REQUEST, UPDATE_CALENDAR_GROUP } from '../../../DAL'
+import { ADD_CALENDAR_GROUP, GET_GROUPS_AND_MEMBERS_FOR_CALENDAR, GET_MEMBERS_AND_PROGRAMMES_LIST_FOR_CALENDAR_GROUP, GET_MEMBER_LIST_FOR_PAYMENT_REQUEST, UPDATE_CALENDAR_GROUP } from '../../../DAL'
 import MyKeyboardAvoidingView from '../../../components/MyKeyboardAvoidingView'
 import OptionModalWithSearch from '../../../components/OptionModalWithSearch'
 import MyChip from '../../../components/MyChip'
@@ -17,6 +17,13 @@ import showToast from '../../../functions/showToast'
 import MyLoader from '../../../components/MyLoader'
 import { icons } from '../../../utilities/icons'
 import Collapsible from 'react-native-collapsible'
+import moment from 'moment'
+import { dateTimeFormat } from '../../../utilities/constants'
+import CalendarModal from '../../../components/CalendarModal'
+import TimePicker from '../../../components/TimePicker'
+import ColorModal from '../../../components/ColorModal'
+import routes from '../../../navigation/routes'
+import Editor from '../../../components/Editor'
 
 const GroupAddEdit = ({ navigation, route }) => {
   // const { group, ammendList } = route?.params;
@@ -25,13 +32,12 @@ const GroupAddEdit = ({ navigation, route }) => {
   console.log(group, "group")
   const isEdit = !!group;
   const { token } = useSelector(selectUser);
-  const [list, setList] = useState([]);
+  const ref_calendar = useRef();
+  const ref_timePicker = useRef();
   const [loader, setLoader] = useState(false);
-  const [searchText, setSearchText] = useState("")
   const [memberList, setMemberList] = useState([]);
-  const [programmeList, setProgrammeList] = useState([]);
-  const [eventsList, setEventsList] = useState([]);
-  const [buttonAlignment, setButtonAlignment] = useState("center");
+  const [groupList, setGroupList] = useState([]);
+  const [colorModal, setColorModal] = useState(false);
   const [optionModal, setOptionModal] = useState({
     isVisible: false,
     type: "",
@@ -39,12 +45,17 @@ const GroupAddEdit = ({ navigation, route }) => {
   const [groupData, updateGroupData] = useState({
     title: !!group?.title ? group?.title : "",
     status: isEdit && !!group?.status == false ? false : true,
-    groupBy: !!group?.group_by ? group?.group_by : "program",
-    program: !!group?.program ? group?.program.map(x => x?._id) : [],
-    event: !!group?.event ? group?.event.map(x => x?._id) : [],
+    group: !!group?.event ? group?.event.map(x => x?._id) : [],
     member: !!group?.member ? group?.member.map(x => x?._id) : [],
+    startDate: moment(),
+    startTime: moment().format("HH:mm"),
+    endDate: moment(),
+    weekday: [],
+    endTime: moment().format("HH:mm"),
     recurringType: "daily",
-    
+    color: "#000000",
+    desc: ""
+
   })
   const setGroupData = (update) => updateGroupData({ ...groupData, ...update });
 
@@ -54,46 +65,16 @@ const GroupAddEdit = ({ navigation, route }) => {
   })
 
   useEffect(() => {
-    getProgrammsListFromServer()
     getMemberListFromServer()
   }, [])
 
   //! APIs
 
-  const getProgrammsListFromServer = async () => {
-    let res = await GET_MEMBERS_AND_PROGRAMMES_LIST_FOR_CALENDAR_GROUP({ navigation, token });
-    if (res.code == 200) {
-      setProgrammeList(res?.programs);
-      setEventsList(res?.portals);
-    }
-  }
-
-
   const getMemberListFromServer = async (searchText = "") => {
-    let res = await GET_MEMBER_LIST_FOR_PAYMENT_REQUEST({ navigation, token, searchText: searchText.trim() });
+    let res = await GET_GROUPS_AND_MEMBERS_FOR_CALENDAR({ navigation, token, searchText: searchText.trim() });
     if (res.code == 200) {
       setMemberList(res?.members)
-    }
-  }
-
-
-  const addGroupToServer = async (body) => {
-    let res = await ADD_CALENDAR_GROUP({ navigation, token, body });
-    setLoader(false)
-    if (res.code == 200) {
-      showToast({ title: res.message, type: "success" })
-      ammendList(res?.group)
-      navigation.goBack()
-    }
-  }
-
-  const updateGroupToServer = async (body) => {
-    let res = await UPDATE_CALENDAR_GROUP({ navigation, token, body, slug: group?.group_slug });
-    setLoader(false)
-    if (res.code == 200) {
-      showToast({ title: res.message, type: "success" })
-      ammendList(res?.group)
-      navigation.goBack()
+      setGroupList(res?.group)
     }
   }
 
@@ -102,28 +83,28 @@ const GroupAddEdit = ({ navigation, route }) => {
 
   const onSubmit = () => {
     if (groupData.title.trim() == "") {
-      showToast({ title: "Alert", body: "Please enter group name", type: "info" })
+      showToast({ title: "Alert", type: "info", body: "Please enter event title" })
     } else {
-      setLoader(true)
-      let obj = {
-        group_by: groupData.groupBy,
-        title: groupData.title.trim(),
-        status: groupData.status,
-        member: groupData.member.map(member => ({ member_id: member._id }))
-      };
-      if (obj.group_by == "program") {
-        obj["program"] = groupData.program.map(item => ({ program_slug: item.program_slug }))
-      } else {
-        obj["event"] = groupData.event.map(item => ({ event_slug: item.event_slug }))
-      }
-
-      if (isEdit) {
-        updateGroupToServer(obj)
-      } else {
-        addGroupToServer(obj)
-      }
+      navigation.navigate(routes.calendarEventsAddEditNotification, {
+        data: groupData
+      })
     }
+
   }
+
+
+  const handlerWeekdays = (day) => {
+    let days = [...groupData.weekday];
+    let dINDEX = days.findIndex(x => x == day.value)
+    if (dINDEX > -1) {
+      days.splice(dINDEX, 1);
+    } else {
+      days.push(day.value)
+    }
+    setGroupData({ weekday: [...days] })
+  }
+
+
 
   //Todo /// optoion functions
 
@@ -137,18 +118,11 @@ const GroupAddEdit = ({ navigation, route }) => {
   }
 
   const filterTheList = (list, text) => {
-    let nList = list.slice().filter(y => {
+    return list.slice().filter(y => {
       if (!groupData[optionModal?.type].find(x => x?._id == y?._id)) return true
       else return false
     });
-    if (optionModal?.type == "member" || text.trim() == "") {
-      return nList
-    } else if (optionModal?.type == "event" || optionModal?.type == "program") {
-      let stext = text.trim().toLowerCase();
-      nList = list.slice().filter(x => x.title.toLowerCase().includes(stext))
-    } else {
-      nList = list
-    }
+
   }
 
   const removeItem = (index, type) => {
@@ -157,11 +131,14 @@ const GroupAddEdit = ({ navigation, route }) => {
   }
 
 
+  //? /// Views
+
   const selectedView = (list, type) => {
     return (
       <View style={__styles.chipsLisView}>
         {list.map((item, index) =>
           <MyChip
+            key={item?._id}
             title={item?.title}
             onPress={() => removeItem(index, type)}
           />
@@ -184,9 +161,10 @@ const GroupAddEdit = ({ navigation, route }) => {
   }
 
 
+
   return (
     <RootView title={isEdit ? "Edit Event" : "Add Event"}>
-      <MyKeyboardAvoidingView>
+      <MyKeyboardAvoidingView >
         <MyInputs
           label='Title*'
           onChangeText={(text) => setGroupData({ title: text })}
@@ -194,9 +172,10 @@ const GroupAddEdit = ({ navigation, route }) => {
         />
 
         <MyTouchableInput
+          onPress={() => setColorModal(true)}
           label='Color*'
           view={() => (
-            <View style={{ flex: 1, marginLeft: 10, backgroundColor: 'red', borderWidth: 1, borderColor: colors.white, height: 30, borderRadius: 5 }} />
+            <View style={[__styles.colorView, { backgroundColor: groupData.color, }]} />
           )}
         />
 
@@ -241,10 +220,10 @@ const GroupAddEdit = ({ navigation, route }) => {
               {weekdays.map((day, dayIndex) =>
                 <View key={day.shortName} style={{ flex: 1 }}>
                   <MyCheckBox
-                    // onPress={() => handlerWeekdays(day, index)}
+                    onPress={() => handlerWeekdays(day)}
                     title={day.shortName}
                     row={false}
-                  // value={item?.days.includes(day.fullName)}
+                    value={groupData?.weekday.includes(day.value)}
                   />
                 </View>
               )}
@@ -257,13 +236,17 @@ const GroupAddEdit = ({ navigation, route }) => {
           <View style={{ flex: 1, marginRight: 10 }}>
             <MyTouchableInput
               label='Start Date*'
-              icon={()=>icons.calendar(colors.primary)}
+              onPress={() => ref_calendar?.current?.openModal(groupData.startDate, "startDate")}
+              icon={() => icons.calendar(colors.primary)}
+              value={moment(groupData?.startDate).format(dateTimeFormat.date)}
             />
           </View>
           <View style={{ flex: 1, marginRight: 10 }}>
             <MyTouchableInput
               label='Start Time*'
+              onPress={() => ref_timePicker?.current?.openModal(groupData.startTime, "startTime")}
               icon={icons.clock}
+              value={moment(groupData?.startTime, "HH:mm").format(dateTimeFormat.time)}
             />
           </View>
         </View>
@@ -272,13 +255,17 @@ const GroupAddEdit = ({ navigation, route }) => {
           <View style={{ flex: 1, marginRight: 10 }}>
             <MyTouchableInput
               label='End Date*'
-              icon={()=>icons.calendar(colors.primary)}
+              onPress={() => ref_calendar?.current?.openModal(groupData.endDate, "endDate")}
+              icon={() => icons.calendar(colors.primary)}
+              value={moment(groupData?.endDate).format(dateTimeFormat.date)}
             />
           </View>
           <View style={{ flex: 1, marginRight: 10 }}>
             <MyTouchableInput
               label='End Time*'
+              onPress={() => ref_timePicker?.current?.openModal(groupData.endTime, "endTime")}
               icon={icons.clock}
+              value={moment(groupData?.endTime, "HH:mm").format(dateTimeFormat.time)}
             />
           </View>
         </View>
@@ -305,39 +292,13 @@ const GroupAddEdit = ({ navigation, route }) => {
 
 
 
-        {/* <View style={__styles.radioRootView}>
-          <MyText isLabel>Group By *</MyText>
-          <View style={__styles.radioView}>
-            <View style={__styles.radioItem}>
-              <MyCheckBox
-                title='Programmme'
-                onPress={() => setGroupData({ groupBy: "program" })}
-                value={groupData?.groupBy == "program"}
 
-              />
-            </View>
-            <View style={__styles.radioItem}>
-              <MyCheckBox
-                title='Event'
-                onPress={() => setGroupData({ groupBy: "event" })}
-                value={groupData?.groupBy == "event"}
-              />
-            </View>
-          </View>
-        </View> */}
 
-        {groupData.groupBy == "program" ?
-
-          <MyTouchableInput
-            label='Programmes'
-            iconOnPress={() => setOptionModal({ isVisible: true, type: groupData.groupBy })}
-            view={() => selectedView(groupData?.program, "program")}
-          /> :
-          <MyTouchableInput
-            label='Event'
-            view={() => selectedView(groupData?.event, "event")}
-            iconOnPress={() => setOptionModal({ isVisible: true, type: groupData.groupBy })}
-          />}
+        <MyTouchableInput
+          label='Groups'
+          view={() => selectedView(groupData?.group, "group")}
+          iconOnPress={() => setOptionModal({ isVisible: true, type: "group" })}
+        />
 
         <MyTouchableInput
           view={() => selectedMemberView(groupData?.member, "member")}
@@ -345,11 +306,31 @@ const GroupAddEdit = ({ navigation, route }) => {
           iconOnPress={() => setOptionModal({ isVisible: true, type: "member" })}
         />
 
+        <Editor
+          initialValue={groupData?.desc}
+          onChange={(text) => setGroupData({ desc: text })}
+          height={150}
+          label='Event Description'
+          placeholder='Write event description'
+        />
 
         <View style={{ marginTop: 10 }}>
-          <MyButton title='Submit' onPress={onSubmit} />
+          <MyButton
+            title='Next'
+            onPress={onSubmit} />
         </View>
       </MyKeyboardAvoidingView>
+
+
+      <CalendarModal
+        ref={ref_calendar}
+        onDateSelected={(date, type) => setGroupData({ [type]: moment(date) })}
+      />
+
+      <TimePicker
+        ref={ref_timePicker}
+        onAgree={(time, type) => setGroupData({ [type]: time })}
+      />
 
       <OptionModalWithSearch
         isVisible={optionModal.isVisible}
@@ -358,28 +339,30 @@ const GroupAddEdit = ({ navigation, route }) => {
         noIcon
         filterTheList={filterTheList}
         onSearchTextChange={(text) => {
-          if (optionModal?.type == "member") {
-            getMemberListFromServer(text.trim())
-          }
+          getMemberListFromServer(text.trim())
         }}
         optionList={
-          optionModal?.type == "program" ? programmeList :
-            optionModal?.type == "event" ? eventsList :
-              optionModal?.type == "member" ? memberList :
-                []
+          optionModal?.type == "group" ? groupList :
+            optionModal?.type == "member" ? memberList :
+              []
         }
         title={
-          optionModal?.type == "program" ? "Programme" :
-            optionModal?.type == "event" ? "Event" :
-              optionModal?.type == "member" ? "Member" : ""
+          optionModal?.type == "group" ? "Group" :
+            optionModal?.type == "member" ? "Member" : ""
         }
         renderText={({ item }) => (
           <MyText>
-            {(optionModal?.type == "program" || optionModal?.type == "event") ?
+            {optionModal?.type == "group" ?
               `${item?.title}` :
               optionModal?.type == "member" ? `${item?.first_name} ${item?.last_name} (${item?.email})` : ""}
           </MyText>
         )}
+      />
+
+      <ColorModal
+        clodeModal={() => setColorModal(false)}
+        getColor={(color) => setGroupData({ color })}
+        isVisible={colorModal}
       />
 
       <MyLoader enable={loader} />
@@ -390,39 +373,56 @@ const GroupAddEdit = ({ navigation, route }) => {
 export default GroupAddEdit
 
 
+
 const weekdays = [{
   fullName: "Monday",
   shortName: "Mon",
+  value: 1
 },
 {
   fullName: "Tuesday",
   shortName: "Tue",
+  value: 2
 },
 {
   fullName: "Wednesday",
   shortName: "Wed",
+  value: 3
 },
 {
   fullName: "Thursday",
   shortName: "Thu",
+  value: 4
 },
 {
   fullName: "Friday",
   shortName: "Fri",
+  value: 5
 },
 {
   fullName: "Saturday",
   shortName: "Sat",
+  value: 6
 },
 {
   fullName: "Sunday",
   shortName: "Sun",
+  value: 0
 }]
 
 const __styles = StyleSheet.create({
+  colorView: {
+    borderWidth: 1,
+    borderColor: colors.white,
+    height: 30,
+    borderRadius: 5,
+    flex: 1,
+    marginLeft: 10,
+  },
   radioRootView: {
     marginBottom: 15
   },
+
   radioView: {
     flexDirection: "row",
     borderWidth: 1,

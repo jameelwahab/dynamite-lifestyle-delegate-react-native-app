@@ -33,7 +33,8 @@ const Editor = ({
   height = 300,
   backgroundColor = colors.secondary,
   label = "",
-  autoResonderMsgs = []
+  autoResonderMsgs = [],
+  placeholder = 'Type a message...'
 }) => {
   const navigation = useNavigation();
   const { token } = useSelector(selectUser);
@@ -244,7 +245,7 @@ const Editor = ({
                 iconTint={colors.primary}
                 initialContentHTML={!!initialValue ? `<div>${initialValue}</div>` : ""}
                 useContainer={true}
-                placeholder={'Type a message...'}
+                placeholder={placeholder}
                 onChange={text => onChange(text)}
                 androidLayerType="hardware"
                 androidHardwareAccelerationDisabled

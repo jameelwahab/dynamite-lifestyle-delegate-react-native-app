@@ -67,13 +67,15 @@ const TransparentButton = ({
   title = "",
   icon = () => { },
   onPress = () => { },
+  style = {},
+  underlayColor = colors.lightPrimary2
 }) => {
   return (
     <TouchableHighlight
       style={{ borderRadius: 10, }}
-      underlayColor={colors.lightPrimary2}
+      underlayColor={underlayColor}
       onPress={onPress}>
-      <View style={__tarsparentButtonStyle.root} >
+      <View style={[__tarsparentButtonStyle.root, style]} >
         {icon?.()}
         {!!title && <Text style={__tarsparentButtonStyle.text} >{title}</Text>}
       </View>

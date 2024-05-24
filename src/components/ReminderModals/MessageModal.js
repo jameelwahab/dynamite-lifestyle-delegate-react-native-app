@@ -17,6 +17,7 @@ let selection;
 const MessageModal = forwardRef(({ onReminderSavePress }, ref) => {
   const [isVisible, setIsVisible] = useState(false);
   const [msg, setMsg] = useState("")
+  const [index, setIndex] = useState(undefined)
   const [linkModal, setLinkModal] = useState({ isVisible: false, link: "", title: "" });
   useImperativeHandle(ref, () => {
     return {
@@ -34,16 +35,19 @@ const MessageModal = forwardRef(({ onReminderSavePress }, ref) => {
     }
     onReminderSavePress({
       message_notification_info: obj
-    });
+    },index);
     closeModal();
   }
 
   const closeModal = () => {
     setIsVisible(false);
+    setIndex(undefined)
+    setMsg("")
   }
 
-  const openModal = (data) => {
+  const openModal = (data,index=undefined) => {
     setIsVisible(true);
+    setIndex(index)
     if (!!data) {
       setMsg(!!data?.message ? data?.message : "")
     }
