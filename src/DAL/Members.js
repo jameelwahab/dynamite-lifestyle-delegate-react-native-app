@@ -32,7 +32,7 @@ export const LIST_OF_MEMBERS_ONLY = ({ token, navigation, page, searchText, body
   user_status_type = "", search_text = ""
 } }) => {
   return invokeApi({
-    path: `api/event_subscriber/subscriber_list_for_member_with_filter?page=${page}&limit=10&search_text=${searchText}`,
+    path: `api/event_subscriber/subscriber_list_for_member_with_filter?page=${page}&limit=20&search_text=${searchText}`,
     method: "POST",
     postData: {
       coins, coins_from, coins_range, coins_to, community, date, event_page, expiry_in, filter_From,
@@ -54,7 +54,7 @@ export const LIST_OF_NURTURE = ({ token, navigation, page, searchText, body: {
   user_status_type = "", search_text = ""
 } }) => {
   return invokeApi({
-    path: `api/consultant/member_list_for/associate?page=${page}&limit=10&search_text=${searchText}`,
+    path: `api/consultant/member_list_for/associate?page=${page}&limit=20&search_text=${searchText}`,
     method: "POST",
     postData: {
       coins, coins_from, coins_range, coins_to, community, date, event_page, expiry_in, filter_From,
@@ -79,9 +79,9 @@ export const SAVE_FILTER = ({ token, navigation, body: {
   })
 }
 
-export const GET_FILTER_DATA = ({ token, navigation, searchText }) => {
+export const GET_FILTER_DATA = ({ token, navigation, searchText ,type}) => {
   return invokeApi({
-    path: `api/consultant/filter_data_for/delegate?search_text=&delegate_search_text=${searchText}&filter_on_tab_name=all-member`,
+    path: `api/consultant/filter_data_for/delegate?search_text=&delegate_search_text=${searchText}&filter_on_tab_name=${type}`,
     method: "GET",
     token,
     navigation,

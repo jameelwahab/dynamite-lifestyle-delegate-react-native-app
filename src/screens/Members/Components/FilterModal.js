@@ -21,7 +21,7 @@ import Toast from 'react-native-toast-message';
 import showToast from '../../../functions/showToast';
 import OptionModalWithSearch from '../../../components/OptionModalWithSearch';
 
-const FilterModal = forwardRef(({ token, filterTheData, appliedFilter, isMembers, isNurture, isAllMembers }, ref) => {
+const FilterModal = forwardRef(({ token, type, filterTheData, appliedFilter, isMembers, isNurture, isAllMembers }, ref) => {
   const calendarRef = useRef()
   const [isVisible, setIsVisible] = useState(false);
   const [nurtureModalVisibilty, setNurtureModalVisibilty] = useState(false);
@@ -199,7 +199,7 @@ const FilterModal = forwardRef(({ token, filterTheData, appliedFilter, isMembers
   }
 
   const getFilterData = async (searchText = "") => {
-    let res = await GET_FILTER_DATA({ navigation, token, searchText });
+    let res = await GET_FILTER_DATA({ navigation, token, searchText, type });
     if (res.code == 200) {
       setFilterData(res)
     }

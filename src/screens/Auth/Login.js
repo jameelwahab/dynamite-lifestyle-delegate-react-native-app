@@ -45,8 +45,6 @@ const Login = ({ navigation }) => {
   }
 
   const onMainScreen = async () => {
-
-   
     if (email.trim() == "") {
       showToast({ body: "Please enter your email" });
     } else if (!isEmailValid(email.trim())) {

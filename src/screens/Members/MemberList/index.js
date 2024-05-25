@@ -141,7 +141,22 @@ const MemberList = ({ navigation, route }) => {
       .catch(error => console.error(error));
   }
 
+  const setSortfilter = (sort) => {
+    let nOBj = {
+      label: sort.title,
+      value: sort.key,
+      type: "sort"
+    }
+    let index = filterChipList.findIndex(x => x.type == 'sort');
+    if (index > -1) {
+      filterChipList.splice(index, 1, nOBj)
+    } else {
+      filterChipList.push(nOBj)
+    }
+    setFilterChipList([...filterChipList]);
+  }
   const filterTheData = (obj, data, isSavedFilter, isFilter) => {
+    console.log(data?.lead_status, "leaf_status")
     let list = [];
 
     if (!!sorted) {
@@ -168,8 +183,10 @@ const MemberList = ({ navigation, route }) => {
         } else if (x == "event_page") {
           let id = obj[x][0]
           if (!!id) {
+            let label = data?.sale_pages.find((x) => x._id == id)?.sale_page_title;
+            console.log(label, "event_page")
             let nOBj = {
-              label: data?.sale_pages.find((x) => x._id == id)?.sale_page_title,
+              label: label,
               value: id,
               type: x
             }
@@ -177,28 +194,38 @@ const MemberList = ({ navigation, route }) => {
           }
         } else if (x == "lead_status") {
           obj[x].forEach((z, j) => {
-            let nOBj = {
-              label: data?.lead_status.find(y => y._id == z)?.title,
-              value: z,
-              type: x
+            let label = data?.lead_status.find(y => y._id == z)?.title;
+            console.log(label, "lead_status")
+            if (label) {
+              let nOBj = {
+                label: label,
+                value: z,
+                type: x
+              }
+              list.push(nOBj);
             }
-            list.push(nOBj);
           })
         }
       } else if (x == 'delegate' && !!obj[x]) {
-        let nOBj = {
-          label: getNameForDelage(data?.delegates_list, obj[x]),
-          value: obj[x],
-          type: x
+        let label = getNameForDelage(data?.delegates_list, obj[x]);
+        if (label) {
+          let nOBj = {
+            label: label,
+            value: obj[x],
+            type: x
+          }
+          list.push(nOBj);
         }
-        list.push(nOBj);
       } else if (x == 'nurture' && !!obj[x]) {
-        let nOBj = {
-          label: getNameForDelage(data?.delegates_list, obj[x]),
-          value: obj[x],
-          type: x
+        let label = getNameForDelage(data?.delegates_list, obj[x]);
+        if (label) {
+          let nOBj = {
+            label: label,
+            value: obj[x],
+            type: x
+          }
+          list.push(nOBj);
         }
-        list.push(nOBj);
       } else if (x == 'plan' && !!obj[x]) {
         let pageId = obj.event_page[0];
         if (!!pageId) {
@@ -379,10 +406,11 @@ const MemberList = ({ navigation, route }) => {
   }
 
   useEffect(() => {
-
+console.log(sorted,"sorted")
     page = 0;
     canLoadMore = false
-    debounce(() => getMembers(true), 100)
+    getMembers(true)
+    // debounce(() => getMembers(true), 100)
   }, [JSON.stringify(sorted), JSON.stringify(Filter)])
 
   // useEffect(() => {
@@ -490,7 +518,9 @@ const MemberList = ({ navigation, route }) => {
 
   const getNameForDelage = (list, id) => {
     let obj = list.find((x) => x._id == id);
-    return obj.first_name + " " + obj.last_name
+    if (obj) {
+      return obj?.first_name + " " + obj?.last_name
+    } else return null
   }
 
   const countLength = () => {
@@ -519,7 +549,7 @@ const MemberList = ({ navigation, route }) => {
   }
 
   const filterRemoveAction = (item) => {
-    if (item.type == "community") {
+    if (item.type == "sort") {
       setSorted(null)
     } else if (item.type == "community") {
       updateFilter({ community: Filter?.community.slice().filter(z => z != item.value) });
@@ -613,7 +643,7 @@ const MemberList = ({ navigation, route }) => {
                   }} >{"Clear Filter"}</MyText> */}
                   <TouchableOpacity
                     onPress={clearFilter}
-                    style={{ borderWidth: 1, borderColor: colors.primary, borderRadius: 10, paddingHorizontal: 10,marginRight:10, paddingVertical: 5, backgroundColor: colors.lightPrimary3 }}>
+                    style={{ borderWidth: 1, borderColor: colors.primary, borderRadius: 10, paddingHorizontal: 10, marginRight: 10, paddingVertical: 5, backgroundColor: colors.lightPrimary3 }}>
                     <MyText color={colors.primary}>{"Clear Filter"}</MyText>
                   </TouchableOpacity>
                 </Pressable>
@@ -790,7 +820,9 @@ const MemberList = ({ navigation, route }) => {
       <SortModal
         ref={sortModalRef}
         onSelected={(selected) => {
+          console.log(selected, 'selected')
           setSorted(selected)
+          setSortfilter(selected)
         }}
         alreadySelected={sorted}
       />
@@ -799,6 +831,7 @@ const MemberList = ({ navigation, route }) => {
         filterTheData={filterTheData}
         ref={filterModalRef}
         appliedFilter={{ ...Filter, isSavedFilterApplied: isSavedFilterApplied }}
+        type={type}
         isMembers={isMembers}
         isNurture={isNurture}
         isAllMembers={isAllMembers}
