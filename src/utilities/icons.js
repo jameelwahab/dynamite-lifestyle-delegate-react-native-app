@@ -134,4 +134,5 @@ export const icons = {
   repeat: (color = colors.white, size = 20) => { return (<MaterialCommunityIcons name="repeat" color={color} size={size} />) },
   notification: (color = colors.white, size = 20) => { return (<FontAwesome name="bell" color={color} size={size} />) },
   messageFilled: (color = colors.white, size = 20) => { return (<Ionicons name="chatbox" color={color} size={size} />) },
+  warnOuline: (color = colors.white, size = 20) => { return (<Ionicons name="warning-outline" color={color} size={size} />) },
 }

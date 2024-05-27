@@ -9,7 +9,7 @@ import moment from 'moment';
 import { dateTimeFormat } from '../../../utilities/constants';
 import { useSelector } from 'react-redux';
 import { selectTimeZone } from '../../../redux/reducers/timezoneSlice';
-import { convertTimezone, convertTimezoneFrom } from '../../../functions/convertTime';
+import { convertTimezone, convertTimezone2, convertTimezoneFrom } from '../../../functions/convertTime';
 const ScheduleModal = forwardRef(({ }, ref) => {
   const [isVisible, setVisiblity] = useState(false);
   const [time, setTime] = useState(null);
@@ -31,6 +31,7 @@ const ScheduleModal = forwardRef(({ }, ref) => {
 
 
   const modalSchedule = () => {
+    console.log(time, "")
     return (
       <Modal
         isVisible={isVisible}
@@ -55,7 +56,7 @@ const ScheduleModal = forwardRef(({ }, ref) => {
           {!!time &&
             <View style={{ paddingBottom: 10, paddingHorizontal: 10 }}>
               {/* <MyText>{`Post will be pushlished on ${moment(time).tz(timezone.admin).format(dateTimeFormat.dateTimeWithText("at"))} (Europe/Dublin)`}</MyText> */}
-              <MyText>{`Post will be pushlished on ${moment(time).tz(timezone.admin).subtract({ hour: 1 }).format(dateTimeFormat.dateTimeWithText("at"))} (Europe/Dublin)`}</MyText>
+              <MyText>{`Post will be pushlished on ${convertTimezone2(time, { user: timezone.admin, admin: timezone.admin }).format(dateTimeFormat.dateTimeWithText("at"))} (Europe/Dublin)`}</MyText>
             </View>}
         </View>
 

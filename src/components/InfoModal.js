@@ -8,12 +8,12 @@ import { icons } from '../utilities/icons';
 import { colors } from '../utilities/colors';
 import MyWebview from './MyWebview';
 
-const InfoModal = forwardRef(({ }, ref) => {
+const InfoModal = forwardRef(({ header }, ref) => {
   const [isVisible, setVisiblity] = useState(false);
   const [text, setText] = useState("");
   const [subText, setSubText] = useState("");
   const [isHtml, setIsHtml] = useState("")
-
+  console.log(header, "header")
   useImperativeHandle(ref, () => {
     return {
       openModal,
@@ -48,13 +48,16 @@ const InfoModal = forwardRef(({ }, ref) => {
         // avoidKeyboard={true}
         style={{ margin: 0, marginHorizontal: 5 }}>
         <View style={__style.rootView}>
-          <View style={__style.headingView}>
-            <Pressable
-              hitSlop={{ top: 10, left: 10, right: 10, left: 10 }}
-              style={{ marginBottom: 10 }}
-              onPress={closeScheduleTimeModal}>
-              {icons.crosssWithCircle(colors.white, 20)}
-            </Pressable>
+          <View style={{ flexDirection: "row" }}>
+            {header?.()}
+            <View style={__style.headingView}>
+              <Pressable
+                hitSlop={{ top: 10, left: 10, right: 10, left: 10 }}
+                style={{ marginBottom: 10 }}
+                onPress={closeScheduleTimeModal}>
+                {icons.crosssWithCircle(colors.white, 20)}
+              </Pressable>
+            </View>
           </View>
           <View style={{ paddingBottom: 10, paddingHorizontal: 10 }}>
             {isHtml ?
@@ -90,7 +93,7 @@ const __style = StyleSheet.create({
     padding: 10
   },
   headingView: {
-
-    alignSelf: "flex-end"
+    flex: 1,
+    alignItems: "flex-end"
   },
 })

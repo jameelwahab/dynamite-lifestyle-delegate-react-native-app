@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useReducer, useRef, useState } from 'react'
 import RootView from '../../components/RootView'
 import MyText from '../../components/MyText'
 import { useSelector } from 'react-redux'
@@ -23,11 +23,13 @@ import showToast from '../../functions/showToast'
 import { convertTimezone } from '../../functions/convertTime'
 import { selectTimeZone } from '../../redux/reducers/timezoneSlice'
 import TimePicker from '../../components/TimePicker'
+import InfoModal from '../../components/InfoModal'
 
 const PerformanceStreak = ({ navigation, route }) => {
   const { key } = route?.params
   const { token } = useSelector(selectUser);
   const { navbar } = useSelector(selectNavbar);
+  const ref_infoModal = useRef();
   const timezone = useSelector(selectTimeZone);
   const [title] = useState(navbar?.find(x => x._id == key)?.title);
   const [loader, setLoader] = useState(true);
@@ -94,13 +96,17 @@ const PerformanceStreak = ({ navigation, route }) => {
           focus_performance_rate: res?.strek?.focus_performance_rate,
           win_note: res?.strek?.win_note,
           win_note_performance_rate: res?.strek?.win_note_performance_rate
-        })
+        });
+
       }
       setSettings(res?.streak_performance_setting);
       setReminder({
         time: !!res?.dynamite_streak_performance_reminder_time.time ? moment(res?.dynamite_streak_performance_reminder_time.time).format("HH:mm") : "00:00",
         days: res?.dynamite_streak_performance_reminder_time.days ? res?.dynamite_streak_performance_reminder_time.days : []
       })
+      if (!res?.is_reminder_added) {
+        ref_infoModal?.current?.openModal(res?.streak_performance_setting?.streak_performance_days_reminder, null, true)
+      }
       // showToast({ title: res?.message, type: "success" });
     }
   }
@@ -133,6 +139,18 @@ const PerformanceStreak = ({ navigation, route }) => {
   }
 
   //* Views
+
+
+  const infoHeaderView = () => {
+    return (
+      <View style={{flexDirection:"row",alignItems:"center"}}>
+        <MyText fontSize={18} type='bold' >Warning</MyText>
+        <View style={{marginLeft:5}}>
+        {icons.warnOuline(colors.primary)}
+        </View>
+      </View>
+    )
+  }
   const reminderView = () => {
     return (
       <View style={__styles.reminderView}>
@@ -304,6 +322,11 @@ const PerformanceStreak = ({ navigation, route }) => {
           }
           setReminder({ ...reminder, days: [...reminder.days] })
         }}
+      />
+
+      <InfoModal
+        ref={ref_infoModal}
+        header={infoHeaderView}
       />
     </RootView>
   )

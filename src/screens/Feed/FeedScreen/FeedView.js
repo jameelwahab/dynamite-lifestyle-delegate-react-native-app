@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, Pressable } from 'reac
 import React, { memo, useEffect, useState } from 'react'
 import UserImage from '../../../components/UserImage'
 import MyText from '../../../components/MyText'
-import { convertTimezone } from '../../../functions/convertTime'
+import { convertTimezone, convertTimezone2 } from '../../../functions/convertTime'
 import { colors } from '../../../utilities/colors'
 import { S3_URL, isDev } from '../../../utilities/constants'
 import ImagesForFeed from './ImagesForFeed'

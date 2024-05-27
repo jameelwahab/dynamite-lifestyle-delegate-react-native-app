@@ -191,6 +191,7 @@ const index = (props) => {
   }
 
   const handleSocketEvents = async (data, event) => {
+    console.log(event,"event")
     if (data?.action_response?.unread_notification_count != undefined) {
       if (typeof (data?.action_response?.unread_notification_count) == "number") {
         setCount(data?.action_response?.unread_notification_count)
