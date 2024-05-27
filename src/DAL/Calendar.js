@@ -6,7 +6,7 @@ export const GET_CALENDAR_EVENTS_LIST = ({ token, navigation, body: {
   return invokeApi({
     path: `api/event/list`,
     method: "POST",
-    body: { created_for, end_date, start_date },
+    postData: { created_for, end_date, start_date },
     token,
     navigation,
   })
@@ -42,21 +42,64 @@ export const GET_GROUPS_AND_MEMBERS_FOR_CALENDAR = ({ token, navigation, searchT
 }
 
 
-export const ADD_CALENDAR_EVENT = ({ token, navigation, body }) => {
+export const ADD_CALENDAR_EVENT = ({ token, navigation, body, by }) => {
   return invokeApi({
-    path: `api/event/add/by_admin`,
+    path: `api/event/add/${by}`,
     method: "POST",
-    postData:body,
+    postData: body,
     token,
     navigation,
   })
 }
 
-export const UPDATE_CALENDAR_EVENT = ({ token, navigation, body }) => {
+export const UPDATE_CALENDAR_EVENT = ({ token, navigation, slug, body, by }) => {
   return invokeApi({
-    path: `api/event/add/by_admin`,
+    path: `api/event/update/${by}/${slug}`,
+    method: "PUT",
+    postData: body,
+    token,
+    navigation,
+  })
+}
+
+export const UPDATE_CALENDAR_EVENT_ITERATION = ({ token, navigation, slug, body }) => {
+  return invokeApi({
+    path: `api/event/event_iteration/update/${slug}`,
+    method: "PUT",
+    postData: body,
+    token,
+    navigation,
+  })
+}
+
+export const UPDATE_CALENDAR_EVENT_ITERATION_BY_MEMBER = ({ token, navigation, slug, body }) => {
+  return invokeApi({
+    path: `api/event/event_iteration/update/by_member/${slug}`,
+    method: "PUT",
+    postData: body,
+    token,
+    navigation,
+  })
+}
+
+
+export const DELETE_CALENDAR_EVENT = ({ token, navigation, body: {
+  event_slug, iteration_id, update_type
+} }) => {
+  return invokeApi({
+    path: `api/event/delete`,
     method: "POST",
-    postData:body,
+    postData: { event_slug, iteration_id, update_type },
+    token,
+    navigation,
+  })
+}
+
+
+export const CALENDAR_EVENT_DETAIL_BY_Id = ({ token, navigation, id }) => {
+  return invokeApi({
+    path: `api/event/detail/id/${id}`,
+    method: "GET",
     token,
     navigation,
   })

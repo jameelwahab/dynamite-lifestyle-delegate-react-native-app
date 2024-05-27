@@ -13,18 +13,26 @@ import breakReference from '../../../functions/breakReference'
 import NotificationModal from '../../../components/ReminderModals/NotificationModal'
 import MessageModal from '../../../components/ReminderModals/MessageModal'
 import moment from 'moment'
-import { ADD_CALENDAR_EVENT } from '../../../DAL'
+import { ADD_CALENDAR_EVENT, UPDATE_CALENDAR_EVENT, UPDATE_CALENDAR_EVENT_ITERATION, UPDATE_CALENDAR_EVENT_ITERATION_BY_MEMBER } from '../../../DAL'
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../../redux/reducers/userSlice'
 import MyLoader from '../../../components/MyLoader'
 import routes from '../../../navigation/routes'
+import EventOptionModal from '../components/EventOptionModal'
+import { dateTimeFormat } from '../../../utilities/constants'
+import { convertTimezone2 } from '../../../functions/convertTime'
+import { selectTimeZone } from '../../../redux/reducers/timezoneSlice'
 
 const CalendarNotifications = ({ navigation, route }) => {
-  const { data } = route?.params;
+  const { data, event, iteration_id, type: eventType, notifications: savedNotifications } = route?.params;
+
+  const isDelegateEvents = eventType == "consultant_user";
   const { token } = useSelector(selectUser);
+  const timezone = useSelector(selectTimeZone)
   const refNotificationModal = useRef()
+  const ref_option = useRef();
   const refMessageModal = useRef();
-  const [notifications, setnotifications] = useState([{ ...notifyObject }])
+  const [notifications, setnotifications] = useState(!!savedNotifications ? savedNotifications : !!event?.notify_before ? event?.notify_before : [{ ...notifyObject }])
   const [loader, setLoader] = useState(false);
 
 
@@ -32,36 +40,124 @@ const CalendarNotifications = ({ navigation, route }) => {
   //! ///////  APIs
 
   const onAddEvent = async (body) => {
-    let res = await ADD_CALENDAR_EVENT({ navigation, token, body });
+    let res = await ADD_CALENDAR_EVENT({
+      navigation, token, body,
+      by: isDelegateEvents ? "by_delegate" : "by_admin"
+    });
+    setLoader(false)
     if (res.code == 200) {
       navigation.navigate(routes.calendarEventsList, {
         refresh: true
       })
-      setLoader(false)
     }
   }
 
-  const onSavePress = () => {
+
+  const onEditEvent = async (body) => {
+    let res = await UPDATE_CALENDAR_EVENT({
+      navigation, token, body, slug: event?.event_slug,
+      by: isDelegateEvents ? "by_delegate" : "by_admin"
+    });
+    setLoader(false)
+    if (res.code == 200) {
+      navigation.navigate(routes.calendarEventsList, {
+        refresh: true
+      })
+    }
+  }
+
+  const onEditIteration = async (body) => {
+    let res = await UPDATE_CALENDAR_EVENT_ITERATION({ navigation, token, body, slug: event?.event_slug });
+    setLoader(false)
+    if (res.code == 200) {
+      navigation.navigate(routes.calendarEventsList, {
+        refresh: true
+      })
+
+    }
+  }
+
+  const onEditIterationDelegate = async (body) => {
+    let res = await UPDATE_CALENDAR_EVENT_ITERATION_BY_MEMBER({ navigation, token, body, slug: event?.event_slug });
+    setLoader(false)
+    if (res.code == 200) {
+      navigation.navigate(routes.calendarEventsList, {
+        refresh: true
+      })
+
+    }
+  }
+
+  //? Functions
+  const onSubmitPress = () => {
+    if (isDelegateEvents && !!event) {
+      if ((event?.title.trim() != data?.title.trim()) ||
+        (convertTimezone2(event?.start_date_time, timezone).format(dateTimeFormat.date) != moment(data?.startDate).format(dateTimeFormat.date)) ||
+        (convertTimezone2(event?.start_date_time, timezone).format("HH:mm") != data?.startTime) ||
+        (convertTimezone2(event?.end_date_time, timezone).format(dateTimeFormat.date) != moment(data?.endDate).format(dateTimeFormat.date)) ||
+        (convertTimezone2(event?.end_date_time, timezone).format("HH:mm") != data?.endTime)
+      ) {
+        ref_option?.current?.openModal()
+      } else {
+        onSavePress()
+      }
+
+    } else {
+      onSavePress()
+    }
+  }
+
+  const onSavePress = (type = "current") => {
     let body = {
       title: data?.title.trim(),
       color: data?.color,
-      created_for: "",
       description: data?.desc,
       start_date: moment(data?.startDate).format("YYYY-MM-DD"),
       start_time: data?.startTime,
       end_date: moment(data?.endDate).format("YYYY-MM-DD"),
       end_time: data?.endTime,
-      group: data?.group.map(x => ({ group_slug: x?.group_slug })),
-      member: data?.member.map(x => ({ member_id: x?._id })),
       is_notify_user: true,
       notify_before: notifications,
       recurring_type: data?.recurringType,
-      status: data?.status,
       weekday: data?.weekday
     }
+    if (!isDelegateEvents) {
+      body = {
+        ...body,
+        status: data?.status,
+        created_for: "",
+        group: data?.group.map(x => ({ group_slug: x?.group_slug })),
+        member: data?.member.map(x => ({ member_id: x?._id })),
+      }
+    }
     setLoader(true)
-    onAddEvent(body)
+    if (!!event) {
+      if (!!iteration_id) {
+        body["recurring_type"] = undefined;
+        body["iteration_id"] = iteration_id;
+        delete body["group"];
+        delete body["member"];
+        delete body["created_for"];
+        delete body["weekday"];
+        if (isDelegateEvents) {
+          body["update_type"] = type;
+          onEditIterationDelegate(body);
+        } else {
+          onEditIteration(body)
+        }
+      } else {
+        onEditEvent(body)
+      }
+    } else {
+      onAddEvent(body)
+    }
 
+  }
+
+  const onBackPress = () => {
+    navigation.navigate(routes.calendarEventsAddEdit, {
+      notifications, event, iteration_id,
+    })
   }
 
   const addNotification = () => {
@@ -107,6 +203,8 @@ const CalendarNotifications = ({ navigation, route }) => {
       setnotifications([...notifications]);
     }
   }
+
+  //*    Views
 
   const notificationView = ({ item, index }) => {
     let pushNot = item?.notification_send_type.find(x => x.name == "push_notification_access")
@@ -198,7 +296,9 @@ const CalendarNotifications = ({ navigation, route }) => {
   }
 
   return (
-    <RootView title="Event Notification Setting" >
+    <RootView
+      customBackPress={onBackPress}
+      title="Event Notification Setting" >
 
       <View style={{ flex: 1 }}>
         <MyKeyboardAvoidingView noScrollView >
@@ -217,7 +317,7 @@ const CalendarNotifications = ({ navigation, route }) => {
                   />
                 </View>
                 <View style={{ marginTop: 10 }}>
-                  <MyButton title='Submit' onPress={onSavePress} />
+                  <MyButton title='Submit' onPress={onSubmitPress} />
                 </View>
               </View>
             }
@@ -238,6 +338,12 @@ const CalendarNotifications = ({ navigation, route }) => {
         onReminderSavePress={(data, index) => {
           notifcatioDataTypeHandler(data, index, "message_notification_access");
         }}
+      />
+
+      <EventOptionModal
+        ref={ref_option}
+        title="Perform this action On?"
+        onAgree={(type) => onSavePress(type)}
       />
       <MyLoader enable={loader} />
     </RootView>

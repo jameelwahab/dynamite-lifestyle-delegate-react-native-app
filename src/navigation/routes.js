@@ -51,6 +51,7 @@ const routes = {
   delegateReportNavigator: "DELEGATE_REPORT_NAVIGATOR",
   calendarGroupsNavigator: "CALENDAR_GROUPS_NAVIGATOR",
   calendarEventNavigator: "CALENDAR_EVENTS_NAVIGATOR",
+  delegateEventsNavigator: "DELEGATE_EVENTS_NAVIGATOR",
   delegateCalendarEventNavigator: "DELEGATE_CALENDAR_EVENTS_NAVIGATOR",
   salesTeamNavigator: "SALES_TEAM_NAVIGATOR",
   salesPendingCommissionsNavigator: "SALE_PENDING_COMMISSION_NAVIGATOR",
@@ -300,8 +301,11 @@ const routes = {
 
   //? Calendar Events
   calendarEventsList: "CALENDAR_EVENTS_SCREEN",
+  calendarEventDetail: "CALENDAR_EVENT_DETAIL_SCREEN",
   calendarEventsAddEdit: "CALENDAR_EVENTS_ADD_EDIT_SCREEN",
   calendarEventsAddEditNotification: "CALENDAR_EVENTS_ADD_EDIT_NOTIFICATIONS",
+
+  
 
   //? Sales Team
   salesTeamListing: "SALES_TEAM_LISTING_SCREEN",

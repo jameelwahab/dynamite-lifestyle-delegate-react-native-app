@@ -9,7 +9,7 @@ import { colors } from '../../../utilities/colors'
 import MyCheckBox from '../../../components/MyCheckBox'
 import MyTouchableInput from '../../../components/MyTouchableInput'
 import { MyButton } from '../../../components/MyButton'
-import { ADD_CALENDAR_GROUP, GET_GROUPS_AND_MEMBERS_FOR_CALENDAR, GET_MEMBERS_AND_PROGRAMMES_LIST_FOR_CALENDAR_GROUP, GET_MEMBER_LIST_FOR_PAYMENT_REQUEST, UPDATE_CALENDAR_GROUP } from '../../../DAL'
+import { GET_GROUPS_AND_MEMBERS_FOR_CALENDAR, } from '../../../DAL'
 import MyKeyboardAvoidingView from '../../../components/MyKeyboardAvoidingView'
 import OptionModalWithSearch from '../../../components/OptionModalWithSearch'
 import MyChip from '../../../components/MyChip'
@@ -24,14 +24,17 @@ import TimePicker from '../../../components/TimePicker'
 import ColorModal from '../../../components/ColorModal'
 import routes from '../../../navigation/routes'
 import Editor from '../../../components/Editor'
+import { convertTimezone2 } from '../../../functions/convertTime'
+import { selectTimeZone } from '../../../redux/reducers/timezoneSlice'
+
 
 const GroupAddEdit = ({ navigation, route }) => {
-  // const { group, ammendList } = route?.params;
-  const group = undefined;
-  const ammendList = () => { }
-  console.log(group, "group")
-  const isEdit = !!group;
+  const { event, iteration_id, type: eventType } = route?.params;
+  const isDelegateEvents = eventType == "consultant_user";
+  const isEdit = !!event;
+  const isEditIteration = !!iteration_id;
   const { token } = useSelector(selectUser);
+  const timezone = useSelector(selectTimeZone)
   const ref_calendar = useRef();
   const ref_timePicker = useRef();
   const [loader, setLoader] = useState(false);
@@ -43,18 +46,18 @@ const GroupAddEdit = ({ navigation, route }) => {
     type: "",
   })
   const [groupData, updateGroupData] = useState({
-    title: !!group?.title ? group?.title : "",
-    status: isEdit && !!group?.status == false ? false : true,
-    group: !!group?.event ? group?.event.map(x => x?._id) : [],
-    member: !!group?.member ? group?.member.map(x => x?._id) : [],
-    startDate: moment(),
-    startTime: moment().format("HH:mm"),
-    endDate: moment(),
-    weekday: [],
-    endTime: moment().format("HH:mm"),
-    recurringType: "daily",
-    color: "#000000",
-    desc: ""
+    title: !!event?.title ? event?.title : "",
+    status: isEdit && !!event?.status == false ? false : true,
+    group: !!event?.group ? event?.group.map(x => x?._id) : [],
+    member: !!event?.member ? event?.member.map(x => x?._id) : [],
+    startDate: !!event?.start_date_time ? convertTimezone2(event?.start_date_time, timezone) : moment(),
+    startTime: !!event?.start_date_time ? convertTimezone2(event?.start_date_time, timezone).format("HH:mm") : moment().format("HH:mm"),
+    endDate: !!event?.end_date_time ? convertTimezone2(event?.end_date_time, timezone) : moment(),
+    endTime: !!event?.end_date_time ? convertTimezone2(event?.end_date_time, timezone).format("HH:mm") : moment().format("HH:mm"),
+    weekday: !!event?.weekday ? event?.weekday : [],
+    recurringType: !!event?.recurring_type ? event?.recurring_type : "daily",
+    color: !!event?.color ? event?.color : "#000000",
+    desc: !!event?.description ? event?.description : ""
 
   })
   const setGroupData = (update) => updateGroupData({ ...groupData, ...update });
@@ -86,7 +89,10 @@ const GroupAddEdit = ({ navigation, route }) => {
       showToast({ title: "Alert", type: "info", body: "Please enter event title" })
     } else {
       navigation.navigate(routes.calendarEventsAddEditNotification, {
-        data: groupData
+        data: groupData,
+        event,
+        iteration_id,
+        notifications: route?.params?.notifications
       })
     }
 
@@ -163,7 +169,7 @@ const GroupAddEdit = ({ navigation, route }) => {
 
 
   return (
-    <RootView title={isEdit ? "Edit Event" : "Add Event"}>
+    <RootView title={isEditIteration ? "Edit Iteration" : isEdit ? "Edit Event" : "Add Event"}>
       <MyKeyboardAvoidingView >
         <MyInputs
           label='Title*'
@@ -180,57 +186,59 @@ const GroupAddEdit = ({ navigation, route }) => {
         />
 
         {/* //?  Recurring Type */}
-        <View>
-          <MyText isLabel>Recurring Type</MyText>
-          <View style={__styles.alignBtnsRow}>
-            <Pressable
-              onPress={() => setGroupData({ recurringType: "daily" })}
-              style={[__styles.alignBtnView, groupData?.recurringType == "daily" && __styles.alignSelectedBtnView]}
-            >
-              <MyText
-                type='medium'
-                color={groupData?.recurringType == "daily" ? colors.black : colors.white} >Daily</MyText>
-            </Pressable>
-            <View style={__styles.verticalDivider} />
-            <Pressable
-              onPress={() => setGroupData({ recurringType: "weekly" })}
-              style={[__styles.alignBtnView, groupData.recurringType == "weekly" && __styles.alignSelectedBtnView]}>
-              <MyText
-                type='medium'
-                color={groupData?.recurringType == "weekly" ? colors.black : colors.white}
-              >Weekly</MyText>
-            </Pressable>
-            <View style={__styles.verticalDivider} />
-            <Pressable
-              onPress={() => setGroupData({ recurringType: "monthly" })}
-              style={[__styles.alignBtnView, groupData.recurringType == "monthly" && __styles.alignSelectedBtnView]}>
-              <MyText
-                type='medium'
-                color={groupData?.recurringType == "monthly" ? colors.black : colors.white}
-              >Monthly</MyText>
-            </Pressable>
-          </View>
-        </View>
-
-        <Collapsible collapsed={groupData?.recurringType != "weekly"} >
-          <View style={__styles.radioRootView}>
-            <MyText isLabel>Weekdays *</MyText>
-            <View style={[__styles.radioView, { flexWrap: "wrap" }]}>
-
-              {weekdays.map((day, dayIndex) =>
-                <View key={day.shortName} style={{ flex: 1 }}>
-                  <MyCheckBox
-                    onPress={() => handlerWeekdays(day)}
-                    title={day.shortName}
-                    row={false}
-                    value={groupData?.weekday.includes(day.value)}
-                  />
-                </View>
-              )}
-
+        {!isEditIteration &&
+          <View>
+            <MyText isLabel>Recurring Type</MyText>
+            <View style={__styles.alignBtnsRow}>
+              <Pressable
+                onPress={() => setGroupData({ recurringType: "daily" })}
+                style={[__styles.alignBtnView, groupData?.recurringType == "daily" && __styles.alignSelectedBtnView]}
+              >
+                <MyText
+                  type='medium'
+                  color={groupData?.recurringType == "daily" ? colors.black : colors.white} >Daily</MyText>
+              </Pressable>
+              <View style={__styles.verticalDivider} />
+              <Pressable
+                onPress={() => setGroupData({ recurringType: "weekly" })}
+                style={[__styles.alignBtnView, groupData.recurringType == "weekly" && __styles.alignSelectedBtnView]}>
+                <MyText
+                  type='medium'
+                  color={groupData?.recurringType == "weekly" ? colors.black : colors.white}
+                >Weekly</MyText>
+              </Pressable>
+              <View style={__styles.verticalDivider} />
+              <Pressable
+                onPress={() => setGroupData({ recurringType: "monthly" })}
+                style={[__styles.alignBtnView, groupData.recurringType == "monthly" && __styles.alignSelectedBtnView]}>
+                <MyText
+                  type='medium'
+                  color={groupData?.recurringType == "monthly" ? colors.black : colors.white}
+                >Monthly</MyText>
+              </Pressable>
             </View>
-          </View>
-        </Collapsible>
+          </View>}
+
+        {!isEditIteration &&
+          <Collapsible collapsed={groupData?.recurringType != "weekly"} >
+            <View style={__styles.radioRootView}>
+              <MyText isLabel>Weekdays *</MyText>
+              <View style={[__styles.radioView, { flexWrap: "wrap" }]}>
+
+                {weekdays.map((day, dayIndex) =>
+                  <View key={day.shortName} style={{ flex: 1 }}>
+                    <MyCheckBox
+                      onPress={() => handlerWeekdays(day)}
+                      title={day.shortName}
+                      row={false}
+                      value={groupData?.weekday.includes(day.value)}
+                    />
+                  </View>
+                )}
+
+              </View>
+            </View>
+          </Collapsible>}
 
         <View style={{ flexDirection: "row" }}>
           <View style={{ flex: 1, marginRight: 10 }}>
@@ -270,42 +278,43 @@ const GroupAddEdit = ({ navigation, route }) => {
           </View>
         </View>
 
-        <View style={__styles.radioRootView}>
-          <MyText isLabel>Group Status *</MyText>
-          <View style={__styles.radioView}>
-            <View style={__styles.radioItem}>
-              <MyCheckBox
-                title='Active'
-                onPress={() => setGroupData({ status: true })}
-                value={groupData?.status}
-              />
+        {!isDelegateEvents &&
+          <View style={__styles.radioRootView}>
+            <MyText isLabel>Status *</MyText>
+            <View style={__styles.radioView}>
+              <View style={__styles.radioItem}>
+                <MyCheckBox
+                  title='Active'
+                  onPress={() => setGroupData({ status: true })}
+                  value={groupData?.status}
+                />
+              </View>
+              <View style={__styles.radioItem}>
+                <MyCheckBox
+                  title='Inactive'
+                  onPress={() => setGroupData({ status: false })}
+                  value={!groupData?.status}
+                />
+              </View>
             </View>
-            <View style={__styles.radioItem}>
-              <MyCheckBox
-                title='Inactive'
-                onPress={() => setGroupData({ status: false })}
-                value={!groupData?.status}
-              />
-            </View>
-          </View>
-        </View>
+          </View>}
 
 
 
+        {(!isEditIteration && !isDelegateEvents) &&
+          <>
+            <MyTouchableInput
+              label='Groups'
+              view={() => selectedView(groupData?.group, "group")}
+              iconOnPress={() => setOptionModal({ isVisible: true, type: "group" })}
+            />
 
-
-        <MyTouchableInput
-          label='Groups'
-          view={() => selectedView(groupData?.group, "group")}
-          iconOnPress={() => setOptionModal({ isVisible: true, type: "group" })}
-        />
-
-        <MyTouchableInput
-          view={() => selectedMemberView(groupData?.member, "member")}
-          label='Members'
-          iconOnPress={() => setOptionModal({ isVisible: true, type: "member" })}
-        />
-
+            <MyTouchableInput
+              view={() => selectedMemberView(groupData?.member, "member")}
+              label='Members'
+              iconOnPress={() => setOptionModal({ isVisible: true, type: "member" })}
+            />
+          </>}
         <Editor
           initialValue={groupData?.desc}
           onChange={(text) => setGroupData({ desc: text })}
@@ -363,7 +372,10 @@ const GroupAddEdit = ({ navigation, route }) => {
         clodeModal={() => setColorModal(false)}
         getColor={(color) => setGroupData({ color })}
         isVisible={colorModal}
+        selectedColor={groupData?.color}
       />
+
+     
 
       <MyLoader enable={loader} />
     </RootView>

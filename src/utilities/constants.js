@@ -1,8 +1,8 @@
 import { displayName } from '../../app.json';
 
 
-// export const isDev = true;
-export const isDev = false;
+export const isDev = true;
+// export const isDev = false;
 
 let domain, socketUrl, S3_URL, appName, websiteBaseUrl
 if (isDev) {
@@ -28,7 +28,8 @@ export const dateTimeFormat = {
   date: "DD-MM-YYYY",
   time: "hh:mm A",
   dateTime: "DD-MM-YYYY hh:mm A",
-  dateTimeWithText: (text) => `DD-MM-YYYY [${text}] hh:mm A`
+  dateTimeWithText: (text) => `DD-MM-YYYY [${text}] hh:mm A`,
+  conversion:"YYYY-MM-DD HH:mm:ss"
 }
 
 export const TimeZones = [

@@ -14,26 +14,26 @@ import CalendarDetail from '../../screens/Calendar/CalendarDetail'
 
 
 
-const CalendarEventsStack = createNativeStackNavigator()
+const DelegateEventsStack = createNativeStackNavigator()
 
-const StackCalendarEvents = ({ route }) => {
+const StackDelegateEvents = ({ route }) => {
   return (
     <View style={{ flex: 1, backgroundColor: colors.darkSecondary }}>
-      <CalendarEventsStack.Navigator
+      <DelegateEventsStack.Navigator
         screenOptions={{ headerShown: false }}>
-        <CalendarEventsStack.Screen initialParams={route.params}
+        <DelegateEventsStack.Screen initialParams={route.params}
           name={routes.calendarEventsList} component={CalendarEvents} />
-        <CalendarEventsStack.Screen initialParams={route.params} name={routes.calendarEventsAddEdit} component={AddEditEvent} />
-        <CalendarEventsStack.Screen initialParams={route.params} name={routes.calendarEventsAddEditNotification} component={CalendarNotifications} />
-        <CalendarEventsStack.Screen initialParams={route.params} name={routes.calendarEventDetail} component={CalendarDetail} />
+        <DelegateEventsStack.Screen initialParams={route.params} name={routes.calendarEventsAddEdit} component={AddEditEvent} />
+        <DelegateEventsStack.Screen initialParams={route.params} name={routes.calendarEventsAddEditNotification} component={CalendarNotifications} />
+        <DelegateEventsStack.Screen initialParams={route.params} name={routes.calendarEventDetail} component={CalendarDetail} />
 
         {/*//? Default Screens Start */}
         {defaultScreens.map((x, i) => (
-          <CalendarEventsStack.Screen key={x.name} name={x.name} component={x.component} />
+          <DelegateEventsStack.Screen key={x.name} name={x.name} component={x.component} />
         ))}
         {/*//? Default Screens End */}
-      </CalendarEventsStack.Navigator>
+      </DelegateEventsStack.Navigator>
     </View>
   )
 }
-export default StackCalendarEvents
+export default StackDelegateEvents

@@ -12,6 +12,7 @@ const MyKeyboardAvoidingView = ({ noScrollView = false, children }) => {
       {noScrollView ? children :
         <ScrollView showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 30 }}
+          // nestedScrollEnabled={true}
         >
           {children}
         </ScrollView>}

@@ -265,6 +265,7 @@ const Editor = ({
           </View>
           <RichToolbar
             editor={RichText}
+    
             onInsertLink={openDialogue}
             selectedIconTint={colors.primary}
             // keyboardDisplayRequiresUserAction={true}

@@ -5,7 +5,6 @@ import notifee from '@notifee/react-native';
 
 const notificationHandler = (remoteMessage, navigation, navbar) => {
   let { data } = remoteMessage;
-  console.log(remoteMessage, "notificationHandler")
   if (feedType.includes(data?.type)) {
     let navigator = "";
     if (data?.feed_tab == "the_cosmos" && !!navbar.find(x => x.value == "the_cosmos")) {
@@ -17,7 +16,6 @@ const notificationHandler = (remoteMessage, navigation, navbar) => {
       else if (!!navbar.find(x => x.value == "the_source_feed"))
         navigator = routes.sourceFeedNavigator;
     }
-    console.log(navigator, "navigator")
     if (!!navigator) {
       let params = { feedId: data?.feed_id };
       if (data?.type == "addcomment" || data?.type == "addcommentreply" || data?.type == "commentlike") {
@@ -122,6 +120,7 @@ const notificationHandler = (remoteMessage, navigation, navbar) => {
       })
     }
   } else if (data?.type == "goal_statement_completed") {
+
     navigation.reset({
       routes: [{
         name: routes.mainScreen,
@@ -136,6 +135,30 @@ const notificationHandler = (remoteMessage, navigation, navbar) => {
                   name: routes.goalStatmentDetail,
                   params: {
                     memberId: data?.sender
+                  }
+                }],
+            }
+          }],
+        }
+      }]
+    })
+  } else if (data?.type == "calender_event") {
+    let event = JSON.parse(data?.event_data)
+    navigation.reset({
+      routes: [{
+        name: routes.mainScreen,
+        state: {
+          routes: [{
+            name: routes?.delegateEventsNavigator,
+            state: {
+              routes: [
+                {
+                  name: routes?.calendarEventsList,
+                }, {
+                  name: routes.calendarEventDetail,
+                  params: {
+                    eventId: event?.event_id,
+                    iteration_id: event?._id,
                   }
                 }],
             }

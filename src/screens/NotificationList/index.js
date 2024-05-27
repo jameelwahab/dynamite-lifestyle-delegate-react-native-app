@@ -256,6 +256,25 @@ const NotificationList = ({ navigation, route }) => {
           }
         }],
       })
+    } else if (notification_type == "event_reminder" && !!navbar.find(x => x.value == "delegate_events")) {
+      navigation.reset({
+        routes: [{
+          name: routes.delegateEventsNavigator,
+          state: {
+            routes: [
+              {
+                name: routes.calendarEventsList,
+              },
+              {
+                name: routes.calendarEventDetail,
+                params: {
+                  eventId: item.event_id,
+                  iteration_id: item.event_id,
+                }
+              }],
+          }
+        }],
+      })
     }
 
   }
@@ -361,7 +380,7 @@ const NotificationList = ({ navigation, route }) => {
           <UserImage
             size={35}
             image={item?.user_info_sender?.profile_image}
-            name={item?.user_info_sender?.name}
+            name={item?.notification_title}
             backgroundTransparent
           />
           <View style={__styles.typeIcon}>
