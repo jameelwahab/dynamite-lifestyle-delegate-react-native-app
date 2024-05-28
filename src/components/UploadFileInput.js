@@ -35,14 +35,17 @@ const UploadFileInput = ({
             <View style={__styles.checkBoxView}>
               <MyCheckBox
                 onPress={onCheckBoxPress}
-                value={checkBoxValue} />
+                value={checkBoxValue}
+                pb={0}
+              />
             </View>
           }
           <View style={__styles.headingView}>
-            <MyText type='medium' >{label}</MyText>
-            <View style={{ marginTop: 2 }}>
-              <MyText fontSize={11} color={colors.lightText} >{subLabel}</MyText>
-            </View>
+            <MyText type='medium'>{label}</MyText>
+            {!!subLabel &&
+              <View style={{ marginTop: 2 }}>
+                <MyText fontSize={11} color={colors.lightText} >{subLabel}</MyText>
+              </View>}
           </View>
           {!disable &&
             <TouchableOpacity
@@ -120,7 +123,7 @@ const __styles = StyleSheet.create({
   headerView: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 5
+    paddingHorizontal: 5,
   },
   headingView: {
     flex: 1,

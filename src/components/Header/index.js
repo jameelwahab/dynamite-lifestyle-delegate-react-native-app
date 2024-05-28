@@ -81,9 +81,16 @@ const Header = ({
             </Pressable>
           }
         </View>
+
+        {/* <View style={{  height: 50,justifyContent:"center" }}>
+          <Image
+            source={require("../../assets/logo/mission-control-only.jpeg")}
+            style={{ width: 180,resizeMode:"contain",}}
+          />
+        </View> */}
         <View style={{ flex: 1, justifyContent: "flex-end", alignItems: "center", flexDirection: "row", paddingRight: 10 }}>
 
-
+      
 
           {!hideChatIcon && isChatAllowed &&
             <TouchableOpacity

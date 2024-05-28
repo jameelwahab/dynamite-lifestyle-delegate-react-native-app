@@ -76,7 +76,6 @@ const AudioPlayerForList = ({ stop = "", url, id, loop = false, onLoopComplete }
 
 
   const { state: playerState } = usePlaybackState();
-  console.log(playerState, "playerState")
   if (playerState === "ready" && loading != "") {
     setLoading("")
   }

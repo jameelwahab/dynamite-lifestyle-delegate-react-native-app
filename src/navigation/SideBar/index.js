@@ -386,7 +386,7 @@ const index = (props) => {
             let isCollaseable = Array.isArray(x.child_options);
             return (
               <View key={x.value}>
-                {optionView(x, i, isCollaseable, user[showDotArray[x._id]])}
+                {optionView(x, i, isCollaseable, user[showDotArray[x?.value]])}
                 {isCollaseable && x?.child_options.map((y, j) => nestedOptionView(y, i, x))}
               </View>)
           }

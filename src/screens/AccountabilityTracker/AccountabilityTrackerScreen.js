@@ -86,7 +86,6 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
 
 
   useEffect(() => {
-
     if (!!route?.params?.date) {
       setSettings(null)
       setDate(route.params.date)
@@ -288,7 +287,7 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
       setLoader(true);
       let res = await MOVE_TO_TOMMORROW({
         navigation, token, body: {
-          date: moment(date).add({ day: 1 }).format("DD-MM-YYYY"),
+          date: moment(date).add({ day: 1 }).format("YYYY-MM-DD"),
           intention_object: intention
         }
       });
@@ -578,7 +577,7 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
           <View key={`intenstions${index}`} style={[__styles.reminderView, { marginTop: 5, paddingBottom: 10 }]}>
             <View style={{ marginTop: 5 }}>
               <UploadFileInput
-                label='Mark the checkbox to complete Your Goal Statement'
+                label={item?.statement}
                 showCheckbox={true}
                 checkBoxValue={item?.status}
                 onCheckBoxPress={() => intentionHandler(index, { status: !item?.status })}
@@ -631,7 +630,7 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
           {list.map((item, index) => (
             <View key={"activities" + index} style={__styles.activityView} >
               <View style={__styles.activityRow}>
-                <MyText>{item?.date}</MyText>
+                <MyText>{moment(item?.createdAt).format(dateTimeFormat.date)}</MyText>
                 <View style={__styles.activityNestedRow}>
                   <MyText>{moment(item?.date_time, "YYYY-MM-DD HH:mm").format(dateTimeFormat.time)}</MyText>
                   <MenuButton

@@ -70,8 +70,10 @@ const PastActivities = ({ navigation, route }) => {
     setOptions({ isVisible: false, item: null });
     setTimeout(() => {
       if (opt.key == "edit") {
+
+
         navigation.navigate(routes.accountabilityTrackerScreen, {
-          date: moment(item?.date, "YYYY-MM-DD")
+          date: moment(item?.date, "DD-MM-YYYY")
         })
       } else if (opt.key == "delete") {
         setConfirmation({ isVisible: true, item: item })

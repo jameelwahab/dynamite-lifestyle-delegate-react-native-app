@@ -30,7 +30,8 @@ const dateStringCalendar = "YYYY-MM-DD";
 const CalendarScreen = ({ navigation, route }) => {
   const { key, parentKey, type: eventType } = route?.params;
   const isDelegateEvents = eventType == "consultant_user";
-  const { token } = useSelector(selectUser);
+  const { token,user } = useSelector(selectUser);
+  console.log(user,"user")
   const { navbar } = useSelector(selectNavbar);
   const timezone = useSelector(selectTimeZone);
   const [title] = useState(isDelegateEvents ?
@@ -290,7 +291,7 @@ const CalendarScreen = ({ navigation, route }) => {
           <View style={__styles.eventWeekView} >
             {calendarEvents[item]?.list.map((event,) => (
               <TouchableOpacity
-                onPress={() => onEventDetail(item)}
+                onPress={() => onEventDetail(event)}
                 style={__styles.eventWeekRootView}>
                 <View style={[__styles.eventColorView, { backgroundColor: event?.color }]} />
                 <View style={__styles.eventTitleAndDetail}>

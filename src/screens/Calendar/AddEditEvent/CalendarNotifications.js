@@ -22,6 +22,9 @@ import EventOptionModal from '../components/EventOptionModal'
 import { dateTimeFormat } from '../../../utilities/constants'
 import { convertTimezone2 } from '../../../functions/convertTime'
 import { selectTimeZone } from '../../../redux/reducers/timezoneSlice'
+import useBackHandler from '../../../hooks/useBackHandler'
+
+
 
 const CalendarNotifications = ({ navigation, route }) => {
   const { data, event, iteration_id, type: eventType, notifications: savedNotifications } = route?.params;
@@ -34,6 +37,8 @@ const CalendarNotifications = ({ navigation, route }) => {
   const refMessageModal = useRef();
   const [notifications, setnotifications] = useState(!!savedNotifications ? savedNotifications : !!event?.notify_before ? event?.notify_before : [{ ...notifyObject }])
   const [loader, setLoader] = useState(false);
+
+
 
 
 
@@ -155,10 +160,13 @@ const CalendarNotifications = ({ navigation, route }) => {
   }
 
   const onBackPress = () => {
+    console.log("onBackPress")
     navigation.navigate(routes.calendarEventsAddEdit, {
       notifications, event, iteration_id,
     })
+    return true
   }
+  useBackHandler(onBackPress)
 
   const addNotification = () => {
     notifications.push({ ...notifyObject })

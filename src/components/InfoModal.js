@@ -13,7 +13,6 @@ const InfoModal = forwardRef(({ header }, ref) => {
   const [text, setText] = useState("");
   const [subText, setSubText] = useState("");
   const [isHtml, setIsHtml] = useState("")
-  console.log(header, "header")
   useImperativeHandle(ref, () => {
     return {
       openModal,
