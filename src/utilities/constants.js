@@ -1,8 +1,8 @@
 import { displayName } from '../../app.json';
 
 
-export const isDev = true;
-// export const isDev = false;
+// export const isDev = true;
+export const isDev = false;
 
 let domain, socketUrl, S3_URL, appName, websiteBaseUrl
 if (isDev) {
