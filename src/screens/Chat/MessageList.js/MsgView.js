@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, Pressable } from 'react-native'
+import { View, Text, TouchableOpacity, Pressable, Image } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import utilities from '../../../utilities'
 import MyText from '../../../components/MyText'
@@ -14,10 +14,10 @@ import { fonts } from '../../../utilities/fonts'
 import AudioChatView from './AudioChatView'
 import openUrl from '../../../functions/openUrl';
 import { icons } from '../../../utilities/icons'
+import urlify from '../../../functions/urlify'
 
 
 const MsgView = ({ item, index, user, timezone, onMsgLongPress, openImageZommer, playIconClick, stopPlayer, state, setState }) => {
-  console.log(playIconClick, stopPlayer, "checl")
 
   const isOtherMember = (id) => {
     return id == user?._id;
@@ -71,10 +71,9 @@ const MsgView = ({ item, index, user, timezone, onMsgLongPress, openImageZommer,
           }
 
 
-
           {/*//?   Message View  */}
 
-          <View style={{ paddingHorizontal: 5 }}>
+          {!!item?.message && <View style={{ paddingHorizontal: 5 }}>
             {isHtml(item?.message) ?
               <MyWebview
                 style={isOtherMember(item.receiver_id) ? WebviewStyleOther : WebviewStyleMine}
@@ -88,17 +87,22 @@ const MsgView = ({ item, index, user, timezone, onMsgLongPress, openImageZommer,
                   openUrl(url);
                   return false
                 }}>
-                {item.message}
+                {urlify(item.message)}
+                {/* <MyText>{item.message}</MyText> */}
               </Markdown>
             }
-          </View>
+          </View>}
 
-          <View style={{ marginTop: 5, alignSelf: "flex-end", flexDirection: "row",alignItems:"center" }}>
+          <View style={{ marginTop: 5, alignSelf: "flex-end", flexDirection: "row", alignItems: "center" }}>
             {!isOtherMember(item.receiver_id) &&
               <View style={{ marginRight: 5 }}>
                 {!!item?.status == false || item?.status == "sent"
-                    ? icons.sent(colors.white, 18) :
-                icons.seen(item?.status == "read" ? colors.primary : colors.white, 18)}
+                  ? icons.sent(colors.white, 18) :
+                  icons.seen(item?.status == "read" ? colors.primary : colors.white, 18)}
+              </View>}
+            {!!item?.is_broadcast &&
+              <View style={{ marginRight: 5 }}>
+                <Image source={icons.broadcast} style={{ height: 20, width: 20,tintColor:colors.primary }} />
               </View>}
             <MyText
               fontSize={10}

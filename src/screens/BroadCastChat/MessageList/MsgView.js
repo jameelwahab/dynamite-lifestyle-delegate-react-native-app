@@ -15,6 +15,7 @@ import AudioChatView from './AudioChatView'
 import openUrl from '../../../functions/openUrl';
 import { icons } from '../../../utilities/icons'
 import moment from 'moment'
+import urlify from '../../../functions/urlify'
 
 
 const MsgView = ({ item, index, user, timezone, onMsgLongPress, openImageZommer, playIconClick, stopPlayer, state, setState, infoRef }) => {
@@ -89,7 +90,7 @@ const MsgView = ({ item, index, user, timezone, onMsgLongPress, openImageZommer,
                     openUrl(url);
                     return false
                   }}>
-                  {item.message}
+                  {urlify(item.message)}
                 </Markdown>
               }
             </View>}

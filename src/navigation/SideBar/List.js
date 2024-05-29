@@ -335,23 +335,23 @@ export const ParentComponents = {
       key: "aadbd7a3-91c1-40dd-bf24-532fc288d265555"
     }
   },
-  // "79fe1cf4-6cd7-42d0-a855-3fcf5fec045a": {
-  //   key: null,
-  //   component: null,
-  //   params: {
-  //     value: "calendar",
-  //     key: "79fe1cf4-6cd7-42d0-a855-3fcf5fec045a"
-  //   }
-  // },
-  // "d2ff9f8b-20a8-4646-a08b-cbdfd931f454": {
-  //   key: routes.delegateEventsNavigator,
-  //   component: StackDelegateEvents,
-  //   params: {
-  //     type: "consultant_user",
-  //     value: "delegate_events",
-  //     key: "d2ff9f8b-20a8-4646-a08b-cbdfd931f454"
-  //   }
-  // },
+  "79fe1cf4-6cd7-42d0-a855-3fcf5fec045a": {
+    key: null,
+    component: null,
+    params: {
+      value: "calendar",
+      key: "79fe1cf4-6cd7-42d0-a855-3fcf5fec045a"
+    }
+  },
+  "d2ff9f8b-20a8-4646-a08b-cbdfd931f454": {
+    key: routes.delegateEventsNavigator,
+    component: StackDelegateEvents,
+    params: {
+      type: "consultant_user",
+      value: "delegate_events",
+      key: "d2ff9f8b-20a8-4646-a08b-cbdfd931f454"
+    }
+  },
   //? Sales Tab
   // "aadbd7a3-91c1-499dd-bf24-7846756776677887": {
   //   key: null,

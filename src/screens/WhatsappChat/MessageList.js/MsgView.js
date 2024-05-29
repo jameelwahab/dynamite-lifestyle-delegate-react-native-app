@@ -16,10 +16,11 @@ import openUrl from '../../../functions/openUrl';
 import { icons } from '../../../utilities/icons'
 import { MyButton } from '../../../components/MyButton'
 import UserImage from '../../../components/UserImage'
+import urlify from '../../../functions/urlify'
 
 
 const MsgView = ({ item, user, timezone, openImageZommer, playIconClick, stopPlayer, state, templates }) => {
-  console.log(playIconClick, stopPlayer, "checl")
+
 
 
   const showTemplate = (type, isMe1) => {
@@ -163,7 +164,7 @@ const MsgView = ({ item, user, timezone, openImageZommer, playIconClick, stopPla
                           openUrl(url);
                           return false
                         }}>
-                        {item?.message?.message}
+                        {urlify(item?.message?.message)}
                       </Markdown>
                 }
               </View>
