@@ -16,6 +16,7 @@ import { MenuButton, MyButton } from '../../components/MyButton'
 import copyText from '../../functions/copyText'
 import { websiteBaseUrl } from '../../utilities/constants'
 import openUrl from '../../functions/openUrl'
+import routes from '../../navigation/routes'
 
 const LinksList = ({ navigation, route }) => {
   const { key } = route?.params;
@@ -37,9 +38,18 @@ const LinksList = ({ navigation, route }) => {
   const onOptionSelected = (opt) => {
     let item = optionModal?.selectedItem;
     setOptionModal({ isVisible: false, selectedItem: null });
-    setTimeout(() => {
-      copy(item, opt.type)
-    }, 200);
+    if (opt?.type == "main" || opt?.type == "appointment") {
+      setTimeout(() => {
+        copy(item, opt.type)
+      }, 200);
+    } else {
+      setTimeout(() => {
+        navigation.navigate(routes.linksPaymentPlan, {
+          _id: item?._id,
+          title: item?.sale_page_title
+        })
+      }, 400);
+    }
   }
 
   const getDataFromServer = async () => {
@@ -137,8 +147,8 @@ const LinksList = ({ navigation, route }) => {
 
   return (
     <RootView hideBackBottomButton
-     title={title}
-     subTitle={`Total: ${list.length}`}
+      title={title}
+      subTitle={`Total: ${list.length}`}
     >
       <View style={{ flex: 1 }}>
         <FlatList
@@ -176,6 +186,11 @@ const options = [
     icon: () => icons.eye(colors.primary, 17),
     title: "Copy Appointment URL",
     type: "appointment"
+  },
+  {
+    icon: () => icons.edit(colors.primary, 17),
+    title: "Set Commission",
+    type: "commission"
   }]
 
 const __styles = StyleSheet.create({

@@ -165,6 +165,8 @@ const routes = {
 
   //? Links
   linksListing: "LINKS_LISTING_SCREEN",
+  linksPaymentPlan: "LINKS_PAYMENT_PLAN_LIST",
+  linksManageSaleTeamCommission: "LINKS_MANAGE_SALE_TEAM_COMMISSION",
 
   //? Subscription
   subscriptionList: "SUBSCRIPTION_LISTING_SCREEN",
@@ -312,7 +314,7 @@ const routes = {
   salesTeamDetail: "SALES_TEAM_DETAIL_SCREEN",
   salesTeamAddEdit: "SALES_TEAM_ADD_EDIT_SCREEN",
   salesTeamFilterScreen: "SALES_TEAM_FILTER_SCREEN",
-  
+
   //? Sales Paid
   salePidCommissionScreen: "SALES_PAID_COMMISSIONMENT_SCREEN",
 
