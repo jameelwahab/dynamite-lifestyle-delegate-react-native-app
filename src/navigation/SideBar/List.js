@@ -353,14 +353,14 @@ export const ParentComponents = {
     }
   },
   //? Sales Tab
-  // "aadbd7a3-91c1-499dd-bf24-7846756776677887": {
-  //   key: null,
-  //   component: null,
-  //   params: {
-  //     value: "/sales",
-  //     key: "aadbd7a3-91c1-499dd-bf24-7846756776677887"
-  //   }
-  // },
+  "aadbd7a3-91c1-499dd-bf24-7846756776677887": {
+    key: null,
+    component: null,
+    params: {
+      value: "/sales",
+      key: "aadbd7a3-91c1-499dd-bf24-7846756776677887"
+    }
+  },
 }
 
 export const ChildComponents = {

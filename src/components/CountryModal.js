@@ -20,7 +20,7 @@ import MyText from './MyText';
 import { fonts } from '../utilities/fonts';
 
 
-export default function CountryModal({ selectCountry = () => { }, isVisible, closeModal }) {
+export default function CountryModal({ selectCountry = () => { }, isVisible, closeModal, showCountryCode = false }) {
   const [searchText, setSearchText] = useState('');
   const [listData, setListData] = useState([])
 
@@ -151,7 +151,7 @@ export default function CountryModal({ selectCountry = () => { }, isVisible, clo
                     </View>
                     <View>
                       <MyText fontSize={16} color={colors.text}>
-                        {item.code}
+                        {showCountryCode ? item?.dial_code : item.code}
                       </MyText>
                     </View>
                   </View>

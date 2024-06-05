@@ -4,7 +4,7 @@ import RootView from '../../../components/RootView'
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../../redux/reducers/userSlice'
 import { selectNavbar } from '../../../redux/reducers/navbarSlice'
-import {   SALE_TEAM_BY_PENDING_COMMISSION } from '../../../DAL'
+import { SALE_TEAM_BY_PAID_COMMISSION, SALE_TEAM_MEMBER_COMMISSION_LIST } from '../../../DAL'
 import MemberView from '../../../components/MemberView'
 import { colors } from '../../../utilities/colors'
 import StatView from '../../../components/StatView'
@@ -15,16 +15,16 @@ import MyRefreshControl from '../../../components/MyRefreshControl'
 import FooterLoader from '../../../components/FooterLoader'
 import EmptyView from '../../../components/EmptyView'
 import MyLoader from '../../../components/MyLoader'
+import moment from 'moment'
+import { dateTimeFormat } from '../../../utilities/constants'
 
 
 
-let pcPage = 0;
-let pcCanLoadMore = false;
+let pncPage = 0;
+let pncCanLoadMore = false;
 const TeamList = ({ navigation, route }) => {
-  const { key, parentKey } = route?.params
+  const { member } = route?.params
   const { token } = useSelector(selectUser);
-  const { navbar } = useSelector(selectNavbar);
-  const [title] = useState(navbar?.find(x => x._id == parentKey)?.child_options?.find(y => y._id == key)?.title);
   const [list, setList] = useState([]);
   const [loader, setLoader] = useState(true);
   const [searchText, setSearchText] = useState("")
@@ -35,8 +35,8 @@ const TeamList = ({ navigation, route }) => {
 
 
   useEffect(() => {
-    pcCanLoadMore = false;
-    pcPage = 0;
+    pncCanLoadMore = false;
+    pncPage = 0;
     setLoader(true)
     getTeamListFromServer(true)
   }, [])
@@ -46,22 +46,22 @@ const TeamList = ({ navigation, route }) => {
 
 
   const onSearchPress = () => {
-    pcCanLoadMore = false;
-    pcPage = 0;
+    pncCanLoadMore = false;
+    pncPage = 0;
     setSearchLoader(true);
     getTeamListFromServer(true)
   }
 
   const onRefresh = () => {
-    pcCanLoadMore = false;
-    pcPage = 0;
+    pncCanLoadMore = false;
+    pncPage = 0;
     setRefreshing(true)
     getTeamListFromServer(true)
   }
 
   const loadMore = () => {
-    if (pcCanLoadMore) {
-      pcCanLoadMore = false;
+    if (pncCanLoadMore) {
+      pncCanLoadMore = false;
       setFooterLoader(true);
       getTeamListFromServer()
     }
@@ -72,20 +72,21 @@ const TeamList = ({ navigation, route }) => {
 
   //! //////// API
   const getTeamListFromServer = async (newArray = false) => {
-    let res = await SALE_TEAM_BY_PENDING_COMMISSION({
-      token, navigation, page: pcPage, searchText: searchText.trim(),
+    let res = await SALE_TEAM_MEMBER_COMMISSION_LIST({
+      token, navigation, page: pncPage, searchText: searchText.trim(),
+      memberId: member?._id
     });
     if (res.code == 200) {
-      let length = newArray ? res?.sales_team.length : list.length + res?.sales_team.length;
-      if (length < res?.total_count) {
-        pcPage++;
-        pcCanLoadMore = true;
+      let length = newArray ? res?.transaction.length : list.length + res?.transaction.length;
+      if (length < res?.total_member_count) {
+        pncPage++;
+        pncCanLoadMore = true;
       } else {
-        pcCanLoadMore = false;
+        pncCanLoadMore = false;
       }
-      setTotal(res?.total_count)
+      setTotal(res?.total_member_count)
       setLoader(false);
-      setList(newArray ? res?.sales_team : [...list, ...res?.sales_team]);
+      setList(newArray ? res?.transaction : [...list, ...res?.transaction]);
       setSearchLoader(false);
       setRefreshing(false);
       setFooterLoader(false);
@@ -110,16 +111,16 @@ const TeamList = ({ navigation, route }) => {
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <View style={{ flex: 1 }}>
             <MemberView
-              member={item}
-              customImage={item?.image?.thumbnail_1}
+              member={item?.member_info}
+            // customImage={item?.image?.thumbnail_1}
             />
           </View>
 
         </View>
         <View style={{ padding: 5 }}>
-          <StatView title={"Total Commission"} value={prependCurency("gbp") + " " + (!!item?.total_commission ? item?.total_commission.toFixed(2) : "0.00")} />
-          <StatView title={"Paid Commission"} value={prependCurency("gbp") + " " + (!!item?.commission_paid ? item?.commission_paid.toFixed(2) : "0.00")} />
-          <StatView title={"Due Commission"} value={prependCurency("gbp") + " " + (!!item?.commission_due ? item?.commission_due.toFixed(2) : "0.00")} />
+          <StatView title={"Transaction"} value={`Sale Page (${item?.sale_page_info?.sale_page_title} | ${item?.plan_info?.plan_title})`} />
+          <StatView title={"Commission Amount"} value={item?.referral_commission} />
+          <StatView title={"Date"} value={moment(item?.createdAt).format(dateTimeFormat.date)} />
 
         </View>
       </View>
@@ -146,8 +147,7 @@ const TeamList = ({ navigation, route }) => {
       <View>
         <View style={__styles.topView}>
           <TitleView
-            title={title}
-            hideBackBottomButton
+            title={!!member ? `${member?.first_name} commission Detail`:""}
             subTitle={`Showing ${list.length} of ${total}`}
           />
         </View>

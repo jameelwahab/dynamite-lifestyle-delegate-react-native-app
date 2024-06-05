@@ -8,6 +8,8 @@ import { colors } from '../../utilities/colors'
 
 import TeamList from '../../screens/Sales/Team/TeamList'
 import TeamAddEdit from '../../screens/Sales/Team/TeamAddEdit'
+import TeamFilterScreen from '../../screens/Sales/Team/TeamFilterScreen'
+import TeamCommissionDetail from '../../screens/Sales/Team/TeamCommissionDetail'
 
 
 
@@ -22,6 +24,8 @@ const StackSalesTeam = ({ route }) => {
         screenOptions={{ headerShown: false }}>
         <SalesTeamStack.Screen initialParams={route.params} name={routes.salesTeamListing} component={TeamList} />
         <SalesTeamStack.Screen name={routes.salesTeamAddEdit} component={TeamAddEdit} />
+        <SalesTeamStack.Screen name={routes.salesTeamFilterScreen} component={TeamFilterScreen} />
+        <SalesTeamStack.Screen name={routes.salesTeamDetail} component={TeamCommissionDetail} />
 
         {/*//? Default Screens Start */}
         {defaultScreens.map((x, i) => (

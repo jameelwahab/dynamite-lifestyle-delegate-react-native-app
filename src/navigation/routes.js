@@ -305,12 +305,14 @@ const routes = {
   calendarEventsAddEdit: "CALENDAR_EVENTS_ADD_EDIT_SCREEN",
   calendarEventsAddEditNotification: "CALENDAR_EVENTS_ADD_EDIT_NOTIFICATIONS",
 
-  
+
 
   //? Sales Team
   salesTeamListing: "SALES_TEAM_LISTING_SCREEN",
+  salesTeamDetail: "SALES_TEAM_DETAIL_SCREEN",
   salesTeamAddEdit: "SALES_TEAM_ADD_EDIT_SCREEN",
-
+  salesTeamFilterScreen: "SALES_TEAM_FILTER_SCREEN",
+  
   //? Sales Paid
   salePidCommissionScreen: "SALES_PAID_COMMISSIONMENT_SCREEN",
 

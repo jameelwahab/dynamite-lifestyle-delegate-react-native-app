@@ -137,7 +137,7 @@ const VideoAddEdit = ({ route, navigation }) => {
             </View>
             <View style={__styles.radioItem}>
               <MyCheckBox
-                title='Inctive'
+                title='Inactive'
                 onPress={() => setData({ status: false })}
                 value={!data?.status}
               />

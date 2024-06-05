@@ -21,7 +21,7 @@ const StackSalesPaidCommission = ({ route }) => {
       <PaidCommissionStack.Navigator
         screenOptions={{ headerShown: false }}>
           
-        <PaidCommissionStack.Screen initialParams={route.params} name={routes.salesPaidCommissionsNavigator} component={PaidCommission} />
+        <PaidCommissionStack.Screen initialParams={route.params} name={routes.salePidCommissionScreen} component={PaidCommission} />
         {/*//? Default Screens Start */}
         {defaultScreens.map((x, i) => (
           <PaidCommissionStack.Screen key={x.name} name={x.name} component={x.component} />
