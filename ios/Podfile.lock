@@ -1,4 +1,10 @@
 PODS:
+  - AppAuth (1.7.5):
+    - AppAuth/Core (= 1.7.5)
+    - AppAuth/ExternalUserAgent (= 1.7.5)
+  - AppAuth/Core (1.7.5)
+  - AppAuth/ExternalUserAgent (1.7.5):
+    - AppAuth/Core
   - BEMCheckBox (1.4.1)
   - boost (1.76.0)
   - BVLinearGradient (2.8.3):
@@ -175,6 +181,10 @@ PODS:
     - GoogleUtilities/Environment (~> 7.7)
     - nanopb (< 2.30911.0, >= 2.30908.0)
     - PromisesObjC (< 3.0, >= 1.2)
+  - GoogleSignIn (7.1.0):
+    - AppAuth (< 2.0, >= 1.7.3)
+    - GTMAppAuth (< 5.0, >= 4.1.1)
+    - GTMSessionFetcher/Core (~> 3.3)
   - GoogleUtilities (7.13.3):
     - GoogleUtilities/AppDelegateSwizzler (= 7.13.3)
     - GoogleUtilities/Environment (= 7.13.3)
@@ -219,6 +229,10 @@ PODS:
   - GoogleUtilities/UserDefaults (7.13.3):
     - GoogleUtilities/Logger
     - GoogleUtilities/Privacy
+  - GTMAppAuth (4.1.1):
+    - AppAuth/Core (~> 1.7)
+    - GTMSessionFetcher/Core (< 4.0, >= 3.3)
+  - GTMSessionFetcher/Core (3.4.1)
   - hermes-engine (0.71.11):
     - hermes-engine/Pre-built (= 0.71.11)
   - hermes-engine/Pre-built (0.71.11)
@@ -652,6 +666,9 @@ PODS:
     - RNFBApp
   - RNGestureHandler (2.13.2):
     - React-Core
+  - RNGoogleSignin (12.1.1):
+    - GoogleSignIn (~> 7.1)
+    - React-Core
   - RNImageCropPicker (0.40.0):
     - React-Core
     - React-RCTImage
@@ -845,6 +862,7 @@ DEPENDENCIES:
   - "RNFBCrashlytics (from `../node_modules/@react-native-firebase/crashlytics`)"
   - "RNFBMessaging (from `../node_modules/@react-native-firebase/messaging`)"
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
+  - "RNGoogleSignin (from `../node_modules/@react-native-google-signin/google-signin`)"
   - RNImageCropPicker (from `../node_modules/react-native-image-crop-picker`)
   - "RNNotifee (from `../node_modules/@notifee/react-native`)"
   - RNPermissions (from `../node_modules/react-native-permissions`)
@@ -857,6 +875,7 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
+    - AppAuth
     - BEMCheckBox
     - CocoaAsyncSocket
     - DGCharts
@@ -881,7 +900,10 @@ SPEC REPOS:
     - fmt
     - GoogleAppMeasurement
     - GoogleDataTransport
+    - GoogleSignIn
     - GoogleUtilities
+    - GTMAppAuth
+    - GTMSessionFetcher
     - libevent
     - libwebp
     - lottie-ios
@@ -1026,6 +1048,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-firebase/messaging"
   RNGestureHandler:
     :path: "../node_modules/react-native-gesture-handler"
+  RNGoogleSignin:
+    :path: "../node_modules/@react-native-google-signin/google-signin"
   RNImageCropPicker:
     :path: "../node_modules/react-native-image-crop-picker"
   RNNotifee:
@@ -1046,6 +1070,7 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
+  AppAuth: 501c04eda8a8d11f179dbe8637b7a91bb7e5d2fa
   BEMCheckBox: 5ba6e37ade3d3657b36caecc35c8b75c6c2b1a4e
   boost: 57d2868c099736d80fcd648bf211b4431e51a558
   BVLinearGradient: 880f91a7854faff2df62518f0281afb1c60d49a3
@@ -1076,7 +1101,10 @@ SPEC CHECKSUMS:
   glog: 04b94705f318337d7ead9e6d17c019bd9b1f6b1b
   GoogleAppMeasurement: 722db6550d1e6d552b08398b69a975ac61039338
   GoogleDataTransport: 6c09b596d841063d76d4288cc2d2f42cc36e1e2a
+  GoogleSignIn: d4281ab6cf21542b1cfaff85c191f230b399d2db
   GoogleUtilities: ea963c370a38a8069cc5f7ba4ca849a60b6d7d15
+  GTMAppAuth: f69bd07d68cd3b766125f7e072c45d7340dea0de
+  GTMSessionFetcher: 8000756fc1c19d2e5697b90311f7832d2e33f6cd
   hermes-engine: 34c863b446d0135b85a6536fa5fd89f48196f848
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
   libwebp: 1786c9f4ff8a279e4dac1e8f385004d5fc253009
@@ -1138,6 +1166,7 @@ SPEC CHECKSUMS:
   RNFBCrashlytics: 9d5b36a7e280178c5d61695936cb812005bf17ad
   RNFBMessaging: b167065ee2fcc7fe43a32b35d79d5eb23bceb4ad
   RNGestureHandler: bb86e378287f7713baf3ca205423eb8109790022
+  RNGoogleSignin: 9b8f00d1c2f04f88e91649b176242807fe910128
   RNImageCropPicker: 486e2f7e2b0461ce24321f751410dce1b3b49e6d
   RNNotifee: 5155e0a5e0a97d0c839030d8192783cd63053999
   RNPermissions: 29a4b4ce80d3fab7376d6b32ebb253ff7f3b7913

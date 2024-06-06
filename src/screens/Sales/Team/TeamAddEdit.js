@@ -30,7 +30,7 @@ const TeamAddEdit = ({ navigation, route }) => {
     contact: !!memberOldData?.contact_number ? memberOldData?.contact_number : "",
     country: !!memberOldData?.state ? memberOldData?.state : "",
     address: !!memberOldData?.address ? memberOldData?.address : "",
-    timezone: !!memberOldData?.time_zone ? memberOldData?.time_zone : "",
+    timezone: !!memberOldData?.time_zone ? memberOldData?.time_zone : "Europe/Dublin",
     status: !!memberOldData && !!memberOldData?.status == false ? false : true,
     bio: !!memberOldData?.biography ? memberOldData?.biography : "",
     image: !!memberOldData?.image?.thumbnail_1 ? memberOldData?.image?.thumbnail_1 : null,
@@ -189,7 +189,7 @@ const TeamAddEdit = ({ navigation, route }) => {
               <MyCheckBox
                 title='Inactive'
                 onPress={() => setMember({ status: false })}
-                value={member?.status}
+                value={!member?.status}
               />
             </View>
           </View>

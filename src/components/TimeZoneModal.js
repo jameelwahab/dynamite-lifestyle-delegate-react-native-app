@@ -103,7 +103,7 @@ export default function TimeZoneModal({ selectTimeZone = () => { }, isVisible, c
               <TextInput
                 value={searchText}
                 onChangeText={searchInList}
-                placeholder="Europe/Dublin"
+                placeholder="Search..."
                 placeholderTextColor={colors.lightText}
                 spellCheck={false}
                 style={{ color: colors.text, paddingVertical: 12, marginLeft: 10, fontFamily: fonts.medium, includeFontPadding: false }}

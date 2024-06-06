@@ -30,6 +30,7 @@ import { selectTimeZone } from '../../../redux/reducers/timezoneSlice'
 
 const GroupAddEdit = ({ navigation, route }) => {
   const { event, iteration_id, type: eventType } = route?.params;
+  console.log(route?.params,"route?.params")
   const isDelegateEvents = eventType == "consultant_user";
   const isEdit = !!event;
   const isEditIteration = !!iteration_id;
@@ -49,7 +50,7 @@ const GroupAddEdit = ({ navigation, route }) => {
     title: !!event?.title ? event?.title : "",
     status: isEdit && !!event?.status == false ? false : true,
     group: !!event?.group ? event?.group.map(x => x?._id) : [],
-    member: !!event?.member ? event?.member.map(x => x?._id) : [],
+    member: !!route?.params?.member ? [route?.params?.member] : !!event?.member ? event?.member.map(x => x?._id) : [],
     startDate: !!event?.start_date_time ? convertTimezone2(event?.start_date_time, timezone) : moment(),
     startTime: !!event?.start_date_time ? convertTimezone2(event?.start_date_time, timezone).format("HH:mm") : moment().format("HH:mm"),
     endDate: !!event?.end_date_time ? convertTimezone2(event?.end_date_time, timezone) : moment(),
@@ -92,7 +93,8 @@ const GroupAddEdit = ({ navigation, route }) => {
         data: groupData,
         event,
         iteration_id,
-        notifications: route?.params?.notifications
+        notifications: route?.params?.notifications,
+        popTo: !!route?.params?.popTo ? route?.params?.popTo : undefined
       })
     }
 
@@ -375,7 +377,7 @@ const GroupAddEdit = ({ navigation, route }) => {
         selectedColor={groupData?.color}
       />
 
-     
+
 
       <MyLoader enable={loader} />
     </RootView>

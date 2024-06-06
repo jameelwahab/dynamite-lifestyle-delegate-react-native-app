@@ -28,6 +28,7 @@
     "@react-native-firebase/app": "18.5.0",
     "@react-native-firebase/crashlytics": "18.5.0",
     "@react-native-firebase/messaging": "18.5.0",
+    "@react-native-google-signin/google-signin": "^12.1.1",
     "@react-native-picker/picker": "^2.7.5",
     "@react-navigation/drawer": "^6.6.4",
     "@react-navigation/material-top-tabs": "^6.6.4",
@@ -38,6 +39,7 @@
     "@rneui/themed": "^4.0.0-rc.8",
     "@ronradtke/react-native-markdown-display": "^8.0.0",
     "@stripe/stripe-react-native": "^0.35.1",
+    "add": "^2.0.6",
     "axios": "^1.5.1",
     "html-entities": "^2.4.0",
     "libphonenumber-js": "^1.10.54",
@@ -97,7 +99,8 @@
     "react-native-webview": "^13.6.2",
     "react-native-wheel-pick": "^1.2.2",
     "react-redux": "^8.1.3",
-    "socket.io-client": "^4.7.2"
+    "socket.io-client": "^4.7.2",
+    "yarn": "^1.22.22"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

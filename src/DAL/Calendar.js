@@ -104,3 +104,23 @@ export const CALENDAR_EVENT_DETAIL_BY_Id = ({ token, navigation, id }) => {
     navigation,
   })
 }
+
+
+export const SYNC_GOOGLE_CALENDAR_WITH_SERVER = ({ token, navigation, googleServerCode }) => {
+  return invokeApi({
+    path: `app/sync_delegate_cylender`,
+    method: "POST",
+    postData: { code: googleServerCode },
+    token,
+    navigation,
+  })
+}
+
+export const DESYNC_GOOGLE_CALENDAR_WITH_SERVER = ({ token, navigation, googleServerCode }) => {
+  return invokeApi({
+    path: `api/member/remove_google_access/remove`,
+    method: "GET",
+    token,
+    navigation,
+  })
+}

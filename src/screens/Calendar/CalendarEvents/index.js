@@ -1,19 +1,19 @@
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, Image } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { selectNavbar } from '../../../redux/reducers/navbarSlice';
 import RootView from '../../../components/RootView';
 import MyText from '../../../components/MyText';
-import { selectUser } from '../../../redux/reducers/userSlice';
+import { removeGoogleSyncedData, selectUser, setGoogleSyncedData } from '../../../redux/reducers/userSlice';
 import { Calendar } from 'react-native-calendars';
 import { colors } from '../../../utilities/colors';
 import { fonts } from '../../../utilities/fonts';
 import moment from 'moment';
 import MyLoader from '../../../components/MyLoader';
-import { GET_ALL_CALENDAR_EVENTS_LIST, GET_CALENDAR_EVENTS_LIST } from '../../../DAL';
+import { DESYNC_GOOGLE_CALENDAR_WITH_SERVER, GET_ALL_CALENDAR_EVENTS_LIST, GET_CALENDAR_EVENTS_LIST, SYNC_GOOGLE_CALENDAR_WITH_SERVER } from '../../../DAL';
 import { convertTimezone2 } from '../../../functions/convertTime';
 import { selectTimeZone } from '../../../redux/reducers/timezoneSlice';
-import { dateTimeFormat } from '../../../utilities/constants';
+import { GoogleClientIds, dateTimeFormat, googleScopes } from '../../../utilities/constants';
 import EmptyView from '../../../components/EmptyView';
 import { MenuButton, TransparentButton } from '../../../components/MyButton';
 import { icons } from '../../../utilities/icons';
@@ -23,21 +23,22 @@ import TitleView from '../../../components/TitleView';
 import StatView from '../../../components/StatView';
 import OptionModal from '../../../components/OptionModal';
 import ConfirmationModal from '../../../components/ConfirmationModal';
-
+import { GoogleSignin, statusCodes, } from '@react-native-google-signin/google-signin';
+import showToast from '../../../functions/showToast';
+import UserImage from '../../../components/UserImage';
 
 
 const dateStringCalendar = "YYYY-MM-DD";
 const CalendarScreen = ({ navigation, route }) => {
   const { key, parentKey, type: eventType } = route?.params;
   const isDelegateEvents = eventType == "consultant_user";
-  const { token,user } = useSelector(selectUser);
-  console.log(user,"user")
+  const { token, user, googleSyncedData, isSyncWithGoogleAllowed } = useSelector(selectUser);
+  const dispatch = useDispatch();
   const { navbar } = useSelector(selectNavbar);
   const timezone = useSelector(selectTimeZone);
   const [title] = useState(isDelegateEvents ?
     navbar?.find(x => x._id == key)?.title
     : navbar?.find(x => x._id == parentKey)?.child_options?.find(y => y._id == key)?.title);
-    console.log(title,'title')
   const [curDate, setCurDate] = useState(moment().format(dateStringCalendar));
   const [loader, setLoader] = useState(false);
   const [calendarEvents, setCalendarEvents] = useState({})
@@ -47,8 +48,7 @@ const CalendarScreen = ({ navigation, route }) => {
   const [seeMore, setSeeMore] = useState({});
   const [options, setOptions] = useState({ isVisible: false, item: null });
   const [confirmation, setConfirmation] = useState({ isVisible: false, item: null })
-
-
+  const [googleRemoveCofirmationShown, setGoogleRemoveCofirmationShown] = useState(false);
   useEffect(() => {
     callAPI()
   }, [moment(curDate).format("MM-YYYY"), type, viewType])
@@ -65,6 +65,18 @@ const CalendarScreen = ({ navigation, route }) => {
       callAPI()
     }
   }, [route])
+
+  useEffect(() => {
+    if (isSyncWithGoogleAllowed) {
+      GoogleSignin.configure({
+        scopes: googleScopes,
+        iosClientId: GoogleClientIds?.ios,
+        webClientId: GoogleClientIds?.web,
+        androidClientId: GoogleClientIds?.android,
+        offlineAccess: true,
+      });
+    }
+  }, [])
 
 
 
@@ -120,6 +132,79 @@ const CalendarScreen = ({ navigation, route }) => {
     }
   }
 
+  const syncWithGoogleAPI = async (gCode) => {
+    setLoader(true);
+    let res = await SYNC_GOOGLE_CALENDAR_WITH_SERVER({ navigation, token, googleServerCode: gCode });
+    if (res.code == 200) {
+      dispatch(setGoogleSyncedData(res?.google_account_info))
+      showToast({ title: res.message, type: "success" })
+      setLoader(false);
+    } else {
+      setLoader(false);
+    }
+  }
+
+  const deSyncWithGoogleAPI = async () => {
+    setGoogleRemoveCofirmationShown(false)
+    setLoader(true);
+    let res = await DESYNC_GOOGLE_CALENDAR_WITH_SERVER({ navigation, token, });
+    if (res.code == 200) {
+      dispatch(removeGoogleSyncedData())
+      showToast({ title: res.message, type: "success" })
+      setLoader(false);
+
+      try {
+        let user = GoogleSignin.getCurrentUser();
+
+        if (!!user)
+          await GoogleSignin.revokeAccess();
+        await GoogleSignin.signOut()
+        console.log(GoogleSignin.getCurrentUser(),"GoogleSignin.getCurrentUser()")
+      } catch (error) {
+        console.log(error, "error")
+      }
+    } else {
+      setLoader(false);
+    }
+  }
+
+  //? Google Functions
+
+  const signInWithGoogle = async () => {
+    try {
+      await GoogleSignin.hasPlayServices({
+        showPlayServicesUpdateDialog: true,
+      });
+      const userInfo = await GoogleSignin.signIn();
+      console.log("GoogleUser...", userInfo);
+
+      const isCalendarPermissionGranted = googleScopes.every((val) => userInfo?.scopes.includes(val));
+      if (isCalendarPermissionGranted) {
+        syncWithGoogleAPI(userInfo.serverAuthCode)
+      } else {
+        // Alert.alert("Alert", "You didn't allow all Calendar permissions\nPlease try again and allow all Calendar Permissions");
+        showToast({ title: "Alert", body: "You didn't allow all Calendar permissions\nPlease try again and allow all Calendar Permissions", type: "info" })
+        await GoogleSignin.revokeAccess();
+        let signOut = await GoogleSignin.signOut()
+
+      }
+    } catch (error) {
+      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+        // Alert.alert("Alert", "User cancelled the process")
+      } else if (error.code === statusCodes.IN_PROGRESS) {
+        Alert.alert("Alert", "Already signed in")
+        // operation (e.g. sign in) is in progress already
+      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+
+        showToast({ title: "Alert", body: "Goolge Play Services not available", type: "info" })
+        // play services not available or outdated
+      } else {
+        showToast({ title: "Alert", body: error?.message, type: "info" })
+
+        // some other error happened
+      }
+    }
+  }
 
 
 
@@ -181,44 +266,73 @@ const CalendarScreen = ({ navigation, route }) => {
 
   const topView = () => {
     return (
-      <View style={__styles.topView}>
+      <>
+        {isSyncWithGoogleAllowed && isDelegateEvents &&
+          <>
+            {!!googleSyncedData ?
+              <>
+                <TouchableOpacity
+                  onPress={() => setGoogleRemoveCofirmationShown(true)}
+                  style={__styles.googleDataBtn} >
+                  <UserImage
+                    image={googleSyncedData?.picture}
+                    name={googleSyncedData?.name}
+                    noS3
+                    size={25}
+                  />
+                  <View style={{ marginLeft: 10 }}>
+                    <MyText type='medium' fontSize={14} color={colors.white} >{googleSyncedData?.name}</MyText>
+                    <MyText fontSize={12} color={colors.white} >{googleSyncedData?.email}</MyText>
+                  </View>
+                  <View style={__styles.crossGoogleBtn}>
+                    {icons.crosssWithCircle(colors.delete, 25)}
+                  </View>
+                </TouchableOpacity>
 
-        {/* <View style={__styles.googleBnt} >
-          <Image source={icons.googleCalendar}
-            style={{ height: 20, width: 20 }} />
-          <View style={{  marginLeft: 10 }}>
-            <MyText color={colors.black} >Sync with Google Calendar</MyText>
-          </View>
-        </View> */}
-        <View style={{ flex: 1, alignItems: "flex-end" }}>
-          <View style={__styles.mergeButtons}>
-            <TouchableOpacity
-              onPress={() => setType("month")}
-              style={__styles.mergeButtonView}>
-              <MyText
-                style={__styles.mergeButtonText}
-                color={type == "month" ? colors.primary : colors.white}
-              >month</MyText>
-            </TouchableOpacity>
-            <View style={__styles.divider} />
-            <TouchableOpacity
-              onPress={() => setType("week")}
-              style={__styles.mergeButtonView}>
-              <MyText style={__styles.mergeButtonText}
-                color={type == "week" ? colors.primary : colors.white}
-              >week</MyText>
-            </TouchableOpacity>
-            <View style={__styles.divider} />
-            <TouchableOpacity
-              onPress={() => setType("day")}
-              style={__styles.mergeButtonView}>
-              <MyText
-                color={type == "day" ? colors.primary : colors.white}
-                style={__styles.mergeButtonText} >day</MyText>
-            </TouchableOpacity>
+              </>
+              : <TouchableOpacity
+                onPress={signInWithGoogle}
+                style={__styles.googleBnt} >
+                <Image source={icons.googleCalendar}
+                  style={{ height: 22, width: 22 }} />
+                <View style={{ marginLeft: 10 }}>
+                  <MyText type='medium' fontSize={14} color={colors.black} >Sync with Google Calendar</MyText>
+                </View>
+              </TouchableOpacity>}
+          </>
+        }
+
+        <View style={__styles.topView}>
+          <View style={{ flex: 1, alignItems: "flex-end" }}>
+            <View style={__styles.mergeButtons}>
+              <TouchableOpacity
+                onPress={() => setType("month")}
+                style={__styles.mergeButtonView}>
+                <MyText
+                  style={__styles.mergeButtonText}
+                  color={type == "month" ? colors.primary : colors.white}
+                >month</MyText>
+              </TouchableOpacity>
+              <View style={__styles.divider} />
+              <TouchableOpacity
+                onPress={() => setType("week")}
+                style={__styles.mergeButtonView}>
+                <MyText style={__styles.mergeButtonText}
+                  color={type == "week" ? colors.primary : colors.white}
+                >week</MyText>
+              </TouchableOpacity>
+              <View style={__styles.divider} />
+              <TouchableOpacity
+                onPress={() => setType("day")}
+                style={__styles.mergeButtonView}>
+                <MyText
+                  color={type == "day" ? colors.primary : colors.white}
+                  style={__styles.mergeButtonText} >day</MyText>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
-      </View>
+      </>
     )
   }
 
@@ -375,23 +489,24 @@ const CalendarScreen = ({ navigation, route }) => {
 
   const titleView = () => {
     return (
-      <View style={{ flex: 1, flexDirection: "row", alignItems: "center", paddingHorizontal: 10 }}>
+      <View style={{ flex: 1, flexDirection: "row", alignItems: "center", paddingHorizontal: 10, }}>
         <TitleView
           hideBackBottomButton
           title={title}
         />
         <View style={{ flex: 1, alignItems: "flex-end" }}>
           {!isDelegateEvents &&
-          <TouchableOpacity
-            onPress={() => setViewType((type) => type == "calendar" ? "list" : "calendar")}
-            style={__styles.toggleBtnView}
-          >
-            {viewType == "calendar" ? icons.list(colors.black, 18) : icons.calendar(colors.black, 18)}
-          </TouchableOpacity>}
+            <TouchableOpacity
+              onPress={() => setViewType((type) => type == "calendar" ? "list" : "calendar")}
+              style={__styles.toggleBtnView}
+            >
+              {viewType == "calendar" ? icons.list(colors.black, 18) : icons.calendar(colors.black, 18)}
+            </TouchableOpacity>}
         </View>
       </View>
     )
   }
+
   return (
     <RootView hideBackBottomButton titleView={titleView} >
       {viewType == "calendar" ?
@@ -423,6 +538,13 @@ const CalendarScreen = ({ navigation, route }) => {
         isVisible={confirmation.isVisible}
         onAgree={onAgree}
         closeModal={() => setConfirmation({ isVisible: false, item: null })}
+      />
+
+      <ConfirmationModal
+        title={"Are you sure you want to remove this account?"}
+        isVisible={googleRemoveCofirmationShown}
+        onAgree={() => deSyncWithGoogleAPI()}
+        closeModal={() => setGoogleRemoveCofirmationShown(false)}
       />
       <FAB onPress={onAddEventScreen} />
       <MyLoader enable={loader} />
@@ -574,8 +696,32 @@ const __styles = StyleSheet.create({
     flexDirection: "row",
     // flexWrap: "wrap",
     backgroundColor: colors.white,
+    borderRadius: 5,
+    height: 40,
+    alignItems: "center",
+    paddingHorizontal: 10,
+    alignSelf: "flex-end",
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: colors.primary,
+  },
+  googleDataBtn: {
+    flexDirection: "row",
+    backgroundColor: colors.lightPrimary3,
     borderRadius: 10,
-    padding: 5
+    height: 40,
+    alignItems: "center",
+    paddingHorizontal: 10,
+    alignSelf: "flex-end",
+    marginBottom: 10,
+    // borderWidth: 1 / 2,
+    // borderColor: colors.primary,
+  },
+  crossGoogleBtn: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    zIndex: 100
   },
   eventListView: {
     paddingVertical: 10,

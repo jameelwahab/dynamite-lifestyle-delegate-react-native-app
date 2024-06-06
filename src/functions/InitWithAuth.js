@@ -30,7 +30,15 @@ const InitWithAuth = async (token, navigation, setLoader, dispatch) => {
     }
     notifee.setBadgeCount(res?.unread_notification_count)
     dispatch(setSettings({ ...res?.consultant_setting, stripeKey: stripeKey }));
-    dispatch(setUserAndToken({ user: res?.consultant, token: token, isChatAllowed, isWhatsappChatAllowed, count: res?.unread_notification_count }));
+    dispatch(setUserAndToken({
+      user: res?.consultant,
+      token: token,
+      isChatAllowed,
+      isWhatsappChatAllowed,
+      count: res?.unread_notification_count,
+      isSyncWithGoogleAllowed: res?.site_setting?.is_calendar_enabled_for_delegate,
+      googleSyncedData: res?.consultant?.is_google_signin ? res?.consultant?.google_account_info : null
+    }));
     dispatch(setNavbar(res?.nav_items));
     dispatch(setTimeZone({ user: res?.consultant?.time_zone, admin: res?.time_zone }))
     dispatch(setSocket(io(socketUrl, {

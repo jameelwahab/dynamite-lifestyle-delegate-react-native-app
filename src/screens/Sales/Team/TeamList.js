@@ -49,7 +49,11 @@ const TeamList = ({ navigation, route }) => {
     end_date: null,
     start_date: null,
     search_by_commission: false,
-    status: true
+    status: {
+      key: "active",
+      title: "Active",
+      value: true,
+    }
   })
 
   useEffect(() => {
@@ -69,14 +73,18 @@ const TeamList = ({ navigation, route }) => {
   }, [route])
 
   const updateMemberInList = (member) => {
-    let index = list.findIndex(x => x?._id == member._id);
-    if (index > -1) {
-      list.splice(index, 1, member);
-    } else {
-      list.unshift(member);
-      setTotal(val => ++val)
-    }
-    setList([...list]);
+    tlCanLoadMore = false;
+    tlPage = 0;
+    setLoader(true)
+    getTeamListFromServer(true)
+    // let index = list.findIndex(x => x?._id == member._id);
+    // if (index > -1) {
+    //   list.splice(index, 1, member);
+    // } else {
+    //   list.unshift(member);
+    //   setTotal(val => ++val)
+    // }
+    // setList([...list]);
   }
 
   const onSearchPress = () => {
@@ -130,7 +138,7 @@ const TeamList = ({ navigation, route }) => {
         end_date: !!filters?.end_date ? moment(filters?.end_date).format("YYYY-MM-DD") : null,
         start_date: !!filters?.start_date ? moment(filters?.start_date).format("YYYY-MM-DD") : null,
         search_by_commission: filters?.search_by_commission,
-        status: filters?.status,
+        status: filters?.status?.value,
         search_text: searchText.trim()
       }
     });
@@ -200,7 +208,7 @@ const TeamList = ({ navigation, route }) => {
           />
         </View>
         <View style={{ padding: 5 }}>
-          <StatView title={"Phone"} value={item?.contact_number} />
+          <StatView title={"Phone"} value={"+" + item?.contact_number} />
           <StatView title={"Total Commission"} value={prependCurency("gbp") + " " + (!!item?.total_commission ? item?.total_commission.toFixed(2) : "0.00")} />
           <StatView title={"Paid Commission"} value={prependCurency("gbp") + " " + (!!item?.commission_paid ? item?.commission_paid.toFixed(2) : "0.00")} />
           <StatView title={"Due Commission"} value={prependCurency("gbp") + " " + (!!item?.commission_due ? item?.commission_due.toFixed(2) : "0.00")} />
@@ -210,6 +218,9 @@ const TeamList = ({ navigation, route }) => {
     )
   }
 
+  const setToAll = () => {
+    setFilters({ ...filters, status: { key: "all", title: "All", value: undefined, } })
+  }
 
   const headerView = () => {
     return (
@@ -217,8 +228,8 @@ const TeamList = ({ navigation, route }) => {
         {/* {isFilterApplied() && */}
         <View style={{ alignItems: "center", flexDirection: "row", flexWrap: "wrap", paddingBottom: 5 }}>
           <MyText type='medium' >Filtered By : </MyText>
-          <MyChip title={filters?.status ? "Active" : "Inactive"}
-            onPress={() => setFilters({ ...filters, status: true })} />
+          <MyChip title={filters?.status?.title}
+            onPress={filters?.status?.key != 'all' ? setToAll : undefined} />
           {!!filters?.start_date && !!filters.end_date &&
             <MyChip title={`Commission Date from ${moment(filters.start_date).format(dateTimeFormat.date)} to ${moment(filters.end_date).format(dateTimeFormat.date)}`}
               onPress={() => setFilters({ ...filters, start_date: null, end_date: null })} />}
@@ -229,9 +240,9 @@ const TeamList = ({ navigation, route }) => {
 
 
 
-          {(!!filters.start_date || filters.end_date || !!filters?.search_by_commission) &&
+          {(!!filters.start_date || filters.end_date || !!filters?.search_by_commission || filters?.status?.key != "all") &&
             <TouchableOpacity
-              onPress={() => setFilters({ start_date: null, end_date: null, status: true, search_by_commission: false, commission_from: 0, commission_to: 0 })}
+              onPress={() => setFilters({ start_date: null, end_date: null, status: { key: "all", title: "All", value: undefined, }, search_by_commission: false, commission_from: 0, commission_to: 0 })}
               style={{ marginLeft: 5, marginTop: 5, marginRight: 10, borderWidth: 1, borderColor: colors.primary, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 5, backgroundColor: colors.primary + "33" }}>
               <MyText color={colors.primary}>{"Clear Filter"}</MyText>
             </TouchableOpacity>}

@@ -13,7 +13,8 @@ import BookingFilter from '../../screens/Appointments/Bookings/BookingFilter'
 import GenericQuetionList from '../../screens/Questions/GenericQuetionList'
 import BookingNotesList from '../../screens/Appointments/Bookings/Notes/BookingNotesList'
 import AddNote from '../../screens/Appointments/Bookings/Notes/AddNote'
-
+import AddEditEvent from '../../screens/Calendar/AddEditEvent'
+import CalendarNotifications from '../../screens/Calendar/AddEditEvent/CalendarNotifications'
 
 
 const BookingsStack = createNativeStackNavigator()
@@ -30,7 +31,8 @@ const StackBookings = ({ route }) => {
         <BookingsStack.Screen name={routes.genericQestionListing} component={GenericQuetionList} />
         <BookingsStack.Screen name={routes.bookingNotesList} component={BookingNotesList} />
         <BookingsStack.Screen name={routes.bookingAddNote} component={AddNote} />
-
+        <BookingsStack.Screen initialParams={{ value: "calendar_events", parentValue: "calendar", }} name={routes.calendarEventsAddEdit} component={AddEditEvent} />
+        <BookingsStack.Screen initialParams={{ value: "calendar_events", parentValue: "calendar", }} name={routes.calendarEventsAddEditNotification} component={CalendarNotifications} />
 
         {/*//? Default Screens Start */}
         {defaultScreens.map((x, i) => (

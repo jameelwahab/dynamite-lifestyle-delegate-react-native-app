@@ -22,6 +22,7 @@ import { useSelector } from 'react-redux'
 import moment from 'moment'
 
 const BookingNotesList = ({ navigation, route }) => {
+  console.log(route, "route")
   const { bookingId, userInfo } = route?.params;
   const timezone = useSelector(selectTimeZone)
   const { token } = useSelector(selectUser);
@@ -44,6 +45,14 @@ const BookingNotesList = ({ navigation, route }) => {
     } else if (opt.type == "delete") {
       setTimeout(() => {
         setConfirmationModal({ isVisible: true, title: "Are you sure you want to delete this note?" });
+      }, 400);
+      setOptionModal({ ...optionModal, isVisible: false, })
+    } else if (opt.type == "event") {
+      setTimeout(() => {
+        navigation.navigate(routes.calendarEventsAddEdit, {
+          member: userInfo,
+          popTo: route.name,
+        });
       }, 400);
       setOptionModal({ ...optionModal, isVisible: false, })
     }
@@ -192,7 +201,13 @@ const myOptions = [{
   icon: icons.trash,
   title: "Delete",
   type: "delete"
-}]
+},
+{
+  icon: () => icons.calendar(colors.primary),
+  title: "Add to Calendar Event",
+  type: "event"
+},
+]
 
 const __styles = StyleSheet.create({
   headerView: {

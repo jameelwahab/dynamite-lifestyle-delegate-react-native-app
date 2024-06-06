@@ -28,6 +28,7 @@ import useBackHandler from '../../../hooks/useBackHandler'
 
 const CalendarNotifications = ({ navigation, route }) => {
   const { data, event, iteration_id, type: eventType, notifications: savedNotifications } = route?.params;
+  console.log(navigation, " route?.params")
 
   const isDelegateEvents = eventType == "consultant_user";
   const { token } = useSelector(selectUser);
@@ -51,9 +52,13 @@ const CalendarNotifications = ({ navigation, route }) => {
     });
     setLoader(false)
     if (res.code == 200) {
-      navigation.navigate(routes.calendarEventsList, {
-        refresh: true
-      })
+      if (route.params?.popTo) {
+        navigation.pop(2)
+      } else {
+        navigation.navigate(routes.calendarEventsList, {
+          refresh: true
+        })
+      } 2
     }
   }
 

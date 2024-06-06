@@ -15,10 +15,12 @@ import Collapsible from 'react-native-collapsible'
 import MyKeyboardAvoidingView from '../../../components/MyKeyboardAvoidingView'
 import routes from '../../../navigation/routes'
 import showToast from '../../../functions/showToast'
+import OptionModal from '../../../components/OptionModal'
 
 const TeamFilterScreen = ({ navigation, route }) => {
   const ref_calendar = useRef()
   const [filters, updateFilters] = useState(route?.params?.filters);
+  const [isStatusModalShown, setStatusModalShown] = useState(false);
   const setFilters = (update) => {
     updateFilters({ ...filters, ...update })
   }
@@ -69,7 +71,12 @@ const TeamFilterScreen = ({ navigation, route }) => {
         />
 
 
-        <View style={__styles.radioRootView}>
+        <MyTouchableInput
+          label='Status*'
+          value={filters?.status?.title}
+          onPress={() => setStatusModalShown(true)}
+        />
+        {/* <View style={__styles.radioRootView}>
           <MyText isLabel>Status*</MyText>
           <View style={__styles.radioView}>
             <View style={__styles.radioItem}>
@@ -87,7 +94,7 @@ const TeamFilterScreen = ({ navigation, route }) => {
               />
             </View>
           </View>
-        </View>
+        </View> */}
 
 
         <View style={{ marginTop: 10 }}>
@@ -140,6 +147,16 @@ const TeamFilterScreen = ({ navigation, route }) => {
 
       </MyKeyboardAvoidingView>
 
+      <OptionModal
+        optionList={statuslist}
+        isVisible={isStatusModalShown}
+        onSelected={(opt) => {
+          setStatusModalShown(false);
+          setFilters({ status: opt })
+        }}
+        closeModal={() => setStatusModalShown(false)}
+      />
+
       <CalendarModal
         ref={ref_calendar}
         onDateSelected={(date, type) => setFilters({ [type]: date })}
@@ -149,6 +166,24 @@ const TeamFilterScreen = ({ navigation, route }) => {
 }
 
 export default TeamFilterScreen
+
+const statuslist = [
+  {
+    key: "active",
+    title: "Active",
+    value: true,
+  },
+  {
+    key: "inactive",
+    title: "Inactive",
+    value: false,
+  },
+  {
+    key: "all",
+    title: "All",
+    value: undefined,
+  }
+]
 
 const __styles = StyleSheet.create({
   radioRootView: {

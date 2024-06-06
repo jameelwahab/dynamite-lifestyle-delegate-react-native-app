@@ -5,12 +5,12 @@ import MyText from './MyText'
 import { S3_URL } from '../utilities/constants'
 import { colors } from '../utilities/colors'
 
-const UserImage = ({ image, name, size = 40, backgroundTransparent = false }) => {
+const UserImage = ({ image, name, size = 40, backgroundTransparent = false, noS3 = false }) => {
   return (
     <View style={{ height: size, width: size, borderRadius: size / 2, overflow: "hidden", borderWidth: 1 / 4, borderColor: colors.primary, alignItems: "center", justifyContent: "center", backgroundColor: backgroundTransparent ? "#00000000" : colors.grey }}>
       {!!image ?
         <MyImage
-          source={{ uri: S3_URL + image }}
+          source={{ uri: noS3 ? image : S3_URL + image }}
           style={{ height: "100%", width: '100%' }} />
         :
         <MyText color={colors.white}>
