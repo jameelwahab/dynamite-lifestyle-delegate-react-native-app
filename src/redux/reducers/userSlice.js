@@ -8,6 +8,9 @@ const initialState = {
   unreadCount: 0,
   isSyncWithGoogleAllowed: false,
   googleSyncedData: null,
+  googleClientIdForIOS: "",
+  googleClientIdForAndriod: "",
+  googleClientIdForWeb: "",
 };
 const userSlice = createSlice({
   name: "user",
@@ -25,6 +28,9 @@ const userSlice = createSlice({
       state.isChatAllowed = action.payload.isChatAllowed;
       state.isWhatsappChatAllowed = action.payload.isWhatsappChatAllowed;
       state.unreadCount = action.payload.count;
+      state.googleClientIdForIOS = action.payload.googleClientIdIOS;
+      state.googleClientIdForAndriod = action.payload.googleClientIdAndroid;
+      state.googleClientIdForWeb = action.payload.googleClientIdWeb;
       state.isSyncWithGoogleAllowed = action.payload.isSyncWithGoogleAllowed;
       state.googleSyncedData = action.payload.googleSyncedData;
     },
@@ -45,6 +51,13 @@ const userSlice = createSlice({
     }
   }
 })
-export const { setConsultant, clearUser, setUserAndToken, clearUserAndToken, setUnReadCount, setGoogleSyncedData, removeGoogleSyncedData } = userSlice.actions;
+export const { setConsultant,
+  clearUser, setUserAndToken,
+  clearUserAndToken, setUnReadCount,
+  setGoogleSyncedData, removeGoogleSyncedData,
+  googleClientIdForIOS, googleClientIdForAndriod,
+  googleClientIdForWeb
+
+} = userSlice.actions;
 export const selectUser = (state) => state.user;
 export default userSlice.reducer;

@@ -13,7 +13,7 @@ import MyLoader from '../../../components/MyLoader';
 import { DESYNC_GOOGLE_CALENDAR_WITH_SERVER, GET_ALL_CALENDAR_EVENTS_LIST, GET_CALENDAR_EVENTS_LIST, SYNC_GOOGLE_CALENDAR_WITH_SERVER } from '../../../DAL';
 import { convertTimezone2 } from '../../../functions/convertTime';
 import { selectTimeZone } from '../../../redux/reducers/timezoneSlice';
-import { GoogleClientIds, dateTimeFormat, googleScopes } from '../../../utilities/constants';
+import { GoogleClientIdsForAndroidDebugMode, dateTimeFormat, googleScopes } from '../../../utilities/constants';
 import EmptyView from '../../../components/EmptyView';
 import { MenuButton, TransparentButton } from '../../../components/MyButton';
 import { icons } from '../../../utilities/icons';
@@ -32,7 +32,9 @@ const dateStringCalendar = "YYYY-MM-DD";
 const CalendarScreen = ({ navigation, route }) => {
   const { key, parentKey, type: eventType } = route?.params;
   const isDelegateEvents = eventType == "consultant_user";
-  const { token, user, googleSyncedData, isSyncWithGoogleAllowed } = useSelector(selectUser);
+  const { token, user, googleSyncedData, isSyncWithGoogleAllowed,
+    googleClientIdForIOS, googleClientIdForAndriod, googleClientIdForWeb
+  } = useSelector(selectUser);
   const dispatch = useDispatch();
   const { navbar } = useSelector(selectNavbar);
   const timezone = useSelector(selectTimeZone);
@@ -70,9 +72,11 @@ const CalendarScreen = ({ navigation, route }) => {
     if (isSyncWithGoogleAllowed) {
       GoogleSignin.configure({
         scopes: googleScopes,
-        iosClientId: GoogleClientIds?.ios,
-        webClientId: GoogleClientIds?.web,
-        androidClientId: GoogleClientIds?.android,
+        iosClientId: googleClientIdForIOS,
+        webClientId: googleClientIdForWeb,
+        androidClientId: __DEV__ ?
+          GoogleClientIdsForAndroidDebugMode :
+          googleClientIdForAndriod,
         offlineAccess: true,
       });
     }
@@ -159,7 +163,7 @@ const CalendarScreen = ({ navigation, route }) => {
         if (!!user)
           await GoogleSignin.revokeAccess();
         await GoogleSignin.signOut()
-        console.log(GoogleSignin.getCurrentUser(),"GoogleSignin.getCurrentUser()")
+        console.log(GoogleSignin.getCurrentUser(), "GoogleSignin.getCurrentUser()")
       } catch (error) {
         console.log(error, "error")
       }

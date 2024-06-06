@@ -34,12 +34,8 @@ export const googleScopes = [
   "https://www.googleapis.com/auth/calendar.events"];
 
 
-export const GoogleClientIds = {
-  ios: "608984481708-nb8p06c9djmvppf8i3h2n7lbv331gbdl.apps.googleusercontent.com",
-  web: "608984481708-8j2fabm9eqbalcuk6rvj9cj4njuo451l.apps.googleusercontent.com",
-  android: __DEV__ ? "608984481708-77j6lt82sp1jpftfejgb1955l2gheuid.apps.googleusercontent.com" :
-    "608984481708-55koqmpu35e0uemkg8tlvtacunpnr0hf.apps.googleusercontent.com"
-}
+export const GoogleClientIdsForAndroidDebugMode = "608984481708-77j6lt82sp1jpftfejgb1955l2gheuid.apps.googleusercontent.com";
+
 
 export const dateTimeFormat = {
   date: "DD-MM-YYYY",

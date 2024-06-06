@@ -37,7 +37,10 @@ const InitWithAuth = async (token, navigation, setLoader, dispatch) => {
       isWhatsappChatAllowed,
       count: res?.unread_notification_count,
       isSyncWithGoogleAllowed: res?.site_setting?.is_calendar_enabled_for_delegate,
-      googleSyncedData: res?.consultant?.is_google_signin ? res?.consultant?.google_account_info : null
+      googleSyncedData: res?.consultant?.is_google_signin ? res?.consultant?.google_account_info : null,
+      googleClientIdAndroid: res?.site_setting?.delegate_android_client_id,
+      googleClientIdIOS: res?.site_setting?.delegate_ios_client_id,
+      googleClientIdWeb: res?.site_setting?.client_id,
     }));
     dispatch(setNavbar(res?.nav_items));
     dispatch(setTimeZone({ user: res?.consultant?.time_zone, admin: res?.time_zone }))
