@@ -11,6 +11,7 @@ const initialState = {
   googleClientIdForIOS: "",
   googleClientIdForAndriod: "",
   googleClientIdForWeb: "",
+  access: null
 };
 const userSlice = createSlice({
   name: "user",
@@ -33,6 +34,7 @@ const userSlice = createSlice({
       state.googleClientIdForWeb = action.payload.googleClientIdWeb;
       state.isSyncWithGoogleAllowed = action.payload.isSyncWithGoogleAllowed;
       state.googleSyncedData = action.payload.googleSyncedData;
+      state.access = action.payload.access;
     },
     clearUserAndToken: (state) => {
       state = {
@@ -56,8 +58,7 @@ export const { setConsultant,
   clearUserAndToken, setUnReadCount,
   setGoogleSyncedData, removeGoogleSyncedData,
   googleClientIdForIOS, googleClientIdForAndriod,
-  googleClientIdForWeb
-
+  googleClientIdForWeb, access
 } = userSlice.actions;
 export const selectUser = (state) => state.user;
 export default userSlice.reducer;

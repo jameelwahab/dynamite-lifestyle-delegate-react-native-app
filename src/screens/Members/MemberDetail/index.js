@@ -28,6 +28,7 @@ import InfoModal from '../../../components/InfoModal'
 
 const MemberDetail = ({ navigation, route }) => {
   const { type } = route?.params;
+  const { access } = useSelector(selectUser);
   const isAllMembers = type == "all-member";
   const isMembers = type == "member";
   const isNurture = type == "nurture";
@@ -67,6 +68,15 @@ const MemberDetail = ({ navigation, route }) => {
       })
     }
   }
+
+  const filterTheList = (list) => {
+    return list.slice().filter(x => {
+      if (x.key == "profile") {
+        return access?.view_profile
+      } else return true
+    })
+  }
+
 
   const updateTheNotes = (notes, memberId) => {
     route?.params?.updateNotes?.(notes, memberId);
@@ -168,7 +178,11 @@ const MemberDetail = ({ navigation, route }) => {
           </TouchableOpacity>
 
           <Pressable
-            onPress={() => onOptSelected({ key: "profile" })}
+            onPress={() => {
+              if (access?.view_profile) {
+                onOptSelected({ key: "profile" })
+              }
+            }}
             style={{ flexDirection: "row", flex: 1, alignItems: "center" }}>
             <View>
               <UserImage
@@ -337,8 +351,8 @@ const MemberDetail = ({ navigation, route }) => {
             if (isChecked) {
               let str = member?.call_history?.notes;
               let str2 = moment(member?.call_history?.date).format(dateTimeFormat.date)
-              
-              ref_info?.current?.openModal(str,str2, true)
+
+              ref_info?.current?.openModal(str, str2, true)
             } else {
               ref_callHistoryModal?.current?.openModal()
             }
@@ -355,7 +369,7 @@ const MemberDetail = ({ navigation, route }) => {
         <StatView title={"Coins"} value={numFormatter(member?.coins_count)} uppercase />
         {isAllMembers && <StatView title={"Reffered User"} value={!!member?.affliliate ?
           member?.affliliate?.affiliate_user_info?.first_name + " " + member?.affliliate?.affiliate_user_info?.last_name + " (" + member?.affliliate?.affiliate_url_name + ") " : "Master Link"} />}
-        {!isNurture && <StatView title={"Nurture"} value={!!member?.nurture ? member?.nurture?.first_name + " " + member?.nurture?.last_name : "N/A"} />}
+        {!isNurture && access?.Show_nurture_in_filter && <StatView title={"Nurture"} value={!!member?.nurture ? member?.nurture?.first_name + " " + member?.nurture?.last_name : "N/A"} />}
         {!isMembers && <StatView title={"Delegate"} value={!!member?.consultant ? member?.consultant?.first_name + " " + member?.consultant?.last_name : "N/A"} />}
         <StatView title={"Community Level"} value={member?.community_level} uppercase={member?.community_level == 'pta'} />
         <StatView title={"Wheel of life"} view={wheelOfLifeStatus} />
@@ -418,7 +432,7 @@ const MemberDetail = ({ navigation, route }) => {
         closeModal={() => setIsOptionModalVisible(false)}
         isVisible={isOptionModalVisible}
         onSelected={onOptSelected}
-        optionList={optionList}
+        optionList={filterTheList(optionList)}
       />
       <NotesModal
         memberId={member?._id}

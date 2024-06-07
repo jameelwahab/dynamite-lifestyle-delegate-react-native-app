@@ -41,6 +41,7 @@ const InitWithAuth = async (token, navigation, setLoader, dispatch) => {
       googleClientIdAndroid: res?.site_setting?.delegate_android_client_id,
       googleClientIdIOS: res?.site_setting?.delegate_ios_client_id,
       googleClientIdWeb: res?.site_setting?.client_id,
+      access: res?.access_object
     }));
     dispatch(setNavbar(res?.nav_items));
     dispatch(setTimeZone({ user: res?.consultant?.time_zone, admin: res?.time_zone }))

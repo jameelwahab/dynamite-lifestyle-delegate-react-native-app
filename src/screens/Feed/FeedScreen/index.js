@@ -51,14 +51,14 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
   const addPostRef = useRef()
   const scheduleModalRef = useRef();
   const ref_personalNoteModal = useRef();
-
   const { feedFor, feedId, eventId = "" } = route?.params;
+  console.log(feedFor, "feedFor")
   const isCosmos = feedFor == "the_cosmos";
   const isScheduledFeed = feedFor == "scheduled";
   const isAllSourceFeed = feedFor == "all_source";
   const isEventFeed = feedFor == "event";
-  console.log(feedFor, "feedFor")
-  const { token, user } = useSelector(selectUser);
+  const { token, user, access } = useSelector(selectUser);
+  console.log(access, "access")
   const { socket } = useSelector(selectSocket);
   const timezone = useSelector(selectTimeZone);
   const { settings } = useSelector(selectSettings);
@@ -67,7 +67,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
   const [loader, setLoader] = useState(true);
   const [feedLevel, setFeedLevel] = useState(
     isEventFeed ? "all" :
-      isCosmos ? user?.team_type == "both" ? 'all' : user?.team_type :
+      isCosmos ? access?.cosmos_feeds_filters ? access?.default_filter : user?.team_type :
         isAllSourceFeed ? "all" : "dynamite"
   );
   const [feedFooterLoader, setFeedFooterLoader] = useState(false);
@@ -75,6 +75,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
   const [commentsFooterLoader, setCommentsFooterLoader] = useState(false);
   const [feedOptionModal, setFeedOptionModal] = useState({ isVisible: false, selectedItem: null, })
   const [confirmation, setConfirmation] = useState({ isVisible: false, item: null, title: "", type: "" });
+  const [cosmosLevels] = useState(makeCosmosLevls());
   const [tab, setTab] = useState(0);
   const [inView, setInView] = useState("")
   const [comments, setComments] = useState({
@@ -91,6 +92,12 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
 
   });
 
+  function makeCosmosLevls() {
+    return access?.cosmos_feed_filters.map((x) => ({
+      title: x.split("_").join(" "),
+      type: x
+    }))
+  }
 
 
 
@@ -720,7 +727,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       let newList = [...options];
 
       if ((isEventFeed && feedOptionModal?.selectedItem?.action_info?.action_id == user?._id) || !isEventFeed) {
-        if (user?.is_super_delegate) {
+        if (access?.feed_pin_unpin_option) {
           if (feedOptionModal?.selectedItem?.is_feature)
             newList = newList.slice().filter(x => x.type != "pin");
           else if (!feedOptionModal?.selectedItem?.is_feature)
@@ -732,16 +739,29 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       if (!isEventFeed) {
         newList = newList.slice().filter(x => x.type != "notes");
       }
-      console.log(!isEventFeed, !user?.is_super_delegate, !isEventFeed || !user?.is_super_delegate, "isEventFeed && user?.is_super_delegate")
+
+
 
       if (!isCosmos || !isScheduledFeed || !isEventFeed) {
         newList = newList.slice().filter(x => {
           if (x.type == "message" && user?._id == feedOptionModal?.selectedItem?.action_info?.action_id) {
             return false
           }
+          else if ((!access?.edit_delete_option_in_source_all_source_feeds && feedOptionModal?.selectedItem?.action_info?.action_id != user?._id) && (x.type == "edit" || x.type == "delete")) {
+            return false
+          }
           return true
         });
       }
+
+      // if(!access?.feed_pin_unpin_option){
+      //   newList = newList.slice().filter(x => {
+      //     if (x.type == "message" && user?._id == feedOptionModal?.selectedItem?.action_info?.action_id) {
+      //       return false
+      //     }
+      //     return true
+      //   });
+      // }
 
       return newList
     } else {
@@ -872,7 +892,12 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           timezone={timezone}
           removeFromList={removeFromList}
           isSuperDelegate={user?.is_super_delegate}
-          hideLevelView={isEventFeed}
+          hideLevelView={isEventFeed || (isCosmos && !access?.cosmos_feeds_filters)}
+          isMultipleSelectAllowed={access?.multiple_levels_in_source_all_source_scadule_feeds}
+          showEventOption={access?.event_info_in_source_all_source_scadule_feeds}
+          cosmosLevelList={access?.cosmos_feed_filters}
+          defaultCosmosFilter={access?.default_filter}
+          selectLevelOptionOnAddPostForCosmos={access?.choose_level_in_cosmos_feeds}
         />
       </View>
     )
@@ -907,8 +932,8 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       <View style={{ flex: 1, marginHorizontal: -10 }}>
         <FlatList
           data={tab == 0 ? feed : []}
-          onViewableItemsChanged={onViewableItemsChanged}
-          viewabilityConfig={viewConfigRef.current}
+          // onViewableItemsChanged={onViewableItemsChanged}
+          // viewabilityConfig={viewConfigRef.current}
           showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item?._id}
           ListHeaderComponent={!!!feedId && headerView()}

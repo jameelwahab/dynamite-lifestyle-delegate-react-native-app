@@ -33,9 +33,12 @@ import MyWebview from '../../../components/MyWebview'
 import openUrl from '../../../functions/openUrl'
 import { isUrl } from '../../../functions/regex'
 import MyCheckBox from '../../../components/MyCheckBox'
+import capitalize from '../../../functions/capitalize'
 
 
-const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, selectFeedlevel, feedLevel, tab, isCosmos, isScheduledFeed, timezone, removeFromList, isSuperDelegate, hideLevelView, isEventFeed, eventId }, ref) => {
+const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, selectFeedlevel, feedLevel, tab, isCosmos, isScheduledFeed, timezone, removeFromList, isSuperDelegate, hideLevelView, isEventFeed, eventId, isMultipleSelectAllowed, showEventOption,
+  cosmosLevelList, selectLevelOptionOnAddPostForCosmos, defaultCosmosFilter,
+}, ref) => {
   const lvlModalRef = useRef()
   const tablRef = useRef()
   const [loader, setLoader] = useState(false);
@@ -47,7 +50,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     visibility: false
   });
   const [postCategory, setPostCategory] = useState("general");
-  const [postCeatedFor, setPostCreatedFor] = useState(isCosmos ? feedLevel != 'all' ? feedLevel : "delegate" : PostCretedForSourceFeed[0].type);
+  const [postCeatedFor, setPostCreatedFor] = useState(isCosmos ? feedLevel != 'all' ? feedLevel : user?.team_type : PostCretedForSourceFeed[0].type);
   const [postCeatedForArray, setPostCreatedForArray] = useState([PostCretedForSourceFeed[0]]);
   const [postType, setPostType] = useState("general");
   const [postText, setPostText] = useState("");
@@ -154,8 +157,22 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
         type: Modalfor
       })
     } else if (Modalfor == "createdFor") {
+      let arr = [];
+      if (isCosmos) {
+        cosmosLevelList.forEach((x) => {
+          if (x != "all") {
+            arr.push({
+              title: `${x.split("_").map((y) => capitalize(y)).join(" ")}${x == "marketing" ? " Team" : ""}`,
+              type: x,
+            })
+          }
+        })
+        console.log(arr, "arr")
+      } else {
+        arr = PostCretedForSourceFeed;
+      }
       setOption({
-        list: isCosmos ? PostCretedFor : PostCretedForSourceFeed,
+        list: arr,
         visibility: true,
         type: Modalfor
       })
@@ -180,16 +197,21 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     closeOptionModal()
   }
   const onMultipleOptionSelected = (opt) => {
-    let list = [...postCeatedForArray];
-    let index = list.findIndex(x => x.type == opt.type);
-    console.log(list, index)
-    if (index > -1) {
-      list.splice(index, 1);
+    if (isMultipleSelectAllowed) {
+      let list = [...postCeatedForArray];
+      let index = list.findIndex(x => x.type == opt.type);
+      console.log(list, index)
+      if (index > -1) {
+        list.splice(index, 1);
+      } else {
+        list.push(opt)
+      }
+      console.log(list)
+      setPostCreatedForArray([...list])
     } else {
-      list.push(opt)
+      setPostCreatedForArray([opt])
+      setMultipleLevelModalVisiblity(false)
     }
-    console.log(list)
-    setPostCreatedForArray([...list])
 
   }
   useEffect(() => {
@@ -267,10 +289,9 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
       fd.append("created_for_level_or_type", JSON.stringify(postCeatedForArray.map(x => x.type)));
     } else if (!!editId) {
       fd.append("created_for_level_or_type", postCeatedFor);
-    }
-    else {
+    } else {
       fd.append("created_for_level_or_type", isCosmos ?
-        feedLevel == 'all' ? JSON.stringify(["both"]) : JSON.stringify([postCeatedFor])
+        JSON.stringify([postCeatedFor])
         : JSON.stringify([postCeatedFor]));
     }
 
@@ -621,13 +642,13 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                         {icons.downwardArrow(17, colors.white)}
                       </TouchableOpacity>
 
-                      {(isCosmos || !!editId || !isSuperDelegate) &&
+                      {(isCosmos || !!editId) && !hideLevelView && selectLevelOptionOnAddPostForCosmos &&
                         <TouchableOpacity
                           onPress={() => openOptionModal("createdFor")}
                           style={__style.modalDropBtns}>
                           {isCosmos ?
                             <MyText style={{ textTransform: "capitalize" }}>
-                              {postCeatedFor}
+                              {`${postCeatedFor.split("_").join(" ")}${postCeatedFor == "marketing" ? " Team" : ""}`}
                             </MyText> :
                             <MyText  >
                               {PostCretedForSourceFeed.find(x => x.type == postCeatedFor)?.title}
@@ -738,6 +759,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                         >{eventBtnText}</MyText>
                       </TouchableOpacity>
                     </View>
+
 
                     <TouchableOpacity
                       onPress={() => setEventModalVisible(true)}
@@ -880,7 +902,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                       {icons.code(postType == "embed_code" ? colors.primary : colors.white, 17)}
                     </TouchableOpacity>
                   </View>
-                  {!isCosmos &&
+                  {!isCosmos && showEventOption &&
                     <TouchableOpacity
                       // onPress={() => setEventComplete((prev) => !prev)}
                       onPress={() => setEventModalVisible(true)}
@@ -940,7 +962,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
             optionList={PostCretedForSourceFeed}
             closeModal={() => setMultipleLevelModalVisiblity(false)}
             onSelected={onMultipleOptionSelected}
-            multiple={true}
+            multiple={isMultipleSelectAllowed}
             checkSelected={checkSelected}
           />
 
@@ -1000,7 +1022,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
               <View style={__style.levlBtnLabel}>
                 <MyText color={colors.lightText2} fontSize={12} >Select Level</MyText>
               </View>
-              <MyText type={"medium"} style={{ textTransform: feedLevel == "pta" ? "uppercase" : "capitalize" }} >{feedLevel}</MyText>
+              <MyText type={"medium"} style={{ textTransform: feedLevel == "pta" ? "uppercase" : "capitalize" }} >{feedLevel.split("_").join(" ")}</MyText>
               {icons.down(colors.lightText2)}
             </Pressable>}
 
@@ -1057,6 +1079,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
             selectFeedlevel={selectFeedlevel}
             feedLevel={feedLevel}
             ref={lvlModalRef}
+            cosmosLevelList={cosmosLevelList}
             isCosmos={isCosmos}
           />
 

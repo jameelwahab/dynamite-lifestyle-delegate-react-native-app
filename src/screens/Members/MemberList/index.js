@@ -44,7 +44,8 @@ const MemberList = ({ navigation, route }) => {
   const isAllMembers = type == "all-member";
   const isMembers = type == "member";
   const isNurture = type == "nurture";
-  const { token, user, isChatAllowed, isWhatsappChatAllowed } = useSelector(selectUser);
+  const { token, user, isChatAllowed, access } = useSelector(selectUser);
+  console.log(access, "access")
   const [showChips, setShowChips] = useState(false);
   const sortModalRef = useRef();
   const filterModalRef = useRef();
@@ -406,7 +407,7 @@ const MemberList = ({ navigation, route }) => {
   }
 
   useEffect(() => {
-console.log(sorted,"sorted")
+    console.log(sorted, "sorted")
     page = 0;
     canLoadMore = false
     getMembers(true)
@@ -445,7 +446,7 @@ console.log(sorted,"sorted")
           <MyText fontSize={10} type='medium' color={colors.lightText2}>{`Showing ${list.length} of ${total}`}</MyText>
         </View>
         <View style={{ flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "flex-end" }}>
-          {user?.is_super_delegate &&
+          {((isMembers && access?.member_export_csv) || (isNurture && access?.nurture_export_csv) || (isAllMembers && access?.all_member_export_csv)) &&
             <TouchableOpacity
               onPress={() => makeCsv()}
               style={__styles.headerBtn} >
@@ -578,6 +579,14 @@ console.log(sorted,"sorted")
     }
 
     setFilterChipList((list) => list.slice().filter((x) => x.value != item.value))
+  }
+
+  const filterTheList = (list) => {
+    return list.slice().filter(x => {
+      if (x.key == "profile") {
+        return access?.view_profile
+      } else return true
+    })
   }
 
   const headerView = () => {
@@ -722,9 +731,12 @@ console.log(sorted,"sorted")
 
         <View style={__styles.memberProfileView}>
           <Pressable
-            onPress={() => navigation.navigate(routes.memberProfile, {
-              memberId: item?._id
-            })}
+            onPress={() => {
+              if (access?.view_profile)
+                navigation.navigate(routes.memberProfile, {
+                  memberId: item?._id
+                })
+            }}
             style={{ flexDirection: "row", flex: 1, alignItems: "center" }}>
             <View>
               <UserImage
@@ -767,7 +779,7 @@ console.log(sorted,"sorted")
           <StatView title={"Coins"} value={numFormatter(item?.coins_count)} uppercase />
           {isAllMembers && <StatView title={"Reffered User"} value={!!item?.affliliate?.affiliate_user_info?.first_name ?
             item?.affliliate?.affiliate_user_info?.first_name + " " + item?.affliliate?.affiliate_user_info?.last_name + " (" + item?.affliliate?.affiliate_url_name + ") " : "Master Link"} />}
-          {!isNurture && <StatView title={"Nurture"} value={!!item?.nurture ? item?.nurture?.first_name + " " + item?.nurture?.last_name : "N/A"} />}
+          {!isNurture && access?.Show_nurture_in_filter && <StatView title={"Nurture"} value={!!item?.nurture ? item?.nurture?.first_name + " " + item?.nurture?.last_name : "N/A"} />}
           {!isMembers && <StatView title={"Delegate"} value={!!item?.consultant ? item?.consultant?.first_name + " " + item?.consultant?.last_name : "N/A"} />}
           <StatView title={"Community Level"} value={item?.community_level} uppercase={item?.community_level == 'pta'} />
           <StatView title={"Membership Expire"} value={!!item?.membership_purchase_expiry ?
@@ -835,6 +847,7 @@ console.log(sorted,"sorted")
         isMembers={isMembers}
         isNurture={isNurture}
         isAllMembers={isAllMembers}
+        isNurtureAccessable={access?.Show_nurture_in_filter}
       />
 
       <SaveFilterModal
@@ -855,7 +868,7 @@ console.log(sorted,"sorted")
         closeModal={() => setOptionModal({ isVisible: false, selectedItem: null })}
         isVisible={optionModal?.isVisible}
         onSelected={onOptSelected}
-        optionList={optionList}
+        optionList={filterTheList(optionList)}
       />
     </RootView>
   )

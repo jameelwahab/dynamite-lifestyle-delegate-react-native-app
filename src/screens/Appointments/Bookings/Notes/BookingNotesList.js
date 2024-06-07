@@ -51,6 +51,7 @@ const BookingNotesList = ({ navigation, route }) => {
       setTimeout(() => {
         navigation.navigate(routes.calendarEventsAddEdit, {
           member: userInfo,
+          note: optionModal?.for?.note,
           popTo: route.name,
         });
       }, 400);

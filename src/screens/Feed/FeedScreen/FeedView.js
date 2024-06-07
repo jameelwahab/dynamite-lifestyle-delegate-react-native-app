@@ -88,9 +88,15 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
             source={{
               uri:
                 isCosmos || isScheduledFeed ?
-                  item?.created_for_level_or_type == "delegate" ?
-                    S3_URL + settings?.delegate_feed_icon :
-                    S3_URL + settings?.consultant_feed_icon :
+                  // item?.created_for_level_or_type == "delegate" ?
+                  // S3_URL + settings?.delegate_feed_icon :
+                  // item?.created_for_level_or_type == "consultant" ?
+                  //   S3_URL + settings?.consultant_feed_icon :
+                  //   item?.created_for_level_or_type == "marketing" ?
+                  //     S3_URL + settings?.marketing_feed_icon :
+                  //     item?.created_for_level_or_type == "inner_circle" ?
+                  //       S3_URL + settings?.inner_circle_feed_icon :
+                  S3_URL + settings?.[`${item?.created_for_level_or_type}_feed_icon`] :
                   S3_URL + sourceLevelIcons?.[`${item?.created_for_level_or_type}_badge`]
             }}
             style={__style.feedTypeIcon}

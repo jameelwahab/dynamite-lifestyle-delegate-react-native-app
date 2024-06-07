@@ -5,7 +5,7 @@ import utilities from '../../../utilities';
 import Modal from 'react-native-modal';
 import { fonts } from '../../../utilities/fonts';
 import MyText from '../../../components/MyText';
-const LevelModal = forwardRef(({ feedLevel, selectFeedlevel, isCosmos }, ref) => {
+const LevelModal = forwardRef(({ feedLevel, selectFeedlevel, isCosmos, cosmosLevelList }, ref) => {
   const [isVisible, setIsVisible] = useState(false);
 
   useImperativeHandle(ref, () => {
@@ -35,8 +35,8 @@ const LevelModal = forwardRef(({ feedLevel, selectFeedlevel, isCosmos }, ref) =>
           backgroundColor: feedLevel == item ? colors.secondarySelect : undefined,
           paddingVertical: 20, alignItems: "center"
         }} >
-        <MyText align='center' style={{ textTransform:item=="pta"?"uppercase": "capitalize" }} type='medium' >
-          {item}
+        <MyText align='center' style={{ textTransform: item == "pta" ? "uppercase" : "capitalize" }} type='medium' >
+          {`${item.split("_").join(" ")}${item == "marketing" ? " Team" : ""}`}
         </MyText>
       </Pressable>
     )
@@ -65,7 +65,7 @@ const LevelModal = forwardRef(({ feedLevel, selectFeedlevel, isCosmos }, ref) =>
           }}>
 
             <FlatList
-              data={isCosmos ? options : sourceOptions}
+              data={isCosmos ? cosmosLevelList : sourceOptions}
               renderItem={optionView}
               keyExtractor={(item) => item}
               showsVerticalScrollIndicator={false}

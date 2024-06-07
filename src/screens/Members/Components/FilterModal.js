@@ -21,7 +21,7 @@ import Toast from 'react-native-toast-message';
 import showToast from '../../../functions/showToast';
 import OptionModalWithSearch from '../../../components/OptionModalWithSearch';
 
-const FilterModal = forwardRef(({ token, type, filterTheData, appliedFilter, isMembers, isNurture, isAllMembers }, ref) => {
+const FilterModal = forwardRef(({ token, type, filterTheData, appliedFilter, isMembers, isNurture, isAllMembers ,isNurtureAccessable}, ref) => {
   const calendarRef = useRef()
   const [isVisible, setIsVisible] = useState(false);
   const [nurtureModalVisibilty, setNurtureModalVisibilty] = useState(false);
@@ -519,7 +519,7 @@ const FilterModal = forwardRef(({ token, type, filterTheData, appliedFilter, isM
                   </Pressable>
                 )}
               />
-              {!isNurture &&
+              {!isNurture &&  isNurtureAccessable &&
                 <MyTouchableInput
                   label='Choose Nuture'
                   value={!!nurture ? `${nurture?.first_name} ${nurture?.last_name} | ${nurture?.team_type}` : ""}

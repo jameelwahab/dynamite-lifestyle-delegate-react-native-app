@@ -30,7 +30,7 @@ import { selectTimeZone } from '../../../redux/reducers/timezoneSlice'
 
 const GroupAddEdit = ({ navigation, route }) => {
   const { event, iteration_id, type: eventType } = route?.params;
-  console.log(route?.params,"route?.params")
+  console.log(route?.params, "route?.params")
   const isDelegateEvents = eventType == "consultant_user";
   const isEdit = !!event;
   const isEditIteration = !!iteration_id;
@@ -58,7 +58,7 @@ const GroupAddEdit = ({ navigation, route }) => {
     weekday: !!event?.weekday ? event?.weekday : [],
     recurringType: !!event?.recurring_type ? event?.recurring_type : "daily",
     color: !!event?.color ? event?.color : "#000000",
-    desc: !!event?.description ? event?.description : ""
+    desc: !!route?.params?.note ? route?.params?.note : !!event?.description ? event?.description : ""
 
   })
   const setGroupData = (update) => updateGroupData({ ...groupData, ...update });
