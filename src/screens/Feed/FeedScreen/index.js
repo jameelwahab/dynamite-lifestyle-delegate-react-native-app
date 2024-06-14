@@ -27,6 +27,7 @@ import routes from '../../../navigation/routes'
 import ScheduleModal from './ScheduleModal'
 import Header from '../../../components/Header'
 import AddPersonalNoteModal from '../AddPersonalNoteModal'
+import MyRefreshControl from '../../../components/MyRefreshControl'
 
 
 
@@ -70,6 +71,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       isCosmos ? access?.cosmos_feeds_filters ? access?.default_filter : user?.team_type :
         isAllSourceFeed ? "all" : "dynamite"
   );
+  const [isRefreshing, setRefreshing] = useState(false)
   const [feedFooterLoader, setFeedFooterLoader] = useState(false);
   const [likesFooterLoader, setLikesFooterLoader] = useState(false);
   const [commentsFooterLoader, setCommentsFooterLoader] = useState(false);
@@ -191,12 +193,13 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       setFeed([res?.feeds])
       setLoader(false);
       setFeedFooterLoader(false);
-
+      setRefreshing(false);
       if (route?.params?.openCommentModal) {
         openComments(feedId, false)
       }
     } else {
       setLoader(false);
+      setRefreshing(false);
       setFeedFooterLoader(false);
     }
   }
@@ -217,9 +220,11 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       }
       setFeed(feedVar.page <= 1 ? res?.feeds : [...feed, ...res?.feeds])
       setLoader(false);
+      setRefreshing(false);
       setFeedFooterLoader(false);
     } else {
       setLoader(false);
+      setRefreshing(false);
       setFeedFooterLoader(false);
     }
   }
@@ -495,6 +500,12 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
     resetCounts();
     getFeed();
   }, [feedLevel])
+
+  const onRefresh = () => {
+    setRefreshing(true)
+    resetCounts();
+    getFeed();
+  }
 
   useEffect(() => {
     SocketEvents()
@@ -934,6 +945,10 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           data={tab == 0 ? feed : []}
           // onViewableItemsChanged={onViewableItemsChanged}
           // viewabilityConfig={viewConfigRef.current}
+          refreshControl={<MyRefreshControl
+            onRefresh={onRefresh}
+            refreshing={isRefreshing}
+          />}
           showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item?._id}
           ListHeaderComponent={!!!feedId && headerView()}

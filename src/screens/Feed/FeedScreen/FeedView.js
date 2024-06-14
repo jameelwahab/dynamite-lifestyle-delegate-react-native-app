@@ -16,6 +16,7 @@ import ResponsiveImage2 from '../../../components/ResponsiveImage2'
 import utilities from '../../../utilities'
 import openUrl from '../../../functions/openUrl'
 import DropShadow from "react-native-drop-shadow";
+import { isHtml } from '../../../functions/regex'
 
 export const FeedView = ({ item, index, user, token, isInView, timezone, settings, openComments, showLikes, openOptions, onLikebtnPress, isCosmos, sourceLevelIcons, isScheduledFeed, openScheduleTimeModal, onFeedDetail, isEventFeed }) => {
 
@@ -115,9 +116,14 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
   const descriptionView = () => (
     <View style={__style.descriptionRootView}>
       {!!item?.description &&
-        // <MyText fontSize={13}>{item?.description}</MyText>
-        <CollapsibleText>{item?.description}</CollapsibleText>
-        // <MyWebview html={item?.description} />
+        <>
+          {/*  <MyText fontSize={13}>{item?.description}</MyText> */}
+           {/* <CollapsibleText>{item?.description}</CollapsibleText> */}
+          {isHtml(item?.description) ?
+            <MyWebview enableCollapse={true} html={item?.description} /> :
+            <CollapsibleText>{item?.description}</CollapsibleText>}
+          {/* <MyWebview html={item?.description} />  */}
+        </>
       }
       {item.feed_type == "image" && !!item?.feed_images && item?.feed_images.length > 0 && (
         <View style={{ marginTop: 10 }}>
