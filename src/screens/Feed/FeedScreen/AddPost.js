@@ -1,5 +1,6 @@
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, TextInput, Pressable, ScrollView } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, TextInput, Pressable, ScrollView, FlatList, Keyboard } from 'react-native'
 import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
+import { Input } from '@rneui/base'
 import UserImage from '../../../components/UserImage'
 import Modal from 'react-native-modal'
 import { colors } from '../../../utilities/colors'
@@ -9,37 +10,46 @@ import { fonts } from '../../../utilities/fonts'
 import MyInputs from '../../../components/MyInputs'
 import { MyButton } from '../../../components/MyButton'
 import ImageUploadModal from '../../../components/ImageUploadModal'
-import { Button, Menu, Divider, PaperProvider } from 'react-native-paper';
-import DropDownPicker from 'react-native-dropdown-picker'
-import ResponsiveImage2 from '../../../components/ResponsiveImage2'
 import utilities from '../../../utilities'
 import MyImage from '../../../components/MyImage'
 import OptionModal from '../../../components/OptionModal'
 import Toast from 'react-native-toast-message'
-import { CREATE_FEED, FEED_DETAIL, UPDATE_FEED, UPLOAD_FEED_IMAGES } from '../../../DAL'
-import { tokens } from 'react-native-paper/lib/typescript/styles/themes/v3/tokens'
+import { CREATE_FEED, FEED_DETAIL, GET_DELEGATES_LIST_FROM_SERVER_FOR_MENTION, UPDATE_FEED, UPLOAD_FEED_IMAGES } from '../../../DAL'
 import showToast from '../../../functions/showToast'
 import { S3_URL, dateTimeFormat } from '../../../utilities/constants'
 import LevelModal from './LevelModal'
 import MyTouchableInput from '../../../components/MyTouchableInput'
 import Editor from '../../../components/Editor'
-import { TriangleColorPicker } from 'react-native-color-picker'
 import ColorModal from '../../../components/ColorModal'
 import DateTimePicker from 'react-native-modal-datetime-picker'
 import moment from 'moment'
-import { convertTimezone, convertTimezoneFrom } from '../../../functions/convertTime'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import MyWebview from '../../../components/MyWebview'
 import openUrl from '../../../functions/openUrl'
 import { isUrl } from '../../../functions/regex'
 import MyCheckBox from '../../../components/MyCheckBox'
 import capitalize from '../../../functions/capitalize'
+import Collapsible from 'react-native-collapsible'
+import MemberView from '../../../components/MemberView'
+import ParsedText from 'react-native-parsed-text';
 
+import { MentionInput } from 'react-native-controlled-mentions'
+import { WebView } from 'react-native-webview';
+import MaskInput from 'react-native-mask-input';
+
+
+
+let cursor = {
+  start: 0,
+  end: 0
+};
 
 const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, selectFeedlevel, feedLevel, tab, isCosmos, isScheduledFeed, timezone, removeFromList, isSuperDelegate, hideLevelView, isEventFeed, eventId, isMultipleSelectAllowed, showEventOption,
   cosmosLevelList, selectLevelOptionOnAddPostForCosmos, defaultCosmosFilter,
 }, ref) => {
   const lvlModalRef = useRef()
+  const webViewRef = useRef()
+  const ref_input = useRef();
   const tablRef = useRef()
   const [loader, setLoader] = useState(false);
   const [isPostModalVisible, setPostModalVisibilty] = useState(false);
@@ -59,7 +69,6 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   const [embededCode, setEmbededCode] = useState("");
   const [editId, setEditId] = useState("");
   const [editFeed, setEditFeed] = useState(null);
-  const [show, setShow] = useState(false)
   const [isEventViewComplete, setEventComplete] = useState(false);
   const [eventTitle, setEventTitle] = useState("");
   const [eventBtnText, setEventBtnText] = useState("");
@@ -67,17 +76,93 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   const [eventBtnTextColor, setEventBtnTextColor] = useState(colors.white)
   const [eventBtnColor, setEventBtnColor] = useState(colors.primary2);
   const [eventBtnAligment, setEventBtnAligment] = useState("center");
-
-
+  const [delegateList, setDelegateList] = useState([]);
+  const [isMentionListVisible, setIsMentionListVisible] = useState(false);
+  const [mentionList, setMentionList] = useState([]);
+  const [_at_index, set_at_index] = useState(-1);
 
   const [dateModalVisible, setDateModalVisible] = useState(false);
   const [timeModalVisibe, setTimeModalVisibe] = useState(false);
   const [publishDate, setPublishDate] = useState(moment().format(dateTimeFormat.date));
   const [publishTime, setPublishTime] = useState("12:00 AM");
   const [eventModalVisible, setEventModalVisible] = useState(false)
-
   const [multipleLevelModalVisiblity, setMultipleLevelModalVisiblity] = useState(false);
 
+
+  useEffect(() => {
+    getTheDelegateListFromServer("");
+  }, [isMentionListVisible])
+
+  function extractSubstring(str) {
+    if (_at_index > -1) {
+      return str = str.substring(_at_index + 1, str.length);
+    }
+    return ""
+  }
+
+  function getSubstringToSpaceEndIndex(str, startIndex) {
+    if (startIndex >= str.length) {
+      return '';
+    }
+    const endIndex = str.indexOf(' ', startIndex);
+
+    return endIndex
+  }
+
+  function replaceSubstring(str, startIndex, endIndex, replacement) {
+    if (startIndex > str.length - 1) {
+      return str; // If indices are out of bounds or invalid, return the original string
+    }
+    let str1 = str.substring(0, startIndex) + replacement;
+    if (endIndex != -1) {
+      str1 += str.substring(endIndex);
+    }
+    return str1
+  }
+
+
+  const replaceString = (str, index, replacement) => {
+    if (index > str.length - 1) {
+      return str;
+    }
+    let endINdex = getSubstringToSpaceEndIndex(str, _at_index);
+    // console.log(endINdex,"endINdex")
+    // console.log(replaceSubstring(str, index, startEndINdex, replacement),"replaceSubstring")
+    console.log(str, index, endINdex, replacement);
+    return replaceSubstring(str, index, endINdex, replacement)
+    // return str.replace(str1, replacement);
+  }
+
+  const removeMemberFromListMEntion = (text) => {
+    // const pattern = /@[^ @]+/g;s
+    // // Find all matches
+    // const matches = text.match(pattern);
+    // mentionList.forEach(member => {
+
+    // })
+  }
+
+  const textHandler = (text, unmasked) => {
+    console.log(text, "masked")
+    console.log(unmasked, "unmasked")
+    removeMemberFromListMEntion(text)
+    setPostText(text);
+    if ((text[cursor?.start] == "@" && (text[cursor?.start + 1] == " " || text[cursor?.start + 1] == undefined)) || text == "@") {
+      let _at_index = cursor?.start;
+      setIsMentionListVisible(true);
+      set_at_index(_at_index)
+    } else {
+      setIsMentionListVisible(false);
+    }
+    if (isMentionListVisible) {
+      if (text[cursor?.start] == " " || !text.includes("@")) {
+        setIsMentionListVisible(false);
+        setDelegateList([])
+      } else {
+        getTheDelegateListFromServer(extractSubstring(text))
+      }
+    }
+  }
 
   useImperativeHandle(ref, () => {
     return {
@@ -85,6 +170,19 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
       // ... your methods ...
     };
   }, []);
+
+
+  const makeSlug = (obj) => {
+    return (obj?.first_name + " " + obj?.last_name).trim().split(" ").join("_").toLowerCase()
+  }
+
+  const onPressOnMentions = (obj) => {
+    setMentionList([...mentionList, obj]);
+    setIsMentionListVisible(false);
+    setDelegateList([]);
+    setPostText(replaceString(postText, _at_index, `@[${obj?.first_name} ${obj?.last_name}]`));
+    set_at_index(-1)
+  }
 
   const selectItemForEdit = (item) => {
     console.log(item, "item for edit");
@@ -115,6 +213,79 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     }
   }
 
+  const getHighlightedText1 = (text, replacementData) => {
+    const regex = /@([^@]+)@/g;
+    const parts = [];
+    let lastIndex = 0;
+    let match;
+
+    while ((match = regex.exec(text)) !== null) {
+      console.log(match, "match")
+      parts.push(text.substring(lastIndex, match.index));
+      let user1 = mentionList.find(x => x._id == match[1]);
+      parts.push(<Text key={match[1]} style={{ color: colors.primary }}>{user1?.first_name + " " + user1?.last_name}</Text>);
+      lastIndex = regex.lastIndex;
+    }
+    parts.push(text.substring(lastIndex));
+    console.log(parts, "parts")
+    return parts;
+  };
+
+  const getHighlightedText = (text, replacementData) => {
+    const regex = /(@[^@]+@)/g;
+
+    return text;
+  };
+
+  const getTheUser = (text) => {
+    const regex = /@([^@]+)@/g;
+    let str1 = text;
+    let match;
+
+    while ((match = regex.exec(str1)) !== null) {
+      let user = mentionList.find(x => x._id == match[1]);
+      // console.log(match, "match")
+      // let node = <Text style={__style.mentionUserText}>{user?.first_name + " " + user?.last_name}</Text>;
+      // console.log(node,"node")
+      str1 = getHighlightedText(match[0], user)
+    }
+    console.log(str1, 'str1')
+    return str1;
+  }
+
+
+  const replaceAndHighlight = (str) => {
+    // Split the input string into an array of parts with placeholders
+    // const parts = `${str}`.split(/(@\w+@)/g);
+    // const parts = str.split(/(@[^ @]+)/g);
+    const parts = str.split(/(\[@[^:]+:[^\]]+\])/g);
+
+    let arr = []
+    parts.forEach((part, index) => {
+      console.log(part[0], part[1])
+      if (part[0] == "@" && !!part[1]) {
+        const slug = part.substring(1); // Extract the id without the @ symbols
+        console.log(slug, "slug")
+        const value = mentionList.find(x => x.slug == slug);
+        if (!!value) {
+          arr.push(
+            (<Text key={index} style={__style.mentionUserText}>
+              {"@" + value.slug}
+            </Text>)
+          );
+        } else {
+          arr.push(<Text key={index}>{part}</Text>)
+        }
+      } else {
+        arr.push(<Text key={index}>{part}</Text>)
+      }
+
+    });
+
+
+
+    return str
+  };
 
 
   const onImagePicked = (newImages) => {
@@ -147,6 +318,14 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     setEventBtnTextColor(colors.white);
     setPublishDate(moment().format(dateTimeFormat.date));
     setPublishTime("12:00 AM");
+    setMentionList([]);
+    setDelegateList([]);
+    setIsMentionListVisible(false);
+    set_at_index(-1)
+    cursor = {
+      start: 0,
+      end: 0
+    };
   }
 
   const openOptionModal = (Modalfor) => {
@@ -196,6 +375,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
     closeOptionModal()
   }
+
   const onMultipleOptionSelected = (opt) => {
     if (isMultipleSelectAllowed) {
       let list = [...postCeatedForArray];
@@ -214,15 +394,12 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     }
 
   }
-  useEffect(() => {
-    console.log(postCeatedForArray)
-  }, [
-    JSON.stringify(postCeatedForArray)
-  ])
+
 
   const checkSelected = (opt) => {
     return !!postCeatedForArray.find(x => x.type == opt.type)
   }
+
   const addPostBtn = async () => {
     // if (postType == "general" && ) {
     //   showToast({ body: "Please add some text to be posted", title: "Alert", type: "info" });
@@ -360,10 +537,15 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     }
   }
 
+  const getTheDelegateListFromServer = async (text) => {
+    let res = await GET_DELEGATES_LIST_FROM_SERVER_FOR_MENTION({ navigation, token, searchText: text.trim() });
+    if (res.code == 200) {
+      setDelegateList(res?.users)
+    }
+  }
 
 
   const btn_cancelEvent = () => {
-
     setEventTitle("")
     setEventBtnText("");
     setEventBtnLink("");
@@ -586,6 +768,49 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   }
 
 
+
+  const renderText = (matchingString, matches) => {
+    // matches => ["[@michel:5455345]", "@michel", "5455345"]
+    let pattern = /\[(@[^:]+):([^\]]+)\]/i;
+    let match = matchingString.match(pattern);
+    console.log(match, "match")
+    return `${match[1]}`;
+  }
+
+
+
+  const onMessage = (event) => {
+    console.log('HTML content:', event.nativeEvent.data);
+  };
+
+  const htmlInput = () => {
+    const htmlContent = `
+    <html>
+    <body>
+      <div contenteditable="true" style="width:${utilities.screenWidth() - 40}; height: 150;">
+        <p></p>
+      </div>
+      <script>
+        document.body.addEventListener('input', function(e) {
+          window.ReactNativeWebView.postMessage(e.target.innerHTML);
+        }, false);
+      </script>
+    </body>
+    </html>
+  `;
+
+    return (
+      <WebView
+        style={{ height: 100 }}
+        ref={webViewRef}
+        source={{ html: htmlContent }}
+        onMessage={onMessage}
+        // scrollEnabled={false}
+        scalesPageToFit
+      />
+    );
+  }
+
   const Modal_addPost = () => {
     let levelLength = postCeatedForArray.length
     return (
@@ -598,7 +823,6 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
         hasBackdrop={false}
         animationInTiming={500}
         animationOutTiming={500}
-        // avoidKeyboard={true}
         style={{ margin: 0 }}>
         <SafeAreaView style={{ flex: 1 }} >
           <View pointerEvents={loader ? "none" : "auto"} style={__style.modalRootView}>
@@ -616,304 +840,408 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
             </View>
             <View style={[__style.divider, { marginTop: -1 }]} />
             <KeyboardAwareScrollView
+              style={__style.postView}
               showsVerticalScrollIndicator={false}>
 
-              <View style={__style.postView}>
+              {/* <View style={__style.postView}> */}
 
-                {/* //* Profile view with actions */}
+              {/* //* Profile view with actions */}
 
-                <View style={[__style.inputRootView,]}>
-                  <UserImage
-                    image={user?.image?.thumbnail_1}
-                    name={user?.first_name}
-                    size={45}
-                  />
+              <View style={[__style.inputRootView,]}>
+                <UserImage
+                  image={user?.image?.thumbnail_1}
+                  name={user?.first_name}
+                  size={45}
+                />
 
-                  {/* //* Dropdown btns */}
-                  <View style={{ marginLeft: 10, flex: 1 }}>
-                    <MyText fontSize={16} type="bold">{user?.first_name + " " + user?.last_name}</MyText>
-                    <View style={__style.modalActionButtonRow}>
+                {/* //* Dropdown btns */}
+                <View style={{ marginLeft: 10, flex: 1 }}>
+                  <MyText fontSize={16} type="bold">{user?.first_name + " " + user?.last_name}</MyText>
+                  <View style={__style.modalActionButtonRow}>
 
+                    <TouchableOpacity
+                      onPress={() => openOptionModal("category")}
+                      style={__style.modalDropBtns}>
+                      <MyText style={{ textTransform: "capitalize" }}>
+                        {postCategory}</MyText>
+                      {icons.downwardArrow(17, colors.white)}
+                    </TouchableOpacity>
+
+                    {(isCosmos || !!editId) && !hideLevelView && selectLevelOptionOnAddPostForCosmos &&
                       <TouchableOpacity
-                        onPress={() => openOptionModal("category")}
+                        onPress={() => openOptionModal("createdFor")}
                         style={__style.modalDropBtns}>
-                        <MyText style={{ textTransform: "capitalize" }}>
-                          {postCategory}</MyText>
+                        {isCosmos ?
+                          <MyText style={{ textTransform: "capitalize" }}>
+                            {`${postCeatedFor.split("_").join(" ")}${postCeatedFor == "marketing" ? " Team" : ""}`}
+                          </MyText> :
+                          <MyText>
+                            {PostCretedForSourceFeed.find(x => x.type == postCeatedFor)?.title}
+                          </MyText>}
+                        {icons.downwardArrow(17, colors.white)}
+                      </TouchableOpacity>}
+                    {!!!editId &&
+                      <View opacity={0.7}>
+                        <TouchableOpacity
+                          style={__style.modalDropBtns}>
+                          <MyText>{isScheduledFeed ? "Schedule" : "Publish"}</MyText>
+                          {/* {icons.downwardArrow(17, colors.white)} */}
+                        </TouchableOpacity>
+                      </View>}
+                  </View>
+                  {!isCosmos && !!!editId && isSuperDelegate && !isEventFeed &&
+                    <View style={{ marginTop: 10 }}>
+                      <TouchableOpacity
+                        onPress={() => setMultipleLevelModalVisiblity(true)}
+                        style={[__style.modalDropBtns, { alignSelf: "flex-start" }]}>
+                        <MyText >
+                          {levelLength > 0 ? postCeatedForArray.map((x, i) => {
+                            let name = x.title;
+                            if ((i + 1) != levelLength) {
+                              name = name + ", ";
+                            }
+                            return name
+                          }) : "Select Level*"}
+                        </MyText>
                         {icons.downwardArrow(17, colors.white)}
                       </TouchableOpacity>
-
-                      {(isCosmos || !!editId) && !hideLevelView && selectLevelOptionOnAddPostForCosmos &&
-                        <TouchableOpacity
-                          onPress={() => openOptionModal("createdFor")}
-                          style={__style.modalDropBtns}>
-                          {isCosmos ?
-                            <MyText style={{ textTransform: "capitalize" }}>
-                              {`${postCeatedFor.split("_").join(" ")}${postCeatedFor == "marketing" ? " Team" : ""}`}
-                            </MyText> :
-                            <MyText  >
-                              {PostCretedForSourceFeed.find(x => x.type == postCeatedFor)?.title}
-                            </MyText>}
-                          {icons.downwardArrow(17, colors.white)}
-                        </TouchableOpacity>}
-                      {!!!editId &&
-                        <View opacity={0.7}>
-                          <TouchableOpacity
-                            style={__style.modalDropBtns}>
-                            <MyText>{isScheduledFeed ? "Schedule" : "Publish"}</MyText>
-                            {/* {icons.downwardArrow(17, colors.white)} */}
-                          </TouchableOpacity>
-                        </View>}
                     </View>
-                    {!isCosmos && !!!editId && isSuperDelegate && !isEventFeed &&
-                      <View style={{ marginTop: 10 }}>
-                        <TouchableOpacity
-                          onPress={() => setMultipleLevelModalVisiblity(true)}
-                          style={[__style.modalDropBtns, { alignSelf: "flex-start" }]}>
-                          <MyText >
-                            {levelLength > 0 ? postCeatedForArray.map((x, i) => {
-                              let name = x.title;
-                              if ((i + 1) != levelLength) {
-                                name = name + ", ";
-                              }
-                              return name
-                            }) : "Select Level*"}
-                          </MyText>
-                          {icons.downwardArrow(17, colors.white)}
-                        </TouchableOpacity>
-                      </View>
-                    }
-                  </View>
-
+                  }
                 </View>
 
+              </View>
 
 
 
 
 
-                {/*//*   Post Text     */}
 
+              {/*//*   Post Text     */}
+
+              <TextInput
+                style={[__style.modalInput, {
+                  color: colors.lightText2,
+                  fontFamily: fonts.regular,
+                  includeFontPadding: false,
+
+                }]}
+                multiline={true}
+                autoCapitalize='none'
+                autoComplete="off"
+                textAlignVertical="top"
+                autoCorrect={false}
+                placeholder="What's on your mind?"
+                placeholderTextColor={colors.lightText2}
+                keyboardAppearance="dark"
+                selectionColor={colors.selection}
+                cursorColor={colors.white}
+                ref={ref_input}
+                value={postText}
+                onChangeText={(text)=>setPostText(text)}
+                // onSelectionChange={(e) => {
+                //   console.log(e.nativeEvent.selection)
+                //   cursor = e.nativeEvent.selection
+                // }}
+              />
+              {/* <View>
+
+
+                <TextInput editable={false}
+                  multiline={true}
+                  style={[__style.modalInput, {
+                    position: "absolute", color: colors.lightText2, fontFamily: fonts.regular,
+                    includeFontPadding: false,
+                    width: "100%",
+
+                  }]} >
+                  <ParsedText
+                    parse={[
+                      { pattern: /\[(@[^:]+):([^\]]+)\]/i, style: __style.mentionUserText,  renderText: renderText },
+                    ]} >
+
+                    {replaceAndHighlight(postText)}
+                  </ParsedText>
+                </TextInput>
                 <TextInput
-                  style={__style.modalInput}
+                  style={[__style.modalInput, {
+                    color: colors.transparent,
+                    fontFamily: fonts.regular,
+                    includeFontPadding: false,
+
+                  }]}
                   multiline={true}
                   autoCapitalize='none'
                   autoComplete="off"
                   textAlignVertical="top"
                   autoCorrect={false}
-                  onChangeText={(text) => setPostText(text)}
-                  value={postText}
                   placeholder="What's on your mind?"
                   placeholderTextColor={colors.lightText2}
                   keyboardAppearance="dark"
                   selectionColor={colors.selection}
                   cursorColor={colors.white}
+                  ref={ref_input}
+                  value={postText}
+                  onChangeText={textHandler}
+                  onSelectionChange={(e) => {
+                    console.log(e.nativeEvent.selection)
+                    cursor = e.nativeEvent.selection
+                  }}
                 />
+              </View> */}
+              {/* 
+            {/*      <View style={{ maxHeight: 150 }}>
+                <Text style={[{
+                  color: colors.lightText,
+                  fontFamily: fonts.regular,
+                  includeFontPadding: false
+                }]} >{replaceAndHighlight(`${postText}`)}</Text>
+              </View> */}
 
 
-                {/*//*   Schedule View    */}
-                {isScheduledFeed &&
-                  <View style={{ marginBottom: 10 }}>
-                    <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
-                      <View style={{ flex: 1 }}>
-                        <MyTouchableInput
-                          noSpace
-                          label='Publish Date*'
-                          value={publishDate}
-                          icon={() => icons.calendar(colors.lightPrimary, 20)}
-                          onPress={() => setDateModalVisible(true)}
-                        />
-                      </View>
-                      <View style={{ flex: 1, marginLeft: 10 }}>
-                        <MyTouchableInput
-                          noSpace
-                          label='Publish Time*'
-                          value={publishTime}
-                          icon={() => icons.clock(colors.lightPrimary, 20)}
-                          onPress={() => setTimeModalVisibe(true)}
-                        />
-                      </View>
-                    </View>
-                    <MyText style={{ marginTop: 5 }} fontSize={12} color={colors.lightText}  >{"Date and Time are in Europe/Dublin timezone"}</MyText>
+              {isMentionListVisible && delegateList.length > 0 &&
+                <View style={{
+                  position: "absolute",
+                  zIndex: 3,
+                  alignItems: "center",
+                  top: 50 + 160
+                }}>
+                  <View style={{
+                    width: utilities.screenWidth() - 30,
+                    backgroundColor: colors.darkSecondary,
+                    borderRadius: 5,
+                    maxHeight: 190,
+                    shadowColor: "#FFF",
+                    shadowOffset: {
+                      width: 0,
+                      height: 1,
+                    },
+                    shadowOpacity: 0.20,
+                    shadowRadius: 1.41,
+                    elevation: 2,
+                  }}>
+                    <ScrollView
+                      contentContainerStyle={{ padding: 10 }}>
+                      {delegateList.map((item) =>
+                        <TouchableOpacity
+                          onPress={() => onPressOnMentions(item)}
+                          style={{ paddingVertical: 4 }}>
+                          <MemberView
+                            size={30}
+                            titleSize={12}
+                            member={item}
+                            customImage={item?.image?.thumbnail_1}
+                            hideEmail />
+                        </TouchableOpacity>)}
+                    </ScrollView>
                   </View>
-                }
+                </View>}
 
 
-                {/* //* Eent View */}
 
-                {isEventViewComplete &&
-                  <View style={{ paddingHorizontal: 10 }} >
-                    <View style={__style.eventRootView} >
-                      <View style={__style.eventTitleView}>
-                        <MyWebview html={eventTitle} />
-                      </View>
-                      <TouchableOpacity
-                        onPress={() => openUrl(eventBtnLink)}
-                        style={[__style.eventBtnView, {
-                          backgroundColor: eventBtnColor,
-                          alignSelf: btnAligmnet[eventBtnAligment]
-                        }]}>
-                        <MyText
-                          color={eventBtnTextColor}
-                          type='medium'
-                          style={{ paddingHorizontal: 10, }}
-                        >{eventBtnText}</MyText>
-                      </TouchableOpacity>
+              {/*//*   Schedule View    */}
+              {isScheduledFeed &&
+                <View style={{ marginBottom: 10 }}>
+                  <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
+                    <View style={{ flex: 1 }}>
+                      <MyTouchableInput
+                        noSpace
+                        label='Publish Date*'
+                        value={publishDate}
+                        icon={() => icons.calendar(colors.lightPrimary, 20)}
+                        onPress={() => setDateModalVisible(true)}
+                      />
                     </View>
+                    <View style={{ flex: 1, marginLeft: 10 }}>
+                      <MyTouchableInput
+                        noSpace
+                        label='Publish Time*'
+                        value={publishTime}
+                        icon={() => icons.clock(colors.lightPrimary, 20)}
+                        onPress={() => setTimeModalVisibe(true)}
+                      />
+                    </View>
+                  </View>
+                  <MyText style={{ marginTop: 5 }} fontSize={12} color={colors.lightText}  >{"Date and Time are in Europe/Dublin timezone"}</MyText>
+                </View>
+              }
 
 
+              {/* //* Eent View */}
+
+              {isEventViewComplete &&
+                <View style={{ paddingHorizontal: 10 }} >
+                  <View style={__style.eventRootView} >
+                    <View style={__style.eventTitleView}>
+                      <MyWebview html={eventTitle} />
+                    </View>
                     <TouchableOpacity
-                      onPress={() => setEventModalVisible(true)}
-                      style={{
-                        backgroundColor: colors.white, height: 30, width: 30, borderRadius: 30 / 2, alignItems: "center", justifyContent: "center", position: "absolute", right: 0, top: 5,
-                        shadowColor: "#fff",
-                        shadowOffset: {
-                          width: 0,
-                          height: 2,
-                        },
-                        shadowOpacity: 0.25,
-                        shadowRadius: 3.84,
-
-                        elevation: 5,
-                      }} >
-                      {icons.editpencil(colors.border, 20)}
+                      onPress={() => openUrl(eventBtnLink)}
+                      style={[__style.eventBtnView, {
+                        backgroundColor: eventBtnColor,
+                        alignSelf: btnAligmnet[eventBtnAligment]
+                      }]}>
+                      <MyText
+                        color={eventBtnTextColor}
+                        type='medium'
+                        style={{ paddingHorizontal: 10, }}
+                      >{eventBtnText}</MyText>
                     </TouchableOpacity>
+                  </View>
 
-                    {/* <View style={{ backgroundColor: colors.grey, height: 30, width: 30, borderRadius: 30 / 2, alignItems: "center", justifyContent: "center", position: "absolute", top: 0, left: 2 }} >
+
+                  <TouchableOpacity
+                    onPress={() => setEventModalVisible(true)}
+                    style={{
+                      backgroundColor: colors.white, height: 30, width: 30, borderRadius: 30 / 2, alignItems: "center", justifyContent: "center", position: "absolute", right: 0, top: 5,
+                      shadowColor: "#fff",
+                      shadowOffset: {
+                        width: 0,
+                        height: 2,
+                      },
+                      shadowOpacity: 0.25,
+                      shadowRadius: 3.84,
+
+                      elevation: 5,
+                    }} >
+                    {icons.editpencil(colors.border, 20)}
+                  </TouchableOpacity>
+
+                  {/* <View style={{ backgroundColor: colors.grey, height: 30, width: 30, borderRadius: 30 / 2, alignItems: "center", justifyContent: "center", position: "absolute", top: 0, left: 2 }} >
                       {icons.edit(colors.white, 15)}
                     </View> */}
-                  </View>
-                }
-
-
-
-
-
-
-
-
-                {/*//*   Images List     */}
-                {postType == "image" &&
-                  <View>
-                    <View style={{ flexDirection: "row", marginBottom: 5 }}>
-                      <ScrollView horizontal
-                        contentContainerStyle={{ paddingVertical: 10 }}
-                        indicatorStyle="white"
-                      >
-                        {images.map((image, index) => (
-                          <View>
-                            <MyImage
-                              source={{ uri: !!image.uri ? image.uri : S3_URL + image.thumbnail_1 }}
-                              style={{ width: ((utilities.screenWidth() - 40) / 4), aspectRatio: 1, borderRadius: 10, marginRight: 10, overflow: "hidden" }}
-                            />
-                            <TouchableOpacity
-                              onPress={() => {
-                                setImages((images) => images.filter((x, i) => i != index))
-
-                              }}
-                              style={[__style.inputCrossBtn, { backgroundColor: colors.primary, right: 5, top: -8 }]}>
-                              {icons.crosss(colors.black, 15)}
-                            </TouchableOpacity>
-                          </View>
-                        ))}
-
-                      </ScrollView>
-                    </View>
-
-                    {/*//*   Image View     */}
-
-                    <View>
-                      <Pressable
-                        onPress={() => setImageModalVisibilty(true)}
-                        style={__style.addPhotoView}>
-                        <MyText type='medium' color={colors.primary} >Add Photo</MyText>
-                        {icons.upload()}
-                      </Pressable>
-                      <TouchableOpacity
-                        onPress={() => setPostType("general")}
-                        style={[__style.inputCrossBtn, { top: -5, backgroundColor: colors.black }]}>
-                        {icons.crosss(colors.primary, 15)}
-                      </TouchableOpacity>
-                    </View>
-                  </View>}
-                {/* //*     Post Video url      */}
-
-
-                {postType == "video" &&
-                  <View >
-                    <TextInput
-                      style={__style.videoInput}
-                      autoCapitalize='none'
-                      autoComplete="off"
-                      autoCorrect={false}
-                      onChangeText={(text) => setVideoLink(text)}
-                      value={videoLink}
-                      placeholder="Video URL"
-                      placeholderTextColor={colors.lightText2}
-                    />
-                    <TouchableOpacity
-                      onPress={() => setPostType("general")}
-                      style={__style.inputCrossBtn}>
-                      {icons.crosss(colors.white, 15)}
-                    </TouchableOpacity>
-                  </View>}
-
-
-                {/* //*     Post Embed Code      */}
-                {postType == "embed_code" &&
-                  <View >
-                    <TextInput
-                      style={[__style.videoInput, { height: 120 }]}
-                      multiline={true}
-                      textAlignVertical='top'
-                      autoCapitalize='none'
-                      autoComplete="off"
-                      autoCorrect={false}
-                      onChangeText={(text) => setEmbededCode(text)}
-                      value={embededCode}
-                      placeholder="Embeded Code"
-                      placeholderTextColor={colors.lightText2}
-                    />
-                    <TouchableOpacity
-                      onPress={() => setPostType("general")}
-                      style={__style.inputCrossBtn}>
-                      {icons.crosss(colors.white, 15)}
-                    </TouchableOpacity>
-                  </View>}
-
-
-                {/* //*     post type action buttonns  */}
-                <View style={__style.typeButtonRow}>
-                  <View style={{ flex: 1, flexDirection: "row" }}>
-                    <TouchableOpacity
-                      onPress={() => setPostType("image")}
-                      style={__style.typeButtonView}>
-                      {icons.camera(postType == "image" ? colors.primary : colors.white, 17)}
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      onPress={() => setPostType("video")}
-                      style={[__style.typeButtonView,]}>
-                      {icons.video(postType == "video" ? colors.primary : colors.white, 17)}
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      onPress={() => setPostType("embed_code")}
-                      style={__style.typeButtonView}>
-                      {icons.code(postType == "embed_code" ? colors.primary : colors.white, 17)}
-                    </TouchableOpacity>
-                  </View>
-                  {!isCosmos && showEventOption &&
-                    <TouchableOpacity
-                      // onPress={() => setEventComplete((prev) => !prev)}
-                      onPress={() => setEventModalVisible(true)}
-                      style={__style.typeButtonView}>
-                      {icons.calendarTick(isEventViewComplete ? colors.primary : colors.white, 20)}
-                    </TouchableOpacity>
-                  }
                 </View>
+              }
 
 
+
+
+
+
+
+
+              {/*//*   Images List     */}
+              {postType == "image" &&
+                <View>
+                  <View style={{ flexDirection: "row", marginBottom: 5 }}>
+                    <ScrollView horizontal
+                      contentContainerStyle={{ paddingVertical: 10 }}
+                      indicatorStyle="white"
+                    >
+                      {images.map((image, index) => (
+                        <View>
+                          <MyImage
+                            source={{ uri: !!image.uri ? image.uri : S3_URL + image.thumbnail_1 }}
+                            style={{ width: ((utilities.screenWidth() - 40) / 4), aspectRatio: 1, borderRadius: 10, marginRight: 10, overflow: "hidden" }}
+                          />
+                          <TouchableOpacity
+                            onPress={() => {
+                              setImages((images) => images.filter((x, i) => i != index))
+
+                            }}
+                            style={[__style.inputCrossBtn, { backgroundColor: colors.primary, right: 5, top: -8 }]}>
+                            {icons.crosss(colors.black, 15)}
+                          </TouchableOpacity>
+                        </View>
+                      ))}
+
+                    </ScrollView>
+                  </View>
+
+                  {/*//*   Image View     */}
+
+                  <View>
+                    <Pressable
+                      onPress={() => setImageModalVisibilty(true)}
+                      style={__style.addPhotoView}>
+                      <MyText type='medium' color={colors.primary} >Add Photo</MyText>
+                      {icons.upload()}
+                    </Pressable>
+                    <TouchableOpacity
+                      onPress={() => setPostType("general")}
+                      style={[__style.inputCrossBtn, { top: -5, backgroundColor: colors.black }]}>
+                      {icons.crosss(colors.primary, 15)}
+                    </TouchableOpacity>
+                  </View>
+                </View>}
+              {/* //*     Post Video url      */}
+
+
+              {postType == "video" &&
+                <View >
+                  <TextInput
+                    style={__style.videoInput}
+                    autoCapitalize='none'
+                    autoComplete="off"
+                    autoCorrect={false}
+                    onChangeText={(text) => setVideoLink(text)}
+                    value={videoLink}
+                    placeholder="Video URL"
+                    placeholderTextColor={colors.lightText2}
+                  />
+                  <TouchableOpacity
+                    onPress={() => setPostType("general")}
+                    style={__style.inputCrossBtn}>
+                    {icons.crosss(colors.white, 15)}
+                  </TouchableOpacity>
+                </View>}
+
+
+              {/* //*     Post Embed Code      */}
+              {postType == "embed_code" &&
+                <View >
+                  <TextInput
+                    style={[__style.videoInput, { height: 120 }]}
+                    multiline={true}
+                    textAlignVertical='top'
+                    autoCapitalize='none'
+                    autoComplete="off"
+                    autoCorrect={false}
+                    onChangeText={(text) => setEmbededCode(text)}
+                    value={embededCode}
+                    placeholder="Embeded Code"
+                    placeholderTextColor={colors.lightText2}
+                  />
+                  <TouchableOpacity
+                    onPress={() => setPostType("general")}
+                    style={__style.inputCrossBtn}>
+                    {icons.crosss(colors.white, 15)}
+                  </TouchableOpacity>
+                </View>}
+
+
+              {/* //*     post type action buttonns  */}
+              <View style={__style.typeButtonRow}>
+                <View style={{ flex: 1, flexDirection: "row" }}>
+                  <TouchableOpacity
+                    onPress={() => setPostType("image")}
+                    style={__style.typeButtonView}>
+                    {icons.camera(postType == "image" ? colors.primary : colors.white, 17)}
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    onPress={() => setPostType("video")}
+                    style={[__style.typeButtonView,]}>
+                    {icons.video(postType == "video" ? colors.primary : colors.white, 17)}
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    onPress={() => setPostType("embed_code")}
+                    style={__style.typeButtonView}>
+                    {icons.code(postType == "embed_code" ? colors.primary : colors.white, 17)}
+                  </TouchableOpacity>
+                </View>
+                {!isCosmos && showEventOption &&
+                  <TouchableOpacity
+                    // onPress={() => setEventComplete((prev) => !prev)}
+                    onPress={() => setEventModalVisible(true)}
+                    style={__style.typeButtonView}>
+                    {icons.calendarTick(isEventViewComplete ? colors.primary : colors.white, 20)}
+                  </TouchableOpacity>
+                }
               </View>
+
+
+              {/* </View> */}
 
               {/* //*    add post Button  */}
               {!!editId ?
@@ -939,6 +1267,8 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                 </View>}
             </KeyboardAwareScrollView>
           </View>
+
+
 
           <ImageUploadModal
             closeModal={() => setImageModalVisibilty(false)}
@@ -1002,7 +1332,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
           {EventModal()}
 
           {isPostModalVisible && !eventModalVisible && <Toast />}
-        </SafeAreaView>
+        </SafeAreaView >
         <SafeAreaView style={{ flex: 0, backgroundColor: colors.secondary }} ></SafeAreaView>
       </Modal >
 
@@ -1152,6 +1482,10 @@ const __style = StyleSheet.create({
     borderRadius: 10,
     marginTop: 10
   },
+  mentionUserText: {
+    backgroundColor: colors.lightPrimary3,
+    color: colors.primary
+  },
   inputRootView: {
     flexDirection: "row",
     alignItems: "center"
@@ -1255,9 +1589,8 @@ const __style = StyleSheet.create({
     marginTop: 10,
     padding: 10,
     paddingTop: 10,
-    color: colors.lightText2,
-    fontFamily: fonts.regular,
-    includeFontPadding: false
+    // color: colors.lightText
+
   },
   videoInput: {
     height: 40,
@@ -1354,3 +1687,36 @@ const __style = StyleSheet.create({
   }
 
 })
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+  },
+  overlayContainer: {
+    position: 'relative',
+  },
+  textInput: {
+    height: 150,
+    borderColor: 'gray',
+    borderWidth: 1,
+    padding: 10,
+    paddingTop: 10,
+    color: 'transparent', // Make text invisible
+    // backgroundColor:'red'
+  },
+  overlay: {
+    padding: 10,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    pointerEvents: 'none', // Allow touches to pass through to TextInput
+    // backgroundColor:"pink"
+  },
+  formattedText: {
+    fontSize: 14,
+    color: colors.white,
+  },
+});

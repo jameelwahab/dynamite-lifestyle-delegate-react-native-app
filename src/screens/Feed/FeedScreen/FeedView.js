@@ -117,6 +117,7 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
       {!!item?.description &&
         // <MyText fontSize={13}>{item?.description}</MyText>
         <CollapsibleText>{item?.description}</CollapsibleText>
+        // <MyWebview html={item?.description} />
       }
       {item.feed_type == "image" && !!item?.feed_images && item?.feed_images.length > 0 && (
         <View style={{ marginTop: 10 }}>

@@ -7,7 +7,7 @@ import { convertTimezone } from '../../../functions/convertTime';
 import { selectTimeZone } from '../../../redux/reducers/timezoneSlice';
 import { useSelector } from 'react-redux';
 import { colors } from '../../../utilities/colors';
-import { ADD_AS_NOTE, MESSAGE_LIST_BY_CHAT_ID, READ_ALL_MESSAGES } from '../../../DAL';
+import { ADD_AS_NOTE, MARK_AS_UNREAD, MESSAGE_LIST_BY_CHAT_ID, READ_ALL_MESSAGES } from '../../../DAL';
 import { selectUser } from '../../../redux/reducers/userSlice';
 import MyLoader, { SimpleLoader } from '../../../components/MyLoader';
 import utilities from '../../../utilities';
@@ -199,7 +199,7 @@ const MessageList = ({ navigation, route }) => {
   }
 
   const getMemberList = async () => {
-    let res = await MESSAGE_LIST_BY_CHAT_ID({ navigation, token, chatId: member?.chatId, page:mlpage })
+    let res = await MESSAGE_LIST_BY_CHAT_ID({ navigation, token, chatId: member?.chatId, page: mlpage })
     setLoader(false);
     setFooterLoader(false)
 
@@ -220,6 +220,14 @@ const MessageList = ({ navigation, route }) => {
     let res = await READ_ALL_MESSAGES({ token, navigation, chatId: member?.chatId });
     if (res.code == 200) {
       route?.params?.resetCountToZero?.(member?.chatId);
+      route?.params?.refresh?.();
+    }
+  }
+
+  const unReadMessage = async (msgId) => {
+    let res = await MARK_AS_UNREAD({ token, navigation, messageId:msgId});
+    if (res.code == 200) {
+      showToast({ title: "Marked as Unread", type: "success" })
       route?.params?.refresh?.();
     }
   }
@@ -262,6 +270,8 @@ const MessageList = ({ navigation, route }) => {
       })
     } else if (opt.type == 'note') {
       api_addAdNote(item?._id);
+    }else if (opt.type == 'unread') {
+      unReadMessage(item?._id);
     }
   }
 
@@ -301,6 +311,11 @@ const MessageList = ({ navigation, route }) => {
       } else {
         options = msgOptionList.slice().filter(x => x.type == 'note' || x.type == 'copy');
       }
+      options.push({
+        title: "Mark as unread",
+        icon: () => icons.unread(colors.primary),
+        type: "unread"
+      })
     } else {
       if (item.message_type == "image" && !!item?.image) {
         options = [...msgOptionList];
@@ -312,6 +327,7 @@ const MessageList = ({ navigation, route }) => {
         options = msgOptionList.slice().filter(x => x.type == 'delete');
       } else {
         options = msgOptionList.slice().filter(x => x.type != 'download');
+
       }
     }
     setOptionModal({ isVisible: true, item: item, opt: "", optionList: options })
@@ -491,6 +507,8 @@ const msgOptionList = [
     title: "Delete",
     type: "delete"
   },
+
 ]
+
 
 

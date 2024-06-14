@@ -73,6 +73,15 @@ export const READ_ALL_MESSAGES = ({ token, navigation, chatId, }) => {
   })
 }
 
+export const MARK_AS_UNREAD = ({ token, navigation, messageId }) => {
+  return invokeApi({
+    path: `api/chat/mark_as/unread/${messageId}`,
+    method: "GET",
+    token: token,
+    navigation: navigation,
+  })
+}
+
 
 export const ADD_AS_NOTE = ({ token, navigation, body: { member_id, message_id } }) => {
   return invokeApi({

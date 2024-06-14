@@ -98,7 +98,7 @@ const ImagesForFeed = ({ index, list, swiper }) => {
             style={{ alignSelf: "center" }}
           />
         </PressableWrapper>
-      ) : length == 2 ? ( 
+      ) : length == 2 ? (
         <View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
           <PressableWrapper swiper={swiper} onPress={() => openImageZoomer(0)}>
             <ResponsiveImage2
@@ -174,68 +174,76 @@ const ImagesForFeed = ({ index, list, swiper }) => {
               </PressableWrapper>
             </View>
           </>
-        ) : length == 5 ? (
-          <View>
-            <PressableWrapper swiper={swiper} onPress={() => openImageZoomer(0)}>
-              <ResponsiveImage2
-                width={Dimensions.get('window').width - 40}
-                uri={S3_URL + list[0]?.thumbnail_1}
-                style={{ alignSelf: "center" }}
-              />
-            </PressableWrapper>
-            <View style={{ flexDirection: "row", justifyContent: "space-evenly", marginTop: 10 }}>
-              {list.map((x, i) => {
-                if (i != 0)
-                  if (!!x?.thumbnail_1) {
-                    return (
-                      <PressableWrapper swiper={swiper} onPress={() => openImageZoomer(i)}>
-                        <ResponsiveImage2
-                          width={utilities.screenWidth() - 40 / length}
-                          uri={S3_URL + x.thumbnail_1}
-                          style={{ aspectRatio: 1 }}
-                        />
-                      </PressableWrapper>
-                    )
-                  } else return null
-              })}
-
-            </View>
-          </View>
-        ) : (
-          <View >
-            <PressableWrapper  >
-              <ResponsiveImage2
-                width={Dimensions.get('window').width - 40}
-                uri={S3_URL + list[0]?.thumbnail_1}
-                style={{ alignSelf: "center" }}
-              />
-            </PressableWrapper>
-            <View style={{ flexDirection: "row", justifyContent: "space-evenly", marginTop: 10 }}>
-              {list.map((x, i) => {
-                if (i != 0 && i <= 4) {
-                  if (!!x?.thumbnail_1) {
-                    return (
-                      <PressableWrapper onPress={() => openImageZoomer(i)}  >
-                        <View style={{ width: (Dimensions.get('window').width) / length, aspectRatio: 1, overflow: "hidden" }} >
-                          <MyImage
-                            source={{ uri: S3_URL + x.thumbnail_1 }}
-                            style={{ aspectRatio: 1, width: "100%" }}
-                          />
-                          {i == 4 && (
-                            <View style={{ backgroundColor: "#000000AA", position: "absolute", height: "100%", width: "100%", alignItems: "center", justifyContent: "center" }} >
-                              <MyText>{`${(length - i)}+`}</MyText>
-                            </View >
-                          )}
-                        </View>
-                      </PressableWrapper>
-                    )
-                  }
-                  else return null
-                }
-              })}
-            </View>
-          </View>
         )
+          : length == 5 ? (
+            <View>
+              <PressableWrapper swiper={swiper} onPress={() => openImageZoomer(0)}>
+                <ResponsiveImage2
+                  width={Dimensions.get('window').width - 40}
+                  uri={S3_URL + list[0]?.thumbnail_1}
+                  style={{ alignSelf: "center" }}
+                />
+              </PressableWrapper>
+              <View style={{ flexDirection: "row", justifyContent: "space-evenly", marginTop: 10, marginHorizontal: -10 }}>
+                {list.map((x, i) => {
+                  if (i != 0)
+                    if (!!x?.thumbnail_1) {
+                      return (
+                        <PressableWrapper swiper={swiper} onPress={() => openImageZoomer(i)}>
+                          {/* <ResponsiveImage2
+                            width={(utilities.screenWidth() - 40 )/ (length)}
+                            uri={S3_URL + x.thumbnail_1}
+                            style={{ aspectRatio: 1 }}
+                          /> */}
+                          <View style={{ width: utilities.screenWidth() / length, aspectRatio: 1, overflow: "hidden" }} >
+                            <MyImage
+                              source={{ uri: S3_URL + x.thumbnail_1 }}
+                              style={{ aspectRatio: 1, width: "100%" }}
+                            />
+                          </View>
+                        </PressableWrapper>
+                      )
+                    } else return null
+                })}
+
+              </View>
+            </View>
+          )
+            : (
+              <View >
+                <PressableWrapper  >
+                  <ResponsiveImage2
+                    width={Dimensions.get('window').width - 40}
+                    uri={S3_URL + list[0]?.thumbnail_1}
+                    style={{ alignSelf: "center" }}
+                  />
+                </PressableWrapper>
+                <View style={{ flexDirection: "row", justifyContent: "space-evenly", marginTop: 10 }}>
+                  {list.map((x, i) => {
+                    if (i != 0 && i <= 4) {
+                      if (!!x?.thumbnail_1) {
+                        return (
+                          <PressableWrapper onPress={() => openImageZoomer(i)}  >
+                            <View style={{ width: (Dimensions.get('window').width) / length, aspectRatio: 1, overflow: "hidden" }} >
+                              <MyImage
+                                source={{ uri: S3_URL + x.thumbnail_1 }}
+                                style={{ aspectRatio: 1, width: "100%" }}
+                              />
+                              {i == 4 && (
+                                <View style={{ backgroundColor: "#000000AA", position: "absolute", height: "100%", width: "100%", alignItems: "center", justifyContent: "center" }} >
+                                  <MyText>{`${(length - i)}+`}</MyText>
+                                </View >
+                              )}
+                            </View>
+                          </PressableWrapper>
+                        )
+                      }
+                      else return null
+                    }
+                  })}
+                </View>
+              </View>
+            )
         : swiperView()
       }
 
@@ -250,14 +258,14 @@ export default ImagesForFeed
 const PressableWrapper = ({ swiper, children, onPress }) => {
   if (!!swiper) {
     return (
-      <Pressable onPress={onPress}  style={{borderRadius:10,overflow:"hidden"}}>
+      <Pressable onPress={onPress} style={{ borderRadius: 10, overflow: "hidden" }}>
         {children}
       </Pressable>
     )
   }
   else {
     return (
-      <Pressable onPress={onPress} style={{borderRadius:10,overflow:"hidden"}}>
+      <Pressable onPress={onPress} style={{ borderRadius: 10, overflow: "hidden" }}>
         {children}
       </Pressable>
     )

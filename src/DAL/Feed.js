@@ -212,5 +212,14 @@ export const FEED_LIKE_ACTIONS = ({ token, navigation, formdata }) => {
   })
 }
 
+export const GET_DELEGATES_LIST_FROM_SERVER_FOR_MENTION = ({ token, navigation, searchText }) => {
+  return invokeApi({
+    path: `api/feeds/delegate/list?list_type=the_cosmos&search_text=${searchText}`,
+    method: "GET",
+    token,
+    navigation,
+  })
+}
+
 
 
