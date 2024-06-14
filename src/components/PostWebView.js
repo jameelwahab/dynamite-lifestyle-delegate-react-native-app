@@ -8,14 +8,16 @@ import WebView from "react-native-webview";
 import { isUrl } from "../functions/regex";
 import openUrl from "../functions/openUrl";
 import { urlifyWithAchorTag } from "../functions/urlify";
+import { isBetweenTags } from "../functions/isBtweenTags";
 
 
 
-export class MyWebview extends Component {
+class PostWebView extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      
+      isCollapsed: true,
+      collapedEnabled: !!this.props?.enableCollapse,
     }
   }
   shouldComponentUpdate(nextProps, nextState) {
@@ -54,17 +56,54 @@ export class MyWebview extends Component {
 
   }
 
+  toggleCollapse = (event, href) => {
+    console.log("toggleCollapse", event.currentTarget, href, isUrl(href))
+    if (isUrl(href)) {
+      openUrl(href)
+    } else {
+      console.log(this.state.isCollapsed, "this.state.isCollapsed ")
+      this.setState({ isCollapsed: !this.state.isCollapsed });
+    }
+  }
 
+
+  onPress(event, href) {
+    Alert.alert(`You just pressed ${href}`);
+  }
+
+
+  renderersProps = {
+    a: {
+      onPress: this.onPress
+    }
+  };
 
   render() {
     let { html, style, baseStyle } = this.props;
+    html = urlifyWithAchorTag(html);
     html = "<div>" + html.replace(/padding/g, "") + "</div>";
-  
+    console.log(html, "length");
+    let ammededHtml = ""
+    if (this.state.collapedEnabled && html.length > 150) {
+      if (this.state.isCollapsed) {
+        let index = 150
+        let res = isBetweenTags(html, 150);
+        if (res.betweenTags) {
+          index = res?.closingTagIndex
+        }
+        ammededHtml = html.slice(0, index) + "... " + `</div><div><a href='see'> See More </a></div></div>`
+      } else {
+        ammededHtml = html + "</div><div><a href='see' > See Less </a></div></div>"
+      }
+    } else {
+      ammededHtml = html;
+    }
+
     return (
       <RenderHTML
         WebView={WebView}
         contentWidth={this.props.fullWidth ? Dimensions.get("window").width - 40 : !!this.props.width ? this.props.width : Dimensions.get("window").width / 1.5}
-        source={{ html: html }}
+        source={{ html: ammededHtml }}
         customHTMLElementModels={this.customHTMLElementModels}
         renderers={this.renderers}
         enableExperimentalMarginCollapsing={true}
@@ -122,6 +161,16 @@ export class MyWebview extends Component {
         }}
         systemFonts={[...defaultSystemFonts, ...Object.values(fonts)]}
         renderersProps={{
+          a: {
+            onPress: (event, href) => {
+              if (isUrl(href)) {
+                openUrl(href)
+              } else {
+                console.log(this.state.isCollapsed, "this.state.isCollapsed ")
+                this.setState({ isCollapsed: !this.state.isCollapsed });
+              }
+            }
+          },
           iframe: {
             // scalesPageToFit: true,
             webViewProps: {
@@ -141,6 +190,6 @@ export class MyWebview extends Component {
   }
 }
 
-export default MyWebview;
+export default PostWebView;
 
 

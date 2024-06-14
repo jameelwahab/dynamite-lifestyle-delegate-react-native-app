@@ -17,6 +17,7 @@ import utilities from '../../../utilities'
 import openUrl from '../../../functions/openUrl'
 import DropShadow from "react-native-drop-shadow";
 import { isHtml } from '../../../functions/regex'
+import  PostWebView  from '../../../components/PostWebView'
 
 export const FeedView = ({ item, index, user, token, isInView, timezone, settings, openComments, showLikes, openOptions, onLikebtnPress, isCosmos, sourceLevelIcons, isScheduledFeed, openScheduleTimeModal, onFeedDetail, isEventFeed }) => {
 
@@ -120,7 +121,9 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
           {/*  <MyText fontSize={13}>{item?.description}</MyText> */}
            {/* <CollapsibleText>{item?.description}</CollapsibleText> */}
           {isHtml(item?.description) ?
-            <MyWebview enableCollapse={true} html={item?.description} /> :
+            <PostWebView enableCollapse={true} html={item?.description} /> 
+            // <CollapsibleText>{item?.description}</CollapsibleText>
+            :
             <CollapsibleText>{item?.description}</CollapsibleText>}
           {/* <MyWebview html={item?.description} />  */}
         </>

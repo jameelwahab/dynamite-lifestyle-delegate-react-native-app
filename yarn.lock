@@ -6988,6 +6988,13 @@ react-native-video@^6.0.0-beta.6:
   resolved "https://registry.yarnpkg.com/react-native-video/-/react-native-video-6.0.0-beta.6.tgz#6529f44b779d85f3fa1ac6a70dc81716701ee792"
   integrity sha512-uVfDfZ8N7mL1wdeN7/6GTSYhVXk3k2LLBlKaSJznwxtLx+yDxfGuNNRsYzkjHyvtz9XUswy+16pdHPaebV4hHA==
 
+react-native-view-more-text@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/react-native-view-more-text/-/react-native-view-more-text-2.2.0.tgz#517bc1f891b53d1a94686d24370739193a6ec19b"
+  integrity sha512-8l/HhIieWA13Fg1Vt5eNNcicykqZ1IbmD/ozrejg5HtB9D/yluW/dCjapGwU/Wt+fLlT43MPBAxrEGPO/g+Aug==
+  dependencies:
+    prop-types "^15.5.7"
+
 react-native-vimeo-iframe@^1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/react-native-vimeo-iframe/-/react-native-vimeo-iframe-1.2.1.tgz#e1f11350cd6c906dda0cc5ad1320988e38e0de07"
