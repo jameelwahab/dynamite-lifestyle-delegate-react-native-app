@@ -1674,6 +1674,13 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
+"@nolemonnomelon/react-native-controlled-mentions@^3.0.0-alpha.4":
+  version "3.0.0-alpha.4"
+  resolved "https://registry.yarnpkg.com/@nolemonnomelon/react-native-controlled-mentions/-/react-native-controlled-mentions-3.0.0-alpha.4.tgz#d5cd2226c2107bb70e2767c4bd6d0f99cd1ff356"
+  integrity sha512-1afiT8NZnpBNN+6VYa+1v/OB9BTssGSvVMQgmYXkGiPB9ioMaba8lb82/D9ZXKlwt+beQuM6UXebK1j/eG+VQA==
+  dependencies:
+    diff "5.0.0"
+
 "@notifee/react-native@5.7.0":
   version "5.7.0"
   resolved "https://registry.yarnpkg.com/@notifee/react-native/-/react-native-5.7.0.tgz#10fee6594db9e53ce22efddd00f043ae95b1e605"

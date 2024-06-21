@@ -3,15 +3,18 @@ import React, { useState } from 'react'
 import MyText from './MyText'
 import { colors } from '../utilities/colors'
 import { fonts } from '../utilities/fonts'
+import ParsedText from 'react-native-parsed-text';
+
 
 const CollapsibleText = ({ style, children }) => {
   const [showFull, setShowFull] = useState(false)
 
+
   if (Platform.OS == "android") {
     return (
-      <MyText  fontSize={13} dataDetectorType="all" userSelect={"all"} selectable={true} style={style}>
+      <MyText fontSize={13} dataDetectorType="all" userSelect={"all"} selectable={true} style={style}>
         <MyText >
-          {children.length < 150 ? children : showFull ? children : children.slice(0, 150) + "..."}
+
         </MyText>
         {children.length > 150 && (
           <MyText

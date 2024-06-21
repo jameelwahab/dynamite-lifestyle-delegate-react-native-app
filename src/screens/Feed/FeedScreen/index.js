@@ -652,6 +652,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       }, 500);
     } else if (selectedOpt?.type == "edit") {
       setTimeout(() => {
+        // console.log(item,"item")
         addPostRef?.current?.selectItemForEdit(item)
       }, 500);
     } else if (selectedOpt?.type == "message") {

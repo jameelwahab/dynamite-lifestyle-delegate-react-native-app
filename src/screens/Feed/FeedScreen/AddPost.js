@@ -1,6 +1,5 @@
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, TextInput, Pressable, ScrollView, FlatList, Keyboard } from 'react-native'
 import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
-import { Input } from '@rneui/base'
 import UserImage from '../../../components/UserImage'
 import Modal from 'react-native-modal'
 import { colors } from '../../../utilities/colors'
@@ -27,15 +26,11 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import MyWebview from '../../../components/MyWebview'
 import openUrl from '../../../functions/openUrl'
 import { isUrl } from '../../../functions/regex'
-import MyCheckBox from '../../../components/MyCheckBox'
 import capitalize from '../../../functions/capitalize'
-import Collapsible from 'react-native-collapsible'
 import MemberView from '../../../components/MemberView'
-import ParsedText from 'react-native-parsed-text';
-
-import { MentionInput } from 'react-native-controlled-mentions'
-import { WebView } from 'react-native-webview';
-import MaskInput from 'react-native-mask-input';
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { SimpleLoader } from '../../../components/MyLoader'
+import convertToMentionabableText from '../../../functions/convertToMentionabableText'
 
 
 
@@ -47,6 +42,7 @@ let cursor = {
 const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, selectFeedlevel, feedLevel, tab, isCosmos, isScheduledFeed, timezone, removeFromList, isSuperDelegate, hideLevelView, isEventFeed, eventId, isMultipleSelectAllowed, showEventOption,
   cosmosLevelList, selectLevelOptionOnAddPostForCosmos, defaultCosmosFilter,
 }, ref) => {
+  const inset = useSafeAreaInsets();
   const lvlModalRef = useRef()
   const webViewRef = useRef()
   const ref_input = useRef();
@@ -78,8 +74,12 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   const [eventBtnAligment, setEventBtnAligment] = useState("center");
   const [delegateList, setDelegateList] = useState([]);
   const [isMentionListVisible, setIsMentionListVisible] = useState(false);
+  const [isMentionListLoading, setMentionListLoading] = useState(false);
   const [mentionList, setMentionList] = useState([]);
+
+
   const [_at_index, set_at_index] = useState(-1);
+  const [inputHeight, setInputHeight] = useState(0)
 
   const [dateModalVisible, setDateModalVisible] = useState(false);
   const [timeModalVisibe, setTimeModalVisibe] = useState(false);
@@ -90,14 +90,26 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
 
   useEffect(() => {
-    getTheDelegateListFromServer("");
+    if (isMentionListVisible == false) {
+      getTheDelegateListFromServer("");
+    }
   }, [isMentionListVisible])
 
-  function extractSubstring(str) {
-    if (_at_index > -1) {
-      return str = str.substring(_at_index + 1, str.length);
+  function extractSubstring(str, sIndex) {
+    let startIndex;
+
+    if (!!sIndex) {
+      startIndex = sIndex
+    } else {
+      startIndex = _at_index;
     }
-    return ""
+    let endIndex = str.indexOf(' ', startIndex);
+    if (endIndex == -1) {
+      endIndex = str.length - 1;
+    }
+
+    return str.substring(startIndex + 1, endIndex);
+
   }
 
   function getSubstringToSpaceEndIndex(str, startIndex) {
@@ -122,46 +134,82 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
 
   const replaceString = (str, index, replacement) => {
-    if (index > str.length - 1) {
-      return str;
-    }
+    // if (index > str.length - 1) {
+    //   return str;
+    // }
     let endINdex = getSubstringToSpaceEndIndex(str, _at_index);
-    // console.log(endINdex,"endINdex")
-    // console.log(replaceSubstring(str, index, startEndINdex, replacement),"replaceSubstring")
-    console.log(str, index, endINdex, replacement);
     return replaceSubstring(str, index, endINdex, replacement)
-    // return str.replace(str1, replacement);
+
   }
 
-  const removeMemberFromListMEntion = (text) => {
-    // const pattern = /@[^ @]+/g;s
-    // // Find all matches
-    // const matches = text.match(pattern);
-    // mentionList.forEach(member => {
 
-    // })
+
+  const chnageTheIndexes = (text, oldText) => {
+
+    let cursorPosition = cursor?.start;
+    if (cursorPosition < oldText.length) {
+      let diff = text.length - oldText.length;
+
+      mentionList.forEach((item, index) => {
+        if (cursorPosition <= item?.offset) {
+          item.offset = item?.offset + diff
+        }
+        console.log(cursorPosition, item?.offset, (item?.offset + item?.length), "check")
+        if (cursorPosition > item?.offset && cursorPosition < (item?.offset + item?.length)) {
+          mentionList.splice(index, 1)
+        }
+
+      })
+
+      console.log(mentionList, "mentionList")
+      setMentionList([...mentionList])
+    }
+
   }
 
-  const textHandler = (text, unmasked) => {
-    console.log(text, "masked")
-    console.log(unmasked, "unmasked")
-    removeMemberFromListMEntion(text)
-    setPostText(text);
+
+  const textHandler = (text) => {
+    chnageTheIndexes(text, postText)
+    setPostText(text)
+
     if ((text[cursor?.start] == "@" && (text[cursor?.start + 1] == " " || text[cursor?.start + 1] == undefined)) || text == "@") {
       let _at_index = cursor?.start;
-      setIsMentionListVisible(true);
       set_at_index(_at_index)
-    } else {
+      setIsMentionListVisible(true);
+      getTheDelegateListFromServer(extractSubstring(text, _at_index))
+    }
+    if (!text.includes("@")) {
       setIsMentionListVisible(false);
+      set_at_index(-1)
     }
     if (isMentionListVisible) {
-      if (text[cursor?.start] == " " || !text.includes("@")) {
+      if (text.substring(_at_index, cursor?.start).includes(" ")) {
         setIsMentionListVisible(false);
         setDelegateList([])
-      } else {
+      }
+      else {
         getTheDelegateListFromServer(extractSubstring(text))
       }
     }
+
+    // if ((text[cursor?.start] == "@" && (text[cursor?.start + 1] == " " || text[cursor?.start + 1] == undefined)) || text == "@") {
+    //   let _at_index = cursor?.start;
+    //   setIsMentionListVisible(true);
+    //   set_at_index(_at_index)
+    //   getTheDelegateListFromServer(extractSubstring(text))
+    // }
+    // if (!text.includes("@")) {
+    //   setIsMentionListVisible(false);
+    // }
+    // if (isMentionListVisible) {
+    //   if (text.substring(_at_index, cursor?.start).includes(" ")) {
+    //     setIsMentionListVisible(false);
+    //     setDelegateList([])
+    //   }
+    //   else {
+    //     getTheDelegateListFromServer(extractSubstring(text))
+    //   }
+    // }
   }
 
   useImperativeHandle(ref, () => {
@@ -172,15 +220,29 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   }, []);
 
 
-  const makeSlug = (obj) => {
-    return (obj?.first_name + " " + obj?.last_name).trim().split(" ").join("_").toLowerCase()
-  }
 
   const onPressOnMentions = (obj) => {
-    setMentionList([...mentionList, obj]);
+    // let endINdex = getSubstringToSpaceEndIndex(str, _at_index);
+    let diff = extractSubstring(postText, _at_index).length;
+    mentionList.forEach((item) => {
+      // console.log(_at_index , item.offset,_at_index < item.offset,"check")
+      if (_at_index < item.offset) {
+        item.offset = item.offset + `${obj?.first_name} ${obj?.last_name}`.trim().length - diff
+      }
+    })
+
+    let arr = [...mentionList, {
+      ...obj,
+      offset: _at_index,
+      length: `${obj?.first_name} ${obj?.last_name}`.trim().length
+    }];
+    arr.sort((a, b) => a.offset - b.offset);
+
+    setMentionList(arr);
+
     setIsMentionListVisible(false);
     setDelegateList([]);
-    setPostText(replaceString(postText, _at_index, `@[${obj?.first_name} ${obj?.last_name}]`));
+    setPostText(replaceString(postText, _at_index, `${obj?.first_name} ${obj?.last_name} `));
     set_at_index(-1)
   }
 
@@ -192,6 +254,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     setPostCreatedFor(item?.created_for_level_or_type == "both" ? "delegate" : item?.created_for_level_or_type);
     setPostType(item?.feed_type);
     setPostText(item?.description);
+    setMentionList(item?.mentioned_users);
     setImages([...item.feed_images]);
     setVideoLink(item?.video_url);
     setEmbededCode(item?.embed_code)
@@ -213,79 +276,6 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     }
   }
 
-  const getHighlightedText1 = (text, replacementData) => {
-    const regex = /@([^@]+)@/g;
-    const parts = [];
-    let lastIndex = 0;
-    let match;
-
-    while ((match = regex.exec(text)) !== null) {
-      console.log(match, "match")
-      parts.push(text.substring(lastIndex, match.index));
-      let user1 = mentionList.find(x => x._id == match[1]);
-      parts.push(<Text key={match[1]} style={{ color: colors.primary }}>{user1?.first_name + " " + user1?.last_name}</Text>);
-      lastIndex = regex.lastIndex;
-    }
-    parts.push(text.substring(lastIndex));
-    console.log(parts, "parts")
-    return parts;
-  };
-
-  const getHighlightedText = (text, replacementData) => {
-    const regex = /(@[^@]+@)/g;
-
-    return text;
-  };
-
-  const getTheUser = (text) => {
-    const regex = /@([^@]+)@/g;
-    let str1 = text;
-    let match;
-
-    while ((match = regex.exec(str1)) !== null) {
-      let user = mentionList.find(x => x._id == match[1]);
-      // console.log(match, "match")
-      // let node = <Text style={__style.mentionUserText}>{user?.first_name + " " + user?.last_name}</Text>;
-      // console.log(node,"node")
-      str1 = getHighlightedText(match[0], user)
-    }
-    console.log(str1, 'str1')
-    return str1;
-  }
-
-
-  const replaceAndHighlight = (str) => {
-    // Split the input string into an array of parts with placeholders
-    // const parts = `${str}`.split(/(@\w+@)/g);
-    // const parts = str.split(/(@[^ @]+)/g);
-    const parts = str.split(/(\[@[^:]+:[^\]]+\])/g);
-
-    let arr = []
-    parts.forEach((part, index) => {
-      console.log(part[0], part[1])
-      if (part[0] == "@" && !!part[1]) {
-        const slug = part.substring(1); // Extract the id without the @ symbols
-        console.log(slug, "slug")
-        const value = mentionList.find(x => x.slug == slug);
-        if (!!value) {
-          arr.push(
-            (<Text key={index} style={__style.mentionUserText}>
-              {"@" + value.slug}
-            </Text>)
-          );
-        } else {
-          arr.push(<Text key={index}>{part}</Text>)
-        }
-      } else {
-        arr.push(<Text key={index}>{part}</Text>)
-      }
-
-    });
-
-
-
-    return str
-  };
 
 
   const onImagePicked = (newImages) => {
@@ -453,7 +443,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
       });
 
     }
-    console.log(postCeatedFor, "  <==postCeatedFor")
+
 
     let fd = new FormData();
     fd.append("feed_appear_by", postCategory == "general" ? "public" : "win");
@@ -462,6 +452,9 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     fd.append("description", postText);
     fd.append("embed_code", postType == "embed_code" ? embededCode : "");
     fd.append("feed_images", postType == 'image' ? JSON.stringify(uploadedImages) : "[]");
+    if (isCosmos) {
+      fd.append("mentioned_users", JSON.stringify(mentionList));
+    }
     if (!isCosmos && !!editId == false && !isSuperDelegate) {
       fd.append("created_for_level_or_type", JSON.stringify(postCeatedForArray.map(x => x.type)));
     } else if (!!editId) {
@@ -538,9 +531,12 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   }
 
   const getTheDelegateListFromServer = async (text) => {
+    setMentionListLoading(true);
     let res = await GET_DELEGATES_LIST_FROM_SERVER_FOR_MENTION({ navigation, token, searchText: text.trim() });
+    setMentionListLoading(false);
     if (res.code == 200) {
       setDelegateList(res?.users)
+
     }
   }
 
@@ -769,47 +765,32 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
 
 
-  const renderText = (matchingString, matches) => {
-    // matches => ["[@michel:5455345]", "@michel", "5455345"]
-    let pattern = /\[(@[^:]+):([^\]]+)\]/i;
-    let match = matchingString.match(pattern);
-    console.log(match, "match")
-    return `${match[1]}`;
+
+
+
+
+  const replaceAndHighlight = str => {
+    let parts = [];
+    let lastIndex = 0;
+
+
+    mentionList.forEach(user => {
+      let startIndex = user?.offset;
+      let endIndex = user?.offset + user?.length
+      if (lastIndex < startIndex) {
+        parts.push(str.slice(lastIndex, startIndex));
+      }
+      parts.push(<Text style={__style.mentionUserText} >{str.substring(startIndex, endIndex)}</Text>);
+      lastIndex = endIndex;
+    });
+
+    if (lastIndex < str.length) {
+      parts.push(str.slice(lastIndex));
+    }
+
+    return parts
   }
 
-
-
-  const onMessage = (event) => {
-    console.log('HTML content:', event.nativeEvent.data);
-  };
-
-  const htmlInput = () => {
-    const htmlContent = `
-    <html>
-    <body>
-      <div contenteditable="true" style="width:${utilities.screenWidth() - 40}; height: 150;">
-        <p></p>
-      </div>
-      <script>
-        document.body.addEventListener('input', function(e) {
-          window.ReactNativeWebView.postMessage(e.target.innerHTML);
-        }, false);
-      </script>
-    </body>
-    </html>
-  `;
-
-    return (
-      <WebView
-        style={{ height: 100 }}
-        ref={webViewRef}
-        source={{ html: htmlContent }}
-        onMessage={onMessage}
-        // scrollEnabled={false}
-        scalesPageToFit
-      />
-    );
-  }
 
   const Modal_addPost = () => {
     let levelLength = postCeatedForArray.length
@@ -840,6 +821,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
             </View>
             <View style={[__style.divider, { marginTop: -1 }]} />
             <KeyboardAwareScrollView
+              keyboardShouldPersistTaps="always"
               style={__style.postView}
               showsVerticalScrollIndicator={false}>
 
@@ -918,12 +900,11 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
               {/*//*   Post Text     */}
 
-              <TextInput
+              {!isCosmos && <TextInput
                 style={[__style.modalInput, {
                   color: colors.lightText2,
                   fontFamily: fonts.regular,
                   includeFontPadding: false,
-
                 }]}
                 multiline={true}
                 autoCapitalize='none'
@@ -937,105 +918,104 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                 cursorColor={colors.white}
                 ref={ref_input}
                 value={postText}
-                onChangeText={(text)=>setPostText(text)}
-                // onSelectionChange={(e) => {
-                //   console.log(e.nativeEvent.selection)
-                //   cursor = e.nativeEvent.selection
-                // }}
-              />
-              {/* <View>
+                onChangeText={(text) => setPostText(text)}
+                onSelectionChange={(e) => {
+                  cursor = e.nativeEvent.selection
+                }}
+              />}
+              {isCosmos &&
+                <>
+                  <View>
 
 
-                <TextInput editable={false}
-                  multiline={true}
-                  style={[__style.modalInput, {
-                    position: "absolute", color: colors.lightText2, fontFamily: fonts.regular,
-                    includeFontPadding: false,
-                    width: "100%",
-
-                  }]} >
-                  <ParsedText
-                    parse={[
-                      { pattern: /\[(@[^:]+):([^\]]+)\]/i, style: __style.mentionUserText,  renderText: renderText },
-                    ]} >
-
-                    {replaceAndHighlight(postText)}
-                  </ParsedText>
-                </TextInput>
-                <TextInput
-                  style={[__style.modalInput, {
-                    color: colors.transparent,
-                    fontFamily: fonts.regular,
-                    includeFontPadding: false,
-
-                  }]}
-                  multiline={true}
-                  autoCapitalize='none'
-                  autoComplete="off"
-                  textAlignVertical="top"
-                  autoCorrect={false}
-                  placeholder="What's on your mind?"
-                  placeholderTextColor={colors.lightText2}
-                  keyboardAppearance="dark"
-                  selectionColor={colors.selection}
-                  cursorColor={colors.white}
-                  ref={ref_input}
-                  value={postText}
-                  onChangeText={textHandler}
-                  onSelectionChange={(e) => {
-                    console.log(e.nativeEvent.selection)
-                    cursor = e.nativeEvent.selection
-                  }}
-                />
-              </View> */}
-              {/* 
-            {/*      <View style={{ maxHeight: 150 }}>
-                <Text style={[{
-                  color: colors.lightText,
-                  fontFamily: fonts.regular,
-                  includeFontPadding: false
-                }]} >{replaceAndHighlight(`${postText}`)}</Text>
-              </View> */}
-
-
-              {isMentionListVisible && delegateList.length > 0 &&
-                <View style={{
-                  position: "absolute",
-                  zIndex: 3,
-                  alignItems: "center",
-                  top: 50 + 160
-                }}>
-                  <View style={{
-                    width: utilities.screenWidth() - 30,
-                    backgroundColor: colors.darkSecondary,
-                    borderRadius: 5,
-                    maxHeight: 190,
-                    shadowColor: "#FFF",
-                    shadowOffset: {
-                      width: 0,
-                      height: 1,
-                    },
-                    shadowOpacity: 0.20,
-                    shadowRadius: 1.41,
-                    elevation: 2,
-                  }}>
-                    <ScrollView
-                      contentContainerStyle={{ padding: 10 }}>
-                      {delegateList.map((item) =>
-                        <TouchableOpacity
-                          onPress={() => onPressOnMentions(item)}
-                          style={{ paddingVertical: 4 }}>
-                          <MemberView
-                            size={30}
-                            titleSize={12}
-                            member={item}
-                            customImage={item?.image?.thumbnail_1}
-                            hideEmail />
-                        </TouchableOpacity>)}
-                    </ScrollView>
+                    <TextInput
+                      style={[__style.modalInput, {
+                        color: colors.lightText2,
+                        fontFamily: fonts.regular,
+                        includeFontPadding: false,
+                      }]}
+                      multiline={true}
+                      autoCapitalize='none'
+                      autoComplete="off"
+                      textAlignVertical="top"
+                      autoCorrect={false}
+                      placeholder="What's on your mind?"
+                      placeholderTextColor={colors.lightText2}
+                      keyboardAppearance="dark"
+                      selectionColor={colors.selection}
+                      cursorColor={colors.white}
+                      ref={ref_input}
+                      onContentSizeChange={({ nativeEvent: { contentSize: { height } } }) => {
+                        if (inputHeight != height) {
+                          setInputHeight(height)
+                        }
+                      }}
+                      keyboardType='email-address'
+                      onChange={({ nativeEvent: { text } }) => textHandler(text)}
+                      onSelectionChange={(e) => {
+                        console.log(e.nativeEvent.selection, "selection", mentionList)
+                        if (postText.trim() == "" && mentionList.length > 0) {
+                          setMentionList([])
+                        }
+                        cursor = e.nativeEvent.selection
+                      }}
+                    ><Text style={[{
+                      color: colors.lightText,
+                      fontFamily: fonts.regular,
+                      includeFontPadding: false
+                    }]} >
+                        {replaceAndHighlight(postText, mentionList)}
+                      </Text>
+                    </TextInput>
                   </View>
-                </View>}
 
+
+                  {isMentionListVisible && (delegateList.length > 0 || isMentionListLoading) &&
+                    <View
+
+                      style={{
+                        position: "absolute",
+                        zIndex: 3,
+                        alignItems: "center",
+                        top: (inputHeight + 80)
+                      }}>
+                      <View style={{
+                        width: utilities.screenWidth() - 30,
+                        backgroundColor: colors.darkSecondary,
+                        borderRadius: 5,
+                        maxHeight: 190,
+                        shadowColor: "#FFF",
+                        shadowOffset: {
+                          width: 0,
+                          height: 1,
+                        },
+                        shadowOpacity: 0.20,
+                        shadowRadius: 1.41,
+                        elevation: 2,
+                      }}>
+                        {delegateList.length > 0 ?
+                          <ScrollView
+                            keyboardShouldPersistTaps="handled"
+                            contentContainerStyle={{ padding: 10 }}>
+                            {delegateList.map((item) =>
+                              <TouchableOpacity
+                                onPress={() => onPressOnMentions(item)}
+                                style={{ paddingVertical: 4 }}>
+                                <MemberView
+                                  size={30}
+                                  titleSize={12}
+                                  member={item}
+                                  customImage={item?.image?.thumbnail_1}
+                                  hideEmail />
+                              </TouchableOpacity>)}
+                          </ScrollView>
+                          : isMentionListLoading &&
+                          <View style={{ alignItems: "center", justifyContent: "center", height: 100 }}>
+                            <SimpleLoader size={50} />
+                          </View>}
+                      </View>
+                    </View>}
+                </>}
 
 
               {/*//*   Schedule View    */}
