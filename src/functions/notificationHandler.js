@@ -7,7 +7,7 @@ const notificationHandler = (remoteMessage, navigation, navbar) => {
   let { data } = remoteMessage;
   if (feedType.includes(data?.type)) {
     let navigator = "";
-    if (data?.feed_tab == "the_cosmos" && !!navbar.find(x => x.value == "the_cosmos")) {
+    if ((data?.feed_tab == "the_cosmos" || data.type == "feed_mentioned") && !!navbar.find(x => x.value == "the_cosmos")) {
       navigator = routes.feedNavigator;
     }
     else {
@@ -171,5 +171,5 @@ const notificationHandler = (remoteMessage, navigation, navbar) => {
 }
 
 export default notificationHandler;
-const feedType = ["commentlike", "addcomment", "feedlike", "gratitude", "addcommentreply"];
+const feedType = ["commentlike", "addcomment", "feedlike", "gratitude", "addcommentreply", "feed_mentioned"];
 const SupportTicketType = ["send_support_ticket_reminder", "close_support_ticket", "support_ticket_comment", "add_support_ticket"];

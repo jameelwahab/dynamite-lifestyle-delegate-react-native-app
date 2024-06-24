@@ -96,7 +96,7 @@ const NotificationList = ({ navigation, route }) => {
     let { notification_type } = item;
     if (feedType.includes(notification_type)) {
       let navigator = "";
-      if (item?.feed_tab == "the_cosmos" && !!navbar.find(x => x.value == "the_cosmos")) {
+      if ((item?.tab_type == "the_cosmos" || item?.notification_type == "feed_mentioned") && !!navbar.find(x => x.value == "the_cosmos")) {
         navigator = routes.feedNavigator;
       }
       else {
@@ -541,5 +541,5 @@ const __styles = StyleSheet.create({
 
 
 
-const feedType = ["commentlike", "addcomment", "feedlike", "gratitude", "addcommentreply"];
+const feedType = ["commentlike", "addcomment", "feedlike", "gratitude", "addcommentreply", "feed_mentioned"];
 const SupportTicketType = ["send_support_ticket_reminder", "close_support_ticket", "support_ticket_comment", "add_support_ticket", "support_ticket"];

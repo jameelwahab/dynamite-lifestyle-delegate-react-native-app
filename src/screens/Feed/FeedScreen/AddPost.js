@@ -31,6 +31,8 @@ import MemberView from '../../../components/MemberView'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { SimpleLoader } from '../../../components/MyLoader'
 import convertToMentionabableText from '../../../functions/convertToMentionabableText'
+import { useSelector } from 'react-redux'
+import { selectSocket } from '../../../redux/reducers/socketSlice'
 
 
 
@@ -40,9 +42,12 @@ let cursor = {
 };
 
 const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, selectFeedlevel, feedLevel, tab, isCosmos, isScheduledFeed, timezone, removeFromList, isSuperDelegate, hideLevelView, isEventFeed, eventId, isMultipleSelectAllowed, showEventOption,
+  hideAddView,
   cosmosLevelList, selectLevelOptionOnAddPostForCosmos, defaultCosmosFilter,
 }, ref) => {
   const inset = useSafeAreaInsets();
+  const { socket } = useSelector(selectSocket);
+  console.log(socket, "socket")
   const lvlModalRef = useRef()
   const webViewRef = useRef()
   const ref_input = useRef();
@@ -90,26 +95,75 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
 
   useEffect(() => {
+    let text = postText;
+    console.log(text, cursor?.start, "postText")
+    if ((text[cursor?.start] == "@"
+      //  && (text[cursor?.start + 1] == " " || text[cursor?.start + 1] == undefined)
+    )
+      //|| text == "@"
+    ) {
+
+      let _at_index = !!cursor?.start ? cursor?.start : 0;
+      set_at_index(_at_index)
+      setIsMentionListVisible(true);
+      getTheDelegateListFromServer(extractSubstring(text, _at_index))
+    }
+    // console.log(text[_at_index],"")
+    // if (!text.includes("@")) {
+    console.log(text[_at_index], text[_at_index - 1], "text[_at_index]")
+    if ((text[_at_index] != "@") && isMentionListVisible == true) {
+      setIsMentionListVisible(false);
+      set_at_index(-1)
+    }
+    if (isMentionListVisible) {
+      // if (text.substring(_at_index, cursor?.start).includes(" ")) {
+      //   setIsMentionListVisible(false);
+      //   setDelegateList([])
+      // }
+      // else {
+      getTheDelegateListFromServer(extractSubstring(text))
+      // }
+    }
+
+    if (text.trim() == "" && mentionList.length > 0) {
+      setMentionList([])
+    }
+
+  }, [postText])
+
+  useEffect(() => {
     if (isMentionListVisible == false) {
       getTheDelegateListFromServer("");
     }
   }, [isMentionListVisible])
 
   function extractSubstring(str, sIndex) {
+    // console.log(sIndex, "___cursor")
     let startIndex;
 
     if (!!sIndex) {
       startIndex = sIndex
     } else {
-      startIndex = _at_index;
+      startIndex = _at_index + 1;
     }
-    let endIndex = str.indexOf(' ', startIndex);
-    if (endIndex == -1) {
-      endIndex = str.length - 1;
+    let endIndex = cursor?.start;
+    // let endIndex = cursor?.start < startIndex ? startIndex + 1 : cursor?.start;
+    console.log(startIndex, endIndex, "_at_index")
+    // let endIndex = str.indexOf(' ', startIndex);
+    // if (endIndex == -1) {
+    //   endIndex = undefined;
+    // }
+    // let string = "";
+    // if (endIndex <= startIndex) {
+    //   return string
+    // }
+
+    string = str.substring(startIndex, (endIndex + 1));
+    if (string[0] == '@') {
+      string = string.substring(1);
     }
-
-    return str.substring(startIndex + 1, endIndex);
-
+    // console.log(string, "string")
+    return string
   }
 
   function getSubstringToSpaceEndIndex(str, startIndex) {
@@ -137,60 +191,60 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     // if (index > str.length - 1) {
     //   return str;
     // }
-    let endINdex = getSubstringToSpaceEndIndex(str, _at_index);
-    return replaceSubstring(str, index, endINdex, replacement)
+    // let endINdex = getSubstringToSpaceEndIndex(str, _at_index);
+    let endINdex = cursor.start
+    return replaceSubstring(str + " ", index, endINdex, replacement)
 
   }
 
 
 
   const chnageTheIndexes = (text, oldText) => {
+    // console.log("chnageTheIndexes 1", text);
+    // console.log("chnageTheIndexes 2", oldText);
 
+    // console.log("chnageTheIndexes 3", oldText.length);
+    // console.log("chnageTheIndexes 4", cursor?.start);
     let cursorPosition = cursor?.start;
-    if (cursorPosition < oldText.length) {
+    // if (cursorPosition < oldText.length) {
+    if (mentionList.length > 0) {
       let diff = text.length - oldText.length;
 
-      mentionList.forEach((item, index) => {
+      console.log(diff, "diff")
+      let list = [...mentionList]
+
+      let index = list.findIndex(x => cursorPosition > x?.offset && cursorPosition < (x?.offset + x?.length));
+      console.log(index, "index")
+      if (index > -1) {
+        list.splice(index, 1)
+      }
+
+      list.forEach((item, index) => {
+        // console.log(cursorPosition, item?.offset, (item?.offset + item?.length), cursorPosition > item?.offset && cursorPosition < (item?.offset + item?.length), "check")
+        // if (index == 2) {
+        //   console.log(cursorPosition <= item?.offset, "check 2")
+        // }
         if (cursorPosition <= item?.offset) {
           item.offset = item?.offset + diff
         }
-        console.log(cursorPosition, item?.offset, (item?.offset + item?.length), "check")
-        if (cursorPosition > item?.offset && cursorPosition < (item?.offset + item?.length)) {
-          mentionList.splice(index, 1)
-        }
 
+        // if (cursorPosition > item?.offset && cursorPosition < (item?.offset + item?.length)) {
+        //   list.splice(index, 1)
+        // }
       })
-
-      console.log(mentionList, "mentionList")
-      setMentionList([...mentionList])
+      setMentionList([...list])
     }
 
   }
 
 
   const textHandler = (text) => {
+    if (text.trim() == "" || text.trim().length == 1 && mentionList.length > 0) {
+      setMentionList([])
+    }
     chnageTheIndexes(text, postText)
     setPostText(text)
 
-    if ((text[cursor?.start] == "@" && (text[cursor?.start + 1] == " " || text[cursor?.start + 1] == undefined)) || text == "@") {
-      let _at_index = cursor?.start;
-      set_at_index(_at_index)
-      setIsMentionListVisible(true);
-      getTheDelegateListFromServer(extractSubstring(text, _at_index))
-    }
-    if (!text.includes("@")) {
-      setIsMentionListVisible(false);
-      set_at_index(-1)
-    }
-    if (isMentionListVisible) {
-      if (text.substring(_at_index, cursor?.start).includes(" ")) {
-        setIsMentionListVisible(false);
-        setDelegateList([])
-      }
-      else {
-        getTheDelegateListFromServer(extractSubstring(text))
-      }
-    }
 
     // if ((text[cursor?.start] == "@" && (text[cursor?.start + 1] == " " || text[cursor?.start + 1] == undefined)) || text == "@") {
     //   let _at_index = cursor?.start;
@@ -227,7 +281,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     mentionList.forEach((item) => {
       // console.log(_at_index , item.offset,_at_index < item.offset,"check")
       if (_at_index < item.offset) {
-        item.offset = item.offset + `${obj?.first_name} ${obj?.last_name}`.trim().length - diff
+        item.offset = item.offset + (`${obj?.first_name} ${obj?.last_name}`.trim().length - diff)
       }
     })
 
@@ -242,7 +296,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
     setIsMentionListVisible(false);
     setDelegateList([]);
-    setPostText(replaceString(postText, _at_index, `${obj?.first_name} ${obj?.last_name} `));
+    setPostText(replaceString(postText, _at_index, `${obj?.first_name} ${obj?.last_name}`.trim()));
     set_at_index(-1)
   }
 
@@ -254,10 +308,13 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     setPostCreatedFor(item?.created_for_level_or_type == "both" ? "delegate" : item?.created_for_level_or_type);
     setPostType(item?.feed_type);
     setPostText(item?.description);
-    setMentionList(item?.mentioned_users);
+    if (!!item?.mentioned_users) {
+      setMentionList(item?.mentioned_users);
+    }
     setImages([...item.feed_images]);
     setVideoLink(item?.video_url);
     setEmbededCode(item?.embed_code)
+    setPostModalVisibilty(false);
     setPostModalVisibilty(true);
     if (!!item?.event_info && Object.keys(item?.event_info).length > 0) {
       let alignment = !!item?.event_info?.button_alignment ? item?.event_info?.button_alignment : "center";
@@ -498,6 +555,17 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
         refresh?.()
         setPostModalVisibilty(false)
         setLoader(false);
+
+        let socketData = {
+          action: "feed_mentioned",
+          feed_id: res.action_response?.feed._id,
+          token: token,
+          creator_id: user?._id,
+          action_by: user?._id,
+          action_response: res.action_response,
+        };
+        console.log(socketData, "socketData")
+        socket.emit("mention_user_event_listner", socketData);
       } else {
 
         setLoader(false);
@@ -518,6 +586,16 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
         } else {
           updateFeedItem(res1?.feeds)
         }
+        let socketData = {
+          action: "feed_mentioned",
+          feed_id: res.action_response?.feed._id,
+          token: token,
+          creator_id: user?._id,
+          action_by: user?._id,
+          action_response: res.action_response,
+        };
+
+        socket.emit("mention_user_event_listner", socketData);
         setPostModalVisibilty(false)
         setLoader(false);
         setEditId("")
@@ -536,7 +614,9 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     setMentionListLoading(false);
     if (res.code == 200) {
       setDelegateList(res?.users)
-
+      if (res?.users > 0) {
+        setIsMentionListVisible(true)
+      }
     }
   }
 
@@ -920,7 +1000,8 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                 value={postText}
                 onChangeText={(text) => setPostText(text)}
                 onSelectionChange={(e) => {
-                  cursor = e.nativeEvent.selection
+                  cursor = e.nativeEvent.selection;
+
                 }}
               />}
               {isCosmos &&
@@ -945,19 +1026,26 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                       selectionColor={colors.selection}
                       cursorColor={colors.white}
                       ref={ref_input}
-                      onContentSizeChange={({ nativeEvent: { contentSize: { height } } }) => {
-                        if (inputHeight != height) {
-                          setInputHeight(height)
-                        }
+                      // onContentSizeChange={({ nativeEvent: { contentSize: { height } } }) => {
+                      //   console.log(contentSize,"contentSize")
+                      //   if (inputHeight != height) {
+                      //     setInputHeight(height)
+                      //   }
+                      // }}
+                      onLayout={({ nativeEvent }) => {
+console.log(nativeEvent.layout,"nativeEvent.layout.'")
                       }}
+                      // }}
+                      // onPressOut={({ nativeEvent }) => {
+                      //  console.log(nativeEvent,"nativeEvent")
+                      // }}
+                      // clearButtonMode="always" 
                       keyboardType='email-address'
-                      onChange={({ nativeEvent: { text } }) => textHandler(text)}
+                      onChangeText={(text) => textHandler(text)}
                       onSelectionChange={(e) => {
-                        console.log(e.nativeEvent.selection, "selection", mentionList)
-                        if (postText.trim() == "" && mentionList.length > 0) {
-                          setMentionList([])
-                        }
                         cursor = e.nativeEvent.selection
+                        console.log(e.nativeEvent.selection, "selection");
+
                       }}
                     ><Text style={[{
                       color: colors.lightText,
@@ -1321,7 +1409,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
   return (
     <View>
-      {tab == 0 ?
+      {tab == 0 && hideAddView == false ?
         <View >
           {!hideLevelView &&
             <Pressable

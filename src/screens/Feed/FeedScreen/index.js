@@ -59,7 +59,6 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
   const isAllSourceFeed = feedFor == "all_source";
   const isEventFeed = feedFor == "event";
   const { token, user, access } = useSelector(selectUser);
-  console.log(access, "access")
   const { socket } = useSelector(selectSocket);
   const timezone = useSelector(selectTimeZone);
   const { settings } = useSelector(selectSettings);
@@ -864,20 +863,21 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
   const headerView = () => {
     return (
       <View style={{ paddingHorizontal: 10 }}>
-
-        {route?.params?.title &&
-          <View style={{ marginTop: 5, marginLeft: 5 }}>
-            <MyText fontSize={18} type='bold' color={colors.primary} >{route?.params?.title}</MyText></View>
-        }
-        {!!CustomHeader && CustomHeader()}
-        {!hideTabs &&
-          <FeedTabs
-            CustomTabs={CustomTabs}
-            isCosmos={isCosmos}
-            tab={tab}
-            changeTab={changeTab}
-            isScheduleFeedTabAllowed={isScheduleFeedTabAllowed} />}
-
+        {!!!feedId &&
+          <>
+            {route?.params?.title &&
+              <View style={{ marginTop: 5, marginLeft: 5 }}>
+                <MyText fontSize={18} type='bold' color={colors.primary} >{route?.params?.title}</MyText></View>
+            }
+            {!!CustomHeader && CustomHeader()}
+            {!hideTabs &&
+              <FeedTabs
+                CustomTabs={CustomTabs}
+                isCosmos={isCosmos}
+                tab={tab}
+                changeTab={changeTab}
+                isScheduleFeedTabAllowed={isScheduleFeedTabAllowed} />}
+          </>}
         <AddPost
           ref={addPostRef}
           tab={tab}
@@ -897,6 +897,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
             }
             return [...feeds];
           })}
+          hideAddView={!!feedId}
           isCosmos={isCosmos}
           isScheduledFeed={isScheduledFeed || schedulePost}
           isEventFeed={isEventFeed}
@@ -952,7 +953,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           />}
           showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item?._id}
-          ListHeaderComponent={!!!feedId && headerView()}
+          ListHeaderComponent={headerView}
           ListEmptyComponent={!loader && tab == 0 && <EmptyView label={"Posts not found"} />}
           onEndReached={() => {
             if (!!!feedId && feedVar?.canLoadMore && tab == 0) {
@@ -966,9 +967,9 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           }}
           renderItem={tab == 0 && feedRenderView}
           ListFooterComponent={footerView}
-          removeClippedSubviews={true}
-          updateCellsBatchingPeriod={10}
-          maxToRenderPerBatch={10}
+          // removeClippedSubviews={true}
+          // updateCellsBatchingPeriod={10}
+          // maxToRenderPerBatch={10}
           windowSize={5}
           initialNumToRender={10}
         />

@@ -100,15 +100,15 @@ const index = (props) => {
 
     sub4 = messaging().onNotificationOpenedApp(remoteMessage => {
       console.log('[onNotificationOpenedApp] Notification caused app to open from background state:', remoteMessage)
-      if (remoteMessage ) {
-          notificationHandler(remoteMessage, navigation, navbar);
+      if (remoteMessage) {
+        notificationHandler(remoteMessage, navigation, navbar);
       }
     });
 
 
     messaging().getInitialNotification().then(remoteMessage => {
       console.log('[firebase getInitialNotification] Notification caused app to open from quit state:', remoteMessage);
-      if (remoteMessage ) {
+      if (remoteMessage) {
         notificationHandler(remoteMessage, navigation, navbar);
       }
     });
@@ -170,6 +170,7 @@ const index = (props) => {
 
   const enableSocketEvents = () => {
     socket.on("new_notification_receiver_for_delegate", (data) => handleSocketEvents(data, "new_notification_receiver_for_delegate"))
+    socket.on("mention_user_event_trigger", (data) => handleMentionNotificationCount(data, "mention_user_event_trigger"))
     socket.on("goal_stetement_event_reciever", (data) => handleSocketEvents(data, "goal_stetement_event_reciever"))
     socket.on("new_notification_receiver", (data) => handleSocketEvents(data, "new_notification_receiver"))
     socket.on("reminder_event_for_delegate", (data) => handleSocketEvents(data, "reminder_event_for_delegate"))
@@ -180,7 +181,8 @@ const index = (props) => {
   }
 
   const disbaleSocketEvents = () => {
-    socket.off("new_notification_receiver_for_delegate", handleSocketEvents);
+    socket.off("mention_user_event_trigger", handleSocketEvents)
+    socket.off("new_notification_receiver_for_delegate", handleMentionNotificationCount);
     socket.off("goal_stetement_event_reciever", handleSocketEvents);
     socket.off("new_notification_receiver", handleSocketEvents);
     socket.off("reminder_event_for_delegate", handleSocketEvents);
@@ -191,7 +193,7 @@ const index = (props) => {
   }
 
   const handleSocketEvents = async (data, event) => {
-    console.log(event,"event")
+    console.log(event, "event")
     if (data?.action_response?.unread_notification_count != undefined) {
       if (typeof (data?.action_response?.unread_notification_count) == "number") {
         setCount(data?.action_response?.unread_notification_count)
@@ -212,6 +214,14 @@ const index = (props) => {
         setCount(res?.unread_notification_count)
       }
     }
+  }
+  const handleMentionNotificationCount = (data, event) => {
+    console.log(data, event)
+    let notification = data?.action_response?.notification_users.find(x => x?.user_id == user?._id);
+    if (!!notification && notification?.unread_notification_count < -1) {
+      setCount(notification?.unread_notification_count)
+    }
+
   }
 
   const setCount = (count) => {

@@ -60,7 +60,6 @@ const Splash = ({ navigation }) => {
       dispatch(setSettings(res?.consultant_setting));
       moveTo(routes.login)
     } else {
-      setShowAlert(true);
       Alert.alert("Something went wrong",
         res?.message,
         [{ text: "Retry", onPress: checkAuth }])
