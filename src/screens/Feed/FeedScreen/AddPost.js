@@ -47,7 +47,6 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 }, ref) => {
   const inset = useSafeAreaInsets();
   const { socket } = useSelector(selectSocket);
-  console.log(socket, "socket")
   const lvlModalRef = useRef()
   const webViewRef = useRef()
   const ref_input = useRef();
@@ -310,11 +309,9 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     setImages([...item.feed_images]);
     setVideoLink(item?.video_url);
     setEmbededCode(item?.embed_code)
-    setPostModalVisibilty(false);
     setPostModalVisibilty(true);
-    if (!!item?.event_info && Object.keys(item?.event_info).length > 0) {
+    if (!!item?.event_info && Object.keys(item?.event_info).length > 1) {
       let alignment = !!item?.event_info?.button_alignment ? item?.event_info?.button_alignment : "center";
-      console.log(alignment, "alignment")
       setEventComplete(true);
       setEventTitle(item?.event_info?.event_title)
       setEventBtnText(item?.event_info?.button_text);
@@ -560,7 +557,6 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
           action_by: user?._id,
           action_response: res.action_response,
         };
-        console.log(socketData, "socketData")
         socket.emit("mention_user_event_listner", socketData);
       } else {
 

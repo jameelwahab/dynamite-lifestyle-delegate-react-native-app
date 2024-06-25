@@ -801,7 +801,6 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
   // !  VIEWS /////////////////
 
   const footerView = () => {
-    console.log(tab, "FFooter Tab")
     if (tab == 0) {
       return (
         <View style={{ height: 50, alignItems: "center", justifyContent: "center" }}>
