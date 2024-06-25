@@ -137,6 +137,8 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     }
   }, [isMentionListVisible])
 
+
+ 
   function extractSubstring(str, sIndex) {
     // console.log(sIndex, "___cursor")
     let startIndex;
@@ -200,11 +202,6 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
 
   const chnageTheIndexes = (text, oldText) => {
-    // console.log("chnageTheIndexes 1", text);
-    // console.log("chnageTheIndexes 2", oldText);
-
-    // console.log("chnageTheIndexes 3", oldText.length);
-    // console.log("chnageTheIndexes 4", cursor?.start);
     let cursorPosition = cursor?.start;
     // if (cursorPosition < oldText.length) {
     if (mentionList.length > 0) {
@@ -214,7 +211,6 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
       let list = [...mentionList]
 
       let index = list.findIndex(x => cursorPosition > x?.offset && cursorPosition < (x?.offset + x?.length));
-      console.log(index, "index")
       if (index > -1) {
         list.splice(index, 1)
       }
@@ -610,7 +606,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
   const getTheDelegateListFromServer = async (text) => {
     setMentionListLoading(true);
-    let res = await GET_DELEGATES_LIST_FROM_SERVER_FOR_MENTION({ navigation, token, searchText: text.trim() });
+    let res = await GET_DELEGATES_LIST_FROM_SERVER_FOR_MENTION({ navigation, token, searchText: text });
     setMentionListLoading(false);
     if (res.code == 200) {
       setDelegateList(res?.users)
@@ -1026,26 +1022,20 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                       selectionColor={colors.selection}
                       cursorColor={colors.white}
                       ref={ref_input}
-                      // onContentSizeChange={({ nativeEvent: { contentSize: { height } } }) => {
-                      //   console.log(contentSize,"contentSize")
-                      //   if (inputHeight != height) {
-                      //     setInputHeight(height)
-                      //   }
-                      // }}
-                      onLayout={({ nativeEvent }) => {
-console.log(nativeEvent.layout,"nativeEvent.layout.'")
+                      onContentSizeChange={({ nativeEvent: { contentSize: { height } } }) => {
+                        console.log(height, "height")
+                        if (inputHeight != height) {
+                          if (height > 150) {
+                            setInputHeight(150)
+                          } else {
+                            setInputHeight(height)
+                          } 
+                        }
                       }}
-                      // }}
-                      // onPressOut={({ nativeEvent }) => {
-                      //  console.log(nativeEvent,"nativeEvent")
-                      // }}
-                      // clearButtonMode="always" 
                       keyboardType='email-address'
                       onChangeText={(text) => textHandler(text)}
                       onSelectionChange={(e) => {
                         cursor = e.nativeEvent.selection
-                        console.log(e.nativeEvent.selection, "selection");
-
                       }}
                     ><Text style={[{
                       color: colors.lightText,

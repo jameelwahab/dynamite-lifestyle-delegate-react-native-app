@@ -218,7 +218,8 @@ const index = (props) => {
   const handleMentionNotificationCount = (data, event) => {
     console.log(data, event)
     let notification = data?.action_response?.notification_users.find(x => x?.user_id == user?._id);
-    if (!!notification && notification?.unread_notification_count < -1) {
+    console.log(notification,"notification")
+    if (!!notification && notification?.unread_notification_count > -1) {
       setCount(notification?.unread_notification_count)
     }
 

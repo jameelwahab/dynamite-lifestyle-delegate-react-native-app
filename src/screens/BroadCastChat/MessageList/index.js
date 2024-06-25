@@ -166,8 +166,8 @@ const MessageList = ({ navigation, route }) => {
         options = [...msgOptionListSchedule]
       }
     } else {
-      // options = [...msgOptionList]
-      options = [...msgOptionListSchedule]
+      options = [...msgOptionList]
+      // options = [...msgOptionListSchedule]
     }
     setOptionModal({ isVisible: true, item: item, opt: "", optionList: options })
   }

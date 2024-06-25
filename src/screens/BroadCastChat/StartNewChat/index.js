@@ -191,11 +191,13 @@ const StartNewChat = ({ navigation, route }) => {
       <MyLoader enable={loader} />
 
       <OptionModal
+
         optionList={grpList}
         isVisible={isGrpModalVisible}
         closeModal={() => setIsGrpModalVisible(false)}
         checkSelected={(item) => !!selectedGrps.find(x => x._id === item._id)}
         multiple
+        multipleLabel={"Groups List"}
         onSelected={(item) => {
           let index = selectedGrps.findIndex(x => x._id === item._id);
           if (index <= -1) {

@@ -119,7 +119,7 @@ const TeamList = ({ navigation, route }) => {
         </View>
         <View style={{ padding: 5 }}>
           <StatView title={"Transaction"} value={`Sale Page (${item?.sale_page_info?.sale_page_title} | ${item?.plan_info?.plan_title})`} />
-          <StatView title={"Commission Amount"} value={item?.referral_commission} />
+          <StatView title={"Commission Amount"} value={prependCurency(item?.currency) + " " + item?.referral_commission} />
           <StatView title={"Date"} value={moment(item?.createdAt).format(dateTimeFormat.date)} />
 
         </View>
@@ -147,7 +147,7 @@ const TeamList = ({ navigation, route }) => {
       <View>
         <View style={__styles.topView}>
           <TitleView
-            title={!!member ? `${member?.first_name} commission Detail`:""}
+            title={!!member ? `${member?.first_name} commission Detail` : ""}
             subTitle={`Showing ${list.length} of ${total}`}
           />
         </View>

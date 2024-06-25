@@ -345,6 +345,9 @@ const SendMsgView = ({ receiver, navigation, edit, clearEdit, chatId, setChat })
     if (res.code == 200) {
       showToast({ type: "success", title: res?.message });
       setMsg({ text: "", image: "" })
+      if (data.message_type == "publish") {
+        socket.emit("publish_broadcast_message", res);
+      }
       setRecordedAudio(null)
       setSendMsgLoader(false);
       closeBroadcastModal?.();
@@ -358,7 +361,7 @@ const SendMsgView = ({ receiver, navigation, edit, clearEdit, chatId, setChat })
   const updateMsgToServer = async (data, messageId) => {
     let res = await EDIT_SCHEDULE_BROADCAST_MESSAGE({ token, navigation, body: data, chatId, messageId });
     if (res.code == 200) {
-      showToast({type:"success",title:res?.message});
+      showToast({ type: "success", title: res?.message });
       setChat((list) => {
         let index = list.findIndex(x => x._id == messageId);
         if (index > -1) {
@@ -366,6 +369,9 @@ const SendMsgView = ({ receiver, navigation, edit, clearEdit, chatId, setChat })
         }
         return [...list]
       })
+      if (data.message_type == "publish") {
+        socket.emit("publish_broadcast_message", res);
+      }
       clearEdit?.()
       setSendMsgLoader(false);
       setBroadcastType({ isVisible: false, type: 1, scheduleDate: moment(), scheduleTime: "00:00" });
@@ -374,7 +380,7 @@ const SendMsgView = ({ receiver, navigation, edit, clearEdit, chatId, setChat })
     }
   }
 
- 
+
 
   const modifyText = (type, linkTitle = "", url = "") => {
 

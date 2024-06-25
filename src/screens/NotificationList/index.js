@@ -268,8 +268,8 @@ const NotificationList = ({ navigation, route }) => {
               {
                 name: routes.calendarEventDetail,
                 params: {
-                  eventId: item.event_id,
-                  iteration_id: item.event_id,
+                  eventId: item.event_id?._id,
+                  iteration_id: item.iteration_id,
                 }
               }],
           }
