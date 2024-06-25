@@ -1032,7 +1032,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                           } 
                         }
                       }}
-                      keyboardType='email-address'
+                      // keyboardType='email-address'
                       onChangeText={(text) => textHandler(text)}
                       onSelectionChange={(e) => {
                         cursor = e.nativeEvent.selection

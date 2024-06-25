@@ -25,15 +25,18 @@ const FeedText = ({ text, list }) => {
 
 
 
-  let nText = "";
+  let text2 = text.replace(/\r\n/g, "\n")
+  let nText = ""
+  // nText = text.replace(/\r\n/g, "\n");
+  // console.log(nText,"check")
   if (isSeeMoreActive) {
     if (isSeeMoreEnable) {
-      nText = text.slice(0, 150);
+      nText = text2.slice(0, 150);
     } else {
-      nText = text
+      nText = text2
     }
   } else {
-    nText = text
+    nText = text2
   }
 
 
