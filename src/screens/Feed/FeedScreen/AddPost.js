@@ -13,7 +13,7 @@ import utilities from '../../../utilities'
 import MyImage from '../../../components/MyImage'
 import OptionModal from '../../../components/OptionModal'
 import Toast from 'react-native-toast-message'
-import { CREATE_FEED, FEED_DETAIL, GET_DELEGATES_LIST_FROM_SERVER_FOR_MENTION, UPDATE_FEED, UPLOAD_FEED_IMAGES } from '../../../DAL'
+import { CREATE_FEED, FEED_DETAIL, GET_DELEGATES_LIST_FROM_SERVER_FOR_MENTION_V1, UPDATE_FEED, UPLOAD_FEED_IMAGES } from '../../../DAL'
 import showToast from '../../../functions/showToast'
 import { S3_URL, dateTimeFormat } from '../../../utilities/constants'
 import LevelModal from './LevelModal'
@@ -95,33 +95,20 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
   useEffect(() => {
     let text = postText;
-    console.log(text, cursor?.start, "postText")
-    if ((text[cursor?.start] == "@"
-      //  && (text[cursor?.start + 1] == " " || text[cursor?.start + 1] == undefined)
-    )
-      //|| text == "@"
-    ) {
-
-      let _at_index = !!cursor?.start ? cursor?.start : 0;
+    if (text[cursor?.start] == "@" || text == "@") {
+      // let _at_index = !!cursor?.start ? cursor?.start : 0;
+      let _at_index = !!text[cursor?.start] ? cursor?.start : 0;
       set_at_index(_at_index)
       setIsMentionListVisible(true);
       getTheDelegateListFromServer(extractSubstring(text, _at_index))
     }
-    // console.log(text[_at_index],"")
-    // if (!text.includes("@")) {
-    console.log(text[_at_index], text[_at_index - 1], "text[_at_index]")
+
     if ((text[_at_index] != "@") && isMentionListVisible == true) {
       setIsMentionListVisible(false);
       set_at_index(-1)
     }
     if (isMentionListVisible) {
-      // if (text.substring(_at_index, cursor?.start).includes(" ")) {
-      //   setIsMentionListVisible(false);
-      //   setDelegateList([])
-      // }
-      // else {
       getTheDelegateListFromServer(extractSubstring(text))
-      // }
     }
 
     if (text.trim() == "" && mentionList.length > 0) {
@@ -137,9 +124,9 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   }, [isMentionListVisible])
 
 
- 
+
   function extractSubstring(str, sIndex) {
-    // console.log(sIndex, "___cursor")
+
     let startIndex;
 
     if (!!sIndex) {
@@ -148,22 +135,10 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
       startIndex = _at_index + 1;
     }
     let endIndex = cursor?.start;
-    // let endIndex = cursor?.start < startIndex ? startIndex + 1 : cursor?.start;
-    console.log(startIndex, endIndex, "_at_index")
-    // let endIndex = str.indexOf(' ', startIndex);
-    // if (endIndex == -1) {
-    //   endIndex = undefined;
-    // }
-    // let string = "";
-    // if (endIndex <= startIndex) {
-    //   return string
-    // }
-
     string = str.substring(startIndex, (endIndex + 1));
     if (string[0] == '@') {
       string = string.substring(1);
     }
-    // console.log(string, "string")
     return string
   }
 
@@ -202,30 +177,18 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
   const chnageTheIndexes = (text, oldText) => {
     let cursorPosition = cursor?.start;
-    // if (cursorPosition < oldText.length) {
+
     if (mentionList.length > 0) {
       let diff = text.length - oldText.length;
-
-      console.log(diff, "diff")
       let list = [...mentionList]
-
       let index = list.findIndex(x => cursorPosition > x?.offset && cursorPosition < (x?.offset + x?.length));
       if (index > -1) {
         list.splice(index, 1)
       }
-
       list.forEach((item, index) => {
-        // console.log(cursorPosition, item?.offset, (item?.offset + item?.length), cursorPosition > item?.offset && cursorPosition < (item?.offset + item?.length), "check")
-        // if (index == 2) {
-        //   console.log(cursorPosition <= item?.offset, "check 2")
-        // }
         if (cursorPosition <= item?.offset) {
           item.offset = item?.offset + diff
         }
-
-        // if (cursorPosition > item?.offset && cursorPosition < (item?.offset + item?.length)) {
-        //   list.splice(index, 1)
-        // }
       })
       setMentionList([...list])
     }
@@ -271,10 +234,8 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
 
   const onPressOnMentions = (obj) => {
-    // let endINdex = getSubstringToSpaceEndIndex(str, _at_index);
     let diff = extractSubstring(postText, _at_index).length;
     mentionList.forEach((item) => {
-      // console.log(_at_index , item.offset,_at_index < item.offset,"check")
       if (_at_index < item.offset) {
         item.offset = item.offset + (`${obj?.first_name} ${obj?.last_name}`.trim().length - diff)
       }
@@ -296,7 +257,6 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   }
 
   const selectItemForEdit = (item) => {
-    console.log(item, "item for edit");
     setEditId(item._id);
     setEditFeed(item);
     setPostCategory(item?.feed_appear_by == "public" ? "general" : "win");
@@ -386,7 +346,6 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
             })
           }
         })
-        console.log(arr, "arr")
       } else {
         arr = PostCretedForSourceFeed;
       }
@@ -420,13 +379,11 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     if (isMultipleSelectAllowed) {
       let list = [...postCeatedForArray];
       let index = list.findIndex(x => x.type == opt.type);
-      console.log(list, index)
       if (index > -1) {
         list.splice(index, 1);
       } else {
         list.push(opt)
       }
-      console.log(list)
       setPostCreatedForArray([...list])
     } else {
       setPostCreatedForArray([opt])
@@ -502,9 +459,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     fd.append("description", postText);
     fd.append("embed_code", postType == "embed_code" ? embededCode : "");
     fd.append("feed_images", postType == 'image' ? JSON.stringify(uploadedImages) : "[]");
-    if (isCosmos) {
-      fd.append("mentioned_users", JSON.stringify(mentionList));
-    }
+    fd.append("mentioned_users", JSON.stringify(mentionList));
     if (!isCosmos && !!editId == false && !isSuperDelegate) {
       fd.append("created_for_level_or_type", JSON.stringify(postCeatedForArray.map(x => x.type)));
     } else if (!!editId) {
@@ -548,16 +503,17 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
         refresh?.()
         setPostModalVisibilty(false)
         setLoader(false);
-
-        let socketData = {
-          action: "feed_mentioned",
-          feed_id: res.action_response?.feed._id,
-          token: token,
-          creator_id: user?._id,
-          action_by: user?._id,
-          action_response: res.action_response,
-        };
-        socket.emit("mention_user_event_listner", socketData);
+        if (!!res.action_response) {
+          let socketData = {
+            action: "feed_mentioned",
+            feed_id: res.action_response?.feed._id,
+            token: token,
+            creator_id: user?._id,
+            action_by: user?._id,
+            action_response: res.action_response,
+          };
+          socket.emit("mention_user_event_listner", socketData);
+        }
       } else {
 
         setLoader(false);
@@ -578,16 +534,17 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
         } else {
           updateFeedItem(res1?.feeds)
         }
-        let socketData = {
-          action: "feed_mentioned",
-          feed_id: res.action_response?.feed._id,
-          token: token,
-          creator_id: user?._id,
-          action_by: user?._id,
-          action_response: res.action_response,
-        };
-
-        socket.emit("mention_user_event_listner", socketData);
+        if (!!res?.action_response) {
+          let socketData = {
+            action: "feed_mentioned",
+            feed_id: res.action_response?.feed._id,
+            token: token,
+            creator_id: user?._id,
+            action_by: user?._id,
+            action_response: res.action_response,
+          };
+          socket.emit("mention_user_event_listner", socketData);
+        }
         setPostModalVisibilty(false)
         setLoader(false);
         setEditId("")
@@ -602,7 +559,14 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
   const getTheDelegateListFromServer = async (text) => {
     setMentionListLoading(true);
-    let res = await GET_DELEGATES_LIST_FROM_SERVER_FOR_MENTION({ navigation, token, searchText: text });
+    let res = await GET_DELEGATES_LIST_FROM_SERVER_FOR_MENTION_V1({
+      navigation, token, data: {
+        search_text: text,
+        community_levels: isCosmos || isEventFeed ? undefined : postCeatedForArray.map(x => x.type),
+        event_id: isEventFeed ? eventId : undefined,
+        list_type: isCosmos ? "the_cosmos" : "the_source",
+      }
+    });
     setMentionListLoading(false);
     if (res.code == 200) {
       setDelegateList(res?.users)
@@ -972,7 +936,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
               {/*//*   Post Text     */}
 
-              {!isCosmos && <TextInput
+              {/* {isScheduledFeed ? <TextInput
                 style={[__style.modalInput, {
                   color: colors.lightText2,
                   fontFamily: fonts.regular,
@@ -995,101 +959,100 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                   cursor = e.nativeEvent.selection;
 
                 }}
-              />}
-              {isCosmos &&
-                <>
-                  <View>
+              /> : */}
+              <>
+                <View>
 
 
-                    <TextInput
-                      style={[__style.modalInput, {
-                        color: colors.lightText2,
-                        fontFamily: fonts.regular,
-                        includeFontPadding: false,
-                      }]}
-                      multiline={true}
-                      autoCapitalize='none'
-                      autoComplete="off"
-                      textAlignVertical="top"
-                      autoCorrect={false}
-                      placeholder="What's on your mind?"
-                      placeholderTextColor={colors.lightText2}
-                      keyboardAppearance="dark"
-                      selectionColor={colors.selection}
-                      cursorColor={colors.white}
-                      ref={ref_input}
-                      onContentSizeChange={({ nativeEvent: { contentSize: { height } } }) => {
-                        console.log(height, "height")
-                        if (inputHeight != height) {
-                          if (height > 150) {
-                            setInputHeight(150)
-                          } else {
-                            setInputHeight(height)
-                          } 
-                        }
-                      }}
-                      // keyboardType='email-address'
-                      onChangeText={(text) => textHandler(text)}
-                      onSelectionChange={(e) => {
-                        cursor = e.nativeEvent.selection
-                      }}
-                    ><Text style={[{
-                      color: colors.lightText,
+                  <TextInput
+                    style={[__style.modalInput, {
+                      color: colors.lightText2,
                       fontFamily: fonts.regular,
-                      includeFontPadding: false
-                    }]} >
-                        {replaceAndHighlight(postText, mentionList)}
-                      </Text>
-                    </TextInput>
-                  </View>
+                      includeFontPadding: false,
+                    }]}
+                    multiline={true}
+                    autoCapitalize='none'
+                    autoComplete="off"
+                    textAlignVertical="top"
+                    autoCorrect={false}
+                    placeholder="What's on your mind?"
+                    placeholderTextColor={colors.lightText2}
+                    keyboardAppearance="dark"
+                    selectionColor={colors.selection}
+                    cursorColor={colors.white}
+                    ref={ref_input}
+                    onContentSizeChange={({ nativeEvent: { contentSize: { height } } }) => {
+                      if (inputHeight != height) {
+                        if (height > 150) {
+                          setInputHeight(150)
+                        } else {
+                          setInputHeight(height)
+                        }
+                      }
+                    }}
+                    // keyboardType='email-address'
+                    onChangeText={(text) => textHandler(text)}
+                    onSelectionChange={(e) => {
+                      cursor = e.nativeEvent.selection
+                    }}
+                  ><Text style={[{
+                    color: colors.lightText,
+                    fontFamily: fonts.regular,
+                    includeFontPadding: false
+                  }]} >
+                      {replaceAndHighlight(postText, mentionList)}
+                    </Text>
+                  </TextInput>
+                </View>
 
 
-                  {isMentionListVisible && (delegateList.length > 0 || isMentionListLoading) &&
-                    <View
+                {isMentionListVisible && (delegateList.length > 0 || isMentionListLoading) &&
+                  <View
 
-                      style={{
-                        position: "absolute",
-                        zIndex: 3,
-                        alignItems: "center",
-                        top: (inputHeight + 80)
-                      }}>
-                      <View style={{
-                        width: utilities.screenWidth() - 30,
-                        backgroundColor: colors.darkSecondary,
-                        borderRadius: 5,
-                        maxHeight: 190,
-                        shadowColor: "#FFF",
-                        shadowOffset: {
-                          width: 0,
-                          height: 1,
-                        },
-                        shadowOpacity: 0.20,
-                        shadowRadius: 1.41,
-                        elevation: 2,
-                      }}>
-                        {delegateList.length > 0 ?
-                          <ScrollView
-                            keyboardShouldPersistTaps="handled"
-                            contentContainerStyle={{ padding: 10 }}>
-                            {delegateList.map((item) =>
-                              <TouchableOpacity
-                                onPress={() => onPressOnMentions(item)}
-                                style={{ paddingVertical: 4 }}>
-                                <MemberView
-                                  size={30}
-                                  titleSize={12}
-                                  member={item}
-                                  customImage={item?.image?.thumbnail_1}
-                                  hideEmail />
-                              </TouchableOpacity>)}
-                          </ScrollView>
-                          : isMentionListLoading &&
-                          <View style={{ alignItems: "center", justifyContent: "center", height: 100 }}>
-                            <SimpleLoader size={50} />
-                          </View>}
-                      </View>
-                    </View>}
-                </>}
+                    style={{
+                      position: "absolute",
+                      zIndex: 3,
+                      alignItems: "center",
+                      top: isCosmos || isEventFeed ? (inputHeight + 80) : (inputHeight + 130)
+                    }}>
+                    <View style={{
+                      width: utilities.screenWidth() - 30,
+                      backgroundColor: colors.darkSecondary,
+                      borderRadius: 5,
+                      maxHeight: 190,
+                      shadowColor: "#FFF",
+                      shadowOffset: {
+                        width: 0,
+                        height: 1,
+                      },
+                      shadowOpacity: 0.20,
+                      shadowRadius: 1.41,
+                      elevation: 2,
+                    }}>
+                      {delegateList.length > 0 ?
+                        <ScrollView
+                          keyboardShouldPersistTaps="handled"
+                          contentContainerStyle={{ padding: 10 }}>
+                          {delegateList.map((item) =>
+                            <TouchableOpacity
+                              onPress={() => onPressOnMentions(item)}
+                              style={{ paddingVertical: 4 }}>
+                              <MemberView
+                                size={30}
+                                titleSize={12}
+                                member={item}
+                                customImage={item?.image?.thumbnail_1}
+                                hideEmail />
+                            </TouchableOpacity>)}
+                        </ScrollView>
+                        : isMentionListLoading &&
+                        <View style={{ alignItems: "center", justifyContent: "center", height: 100 }}>
+                          <SimpleLoader size={50} />
+                        </View>}
+                    </View>
+                  </View>}
+              </>
+              {/* } */}
 
 
               {/*//*   Schedule View    */}

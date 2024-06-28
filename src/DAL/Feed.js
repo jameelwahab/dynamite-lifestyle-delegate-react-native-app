@@ -1,7 +1,7 @@
 import invokeApi from "../functions/invokeAPI";
 
 export const GET_FEED_LIST =
-  ({ token, navigation, level, type, page,eventId }) => {
+  ({ token, navigation, level, type, page, eventId }) => {
     return invokeApi({
       path: `api/feeds/delegate_portal/listing?page=${page}&limit=10&list_type=${type}&level_or_type=${level}&event=${eventId}`,
       method: "GET",
@@ -216,6 +216,21 @@ export const GET_DELEGATES_LIST_FROM_SERVER_FOR_MENTION = ({ token, navigation, 
   return invokeApi({
     path: `api/feeds/delegate/list?list_type=the_cosmos&search_text=${searchText}`,
     method: "GET",
+    token,
+    navigation,
+  })
+}
+
+export const GET_DELEGATES_LIST_FROM_SERVER_FOR_MENTION_V1 = ({ token, navigation, data: {
+  community_levels = undefined,
+  list_type = undefined,
+  search_text = undefined,
+  event_id = undefined
+} }) => {
+  return invokeApi({
+    path: `api/feeds/delegate_or_member/list`,
+    method: "POST",
+    postData: { community_levels, list_type, search_text, event_id },
     token,
     navigation,
   })
