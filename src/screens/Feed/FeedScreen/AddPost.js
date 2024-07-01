@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, TextInput, Pressable, ScrollView, FlatList, Keyboard } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, TextInput, Pressable, ScrollView, useWindowDimensions } from 'react-native'
 import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import UserImage from '../../../components/UserImage'
 import Modal from 'react-native-modal'
@@ -30,7 +30,6 @@ import capitalize from '../../../functions/capitalize'
 import MemberView from '../../../components/MemberView'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { SimpleLoader } from '../../../components/MyLoader'
-import convertToMentionabableText from '../../../functions/convertToMentionabableText'
 import { useSelector } from 'react-redux'
 import { selectSocket } from '../../../redux/reducers/socketSlice'
 
@@ -45,6 +44,11 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   hideAddView,
   cosmosLevelList, selectLevelOptionOnAddPostForCosmos, defaultCosmosFilter,
 }, ref) => {
+  const { height, width } = useWindowDimensions();
+  console.log(height, "height")
+  const ppi = height / width;
+  console.log(ppi, "dimensions");
+
   const inset = useSafeAreaInsets();
   const { socket } = useSelector(selectSocket);
   const lvlModalRef = useRef()
@@ -94,6 +98,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
 
   useEffect(() => {
+
     let text = postText;
     if (text[cursor?.start] == "@" || text == "@") {
       // let _at_index = !!cursor?.start ? cursor?.start : 0;
@@ -257,14 +262,15 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   }
 
   const selectItemForEdit = (item) => {
+    console.log(item, "selectItemForEdit")
     setEditId(item._id);
     setEditFeed(item);
     setPostCategory(item?.feed_appear_by == "public" ? "general" : "win");
     setPostCreatedFor(item?.created_for_level_or_type == "both" ? "delegate" : item?.created_for_level_or_type);
     setPostType(item?.feed_type);
-    setPostText(item?.description);
+    setPostText(item?.description.replace(/\r\n/g, "\n"));
     if (!!item?.mentioned_users) {
-      setMentionList(item?.mentioned_users);
+      setMentionList(item?.mentioned_users.sort((a, b) => a.offset - b.offset));
     }
     setImages([...item.feed_images]);
     setVideoLink(item?.video_url);
@@ -460,7 +466,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     fd.append("embed_code", postType == "embed_code" ? embededCode : "");
     fd.append("feed_images", postType == 'image' ? JSON.stringify(uploadedImages) : "[]");
     fd.append("mentioned_users", JSON.stringify(mentionList));
-    if (!isCosmos && !!editId == false && !isSuperDelegate) {
+    if (!isCosmos && !!editId == false && isSuperDelegate) {
       fd.append("created_for_level_or_type", JSON.stringify(postCeatedForArray.map(x => x.type)));
     } else if (!!editId) {
       fd.append("created_for_level_or_type", postCeatedFor);
@@ -603,6 +609,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     });
 
     useEffect(() => {
+
       if (eventModalVisible) {
         setTitle(eventTitle)
         setBtnText(eventBtnText);
@@ -903,7 +910,6 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                         <TouchableOpacity
                           style={__style.modalDropBtns}>
                           <MyText>{isScheduledFeed ? "Schedule" : "Publish"}</MyText>
-                          {/* {icons.downwardArrow(17, colors.white)} */}
                         </TouchableOpacity>
                       </View>}
                   </View>
@@ -983,8 +989,9 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                     ref={ref_input}
                     onContentSizeChange={({ nativeEvent: { contentSize: { height } } }) => {
                       if (inputHeight != height) {
-                        if (height > 150) {
-                          setInputHeight(150)
+                        let boxHeight = 150
+                        if (height > boxHeight) {
+                          setInputHeight(boxHeight)
                         } else {
                           setInputHeight(height)
                         }
@@ -1019,7 +1026,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                       width: utilities.screenWidth() - 30,
                       backgroundColor: colors.darkSecondary,
                       borderRadius: 5,
-                      maxHeight: 190,
+                      maxHeight: height > 800 ? 190 : 140,
                       shadowColor: "#FFF",
                       shadowOffset: {
                         width: 0,
@@ -1038,6 +1045,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                               onPress={() => onPressOnMentions(item)}
                               style={{ paddingVertical: 4 }}>
                               <MemberView
+                                secondText={!isCosmos ? ` (${item?.community_level})` : ""}
                                 size={30}
                                 titleSize={12}
                                 member={item}

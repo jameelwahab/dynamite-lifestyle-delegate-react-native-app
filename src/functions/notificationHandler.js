@@ -9,6 +9,8 @@ const notificationHandler = (remoteMessage, navigation, navbar) => {
     let navigator = "";
     if ((data?.feed_tab == "the_cosmos" || data.type == "feed_mentioned") && !!navbar.find(x => x.value == "the_cosmos")) {
       navigator = routes.feedNavigator;
+    } else if (data?.tab_type == "event") {
+      navigator = routes.portalNavigator;
     }
     else {
       if (!!navbar.find(x => x.value == "all_source_feed"))
@@ -18,28 +20,58 @@ const notificationHandler = (remoteMessage, navigation, navbar) => {
     }
     if (!!navigator) {
       let params = { feedId: data?.feed_id };
+      if (data?.tab_type == "event") {
+        params["eventId"] = data?.event_id
+        params["feedFor"] = "event"
+      }
       if (data?.type == "addcomment" || data?.type == "addcommentreply" || data?.type == "commentlike") {
         params["openCommentModal"] = true;
       }
-      navigation.reset({
-        routes: [{
-          name: routes.mainScreen,
-          state: {
-            routes: [{
-              name: navigator,
-              state: {
-                routes: [{
-                  name: routes.feedScreen,
+      if (data?.tab_type == "event") {
+        navigation.reset({
+          routes: [{
+            name: navigator,
+            state: {
+              routes: [
+                {
+                  name: routes.portalListScreen,
+                },
+                {
+                  name: routes.portalDetailScreen,
+                  params: {
+                    eventId: data?.event_id,
+                    feedFor: "event"
+                  }
                 },
                 {
                   name: routes.feedDetailScreen,
                   params: params
                 }],
-              }
-            }],
-          }
-        }]
-      })
+            }
+          }],
+        })
+      }
+      else {
+        navigation.reset({
+          routes: [{
+            name: routes.mainScreen,
+            state: {
+              routes: [{
+                name: navigator,
+                state: {
+                  routes: [{
+                    name: routes.feedScreen,
+                  },
+                  {
+                    name: routes.feedDetailScreen,
+                    params: params
+                  }],
+                }
+              }],
+            }
+          }]
+        })
+      }
     }
 
   } else if (data?.type == "message" && !!navbar.find(x => x.value == "chat")) {

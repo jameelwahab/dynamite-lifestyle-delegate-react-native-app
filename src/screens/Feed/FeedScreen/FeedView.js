@@ -90,7 +90,7 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
             indicatorProps={{ color: colors.secondaryVariant }}
             source={{
               uri:
-                isCosmos || isScheduledFeed ?
+                isCosmos ?
                   // item?.created_for_level_or_type == "delegate" ?
                   // S3_URL + settings?.delegate_feed_icon :
                   // item?.created_for_level_or_type == "consultant" ?

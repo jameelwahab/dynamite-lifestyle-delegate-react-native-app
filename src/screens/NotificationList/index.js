@@ -98,33 +98,65 @@ const NotificationList = ({ navigation, route }) => {
       let navigator = "";
       if ((item?.tab_type == "the_cosmos" || item?.notification_type == "feed_mentioned") && !!navbar.find(x => x.value == "the_cosmos")) {
         navigator = routes.feedNavigator;
+      } else if (item?.tab_type == "event") {
+        navigator = routes.portalNavigator;
       }
       else {
         if (!!navbar.find(x => x.value == "all_source_feed"))
           navigator = routes.allSourcesFeedNavigator;
         else if (!!navbar.find(x => x.value == "the_source_feed"))
           navigator = routes.sourceFeedNavigator;
+
       }
 
       if (!!navigator) {
         let params = { feedId: item?.feeds?._id };
+        if (item?.tab_type == "event") {
+          params["eventId"] = item?.module_id
+          params["feedFor"] = "event"
+        }
         if (notification_type == "addcomment" || notification_type == "addcommentreply" || notification_type == "commentlike") {
           params["openCommentModal"] = true;
         }
-        navigation.reset({
-          routes: [{
-            name: navigator,
-            state: {
-              routes: [{
-                name: routes.feedScreen,
-              },
-              {
-                name: routes.feedDetailScreen,
-                params: params
-              }],
-            }
-          }],
-        })
+        if (item?.tab_type == "event") {
+          navigation.reset({
+            routes: [{
+              name: navigator,
+              state: {
+                routes: [
+                  {
+                    name: routes.portalListScreen,
+                  },
+                  {
+                    name: routes.portalDetailScreen,
+                    params: {
+                      eventId: item?.module_id,
+                      feedFor: "event"
+                    }
+                  },
+                  {
+                    name: routes.feedDetailScreen,
+                    params: params
+                  }],
+              }
+            }],
+          })
+        } else {
+          navigation.reset({
+            routes: [{
+              name: navigator,
+              state: {
+                routes: [{
+                  name: routes.feedScreen,
+                },
+                {
+                  name: routes.feedDetailScreen,
+                  params: params
+                }],
+              }
+            }],
+          })
+        }
       }
 
     } else if (notification_type === "goal_statement_completed") {

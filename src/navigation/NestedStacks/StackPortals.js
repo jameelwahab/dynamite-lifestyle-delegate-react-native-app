@@ -10,6 +10,7 @@ import PortalDetail from '../../screens/Portal/PortalDetail';
 import { colors } from '../../utilities/colors';
 import PortalEventsVideo from '../../screens/Portal/PortalDetail/PortalEventsVideo';
 import PortalChat from '../../screens/Portal/PortalChat';
+import Detail from '../../screens/Feed/Detail';
 
 
 const Portals = createNativeStackNavigator();
@@ -24,6 +25,7 @@ const StackPortals = ({ route }) => {
         <Portals.Screen name={routes.portalDetailScreen} component={PortalDetail} />
         <Portals.Screen name={routes.portalEventVidoScreen} component={PortalEventsVideo} />
         <Portals.Screen name={routes.portalChatList} component={PortalChat} />
+        <Portals.Screen name={routes.feedDetailScreen} component={Detail} />
 
         {/*//? Default Screens Start */}
         {defaultScreens.map((x, i) => (
