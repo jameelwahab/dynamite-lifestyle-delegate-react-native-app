@@ -21,6 +21,9 @@ const UploadFileInput = ({
   showCheckbox = false,
   checkBoxValue = false,
   onCheckBoxPress = () => { },
+  imageString = "",
+  showAlert = false,
+  alertFun = () => { }
 
 }) => {
   const [isImagePickerVisible, setIsImagePickerVisible] = useState(false);
@@ -51,7 +54,13 @@ const UploadFileInput = ({
             <TouchableOpacity
               style={__styles.btnView}
               hitSlop={{ top: 5, left: 5, right: 5, bottom: 5 }}
-              onPress={() => setIsImagePickerVisible(true)}
+              onPress={() => {
+                if (showAlert) {
+                  alertFun()
+                } else {
+                  setIsImagePickerVisible(true)
+                }
+              }}
             >
               {icons.upload2(colors.primary, 20)}
             </TouchableOpacity>}
@@ -73,7 +82,7 @@ const UploadFileInput = ({
                 style={{ height: 50, width: 50 }}
               />
               <View style={{ marginTop: 5 }}>
-                <MyText fontSize={12} >No Image Selected</MyText>
+                <MyText fontSize={12} >{!!imageString ? imageString : "No Image Selected"}</MyText>
               </View>
             </View>}
 

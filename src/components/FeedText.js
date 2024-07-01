@@ -25,7 +25,7 @@ const FeedText = ({ text, list }) => {
 
 
 
-  let text2 = text.replace(/\r\n/g, "\n")
+  let text2 = text.replace(/\r\n/g, "\n").replace(/\r/g, "\n")
   let nText = ""
   // nText = text.replace(/\r\n/g, "\n");
   // console.log(nText,"check")
@@ -42,6 +42,7 @@ const FeedText = ({ text, list }) => {
 
   const links = findLinks(nText);
   const parts = convertToMentionabableText(nText, list, links);
+  console.log(parts, "parts")
 
   return (
     <MyText >

@@ -75,7 +75,7 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
     time: "00:00"
   })
 
-
+  console.log(intentions, "intentions")
 
   useEffect(() => {
     setLoader(true)
@@ -581,7 +581,8 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
                 showCheckbox={true}
                 checkBoxValue={item?.status}
                 onCheckBoxPress={() => intentionHandler(index, { status: !item?.status })}
-                disable={!item?.status}
+                showAlert={!item?.status}
+                alertFun={() => showToast({ title: "Please tick the check box before Uploading Image" })}
                 onImagePicked={(img) => uploadImageToS3(img, index)}
                 onRemoveBtnPress={() => intentionHandler(index, { image: "" })}
                 selectedImage={item?.image}

@@ -45,9 +45,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   cosmosLevelList, selectLevelOptionOnAddPostForCosmos, defaultCosmosFilter,
 }, ref) => {
   const { height, width } = useWindowDimensions();
-  console.log(height, "height")
-  const ppi = height / width;
-  console.log(ppi, "dimensions");
+
 
   const inset = useSafeAreaInsets();
   const { socket } = useSelector(selectSocket);
@@ -268,7 +266,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     setPostCategory(item?.feed_appear_by == "public" ? "general" : "win");
     setPostCreatedFor(item?.created_for_level_or_type == "both" ? "delegate" : item?.created_for_level_or_type);
     setPostType(item?.feed_type);
-    setPostText(item?.description.replace(/\r\n/g, "\n"));
+    setPostText(item?.description.replace(/\r\n/g, "\n").replace(/\r/g, "\n"));
     if (!!item?.mentioned_users) {
       setMentionList(item?.mentioned_users.sort((a, b) => a.offset - b.offset));
     }
@@ -568,7 +566,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     let res = await GET_DELEGATES_LIST_FROM_SERVER_FOR_MENTION_V1({
       navigation, token, data: {
         search_text: text,
-        community_levels: isCosmos || isEventFeed ? undefined : postCeatedForArray.map(x => x.type),
+        community_levels: isCosmos || isEventFeed ? undefined : !!editId ? [postCeatedFor] : postCeatedForArray.map(x => x.type),
         event_id: isEventFeed ? eventId : undefined,
         list_type: isCosmos ? "the_cosmos" : "the_source",
       }
@@ -913,7 +911,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                         </TouchableOpacity>
                       </View>}
                   </View>
-                  {!isCosmos && !!!editId && isSuperDelegate && !isEventFeed &&
+                  {!isCosmos  && !isEventFeed &&
                     <View style={{ marginTop: 10 }}>
                       <TouchableOpacity
                         onPress={() => setMultipleLevelModalVisiblity(true)}
@@ -975,6 +973,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                       color: colors.lightText2,
                       fontFamily: fonts.regular,
                       includeFontPadding: false,
+                      maxHeight: (!isCosmos && height < 800) ? 120 : 150
                     }]}
                     multiline={true}
                     autoCapitalize='none'
@@ -989,7 +988,8 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                     ref={ref_input}
                     onContentSizeChange={({ nativeEvent: { contentSize: { height } } }) => {
                       if (inputHeight != height) {
-                        let boxHeight = 150
+                        let boxHeight = (!isCosmos && height < 800) ? 120 : 150;
+                        console.log(boxHeight, "boxHeight")
                         if (height > boxHeight) {
                           setInputHeight(boxHeight)
                         } else {
@@ -1020,8 +1020,13 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                       position: "absolute",
                       zIndex: 3,
                       alignItems: "center",
-                      top: isCosmos || isEventFeed ? (inputHeight + 80) : (inputHeight + 130)
+                      top: isCosmos || isEventFeed ?
+                        (inputHeight + 80) :
+                        height < 800 ?
+                          inputHeight == 120 ? (inputHeight + 90) :
+                            (inputHeight + 125) : (inputHeight + 130)
                     }}>
+                    {console.log(height, "height")}
                     <View style={{
                       width: utilities.screenWidth() - 30,
                       backgroundColor: colors.darkSecondary,
@@ -1045,7 +1050,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                               onPress={() => onPressOnMentions(item)}
                               style={{ paddingVertical: 4 }}>
                               <MemberView
-                                secondText={!isCosmos ? ` (${item?.community_level})` : ""}
+                                secondText={!isCosmos && !isEventFeed ? ` (${item?.community_level})` : ""}
                                 size={30}
                                 titleSize={12}
                                 member={item}

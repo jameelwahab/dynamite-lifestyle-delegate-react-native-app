@@ -83,6 +83,7 @@ const ImageUploadModal = ({
       maxFiles: 20
     })
       .then(image => {
+        console.log(image, "image")
         if (!multiple) {
           onImagePicked(makeImageObject(image));
         } else {

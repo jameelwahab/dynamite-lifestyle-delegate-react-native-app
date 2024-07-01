@@ -909,7 +909,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           showEventOption={access?.event_info_in_source_all_source_scadule_feeds}
           cosmosLevelList={access?.cosmos_feed_filters}
           defaultCosmosFilter={access?.default_filter}
-          selectLevelOptionOnAddPostForCosmos={access?.choose_level_in_cosmos_feeds}
+          selectLevelOptionOnAddPostForCosmos={isCosmos && access?.choose_level_in_cosmos_feeds}
         />
       </View>
     )
