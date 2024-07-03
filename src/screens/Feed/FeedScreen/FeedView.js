@@ -105,14 +105,14 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
             style={__style.feedTypeIcon}
           />
         </View>}
-      {/* {(((isCosmos || isScheduledFeed) && user?._id == item?.action_info?.action_id) ||
-        (!isCosmos && !isScheduledFeed)) && */}
+      {(((isCosmos || isScheduledFeed) && user?._id == item?.action_info?.action_id) ||
+        (!isCosmos && !isScheduledFeed)) &&
         <TouchableOpacity
           onPress={() => openOptions(item)}
           style={__style.profileTypeIconView}>
           {icons.threeDots(colors.primary, 15)}
         </TouchableOpacity>
-        {/* } */}
+      }
     </View>
   )
 

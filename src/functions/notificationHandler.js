@@ -24,7 +24,7 @@ const notificationHandler = (remoteMessage, navigation, navbar) => {
         params["eventId"] = data?.event_id
         params["feedFor"] = "event"
       }
-      if (data?.type == "addcomment" || data?.type == "addcommentreply" || data?.type == "commentlike") {
+      if (data?.type == "addcomment" || data?.type == "addcommentreply" || data?.type == "commentlike" || data?.type == 'feed_comment_mentioned') {
         params["openCommentModal"] = true;
       }
       if (data?.tab_type == "event") {
@@ -203,5 +203,5 @@ const notificationHandler = (remoteMessage, navigation, navbar) => {
 }
 
 export default notificationHandler;
-const feedType = ["commentlike", "addcomment", "feedlike", "gratitude", "addcommentreply", "feed_mentioned"];
+const feedType = ["commentlike", "addcomment", "feedlike", "gratitude", "addcommentreply", "feed_mentioned", "feed_comment_mentioned"];
 const SupportTicketType = ["send_support_ticket_reminder", "close_support_ticket", "support_ticket_comment", "add_support_ticket"];

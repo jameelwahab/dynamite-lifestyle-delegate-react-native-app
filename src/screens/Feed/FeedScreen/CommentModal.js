@@ -1,7 +1,6 @@
-import { View, Text, SafeAreaView, StyleSheet, FlatList, Pressable, TouchableOpacity, TextInput, ActivityIndicator, Platform, Image } from 'react-native'
+import { View, Text, SafeAreaView, StyleSheet, FlatList, Pressable, TouchableOpacity, TextInput, ActivityIndicator, Platform, ScrollView } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import Modal from 'react-native-modal';
-import utilities from '../../../utilities';
 import { colors } from '../../../utilities/colors';
 import MyText from '../../../components/MyText';
 import CollapsibleText from '../../../components/CollapsibleText';
@@ -15,13 +14,23 @@ import Toast from 'react-native-toast-message';
 import FooterLoader from '../../../components/FooterLoader';
 import OptionModal from '../../../components/OptionModal';
 import showToast from '../../../functions/showToast';
-import { ADD_COMMENT, ADD_COMMENT_V2, COMMENT_LIKE_ACTIONS, DELETE_COMMENT, EDIT_COMMENT, EDIT_COMMENT_V2 } from '../../../DAL';
+import { ADD_COMMENT, ADD_COMMENT_V2, COMMENT_LIKE_ACTIONS, DELETE_COMMENT, EDIT_COMMENT, EDIT_COMMENT_V2, GET_DELEGATES_LIST_FROM_SERVER_FOR_MENTION_V1 } from '../../../DAL';
 import ConfirmationModal from '../../../components/ConfirmationModal';
 import LikeModalForComments from './LikeModalForComments';
 import ImageUploadModal from '../../../components/ImageUploadModal';
 import MyImage from '../../../components/MyImage';
 import { S3_URL } from '../../../utilities/constants';
 import ImageZoomer from '../../../components/ImageZoomer';
+import Collapsible from 'react-native-collapsible';
+import MemberView from '../../../components/MemberView';
+import FeedText from '../../../components/FeedText';
+
+
+let commentCursor = {
+  start: 0,
+  end: 0
+};
+
 
 const CommentModal = ({
   isVisible,
@@ -39,7 +48,11 @@ const CommentModal = ({
   feedId,
   setComments,
   updateFeedItemsSpecificField,
-  socketEmittersForAction
+  socketEmittersForAction,
+  isCosmos,
+  isEventFeed,
+  eventId,
+  feedCreatedFor
 }) => {
   const cmtTextInputRef = useRef();
   const likeModalRef = useRef();
@@ -59,6 +72,183 @@ const CommentModal = ({
     isVisible: false,
     selectedItem: null,
   });
+
+  const [delegateList, setDelegateList] = useState([]);
+  const [isMentionListVisible, setIsMentionListVisible] = useState(false);
+  const [isMentionListLoading, setMentionListLoading] = useState(false);
+  const [mentionList, setMentionList] = useState([]);
+  const [_at_index, set_at_index] = useState(-1);
+
+
+
+  useEffect(() => {
+
+    let text = commentText;
+    if (text[commentCursor?.start] == "@" || text == "@") {
+      // let _at_index = !!commentCursor?.start ? commentCursor?.start : 0;
+      let _at_index = !!text[commentCursor?.start] ? commentCursor?.start : 0;
+      set_at_index(_at_index)
+      setIsMentionListVisible(true);
+      getTheDelegateListFromServer(extractSubstring(text, _at_index))
+    }
+
+    if ((text[_at_index] != "@") && isMentionListVisible == true) {
+      setIsMentionListVisible(false);
+      set_at_index(-1)
+    }
+    if (isMentionListVisible) {
+      getTheDelegateListFromServer(extractSubstring(text))
+    }
+
+    if (text.trim() == "" && mentionList.length > 0) {
+      setMentionList([])
+    }
+
+  }, [commentText])
+
+  useEffect(() => {
+    if (isMentionListVisible == false) {
+      getTheDelegateListFromServer("");
+    }
+  }, [isMentionListVisible])
+
+
+  function extractSubstring(str, sIndex) {
+
+    let startIndex;
+
+    if (!!sIndex) {
+      startIndex = sIndex
+    } else {
+      startIndex = _at_index + 1;
+    }
+    let endIndex = commentCursor?.start;
+    string = str.substring(startIndex, (endIndex + 1));
+    if (string[0] == '@') {
+      string = string.substring(1);
+    }
+    return string
+  }
+
+  function replaceSubstring(str, startIndex, endIndex, replacement) {
+    if (startIndex > str.length - 1) {
+      return str; // If indices are out of bounds or invalid, return the original string
+    }
+    let str1 = str.substring(0, startIndex) + replacement;
+    if (endIndex != -1) {
+      str1 += str.substring(endIndex);
+    }
+    return str1
+  }
+
+
+  const replaceString = (str, index, replacement) => {
+    // if (index > str.length - 1) {
+    //   return str;
+    // }
+    // let endINdex = getSubstringToSpaceEndIndex(str, _at_index);
+    let endINdex = commentCursor.start
+    return replaceSubstring(str + " ", index, endINdex, replacement)
+
+  }
+
+
+
+  const chnageTheIndexes = (text, oldText) => {
+    let cursorPosition = commentCursor?.start;
+
+    if (mentionList.length > 0) {
+      let diff = text.length - oldText.length;
+      let list = [...mentionList]
+      let index = list.findIndex(x => cursorPosition > x?.offset && cursorPosition < (x?.offset + x?.length));
+      if (index > -1) {
+        list.splice(index, 1)
+      }
+      list.forEach((item, index) => {
+        if (cursorPosition <= item?.offset) {
+          item.offset = item?.offset + diff
+        }
+      })
+      setMentionList([...list])
+    }
+
+  }
+
+
+  const textHandler = (text) => {
+    if (text.trim() == "" || text.trim().length == 1 && mentionList.length > 0) {
+      setMentionList([])
+    }
+    chnageTheIndexes(text, commentText)
+    setCommentText(text)
+
+  }
+  const onPressOnMentions = (obj) => {
+    let diff = extractSubstring(commentText, _at_index).length;
+    mentionList.forEach((item) => {
+      if (_at_index < item.offset) {
+        item.offset = item.offset + (`${obj?.first_name} ${obj?.last_name}`.trim().length - diff)
+      }
+    })
+
+    let arr = [...mentionList, {
+      ...obj,
+      offset: _at_index,
+      length: `${obj?.first_name} ${obj?.last_name}`.trim().length
+    }];
+    arr.sort((a, b) => a.offset - b.offset);
+
+    setMentionList(arr);
+
+    setIsMentionListVisible(false);
+    setDelegateList([]);
+    setCommentText(replaceString(commentText, _at_index, `${obj?.first_name} ${obj?.last_name}`.trim()));
+    set_at_index(-1)
+  }
+
+  const replaceAndHighlight = str => {
+    let parts = [];
+    let lastIndex = 0;
+
+
+    mentionList.forEach(user => {
+      let startIndex = user?.offset;
+      let endIndex = user?.offset + user?.length
+      if (lastIndex < startIndex) {
+        parts.push(str.slice(lastIndex, startIndex));
+      }
+      parts.push(<Text style={__style.mentionUserText} >{str.substring(startIndex, endIndex)}</Text>);
+      lastIndex = endIndex;
+    });
+
+    if (lastIndex < str.length) {
+      parts.push(str.slice(lastIndex));
+    }
+
+    return parts
+  }
+
+  const getTheDelegateListFromServer = async (text) => {
+    setMentionListLoading(true);
+    console.log(feedCreatedFor, "feedCreatedFor")
+    let res = await GET_DELEGATES_LIST_FROM_SERVER_FOR_MENTION_V1({
+      navigation, token, data: {
+        search_text: text,
+        community_levels: !isEventFeed ? [feedCreatedFor] : undefined,
+        event_id: isEventFeed ? eventId : undefined,
+        list_type: isCosmos ? "the_cosmos" : "the_source",
+      }
+    });
+    setMentionListLoading(false);
+    if (res.code == 200) {
+      setDelegateList(res?.users)
+      if (res?.users > 0) {
+        setIsMentionListVisible(true)
+      }
+    }
+  }
+
+
 
   useEffect(() => {
     setLoader(false)
@@ -196,6 +386,7 @@ const CommentModal = ({
     setLoader(true);
     let fd = new FormData();
     fd.append("message", commentText.trim());
+    fd.append("mentioned_users", JSON.stringify(mentionList));
     if (!!commentImage && !!commentImage?.uri) {
       fd.append("image", commentImage);
     } else if (!!selectedComment?.image?.thumbnail_1 && !!commentImage == false) {
@@ -203,6 +394,18 @@ const CommentModal = ({
     }
     let res = await EDIT_COMMENT_V2({ token, navigation, commentId: selectedComment?._id, formData: fd })
     if (res.code == 200) {
+
+      // if (!!res.action_response) {
+      //   let socketData = {
+      //     action: "feed_mentioned",
+      //     feed_id: res.action_response?.feed._id,
+      //     token: token,
+      //     creator_id: user?._id,
+      //     action_by: user?._id,
+      //     action_response: res.action_response,
+      //   };
+      //   socket.emit("comment_mention_user_event_trigger", socketData);
+      // }
       socketEmittersForAction(res?.action_response,
         !!selectedComment?.parent_comment ? "edit_comment_reply" : "edit_comment",
         { comment: selectedComment?._id }
@@ -211,6 +414,9 @@ const CommentModal = ({
       setLoader(false);
       setCommentText("");
       setCommentImage(null)
+      set_at_index(-1);
+      setMentionListLoading(false);
+      setIsMentionListVisible(false)
       let editedComment = res?.action_response?.comment;
 
 
@@ -261,6 +467,7 @@ const CommentModal = ({
     let formData = new FormData();
     formData.append("feed", feedId);
     formData.append("message", commentText.trim());
+    formData.append("mentioned_users", JSON.stringify(mentionList));
     if (!!selectedComment) {
       formData.append("parent_comment", selectedComment?._id);
       action = "add_comment_reply"
@@ -298,6 +505,9 @@ const CommentModal = ({
       setCommentImage(null);
       setSelectedComment(null);
       setSelectedCommentFor("");
+      set_at_index(-1);
+      setMentionListLoading(false);
+      setIsMentionListVisible(false)
       // updateFeedItemsSpecificField?.(res?.action_response?.feed?._id, { comment_count: res?.action_response?.feed?.comment_count })
     } else {
       setLoader(false);
@@ -347,7 +557,11 @@ const CommentModal = ({
             </View>
           </View>
           {!!item?.message &&
-            <CollapsibleText style={{ marginTop: 5 }}>{item?.message}</CollapsibleText>}
+            // <CollapsibleText style={{ marginTop: 5 }}>{item?.message}</CollapsibleText>
+            <View style={{ marginTop: 5 }}>
+              <FeedText list={!!item?.mentioned_users ? item?.mentioned_users : []} text={item?.message} />
+            </View>
+          }
 
           {!!item?.image?.thumbnail_1 &&
             <Pressable
@@ -405,7 +619,11 @@ const CommentModal = ({
     setSelectedComment(null);
     setSelectedCommentFor("");
     setCommentImage(null)
-
+    setDelegateList([])
+    setIsMentionListVisible(false);
+    setMentionListLoading(false);
+    setMentionList([])
+    set_at_index(-1)
   }
 
   const commentModal = () => (
@@ -456,6 +674,33 @@ const CommentModal = ({
               />
             </View>
             <View style={__style.shadow}>
+
+              <Collapsible collapsed={!isMentionListVisible} >
+                <View style={{ maxHeight: 120, minHeight: 70 }}>
+                  {delegateList.length > 0 ?
+                    <ScrollView
+                      keyboardShouldPersistTaps="handled"
+                      contentContainerStyle={{ padding: 10 }}>
+                      {delegateList.map((item) =>
+                        <TouchableOpacity
+                          onPress={() => onPressOnMentions(item)}
+                          style={{ paddingVertical: 4 }}>
+                          <MemberView
+                            secondText={!isCosmos && !isEventFeed ? ` (${item?.community_level})` : ""}
+                            size={30}
+                            titleSize={12}
+                            member={item}
+                            customImage={item?.image?.thumbnail_1}
+                            hideEmail />
+                        </TouchableOpacity>)}
+                    </ScrollView>
+                    : isMentionListLoading &&
+                    <View style={{ alignItems: "center", justifyContent: "center", height: 100 }}>
+                      <SimpleLoader size={50} />
+                    </View>}
+                </View>
+              </Collapsible>
+
               <View style={__style.commentUpperView}>
 
                 {!!commentImage &&
@@ -507,7 +752,10 @@ const CommentModal = ({
 
 
               </View>
+
+
               <View style={__style.inputRootView}>
+
 
                 <View style={__style.textInputView}>
                   <TouchableOpacity
@@ -521,8 +769,9 @@ const CommentModal = ({
                     selectionColor={colors.selection}
                     cursorColor={colors.white}
                     multiline={true}
-                    value={commentText}
-                    onChangeText={(text) => setCommentText(text)}
+                    // value={commentText}
+                    // onChangeText={(text) => setCommentText(text)}
+                    onChangeText={textHandler}
                     textAlignVertical="center"
                     placeholder='Write a comment...'
                     placeholderTextColor={colors.placeholder}
@@ -533,7 +782,18 @@ const CommentModal = ({
                     autoCapitalize='none'
                     autoComplete="off"
                     editable={!isLoading}
-                  />
+                    onSelectionChange={(e) => {
+                      commentCursor = e.nativeEvent.selection
+                    }}
+                  >
+                    <Text style={[{
+                      color: colors.lightText,
+                      fontFamily: fonts.regular,
+                      includeFontPadding: false
+                    }]} >
+                      {replaceAndHighlight(commentText, mentionList)}
+                    </Text>
+                  </TextInput>
                 </View>
                 <TouchableOpacity
                   disabled={isLoading}
@@ -674,7 +934,11 @@ const __style = StyleSheet.create({
     alignItems: "center"
   },
 
-  inputRootView: { flexDirection: "row", alignItems: "flex-end", paddingVertical: 10 },
+  inputRootView: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    paddingVertical: 10
+  },
   textInputView: {
     minHeight: 40,
     backgroundColor: "#1c2131",
@@ -724,5 +988,9 @@ const __style = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
     backgroundColor: colors.secondaryVariant
+  },
+  mentionUserText: {
+    backgroundColor: colors.lightPrimary3,
+    color: colors.primary
   }
 })

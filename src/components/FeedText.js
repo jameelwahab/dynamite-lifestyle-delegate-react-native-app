@@ -42,7 +42,7 @@ const FeedText = ({ text, list }) => {
 
   const links = findLinks(nText);
   const parts = convertToMentionabableText(nText, list, links);
-  console.log(parts, "parts")
+
 
   return (
     <MyText >

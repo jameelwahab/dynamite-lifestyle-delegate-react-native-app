@@ -115,7 +115,7 @@ const NotificationList = ({ navigation, route }) => {
           params["eventId"] = item?.module_id
           params["feedFor"] = "event"
         }
-        if (notification_type == "addcomment" || notification_type == "addcommentreply" || notification_type == "commentlike") {
+        if (notification_type == "addcomment" || notification_type == "addcommentreply" || notification_type == "commentlike" || notification_type == "feed_comment_mentioned") {
           params["openCommentModal"] = true;
         }
         if (item?.tab_type == "event") {
@@ -573,5 +573,5 @@ const __styles = StyleSheet.create({
 
 
 
-const feedType = ["commentlike", "addcomment", "feedlike", "gratitude", "addcommentreply", "feed_mentioned"];
+const feedType = ["commentlike", "addcomment", "feedlike", "gratitude", "addcommentreply", "feed_mentioned", "feed_comment_mentioned"];
 const SupportTicketType = ["send_support_ticket_reminder", "close_support_ticket", "support_ticket_comment", "add_support_ticket", "support_ticket"];

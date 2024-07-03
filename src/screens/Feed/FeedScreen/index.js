@@ -40,6 +40,7 @@ let commentVar = {
   page: 0,
   canLoadMore: false,
   id: "",
+  level: "",
 }
 
 let likeVar = {
@@ -53,7 +54,6 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
   const scheduleModalRef = useRef();
   const ref_personalNoteModal = useRef();
   const { feedFor, feedId, eventId = "" } = route?.params;
-  console.log(feedFor, "feedFor")
   const isCosmos = feedFor == "the_cosmos";
   const isScheduledFeed = feedFor == "scheduled";
   const isAllSourceFeed = feedFor == "all_source";
@@ -260,7 +260,8 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
     commentVar = {
       page: 0,
       canLoadMore: false,
-      id: ""
+      id: "",
+      level: ""
     };
     likeVar = {
       page: 0,
@@ -531,10 +532,12 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
   }
 
   const openComments = (id, focus) => {
+    let curFeed = feed.find(fed => fed._id == id);
     commentVar = {
       page: 0,
       canLoadMore: false,
-      id: id
+      id: id,
+      level: !!curFeed ? curFeed?.created_for_level_or_type : ""
     };
     setComments({
       list: [],
@@ -952,7 +955,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           />}
           showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item?._id}
-          ListHeaderComponent={headerView}
+          ListHeaderComponent={headerView()}
           ListEmptyComponent={!loader && tab == 0 && <EmptyView label={"Posts not found"} />}
           onEndReached={() => {
             if (!!!feedId && feedVar?.canLoadMore && tab == 0) {
@@ -997,6 +1000,10 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
         setComments={setComments}
         updateFeedItemsSpecificField={updateFeedItemsSpecificField}
         socketEmittersForAction={socketEmittersForAction}
+        isCosmos={isCosmos}
+        isEventFeed={isEventFeed}
+        eventId={eventId}
+        feedCreatedFor={commentVar?.level}
       />
 
 

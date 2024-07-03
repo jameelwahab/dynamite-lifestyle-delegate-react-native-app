@@ -43,10 +43,9 @@ let cursor = {
 const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, selectFeedlevel, feedLevel, tab, isCosmos, isScheduledFeed, timezone, removeFromList, isSuperDelegate, hideLevelView, isEventFeed, eventId, isMultipleSelectAllowed, showEventOption,
   hideAddView,
   cosmosLevelList, selectLevelOptionOnAddPostForCosmos, defaultCosmosFilter,
+
 }, ref) => {
   const { height, width } = useWindowDimensions();
-
-
   const inset = useSafeAreaInsets();
   const { socket } = useSelector(selectSocket);
   const lvlModalRef = useRef()
@@ -78,12 +77,12 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   const [eventBtnTextColor, setEventBtnTextColor] = useState(colors.white)
   const [eventBtnColor, setEventBtnColor] = useState(colors.primary2);
   const [eventBtnAligment, setEventBtnAligment] = useState("center");
+
+
   const [delegateList, setDelegateList] = useState([]);
   const [isMentionListVisible, setIsMentionListVisible] = useState(false);
   const [isMentionListLoading, setMentionListLoading] = useState(false);
   const [mentionList, setMentionList] = useState([]);
-
-
   const [_at_index, set_at_index] = useState(-1);
   const [inputHeight, setInputHeight] = useState(0)
 
@@ -126,6 +125,10 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     }
   }, [isMentionListVisible])
 
+  const makeCosmosLevel = (teamType) => {
+    return ` (${teamType.split("_").join(" ")})`;
+
+  }
 
 
   function extractSubstring(str, sIndex) {
@@ -265,6 +268,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     setEditFeed(item);
     setPostCategory(item?.feed_appear_by == "public" ? "general" : "win");
     setPostCreatedFor(item?.created_for_level_or_type == "both" ? "delegate" : item?.created_for_level_or_type);
+    setPostCreatedForArray([PostCretedForSourceFeed.find(x => x.type == item?.created_for_level_or_type)])
     setPostType(item?.feed_type);
     setPostText(item?.description.replace(/\r\n/g, "\n").replace(/\r/g, "\n"));
     if (!!item?.mentioned_users) {
@@ -380,7 +384,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   }
 
   const onMultipleOptionSelected = (opt) => {
-    if (isMultipleSelectAllowed) {
+    if (!!editId == false && isMultipleSelectAllowed) {
       let list = [...postCeatedForArray];
       let index = list.findIndex(x => x.type == opt.type);
       if (index > -1) {
@@ -566,7 +570,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     let res = await GET_DELEGATES_LIST_FROM_SERVER_FOR_MENTION_V1({
       navigation, token, data: {
         search_text: text,
-        community_levels: isCosmos || isEventFeed ? undefined : !!editId ? [postCeatedFor] : postCeatedForArray.map(x => x.type),
+        community_levels: isEventFeed ? undefined : isCosmos ? [postCeatedFor] : !!editId ? [postCeatedFor] : postCeatedForArray.map(x => x.type),
         event_id: isEventFeed ? eventId : undefined,
         list_type: isCosmos ? "the_cosmos" : "the_source",
       }
@@ -911,7 +915,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                         </TouchableOpacity>
                       </View>}
                   </View>
-                  {!isCosmos  && !isEventFeed &&
+                  {!isCosmos && !isEventFeed &&
                     <View style={{ marginTop: 10 }}>
                       <TouchableOpacity
                         onPress={() => setMultipleLevelModalVisiblity(true)}
@@ -1050,7 +1054,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                               onPress={() => onPressOnMentions(item)}
                               style={{ paddingVertical: 4 }}>
                               <MemberView
-                                secondText={!isCosmos && !isEventFeed ? ` (${item?.community_level})` : ""}
+                                secondText={!isEventFeed ? isCosmos ? makeCosmosLevel(item?.team_type) : ` (${item?.community_level})` : ""}
                                 size={30}
                                 titleSize={12}
                                 member={item}
@@ -1322,7 +1326,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
             optionList={PostCretedForSourceFeed}
             closeModal={() => setMultipleLevelModalVisiblity(false)}
             onSelected={onMultipleOptionSelected}
-            multiple={isMultipleSelectAllowed}
+            multiple={!!editId == false && isMultipleSelectAllowed}
             checkSelected={checkSelected}
           />
 
