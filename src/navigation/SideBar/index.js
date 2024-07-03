@@ -171,6 +171,7 @@ const index = (props) => {
   const enableSocketEvents = () => {
     socket.on("new_notification_receiver_for_delegate", (data) => handleSocketEvents(data, "new_notification_receiver_for_delegate"))
     socket.on("mention_user_event_trigger", (data) => handleMentionNotificationCount(data, "mention_user_event_trigger"))
+    socket.on("comment_mention_user_event_trigger", (data) => handleMentionNotificationCount(data, "comment_mention_user_event_trigger"))
     socket.on("goal_stetement_event_reciever", (data) => handleSocketEvents(data, "goal_stetement_event_reciever"))
     socket.on("new_notification_receiver", (data) => handleSocketEvents(data, "new_notification_receiver"))
     socket.on("reminder_event_for_delegate", (data) => handleSocketEvents(data, "reminder_event_for_delegate"))
@@ -182,6 +183,7 @@ const index = (props) => {
 
   const disbaleSocketEvents = () => {
     socket.off("mention_user_event_trigger", handleSocketEvents)
+    socket.off("comment_mention_user_event_trigger", handleSocketEvents)
     socket.off("new_notification_receiver_for_delegate", handleMentionNotificationCount);
     socket.off("goal_stetement_event_reciever", handleSocketEvents);
     socket.off("new_notification_receiver", handleSocketEvents);
