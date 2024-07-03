@@ -272,6 +272,7 @@ const CommentModal = ({
       if (item?.image?.thumbnail_1) {
         setCommentImage(item?.image?.thumbnail_1)
       }
+      setMentionList(!!item?.mentioned_users ? item?.mentioned_users : [])
       setSelectedCommentFor("edit")
       setCommentText(item?.message);
       setTimeout(() => {
@@ -417,6 +418,11 @@ const CommentModal = ({
       set_at_index(-1);
       setMentionListLoading(false);
       setIsMentionListVisible(false)
+      setMentionList([])
+      commentCursor = {
+        start: 0,
+        end: 0
+      }
       let editedComment = res?.action_response?.comment;
 
 
@@ -508,6 +514,11 @@ const CommentModal = ({
       set_at_index(-1);
       setMentionListLoading(false);
       setIsMentionListVisible(false)
+      setMentionList([])
+      commentCursor = {
+        start: 0,
+        end: 0
+      }
       // updateFeedItemsSpecificField?.(res?.action_response?.feed?._id, { comment_count: res?.action_response?.feed?.comment_count })
     } else {
       setLoader(false);
