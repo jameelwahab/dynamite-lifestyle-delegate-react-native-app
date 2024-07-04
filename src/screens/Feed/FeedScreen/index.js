@@ -327,7 +327,8 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           if (index > -1) {
             let obj = {
               ...nList[index],
-              message: eeditedComment?.message
+              message: eeditedComment?.message,
+              mentioned_users: !!eeditedComment?.mentioned_users ? eeditedComment?.mentioned_users : []
             }
             if (!!eeditedComment?.image) {
               obj["image"] = eeditedComment?.image

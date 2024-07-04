@@ -24,6 +24,7 @@ import ImageZoomer from '../../../components/ImageZoomer';
 import Collapsible from 'react-native-collapsible';
 import MemberView from '../../../components/MemberView';
 import FeedText from '../../../components/FeedText';
+import breakReference from '../../../functions/breakReference';
 
 
 let commentCursor = {
@@ -272,7 +273,7 @@ const CommentModal = ({
       if (item?.image?.thumbnail_1) {
         setCommentImage(item?.image?.thumbnail_1)
       }
-      setMentionList(!!item?.mentioned_users ? item?.mentioned_users : [])
+      setMentionList(!!item?.mentioned_users ? breakReference(item?.mentioned_users) : [])
       setSelectedCommentFor("edit")
       setCommentText(item?.message);
       setTimeout(() => {
@@ -570,7 +571,7 @@ const CommentModal = ({
           {!!item?.message &&
             // <CollapsibleText style={{ marginTop: 5 }}>{item?.message}</CollapsibleText>
             <View style={{ marginTop: 5 }}>
-              <FeedText list={!!item?.mentioned_users ? item?.mentioned_users : []} text={item?.message} />
+              <FeedText list={!!item?.mentioned_users ? breakReference(item?.mentioned_users) : []} text={item?.message} />
             </View>
           }
 

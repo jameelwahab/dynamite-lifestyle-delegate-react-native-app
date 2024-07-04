@@ -468,7 +468,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     fd.append("embed_code", postType == "embed_code" ? embededCode : "");
     fd.append("feed_images", postType == 'image' ? JSON.stringify(uploadedImages) : "[]");
     fd.append("mentioned_users", JSON.stringify(mentionList));
-    if (!isCosmos && !!editId == false && isSuperDelegate) {
+    if (!isCosmos && !!editId == false ) {
       fd.append("created_for_level_or_type", JSON.stringify(postCeatedForArray.map(x => x.type)));
     } else if (!!editId) {
       fd.append("created_for_level_or_type", postCeatedFor);
