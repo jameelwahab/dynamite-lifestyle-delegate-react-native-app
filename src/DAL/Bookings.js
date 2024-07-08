@@ -102,6 +102,20 @@ export const BOOKING_CONSULTANT_LIST = ({ token, navigation }) => {
   })
 }
 
+export const BOOKING_CONSULTANT_LIST_V1 = ({ token, navigation, body: {
+  data_type, member_type, search_text,delegates_type,consultant_id
+} }) => {
+  return invokeApi({
+    path: `api/consultant/get_sale_page_member_list_for/booking`,
+    method: "POST",
+    postData: {
+      data_type, member_type, search_text,delegates_type,consultant_id
+    },
+    token,
+    navigation,
+  })
+}
+
 export const BOOKING_UPDATE_STATUS = ({ token, navigation, id, data }) => {
   return invokeApi({
     path: `api/consultant/update_booking_status/${id}`,

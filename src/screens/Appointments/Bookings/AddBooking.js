@@ -4,7 +4,7 @@ import RootView from '../../../components/RootView'
 import MyText from '../../../components/MyText'
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../../redux/reducers/userSlice'
-import { BOOKING_ADD, BOOKING_CONSULTANT_LIST, BOOKING_PASS, BOOKING_UPDATE, GET_BOOKING_TIME_SLOTS, GET_BOOKING_TIME_SLOTS_BY_CONSULTANT, GET_SALE_PAGE_LIST_FOR_BOOKING } from '../../../DAL'
+import { BOOKING_ADD, BOOKING_CONSULTANT_LIST, BOOKING_CONSULTANT_LIST_V1, BOOKING_PASS, BOOKING_UPDATE, GET_BOOKING_TIME_SLOTS, GET_BOOKING_TIME_SLOTS_BY_CONSULTANT, GET_SALE_PAGE_LIST_FOR_BOOKING } from '../../../DAL'
 import MyTouchableInput from '../../../components/MyTouchableInput'
 import { MyButton } from '../../../components/MyButton'
 import OptionModalWithSearch from '../../../components/OptionModalWithSearch'
@@ -21,7 +21,8 @@ import MyCheckBox from '../../../components/MyCheckBox'
 
 const AddBooking = ({ navigation, route }) => {
   const ref_calendar = useRef();
-  const { token } = useSelector(selectUser);
+  const { token, access, user } = useSelector(selectUser);
+  console.log(access, user, "access")
   const { editableItem, type } = route?.params;
   const isEdit = type == "edit";
   const isPass = type == "pass";
@@ -48,12 +49,21 @@ const AddBooking = ({ navigation, route }) => {
   useEffect(() => {
     if (isPass) {
       getBookingConsutantFromServer();
-    } else {
-      getBookingsPagesFromServer();
     }
-  }, [searchText])
+    else {
+      if (optionModal?.isVisble && optionModal?.type != "Booking Page" && optionModal?.type != "Time Slot") {
+        getBookingsPagesFromServer()
+      }
+    }
+    // if (isPass) {
+    //   getBookingConsutantFromServer();
+    // } else {
+    //   getBookingsPagesFromServer();
+    // }
+  }, [searchText, optionModal?.isVisble])
 
   useEffect(() => {
+    getPagesFromServer();
     getBookingsTimeSlotsFromServer();
   }, [date, consultant?._id])
 
@@ -73,6 +83,9 @@ const AddBooking = ({ navigation, route }) => {
       setMember(opt);
     } else if (type == "Delegate") {
       setConsultant(opt)
+      if (!isPass) {
+        setBookingPage(null);
+      }
       setTimeSlot(null)
     } else if (type == "Booking Page") {
       setBookingPage(opt)
@@ -182,13 +195,42 @@ const AddBooking = ({ navigation, route }) => {
   }
 
   const getBookingsPagesFromServer = async () => {
-    let res = await GET_SALE_PAGE_LIST_FOR_BOOKING({ navigation, token, search: searchText.trim() });
-    if (res.code == 200) {
-      setPageList(res?.Sale_page);
-      setMemberlist(res?.members);
-      if (optionModal.isVisble && optionModal?.type == "Member") {
-        setOptionModal({ ...optionModal, list: res?.members })
+    let res = await BOOKING_CONSULTANT_LIST_V1({
+      navigation, token, body: {
+        data_type: optionModal?.type == "Delegate" ? "delegates" : "members",
+        member_type: optionModal?.type == "Member" ? access?.show_members_list_for_booking : undefined,
+        delegates_type: optionModal?.type == "Delegate" ? access?.book_call_with_delegate == "other" ? access?.other_delegate_team_type : user?.team_type : undefined,
+        consultant_id: undefined,
+        search_text: searchText.trim()
       }
+    });
+    if (res.code == 200) {
+      console.log(optionModal?.type, "optionModal?.type")
+      if (optionModal?.type == "Delegate") {
+        setConsultantList(res?.data)
+      } else if (optionModal?.type == "Member") {
+        setMemberlist(res?.data)
+      }
+      if (optionModal.isVisble) {
+        setOptionModal({ ...optionModal, list: res?.data })
+      }
+      // setPageList(res?.Sale_page);
+      // setMemberlist(res?.members);
+      // if (optionModal.isVisble && optionModal?.type == "Member") {
+      //   setOptionModal({ ...optionModal, list: res?.members })
+      // }
+    }
+  }
+
+  const getPagesFromServer = async () => {
+    let res = await BOOKING_CONSULTANT_LIST_V1({
+      navigation, token, body: {
+        data_type: "sale_page",
+        consultant_id: consultant?._id
+      }
+    });
+    if (res.code == 200) {
+      setPageList(res?.data);
     }
   }
 
@@ -207,6 +249,9 @@ const AddBooking = ({ navigation, route }) => {
       res = await GET_BOOKING_TIME_SLOTS({ navigation, token, date: moment(date).format("YYYY/MM/DD") });
     }
     if (res.code == 200) {
+      if (optionModal.isVisble && optionModal?.type=="Time Slot") {
+        setOptionModal({ ...optionModal, list: res?.data })
+      }
       setTimeSlotlist(res?.slots)
     }
   }
@@ -228,14 +273,21 @@ const AddBooking = ({ navigation, route }) => {
             onClearButtonPress={() => { setMember(null); }}
           />}
 
-        {isPass &&
-          <MyTouchableInput
-            label='Delegate*'
-            onPress={() => setOptionModal({ isVisble: true, list: consultantList, type: "Delegate", titleKey: "" })}
-            value={!!consultant ? `${consultant?.first_name} ${consultant?.last_name} (${consultant?.email})` : ""}
-            clearbutton={!!consultant}
-            onClearButtonPress={() => { setConsultant(null); setTimeSlot(null); }}
-          />}
+        {/* {isPass && */}
+        <MyTouchableInput
+          label='Delegate*'
+          onPress={() => setOptionModal({ isVisble: true, list: consultantList, type: "Delegate", titleKey: "" })}
+          value={!!consultant ? `${consultant?.first_name} ${consultant?.last_name} (${consultant?.email})` : ""}
+          clearbutton={!!consultant}
+          onClearButtonPress={() => {
+            setConsultant(null);
+            if (!isPass) {
+              setBookingPage(null);
+            }
+            setTimeSlot(null);
+          }}
+        />
+        {/* } */}
 
         <MyTouchableInput
           label={isPass ? "Page Title*" : 'Booking Page*'}

@@ -603,6 +603,17 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
                     />
                   </View>}
 
+                <View>
+                  {item?.is_text_box_shown &&
+                    <MyInputs
+                      placeholder='Write comment here'
+                      multiline
+                      value={item?.text_box_content}
+
+                      onChangeText={(txt) => intentionHandler(index, { text_box_content: txt })}
+                    />}
+                </View>
+
               </View>
             </View>
           </View>))}

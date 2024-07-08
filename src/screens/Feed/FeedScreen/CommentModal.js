@@ -62,6 +62,7 @@ const CommentModal = ({
   const [imageModalVisibility, setImageModalVisibility] = useState(false)
   const [isLoading, setLoader] = useState(false);
   const [selectedComment, setSelectedComment] = useState(null);
+  const [selectedReplyComment, setSelectedReplyComment] = useState(null);
   const [selectedCommentFor, setSelectedCommentFor] = useState("");
   const [imageForZoom, setImageForZoom] = useState("")
   const [confirmation, setConfirmation] = useState({
@@ -185,16 +186,17 @@ const CommentModal = ({
 
   }
   const onPressOnMentions = (obj) => {
-    let diff = extractSubstring(commentText, _at_index).length;
+    let index = _at_index < 0 ? 0 : _at_index;
+    let diff = extractSubstring(commentText, index).length;
     mentionList.forEach((item) => {
-      if (_at_index < item.offset) {
+      if (index < item.offset) {
         item.offset = item.offset + (`${obj?.first_name} ${obj?.last_name}`.trim().length - diff)
       }
     })
 
     let arr = [...mentionList, {
       ...obj,
-      offset: _at_index,
+      offset: index,
       length: `${obj?.first_name} ${obj?.last_name}`.trim().length
     }];
     arr.sort((a, b) => a.offset - b.offset);
@@ -203,7 +205,7 @@ const CommentModal = ({
 
     setIsMentionListVisible(false);
     setDelegateList([]);
-    setCommentText(replaceString(commentText, _at_index, `${obj?.first_name} ${obj?.last_name}`.trim()));
+    setCommentText(replaceString(commentText, index, `${obj?.first_name} ${obj?.last_name}`.trim()));
     set_at_index(-1)
   }
 
@@ -378,6 +380,7 @@ const CommentModal = ({
       //   return { ...obj };
       // })
       setSelectedComment(null);
+      setSelectedReplyComment(null);
       // updateFeedItemsSpecificField?.(res?.action_response?.feed?._id, { comment_count: res?.action_response?.feed?.comment_count })
     } else {
       setLoader(false);
@@ -511,6 +514,7 @@ const CommentModal = ({
       setCommentText("");
       setCommentImage(null);
       setSelectedComment(null);
+      setSelectedReplyComment(null);
       setSelectedCommentFor("");
       set_at_index(-1);
       setMentionListLoading(false);
@@ -540,10 +544,38 @@ const CommentModal = ({
 
   }
 
-  const commentView = (item, index, isChild) => {
+  const onChildCommentPress = (comment, parentComment) => {
+    let user = comment?.user_info_action_for;
+
+    let obj = {
+      first_name: user.name.substring(0, user.name.indexOf(' ')),
+      last_name: user.name.substring(user.name.indexOf(' ') + 1),
+      _id: user?.action_id,
+    }
+    if (!!feedCreatedFor) {
+      obj['community_level'] = feedCreatedFor
+    }
+    if (user?.profile_image) {
+      obj['profile_image'] = user?.profile_image
+    }
+
+    console.log(obj, "user obj")
+    while (mentionList.length > 0) {
+      mentionList.pop()
+    }
+
+    onPressOnMentions(obj)
+  }
+
+
+  const commentView = (item, index, isChild, parentComment) => {
     return (
       <View key={item?._id}>
-        <View style={[__style.commentView, { marginLeft: isChild ? "10%" : undefined, backgroundColor: selectedComment?._id == item?._id ? colors.lightPrimary2 : colors.secondarySelect }]}>
+        <View style={[__style.commentView, {
+          marginLeft: isChild ? "10%" : undefined, backgroundColor:
+            ((!!selectedReplyComment == true && selectedReplyComment?._id == item?._id) || (!!selectedReplyComment == false && selectedComment?._id == item?._id)) ?
+              colors.lightPrimary2 : colors.secondarySelect
+        }]}>
           <View style={__style.profiletView}>
             <UserImage
               image={item?.user_info_action_for?.profile_image}
@@ -592,17 +624,30 @@ const CommentModal = ({
                 style={__style.actionBtnView}>
                 <MyText color={item?.is_liked ? colors.primary : colors.text} fontSize={13} type='medium' >{item?.is_liked ? "Liked" : "Like"}</MyText>
               </TouchableOpacity>
-              {!isChild &&
-                <TouchableOpacity
-                  onPress={() => {
+
+              <TouchableOpacity
+                onPress={() => {
+                  if (isChild) {
+                    setCommentImage(null)
+                    // setCommentText("")
+                    // setMentionList([])
+                    setSelectedComment(parentComment);
+                    setSelectedReplyComment(item)
+                    setSelectedCommentFor("reply");
+                    onChildCommentPress(item, parentComment);
+                    cmtTextInputRef?.current?.focus();
+                  } else {
                     setSelectedComment(item);
+                    setSelectedReplyComment(null)
                     setCommentImage(null)
                     setSelectedCommentFor("reply");
                     cmtTextInputRef?.current?.focus();
-                  }}
-                  style={[__style.actionBtnView, { marginLeft: 10 }]}>
-                  <MyText type='medium' color={colors.text} fontSize={13} >{"Reply"}</MyText>
-                </TouchableOpacity>}
+                  }
+                }
+                }
+                style={[__style.actionBtnView, { marginLeft: 10 }]}>
+                <MyText type='medium' color={colors.text} fontSize={13} >{"Reply"}</MyText>
+              </TouchableOpacity>
             </View>
             {item?.like_count > 0 &&
               <Pressable
@@ -620,7 +665,7 @@ const CommentModal = ({
 
           </View>
         </View>
-        {!!item?.child_comment && Array.isArray(item?.child_comment) && item?.child_comment.map((item2, index2) => commentView(item2, index2, true))}
+        {!!item?.child_comment && Array.isArray(item?.child_comment) && item?.child_comment.map((item2, index2) => commentView(item2, index2, true, item))}
 
       </View>
     )
@@ -629,6 +674,7 @@ const CommentModal = ({
   const resetStates = () => {
     setCommentText("");
     setSelectedComment(null);
+    setSelectedReplyComment(null);
     setSelectedCommentFor("");
     setCommentImage(null)
     setDelegateList([])
@@ -678,7 +724,7 @@ const CommentModal = ({
                 data={comments}
                 keyboardShouldPersistTaps="always"
                 keyExtractor={(item) => item?._id}
-                renderItem={({ item, index }) => commentView(item, index, false)}
+                renderItem={({ item, index }) => commentView(item, index, false, null)}
                 ListEmptyComponent={!loader && <EmptyView label={"No comment exist"} />}
                 showsVerticalScrollIndicator={false}
                 onEndReached={onEndReached}
@@ -745,7 +791,7 @@ const CommentModal = ({
                       <Text>{"Editing"}</Text> :
                       selectedCommentFor == "reply" ?
                         <Text style={{ fontFamily: fonts.regular }} >{"Replying to "}
-                          <Text style={{ fontFamily: fonts.bold, }} >{selectedComment?.user_info_action_for?.name}</Text>
+                          <Text style={{ fontFamily: fonts.bold, }} >{!!selectedReplyComment ? selectedReplyComment?.user_info_action_for?.name : selectedComment?.user_info_action_for?.name}</Text>
                         </Text> : null}
                       <Text>{"  •  "}</Text>
                       <MyText
@@ -753,6 +799,7 @@ const CommentModal = ({
                         fontSize={15}
                         onPress={() => {
                           setSelectedComment(null);
+                          setSelectedReplyComment(null);
                           setCommentText("");
                           setCommentImage(null)
                           setSelectedCommentFor("");
