@@ -54,7 +54,7 @@ export const GET_BOOKING_TIME_SLOTS_BY_CONSULTANT = ({ token, navigation, date, 
 
 export const BOOKING_ADD = ({ token, navigation, data }) => {
   return invokeApi({
-    path: `api/consultant/booking/add/`,
+    path: `api/consultant/booking/add/new`,
     method: "POST",
     postData: data,
     token,

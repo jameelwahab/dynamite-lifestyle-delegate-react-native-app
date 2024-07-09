@@ -307,15 +307,21 @@ const MessageList = ({ navigation, route }) => {
           options = options.slice().filter(x => x.type != 'copy');
         }
       } else if (item.message_type == "audio") {
-        options.push({
-          title: "Mark as unread",
-          icon: () => icons.unread(colors.primary),
-          type: "unread"
-        })
+        // options.push({
+        //   title: "Mark as unread",
+        //   icon: () => icons.unread(colors.primary),
+        //   type: "unread"
+        // })
+        // return
       } else {
         options = msgOptionList.slice().filter(x => x.type == 'note' || x.type == 'copy');
       }
 
+      options.push({
+        title: "Mark as unread",
+        icon: () => icons.unread(colors.primary),
+        type: "unread"
+      })
     } else {
       if (item.message_type == "image" && !!item?.image) {
         options = [...msgOptionList];

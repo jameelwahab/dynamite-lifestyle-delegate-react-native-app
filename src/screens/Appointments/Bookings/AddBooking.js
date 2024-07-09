@@ -34,7 +34,7 @@ const AddBooking = ({ navigation, route }) => {
   const [searchText, setSearchText] = useState("");
   const [optionModal, setOptionModal] = useState({ isVisble: false, list: [], type: "", titleKey: "" });
   const [member, setMember] = useState(null);
-  const [consultant, setConsultant] = useState(null);
+  const [consultant, setConsultant] = useState(access?.book_call_with_delegate == "self" ? user : null);
   const [bookingPage, setBookingPage] = useState(!isAdd ? editableItem?.page : null);
   const [date, setDate] = useState(!isAdd ? moment(editableItem?.date) : moment());
   const [loader, setLoader] = useState(false);
@@ -149,6 +149,8 @@ const AddBooking = ({ navigation, route }) => {
   const onSubmit = () => {
     if (!member && isAdd) {
       showToast({ body: "Member's name can not be empty !", title: "Alert", type: "info" })
+    } else if (access?.book_call_with_delegate == "other" && !!consultant == false && isAdd) {
+      showToast({ body: "Please select a Delegate!", title: "Alert", type: "info" })
     } else if (!bookingPage && !isPass) {
       showToast({ body: "Booking Page can not be empty !", title: "Alert", type: "info" })
     } else if (!date) {
@@ -175,6 +177,7 @@ const AddBooking = ({ navigation, route }) => {
         delete data['member_id'];
         updateBookingToServer(data);
       } else {
+        data["consultant_id"] = consultant?._id;
         addBookingToServer(data)
       }
     }
@@ -182,7 +185,7 @@ const AddBooking = ({ navigation, route }) => {
 
 
   const addBookingToServer = async (obj) => {
-    let res = await BOOKING_ADD({ navigation, token, data: obj });
+    let res = await BOOKING_ADD({ navigation, token, data: obj, });
     setLoader(false);
     if (res.code == 200) {
       navigation.navigate(routes?.bookingList, {
@@ -264,7 +267,7 @@ const AddBooking = ({ navigation, route }) => {
   const getBookingsTimeSlotsFromServer = async () => {
     let res;
     // if (isPass) {
-      res = await GET_BOOKING_TIME_SLOTS_BY_CONSULTANT({ navigation, token, date: moment(date).format("YYYY/MM/DD"), consultant_id: consultant?._id });
+    res = await GET_BOOKING_TIME_SLOTS_BY_CONSULTANT({ navigation, token, date: moment(date).format("YYYY/MM/DD"), consultant_id: consultant?._id });
     // } else {
     //   res = await GET_BOOKING_TIME_SLOTS({ navigation, token, date: moment(date).format("YYYY/MM/DD") });
     // }
@@ -294,7 +297,7 @@ const AddBooking = ({ navigation, route }) => {
           />}
 
         {/* {isPass && */}
-        {access?.book_call_with_delegate == "other" &&
+        {access?.book_call_with_delegate == "other" && !isEdit &&
           <MyTouchableInput
             label='Delegate*'
             onPress={() => setOptionModal({ isVisble: true, list: consultantList, type: "Delegate", titleKey: "" })}
@@ -309,14 +312,15 @@ const AddBooking = ({ navigation, route }) => {
             }}
           />}
 
-        <MyTouchableInput
-          label={isPass ? "Page Title*" : 'Booking Page*'}
-          onPress={() => setOptionModal({ isVisble: true, list: pageList, type: "Booking Page", titleKey: "sale_page_title" })}
-          value={!!bookingPage ? bookingPage?.sale_page_title : ''}
-          clearbutton={!!bookingPage}
-          onClearButtonPress={() => setBookingPage(null)}
-          disabled={isPass}
-        />
+        {!isEdit &&
+          <MyTouchableInput
+            label={isPass ? "Page Title*" : 'Booking Page*'}
+            onPress={() => setOptionModal({ isVisble: true, list: pageList, type: "Booking Page", titleKey: "sale_page_title" })}
+            value={!!bookingPage ? bookingPage?.sale_page_title : ''}
+            clearbutton={!!bookingPage}
+            onClearButtonPress={() => setBookingPage(null)}
+            disabled={isPass || isEdit}
+          />}
 
         <MyTouchableInput
           label='Date*'
