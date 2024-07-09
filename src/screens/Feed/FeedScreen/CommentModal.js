@@ -53,8 +53,10 @@ const CommentModal = ({
   isCosmos,
   isEventFeed,
   eventId,
-  feedCreatedFor
+  feedCreatedFor,
+  onCommentMessagePress
 }) => {
+  console.log(user, "user")
   const cmtTextInputRef = useRef();
   const likeModalRef = useRef();
   const [commentText, setCommentText] = useState("");
@@ -81,7 +83,9 @@ const CommentModal = ({
   const [mentionList, setMentionList] = useState([]);
   const [_at_index, set_at_index] = useState(-1);
 
-
+  const onMessagePress = (item) => {
+    onCommentMessagePress?.(item)
+  }
 
   useEffect(() => {
 
@@ -277,7 +281,7 @@ const CommentModal = ({
       }
       setMentionList(!!item?.mentioned_users ? breakReference(item?.mentioned_users) : [])
       setSelectedCommentFor("edit")
-      setCommentText(item?.message+" ");
+      setCommentText(item?.message + " ");
       setTimeout(() => {
         cmtTextInputRef?.current?.focus()
       }, 500);
@@ -609,7 +613,8 @@ const CommentModal = ({
                 <MyText color={colors.lightText2} fontSize={10}>{convertTimezone(item?.comment_date_time, timezone).format("DD MMM YYYY [at] hh:mm A")}</MyText>
               </View>
             </View>
-            {user?._id == item?.user_info_action_for?.action_id &&
+            {console.log(!isCosmos, !isEventFeed, user?.is_super_delegate, index)}
+            {((user?._id == item?.user_info_action_for?.action_id) || (!isCosmos && !isEventFeed && user?.is_super_delegate)) &&
               <TouchableOpacity
                 onPress={() => setOptions({ isVisible: true, selectedItem: item })}
                 style={__style.menuIconBtn}>
@@ -911,6 +916,8 @@ const CommentModal = ({
           navigation={navigation}
           token={token}
           timezone={timezone}
+          user={user}
+          onMessagePress={onMessagePress}
         />
 
         <ImageUploadModal

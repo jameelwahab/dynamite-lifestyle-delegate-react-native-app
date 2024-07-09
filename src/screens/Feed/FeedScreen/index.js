@@ -50,6 +50,12 @@ let likeVar = {
   actionType: ""
 }
 const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, upcomingEvents, currentEvents, hideTabs = false, isScheduleFeedTabAllowed = false, schedulePost = false }) => {
+  // let feedPage = useRef({
+  //   page: 0,
+  //   canLoadMore: false,
+  // })
+  // let { current: feedVar } = feedPage;
+  // console.log(feedVar,"feedVar")
   const addPostRef = useRef()
   const scheduleModalRef = useRef();
   const ref_personalNoteModal = useRef();
@@ -217,6 +223,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           canLoadMore: false
         }
       }
+      // console.log(feedVar,"feedVar")
       setFeed(feedVar.page <= 1 ? res?.feeds : [...feed, ...res?.feeds])
       setLoader(false);
       setRefreshing(false);
@@ -499,6 +506,8 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
 
   useEffect(() => {
     resetCounts();
+    setFeed([])
+    setLoader(true)
     getFeed();
   }, [feedLevel])
 
@@ -527,8 +536,8 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
   }
 
   const selectFeedlevel = (lvl) => {
-    setLoader(true);
-    setFeed([])
+    // setLoader(true);
+    // setFeed([])
     setFeedLevel(lvl);
   }
 
@@ -664,6 +673,30 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       setTimeout(() => {
         ref_personalNoteModal?.current?.openModal(item?.description)
       }, 500);
+    }
+  }
+
+  const onMessagePress = (item) => {
+    console.log(item, "item")
+    if (!!item?.user_info_action_by?.action_id) {
+      onChatScreen(item?.user_info_action_by?.action_id)
+      setLikes({
+        modalVisibility: false,
+        list: [],
+        loader: false
+      })
+    }
+  }
+
+  const onCommentMessagePress = (item) => {
+    if (!!item?.user_info_action_by?.action_id) {
+      onChatScreen(item?.user_info_action_by?.action_id)
+      setComments({
+        modalVisibility: false,
+        list: [],
+        loader: false,
+        id: ""
+      })
     }
   }
 
@@ -948,8 +981,8 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       <View style={{ flex: 1, marginHorizontal: -10 }}>
         <FlatList
           data={tab == 0 ? feed : []}
-          // onViewableItemsChanged={onViewableItemsChanged}
-          // viewabilityConfig={viewConfigRef.current}
+          onViewableItemsChanged={!__DEV__ && onViewableItemsChanged}
+          viewabilityConfig={!__DEV__ && viewConfigRef.current}
           refreshControl={<MyRefreshControl
             onRefresh={onRefresh}
             refreshing={isRefreshing}
@@ -971,8 +1004,8 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           renderItem={tab == 0 && feedRenderView}
           ListFooterComponent={footerView}
           // removeClippedSubviews={true}
-          // updateCellsBatchingPeriod={10}
-          // maxToRenderPerBatch={10}
+          updateCellsBatchingPeriod={10}
+          maxToRenderPerBatch={10}
           windowSize={5}
           initialNumToRender={10}
         />
@@ -1005,6 +1038,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
         isEventFeed={isEventFeed}
         eventId={eventId}
         feedCreatedFor={commentVar?.level}
+        onCommentMessagePress={onCommentMessagePress}
       />
 
 
@@ -1022,6 +1056,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
         loader={likes?.loader}
         onEndReached={onLikesEndReached}
         footerLoader={likesFooterLoader}
+        onMessagePress={onMessagePress}
       />
 
       <OptionModal

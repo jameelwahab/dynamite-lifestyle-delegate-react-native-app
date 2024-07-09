@@ -225,7 +225,7 @@ const MessageList = ({ navigation, route }) => {
   }
 
   const unReadMessage = async (msgId) => {
-    let res = await MARK_AS_UNREAD({ token, navigation, messageId:msgId});
+    let res = await MARK_AS_UNREAD({ token, navigation, messageId: msgId });
     if (res.code == 200) {
       showToast({ title: "Marked as Unread", type: "success" })
       route?.params?.refresh?.();
@@ -270,7 +270,7 @@ const MessageList = ({ navigation, route }) => {
       })
     } else if (opt.type == 'note') {
       api_addAdNote(item?._id);
-    }else if (opt.type == 'unread') {
+    } else if (opt.type == 'unread') {
       unReadMessage(item?._id);
     }
   }
@@ -299,7 +299,7 @@ const MessageList = ({ navigation, route }) => {
 
 
   const openOptionModal = (item) => {
-    let options;
+    let options = [];
     if (isOtherMember(item.receiver_id)) {
       if (item.message_type == "image" && !!item?.image) {
         options = msgOptionList.slice().filter(x => x.type != 'delete' && x.type != 'edit');
@@ -307,15 +307,15 @@ const MessageList = ({ navigation, route }) => {
           options = options.slice().filter(x => x.type != 'copy');
         }
       } else if (item.message_type == "audio") {
-        return
+        options.push({
+          title: "Mark as unread",
+          icon: () => icons.unread(colors.primary),
+          type: "unread"
+        })
       } else {
         options = msgOptionList.slice().filter(x => x.type == 'note' || x.type == 'copy');
       }
-      options.push({
-        title: "Mark as unread",
-        icon: () => icons.unread(colors.primary),
-        type: "unread"
-      })
+
     } else {
       if (item.message_type == "image" && !!item?.image) {
         options = [...msgOptionList];

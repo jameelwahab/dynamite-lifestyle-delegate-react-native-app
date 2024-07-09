@@ -51,16 +51,25 @@ const AddBooking = ({ navigation, route }) => {
       getBookingConsutantFromServer();
     }
     else {
-      if (optionModal?.isVisble && optionModal?.type != "Booking Page" && optionModal?.type != "Time Slot") {
-        getBookingsPagesFromServer()
+      console.log(optionModal?.isVisble, "optionModal?.isVisble")
+      if (optionModal?.isVisble) {
+        if (optionModal?.type != "Booking Page" && optionModal?.type != "Time Slot") {
+          getBookingsPagesFromServer()
+        } else if (optionModal?.type == "Booking Page") {
+          getPagesFromServer();
+        } else if (optionModal?.type == "Time Slot") {
+          getBookingsTimeSlotsFromServer();
+        }
       }
     }
-    // if (isPass) {
-    //   getBookingConsutantFromServer();
-    // } else {
-    //   getBookingsPagesFromServer();
-    // }
+
   }, [searchText, optionModal?.isVisble])
+
+  // useEffect(() => {
+  //   if (optionModal?.isVisble) {
+  //     getBookingsPagesFromServer()
+  //   }
+  // }, [optionModal?.isVisble])
 
   useEffect(() => {
     getPagesFromServer();
@@ -68,12 +77,20 @@ const AddBooking = ({ navigation, route }) => {
   }, [date, consultant?._id])
 
   const onSearchTextChange = (text) => {
-    if (optionModal.type == "Member") {
+    if (optionModal.type == "Member" || optionModal.type == "Delegate") {
       setSearchText(text);
     }
   }
 
-  const closeOptionModal = () => { setOptionModal({ isVisble: false, list: [], type: "", titleKey: "" }) }
+  const closeOptionModal = () => {
+    optionModal.isVisble = false;
+    optionModal.list = [];
+    optionModal.type = "";
+    optionModal.titleKey = "";
+    // let obj = { isVisble: false, list: [], type: "", titleKey: "" }
+    setOptionModal({ ...optionModal })
+    setSearchText("")
+  }
 
   const onSelected = (opt) => {
     let { titleKey, type } = optionModal;
@@ -231,6 +248,9 @@ const AddBooking = ({ navigation, route }) => {
     });
     if (res.code == 200) {
       setPageList(res?.data);
+      if (optionModal.isVisble) {
+        setOptionModal({ ...optionModal, list: res?.data })
+      }
     }
   }
 
@@ -243,14 +263,14 @@ const AddBooking = ({ navigation, route }) => {
 
   const getBookingsTimeSlotsFromServer = async () => {
     let res;
-    if (isPass) {
+    // if (isPass) {
       res = await GET_BOOKING_TIME_SLOTS_BY_CONSULTANT({ navigation, token, date: moment(date).format("YYYY/MM/DD"), consultant_id: consultant?._id });
-    } else {
-      res = await GET_BOOKING_TIME_SLOTS({ navigation, token, date: moment(date).format("YYYY/MM/DD") });
-    }
+    // } else {
+    //   res = await GET_BOOKING_TIME_SLOTS({ navigation, token, date: moment(date).format("YYYY/MM/DD") });
+    // }
     if (res.code == 200) {
-      if (optionModal.isVisble && optionModal?.type=="Time Slot") {
-        setOptionModal({ ...optionModal, list: res?.data })
+      if (optionModal.isVisble && optionModal?.type == "Time Slot") {
+        setOptionModal({ ...optionModal, list: res?.slots })
       }
       setTimeSlotlist(res?.slots)
     }
@@ -274,20 +294,20 @@ const AddBooking = ({ navigation, route }) => {
           />}
 
         {/* {isPass && */}
-        <MyTouchableInput
-          label='Delegate*'
-          onPress={() => setOptionModal({ isVisble: true, list: consultantList, type: "Delegate", titleKey: "" })}
-          value={!!consultant ? `${consultant?.first_name} ${consultant?.last_name} (${consultant?.email})` : ""}
-          clearbutton={!!consultant}
-          onClearButtonPress={() => {
-            setConsultant(null);
-            if (!isPass) {
-              setBookingPage(null);
-            }
-            setTimeSlot(null);
-          }}
-        />
-        {/* } */}
+        {access?.book_call_with_delegate == "other" &&
+          <MyTouchableInput
+            label='Delegate*'
+            onPress={() => setOptionModal({ isVisble: true, list: consultantList, type: "Delegate", titleKey: "" })}
+            value={!!consultant ? `${consultant?.first_name} ${consultant?.last_name} (${consultant?.email})` : ""}
+            clearbutton={!!consultant}
+            onClearButtonPress={() => {
+              setConsultant(null);
+              if (!isPass) {
+                setBookingPage(null);
+              }
+              setTimeSlot(null);
+            }}
+          />}
 
         <MyTouchableInput
           label={isPass ? "Page Title*" : 'Booking Page*'}

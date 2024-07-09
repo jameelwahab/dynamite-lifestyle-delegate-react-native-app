@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, SafeAreaView, FlatList, Pressable } from 'react-native'
+import { View, Text, StyleSheet, SafeAreaView, FlatList, Pressable, TouchableOpacity } from 'react-native'
 import React, { forwardRef, useImperativeHandle, useState } from 'react'
 import EmptyView from '../../../components/EmptyView';
 import MyLoader from '../../../components/MyLoader';
@@ -18,7 +18,7 @@ let page = 0;
 let canLoadMore = false;
 let commentId = "";
 
-const LikeModalForComments = forwardRef(({ navigation, token,timezone }, ref) => {
+const LikeModalForComments = forwardRef(({ navigation, token, timezone, user, onMessagePress }, ref) => {
   const [isVisible, setIsVisible] = useState(false);
   const [likes, setLikes] = useState([]);
   const [footerLoader, setFooterLoader] = useState(false);
@@ -87,10 +87,19 @@ const LikeModalForComments = forwardRef(({ navigation, token,timezone }, ref) =>
             {icons.heartFilled(colors.heart, 15)}
           </View>
         </View>
-        <View style={{ marginLeft: 10 }}>
+        <View style={{ marginLeft: 10, flex: 1 }}>
           <MyText fontSize={13} type='bold' >{item?.user_info_action_by?.name}</MyText>
           <MyText style={{ marginTop: 3 }} fontSize={10} color={colors.lightText2} >{convertTimezone(item?.createdAt, timezone).format(dateTimeFormat.dateTimeWithText("at"))}</MyText>
         </View>
+        {user?.is_chat_allow && item?.user_info_action_by?.action_by == 'member_user' &&
+          <TouchableOpacity
+            onPress={() => {
+              onMessagePress?.(item)
+              closeLikeModal()
+            }}
+            style={{ padding: 10, }}>
+            {icons.message(colors.primary, 20)}
+          </TouchableOpacity>}
 
       </View>
     )
@@ -135,7 +144,7 @@ const LikeModalForComments = forwardRef(({ navigation, token,timezone }, ref) =>
               <MyLoader enable={loader} />
             </View>
 
-            
+
           </View>
         </SafeAreaView>
       </Modal>)

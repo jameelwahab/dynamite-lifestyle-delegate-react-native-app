@@ -50,7 +50,6 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
   const ref_timePicker = useRef();
   const ref_inputs = useRef([]);
   const ref_scrollView = useRef();
-
   const timezone = useSelector(selectTimeZone);
   const [date, setDate] = useState(moment())
   const [loader, setLoader] = useState(false)
@@ -642,7 +641,7 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
           {list.map((item, index) => (
             <View key={"activities" + index} style={__styles.activityView} >
               <View style={__styles.activityRow}>
-                <MyText>{moment(item?.createdAt).format(dateTimeFormat.date)}</MyText>
+                <MyText>{moment(item?.date,"DD-MM-YYYY").format(dateTimeFormat.date)}</MyText>
                 <View style={__styles.activityNestedRow}>
                   <MyText>{moment(item?.date_time, "YYYY-MM-DD HH:mm").format(dateTimeFormat.time)}</MyText>
                   <MenuButton

@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, SafeAreaView, FlatList, Pressable } from 'react-native'
+import { View, Text, StyleSheet, SafeAreaView, FlatList, Pressable, TouchableOpacity } from 'react-native'
 import React from 'react'
 import EmptyView from '../../../components/EmptyView';
 import MyLoader from '../../../components/MyLoader';
@@ -21,8 +21,10 @@ const LikeModal = ({
   user,
   loader,
   onEndReached,
-  footerLoader
+  footerLoader,
+  onMessagePress
 }) => {
+  console.log(user, "user")
 
   const userLikeView = ({ item, index }) => {
     return (
@@ -37,11 +39,19 @@ const LikeModal = ({
             {icons.heartFilled(colors.heart, 15)}
           </View>
         </View>
-        <View style={{ marginLeft: 10 }}>
-          <MyText fontSize={13} type='bold' >{item?.user_info_action_by?.name}</MyText>
-          <MyText style={{ marginTop: 3 }} fontSize={10} color={colors.lightText2} >{convertTimezone(item?.createdAt, timezone).format(dateTimeFormat.dateTimeWithText("at"))}</MyText>
-        </View>
+        <View style={{ marginLeft: 10, flex: 1, }}>
+          <View style={{}}>
+            <MyText fontSize={13} type='bold' >{item?.user_info_action_by?.name}</MyText>
+            <MyText style={{ marginTop: 3 }} fontSize={10} color={colors.lightText2} >{convertTimezone(item?.createdAt, timezone).format(dateTimeFormat.dateTimeWithText("at"))}</MyText>
+          </View>
 
+        </View>
+        {user?.is_chat_allow && item?.user_info_action_by?.action_by == 'member_user' &&
+          <TouchableOpacity
+            onPress={() => onMessagePress?.(item)}
+            style={{ padding: 10, }}>
+            {icons.message(colors.primary, 20)}
+          </TouchableOpacity>}
       </View>
     )
   }
