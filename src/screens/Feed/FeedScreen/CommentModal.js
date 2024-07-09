@@ -277,7 +277,7 @@ const CommentModal = ({
       }
       setMentionList(!!item?.mentioned_users ? breakReference(item?.mentioned_users) : [])
       setSelectedCommentFor("edit")
-      setCommentText(item?.message);
+      setCommentText(item?.message+" ");
       setTimeout(() => {
         cmtTextInputRef?.current?.focus()
       }, 500);
@@ -544,27 +544,46 @@ const CommentModal = ({
 
   }
 
+  const getReplyingName = () => {
+    let rUser = null
+    if (selectedReplyComment) {
+      rUser = selectedReplyComment?.user_info_action_for
+    } else {
+      rUser = selectedComment?.user_info_action_for
+    }
+    if (rUser?.action_id == user?._id) {
+      return "Yourself"
+    } else {
+      return rUser?.name
+    }
+  }
+
   const onChildCommentPress = (comment, parentComment) => {
-    let user = comment?.user_info_action_for;
+    let mUser = comment?.user_info_action_for;
 
-    let obj = {
-      first_name: user.name.substring(0, user.name.indexOf(' ')),
-      last_name: user.name.substring(user.name.indexOf(' ') + 1),
-      _id: user?.action_id,
-    }
-    if (!!feedCreatedFor) {
-      obj['community_level'] = feedCreatedFor
-    }
-    if (user?.profile_image) {
-      obj['profile_image'] = user?.profile_image
-    }
+    if (mUser?.action_id != user?._id) {
+      let obj = {
+        first_name: mUser.name.substring(0, mUser.name.indexOf(' ')),
+        last_name: mUser.name.substring(mUser.name.indexOf(' ') + 1),
+        _id: mUser?.action_id,
+      }
+      if (!!feedCreatedFor) {
+        obj['community_level'] = feedCreatedFor
+      }
+      if (mUser?.profile_image) {
+        obj['profile_image'] = mUser?.profile_image
+      }
 
-    console.log(obj, "user obj")
-    while (mentionList.length > 0) {
-      mentionList.pop()
-    }
+      console.log(obj, "user obj")
+      while (mentionList.length > 0) {
+        mentionList.pop()
+      }
 
-    onPressOnMentions(obj)
+      onPressOnMentions(obj)
+    } else {
+      setMentionList([])
+      setCommentText("")
+    }
   }
 
 
@@ -640,6 +659,8 @@ const CommentModal = ({
                     setSelectedComment(item);
                     setSelectedReplyComment(null)
                     setCommentImage(null)
+                    setCommentText("");
+                    setMentionList([])
                     setSelectedCommentFor("reply");
                     cmtTextInputRef?.current?.focus();
                   }
@@ -791,7 +812,7 @@ const CommentModal = ({
                       <Text>{"Editing"}</Text> :
                       selectedCommentFor == "reply" ?
                         <Text style={{ fontFamily: fonts.regular }} >{"Replying to "}
-                          <Text style={{ fontFamily: fonts.bold, }} >{!!selectedReplyComment ? selectedReplyComment?.user_info_action_for?.name : selectedComment?.user_info_action_for?.name}</Text>
+                          <Text style={{ fontFamily: fonts.bold, }} >{getReplyingName()}</Text>
                         </Text> : null}
                       <Text>{"  •  "}</Text>
                       <MyText
