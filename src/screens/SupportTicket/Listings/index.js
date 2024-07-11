@@ -24,7 +24,9 @@ let canLoadMore = false;
 
 
 const TicketsList = ({ navigation, route }) => {
-  const { type } = route?.params
+  const { type } = route?.params;
+  const isInternalTicket = type == "internal_ticket";
+  const isSupportTicket = type == "support_ticket";
   const layout = useWindowDimensions();
   const { token, user } = useSelector(selectUser);
   const [index, setIndex] = React.useState(0);
@@ -170,7 +172,7 @@ const TicketsList = ({ navigation, route }) => {
 
   const searchView = useCallback(() => {
     return (
-      <View style={{marginVertical:-10, marginHorizontal: 10, backgroundColor: colors.darkSecondary }}>
+      <View style={{ marginVertical: -10, marginHorizontal: 10, backgroundColor: colors.darkSecondary }}>
         <MyInputs
           leftIcon={icons.search}
           placeholder='Search...'
@@ -212,9 +214,10 @@ const TicketsList = ({ navigation, route }) => {
             <MyText color={focused ? colors.primary : colors.lightText} type='medium' >
               {route.title + " (" + badges[route?.key] + ")"}
             </MyText>
-            {((route?.key == 'need_fixes' && badges['need_to_fixed_dot'] > 0) ||
+            {((route?.key == 'need_fixes' && badges['need_to_fixed_dot'] > 0) || (
+              ((user?.is_sidebar_notify && isSupportTicket) || (user?.is_internal_ticket_notify && isInternalTicket)) &&
               user?.notify_tab == 'need_to_attention' && route?.key == "needs_to_attention" ||
-              user?.notify_tab == route?.key) &&
+              user?.notify_tab == route?.key)) &&
               <View style={__styles.badges} />
             }
           </>

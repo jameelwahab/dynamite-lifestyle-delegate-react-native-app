@@ -24,6 +24,8 @@ import { icons } from '../../../utilities/icons';
 import { convertTimezone } from '../../../functions/convertTime';
 import { selectTimeZone } from '../../../redux/reducers/timezoneSlice';
 import MyInputs from '../../../components/MyInputs';
+import MemberView from '../../../components/MemberView';
+import TitleView from '../../../components/TitleView';
 
 let autoMessages = [];
 const Detail = ({ navigation, route }) => {
@@ -304,7 +306,19 @@ const Detail = ({ navigation, route }) => {
 
 
   return (
-    <RootView  >
+    <RootView
+      titleView={() => {
+        if (!!ticket?.member) {
+          if (ticket?.member?._id != user?._id) {
+            return (
+              <MemberView member={ticket?.member} />
+            )
+          } else {
+            return <TitleView hideBackBottomButton title={"Contact Support"} />
+          }
+        }
+      }}
+    >
 
       <View style={{ flex: 1 }}>
         {isMine == false && renderTopView()}

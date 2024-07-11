@@ -1,9 +1,9 @@
 import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import RootView from '../../../components/RootView'
 import { useSelector } from 'react-redux'
 import { selectNavbar } from '../../../redux/reducers/navbarSlice'
-import { BANK_PAYMENT_LINK, DELETE_PAYMENT_REQUEST, GET_PAYEMENT_DETAIL, GET_PAYMENT_REQUEST_LIST } from '../../../DAL'
+import { BANK_PAYMENT_LINK, DELETE_PAYMENT_REQUEST, GET_PAYEMENT_DETAIL, GET_PAYMENT_REQUEST_LIST, MARK_PAYMENT_AS_CANCELLED_OR_PAID } from '../../../DAL'
 import { selectUser } from '../../../redux/reducers/userSlice'
 import MyLoader from '../../../components/MyLoader'
 import FooterLoader from '../../../components/FooterLoader'
@@ -24,6 +24,7 @@ import copyText from '../../../functions/copyText'
 import BankOptionModal from './components/BankOptionModal'
 import TitleView from '../../../components/TitleView'
 import MyChip from '../../../components/MyChip'
+import moment from 'moment'
 
 
 
@@ -33,14 +34,14 @@ const PaymentRequest = ({ navigation, route }) => {
   const bankOptionModalRef = useRef()
   const { key, parentKey } = route.params
   const { navbar } = useSelector(selectNavbar);
-  const { token } = useSelector(selectUser);
+  const { token, access } = useSelector(selectUser);
   const [title] = useState(navbar?.find(x => x._id == parentKey)?.child_options?.find(y => y._id == key)?.title);
   const [list, setList] = useState([]);
   const [total, setTotal] = useState(0);
   const [loader, setLoader] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [footerLoader, setFooterLoader] = useState(false);
-  const [confirmationModal, setConfirmation] = useState({ isVisible: false, item: null })
+  const [confirmationModal, setConfirmation] = useState({ isVisible: false, item: null, text: "", type: "" })
   const [optionModal, setOptionModal] = useState({ isVisible: false, selectedItem: null, list: [] })
   const [sort, setSort] = useState({ isVisible: false, selected: sortList[1] })
 
@@ -98,9 +99,69 @@ const PaymentRequest = ({ navigation, route }) => {
     }
   }
 
+
+  const markPayemntCancelOrPaid = async (item, type, note = undefined) => {
+    setLoader(true)
+    let res = await MARK_PAYMENT_AS_CANCELLED_OR_PAID({
+      navigation, token, slug: item?.payment_request_slug,
+      type, note
+    })
+    if (res.code == 200) {
+      showToast({ "body": res?.message, type: "success" })
+      changeStatus("cancelled", item)
+      setLoader(false)
+    } else {
+      setLoader(false)
+
+    }
+  }
+
+  const changeStatus = (type, item) => {
+
+    setList((list) => {
+      let index = list.findIndex(x => x._id == item?._id);
+
+      if (index > -1) {
+        if (type == "cancelled") {
+          if (sort.selected.key == "cancelled" || sort.selected.key == "all") {
+            list.splice(index, 1, {
+              ...list[index],
+              is_first_paid: false,
+              status: false,
+              cancel_date: moment().toISOString(),
+              payment_status: "cancelled"
+            });
+          } else {
+            list.splice(index, 1);
+            setTotal((total) => --total);
+          }
+        } else if (type == "paid") {
+          if (sort.selected.key == "paid" || sort.selected.key == "all") {
+            list.splice(index, 1, {
+              ...list[index],
+              is_first_paid: true,
+              status: true,
+              payment_status: "paid",
+              subscription_date: moment().toISOString()
+            });
+          } else {
+            list.splice(index, 1)
+            setTotal((total) => --total);
+          }
+        }
+      }
+      return [...list];
+    });
+
+  }
   const onConfirmationAgree = () => {
-    deletePaymentRequest(confirmationModal?.item);
-    setConfirmation({ isVisible: false, item: null })
+    let { type, item } = confirmationModal;
+    if (type == "delete") {
+      deletePaymentRequest(item);
+    } else if (type == "markAsCancel") {
+      markPayemntCancelOrPaid(item, "cancelled")
+    }
+    setConfirmation({ isVisible: false, item: null, text: "", type: "" })
   }
 
 
@@ -124,7 +185,10 @@ const PaymentRequest = ({ navigation, route }) => {
 
   const appendNewRequest = (reqObj) => {
     // callAPI()
-    setList([reqObj, ...list])
+    if (sort?.selected?.key == "pending" || sort?.selected?.key == "all") {
+      setList([reqObj, ...list])
+      setTotal((total) => ++total);
+    }
   }
 
   const changePayStatus = (updation) => {
@@ -173,13 +237,13 @@ const PaymentRequest = ({ navigation, route }) => {
   const onSelectedOption = (opt) => {
     console.log(opt, "onSelectedOption")
     let { selectedItem } = optionModal;
-    setOptionModal({ isVisible: false, list: [], selectedItem: null });
+
     if (opt.key == "edit") {
       onEditPaymentRequest(selectedItem)
     } else if (opt.key == "delete") {
       setTimeout(() => {
-        setConfirmation({ isVisible: true, item: selectedItem })
-      }, 400);
+        setConfirmation({ isVisible: true, item: selectedItem, text: "Are you sure you want to delete this payment request?", type: "delete" })
+      }, 600);
     } else if (opt.key == "detail") {
       onTransactionalDetail(selectedItem?.payment_request_slug)
     } else if (opt.key == "bank") {
@@ -187,7 +251,21 @@ const PaymentRequest = ({ navigation, route }) => {
       // bankOptionModalRef?.current?.openModal(selectedItem)
       // console.log(bankOptionModalRef,"bankOptionModalRef");
       // copyBankLinkFromServer(selectedItem?._id);
+    } else if (opt.key == "markAsPaid") {
+      navigation.navigate(routes?.markAsPaidScreen, {
+        data: selectedItem,
+        changeStatus
+      })
+      // setTimeout(() => {
+      //   markPaidModalRef?.current?.openModal(selectedItem)
+      // }, 600);
+    } else if (opt.key == "markAsCancel") {
+      setTimeout(() => {
+        setConfirmation({ isVisible: true, item: selectedItem, text: "Are you sure you want to cancel this payment request?", type: "markAsCancel" })
+      }, 600);
     }
+
+    setOptionModal({ isVisible: false, list: [], selectedItem: null });
   }
 
 
@@ -215,31 +293,35 @@ const PaymentRequest = ({ navigation, route }) => {
   }
 
   const openOptionModal = (item) => {
-    console.log(item, "item");
-    console.log(optionsList, "optionsList");
+    console.log(item, "item")
     let list = [];
-    console.log(list, "1")
     if (item?.payment_status == "paid" || item?.is_first_paid) {
       list = optionsList.slice().filter(x => x.key != "edit");
     } else {
       list = optionsList
     }
-    console.log(list, "2")
-    console.log(item?.payment_status != "paid" && item?.is_first_paid == false && item?.request_type == "onetime")
-    if (item?.payment_status != "paid" && item?.is_first_paid == false && item?.request_type == "onetime") {
+
+    if (access?.show_option_mark_request_as_paid && item?.payment_status == "pending" && item?.request_type === "onetime") {
+      list = [...list, paidOpt]
+    }
+
+    if (access?.show_option_mark_request_as_cancelled && item?.payment_status == "pending") {
+      list = [...list, cancelOpt]
+    }
+
+    if (item?.payment_status != "cancelled" && item?.payment_status != "paid" && item?.is_first_paid == false && item?.request_type == "onetime") {
       list = [...list, bankOpt]
     }
-    console.log(list, "3")
     setOptionModal({ isVisible: true, list: list, selectedItem: item });
   }
 
-  const itemView = ({ item, index }) => {
+  const itemView = useCallback(({ item, index }) => {
     return (
       <RequestView item={item} index={index} openOptionModal={openOptionModal}
         onDetail={onTransactionalDetail}
       />
     )
-  }
+  }, [JSON.stringify(list)])
 
   const topView = () => {
     return (
@@ -278,6 +360,9 @@ const PaymentRequest = ({ navigation, route }) => {
           onEndReached={loadMore}
           ListEmptyComponent={!loader && !refreshing && <EmptyView label={'No Payment Requests Found'} />}
           ListFooterComponent={<FooterLoader isVisible={footerLoader} />}
+          removeClippedSubviews={true}
+          maxToRenderPerBatch={5}
+          windowSize={5}
         />
       </View>
       <FAB icon={icons.plus} onPress={onAddPaymentRequest} />
@@ -299,8 +384,8 @@ const PaymentRequest = ({ navigation, route }) => {
       />
 
       <ConfirmationModal
-        title={"Are you sure you want to delete this Payment Request ?"}
-        closeModal={() => setConfirmation({ isVisible: false, item: null })}
+        title={confirmationModal?.text}
+        closeModal={() => setConfirmation({ isVisible: false, item: null, type: "", text: "" })}
         onAgree={onConfirmationAgree}
         isVisible={confirmationModal?.isVisible} />
 
@@ -349,12 +434,28 @@ const sortList = [
     title: "Processing",
     key: "processing",
   },
+  {
+    title: "Cancelled",
+    key: "cancelled",
+  },
 ]
 
 const bankOpt = {
   title: "Copy Bank Payment Link",
   key: "bank",
   icon: icons.bank
+}
+
+const cancelOpt = {
+  title: "Mark Requested As Cancelled",
+  key: "markAsCancel",
+  icon: icons.edit
+}
+
+const paidOpt = {
+  title: "Mark Requested As Paid",
+  key: "markAsPaid",
+  icon: icons.edit
 }
 
 const __styles = StyleSheet.create({

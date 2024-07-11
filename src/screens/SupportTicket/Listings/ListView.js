@@ -10,7 +10,7 @@ import { CHANGE_DEPARTMENT_OF_TICKET, MARK_RESOLVE_TICKET, MOVE_TICKET, SUPPORT_
 import MyLoader, { SimpleLoader } from '../../../components/MyLoader';
 import { useSelector } from 'react-redux';
 import { selectUser } from '../../../redux/reducers/userSlice';
-import { S3_URL } from '../../../utilities/constants';
+import { dateTimeFormat, S3_URL } from '../../../utilities/constants';
 import moment from 'moment';
 import EmptyView from '../../../components/EmptyView';
 import MyImage from '../../../components/MyImage';
@@ -21,7 +21,7 @@ import Toast from 'react-native-toast-message';
 import showToast from '../../../functions/showToast';
 import UserImage from '../../../components/UserImage';
 import utilities from '../../../utilities';
-import { convertTimezone } from '../../../functions/convertTime';
+import { convertTimezone, convertTimezone2 } from '../../../functions/convertTime';
 import { selectTimeZone } from '../../../redux/reducers/timezoneSlice';
 import MyInputs from '../../../components/MyInputs';
 
@@ -555,8 +555,12 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
                 <MyText fontSize={14} type='medium' >{!!item?.member?.first_name ? item?.member?.first_name + " " + item?.member?.last_name : "N/A"}</MyText>
               </View>
               <View style={{ flexDirection: "row", alignItems: "center", }}>
-                <MyText fontSize={10} type='light'>{convertTimezone(item.last_action_date, timezone).fromNow()}
-                </MyText>
+                <View style={{ alignItems: "flex-end" }}>
+                  <MyText fontSize={10} type='light'>{convertTimezone2(!!item?.last_action_date ? item.last_action_date : item?.support_ticket_date, timezone).fromNow()}</MyText>
+                  
+
+
+                </View>
                 <MenuButton
                   // backgroundColor={colors.transparent}
                   size={22}
@@ -564,10 +568,14 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
                 />
               </View>
             </View>
+            {route == "need_fixes" &&
+                    <MyText style={{}}   color={colors.white} fontSize={12} >{`Target Date: ${moment(item?.issue_fix_date).format(dateTimeFormat.date)}`}</MyText>}
             <MyText style={{ marginTop: 3 }} fontSize={12} >{item?.subject}</MyText>
             <MyText style={{ marginTop: 3 }} numberOfLines={1} color={colors.lightText} fontSize={12} >
               {item?.description.slice(0, 60)}
             </MyText>
+
+
             {route == "need_fixes" && moment(item.issue_fix_date).diff(moment(), 'days') < 2 &&
               <View style={__styles.badges} />}
           </View>

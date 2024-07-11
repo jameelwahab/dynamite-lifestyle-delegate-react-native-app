@@ -165,3 +165,19 @@ export const BANK_PAYMENT_LINK =
       navigation
     })
   }
+
+export const MARK_PAYMENT_AS_CANCELLED_OR_PAID =
+  ({ token, navigation, slug, type, note }) => {
+    return invokeApi({
+      path: `api/payment_request/change_one_time_payment_status/paid/canceled`,
+      method: "POST",
+      postData: {
+        payment_request_slug: slug,
+        type: type,
+        verification_note: !!note ? note : undefined
+      },
+      token,
+      navigation
+    })
+  }
+

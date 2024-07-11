@@ -17,6 +17,7 @@ import CountryModal from '../../../components/CountryModal'
 import OptionModal from '../../../components/OptionModal'
 import MyLoader from '../../../components/MyLoader'
 import showToast from '../../../functions/showToast'
+import MyKeyboardAvoidingView from '../../../components/MyKeyboardAvoidingView'
 
 
 const AddPaymentRequest = ({ navigation, route }) => {
@@ -42,7 +43,7 @@ const AddPaymentRequest = ({ navigation, route }) => {
   const [loader, setLoader] = useState(false)
   const [selected, updateSelected] = useState({
     template: null, title: "", status: statusList[0], currency: currencyList[1], product: null,
-    programme: null, requestType: null, totalAmount: "", vat: "", note: "",
+    programme: null, requestType: { title: "Onetime", key: "onetime", }, totalAmount: "", vat: "", note: "",
     initialAmount: "", installments: "", installmentAmount: "", planType: null,
     noOfDays: ""
   })
@@ -263,9 +264,11 @@ const AddPaymentRequest = ({ navigation, route }) => {
     <RootView title={!!editItem ? "Edit Payment Request" : "Add Payment Request"}>
       <View style={{ flex: 1, }}>
         <KeyboardAwareScrollView
+
           contentContainerStyle={{ paddingBottom: 40, paddingTop: 10, }}
           keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}>
+          showsVerticalScrollIndicator={false}
+          >
 
           {/* <MyTouchableInput label='Member Type*' /> */}
 
@@ -442,8 +445,10 @@ const AddPaymentRequest = ({ navigation, route }) => {
                 value={selected?.vat}
                 onChangeText={(text) => setSelected({ vat: text })} />
             </View>
+
             <MyInputs
-              label='Transaction Note' multiline
+              label='Transaction Note'
+              multiline
               value={selected?.note}
               onChangeText={(text) => setSelected({ note: text })} />
           </View>
@@ -478,6 +483,8 @@ const AddPaymentRequest = ({ navigation, route }) => {
         onSelected={onOptionSelected}
         titleKey={optionModal.titlekey}
       />
+
+      
 
       <MyLoader enable={loader} />
 

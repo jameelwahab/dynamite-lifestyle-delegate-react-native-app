@@ -8,6 +8,8 @@ import prependCurency from '../../../../functions/prependCurency'
 import { fonts } from '../../../../utilities/fonts'
 import { MenuButton } from '../../../../components/MyButton'
 import MemberView from '../../../../components/MemberView'
+import moment from 'moment'
+import { dateTimeFormat } from '../../../../utilities/constants'
 
 
 
@@ -19,7 +21,7 @@ const RequestView = ({ item, index, openOptionModal, onDetail }) => {
         <Pressable
           onPress={() => onDetail(item?.payment_request_slug)}
           style={[__styles.profileView, { flex: 1, marginRight: 10 }]} >
-            <MemberView member={item?.member} marginLeft={0} size={35} titleSize={14}/>
+          <MemberView member={item?.member} marginLeft={0} size={35} titleSize={14} />
         </Pressable>
         <MenuButton
           onPress={() => openOptionModal(item)}
@@ -34,7 +36,7 @@ const RequestView = ({ item, index, openOptionModal, onDetail }) => {
         <StatView title={"Initial Amount"} value={prependCurency(item?.currency) + " " + item?.initial_amount} />
         <StatView title={"Installment Amount"} value={prependCurency(item?.currency) + " " + item?.installment_amount} />
         <StatView title={"Month"} value={item?.month} />
-        <StatView title={"First Paid"} view={() => <PaidView value={item?.is_first_paid} text={item?.is_first_paid ? "PAID" : "PENDING"} />} />
+        <StatView title={"First Paid"} view={() => <PaidView value={item?.is_first_paid} text={item?.payment_status == "cancelled" ? `Cancelled on ${moment(item?.cancel_date).format(dateTimeFormat.date)}` : item?.is_first_paid ? `PAID on ${moment(item?.subscription_date).format(dateTimeFormat.date)} ` : item?.payment_status == "processing" ? "PROCESSING" : "PENDING"} />} />
         <StatView title={"Status"} view={() => <PaidView value={item?.status} text={item?.status ? "ACTIVE" : "INACTIVE"} />} />
       </View>
     </View>

@@ -12,7 +12,7 @@ import UserImage from '../../../components/UserImage'
 import OptionModal from '../../../components/OptionModal'
 import ConfirmationModal from '../../../components/ConfirmationModal'
 import EmptyView from '../../../components/EmptyView'
-import { convertTimezone, } from '../../../functions/convertTime'
+import { convertTimezone, convertTimezone2, } from '../../../functions/convertTime'
 import { dateTimeFormat } from '../../../utilities/constants'
 import MemberView from '../../../components/MemberView'
 import { BOOKING_NOTES_DELETE, PROGRESS_NOTES_DELETE, PROGRESS_NOTES_LIST, } from '../../../DAL'
@@ -23,7 +23,7 @@ import { useSelector } from 'react-redux'
 const PorgressNotesList = ({ navigation, route }) => {
   const { reportId } = route?.params;
   const timezone = useSelector(selectTimeZone);
-  const { token } = useSelector(selectUser);
+  const { token, user } = useSelector(selectUser);
   const [loader, setLoader] = useState(false)
   const [list, setList] = useState([]);
   const [optionModal, setOptionModal] = useState({ isVisible: false, for: "" })
@@ -65,7 +65,7 @@ const PorgressNotesList = ({ navigation, route }) => {
   const getDataFromServer = async () => {
     let res = await PROGRESS_NOTES_LIST({ token, navigation, id: reportId });
     if (res.code == 200) {
-      setList(res?.internal_note?.internal_note)
+      setList(res?.internal_note?.internal_note.slice().reverse())
       setLoader(false)
     } else {
       setLoader(false)
@@ -90,10 +90,10 @@ const PorgressNotesList = ({ navigation, route }) => {
               <MyText color={colors.primary} fontSize={14} >
                 {`${item?.action_user_info?.action_name}`}
               </MyText>
-              <MyText fontSize={10} color={colors.lightText2} >{convertTimezone(item?.note_date_time, timezone).format(dateTimeFormat.dateTime)}</MyText>
+              <MyText fontSize={10} color={colors.lightText2} >{convertTimezone2(item?.note_date_time, timezone).format(dateTimeFormat.dateTime)}</MyText>
             </View>
 
-            {item?.action_by != "admin_user" &&
+            {item?.action_user_info?.action_id == user?._id &&
               <TouchableOpacity
                 onPress={() => setOptionModal({ isVisible: true, for: item })}
                 style={__styles.threeDotBtnView}>

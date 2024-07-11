@@ -35,6 +35,7 @@ const PodAdd = ({ navigation, route }) => {
   const [optionModal, setOptionModal] = useState({ isVisible: false, type: "", list: [], });
   const [multipleOptionModal, setMultipleOptionModal] = useState(false);
   const [memberModalVisibility, setMemberModalVisibility] = useState(false);
+  const [exMemberModalVisibility, setExMemberModalVisibility] = useState(false);
   const [timePicker, setTimePicker] = useState(false);
   const [groupList, setGroupList] = useState([]);
   const [memberList, setMemberList] = useState([]);
@@ -56,12 +57,13 @@ const PodAdd = ({ navigation, route }) => {
     recurrenceEndDate: moment(),
     groups: [],
     members: [],
+    excludedMembers: [],
     logo: null,
     shortDesc: "",
     longDesc: "",
   })
 
-  const { title, status, zoomlink, password, isRecurring, communityLvl, startDate, startTime, hours, minutes, recurrenceType, recurrenceDays, recurrenceEndDate, groups, members, logo, shortDesc, longDesc } = cred;
+  const { title, status, zoomlink, password, isRecurring, communityLvl, startDate, startTime, hours, minutes, recurrenceType, recurrenceDays, recurrenceEndDate, groups, members, excludedMembers, logo, shortDesc, longDesc } = cred;
   const setCred = (updation) => updateCred((old) => ({ ...old, ...updation }));
 
   useEffect(() => {
@@ -103,10 +105,39 @@ const PodAdd = ({ navigation, route }) => {
     setCred({ members: [...members] });
   }
 
+
+
+
   const filterTheList = (list, text) => {
     let nlist = [];
     nlist = list.filter(x => {
       return !!!members.find(y => y._id == x?._id);
+    })
+    if (text.trim() == "") {
+      return nlist
+    } else {
+      return nlist?.slice().filter(x => {
+        let nameText = (x?.first_name + " " + x?.last_name + " (" + x?.email + ")").toLowerCase();
+        let searchText = text?.toLowerCase().trim();
+        return nameText.includes(searchText)
+      })
+    }
+  }
+
+  const onMemberSelectforEx = (opt) => {
+    let index = excludedMembers.findIndex(x => x._id == opt?._id);
+    if (index > -1) {
+      excludedMembers.splice(index, 1);
+    } else {
+      excludedMembers.push(opt);
+    }
+    setCred({ excludedMembers: [...excludedMembers] });
+  }
+
+  const filterTheListforEx = (list, text) => {
+    let nlist = [];
+    nlist = list.filter(x => {
+      return !!!excludedMembers.find(y => y._id == x?._id);
     })
     if (text.trim() == "") {
       return nlist
@@ -175,7 +206,8 @@ const PodAdd = ({ navigation, route }) => {
         recurrenceDays: !!room?.weekdays ? room?.weekdays : [],
         recurrenceEndDate: !!room?.end_date ? moment(room?.end_date, "YYYY-MM-DD") : moment(),
         groups: !!room?.group ? room?.group.map(x => x._id) : [],
-        members: res.room_members,
+        members: !!res.room_members ? res.room_members : res.room_members,
+        excludedMembers: !!room?.exclude_members ? room?.exclude_members.map(x => x._id) : [],
         logo: !!room?.room_image?.thumbnail_1 ? room?.room_image?.thumbnail_1 : null,
         shortDesc: !!room?.short_description ? room?.short_description : "",
         longDesc: !!room?.detail_description ? room?.detail_description : "",
@@ -213,6 +245,7 @@ const PodAdd = ({ navigation, route }) => {
     fd.append("end_date", moment(recurrenceEndDate).format("YYYY-MM-DD"))
     fd.append("group", JSON.stringify(groups.map(grp => ({ group_slug: grp.group_slug }))))
     fd.append("member", JSON.stringify(members.map(member => ({ member_id: member._id }))));
+    fd.append("exclude_members", JSON.stringify(excludedMembers.map(member => ({ _id: member._id }))));
     if (isEdit) {
       fd.append("order", Number(order))
     }
@@ -262,7 +295,7 @@ const PodAdd = ({ navigation, route }) => {
         enableResetScrollToCoords={false}>
 
         <MyInputs
-          label='Title'
+          label='Title*'
           value={title}
           onChangeText={(text) => setCred({ title: text })}
         />
@@ -475,6 +508,26 @@ const PodAdd = ({ navigation, route }) => {
           }}
         />
 
+        <MyTouchableInput
+          label='Exclude Members'
+          iconOnPress={() => setExMemberModalVisibility(true)}
+          clearbutton={excludedMembers?.length > 0}
+          onClearButtonPress={() => setCred({ excludedMembers: [] })}
+          view={() => {
+            return (
+              <View style={{ flexDirection: "row", flex: 1, alignItems: "center", flexWrap: "wrap", paddingVertical: 2 }}>
+                {excludedMembers.map((item, index) => (
+                  <MyChip
+                    key={item?._id}
+                    title={item?.first_name + " (" + item?.email + ")"}
+                    onPress={() => onMemberSelectforEx(item)}
+                  />
+                ))}
+              </View>
+            )
+          }}
+        />
+
 
         <UploadFileInput
           label='Upload Logo*'
@@ -539,8 +592,18 @@ const PodAdd = ({ navigation, route }) => {
         onSelected={onMemberSelect}
         filterTheList={filterTheList}
         title='Member'
+      />
 
-
+      <OptionModalWithSearch
+        optionList={memberList}
+        isVisible={exMemberModalVisibility}
+        closeModal={() => setExMemberModalVisibility(false)}
+        renderText={({ item }) =>
+          <MyText>{`${item?.first_name} ${item?.last_name} (${item?.email})`}</MyText>}
+        noIcon
+        onSelected={onMemberSelectforEx}
+        filterTheList={filterTheListforEx}
+        title='Member'
       />
 
 

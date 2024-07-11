@@ -24,13 +24,14 @@ const List = ({ navigation, route }) => {
 
   const { token } = useSelector(selectUser);
   const timezone = useSelector(selectTimeZone);
-  const [loader, setLoader] = useState(false)
+  const [loader, setLoader] = useState(true)
   const [list, setList] = useState([])
   const [optionModal, setOptionModal] = useState({ isVisible: false, for: "" })
   const [confirmationModal, setConfirmationModal] = useState({ isVisible: false, title: "", item: null })
 
 
   const getNotesList = async () => {
+    setLoader(true)
     let res = await ASSESSMENT_NOTE_LIST({ token, navigation, type, assessmentId });
     setLoader(false)
     if (res.code == 200) {
@@ -122,7 +123,7 @@ const List = ({ navigation, route }) => {
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: 70 }}
             ListEmptyComponent={() =>
-              <EmptyView label={"No notes"} />
+             !loader && <EmptyView label={"No notes"} />
             }
           />
         </View>

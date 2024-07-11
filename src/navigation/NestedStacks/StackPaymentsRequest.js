@@ -8,6 +8,7 @@ import { colors } from '../../utilities/colors';
 import { defaultScreens } from './defaultScreens';
 import PaymentrequestDetail from '../../screens/Payments/PaymentRequest/PaymentrequestDetail';
 import AddPaymentRequest from '../../screens/Payments/PaymentRequest/AddPaymentRequest';
+import MarkAsPaid from '../../screens/Payments/PaymentRequest/MarkAsPaid';
 
 
 const PaymentRequestStack = createNativeStackNavigator();
@@ -22,6 +23,7 @@ const StackPaymentsRequest = ({ route }) => {
 
         <PaymentRequestStack.Screen name={routes.addEditPaymenyRequestScreen} component={AddPaymentRequest} />
         <PaymentRequestStack.Screen name={routes.PaymenyRequestDetailScreen} component={PaymentrequestDetail} />
+        <PaymentRequestStack.Screen name={routes.markAsPaidScreen} component={MarkAsPaid} />
 
         {/*//? Default Screens Start */}
         {defaultScreens.map((x, i) => (

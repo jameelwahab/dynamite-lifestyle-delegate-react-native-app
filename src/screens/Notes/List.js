@@ -17,7 +17,7 @@ import OptionModal from '../../components/OptionModal'
 import ConfirmationModal from '../../components/ConfirmationModal'
 import { useNavigation } from '@react-navigation/native'
 import EmptyView from '../../components/EmptyView'
-import { convertTimezone } from '../../functions/convertTime'
+import { convertTimezone, convertTimezone2 } from '../../functions/convertTime'
 const List = ({ ticket, user, timezone }) => {
   const navigation = useNavigation();
   const { token } = useSelector(selectUser);
@@ -84,7 +84,7 @@ const List = ({ ticket, user, timezone }) => {
                 {item?.action_user_info?.action_name}
               </MyText>
             </View>
-            <MyText fontSize={10} >{convertTimezone(item?.note_date_time, timezone).format("YYYY-MM-DD hh:mm A")}</MyText>
+            <MyText fontSize={10} >{convertTimezone2(item?.note_date_time, timezone).format("YYYY-MM-DD hh:mm A")}</MyText>
 
             <TouchableOpacity
               onPress={() => setOptionModal({ isVisible: true, for: item })}
