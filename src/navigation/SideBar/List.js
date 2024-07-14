@@ -52,6 +52,7 @@ import StackSalesTeamTransaction from "../NestedStacks/StackSalesTeamTransaction
 import StackCalendarGroups from "../NestedStacks/StackCalendarGroups";
 import StackCalendarEvents from "../NestedStacks/StackCalendarEvents";
 import StackDelegateEvents from "../NestedStacks/StackDelegateEvents";
+import StackLeadCenter from "../NestedStacks/StackLeadCenter";
 
 
 
@@ -359,6 +360,14 @@ export const ParentComponents = {
     params: {
       value: "/sales",
       key: "aadbd7a3-91c1-499dd-bf24-7846756776677887"
+    }
+  },
+  "aadbd7a3-444444-40dd-bf24-7846756776677887": {
+    key: routes.leadcenterNavigator,
+    component: StackLeadCenter,
+    params: {
+      value: "leads_center",
+      key: "aadbd7a3-444444-40dd-bf24-7846756776677887"
     }
   },
 }

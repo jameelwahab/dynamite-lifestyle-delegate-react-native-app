@@ -5,6 +5,7 @@ import Video from 'react-native-video';
 import { icons } from '../utilities/icons';
 import { colors } from '../utilities/colors';
 import invokeApi from '../functions/invokeAPI';
+import extractVimeoData from '../functions/extractVimeoData';
 
 
 const { PipModule } = NativeModules;
@@ -74,11 +75,15 @@ export default class VimeoWithPip extends Component {
 
     if (!!Id) {
       try {
-        let res = await fetch(`https://player.vimeo.com/video/${Id}/config`);
-        res = await res.json();
+        // let res = await fetch(`https://player.vimeo.com/video/${Id}`);
+        let res = await invokeApi({
+          path: `https://player.vimeo.com/video/${Id}`,
+          excludeBaseURL: true,
+        })
+        let data = await extractVimeoData(res);
         this.setState({
-          videoUrl: res.request.files.hls.cdns[res.request.files.hls.default_cdn].url,
-          poster: res.video.thumbs['640']
+          videoUrl: data.request.files.hls.cdns[data.request.files.hls.default_cdn].url,
+          poster: data.video.thumbs['640']
         })
 
       } catch (e) {

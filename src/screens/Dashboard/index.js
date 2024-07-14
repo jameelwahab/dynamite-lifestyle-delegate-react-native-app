@@ -51,9 +51,9 @@ const Dasboard = ({ navigation }) => {
   }
 
 
+
   useEffect(() => {
 
-    console.log()
     if (!loader) {
       setData(null);
       setLoader(true);

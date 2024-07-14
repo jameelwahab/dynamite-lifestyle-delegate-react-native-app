@@ -447,13 +447,13 @@ const bankOpt = {
 }
 
 const cancelOpt = {
-  title: "Mark Requested As Cancelled",
+  title: "Mark Request As Cancelled",
   key: "markAsCancel",
   icon: icons.edit
 }
 
 const paidOpt = {
-  title: "Mark Requested As Paid",
+  title: "Mark Request As Paid",
   key: "markAsPaid",
   icon: icons.edit
 }

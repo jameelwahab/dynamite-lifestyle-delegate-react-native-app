@@ -192,7 +192,7 @@ const AddPaymentRequest = ({ navigation, route }) => {
     setLoader(true);
     let res = await ADD_PAYMENT_REQUEST({ token, navigation, body: obj });
     if (res.code == 200) {
-      showToast({ "body": res?.message, type: "success" })
+      showToast({ "title": res?.message, type: "success" })
       setLoader(false);
       route?.params?.backScreenFunc?.(res?.payment_request);
       navigation.goBack();
@@ -206,7 +206,7 @@ const AddPaymentRequest = ({ navigation, route }) => {
     setLoader(true);
     let res = await EDIT_PAYMENT_REQUEST({ token, navigation, body: obj, slug: editItem?.payment_request_slug });
     if (res.code == 200) {
-      showToast({ "body": res?.message, type: "success" })
+      showToast({ "title": res?.message, type: "success" })
       setLoader(false);
       route?.params?.backScreenFunc?.(res?.payment_request);
       navigation.goBack();

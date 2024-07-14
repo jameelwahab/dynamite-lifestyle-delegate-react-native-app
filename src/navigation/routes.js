@@ -57,8 +57,12 @@ const routes = {
   salesPendingCommissionsNavigator: "SALE_PENDING_COMMISSION_NAVIGATOR",
   salesPaidCommissionsNavigator: "SALE_PAID_COMMISSION_NAVIGATOR",
   salesTeamTransactionsNavigator: "SALES_TEAM_TRANSACTION_NAVIGATOR",
-
+  leadcenterNavigator: "LEADCENTER_NAVIGATOR",
   //! ///    Screens'
+
+  //? Lead center
+
+  leadcenterScreen: "LEADCENTER_SCREEN",
 
   //? AUth
   login: "LOGIN_SCREEN",
