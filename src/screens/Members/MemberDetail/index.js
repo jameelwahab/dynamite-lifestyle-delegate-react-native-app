@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TouchableHighlight, Pressable, Image } from 'react-native'
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import RootView from '../../../components/RootView'
 import MyText from '../../../components/MyText'
 import { colors } from '../../../utilities/colors'
@@ -43,6 +43,7 @@ const MemberDetail = ({ navigation, route }) => {
   const [showMorePages, setShowMorePages] = useState(false);
   const [showMorePrograms, setShowMorePrograms] = useState(false);
   const [isOptionModalVisible, setIsOptionModalVisible] = useState(false);
+
 
 
   const onOptSelected = (opt) => {
@@ -93,14 +94,13 @@ const MemberDetail = ({ navigation, route }) => {
 
   const updateLeadStatus = (leadStatus, icome, date) => {
     let lead = {
-
       background_color: leadStatus?.background_color,
       text_color: leadStatus?.text_color,
       title: leadStatus?.title,
       _id: leadStatus?._id
 
     }
-    setMember({
+    let obj = {
       ...member,
       lead_status: lead,
       lead_status_history: [{
@@ -109,7 +109,9 @@ const MemberDetail = ({ navigation, route }) => {
         lead_status: lead
       },
       ...member?.lead_status_history]
-    })
+    }
+    setMember({ ...obj })
+    route?.params?.updateData?.({ ...obj });
   }
 
   const onChatScreen = async (memberId) => {

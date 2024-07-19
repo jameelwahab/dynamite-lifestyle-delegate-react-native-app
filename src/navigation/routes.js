@@ -90,6 +90,7 @@ const routes = {
   changePassword: "CHANGE_PASSWORD_SCREEN",
   reminderSettings: "REMINDER_SETTINGS_SCREEN",
   zoomSettings: "ZOOM_SETTINGS_SCREEN",
+  changeAffiliateIdScreen: "CHANGE_AFFILIATE_ID_SCREEN",
 
   //? Notes
   addNote: "ADD_NOTE",

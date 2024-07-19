@@ -19,7 +19,7 @@ import notifee from '@notifee/react-native';
 const ProfileDropDown = ({ isVisible = false, closeModal = () => { }, user }) => {
   const navigation = useNavigation();
   const { socket } = useSelector(selectSocket);
-  const dispatch = useDispatch()  
+  const dispatch = useDispatch()
 
   const logoutBtn = async () => {
     try {
@@ -111,7 +111,9 @@ const ProfileDropDown = ({ isVisible = false, closeModal = () => { }, user }) =>
           {optionsView(icons.user, "Edit Profile", () => navigateTo(routes.editProfile))}
           {optionsView(icons.copy, "Copy Refferal Id", () => copyTheText(user?.affiliate_url_name, "Refferal Id Copied"))}
           {optionsView(icons.copy, "Copy App Refferal Id", () => copyTheText(user?.affiliate_link, "App Refferal Id Copied"))}
+          {optionsView(icons.edit, "Change Affiliate Id", () => navigateTo(routes?.changeAffiliateIdScreen))}
           {optionsView(icons.gear, "Settings", () => navigateTo(routes.otherSettings))}
+
 
           <TouchableOpacity
             onPress={logoutBtn}

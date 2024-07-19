@@ -98,10 +98,19 @@ const MemberList = ({ navigation, route }) => {
       })
     } else if (opt?.key == "profile") {
       navigation.navigate(routes.memberProfile, {
-        memberId: item?._id
+        memberId: item?._id,
       })
     }
 
+  }
+
+  const updateData = (memberObj) => {
+    let index = list.findIndex(x => x._id === memberObj?._id);
+    console.log(list[index], memberObj, "updateData")
+    if (index > -1) {
+      list.splice(index, 1, memberObj);
+      setList([...list]);
+    }
   }
 
   const makeCsv = async () => {
@@ -428,7 +437,8 @@ const MemberList = ({ navigation, route }) => {
     navigation.navigate(routes.memberDetails, {
       member: item,
       updateNotes: updateNotes,
-      updateCallNote: updateCallNote
+      updateCallNote: updateCallNote,
+      updateData:updateData
     })
   }
 

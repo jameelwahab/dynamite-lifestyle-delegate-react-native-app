@@ -981,17 +981,18 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       <View style={{ flex: 1, marginHorizontal: -10 }}>
         <FlatList
           data={tab == 0 ? feed : []}
-          onViewableItemsChanged={!__DEV__ && onViewableItemsChanged}
-          viewabilityConfig={!__DEV__ && viewConfigRef.current}
+          // onViewableItemsChanged={!__DEV__ && onViewableItemsChanged}
+          // viewabilityConfig={!__DEV__ && viewConfigRef.current}
           refreshControl={<MyRefreshControl
             onRefresh={onRefresh}
             refreshing={isRefreshing}
           />}
           showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item?._id}
-          ListHeaderComponent={headerView()}
+          ListHeaderComponent={headerView}
           ListEmptyComponent={!loader && tab == 0 && <EmptyView label={"Posts not found"} />}
           onEndReached={() => {
+            console.log(feedId, feedVar?.canLoadMore, tab, "OnEndReached")
             if (!!!feedId && feedVar?.canLoadMore && tab == 0) {
               feedVar = {
                 ...feedVar,
@@ -1001,13 +1002,15 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
               getFeed();
             }
           }}
+          onEndReachedThreshold={0.3}
           renderItem={tab == 0 && feedRenderView}
-          ListFooterComponent={footerView}
+          ListFooterComponent={footerView()}
           // removeClippedSubviews={true}
           updateCellsBatchingPeriod={10}
           maxToRenderPerBatch={10}
           windowSize={5}
           initialNumToRender={10}
+
         />
       </View>
 

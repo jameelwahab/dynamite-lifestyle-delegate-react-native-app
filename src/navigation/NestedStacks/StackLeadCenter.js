@@ -5,7 +5,7 @@ import { createNativeStackNavigator, } from '@react-navigation/native-stack'
 import routes from '../routes'
 import { defaultScreens } from './defaultScreens'
 import { colors } from '../../utilities/colors'
-import LeadCenter from '../../screens/LeadCenter'
+import LeadCenter from '../../screens/LeadCenter/index2.js'
 
 
 

@@ -23,12 +23,15 @@ export const UPLOAD_FILE_TO_S3 = ({ body, token, navigation }) => {
 }
 
 
-export const UPDATE_REMINDER_MESSAGES = ({ body, token, navigation }) => {
+export const CHANGE_AFFILIATE_NAME = ({ token, navigation, consultantId, newAffiliateName }) => {
   return invokeApi({
-    path: "api/consultant/welcome_reminder_setting_for_delegate",
-    method: "POST",
+    path: `app/affiliate_url_name/update/${consultantId}`,
+    method: "PUT",
     token: token,
     navigation: navigation,
-    postData: body
+    postData: {
+      user_type: "consultant",
+      affiliate_url_name: newAffiliateName,
+    }
   })
 }

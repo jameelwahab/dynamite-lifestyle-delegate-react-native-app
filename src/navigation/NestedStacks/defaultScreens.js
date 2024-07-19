@@ -2,6 +2,7 @@ import MessageList from "../../screens/Chat/MessageList.js";
 import NotificationList from "../../screens/NotificationList";
 import ChangePassword from "../../screens/Profile/ChangePassword";
 import EditProfile from "../../screens/Profile/EditProfile";
+import ChangeAffiliateId from "../../screens/Settings/ChangeAffiliateId.js";
 import OtherSettings from "../../screens/Settings/OtherSettings";
 import ReminderSettings from "../../screens/Settings/ReminderSettings";
 import ZoomSettings from "../../screens/Settings/ZoomSettings";
@@ -36,6 +37,10 @@ export const defaultScreens = [
   {
     name: routes.notificationList,
     component: NotificationList
+  },
+  {
+    name: routes.changeAffiliateIdScreen,
+    component: ChangeAffiliateId
   }
 
 ]
