@@ -16,14 +16,16 @@ import OptionModal from '../../../components/OptionModal'
 import { MenuButton } from '../../../components/MyButton'
 import { icons } from '../../../utilities/icons'
 import ConfirmationModal from '../../../components/ConfirmationModal'
+import MyRefreshControl from '../../../components/MyRefreshControl'
 
 const PortalListing = ({ navigation, route }) => {
-  const { key ,value} = route?.params;
+  const { key, value } = route?.params;
   const isDelegatePortals = value == "my_portals";
   const { navbar } = useSelector(selectNavbar);
   const { token } = useSelector(selectUser);
   const [title] = useState(navbar?.find(x => x._id == key)?.title);
   const [loader, setLoader] = useState(true);
+  const [isRefreshing, setRefreshing] = useState(false);
   const [list, setList] = useState([])
   const [optionModal, setOptionModal] = useState({
     isVisible: false,
@@ -111,8 +113,10 @@ const PortalListing = ({ navigation, route }) => {
     if (res.code == 200) {
       setList(res?.dynamite_events)
       setLoader(false)
+      setRefreshing(false)
     } else {
       setLoader(false)
+      setRefreshing(false)
     }
   }
 
@@ -144,6 +148,12 @@ const PortalListing = ({ navigation, route }) => {
   useEffect(() => {
     getDataFromServer()
   }, [route]);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+
+    getDataFromServer()
+  }
 
 
   const ammendList = (item) => {
@@ -209,6 +219,10 @@ const PortalListing = ({ navigation, route }) => {
           renderItem={renderEvent}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 80 }}
+          refreshControl={<MyRefreshControl
+            refreshing={isRefreshing}
+            onRefresh={onRefresh}
+          />}
         />
 
 

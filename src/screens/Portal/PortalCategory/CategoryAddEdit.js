@@ -92,6 +92,10 @@ const CategoryAddEdit = ({ route, navigation }) => {
         enableResetScrollToCoords={false}
         contentContainerStyle={{ paddingBottom: 50 }}
       >
+
+
+        
+
         <MyInputs
           label='Title *'
           value={data?.title}

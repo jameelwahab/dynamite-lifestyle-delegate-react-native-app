@@ -15,7 +15,7 @@ import TrackPlayer, {
   Capability,
 } from 'react-native-track-player';
 import notifee, {AndroidImportance} from '@notifee/react-native';
-import { fonts } from './src/utilities/fonts';
+import {fonts} from './src/utilities/fonts';
 
 const toastConfig = {
   success: props => (
@@ -30,8 +30,8 @@ const toastConfig = {
       text1NumberOfLines={2}
       text2NumberOfLines={2}
       style={{backgroundColor: props.props.bgColor, borderLeftWidth: 0}}
-      text1Style={{color: colors.white,fontFamily:fonts.bold,fontSize:16}}
-      text2Style={{color: colors.white,fontFamily:fonts.bold}}
+      text1Style={{color: colors.white, fontFamily: fonts.bold, fontSize: 16}}
+      text2Style={{color: colors.white, fontFamily: fonts.bold}}
     />
   ),
 };

@@ -56,11 +56,29 @@ export const GET_PORTAL_USER_LIST = ({ token, navigation, slug, searchText, stat
   })
 }
 
-
+export const GET_PORTAL_TEMPLATES = ({ token, navigation, slug, searchText, status }) => {
+  return invokeApi({
+    path: `api/dynamite_event/list_event_templates/delegate`,
+    method: "GET",
+    token,
+    navigation,
+  })
+}
 
 export const ADD_PORTAL_EVENT = ({ token, navigation, formdata }) => {
   return invokeApi({
     path: `api/dynamite_event/`,
+    method: "POST",
+    headers: { "content-type": "multipart/form-data" },
+    postData: formdata,
+    token,
+    navigation,
+  })
+}
+
+export const ADD_PORTAL_EVENT_BY_DELEGATE = ({ token, navigation, formdata }) => {
+  return invokeApi({
+    path: `api/dynamite_event/add_dynamite_event_by/delegate`,
     method: "POST",
     headers: { "content-type": "multipart/form-data" },
     postData: formdata,
@@ -362,7 +380,7 @@ export const PORTAL_VIDEO_QUESTION_CONFIG = ({ token, navigation, videoId, body:
   })
 }
 
-export const GET_MEMBER_LIST_FOR_PERSONAL_NOTES = ({ token, navigation,searchText}) => {
+export const GET_MEMBER_LIST_FOR_PERSONAL_NOTES = ({ token, navigation, searchText }) => {
   return invokeApi({
     path: `app/list_member_for_persoal_note/delegate?search_text=${searchText}`,
     method: "GET",
@@ -371,13 +389,13 @@ export const GET_MEMBER_LIST_FOR_PERSONAL_NOTES = ({ token, navigation,searchTex
   })
 }
 
-export const ADD_PERSONAL_NOTE_FOR_PORTAL = ({ token, navigation,memberId,note}) => {
+export const ADD_PERSONAL_NOTE_FOR_PORTAL = ({ token, navigation, memberId, note }) => {
   return invokeApi({
     path: `api/member/update_personal_note`,
     method: "POST",
-    postData:{
-      member_id:memberId,
-      personal_note:note
+    postData: {
+      member_id: memberId,
+      personal_note: note
     },
     token,
     navigation,

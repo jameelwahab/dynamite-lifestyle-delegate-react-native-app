@@ -40,6 +40,7 @@ const ZoomSettings = ({ navigation }) => {
 
   return (
     <RootView
+      hideNotificaitonIcon
       hideChatIcon
       hideProfile
       title='Zoom Setting'>

@@ -13,6 +13,7 @@ const OtherSettings = ({ navigation }) => {
     <RootView
       hideChatIcon
       hideProfile
+      hideNotificaitonIcon
       title='Settings'
     >
       <View style={{ paddingHorizontal: 10, flex: 1 }}>

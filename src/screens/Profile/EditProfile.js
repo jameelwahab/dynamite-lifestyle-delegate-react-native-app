@@ -81,6 +81,7 @@ const EditProfile = ({ navigation }) => {
       title='Edit Profile'
       hideChatIcon
       hideProfile
+      hideNotificaitonIcon
     >
       <KeyboardAwareScrollView
         extraScrollHeight={100}

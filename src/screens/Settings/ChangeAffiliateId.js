@@ -67,6 +67,9 @@ const ChangeAffiliateId = ({ navigation }) => {
   return (
     <RootView
       hideBackBottomButton
+      hideChatIcon
+      hideNotificaitonIcon
+      hideProfile
       titleView={titleView}
     >
       <MyKeyboardAvoidingView>

@@ -8,12 +8,17 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { CHNAGE_PASSWORD } from '../../DAL'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import MyInputs from '../../components/MyInputs'
+import MyText from '../../components/MyText'
+import { colors } from '../../utilities/colors'
+import MyCheckBox from '../../components/MyCheckBox'
+import routes from '../../navigation/routes'
 
 const ChangePassword = ({ navigation }) => {
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPasswrod, setConfirmPasswrod] = useState("")
   const [loader, setLoader] = useState(false);
+  const [logoutFrom, setLogoutFrom] = useState("other_devices")
 
   const btn_save = async () => {
     if (oldPassword == "") {
@@ -28,13 +33,24 @@ const ChangePassword = ({ navigation }) => {
         old_password: oldPassword,
         password: newPassword,
         confirm_password: confirmPasswrod,
+        logout_from: logoutFrom
       }
       let token = await AsyncStorage.getItem("@token")
       let res = await CHNAGE_PASSWORD({ body, token, navigation });
       setLoader(false);
       if (res.code == 200) {
         showToast({ title: "Password Changed", body: "Your password has been Changed Successfully!", type: "success" });
-        navigation.goBack()
+        if (logoutFrom == "all_devices") {
+          await AsyncStorage.multiRemove(["token"]);
+          navigation.reset({
+            index: 0,
+            routes: [{
+              name: routes.login
+            }]
+          })
+        } else {
+          navigation.goBack()
+        }
       }
     }
   }
@@ -46,6 +62,7 @@ const ChangePassword = ({ navigation }) => {
     <RootView
       hideChatIcon
       hideProfile
+      hideNotificaitonIcon
       title='Change Password' >
       <View style={{ flex: 1 }}>
         <KeyboardAwareScrollView keyboardShouldPersistTaps="handled" >
@@ -73,9 +90,32 @@ const ChangePassword = ({ navigation }) => {
               onChangeText={(text) => setConfirmPasswrod(text)}
             />
 
-            <MyButton
-              onPress={btn_save}
-              invert title='Save' />
+            <View>
+              <MyText color={colors.primary} type='medium' >For security reasons, would you like to:</MyText>
+
+              <View style={{ marginTop: 15 }}>
+                <MyCheckBox
+                  circle
+                  title='Logout from other devices'
+                  value={logoutFrom == "other_devices"}
+                  onPress={() => setLogoutFrom("other_devices")}
+                />
+                <View style={{ marginTop: 5 }}>
+                  <MyCheckBox
+                    circle
+                    title='Logout from all devices'
+                    value={logoutFrom == "all_devices"}
+                    onPress={() => setLogoutFrom("all_devices")}
+                  />
+                </View>
+              </View>
+            </View>
+
+            <View style={{ marginTop: 15 }}>
+              <MyButton
+                onPress={btn_save}
+                invert title='Save' />
+            </View>
 
           </View>
         </KeyboardAwareScrollView>

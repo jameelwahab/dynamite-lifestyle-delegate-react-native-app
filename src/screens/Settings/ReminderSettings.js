@@ -209,6 +209,7 @@ const ReminderSettings = ({ navigation }) => {
 
   return (
     <RootView
+    hideNotificaitonIcon
       hideChatIcon
       hideProfile title='Welcome Reminder Setting'>
       <View style={{ flex: 1 }}>
