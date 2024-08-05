@@ -61,9 +61,9 @@ export const CHNAGE_PASSWORD = ({ body, token, navigation }) => {
   })
 }
 
-export const LOGOUT = ({ token, navigation }) => {
+export const LOGOUT = ({ token, navigation, type = "this_device" }) => {
   return invokeApi({
-    path: "api/consultant/logout_consultant",
+    path: `api/consultant/logout_consultant?logout_from=${type}`,
     method: "POST",
     token: token,
     navigation: navigation,

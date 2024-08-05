@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native'
-import React from 'react'
+import React, { useRef } from 'react'
 import Modal from 'react-native-modal'
 import MyText from '../MyText'
 import utilities from '../../utilities'
@@ -14,33 +14,16 @@ import copyText from '../../functions/copyText'
 import { useDispatch, useSelector } from 'react-redux'
 import { clearSocket, selectSocket } from '../../redux/reducers/socketSlice'
 import notifee from '@notifee/react-native';
+import LogoutModal from './LogoutModal'
 
 
 const ProfileDropDown = ({ isVisible = false, closeModal = () => { }, user }) => {
   const navigation = useNavigation();
-  const { socket } = useSelector(selectSocket);
-  const dispatch = useDispatch()
+  const ref_logoutModal = useRef();
 
   const logoutBtn = async () => {
-    try {
-      let token = await AsyncStorage.getItem("@token");
-      let res = await LOGOUT({ token, navigation });
-      await AsyncStorage.multiRemove(["@token", "@user"])
-    } catch (error) {
-      console.log(error, "error removing asyncStorage")
-    }
+    ref_logoutModal?.current?.openModal?.()
 
-    closeModal()
-
-    socket.disconnect();
-    dispatch(clearSocket())
-    notifee.setBadgeCount(0);
-    setTimeout(() => {
-      navigation.reset({
-        index: 0,
-        routes: [{ name: routes.login }]
-      })
-    }, 500);
   }
 
 
@@ -124,6 +107,7 @@ const ProfileDropDown = ({ isVisible = false, closeModal = () => { }, user }) =>
           </TouchableOpacity>
         </View>
       </View>
+      <LogoutModal closeProfileModal={closeModal} ref={ref_logoutModal} />
     </Modal>
   )
 

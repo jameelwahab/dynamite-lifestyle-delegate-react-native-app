@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, Pressable, Image, TouchableOpacity, Platform, } from 'react-native'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { colors } from '../../utilities/colors'
 // import { backArrow, menu } from '../utilities/icons'
 import { useNavigation } from '@react-navigation/native'
@@ -15,6 +15,7 @@ import MyImage from '../MyImage'
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../redux/reducers/userSlice'
 import routes from '../../navigation/routes'
+import LogoutModal from './LogoutModal'
 
 
 
@@ -33,6 +34,7 @@ const Header = ({
   subTitle = ""
 }) => {
   const { user, token, isChatAllowed, unreadCount } = useSelector(selectUser)
+  
   const navigation = useNavigation()
   const [isUserModalVisible, setIsUserModalVisible] = useState(false)
 
@@ -66,6 +68,8 @@ const Header = ({
         isVisible={isUserModalVisible}
         closeModal={() => setIsUserModalVisible(false)}
       />
+
+      
 
       <View style={__header.rootView}>
         <View style={__header.leftButtonView}>

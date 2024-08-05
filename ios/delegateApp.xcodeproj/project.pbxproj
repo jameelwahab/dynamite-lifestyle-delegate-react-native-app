@@ -16,6 +16,7 @@
 		16FA29602B676A1400A87E94 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 16FA295F2B676A1400A87E94 /* GoogleService-Info.plist */; };
 		7699B88040F8A987B510C191 /* libPods-delegateApp-delegateAppTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19F6CBCC0A4E27FBF8BF4A61 /* libPods-delegateApp-delegateAppTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		A0A326F82C60A09400FB2E85 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A0A326F72C60A09400FB2E85 /* PrivacyInfo.xcprivacy */; };
 		AC8DFFD584FC411092100154 /* Montserrat-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 802BDFC3E3CE4758B19A8307 /* Montserrat-Medium.ttf */; };
 		AE6953771FF8478DB3AFD11B /* Montserrat-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 98E1718933EB4E1EB59DFE81 /* Montserrat-SemiBold.ttf */; };
 		CB789FDB6C85447CB4816F6C /* Montserrat-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 94AF6DDC591D4F7B9229A154 /* Montserrat-Italic.ttf */; };
@@ -60,6 +61,7 @@
 		94AF6DDC591D4F7B9229A154 /* Montserrat-Italic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Montserrat-Italic.ttf"; path = "../src/assets/fonts/Montserrat-Italic.ttf"; sourceTree = "<group>"; };
 		98E1718933EB4E1EB59DFE81 /* Montserrat-SemiBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Montserrat-SemiBold.ttf"; path = "../src/assets/fonts/Montserrat-SemiBold.ttf"; sourceTree = "<group>"; };
 		9CE521E3621D4C9D99D922BA /* Montserrat-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Montserrat-Regular.ttf"; path = "../src/assets/fonts/Montserrat-Regular.ttf"; sourceTree = "<group>"; };
+		A0A326F72C60A09400FB2E85 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		AD1F912D41384F67B00058E5 /* Montserrat-Light.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Montserrat-Light.ttf"; path = "../src/assets/fonts/Montserrat-Light.ttf"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
@@ -104,6 +106,7 @@
 		13B07FAE1A68108700A75B9A /* delegateApp */ = {
 			isa = PBXGroup;
 			children = (
+				A0A326F72C60A09400FB2E85 /* PrivacyInfo.xcprivacy */,
 				16FA29612B67913600A87E94 /* delegateApp.entitlements */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
@@ -288,6 +291,7 @@
 				F148E6A25CDD4FFBB61951B2 /* Montserrat-Light.ttf in Resources */,
 				AC8DFFD584FC411092100154 /* Montserrat-Medium.ttf in Resources */,
 				D81756C5DDEA4944AB1FFF94 /* Montserrat-Regular.ttf in Resources */,
+				A0A326F82C60A09400FB2E85 /* PrivacyInfo.xcprivacy in Resources */,
 				AE6953771FF8478DB3AFD11B /* Montserrat-SemiBold.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -675,6 +679,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
+					_LIBCPP_ENABLE_CXX17_REMOVED_UNARY_BINARY_FUNCTION,
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -701,6 +706,7 @@
 					"-DFOLLY_MOBILE=1",
 					"-DFOLLY_USE_LIBCPP=1",
 				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 			};
@@ -742,6 +748,10 @@
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = i386;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					_LIBCPP_ENABLE_CXX17_REMOVED_UNARY_BINARY_FUNCTION,
+				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -765,6 +775,7 @@
 					"-DFOLLY_MOBILE=1",
 					"-DFOLLY_USE_LIBCPP=1",
 				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
