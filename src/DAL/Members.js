@@ -79,7 +79,7 @@ export const SAVE_FILTER = ({ token, navigation, body: {
   })
 }
 
-export const GET_FILTER_DATA = ({ token, navigation, searchText ,type}) => {
+export const GET_FILTER_DATA = ({ token, navigation, searchText, type }) => {
   return invokeApi({
     path: `api/consultant/filter_data_for/delegate?search_text=&delegate_search_text=${searchText}&filter_on_tab_name=${type}`,
     method: "GET",
@@ -236,6 +236,15 @@ export const MEMBER_PROFILE = ({ token, navigation, memberId, startDate, endDate
 export const GET_EVENT_DETAIL = ({ token, navigation, slug }) => {
   return invokeApi({
     path: `api/event/detail/${slug}`,
+    method: "GET",
+    token,
+    navigation,
+  })
+}
+
+export const GET_MEMBER_LISTING_FOR_SUB_TEAM = ({ token, navigation, page, searchText }) => {
+  return invokeApi({
+    path: `api/event_subscriber/member_list_for_sub_team?page=${page}&limit=10&search_text=${searchText}`,
     method: "GET",
     token,
     navigation,

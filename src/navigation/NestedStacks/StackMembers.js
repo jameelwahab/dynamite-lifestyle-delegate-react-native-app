@@ -16,17 +16,22 @@ import GenericQuetionList from '../../screens/Questions/GenericQuetionList'
 import QuestionsList from '../../screens/Members/QuestionsList'
 import MemberProfile from '../../screens/Members/MemberProfile.js'
 import MessageList from '../../screens/WhatsappChat/MessageList.js'
+import { useSelector } from 'react-redux'
+import { selectUser } from '../../redux/reducers/userSlice'
+import MemberListForSubTeam from '../../screens/Members/MemberListForSubTeam'
 
 
 const MemberStack = createNativeStackNavigator()
 
 const StackMembers = ({ route }) => {
+  const { user } = useSelector(selectUser);
+  console.log(user, "user")
   return (
     <View style={{ flex: 1, backgroundColor: colors.darkSecondary }}>
       <MemberStack.Navigator
         initialRouteName={routes.allMemberScreens}
         screenOptions={{ headerShown: false }}>
-        <MemberStack.Screen initialParams={route.params} name={routes.allMemberScreens} component={MemberList} />
+        <MemberStack.Screen initialParams={route.params} name={routes.allMemberScreens} component={user?.team_type == "sub_team" ? MemberListForSubTeam : MemberList} />
         <MemberStack.Screen initialParams={route.params} name={routes.memberDetails} component={MemberDetail} />
         <MemberStack.Screen name={routes.memberNotesListing} component={List} />
         <MemberStack.Screen name={routes.memberAddNote} component={AddNote} />

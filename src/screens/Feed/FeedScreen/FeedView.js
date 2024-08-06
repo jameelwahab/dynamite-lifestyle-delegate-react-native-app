@@ -20,7 +20,7 @@ import { isHtml } from '../../../functions/regex'
 import PostWebView from '../../../components/PostWebView'
 import FeedText from '../../../components/FeedText'
 
-export const FeedView = ({ item, index, user, token, isInView, timezone, settings, openComments, showLikes, openOptions, onLikebtnPress, isCosmos, sourceLevelIcons, isScheduledFeed, openScheduleTimeModal, onFeedDetail, isEventFeed }) => {
+export const FeedView = ({ item, index, user, token, isInView, timezone, settings, openComments, showLikes, openOptions, onLikebtnPress, isCosmos, sourceLevelIcons, isScheduledFeed, openScheduleTimeModal, onFeedDetail, isEventFeed, filterTheOptions }) => {
 
 
   const [animationState, setAnimationState] = useState(0)
@@ -105,8 +105,9 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
             style={__style.feedTypeIcon}
           />
         </View>}
+
       {(((isCosmos || isScheduledFeed) && user?._id == item?.action_info?.action_id) ||
-        (!isCosmos && !isScheduledFeed)) &&
+        (!isCosmos && !isScheduledFeed)) && filterTheOptions(item) > 0 &&
         <TouchableOpacity
           onPress={() => openOptions(item)}
           style={__style.profileTypeIconView}>

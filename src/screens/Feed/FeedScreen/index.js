@@ -49,7 +49,7 @@ let likeVar = {
   id: "",
   actionType: ""
 }
-const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, upcomingEvents, currentEvents, hideTabs = false, isScheduleFeedTabAllowed = false, schedulePost = false }) => {
+const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, upcomingEvents, currentEvents, hideTabs = false, isScheduleFeedTabAllowed = false, schedulePost = false, }) => {
   // let feedPage = useRef({
   //   page: 0,
   //   canLoadMore: false,
@@ -63,8 +63,10 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
   const isCosmos = feedFor == "the_cosmos";
   const isScheduledFeed = feedFor == "scheduled";
   const isAllSourceFeed = feedFor == "all_source";
+  const isTheSourceFeed = feedFor == "the_source";
   const isEventFeed = feedFor == "event";
-  const { token, user, access } = useSelector(selectUser);
+  const { token, user, access, isChatAllowed } = useSelector(selectUser);
+  console.log(access, "access")
   const { socket } = useSelector(selectSocket);
   const timezone = useSelector(selectTimeZone);
   const { settings } = useSelector(selectSettings);
@@ -772,50 +774,226 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
 
   const filterTheOptions = (options) => {
     if (feedOptionModal.isVisible) {
-      let newList = [...options];
+      let feed = feedOptionModal?.selectedItem;
+      let newList = [];
+      let isMine = feed?.action_info?.action_id == user?._id;
 
-      if ((isEventFeed && feedOptionModal?.selectedItem?.action_info?.action_id == user?._id) || !isEventFeed) {
-        if (access?.feed_pin_unpin_option) {
-          if (feedOptionModal?.selectedItem?.is_feature)
-            newList = newList.slice().filter(x => x.type != "pin");
-          else if (!feedOptionModal?.selectedItem?.is_feature)
-            newList = newList.slice().filter(x => x.type != "unpin");
-        } else {
-          newList = newList.slice().filter(x => x.type != "pin" && x.type != "unpin");
+      options.forEach((item) => {
+        if (item.type == "pin") {
+          if (access?.feed_pin_unpin_option) {
+            if (!feed?.is_feature) {
+              if (isAllSourceFeed || isTheSourceFeed) {
+                newList.push(item);
+              } else if (isMine) {
+                if (!isScheduledFeed) {
+                  newList.push(item);
+                }
+              }
+            }
+          }
         }
-      }
-      if (!isEventFeed) {
-        newList = newList.slice().filter(x => x.type != "notes");
-      }
 
-
-
-      if (!isCosmos || !isScheduledFeed || !isEventFeed) {
-        newList = newList.slice().filter(x => {
-          if (x.type == "message" && user?._id == feedOptionModal?.selectedItem?.action_info?.action_id) {
-            return false
+        if (item.type == "unpin") {
+          if (access?.feed_pin_unpin_option) {
+            if (feed?.is_feature) {
+              if (isAllSourceFeed || isTheSourceFeed) {
+                newList.push(item);
+              } else if (isMine) {
+                if (!isScheduledFeed) {
+                  newList.push(item);
+                }
+              }
+            }
           }
-          else if ((!access?.edit_delete_option_in_source_all_source_feeds && feedOptionModal?.selectedItem?.action_info?.action_id != user?._id) && (x.type == "edit" || x.type == "delete")) {
-            return false
-          }
-          return true
-        });
-      }
+        }
 
-      // if(!access?.feed_pin_unpin_option){
+        if (item.type == "edit" || item.type == "delete") {
+          if (isMine) {
+            newList.push(item);
+          } else {
+            if (isAllSourceFeed || isTheSourceFeed) {
+              if (access?.edit_delete_option_in_source_all_source_feeds) {
+                newList.push(item);
+              }
+            }
+          }
+        }
+
+        if (item.type == "notes") {
+          if (isEventFeed) {
+            newList.push(item);
+          }
+        }
+
+        if (item.type == "message") {
+          if (isChatAllowed) {
+            if (!isMine) {
+              newList.push(item);
+            }
+          }
+        }
+
+
+      })
+
+      return newList
+
+      //   if ((isEventFeed && feedOptionModal?.selectedItem?.action_info?.action_id == user?._id) || !isEventFeed) {
+      //     if (access?.feed_pin_unpin_option) {
+      //       if (feedOptionModal?.selectedItem?.is_feature)
+      //         newList = newList.slice().filter(x => x.type != "pin");
+      //       else if (!feedOptionModal?.selectedItem?.is_feature)
+      //         newList = newList.slice().filter(x => x.type != "unpin");
+      //     } else {
+      //       newList = newList.slice().filter(x => x.type != "pin" && x.type != "unpin");
+      //     }
+      //   }else{
+      //     newList = newList.slice().filter(x => x.type != "pin" && x.type != "unpin");
+      //   }
+      //   if (!isEventFeed) {
+      //     newList = newList.slice().filter(x => x.type != "notes");
+      //   }
+
+
       //   newList = newList.slice().filter(x => {
-      //     if (x.type == "message" && user?._id == feedOptionModal?.selectedItem?.action_info?.action_id) {
+      //     if ((x.type == "message" && user?._id == feedOptionModal?.selectedItem?.action_info?.action_id) || (!!isChatAllowed == false && x.type == "message")) {
+      //       return false
+      //     }
+      //     else if (
+      //      ( !isCosmos && !isScheduledFeed && !isEventFeed )&&
+      //       (!access?.edit_delete_option_in_source_all_source_feeds && feedOptionModal?.selectedItem?.action_info?.action_id != user?._id) &&
+      //       (x.type == "edit" || x.type == "delete")) {
       //       return false
       //     }
       //     return true
       //   });
-      // }
 
-      return newList
-    } else {
-      return []
+      //   console.log(newList, "newList 4")
+      //   // if(!access?.feed_pin_unpin_option){
+      //   //   newList = newList.slice().filter(x => {
+      //   //     if (x.type == "message" && user?._id == feedOptionModal?.selectedItem?.action_info?.action_id) {
+      //   //       return false
+      //   //     }
+      //   //     return true
+      //   //   });
+      //   // }
+      //   console.log(newList, "newList")
+      //   return newList
+      // } else {
+      //   return []
     }
   }
+
+  const filterTheOptionsCount = (feed) => {
+
+    let newList = [];
+    let isMine = feed?.action_info?.action_id == user?._id;
+
+    feedOptionList.forEach((item) => {
+      if (item.type == "pin") {
+        if (access?.feed_pin_unpin_option) {
+          if (!feed?.is_feature) {
+            if (isAllSourceFeed || isTheSourceFeed) {
+              newList.push(item);
+            } else if (isMine) {
+              if (!isScheduledFeed) {
+                newList.push(item);
+              }
+            }
+          }
+        }
+      }
+
+      if (item.type == "unpin") {
+        if (access?.feed_pin_unpin_option) {
+          if (feed?.is_feature) {
+            if (isAllSourceFeed || isTheSourceFeed) {
+              newList.push(item);
+            } else if (isMine) {
+              if (!isScheduledFeed) {
+                newList.push(item);
+              }
+            }
+          }
+        }
+      }
+
+      if (item.type == "edit" || item.type == "delete") {
+        if (isMine) {
+          newList.push(item);
+        } else {
+          if (isAllSourceFeed || isTheSourceFeed) {
+            if (access?.edit_delete_option_in_source_all_source_feeds) {
+              newList.push(item);
+            }
+          }
+        }
+      }
+
+      if (item.type == "notes") {
+        if (isEventFeed) {
+          newList.push(item);
+        }
+      }
+
+      if (item.type == "message") {
+        if (isChatAllowed) {
+          if (!isMine) {
+            newList.push(item);
+          }
+        }
+      }
+
+
+    })
+    return newList.length
+
+    //   if ((isEventFeed && feedOptionModal?.selectedItem?.action_info?.action_id == user?._id) || !isEventFeed) {
+    //     if (access?.feed_pin_unpin_option) {
+    //       if (feedOptionModal?.selectedItem?.is_feature)
+    //         newList = newList.slice().filter(x => x.type != "pin");
+    //       else if (!feedOptionModal?.selectedItem?.is_feature)
+    //         newList = newList.slice().filter(x => x.type != "unpin");
+    //     } else {
+    //       newList = newList.slice().filter(x => x.type != "pin" && x.type != "unpin");
+    //     }
+    //   }else{
+    //     newList = newList.slice().filter(x => x.type != "pin" && x.type != "unpin");
+    //   }
+    //   if (!isEventFeed) {
+    //     newList = newList.slice().filter(x => x.type != "notes");
+    //   }
+
+
+    //   newList = newList.slice().filter(x => {
+    //     if ((x.type == "message" && user?._id == feedOptionModal?.selectedItem?.action_info?.action_id) || (!!isChatAllowed == false && x.type == "message")) {
+    //       return false
+    //     }
+    //     else if (
+    //      ( !isCosmos && !isScheduledFeed && !isEventFeed )&&
+    //       (!access?.edit_delete_option_in_source_all_source_feeds && feedOptionModal?.selectedItem?.action_info?.action_id != user?._id) &&
+    //       (x.type == "edit" || x.type == "delete")) {
+    //       return false
+    //     }
+    //     return true
+    //   });
+
+    //   console.log(newList, "newList 4")
+    //   // if(!access?.feed_pin_unpin_option){
+    //   //   newList = newList.slice().filter(x => {
+    //   //     if (x.type == "message" && user?._id == feedOptionModal?.selectedItem?.action_info?.action_id) {
+    //   //       return false
+    //   //     }
+    //   //     return true
+    //   //   });
+    //   // }
+    //   console.log(newList, "newList")
+    //   return newList
+    // } else {
+    //   return []
+
+  }
+
 
   const onLikebtnPress = async (feedId, isLike) => {
     let fd = new FormData();
@@ -859,6 +1037,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       return (
         <View style={{ flex: 1, paddingHorizontal: 10 }}>
           <FeedScreen
+            filterTheOptions={filterTheOptionsCount}
             navigation={navigation}
             route={route}
             hideTabs={true}
@@ -954,6 +1133,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
 
   const feedRenderView = useCallback(({ item, index }) =>
     <FeedView
+      filterTheOptions={filterTheOptionsCount}
       isInView={inView == item?._id}
       item={item}
       index={index}
@@ -989,7 +1169,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           />}
           showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item?._id}
-          ListHeaderComponent={headerView}
+          ListHeaderComponent={headerView()}
           ListEmptyComponent={!loader && tab == 0 && <EmptyView label={"Posts not found"} />}
           onEndReached={() => {
             console.log(feedId, feedVar?.canLoadMore, tab, "OnEndReached")

@@ -12,13 +12,11 @@ import notifee from '@notifee/react-native';
 const InitWithAuth = async (token, navigation, setLoader, dispatch) => {
   let res = await INIT_WITH_TOKEN({ token: token });
   if (res.code == 200) {
-    let isChatAllowed = false;
+    let isChatAllowed = !!res?.access_object?.is_chat_allowed;
     let isWhatsappChatAllowed = false;
     res?.nav_items.forEach(item => {
       console.table(item.title + "  --->  ", item.value, item)
-      if (item.value == "chat") {
-        isChatAllowed = true;
-      } else if (item.value == "whatsapp_chat") {
+      if (item.value == "whatsapp_chat") {
         isWhatsappChatAllowed = true
       }
     })

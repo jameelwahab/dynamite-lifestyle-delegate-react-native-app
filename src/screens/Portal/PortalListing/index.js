@@ -17,6 +17,7 @@ import { MenuButton } from '../../../components/MyButton'
 import { icons } from '../../../utilities/icons'
 import ConfirmationModal from '../../../components/ConfirmationModal'
 import MyRefreshControl from '../../../components/MyRefreshControl'
+import EmptyView from '../../../components/EmptyView'
 
 const PortalListing = ({ navigation, route }) => {
   const { key, value } = route?.params;
@@ -219,6 +220,7 @@ const PortalListing = ({ navigation, route }) => {
           renderItem={renderEvent}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 80 }}
+          ListEmptyComponent={!loader && <EmptyView label={"No Events"} />}
           refreshControl={<MyRefreshControl
             refreshing={isRefreshing}
             onRefresh={onRefresh}

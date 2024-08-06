@@ -45,7 +45,6 @@ const MemberList = ({ navigation, route }) => {
   const isMembers = type == "member";
   const isNurture = type == "nurture";
   const { token, user, isChatAllowed, access } = useSelector(selectUser);
-  console.log(access, "access")
   const [showChips, setShowChips] = useState(false);
   const sortModalRef = useRef();
   const filterModalRef = useRef();
@@ -761,6 +760,7 @@ const MemberList = ({ navigation, route }) => {
               {isAllMembers && <MyText fontSize={12} >{item?.email}</MyText>}
             </View>
           </Pressable>
+          
           {item?.is_wheel_of_life &&
             <View style={{ marginRight: 10 }}>
               <Image source={icons.wheelOfLife} style={{ height: 20, width: 20 }} />

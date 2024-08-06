@@ -394,7 +394,7 @@ const CommentModal = ({
   const updateComentToServer = async () => {
     setLoader(true);
     let fd = new FormData();
-    fd.append("message", commentText.trim());
+    fd.append("message", commentText);
     fd.append("mentioned_users", JSON.stringify(mentionList));
     if (!!commentImage && !!commentImage?.uri) {
       fd.append("image", commentImage);
@@ -480,7 +480,7 @@ const CommentModal = ({
     let action = "add_comment";
     let formData = new FormData();
     formData.append("feed", feedId);
-    formData.append("message", commentText.trim());
+    formData.append("message", commentText);
     formData.append("mentioned_users", JSON.stringify(mentionList));
     if (!!selectedComment) {
       formData.append("parent_comment", selectedComment?._id);
