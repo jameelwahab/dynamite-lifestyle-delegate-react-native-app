@@ -21,16 +21,17 @@ const ChangePassword = ({ navigation }) => {
   const [logoutFrom, setLogoutFrom] = useState("other_devices")
 
   const btn_save = async () => {
-    if (oldPassword == "") {
-      showToast({ body: "Please enter your old password" });
-    } else if (newPassword == "") {
+    // if (oldPassword == "") {
+    //   showToast({ body: "Please enter your old password" });
+    // } else
+    if (newPassword == "") {
       showToast({ body: "Please enter your new password" });
     } else if (confirmPasswrod != newPassword) {
       showToast({ body: "Passwords do not match" });
     } else {
       setLoader(true);
       let body = {
-        old_password: oldPassword,
+        // old_password: oldPassword,
         password: newPassword,
         confirm_password: confirmPasswrod,
         logout_from: logoutFrom
@@ -66,13 +67,13 @@ const ChangePassword = ({ navigation }) => {
       title='Change Password' >
       <View style={{ flex: 1 }}>
         <KeyboardAwareScrollView keyboardShouldPersistTaps="handled" >
-          <View style={{ flex: 1, marginTop: 30, marginHorizontal: 10 }}>
-            <MyInputs
+          <View style={{ flex: 1, marginTop: 10, marginHorizontal: 10 }}>
+            {/* <MyInputs
               isPassword={true}
               label='Old Password*'
               value={oldPassword}
               onChangeText={(text) => setOldPassword(text)}
-            />
+            /> */}
 
 
             <MyInputs
@@ -90,7 +91,7 @@ const ChangePassword = ({ navigation }) => {
               onChangeText={(text) => setConfirmPasswrod(text)}
             />
 
-            <View>
+            <View style={{ marginTop: 10, }}>
               <MyText color={colors.primary} type='medium' >For security reasons, would you like to:</MyText>
 
               <View style={{ marginTop: 15 }}>
