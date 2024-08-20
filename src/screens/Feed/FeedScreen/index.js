@@ -430,7 +430,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
                 childList.splice(childIndex, 1, {
                   ...nList[index].child_comment[childIndex],
                   like_count: editedComment?.comment_like_count,
-                  is_liked: editedComment?.is_liked
+                  is_liked: editedComment?.is_liked && user?._id == data?.action_by ? true : nList[index].child_comment[childIndex]?.is_liked,
                 });
                 nList.splice(index, 1, { ...nList[index], child_comment: childList });
               }
@@ -443,7 +443,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
               nList.splice(index, 1, {
                 ...nList[index],
                 like_count: editedComment?.comment_like_count,
-                is_liked: editedComment?.is_liked
+                is_liked: editedComment?.is_liked && user?._id == data?.action_by ? true : nList[index]?.is_liked
               })
             }
           }

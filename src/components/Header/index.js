@@ -228,7 +228,9 @@ const __header = StyleSheet.create({
   },
   badge: {
     height: 20,
-    width: 20,
+    // width: 20,
+    minWidth:20,
+    paddingHorizontal:2,
     borderRadius: 20 / 2,
     alignItems: "center",
     justifyContent: "center",
