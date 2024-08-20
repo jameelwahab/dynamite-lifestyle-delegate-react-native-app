@@ -3,7 +3,7 @@ import invokeApi from "../functions/invokeAPI";
 export const GET_FEED_LIST =
   ({ token, navigation, level, type, page, eventId }) => {
     return invokeApi({
-      path: `api/feeds/delegate_portal/listing?page=${page}&limit=10&list_type=${type}&level_or_type=${level}&event=${eventId}`,
+      path: `api/feeds/delegate_portal/feed_listing/v1?page=${page}&limit=10&list_type=${type}&level_or_type=${level}&event=${eventId}`,
       method: "GET",
       token,
       navigation,
@@ -13,7 +13,7 @@ export const GET_FEED_LIST =
 export const GET_FEED_DETAIL =
   ({ token, navigation, feedId }) => {
     return invokeApi({
-      path: `api/feeds/detail/delegate/${feedId}`,
+      path: `api/feeds/delegate_portal/feed_details/v1/${feedId}`,
       method: "GET",
       token,
       navigation,
@@ -34,12 +34,26 @@ export const GET_FEED_EXTRA_DATA =
 export const GET_COMMENT_LIST =
   ({ token, navigation, body, page }) => {
     return invokeApi({
-      path: `api/feeds/comment_by_feed/delegate?page=${page}&limit=15`,
+      path: `api/feeds/list_comment_with_pagination/v1?page=${page}&limit=15`,
       headers: { 'Content-Type': 'multipart/form-data' },
       method: "POST",
       postData: body,
       token,
       navigation,
+    })
+  }
+
+export const GET_CHILD_COMMENT_LIST =
+  ({ token, navigation, page, feedId, parentCommentId }) => {
+    return invokeApi({
+      path: `api/feeds/list_comment_with_pagination/v1?page=${page}&limit=10`,
+      method: "POST",
+      token,
+      navigation,
+      postData: JSON.stringify({
+        feed_id: feedId,
+        parent_id: parentCommentId
+      }),
     })
   }
 

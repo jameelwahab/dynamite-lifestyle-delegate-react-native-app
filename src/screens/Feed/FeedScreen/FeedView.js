@@ -19,6 +19,7 @@ import DropShadow from "react-native-drop-shadow";
 import { isHtml } from '../../../functions/regex'
 import PostWebView from '../../../components/PostWebView'
 import FeedText from '../../../components/FeedText'
+import numFormatter from '../../../functions/numFormatter'
 
 export const FeedView = ({ item, index, user, token, isInView, timezone, settings, openComments, showLikes, openOptions, onLikebtnPress, isCosmos, sourceLevelIcons, isScheduledFeed, openScheduleTimeModal, onFeedDetail, isEventFeed, filterTheOptions }) => {
 
@@ -202,26 +203,10 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
         <TouchableOpacity
           onPress={() => showLikes(item?._id)}
           style={__style.likeView}>
-          {icons.heartFilled(colors.heart, 20)}
+          {icons.heartFilled(colors.heart, 15)}
           <View style={__style.likeImagesView}>
-            {item?.top_liked_user?.map((item, index) => {
-              if (index < 2)
-                return (
-                  <View
-                    key={item?.user_info_action_by?.profile_image}
-                    style={[__style.likeImageView, { marginLeft: -(index + 5) }]}>
-                    <MyImage
-                      style={__style.likeImage}
-                      source={{
-                        uri: S3_URL + item?.user_info_action_by?.profile_image
-                      }}
-                    />
-                  </View>
-                )
-              else return null;
-            })}
-            {item?.like_count > 2 &&
-              <MyText fontSize={12}>{` and ${item?.like_count - 2} others`}</MyText>}
+
+            <MyText fontSize={12}>{numFormatter(item?.like_count, 1)}</MyText>
           </View>
         </TouchableOpacity> :
         <View />}
@@ -230,7 +215,10 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
         <TouchableOpacity
           onPress={() => openComments(item?._id, false)}
           style={__style.likeView}>
-          <MyText fontSize={12}>{`${item?.comment_count} comments`}</MyText>
+          {icons.comment(colors.white, 15)}
+          <View style={__style.likeImagesView}>
+            <MyText fontSize={12}>{`${numFormatter(item?.comment_count, 1)}`}</MyText>
+          </View>
         </TouchableOpacity>
       }
 
@@ -435,9 +423,10 @@ const __style = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginTop: 10
+    marginTop: 10,
+    paddingHorizontal:10
   },
-  likeView: { flexDirection: "row", alignItems: "center", height: "100%" },
+  likeView: { flexDirection: "row", alignItems: "center",paddingVertical:2, },
   likeImagesView: { flexDirection: "row", alignItems: "center", marginLeft: 5 },
   likeImageView: { width: 18, height: 18, borderRadius: 18 / 2, overflow: "hidden", borderWidth: 2, borderColor: colors.white },
   likeImage: { width: 16, height: 16 }

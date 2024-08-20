@@ -14,7 +14,7 @@ import Toast from 'react-native-toast-message';
 import FooterLoader from '../../../components/FooterLoader';
 import OptionModal from '../../../components/OptionModal';
 import showToast from '../../../functions/showToast';
-import { ADD_COMMENT, ADD_COMMENT_V2, COMMENT_LIKE_ACTIONS, DELETE_COMMENT, EDIT_COMMENT, EDIT_COMMENT_V2, GET_DELEGATES_LIST_FROM_SERVER_FOR_MENTION_V1 } from '../../../DAL';
+import { ADD_COMMENT, ADD_COMMENT_V2, COMMENT_LIKE_ACTIONS, DELETE_COMMENT, EDIT_COMMENT, EDIT_COMMENT_V2, GET_CHILD_COMMENT_LIST, GET_DELEGATES_LIST_FROM_SERVER_FOR_MENTION_V1 } from '../../../DAL';
 import ConfirmationModal from '../../../components/ConfirmationModal';
 import LikeModalForComments from './LikeModalForComments';
 import ImageUploadModal from '../../../components/ImageUploadModal';
@@ -25,6 +25,7 @@ import Collapsible from 'react-native-collapsible';
 import MemberView from '../../../components/MemberView';
 import FeedText from '../../../components/FeedText';
 import breakReference from '../../../functions/breakReference';
+import numFormatter from '../../../functions/numFormatter';
 
 
 let commentCursor = {
@@ -82,6 +83,7 @@ const CommentModal = ({
   const [isMentionListLoading, setMentionListLoading] = useState(false);
   const [mentionList, setMentionList] = useState([]);
   const [_at_index, set_at_index] = useState(-1);
+  const [childCommentLoader, setChildCommentLoader] = useState({});
 
   const onMessagePress = (item) => {
     onCommentMessagePress?.(item)
@@ -189,6 +191,7 @@ const CommentModal = ({
     setCommentText(text)
 
   }
+
   const onPressOnMentions = (obj) => {
     let index = _at_index < 0 ? 0 : _at_index;
     let diff = extractSubstring(commentText, index).length;
@@ -589,9 +592,62 @@ const CommentModal = ({
       setCommentText("")
     }
   }
+  const viewMoreReplies = async (parentComment) => {
+    let loadedChildComments = parentComment.child_comment.length;
+    let totalChildComments = parentComment?.child_comments_count;
+    let childCommnetPage = 0;
+    if (totalChildComments - loadedChildComments) {
+      let remainder = loadedChildComments % 10;
+      if (remainder == 0) {
+        childCommnetPage = Math.ceil(loadedChildComments / 10);
+      }
+    }
+
+    setChildCommentLoader((val) => ({
+      ...val,
+      [parentComment?._id]: true
+    }))
+
+    let res = await GET_CHILD_COMMENT_LIST({
+      token, navigation,
+      page: childCommnetPage,
+      feedId: feedId,
+      parentCommentId: parentComment?._id
+    })
+    if (res.code == 200) {
+      setComments((obj) => {
+        obj.list.map(comment => {
+          if (comment._id == parentComment?._id) {
+            comment["child_comment"] = childCommnetPage == 0 ? [...res?.comment] : [...comment?.child_comment, ...res?.comment];
+            // comment["child_comments_count"] = comment.child_comment.length + res.comment.length
+          }
+          console.log(obj, "obj")
+        })
+        return { ...obj }
+      })
+      delete childCommentLoader[parentComment?._id]
+      setChildCommentLoader({ ...childCommentLoader })
+    } else {
+      Alert.alert("Error", res?.message)
+      delete childCommentLoader[parentComment?._id]
+      setChildCommentLoader({ ...childCommentLoader })
+    }
+  }
 
 
   const commentView = (item, index, isChild, parentComment) => {
+
+    let childCommentCount = 0;
+    let childCommentArray = [];
+    let lastChildIndex = parentComment?.child_comment.length > 0 ? parentComment?.child_comment.length - 1 : 0;
+    if (isChild) {
+      childCommentCount = parentComment?.child_comments_count
+      childCommentArray = parentComment?.child_comment
+    } else {
+      childCommentCount = item?.child_comments_count
+      childCommentArray = item?.child_comment
+    }
+
     return (
       <View key={item?._id}>
         <View style={[__style.commentView, {
@@ -613,7 +669,7 @@ const CommentModal = ({
                 <MyText color={colors.lightText2} fontSize={10}>{convertTimezone(item?.comment_date_time, timezone).format("DD MMM YYYY [at] hh:mm A")}</MyText>
               </View>
             </View>
-            {console.log(!isCosmos, !isEventFeed, user?.is_super_delegate, index)}
+
             {((user?._id == item?.user_info_action_for?.action_id) || (!isCosmos && !isEventFeed && user?.is_super_delegate)) &&
               <TouchableOpacity
                 onPress={() => setOptions({ isVisible: true, selectedItem: item })}
@@ -625,7 +681,6 @@ const CommentModal = ({
             </View>
           </View>
           {!!item?.message &&
-            // <CollapsibleText style={{ marginTop: 5 }}>{item?.message}</CollapsibleText>
             <View style={{ marginTop: 5 }}>
               <FeedText list={!!item?.mentioned_users ? breakReference(item?.mentioned_users) : []} text={item?.message} />
             </View>
@@ -641,8 +696,8 @@ const CommentModal = ({
               />
             </Pressable>}
 
-          <View style={[__style.commentActionView, { marginTop: 5 }]}>
-            <View style={[__style.commentActionView, { flex: 1 }]}>
+          <View style={[__style.commentActionView, { marginTop: 5, }]}>
+            <View style={[__style.commentActionView,]}>
               <TouchableOpacity
                 onPress={() => onLikePress(item, index,)}
                 style={__style.actionBtnView}>
@@ -684,11 +739,26 @@ const CommentModal = ({
                 <View style={__style.likeView}>
                   {icons.heartFilled(colors.heart, 15)}
                 </View>
-                <View style={[__style.likeView, { marginLeft: -2 }]}>
-                  <MyText>{item?.like_count}</MyText>
+                <View style={[__style.likeView, { marginLeft: 2 }]}>
+                  <MyText>{numFormatter(item?.like_count, 1)}</MyText>
                 </View>
               </Pressable>}
 
+
+
+
+            {childCommentCount > 0 && ((childCommentArray.length - childCommentCount) < 0) && ((!isChild && childCommentArray.length <= 0) || (isChild && (lastChildIndex == index))) &&
+              <>
+                {childCommentLoader[isChild ? parentComment?._id : item?._id] ?
+                  <SimpleLoader size={20} /> :
+                  <Pressable
+                    onPress={() => viewMoreReplies(isChild ? parentComment : item)}
+                    style={__style.commentActionView}>
+                    <View style={[__style.likeView]}>
+                      <MyText fontSize={12} underlined color={colors.primary} >{isChild ? `View More Replies` : `View ${numFormatter(childCommentCount - childCommentArray.length, 1)} Replies`}</MyText>
+                    </View>
+                  </Pressable>}
+              </>}
           </View>
         </View>
         {!!item?.child_comment && Array.isArray(item?.child_comment) && item?.child_comment.map((item2, index2) => commentView(item2, index2, true, item))}
@@ -1018,7 +1088,8 @@ const __style = StyleSheet.create({
   },
   commentActionView: {
     flexDirection: "row",
-    alignItems: "center"
+    alignItems: "center",
+    justifyContent: "space-between",
   },
 
   inputRootView: {
@@ -1063,7 +1134,9 @@ const __style = StyleSheet.create({
   },
   likeView: {
     // borderWidth: 0.5, borderColor: colors.lightPrimary2,
-    borderRadius: 999, height: 20, width: 20, alignItems: 'center', justifyContent: "center"
+    borderRadius: 999, height: 20,
+    //  width: 20,
+    alignItems: 'center', justifyContent: "center"
   },
   shadow: {
     shadowColor: "#FFF",
