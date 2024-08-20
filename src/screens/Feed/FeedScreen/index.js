@@ -358,7 +358,11 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           let nList = [...obj.list];
           let index = nList.findIndex(x => x._id == eeditedComment?._id);
           if (index > -1) {
-            nList.splice(index, 1, { ...nList[index], ...eeditedComment });
+            const filterArr = !!nList[index]?.child_comment ? nList[index]?.child_comment.filter(x => x._id != data?.comment) : [];
+            console.log(filterArr,"filterArr")
+            nList[index].child_comment = filterArr;
+            nList[index].child_comments_count = eeditedComment?.child_comments_count
+            // nList.splice(index, 1, { ...nList[index], ...eeditedComment });
           }
           return {
             ...obj,
