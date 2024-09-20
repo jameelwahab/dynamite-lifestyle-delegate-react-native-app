@@ -119,12 +119,35 @@ const PortalDetail = (props) => {
               <ResponsiveImage2 uri={S3_URL + event?.banner1_image?.thumbnail_1} />
             </Pressable>}
 
+          {!!event?.banner1_button_text && !!event?.banner1_link &&
+            <View style={{ alignItems: "center", marginVertical: 10, }}>
+              <MyButton
+              noCapitalize
+                style={{ minWidth: "50%", paddingHorizontal: 20 }}
+                textStyle={{ textAlign: "center" }}
+                title={event?.banner1_button_text}
+                onPress={() => openUrl(event?.banner1_link)}
+              />
+            </View>}
+
           {!!event?.banner2_image?.thumbnail_1 &&
             <Pressable
               onPress={() => openUrl(event?.banner2_link)}
               style={__style.bannerImageView}>
               <ResponsiveImage2 uri={S3_URL + event?.banner2_image?.thumbnail_1} />
             </Pressable>}
+
+          {!!event?.banner2_button_text && !!event?.banner2_link &&
+            <View style={{ alignItems: "center", marginVertical: 10, }}>
+              <MyButton
+              noCapitalize
+                textStyle={{ textAlign: "center" }}
+                style={{ minWidth: "50%", paddingHorizontal: 20 }}
+                title={event?.banner2_button_text}
+                onPress={() => openUrl(event?.banner2_link)}
+              />
+            </View>}
+
         </View>
 
         {!!event?.detail_description &&

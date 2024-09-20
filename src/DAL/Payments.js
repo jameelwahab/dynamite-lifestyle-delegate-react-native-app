@@ -33,9 +33,9 @@ export const GET_PAYMENT_REQUEST_LIST = ({ token, navigation, page, sort }) => {
 
 
 
-export const GET_MEMBER_LIST_FOR_PAYMENT_REQUEST = ({ token, navigation, searchText }) => {
+export const GET_MEMBER_LIST_FOR_PAYMENT_REQUEST = ({ token, navigation, searchText,memberType }) => {
   return invokeApi({
-    path: `api/member/members_list_for_select/delegate?search_text=${searchText}`,
+    path: `api/member/members_list_for_select/delegate?include_members=${memberType}&search_text=${searchText}`,
     method: "GET",
     token,
     navigation

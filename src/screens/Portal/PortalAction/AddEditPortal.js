@@ -38,7 +38,9 @@ const AddEditPortal = ({ navigation, route }) => {
     numberOfDays: !!item?.no_of_days ? String(item?.no_of_days) : "0",
     topSectionText: !!item?.top_text ? item?.top_text : "",
     bottomSectionText: !!item?.bottom_text ? item?.top_text : "",
+    banner1BtnText: !!item?.banner1_button_text ? item?.banner1_button_text : "",
     banner1Link: !!item?.banner1_link ? item?.banner1_link : "",
+    banner2BtnText: !!item?.banner2_button_text ? item?.banner2_button_text : "",
     banner2Link: !!item?.banner2_link ? item?.banner2_link : "",
     status: !!!item?.status == false ? false : true,
     isPurchaseLinkEnabled: !!item?.is_purchase_link ? true : false,
@@ -108,7 +110,9 @@ const AddEditPortal = ({ navigation, route }) => {
       fd.append("top_text", data.topSectionText.trim())
       fd.append("bottom_text", data.bottomSectionText.trim())
       fd.append("banner1_link", data.banner1Link)
+      fd.append("banner1_button_text", data.banner1BtnText.trim())
       fd.append("banner2_link", data.banner2Link)
+      fd.append("banner2_button_text", data.banner2BtnText.trim())
       fd.append("status", data.status)
       fd.append("is_purchase_link", data.isPurchaseLinkEnabled);
       if (data.isPurchaseLinkEnabled) {
@@ -309,11 +313,22 @@ const AddEditPortal = ({ navigation, route }) => {
             />
 
             <MyInputs
+              label='Banner 1 Button Text'
+              value={data?.banner1BtnText}
+              onChangeText={(text) => setData({ banner1BtnText: text })}
+            />
+
+            <MyInputs
               label='Banner 2 Link'
               value={data?.banner2Link}
               onChangeText={(text) => setData({ banner2Link: text })}
             />
 
+            <MyInputs
+              label='Banner 2 Button Text'
+              value={data?.banner2BtnText}
+              onChangeText={(text) => setData({ banner2BtnText: text })}
+            />
 
 
             <View style={__styles.radioRootView}>

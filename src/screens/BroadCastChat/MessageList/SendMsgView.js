@@ -65,7 +65,8 @@ const SendMsgView = ({ receiver, navigation, edit, clearEdit, chatId, setChat })
     isVisible: false,
     type: 1,
     scheduleDate: moment(),
-    scheduleTime: "00:00"
+    scheduleTime: "00:00",
+    addAsNote: false
   })
 
   const [sendMsgLoader, setSendMsgLoader] = useState(false);
@@ -73,6 +74,7 @@ const SendMsgView = ({ receiver, navigation, edit, clearEdit, chatId, setChat })
   const setMsg = (updation) => updateMsg({ ...msg, ...updation })
 
   useEffect(() => {
+    console.log(edit, "edit")
     if (!!edit?._id) {
       setMsg({
         image: !!edit?.image ? edit?.image : "",
@@ -81,7 +83,13 @@ const SendMsgView = ({ receiver, navigation, edit, clearEdit, chatId, setChat })
         audioTime: !!edit?.audio_duration ? edit?.audio_duration : "",
       });
       if (edit?.status == "schedule") {
-        setBroadcastType({ ...broadcastType, type: 2, scheduleDate: moment(edit?.schedule_date, "YYYY-MM-DD"), scheduleTime: edit?.schedule_time })
+        setBroadcastType({
+          ...broadcastType,
+          type: 2,
+          scheduleDate: moment(edit?.schedule_date, "YYYY-MM-DD"),
+          scheduleTime: edit?.schedule_time,
+          addAsNote: edit?.add_as_personal_note
+        })
       }
     }
   }, [edit])
@@ -280,7 +288,8 @@ const SendMsgView = ({ receiver, navigation, edit, clearEdit, chatId, setChat })
         message: msg.text.trim(),
         image: imagePath,
         message_content_type: "text",
-        message_type: broadcastType.type == 1 ? "publish" : "schedule"
+        message_type: broadcastType.type == 1 ? "publish" : "schedule",
+        add_as_personal_note: broadcastType?.addAsNote
       }
       if (broadcastType.type == 2) {
         postData['schedule_time'] = moment(moment(broadcastType.scheduleDate).format(dateTimeFormat.date) + " " + broadcastType.scheduleTime, "DD-MM-YYYY HH:mm").toISOString();
@@ -316,7 +325,8 @@ const SendMsgView = ({ receiver, navigation, edit, clearEdit, chatId, setChat })
         message: msg.text.trim(),
         image: imagePath,
         message_content_type: "text",
-        message_type: broadcastType.type == 1 ? "publish" : "schedule"
+        message_type: broadcastType.type == 1 ? "publish" : "schedule",
+        add_as_personal_note: broadcastType?.addAsNote
       }
       if (broadcastType.type == 2) {
         postData['schedule_time'] = moment(moment(broadcastType.scheduleDate).format(dateTimeFormat.date) + " " + broadcastType.scheduleTime, "DD-MM-YYYY HH:mm").toDate();
@@ -569,6 +579,15 @@ const SendMsgView = ({ receiver, navigation, edit, clearEdit, chatId, setChat })
                 <MyText fontSize={12} isLabel>{"Publish date and time is in Europe/Dublin timezone"}</MyText>
               </View>
             </Collapsible>
+
+            <View style={{ marginVertical: 10 }}>
+              <MyCheckBox
+                title="Add as Personal Note"
+                isNormalText
+                value={broadcastType?.addAsNote}
+                onPress={() => setBroadcastType({ ...broadcastType, addAsNote: !broadcastType?.addAsNote })}
+              />
+            </View>
 
             <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "flex-end" }}>
               <TransparentButton title='CANCEL' onPress={closeBroadcastModal} />

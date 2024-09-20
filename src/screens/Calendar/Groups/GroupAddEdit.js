@@ -15,15 +15,16 @@ import OptionModalWithSearch from '../../../components/OptionModalWithSearch'
 import MyChip from '../../../components/MyChip'
 import showToast from '../../../functions/showToast'
 import MyLoader from '../../../components/MyLoader'
+import { selectSettings } from '../../../redux/reducers/settingSlice'
+import OptionModal from '../../../components/OptionModal'
+import { communityLevelArr, communityLevelObj } from '../../../utilities/constants'
 
 const GroupAddEdit = ({ navigation, route }) => {
   const { group, ammendList } = route?.params;
   console.log(group, "group")
   const isEdit = !!group;
-  const { token } = useSelector(selectUser);
-  const [list, setList] = useState([]);
+  const { token, access } = useSelector(selectUser);
   const [loader, setLoader] = useState(false);
-  const [searchText, setSearchText] = useState("")
   const [memberList, setMemberList] = useState([]);
   const [programmeList, setProgrammeList] = useState([]);
   const [eventsList, setEventsList] = useState([]);
@@ -31,6 +32,8 @@ const GroupAddEdit = ({ navigation, route }) => {
     isVisible: false,
     type: "",
   })
+  const [communityLevelModal, setCommunityLevelModal] = useState(false);
+  const [memberModal, setMemberModal] = useState(false);
   const [groupData, updateGroupData] = useState({
     title: !!group?.title ? group?.title : "",
     status: isEdit && !!group?.status == false ? false : true,
@@ -38,6 +41,8 @@ const GroupAddEdit = ({ navigation, route }) => {
     program: !!group?.program ? group?.program.map(x => x?._id) : [],
     event: !!group?.event ? group?.event.map(x => x?._id) : [],
     member: !!group?.member ? group?.member.map(x => x?._id) : [],
+    memberType: !!group?.group_for_member ? group?.group_for_member : memberTypeList[0]?.value,
+    communityLevel: !!group?.community_level ? group?.community_level : ""
   })
   const setGroupData = (update) => updateGroupData({ ...groupData, ...update });
 
@@ -48,8 +53,12 @@ const GroupAddEdit = ({ navigation, route }) => {
 
   useEffect(() => {
     getProgrammsListFromServer()
-    getMemberListFromServer()
+
   }, [])
+
+  useEffect(() => {
+    getMemberListFromServer()
+  }, [groupData?.memberType])
 
   //! APIs
 
@@ -63,7 +72,7 @@ const GroupAddEdit = ({ navigation, route }) => {
 
 
   const getMemberListFromServer = async (searchText = "") => {
-    let res = await GET_MEMBER_LIST_FOR_PAYMENT_REQUEST({ navigation, token, searchText: searchText.trim() });
+    let res = await GET_MEMBER_LIST_FOR_PAYMENT_REQUEST({ navigation, token, searchText: searchText.trim(), memberType: groupData?.memberType });
     if (res.code == 200) {
       setMemberList(res?.members)
     }
@@ -102,7 +111,9 @@ const GroupAddEdit = ({ navigation, route }) => {
         group_by: groupData.groupBy,
         title: groupData.title.trim(),
         status: groupData.status,
-        member: groupData.member.map(member => ({ member_id: member._id }))
+        member: groupData.member.map(member => ({ member_id: member._id })),
+        community_level: groupData?.communityLevel,
+        group_for_member: groupData?.memberType
       };
       if (obj.group_by == "program") {
         obj["program"] = groupData.program.map(item => ({ program_slug: item.program_slug }))
@@ -134,7 +145,6 @@ const GroupAddEdit = ({ navigation, route }) => {
       if (!groupData[optionModal?.type].find(x => x?._id == y?._id)) return true
       else return false
     });
-    console.log(nList,"nList")
     if (optionModal?.type == "member" || text.trim() == "") {
 
     } else if (optionModal?.type == "event" || optionModal?.type == "program") {
@@ -232,6 +242,21 @@ const GroupAddEdit = ({ navigation, route }) => {
           </View>
         </View>
 
+        {access?.allow_mission_control_group_members_option &&
+          <MyTouchableInput
+            onPress={() => setMemberModal(true)}
+            label='Include Members *'
+            value={memberType[groupData?.memberType]}
+
+          />}
+
+        {access?.allow_community_level_in_group &&
+          <MyTouchableInput
+            onPress={() => setCommunityLevelModal(true)}
+            label='Community Level'
+            value={!!groupData?.communityLevel ? communityLevelObj[groupData?.communityLevel] : ""}
+          />}
+
         {groupData.groupBy == "program" ?
 
           <MyTouchableInput
@@ -288,12 +313,57 @@ const GroupAddEdit = ({ navigation, route }) => {
         )}
       />
 
+      {/* Include member modal */}
+      <OptionModal
+        noIcon
+        isVisible={memberModal}
+        closeModal={() => setMemberModal(false)}
+        optionList={memberTypeList}
+        onSelected={(item) => {
+          setMemberModal(false);
+          setGroupData({ ...groupData, memberType: item?.value })
+        }}
+        checkSelected={(item) => item?.value == groupData?.memberType}
+      />
+
+      {/* Community level modal */}
+      <OptionModal
+        onSelected={(item) => {
+          setCommunityLevelModal(false);
+          setGroupData({ ...groupData, communityLevel: item?.value })
+        }}
+        checkSelected={(item) => item?.value == groupData?.communityLevel}
+        noIcon
+        isVisible={communityLevelModal}
+        closeModal={() => setCommunityLevelModal(false)}
+        optionList={communityLevelArr}
+      />
+
+
       <MyLoader enable={loader} />
     </RootView>
   )
 }
 
 export default GroupAddEdit
+
+const memberType = {
+  nurtured_and_delegated: "Nurture & Delegated",
+  all: "All"
+}
+const memberTypeList = [
+  {
+    title: "Nurture & Delegated",
+    value: "nurtured_and_delegated"
+  },
+  {
+    title: "All",
+    value: "all"
+  },
+]
+
+
+
 
 const __styles = StyleSheet.create({
   radioRootView: {

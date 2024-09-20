@@ -19,6 +19,7 @@ import { icons } from '../../../utilities/icons'
 import MyRefreshControl from '../../../components/MyRefreshControl'
 import showToast from '../../../functions/showToast'
 import SearchView from '../../../components/SearchView'
+import { communityLevelWithAllObj } from '../../../utilities/constants'
 
 const GroupList = ({ navigation, route }) => {
   const { key, parentKey } = route?.params
@@ -68,9 +69,9 @@ const GroupList = ({ navigation, route }) => {
 
   const ammendList = (group) => {
     let index = list.findIndex(x => x?._id == group._id);
-    console.log(group,index,"ammendList")
+    console.log(group, index, "ammendList")
     if (index > -1) {
-      list.splice(index, 1,group);
+      list.splice(index, 1, group);
     } else {
       list.unshift(group);
     }
@@ -121,7 +122,7 @@ const GroupList = ({ navigation, route }) => {
           <MyText key={x?._id?._id}>{x?._id?.title},</MyText>
         ))}
 
-       
+
       </View>)
   }
 
@@ -147,6 +148,7 @@ const GroupList = ({ navigation, route }) => {
           <StatView title={"Type"} value={item?.group_type} />
           <StatView title={"Group By"} value={groupBy[item?.group_by]} />
           <StatView title={"Members"} value={item?.member.length} />
+          <StatView original title={"community Level"} value={!!item?.community_level ? communityLevelWithAllObj[item?.community_level.toLowerCase()] : ""} />
           <StatView title={"Status"} view={() => statusView(item?.status)} />
         </View>
       </Pressable>

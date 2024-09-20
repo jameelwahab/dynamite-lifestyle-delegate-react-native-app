@@ -1,8 +1,8 @@
 import { displayName } from '../../app.json';
 
 
-// export const isDev = true;
-export const isDev = false;
+export const isDev = true;
+// export const isDev = false;
 let domain, socketUrl, S3_URL, appName, websiteBaseUrl
 if (isDev) {
   // domain = "https://apidevfeatures.dynamitelifestyle.com/";
@@ -36,6 +36,62 @@ export const googleScopes = [
 
 export const GoogleClientIdsForAndroidDebugMode = "608984481708-77j6lt82sp1jpftfejgb1955l2gheuid.apps.googleusercontent.com";
 
+export const communityLevelObj = {
+  dynamite: "Dynamite",
+  pta: "PTA",
+  elite: "Elite",
+  mastery: "Mastery"
+}
+
+export const communityLevelArr = [
+  {
+    title: "Dynamite",
+    value: "dynamite"
+  },
+  {
+    title: "PTA",
+    value: "pta"
+  },
+  {
+    title: "Elite",
+    value: "elite"
+  },
+  {
+    title: "Mastery",
+    value: "mastery"
+  },
+]
+
+export const communityLevelWithAllObj = {
+  dynamite: "Dynamite",
+  pta: "PTA",
+  elite: "Elite",
+  mastery: "Mastery",
+  all: "All",
+}
+
+export const communityLevelWithAllArr = [
+  {
+    title: "All",
+    value: "all"
+  },
+  {
+    title: "Dynamite",
+    value: "dynamite"
+  },
+  {
+    title: "PTA",
+    value: "pta"
+  },
+  {
+    title: "Elite",
+    value: "elite"
+  },
+  {
+    title: "Mastery",
+    value: "mastery"
+  },
+]
 
 export const dateTimeFormat = {
   date: "DD-MM-YYYY",
