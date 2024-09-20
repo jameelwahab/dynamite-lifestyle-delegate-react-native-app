@@ -32,6 +32,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { SimpleLoader } from '../../../components/MyLoader'
 import { useSelector } from 'react-redux'
 import { selectSocket } from '../../../redux/reducers/socketSlice'
+import PollView from './PollView'
 
 
 
@@ -468,7 +469,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     fd.append("embed_code", postType == "embed_code" ? embededCode : "");
     fd.append("feed_images", postType == 'image' ? JSON.stringify(uploadedImages) : "[]");
     fd.append("mentioned_users", JSON.stringify(mentionList));
-    if (!isCosmos && !!editId == false ) {
+    if (!isCosmos && !!editId == false) {
       fd.append("created_for_level_or_type", JSON.stringify(postCeatedForArray.map(x => x.type)));
     } else if (!!editId) {
       fd.append("created_for_level_or_type", postCeatedFor);
@@ -1242,6 +1243,11 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                   </TouchableOpacity>
                 </View>}
 
+              {/* {postType == "poll" &&
+                <View >
+                  <PollView timezone={timezone} />
+                </View>} */}
+
 
               {/* //*     post type action buttonns  */}
               <View style={__style.typeButtonRow}>
@@ -1263,6 +1269,12 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                     style={__style.typeButtonView}>
                     {icons.code(postType == "embed_code" ? colors.primary : colors.white, 17)}
                   </TouchableOpacity>
+
+                  {/* <TouchableOpacity
+                    onPress={() => setPostType("poll")}
+                    style={__style.typeButtonView}>
+                    {icons.poll(postType == "poll" ? colors.primary : colors.white, 17)}
+                  </TouchableOpacity> */}
                 </View>
                 {!isCosmos && showEventOption &&
                   <TouchableOpacity

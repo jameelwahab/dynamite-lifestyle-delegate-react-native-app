@@ -72,8 +72,12 @@ const AddBooking = ({ navigation, route }) => {
   // }, [optionModal?.isVisble])
 
   useEffect(() => {
-    getPagesFromServer();
-    getBookingsTimeSlotsFromServer();
+    if (!isPass) {
+      getPagesFromServer();
+    }
+    if (consultant?._id) {
+      getBookingsTimeSlotsFromServer();
+    }
   }, [date, consultant?._id])
 
   const onSearchTextChange = (text) => {
@@ -266,11 +270,11 @@ const AddBooking = ({ navigation, route }) => {
 
   const getBookingsTimeSlotsFromServer = async () => {
     let res;
-    // if (isPass) {
-    res = await GET_BOOKING_TIME_SLOTS_BY_CONSULTANT({ navigation, token, date: moment(date).format("YYYY/MM/DD"), consultant_id: consultant?._id });
-    // } else {
-    //   res = await GET_BOOKING_TIME_SLOTS({ navigation, token, date: moment(date).format("YYYY/MM/DD") });
-    // }
+    if (!isEdit) {
+      res = await GET_BOOKING_TIME_SLOTS_BY_CONSULTANT({ navigation, token, date: moment(date).format("YYYY/MM/DD"), consultant_id: consultant?._id });
+    } else {
+      res = await GET_BOOKING_TIME_SLOTS({ navigation, token, date: moment(date).format("YYYY/MM/DD") });
+    }
     if (res.code == 200) {
       if (optionModal.isVisble && optionModal?.type == "Time Slot") {
         setOptionModal({ ...optionModal, list: res?.slots })

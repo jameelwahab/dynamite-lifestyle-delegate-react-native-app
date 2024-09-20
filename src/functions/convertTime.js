@@ -40,3 +40,19 @@ export const convertTimezone2 = (date,state) => {
   let final_date = moment(momentObj).tz(state.user);
   return final_date;
 };
+
+export const convertTimezoneToRegion = (
+  date,
+  state
+) => {
+  // let formated_date = moment(date, "YYYY-MM-DD HH:mm:ss").format(
+  //   "YYYY-MM-DD HH:mm:ss"
+  // );
+  let momentObj = moment.utc(
+    date,
+    "YYYY-MM-DD HH:mm:ss",
+  );
+
+  let final_date = moment(momentObj).clone().tz(state.user);
+  return final_date;
+};
