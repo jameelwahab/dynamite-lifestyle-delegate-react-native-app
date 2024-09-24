@@ -144,7 +144,7 @@ const PollView = forwardRef(({ data, timezone }, ref) => {
         </View>
       </View>
 
-      <View style={{ marginTop: 10 }}>
+      <View style={{ marginTop: -10}}>
         {options.map((item, index) => (
           <View style={__styles.optionView}>
             <View style={{ flex: 1 }}>

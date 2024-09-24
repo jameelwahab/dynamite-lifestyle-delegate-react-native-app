@@ -1301,7 +1301,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                   </TouchableOpacity>
                 </View>}
 
-              {postType == "poll" && access?.enable_poll_feed &&
+              {postType == "poll" && 
                 <View >
                   <PollView ref={ref_poll} data={pollData} timezone={timezone} />
                 </View>}
