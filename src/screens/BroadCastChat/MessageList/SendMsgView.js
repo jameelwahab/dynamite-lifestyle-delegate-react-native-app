@@ -87,7 +87,7 @@ const SendMsgView = ({ receiver, navigation, edit, clearEdit, chatId, setChat })
           ...broadcastType,
           type: 2,
           scheduleDate: moment.utc(edit?.schedule_date_time),
-          scheduleTime:  moment.utc(edit?.schedule_date_time),
+          scheduleTime: moment.utc(edit?.schedule_date_time),
           addAsNote: edit?.add_as_personal_note
         })
       }
@@ -383,6 +383,7 @@ const SendMsgView = ({ receiver, navigation, edit, clearEdit, chatId, setChat })
         socket.emit("publish_broadcast_message", res);
       }
       clearEdit?.()
+      setMsg({ image: "", text: "", audio: "", audioTime: "" })
       setSendMsgLoader(false);
       setBroadcastType({ isVisible: false, type: 1, scheduleDate: moment(), scheduleTime: "00:00" });
     } else {
