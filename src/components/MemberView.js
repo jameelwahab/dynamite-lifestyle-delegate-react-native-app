@@ -4,7 +4,7 @@ import MyText from './MyText'
 import UserImage from './UserImage'
 import { colors } from '../utilities/colors'
 
-const MemberView = ({ member, showPhoneNumber = false, marginLeft = 5, size = 30, titleSize = 12, customImage = "", hideEmail = false, secondText = "" }) => {
+const MemberView = ({ member, showPhoneNumber = false, marginLeft = 5, size = 30, titleSize = 12, customImage = "", hideEmail = false, secondText = "", subText }) => {
   let image = !!customImage ? customImage : member?.profile_image
   return (
 
@@ -16,6 +16,7 @@ const MemberView = ({ member, showPhoneNumber = false, marginLeft = 5, size = 30
           {!!secondText &&
             <MyText type='bold' capitalize fontSize={titleSize} >{`${secondText}`}</MyText>}
         </View>
+        {!!subText && <MyText type='medium' color={colors.lightText2} fontSize={10} >{subText}</MyText>}
         {!hideEmail && <MyText type='medium' color={colors.lightText2} fontSize={10} >{`${member?.email}`}</MyText>}
         {showPhoneNumber && !!member?.contact_number &&
           <MyText type='medium' color={colors.lightText2} fontSize={10} >{member?.contact_number}</MyText>}

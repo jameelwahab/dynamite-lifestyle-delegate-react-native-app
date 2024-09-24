@@ -160,7 +160,7 @@ const PollDetailModal = forwardRef(({ token, navigation, timezone, member, }, re
         <MemberView
           hideEmail
           member={item?.user_info_action_by}
-          subText={convertTimezone2(moment(item?.createdAt), timezone).format("DD-MM-YYYY [at] hh:mm A")}
+          subText={moment(item?.createdAt).format("DD-MM-YYYY [at] hh:mm A")}
         />
       </View>
     )

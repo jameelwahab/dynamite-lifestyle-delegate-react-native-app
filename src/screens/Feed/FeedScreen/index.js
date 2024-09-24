@@ -484,8 +484,15 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
     if (data.action === 'poll_answered') {
       updateFeedItemsSpecificField(data?.feed_obj?._id, {
         poll_info: data?.feed_obj?.poll_info,
-        selected_options: data?.feed_obj?.selected_options
+        // selected_options: data?.feed_obj?.selected_options
       })
+      if (data?.action_by?._id == user?._id) {
+        updateFeedItemsSpecificField(data?.feed_obj?._id, {
+          // poll_info: data?.feed_obj?.poll_info,
+          selected_options: data?.feed_obj?.selected_options
+        })
+      }
+
     } else if (data.action === 'poll_expired') {
       setFeed((list) => {
         list.map((x) => {
