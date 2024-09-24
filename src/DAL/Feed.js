@@ -110,7 +110,8 @@ export const UPLOAD_FEED_IMAGES = ({ token, navigation, formData }) => {
 
 export const CREATE_FEED = ({ token, navigation, formData }) => {
   return invokeApi({
-    path: `api/feeds/delegate_portal/create`,
+    // path: `api/feeds/delegate_portal/create`,
+    path: "api/feeds/delegate_portal/create_with_poll",
     headers: { 'Content-Type': 'multipart/form-data' },
     method: "POST",
     postData: formData,
@@ -130,7 +131,8 @@ export const FEED_DETAIL = ({ token, navigation, feedId }) => {
 
 export const UPDATE_FEED = ({ token, navigation, formData, feedId }) => {
   return invokeApi({
-    path: `api/feeds/update_feed_by_delegate/${feedId}`,
+    // path: `api/feeds/update_feed_by_delegate/${feedId}`,
+    path:`api/feeds/update_feed_by_delegate_with_poll/${feedId}`,
     headers: { 'Content-Type': 'multipart/form-data' },
     method: "PUT",
     postData: formData,
@@ -248,6 +250,40 @@ export const GET_DELEGATES_LIST_FROM_SERVER_FOR_MENTION_V1 = ({ token, navigatio
     token,
     navigation,
   })
+}
+
+
+export const FEED_POLL_ACTIONS = ({ token, navigation, feedId, optionId }) => {
+  return invokeApi({
+    path: `api/feeds/manage_poll_answer`,
+    method: "POST",
+    token,
+    navigation,
+    postData: {
+      feed_id: feedId,
+      option_id: optionId
+    }
+  })
+}
+
+export const FEED_POLLED_MEMBER_LIST = ({ token, navigation, postData }) => {
+  return invokeApi({
+    path: `api/feeds/poll_option_user_list`,
+    method: "POST",
+    token,
+    navigation,
+    postData
+  })
+}
+
+
+export const FEED_POLL_DETAIL = ({ token, navigation, id }) => {
+  return invokeApi({
+    path: `api/feeds/feed_poll_details/${id}`,
+    method: 'GET',
+    token,
+    navigation,
+  });
 }
 
 

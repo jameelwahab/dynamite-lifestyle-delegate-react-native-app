@@ -223,6 +223,8 @@ const NotificationList = ({ navigation, route }) => {
       }
       if (notification_type == "support_ticket_comment") {
         params["tab"] = 1
+      } else if (notification_type == "support_ticket_internal_note") {
+        params["tab"] = 2
       }
 
       let isMineTicket = item?.support_ticket?.action_id == user?._id;
@@ -573,5 +575,5 @@ const __styles = StyleSheet.create({
 
 
 
-const feedType = ["commentlike", "addcomment", "feedlike", "gratitude", "addcommentreply", "feed_mentioned", "feed_comment_mentioned"];
-const SupportTicketType = ["send_support_ticket_reminder", "close_support_ticket", "support_ticket_comment", "add_support_ticket", "support_ticket"];
+const feedType = ["commentlike", "addcomment", "feedlike", "gratitude", "addcommentreply", "feed_mentioned", "feed_comment_mentioned", "poll_answer"];
+const SupportTicketType = ["support_ticket_internal_note", "send_support_ticket_reminder", "close_support_ticket", "support_ticket_comment", "add_support_ticket", "support_ticket"];

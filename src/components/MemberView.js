@@ -9,10 +9,10 @@ const MemberView = ({ member, showPhoneNumber = false, marginLeft = 5, size = 30
   return (
 
     <View style={{ marginLeft, height: 35, flexDirection: "row", alignItems: "center", }}>
-      <UserImage image={image} name={member?.first_name} size={size} />
+      <UserImage image={image} name={!!member?.name ? member?.name : member?.first_name} size={size} />
       <View style={{ marginLeft: 10 }}>
         <View style={{ flexDirection: "row" }}>
-          <MyText type='bold'  fontSize={titleSize} >{`${member?.first_name} ${member?.last_name}`}</MyText>
+          <MyText type='bold' fontSize={titleSize} >{!!member?.name ? member?.name : `${member?.first_name} ${member?.last_name}`}</MyText>
           {!!secondText &&
             <MyText type='bold' capitalize fontSize={titleSize} >{`${secondText}`}</MyText>}
         </View>

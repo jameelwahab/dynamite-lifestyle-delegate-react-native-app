@@ -113,6 +113,8 @@ const notificationHandler = (remoteMessage, navigation, navbar) => {
 
     if (data?.type == "support_ticket_comment") {
       params["tab"] = 1
+    } else if (data?.type == "support_ticket_internal_note") {
+      params["tab"] = 2
     } else if (data?.type == "close_support_ticket") {
       params["route"] = "solved"
     }
@@ -203,5 +205,5 @@ const notificationHandler = (remoteMessage, navigation, navbar) => {
 }
 
 export default notificationHandler;
-const feedType = ["commentlike", "addcomment", "feedlike", "gratitude", "addcommentreply", "feed_mentioned", "feed_comment_mentioned"];
-const SupportTicketType = ["send_support_ticket_reminder", "close_support_ticket", "support_ticket_comment", "add_support_ticket"];
+const feedType = ["commentlike", "addcomment", "feedlike", "gratitude", "addcommentreply", "feed_mentioned", "feed_comment_mentioned", "poll_answer"];
+const SupportTicketType = ["send_support_ticket_reminder", "close_support_ticket", "support_ticket_comment", "add_support_ticket", "support_ticket_internal_note"];

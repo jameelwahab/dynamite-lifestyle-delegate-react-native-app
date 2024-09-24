@@ -82,12 +82,12 @@ const SendMsgView = ({ receiver, navigation, edit, clearEdit, chatId, setChat })
         audio: !!edit?.audio ? edit?.audio : "",
         audioTime: !!edit?.audio_duration ? edit?.audio_duration : "",
       });
-      if (edit?.status == "schedule") {
+      if (edit?.message_type == "schedule") {
         setBroadcastType({
           ...broadcastType,
           type: 2,
-          scheduleDate: moment(edit?.schedule_date, "YYYY-MM-DD"),
-          scheduleTime: edit?.schedule_time,
+          scheduleDate: moment.utc(edit?.schedule_date_time),
+          scheduleTime:  moment.utc(edit?.schedule_date_time),
           addAsNote: edit?.add_as_personal_note
         })
       }

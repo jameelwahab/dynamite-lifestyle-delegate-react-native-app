@@ -27,7 +27,12 @@ const InitWithAuth = async (token, navigation, setLoader, dispatch) => {
       stripeKey = res?.site_setting?.live_publish_key
     }
     notifee.setBadgeCount(res?.unread_notification_count)
-    dispatch(setSettings({ ...res?.consultant_setting, stripeKey: stripeKey }));
+    dispatch(setSettings({
+      ...res?.consultant_setting, stripeKey: stripeKey,
+      pollSettings: {
+        poll_winner_description: res?.poll_winner_description
+      }
+    }));
     dispatch(setUserAndToken({
       user: res?.consultant,
       token: token,

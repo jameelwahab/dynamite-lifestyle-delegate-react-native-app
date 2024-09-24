@@ -33,6 +33,8 @@ import { SimpleLoader } from '../../../components/MyLoader'
 import { useSelector } from 'react-redux'
 import { selectSocket } from '../../../redux/reducers/socketSlice'
 import PollView from './PollView'
+import { convertTimezoneToRegion } from '../../../functions/convertTime'
+
 
 
 
@@ -44,15 +46,15 @@ let cursor = {
 const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, selectFeedlevel, feedLevel, tab, isCosmos, isScheduledFeed, timezone, removeFromList, isSuperDelegate, hideLevelView, isEventFeed, eventId, isMultipleSelectAllowed, showEventOption,
   hideAddView,
   cosmosLevelList, selectLevelOptionOnAddPostForCosmos, defaultCosmosFilter,
+  isPollAllowed
 
 }, ref) => {
   const { height, width } = useWindowDimensions();
   const inset = useSafeAreaInsets();
+  const ref_poll = useRef()
   const { socket } = useSelector(selectSocket);
   const lvlModalRef = useRef()
-  const webViewRef = useRef()
   const ref_input = useRef();
-  const tablRef = useRef()
   const [loader, setLoader] = useState(false);
   const [isPostModalVisible, setPostModalVisibilty] = useState(false);
   const [isImageVisible, setImageModalVisibilty] = useState(false);
@@ -94,6 +96,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   const [eventModalVisible, setEventModalVisible] = useState(false)
   const [multipleLevelModalVisiblity, setMultipleLevelModalVisiblity] = useState(false);
 
+  const [pollData, setPollData] = useState(null)
 
   useEffect(() => {
 
@@ -293,6 +296,8 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
       setPublishDate(moment(item?.schedule_date_time).tz(timezone.admin).format(dateTimeFormat.date));
       setPublishTime(moment(item?.schedule_date_time).tz(timezone.admin).format(dateTimeFormat.time));
     }
+
+    setPollData(item?.poll_info)
   }
 
 
@@ -331,6 +336,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     setDelegateList([]);
     setIsMentionListVisible(false);
     set_at_index(-1)
+    setPollData(null)
     cursor = {
       start: 0,
       end: 0
@@ -406,7 +412,26 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     return !!postCeatedForArray.find(x => x.type == opt.type)
   }
 
+  const areTextValuesUnique = (arr) => {
+    const textSet = new Set();
+
+    for (const obj of arr) {
+      // Check if the text value already exists in the set
+      if (textSet.has(obj.text)) {
+        return false; // Not unique
+      }
+      textSet.add(obj.text);
+    }
+
+    return true; // All text values are unique
+  }
+
   const addPostBtn = async () => {
+    let pollData = null;
+    if (postType == "poll") {
+      pollData = ref_poll?.current?.getData();
+      console.log(pollData, "Poll Data");
+    }
     // if (postType == "general" && ) {
     //   showToast({ body: "Please add some text to be posted", title: "Alert", type: "info" });
     //   return
@@ -429,6 +454,27 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
       showToast({ body: "Please select post level", title: "Alert", type: "info" });
       return
     }
+
+    else if (postType == 'poll') {
+      let time = moment(moment(pollData?.expiryDate).format("YYYY-MM-DD") + " " + moment(pollData?.expiryTime).format("HH:mm"), "YYYY-MM-DD HH:mm").format("YYYY-MM-DD HH:mm");
+      let time2 = convertTimezoneToRegion(moment(), timezone).format("YYYY-MM-DD HH:mm");
+      let isbefore = moment(time).isSameOrBefore(time2);
+      if (isbefore) {
+        showToast({ title: "Alert", body: "Past time selection is not allowed. Please choose a future time.", type: "info" });
+        // Alert.alert('Past time selection is not allowed. Please choose a future time.');
+        return
+      }
+      else if (pollData?.options.some(x => x.text.trim() == "")) {
+        showToast({ title: "Alert", body: "Please add all options.", type: "info" });
+        // Alert.alert('Please add all options.');
+        return
+      } else if (areTextValuesUnique(pollData?.options) == false) {
+        showToast({ title: "Alert", body: "All poll option must be unique", type: "info" });
+        // Alert.alert('All poll option must be unique');
+        return
+      }
+    }
+
 
     setLoader(true);
     let uploadedImages = [];
@@ -478,6 +524,18 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
         JSON.stringify([postCeatedFor])
         : JSON.stringify([postCeatedFor]));
     }
+
+    if (!!pollData) {
+      fd.append('poll_info', JSON.stringify({
+        ...pollData,
+        expiry_date: moment(pollData?.expiryDate).format("YYYY-MM-DD"),
+        expiry_time: moment(pollData?.expiryTime).format("HH:mm"),
+        is_multiple_allow: pollData?.isMultiple,
+        options: pollData?.options
+      }));
+    }
+
+
 
     if (isEventViewComplete) {
       let eventObj = {
@@ -1243,10 +1301,10 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                   </TouchableOpacity>
                 </View>}
 
-              {/* {postType == "poll" &&
+              {postType == "poll" && access?.enable_poll_feed &&
                 <View >
-                  <PollView timezone={timezone} />
-                </View>} */}
+                  <PollView ref={ref_poll} data={pollData} timezone={timezone} />
+                </View>}
 
 
               {/* //*     post type action buttonns  */}
@@ -1270,11 +1328,12 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                     {icons.code(postType == "embed_code" ? colors.primary : colors.white, 17)}
                   </TouchableOpacity>
 
-                  {/* <TouchableOpacity
-                    onPress={() => setPostType("poll")}
-                    style={__style.typeButtonView}>
-                    {icons.poll(postType == "poll" ? colors.primary : colors.white, 17)}
-                  </TouchableOpacity> */}
+                  {isPollAllowed &&
+                    <TouchableOpacity
+                      onPress={() => setPostType("poll")}
+                      style={__style.typeButtonView}>
+                      {icons.poll(postType == "poll" ? colors.primary : colors.white, 17)}
+                    </TouchableOpacity>}
                 </View>
                 {!isCosmos && showEventOption &&
                   <TouchableOpacity

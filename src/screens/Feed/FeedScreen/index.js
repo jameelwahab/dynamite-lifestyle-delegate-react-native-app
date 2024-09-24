@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import RootView from '../../../components/RootView'
 import MyText from '../../../components/MyText'
 import MyLoader, { SimpleLoader } from '../../../components/MyLoader'
-import { GET_FEED_LIST, GET_COMMENT_LIST, GET_LIKE_LIST, GET_COMMENT_LIKES_LIST, FEED_ACTIONS, DELETE_FEED_POST, FEED_LIKE_ACTIONS, GET_FEED_EXTRA_DATA, IS_CHAT_EXIST, GET_FEED_DETAIL } from '../../../DAL'
+import { GET_FEED_LIST, GET_COMMENT_LIST, GET_LIKE_LIST, GET_COMMENT_LIKES_LIST, FEED_ACTIONS, DELETE_FEED_POST, FEED_LIKE_ACTIONS, GET_FEED_EXTRA_DATA, IS_CHAT_EXIST, GET_FEED_DETAIL, FEED_POLL_ACTIONS } from '../../../DAL'
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../../redux/reducers/userSlice'
 import FeedView from './FeedView'
@@ -28,6 +28,7 @@ import ScheduleModal from './ScheduleModal'
 import Header from '../../../components/Header'
 import AddPersonalNoteModal from '../AddPersonalNoteModal'
 import MyRefreshControl from '../../../components/MyRefreshControl'
+import PollDetailModal from './PollDetailModal'
 
 
 
@@ -50,15 +51,11 @@ let likeVar = {
   actionType: ""
 }
 const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, upcomingEvents, currentEvents, hideTabs = false, isScheduleFeedTabAllowed = false, schedulePost = false, }) => {
-  // let feedPage = useRef({
-  //   page: 0,
-  //   canLoadMore: false,
-  // })
-  // let { current: feedVar } = feedPage;
-  // console.log(feedVar,"feedVar")
+
   const addPostRef = useRef()
   const scheduleModalRef = useRef();
   const ref_personalNoteModal = useRef();
+  const ref_pollInfo = useRef();
   const { feedFor, feedId, eventId = "" } = route?.params;
   const isCosmos = feedFor == "the_cosmos";
   const isScheduledFeed = feedFor == "scheduled";
@@ -66,7 +63,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
   const isTheSourceFeed = feedFor == "the_source";
   const isEventFeed = feedFor == "event";
   const { token, user, access, isChatAllowed } = useSelector(selectUser);
-  console.log(access, "access")
+
   const { socket } = useSelector(selectSocket);
   const timezone = useSelector(selectTimeZone);
   const { settings } = useSelector(selectSettings);
@@ -359,7 +356,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           let index = nList.findIndex(x => x._id == eeditedComment?._id);
           if (index > -1) {
             const filterArr = !!nList[index]?.child_comment ? nList[index]?.child_comment.filter(x => x._id != data?.comment) : [];
-            console.log(filterArr,"filterArr")
+            console.log(filterArr, "filterArr")
             nList[index].child_comment = filterArr;
             nList[index].child_comments_count = eeditedComment?.child_comments_count
             // nList.splice(index, 1, { ...nList[index], ...eeditedComment });
@@ -481,7 +478,28 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
     if (data?.action.includes("comment")) {
       updateComments(data)
     }
+
+    ref_pollInfo?.current?.socketActionForPollDetailModal(data)
+
+    if (data.action === 'poll_answered') {
+      updateFeedItemsSpecificField(data?.feed_obj?._id, {
+        poll_info: data?.feed_obj?.poll_info,
+        selected_options: data?.feed_obj?.selected_options
+      })
+    } else if (data.action === 'poll_expired') {
+      setFeed((list) => {
+        list.map((x) => {
+          let index = data.feeds.findIndex(item => item.feed_id == x?._id);
+          if (index > -1) {
+            x.poll_info.poll_status = "expired";
+          }
+        })
+        return [...list]
+      })
+    }
+
   }
+
 
 
   const SocketEvents = () => {
@@ -670,7 +688,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       }, 500);
     } else if (selectedOpt?.type == "edit") {
       setTimeout(() => {
-        // console.log(item,"item")
+        console.log(item, "item")
         addPostRef?.current?.selectItemForEdit(item)
       }, 500);
     } else if (selectedOpt?.type == "message") {
@@ -811,7 +829,26 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           }
         }
 
-        if (item.type == "edit" || item.type == "delete") {
+        if (item.type == "edit") {
+          if (isMine) {
+            // newList.push(item);
+            if (feed?.feed_type == "poll" && feed?.poll_info?.poll_status != "expired") {
+              newList.push(item);
+            } else if (feed?.feed_type != "poll") {
+              newList.push(item);
+            }
+          } else {
+            if (isAllSourceFeed || isTheSourceFeed) {
+              if (access?.edit_delete_option_in_source_all_source_feeds) {
+                if ((feed?.feed_type == "poll" && feed?.poll_info?.poll_status != "expired") || feed?.feed_type != "poll") {
+                  newList.push(item);
+                }
+              }
+            }
+          }
+        }
+
+        if (item.type == "delete") {
           if (isMine) {
             newList.push(item);
           } else {
@@ -886,6 +923,19 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       // } else {
       //   return []
     }
+  }
+
+  const pollAction = async (feedId, optionId) => {
+    let resp = await FEED_POLL_ACTIONS({ token, navigation, feedId, optionId })
+    if (resp.code == 200) {
+
+    } else {
+
+    }
+  }
+
+  const openPollDetail = (item) => {
+    ref_pollInfo?.current?.openModal(item)
   }
 
   const filterTheOptionsCount = (feed) => {
@@ -1130,6 +1180,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           cosmosLevelList={access?.cosmos_feed_filters}
           defaultCosmosFilter={access?.default_filter}
           selectLevelOptionOnAddPostForCosmos={isCosmos && access?.choose_level_in_cosmos_feeds}
+          isPollAllowed={access?.enable_poll_feed}
         />
       </View>
     )
@@ -1155,6 +1206,9 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       sourceLevelIcons={feedData?.feed_setting}
       openScheduleTimeModal={scheduleModalRef?.current?.openScheduleTimeModal}
       onFeedDetail={onFeedDetail}
+      onVotePress={pollAction}
+      pollSettings={settings?.pollSettings}
+      openPollDetail={openPollDetail}
     />, [feed, inView]);
 
   const viewConfigRef = React.useRef({ viewAreaCoveragePercentThreshold: 50 })
@@ -1265,6 +1319,14 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
 
       <AddPersonalNoteModal
         ref={ref_personalNoteModal}
+      />
+
+      <PollDetailModal
+        member={user}
+        token={token}
+        ref={ref_pollInfo}
+        timezone={timezone}
+        navigation={navigation}
       />
 
       <MyLoader enable={loader} />

@@ -21,7 +21,7 @@ import PostWebView from '../../../components/PostWebView'
 import FeedText from '../../../components/FeedText'
 import numFormatter from '../../../functions/numFormatter'
 
-export const FeedView = ({ item, index, user, token, isInView, timezone, settings, openComments, showLikes, openOptions, onLikebtnPress, isCosmos, sourceLevelIcons, isScheduledFeed, openScheduleTimeModal, onFeedDetail, isEventFeed, filterTheOptions }) => {
+export const FeedView = ({ item, index, user, token, isInView, timezone, settings, openComments, showLikes, openOptions, onLikebtnPress, isCosmos, sourceLevelIcons, isScheduledFeed, openScheduleTimeModal, onFeedDetail, isEventFeed, filterTheOptions, onVotePress, pollSettings, openPollDetail }) => {
 
 
   const [animationState, setAnimationState] = useState(0)
@@ -161,6 +161,8 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
             </View>
           )}
 
+
+
         </View>
       }
 
@@ -172,6 +174,12 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
           />
         </View>
       }
+
+      {item.feed_type == "poll" &&
+        <View style={{ margin: 10, }}>
+
+          {pollFeedView(item)}
+        </View>}
 
 
       {!!item?.event_info?.is_event_info &&
@@ -245,6 +253,69 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
       </TouchableOpacity>
     </View>
   )
+
+  const get_winner_option = (options) => {
+    if (options.length === 0) {
+      return null;
+    }
+    return options.reduce(
+      (max, option) => (option.votes > max.votes ? option : max),
+      options[0]
+    );
+  }
+
+  const pollFeedView = (item) => {
+    let feed_setting = pollSettings;
+    return (
+      <View style={{}} >
+        {item?.poll_info?.poll_status == "expired" ?
+          <>
+            <View style={{ marginBottom: 10 }}>
+              {!!feed_setting?.poll_winner_description &&
+                <MyWebview
+                  html={feed_setting?.poll_winner_description.replace(/{winner_option}/g, get_winner_option(item?.poll_info?.options)?.text)}
+                />}
+            </View>
+          </> :
+          <>
+            {item?.poll_info?.options.map((option) => {
+              let isSelected = !!item?.selected_options && item?.selected_options.some(x => x._id == option?._id)
+              return (
+                <TouchableOpacity
+                  onPress={() => onVotePress?.(item?._id, option?._id)}
+                  style={{ flexDirection: "row", alignItems: "center", marginBottom: 10, }}>
+                  <View style={{ backgroundColor: isSelected ? colors.primary : colors.transparent, flex: 1, flexDirection: "row", justifyContent: "space-between", alignItems: "center", minHeight: 40, borderWidth: 1 / 2, borderColor: colors.border, borderRadius: 5, paddingHorizontal: 10 }} >
+                    <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
+                      <View style={{ marginRight: 10, height: 20, width: 20, borderRadius: 20 / 2, borderWidth: 1, borderColor: isSelected ? colors.black : colors.primary, marginHorizontal: 5, alignItems: "center", justifyContent: "center" }} >
+                        {isSelected &&
+                          <View style={{ height: 12, width: 12, borderRadius: 12 / 2, backgroundColor: colors.black }} />}
+                      </View>
+                      <MyText color={isSelected ? colors.black : colors.white} >{option?.text}</MyText>
+                    </View>
+                    {option?.votes > 0 &&
+                      <MyText color={isSelected ? colors.black : colors.white}>{numFormatter(option?.votes, 1)}</MyText>}
+                  </View>
+                </TouchableOpacity>
+              )
+            })}
+
+          </>}
+        <View style={{ alignItems: "center" }}>
+          <MyText fontSize={12} color={colors.gray} >{item?.poll_info?.poll_status == "expired" ? "Poll Expired" :
+            `Poll Expires on ${convertTimezone2(item?.poll_info?.expiry_date_time, timezone).format("DD-MM-YYYY [at] hh:mm A")}`}</MyText>
+        </View>
+
+        {/* <View style={{ height: 1, width: "100%", backgroundColor: colors.lightGolden3, marginTop: 10 }} /> */}
+
+        <Pressable
+          onPress={() => openPollDetail?.(item)}
+          style={{ borderWidth: 1, borderColor: colors.lightPrimary, borderRadius: 5, marginTop: 10, height: 35, alignItems: "center", justifyContent: "center" }} >
+          <MyText color={colors.golden} >View details</MyText>
+        </Pressable>
+      </View>
+    )
+
+  }
 
 
 
@@ -424,9 +495,9 @@ const __style = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     marginTop: 10,
-    paddingHorizontal:10
+    paddingHorizontal: 10
   },
-  likeView: { flexDirection: "row", alignItems: "center",paddingVertical:2, },
+  likeView: { flexDirection: "row", alignItems: "center", paddingVertical: 2, },
   likeImagesView: { flexDirection: "row", alignItems: "center", marginLeft: 5 },
   likeImageView: { width: 18, height: 18, borderRadius: 18 / 2, overflow: "hidden", borderWidth: 2, borderColor: colors.white },
   likeImage: { width: 16, height: 16 }

@@ -115,7 +115,7 @@ const MsgView = ({ item, index, user, timezone, onMsgLongPress, openImageZommer,
                   <TouchableOpacity
                     hitSlop={{ top: 10, left: 10, right: 10, left: 10 }}
                     onPress={() => {
-                      let str = `This message will be published on ${moment(item?.schedule_date_time).tz(timezone.admin).format(dateTimeFormat.dateTimeWithText("at"))} (${timezone.admin}) time`
+                      let str = `This message will be published on ${moment.utc(item?.schedule_date_time).format(dateTimeFormat.dateTimeWithText("at"))} (${timezone.admin}) time`
                       infoRef?.current?.openModal(str)
                     }}
                     style={{ marginRight: 5 }}>

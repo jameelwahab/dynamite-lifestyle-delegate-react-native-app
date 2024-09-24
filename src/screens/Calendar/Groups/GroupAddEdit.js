@@ -116,7 +116,14 @@ const GroupAddEdit = ({ navigation, route }) => {
         group_for_member: groupData?.memberType
       };
       if (obj.group_by == "program") {
-        obj["program"] = groupData.program.map(item => ({ program_slug: item.program_slug }))
+        obj["program"] = groupData.program.map(item => {
+          if (!!item.program_slug) {
+            return ({ program_slug: item.program_slug })
+          } else {
+            let slug = programmeList.find(x => x._id == item._id)?.program_slug;
+            return ({ program_slug: slug })
+          }
+        })
       } else {
         obj["event"] = groupData.event.map(item => ({ event_slug: item.event_slug }))
       }

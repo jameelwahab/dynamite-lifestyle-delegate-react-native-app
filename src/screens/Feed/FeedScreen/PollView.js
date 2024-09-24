@@ -7,7 +7,7 @@ import MyCheckBox from '../../../components/MyCheckBox';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import { colors } from '../../../utilities/colors';
 import moment from 'moment';
-import { convertTimezone, convertTimezoneToRegion } from '../../../functions/convertTime';
+import { convertTimezone, convertTimezone2, convertTimezoneToRegion } from '../../../functions/convertTime';
 import { dateTimeFormat } from '../../../utilities/constants';
 import { icons } from '../../../utilities/icons';
 
@@ -44,7 +44,7 @@ const PollView = forwardRef(({ data, timezone }, ref) => {
       setOptions([...data?.options]);
       setIsMultiple(data?.is_multiple_allow);
       setExpiryDate(moment(data?.expiry_date, "YYYY-MM-DD"))
-      setExpiryTime(convertTimezoneForTimeV3(moment(data?.expiry_time, "hh:mm"), timezone))
+      setExpiryTime(convertTimezone2(moment(data?.expiry_time, "hh:mm"), timezone))
     }
   }, [data])
 
@@ -149,6 +149,7 @@ const PollView = forwardRef(({ data, timezone }, ref) => {
           <View style={__styles.optionView}>
             <View style={{ flex: 1 }}>
               <MyInputs
+                noSpace
                 value={item?.text}
                 style={__styles.dateTimeInput}
                 onChangeText={text => textHandler(text, index)}
@@ -158,7 +159,7 @@ const PollView = forwardRef(({ data, timezone }, ref) => {
             {options.length > 2 &&
               <TouchableOpacity onPress={() => removeOption(index)} style={__styles.crossBtn}>
                 {/* <Image source={ic_cross} style={__styles.crossBtnIcon} /> */}
-                {icons.calendar()}
+                {icons.crosss()}
               </TouchableOpacity>}
           </View>
         ))}
@@ -166,13 +167,16 @@ const PollView = forwardRef(({ data, timezone }, ref) => {
       {options.length < 5 &&
         <View style={__styles.addOptionBtnView}>
           <MyButton
-            image={icons.calendar()}
+            style={{ paddingHorizontal: 10 }}
+            noSpace
+            noCapitalize
+            leftIcon={() => icons.plus(colors.black)}
             onPress={addOption} fullWidth title="Add Option" />
         </View>}
 
-      <View>
+      <View style={{marginTop:10}}>
         <MyCheckBox
-          label={"Allow Selecting Multiple Options"}
+          title={"Allow Selecting Multiple Options"}
           value={isMultiple}
           onPress={() => setIsMultiple((val) => !val)}
         />
@@ -210,14 +214,15 @@ const __styles = StyleSheet.create({
     backgroundColor: colors.backgorund5
   },
   optionView: {
-    marginTop: 10,
+    // marginTop: 10,
     flexDirection: "row"
   },
   crossBtn: {
     width: 30,
     alignItems: "center",
     justifyContent: "center",
-    paddingLeft: 10
+    paddingLeft: 10,
+    marginTop:15
 
   },
   crossBtnIcon: {
