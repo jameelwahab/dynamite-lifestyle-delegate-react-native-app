@@ -74,7 +74,6 @@ const SendMsgView = ({ receiver, navigation, edit, clearEdit, chatId, setChat })
   const setMsg = (updation) => updateMsg({ ...msg, ...updation })
 
   useEffect(() => {
-    console.log(edit, "edit")
     if (!!edit?._id) {
       setMsg({
         image: !!edit?.image ? edit?.image : "",
@@ -93,6 +92,8 @@ const SendMsgView = ({ receiver, navigation, edit, clearEdit, chatId, setChat })
       }
     }
   }, [edit])
+
+  console.log(moment(broadcastType.scheduleDate).format(), "broadcastType")
 
   useEffect(() => {
     selection = null;
@@ -292,9 +293,12 @@ const SendMsgView = ({ receiver, navigation, edit, clearEdit, chatId, setChat })
         add_as_personal_note: broadcastType?.addAsNote
       }
       if (broadcastType.type == 2) {
-        postData['schedule_time'] = moment(moment(broadcastType.scheduleDate).format(dateTimeFormat.date) + " " + broadcastType.scheduleTime, "DD-MM-YYYY HH:mm").toISOString();
-        postData['schedule_date'] = moment(moment(broadcastType.scheduleDate).format(dateTimeFormat.date), "DD-MM-YYYY").toISOString();
-        postData['schedule_date_time'] = moment(moment(broadcastType.scheduleDate).format(dateTimeFormat.date) + " " + broadcastType.scheduleTime, "DD-MM-YYYY HH:mm").format("DD-MM-YYYY HH:mm");
+        // postData['schedule_time'] = moment(moment(broadcastType.scheduleDate).format(dateTimeFormat.date) + " " + broadcastType.scheduleTime, "DD-MM-YYYY HH:mm").toISOString();
+        // postData['schedule_date'] = moment(moment(broadcastType.scheduleDate).format(dateTimeFormat.date), "DD-MM-YYYY").toISOString();
+        // postData['schedule_date_time'] = moment(moment(broadcastType.scheduleDate).format(dateTimeFormat.date) + " " + broadcastType.scheduleTime, "DD-MM-YYYY HH:mm").format("DD-MM-YYYY HH:mm");
+        postData['schedule_time'] = moment(broadcastType.scheduleDate).format("HH:mm");
+        postData['schedule_date'] = moment(broadcastType.scheduleDate).format("YYYY-MM-DD");
+        postData['schedule_date_time'] = moment(broadcastType.scheduleDate).format("YYYY-MM-DD HH:mm");
       }
 
 
@@ -303,7 +307,8 @@ const SendMsgView = ({ receiver, navigation, edit, clearEdit, chatId, setChat })
         postData['audio_url'] = audioPath;
         postData['message_content_type'] = "audio";
       }
-
+      // console.log(postData, "postData")
+      // return
 
 
       updateMsgToServer(postData, edit?._id)

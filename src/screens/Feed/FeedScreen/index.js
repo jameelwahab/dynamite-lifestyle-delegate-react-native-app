@@ -1169,7 +1169,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           updateFeedItem={(newFeed) => setFeed(feeds => {
             let index = feeds.findIndex(feed => feed._id === newFeed?._id);
             if (index !== -1) {
-              feeds.splice(index, 1, newFeed);
+              feeds.splice(index, 1, { ...feed[index], ...newFeed });
             }
             return [...feeds];
           })}
