@@ -248,7 +248,7 @@ const ReplyModal = forwardRef(({ member, question, refresh, list, onClose }, ref
             </View>
 
             <View style={{ paddingHorizontal: 10,marginTop:5 }}>
-              {editor &&
+            {editor &&
                 <Editor
                 label='Reply'
                   height={120}

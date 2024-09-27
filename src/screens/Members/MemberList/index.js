@@ -1,5 +1,5 @@
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image, ScrollView, Pressable, Keyboard, Platform } from 'react-native'
-import React, { useEffect, useRef, useState } from 'react'
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image, ScrollView, Pressable, Keyboard, Platform, TouchableHighlight } from 'react-native'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import RootView from '../../../components/RootView'
 import MyText from '../../../components/MyText'
 import invokeApi from '../../../functions/invokeAPI'
@@ -32,6 +32,8 @@ import OptionModal from '../../../components/OptionModal'
 import downloadImage from '../../../functions/downloadImage'
 import RNFetchBlob from 'react-native-blob-util';
 import showToast from '../../../functions/showToast'
+import LeadModal from '../Components/LeadModal'
+import LeadHistoryModal from '../Components/LeadHistoryModal'
 
 
 
@@ -46,9 +48,12 @@ const MemberList = ({ navigation, route }) => {
   const isNurture = type == "nurture";
   const { token, user, isChatAllowed, access } = useSelector(selectUser);
   const [showChips, setShowChips] = useState(false);
+  const [member, setMember] = useState(null)
   const sortModalRef = useRef();
   const filterModalRef = useRef();
   const saveModalRef = useRef();
+  const leadModalRef = useRef();
+  const hitoryModalRef = useRef()
   const [loader, setLoader] = useState(true);
   const [footerLoader, setFooterLoader] = useState(false)
   const [list, setList] = useState([]);
@@ -306,6 +311,34 @@ const MemberList = ({ navigation, route }) => {
   }
 
 
+  const updateLeadStatus = (leadStatus, icome, date) => {
+    let lead = {
+      background_color: leadStatus?.background_color,
+      text_color: leadStatus?.text_color,
+      title: leadStatus?.title,
+      _id: leadStatus?._id
+
+    }
+    let obj = {
+      ...member,
+      lead_status: lead,
+      lead_status_history: [{
+        income_value: icome,
+        changed_date_time: date,
+        lead_status: lead
+      },
+      ...member?.lead_status_history]
+    }
+    setList((members) => {
+      let index = members.findIndex(x => x?._id == member?._id);
+      if (index > -1) {
+        members[index] = { ...member[index], ...obj }
+      }
+      return [...members]
+    })
+    // route?.params?.updateData?.({ ...obj });
+  }
+
   const getMembers = async (isFirstTime, noSearch = false) => {
     if (isFirstTime) {
       setLoader(true);
@@ -437,7 +470,7 @@ const MemberList = ({ navigation, route }) => {
       member: item,
       updateNotes: updateNotes,
       updateCallNote: updateCallNote,
-      updateData:updateData
+      updateData: updateData
     })
   }
 
@@ -733,8 +766,47 @@ const MemberList = ({ navigation, route }) => {
       </View>)
   }
 
+  const leadStatusView = (item) => {
+    return (
+      <View style={{ flexDirection: "row", alignItems: "center" }}>
+        <TouchableHighlight
+          style={{ flex: 1 }}
+          onPress={() => {
+            setMember(item)
+            leadModalRef?.current?.openModal()
+          }}
+        >
+          <View style={[__styles.leadRootView, !!item?.lead_status && {
+            backgroundColor: item?.lead_status?.background_color
+          }]}>
+            <View style={__styles.leadStatusTextView}>
+              <MyText
+                color={!!item?.lead_status ? item?.lead_status?.text_color : colors.white}>
+                {!!item?.lead_status ?
+                  item?.lead_status?.title :
+                  "Lead Status"}</MyText>
+            </View>
+            <View style={__styles.leadStatusIconView}>
+              {icons.down(colors.primary, 15)}
+            </View>
+          </View>
+        </TouchableHighlight>
+        {!!item?.lead_status > 0 &&
+          <TouchableOpacity
+            onPress={() => {
+              setMember(item);
+              hitoryModalRef?.current?.openModal()
+            }}
+            style={__styles.historyBtn}>
+            {icons.history(colors.primary, 15)}
+          </TouchableOpacity>}
+      </View>
+    )
+  }
 
-  const renderMemberList = ({ item, index }) => {
+
+
+  const renderMemberList = useCallback(({ item, index }) => {
     return (
       <View style={__styles.memberRootView}>
 
@@ -760,7 +832,7 @@ const MemberList = ({ navigation, route }) => {
               {isAllMembers && <MyText fontSize={12} >{item?.email}</MyText>}
             </View>
           </Pressable>
-          
+
           {item?.is_wheel_of_life &&
             <View style={{ marginRight: 10 }}>
               <Image source={icons.wheelOfLife} style={{ height: 20, width: 20 }} />
@@ -792,6 +864,8 @@ const MemberList = ({ navigation, route }) => {
           {!isNurture && access?.Show_nurture_in_filter && <StatView title={"Nurture"} value={!!item?.nurture ? item?.nurture?.first_name + " " + item?.nurture?.last_name : "N/A"} />}
           {!isMembers && <StatView title={"Delegate"} value={!!item?.consultant ? item?.consultant?.first_name + " " + item?.consultant?.last_name : "N/A"} />}
           <StatView title={"Community Level"} value={item?.community_level} uppercase={item?.community_level == 'pta'} />
+          <StatView title={"Last Login Activity"} uppercase value={convertTimezone(item?.last_login_activity, timezone).format(dateTimeFormat.dateTime)} />
+          <StatView title={"Lead Status"} view={() => leadStatusView(item)} />
           <StatView title={"Membership Expire"} value={!!item?.membership_purchase_expiry ?
             !isAllMembers ? moment(new Date(item?.membership_purchase_expiry)).format(dateTimeFormat.date) :
               item?.membership_purchase_expiry
@@ -808,7 +882,7 @@ const MemberList = ({ navigation, route }) => {
         </View>
       </View>
     )
-  }
+  }, [list])
 
 
 
@@ -880,6 +954,23 @@ const MemberList = ({ navigation, route }) => {
         onSelected={onOptSelected}
         optionList={filterTheList(optionList)}
       />
+
+      <LeadModal
+        ref={leadModalRef}
+        navigation={navigation}
+        token={token}
+        updateLeadStatus={updateLeadStatus}
+        memberId={member?._id}
+        oldLead={member?.lead_status}
+      />
+
+      <LeadHistoryModal
+        ref={hitoryModalRef}
+        memberId={member?._id}
+        navigation={navigation}
+        token={token}
+      />
+
     </RootView>
   )
 }
@@ -956,5 +1047,25 @@ const __styles = StyleSheet.create({
     backgroundColor: colors.black,
     alignItems: "center", justifyContent: "center",
     borderRadius: 20 / 2
-  }
+  },
+  leadRootView: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1.2,
+    borderColor: colors.placeholder,
+    height: 40,
+    borderRadius: 10,
+    paddingHorizontal: 10,
+  },
+  leadStatusTextView: {
+    flex: 1
+  },
+  leadStatusIconView: {
+
+  },
+  historyBtn: {
+    width: 30,
+    paddingVertical: 5,
+    alignItems: "center"
+  },
 })

@@ -17,9 +17,12 @@ import { dateTimeFormat } from '../../../utilities/constants'
 import routes from '../../../navigation/routes'
 import { icons } from '../../../utilities/icons'
 import SearchView from '../../../components/SearchView'
+import { convertTimezone } from '../../../functions/convertTime'
+import { selectTimeZone } from '../../../redux/reducers/timezoneSlice'
 
 const MemberListForSubTeam = ({ navigation, route }) => {
   const { token, user, isChatAllowed, access } = useSelector(selectUser)
+  const timezone = useSelector(selectTimeZone)
   const pagination = useRef({ page: 0, canLoadMore: false });
   const [list, setList] = useState([])
   const [loader, setLoader] = useState(false)
@@ -179,7 +182,8 @@ const MemberListForSubTeam = ({ navigation, route }) => {
         <View>
           {/* <StatView title={"Booking Page"} value={!!item?.page?.sale_page_title ? item?.page?.sale_page_title : "N/A"} /> */}
           <StatView title={"Registeration Date"} value={`${moment(item?.createdAt).format(dateTimeFormat.date)}`} uppercase />
-          <StatView title={"Booking Status"} view={() => statusView(item?.status)} />
+          <StatView title={"Last Login Activity"} uppercase value={convertTimezone(item?.last_login_activity, timezone).format(dateTimeFormat.dateTime)} />
+          <StatView title={"Status"} view={() => statusView(item?.status)} />
         </View>
       </View>
     )

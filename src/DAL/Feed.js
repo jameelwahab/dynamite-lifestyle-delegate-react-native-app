@@ -1,9 +1,9 @@
 import invokeApi from "../functions/invokeAPI";
 
 export const GET_FEED_LIST =
-  ({ token, navigation, level, type, page, eventId }) => {
+  ({ token, navigation, level, type, page, eventId,feedTypeAction,feedTypeActionId }) => {
     return invokeApi({
-      path: `api/feeds/delegate_portal/feed_listing/v1?page=${page}&limit=10&list_type=${type}&level_or_type=${level}&event=${eventId}`,
+      path: `api/feeds/delegate_portal/feed_listing/v1?page=${page}&limit=10&list_type=${type}&level_or_type=${level}&event=${eventId}&feed_action_type=${feedTypeAction}&feed_action_by=${feedTypeActionId}`,
       method: "GET",
       token,
       navigation,
@@ -122,7 +122,8 @@ export const CREATE_FEED = ({ token, navigation, formData }) => {
 
 export const FEED_DETAIL = ({ token, navigation, feedId }) => {
   return invokeApi({
-    path: `api/feeds/detail/delegate/${feedId}`,
+    // path: `api/feeds/detail/delegate/${feedId}`,
+    path: `api/feeds/delegate_portal/feed_details/v1/${feedId}`,
     method: "GET",
     token,
     navigation,
@@ -132,7 +133,7 @@ export const FEED_DETAIL = ({ token, navigation, feedId }) => {
 export const UPDATE_FEED = ({ token, navigation, formData, feedId }) => {
   return invokeApi({
     // path: `api/feeds/update_feed_by_delegate/${feedId}`,
-    path:`api/feeds/update_feed_by_delegate_with_poll/${feedId}`,
+    path: `api/feeds/update_feed_by_delegate_with_poll/${feedId}`,
     headers: { 'Content-Type': 'multipart/form-data' },
     method: "PUT",
     postData: formData,

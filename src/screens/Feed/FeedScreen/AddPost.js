@@ -34,6 +34,7 @@ import { useSelector } from 'react-redux'
 import { selectSocket } from '../../../redux/reducers/socketSlice'
 import PollView from './PollView'
 import { convertTimezoneToRegion } from '../../../functions/convertTime'
+import OptionModalWithSearch from '../../../components/OptionModalWithSearch'
 
 
 
@@ -46,18 +47,28 @@ let cursor = {
 const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, selectFeedlevel, feedLevel, tab, isCosmos, isScheduledFeed, timezone, removeFromList, isSuperDelegate, hideLevelView, isEventFeed, eventId, isMultipleSelectAllowed, showEventOption,
   hideAddView,
   cosmosLevelList, selectLevelOptionOnAddPostForCosmos, defaultCosmosFilter,
-  isPollAllowed
+  isPollAllowed,
+  feedType,
+  setFeedType,
+  feedTypeMember,
+  setFeedTypeMember,
+  isFeedFilterAllowed
 
 }, ref) => {
+
   const { height, width } = useWindowDimensions();
   const inset = useSafeAreaInsets();
   const ref_poll = useRef()
+
   const { socket } = useSelector(selectSocket);
   const lvlModalRef = useRef()
   const ref_input = useRef();
   const [loader, setLoader] = useState(false);
   const [isPostModalVisible, setPostModalVisibilty] = useState(false);
   const [isImageVisible, setImageModalVisibilty] = useState(false);
+  const [memberModalVisibilty, setMemberModalVisibilty] = useState(false);
+  const [feedTypeModalVisibility, setFeedTypeModalVisibility] = useState(false)
+  const [memberList, setMemberList] = useState([])
   const [options, setOption] = useState({
     list: [],
     type: "",
@@ -129,6 +140,11 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     }
   }, [isMentionListVisible])
 
+  useEffect(() => {
+    if (memberModalVisibilty) {
+      getTheDelegateListFromServerForSpecificFeed("")
+    }
+  }, [memberModalVisibilty])
   const makeCosmosLevel = (teamType) => {
     return ` (${teamType.split("_").join(" ")})`;
 
@@ -525,16 +541,21 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
         : JSON.stringify([postCeatedFor]));
     }
 
+    console.log(moment(pollData?.expiryDate).format(), "expiryDate")
+    console.log(moment(pollData?.expiryTime).format(), "expiryTime")
     if (!!pollData) {
       fd.append('poll_info', JSON.stringify({
         ...pollData,
         expiry_date: moment(pollData?.expiryDate).format("YYYY-MM-DD"),
         expiry_time: moment(pollData?.expiryTime).format("HH:mm"),
+        // expiry_date_time: moment(pollData?.expiryTime).format("HH:mm"),
         is_multiple_allow: pollData?.isMultiple,
-        options: pollData?.options
+        options: pollData?.options,
+        poll_status: "in_progress",
       }));
     }
 
+    // return;
 
 
     if (isEventViewComplete) {
@@ -640,6 +661,22 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
       if (res?.users > 0) {
         setIsMentionListVisible(true)
       }
+    }
+  }
+
+  const getTheDelegateListFromServerForSpecificFeed = async (text) => {
+
+    let res = await GET_DELEGATES_LIST_FROM_SERVER_FOR_MENTION_V1({
+      navigation, token, data: {
+        search_text: text,
+        community_levels: feedLevel == "all" ? undefined : feedLevel,
+        event_id: undefined,
+        list_type: "the_source",
+      }
+    });
+
+    if (res.code == 200) {
+      setMemberList(res?.users)
     }
   }
 
@@ -1301,7 +1338,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                   </TouchableOpacity>
                 </View>}
 
-              {postType == "poll" && 
+              {postType == "poll" &&
                 <View >
                   <PollView ref={ref_poll} data={pollData} timezone={timezone} />
                 </View>}
@@ -1461,6 +1498,34 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
               {icons.down(colors.lightText2)}
             </Pressable>}
 
+          {isFeedFilterAllowed &&
+            <View style={{ flexDirection: "row", marginTop: 10 }}>
+              <Pressable
+                onPress={() => setFeedTypeModalVisibility(true)}
+                style={[__style.lvlbtnView, { flex: 1, marginRight: 10 }]}>
+                <View style={__style.levlBtnLabel}>
+                  <MyText color={colors.lightText2} fontSize={12} >Feed Type</MyText>
+                </View>
+                <MyText type={"medium"} style={{ textTransform: "capitalize" }} >{feedType?.title}</MyText>
+                {icons.down(colors.lightText2)}
+              </Pressable>
+
+              {feedType?.value == "other" &&
+                <Pressable
+                  onPress={() => {
+                    setMemberModalVisibilty(true);
+                  }}
+                  style={[__style.lvlbtnView, { flex: 2 }]}>
+                  <View style={__style.levlBtnLabel}>
+                    <MyText color={colors.lightText2} fontSize={12} >Select Member</MyText>
+                  </View>
+                  <MyText type={"medium"} style={{ textTransform: "capitalize" }} >{
+                    feedTypeMember ? feedTypeMember?.first_name + " " + feedTypeMember?.last_name : "Select Member"
+                  }</MyText>
+                  {icons.down(colors.lightText2)}
+                </Pressable>}
+            </View>}
+
           <View style={__style.rootView}>
             <View style={__style.inputRootView}>
 
@@ -1511,11 +1576,44 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
 
           <LevelModal
-            selectFeedlevel={selectFeedlevel}
+            selectFeedlevel={(lvl) => {
+              selectFeedlevel(lvl);
+              if (isFeedFilterAllowed) {
+                setFeedType({ title: "All", value: "all" })
+                setFeedTypeMember(null)
+              }
+            }}
             feedLevel={feedLevel}
             ref={lvlModalRef}
             cosmosLevelList={cosmosLevelList}
             isCosmos={isCosmos}
+          />
+
+
+          <OptionModal
+            optionList={FeedTypeList}
+            closeModal={() => setFeedTypeModalVisibility(false)}
+            onSelected={(item) => {
+              setFeedType(item)
+              setFeedTypeModalVisibility(false);
+            }}
+            checkSelected={(item) => item?.value == feedType?.value}
+            isVisible={feedTypeModalVisibility}
+          />
+
+          <OptionModalWithSearch
+            isVisible={memberModalVisibilty}
+            closeModal={() => setMemberModalVisibilty(false)}
+            onSelected={(item) => {
+              setFeedTypeMember(item)
+              setMemberModalVisibilty(false);
+            }}
+            optionList={memberList}
+            onSearchTextChange={(text) => getTheDelegateListFromServerForSpecificFeed(text)}
+            title='Member'
+            renderText={({ item }) => <MyText fontSize={16} >
+              {`${item?.first_name} ${item?.last_name} (${item?.email})`}
+            </MyText>}
           />
 
         </View> : undefined}
@@ -1574,6 +1672,23 @@ const PostCretedForSourceFeed = [
     title: "Mastery",
     type: "mastery"
   },
+]
+
+
+const FeedTypeList = [
+  {
+    title: "All",
+    value: "all"
+  },
+  {
+    title: "My Feeds",
+    value: "own"
+  },
+  {
+    title: "Others Feeds",
+    value: "other"
+  },
+
 ]
 
 const __style = StyleSheet.create({

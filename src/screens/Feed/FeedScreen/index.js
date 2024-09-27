@@ -75,6 +75,8 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       isCosmos ? access?.cosmos_feeds_filters ? access?.default_filter : user?.team_type :
         isAllSourceFeed ? "all" : "dynamite"
   );
+  const [feedType, setFeedType] = useState({ title: "All", value: "all" });
+  const [feedTypeMember, setFeedTypeMember] = useState(null);
   const [isRefreshing, setRefreshing] = useState(false)
   const [feedFooterLoader, setFeedFooterLoader] = useState(false);
   const [likesFooterLoader, setLikesFooterLoader] = useState(false);
@@ -209,7 +211,19 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
   }
 
   const getFeedList = async () => {
-    let res = await GET_FEED_LIST({ navigation, token, type: schedulePost ? "scheduled" : feedFor, level: feedLevel, page: feedVar.page, eventId: eventId });
+    let res = await GET_FEED_LIST({
+      navigation, token,
+      type: schedulePost ? "scheduled" : feedFor,
+      level: feedLevel,
+      page: feedVar.page,
+      eventId: eventId,
+      feedTypeAction: feedType?.value,
+      feedTypeActionId:
+        feedType?.value == "all" ? "all" :
+          feedType?.value == "own" ? user?._id :
+            feedType?.value == "other" ? feedTypeMember?._id :
+              undefined
+    });
     if (res.code == 200) {
       if (res?.total_pages > (1 + feedVar.page)) {
         feedVar = {
@@ -541,6 +555,17 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
     setLoader(true)
     getFeed();
   }, [feedLevel])
+
+  useEffect(() => {
+    if (feedType?.value == "other" && !!feedTypeMember == false) {
+
+    } else {
+      resetCounts();
+      setFeed([])
+      setLoader(true)
+      getFeed();
+    }
+  }, [feedType, feedTypeMember])
 
   const onRefresh = () => {
     setRefreshing(true)
@@ -1169,7 +1194,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           updateFeedItem={(newFeed) => setFeed(feeds => {
             let index = feeds.findIndex(feed => feed._id === newFeed?._id);
             if (index !== -1) {
-              feeds.splice(index, 1, { ...feed[index], ...newFeed });
+              feeds.splice(index, 1, newFeed);
             }
             return [...feeds];
           })}
@@ -1188,6 +1213,11 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           defaultCosmosFilter={access?.default_filter}
           selectLevelOptionOnAddPostForCosmos={isCosmos && access?.choose_level_in_cosmos_feeds}
           isPollAllowed={access?.enable_poll_feed}
+          isFeedFilterAllowed={(isAllSourceFeed || isTheSourceFeed) && access?.isFeedFilterAllowed}
+          feedType={feedType}
+          setFeedType={setFeedType}
+          feedTypeMember={feedTypeMember}
+          setFeedTypeMember={setFeedTypeMember}
         />
       </View>
     )

@@ -144,7 +144,7 @@ const PollView = forwardRef(({ data, timezone }, ref) => {
         </View>
       </View>
 
-      <View style={{ marginTop: -10}}>
+      <View style={{ marginTop: -10 }}>
         {options.map((item, index) => (
           <View style={__styles.optionView}>
             <View style={{ flex: 1 }}>
@@ -174,7 +174,7 @@ const PollView = forwardRef(({ data, timezone }, ref) => {
             onPress={addOption} fullWidth title="Add Option" />
         </View>}
 
-      <View style={{marginTop:10}}>
+      <View style={{ marginTop: 10 }}>
         <MyCheckBox
           title={"Allow Selecting Multiple Options"}
           value={isMultiple}
@@ -183,13 +183,14 @@ const PollView = forwardRef(({ data, timezone }, ref) => {
       </View>
       {/* {console.log(convertTimezoneToRegion(moment(), timezone).format())} */}
       {/* {getMinimumDate()} */}
-      {console.log(moment.utc(dateTimePicker?.time).toString(), "time")}
+      {console.log(data, dateTimePicker?.mode, (!!data && dateTimePicker?.mode == "date"), "check")}
       <DateTimePicker
         isVisible={dateTimePicker?.isVisible}
         minimumDate={dateTimePicker?.mode == "date" ? new Date() : undefined}
         mode={dateTimePicker?.mode}
         date={dateTimePicker?.time}
-        timeZoneName={!!data && dateTimePicker?.mode == "date" ? undefined : timezone?.userTimeZone}
+
+        timeZoneName={!!data && dateTimePicker?.mode == "date" ? undefined : timezone?.user}
         onCancel={closeDateTimePicker}
         onConfirm={(time) => setDateTime(time)}
         // confirmTextIOS={colors.golden}
@@ -222,7 +223,7 @@ const __styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingLeft: 10,
-    marginTop:15
+    marginTop: 15
 
   },
   crossBtnIcon: {

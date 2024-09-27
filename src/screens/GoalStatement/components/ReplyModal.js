@@ -15,6 +15,7 @@ import { GOAL_STATEMENT_ADD_REPLY, GOAL_STATEMENT_DELETE_REPLY } from '../../../
 import ConfirmationModal from '../../../components/ConfirmationModal';
 import Toast from 'react-native-toast-message';
 import showToast from '../../../functions/showToast';
+import MyKeyboardAvoidingView from '../../../components/MyKeyboardAvoidingView';
 
 
 
@@ -143,6 +144,7 @@ const ReplyModal = forwardRef(({ member, token, navigation, setBackQuestion }, r
       animationOut="slideOutRight"
       animationInTiming={300}
       animationOutTiming={300}
+      avoidKeyboard
       style={{ margin: 0 }}>
       <SafeAreaView style={{ flex: 1, backgroundColor: colors.secondaryVariant }}>
         <View style={{ flex: 1 }}>
@@ -176,7 +178,6 @@ const ReplyModal = forwardRef(({ member, token, navigation, setBackQuestion }, r
                   height={120}
                   initialValue={desc}
                   onChange={(text) => setDesc(text)}
-
                 />}
               <View style={{ alignItems: "flex-end" }}>
                 <MyButton
