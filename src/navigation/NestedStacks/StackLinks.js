@@ -9,6 +9,7 @@ import { colors } from '../../utilities/colors'
 import LinksList from '../../screens/Links/LinksList'
 import LinksPaymentPlanList from '../../screens/Links/LinksPaymentPlanList:'
 import LinksSalesCommission from '../../screens/Links/LinksSalesCommission'
+import SubTeamAccess from '../../screens/Links/SubTeamAccess'
 
 
 
@@ -24,6 +25,7 @@ const StackLinks = ({ route }) => {
         <LinksStack.Screen initialParams={route.params} name={routes.linksListing} component={LinksList} />
         <LinksStack.Screen name={routes.linksPaymentPlan} component={LinksPaymentPlanList} />
         <LinksStack.Screen name={routes.linksManageSaleTeamCommission} component={LinksSalesCommission} />
+        <LinksStack.Screen name={routes.linksManageSubTeamAceess} component={SubTeamAccess} />
         
         {/*//? Default Screens Start */}
         {defaultScreens.map((x, i) => (

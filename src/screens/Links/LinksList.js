@@ -42,6 +42,13 @@ const LinksList = ({ navigation, route }) => {
       setTimeout(() => {
         copy(item, opt.type)
       }, 200);
+    } else if (opt?.type == "sub_team_access") {
+      setTimeout(() => {
+        navigation.navigate(routes.linksManageSubTeamAceess, {
+          _id: item?._id,
+          title: item?.sale_page_title
+        })
+      }, 400);
     } else {
       setTimeout(() => {
         navigation.navigate(routes.linksPaymentPlan, {
@@ -191,6 +198,11 @@ const options = [
     icon: () => icons.edit(colors.primary, 17),
     title: "Set Commission",
     type: "commission"
+  },
+  {
+    icon: () => icons.edit(colors.primary, 17),
+    title: "Manage Sub Team Access",
+    type: "sub_team_access"
   }]
 
 const __styles = StyleSheet.create({

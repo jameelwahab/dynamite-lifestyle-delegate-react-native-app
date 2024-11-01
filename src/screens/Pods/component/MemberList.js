@@ -1,19 +1,36 @@
 import { View, Text, FlatList, StyleSheet } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import MyText from '../../../components/MyText'
 import StatView from '../../Members/Components/StatView'
 import { colors } from '../../../utilities/colors'
 import MemberView from '../../../components/MemberView'
 import FooterLoader from '../../../components/FooterLoader'
 import EmptyView from '../../../components/EmptyView'
+import MyCheckBox from '../../../components/MyCheckBox'
 
 
 
-const MemberList = ({ list, loadmore, footerLoader, loader }) => {
+const MemberList = ({ list, loadmore, footerLoader, loader, isCheckBox = false,
+  onCheckBoxPress = () => { },
+  checkedList = {}
+}) => {
+
+
+
   const itemView = ({ item, index }) => {
     return (
       <View style={__styles.rootView}>
-        <MemberView member={item} />
+        {isCheckBox &&
+          <View style={{ marginHorizontal: 5, marginRight: 10 }}>
+            <MyCheckBox
+              pb={0}
+              value={!!checkedList[item?._id]}
+              onPress={() => onCheckBoxPress(item)}
+            />
+          </View>}
+        <View style={{ flex: 1 }}>
+          <MemberView member={item} />
+        </View>
       </View>
     )
   }
@@ -22,6 +39,7 @@ const MemberList = ({ list, loadmore, footerLoader, loader }) => {
     <View style={{ flex: 1 }}>
       <FlatList
         data={list}
+        extraData={checkedList}
         renderItem={itemView}
         onEndReached={loadmore}
         showsVerticalScrollIndicator={false}
@@ -38,6 +56,8 @@ const __styles = StyleSheet.create({
   rootView: {
     marginHorizontal: 10, marginTop: 10,
     backgroundColor: colors.secondary, borderRadius: 10,
-    padding: 10
+    padding: 10,
+    flexDirection: "row",
+    alignItems: "center"
   }
 })

@@ -115,11 +115,11 @@ const GroupList = ({ navigation, route }) => {
       </View>)
   }
 
-  const eventView = (list) => {
+  const eventView = (list, variable = "title") => {
     return (
       <View style={{ paddingVertical: 2, alignSelf: "flex-start", borderRadius: 10 }}>
         {list.map((x, i) => (
-          <MyText key={x?._id?._id}>{x?._id?.title},</MyText>
+          <MyText key={x?._id?._id}>{x?._id?.[variable]},</MyText>
         ))}
 
 
@@ -144,7 +144,13 @@ const GroupList = ({ navigation, route }) => {
           />
         </View>
         <View style={__styles.statView}>
-          <StatView title={"Programme/Event"} view={() => eventView(item?.group_by == "event" ? item?.event : item?.program)} />
+          <StatView title={groupBy[item?.group_by]+"s"}
+            view={() => eventView(
+              item?.group_by == "event" ? item?.event
+                : item?.group_by == "program" ? item?.program
+                  : item?.group_by == "sale_page" ? item?.sale_pages : [],
+              item?.group_by == "sale_page" ? "sale_page_title" : "title")} />
+
           <StatView title={"Type"} value={item?.group_type} />
           <StatView title={"Group By"} value={groupBy[item?.group_by]} />
           <StatView title={"Members"} value={item?.member.length} />
@@ -199,7 +205,8 @@ export default GroupList
 
 const groupBy = {
   event: "Event",
-  program: "Programme"
+  program: "Programme",
+  sale_page: "Sale Page",
 }
 
 const optionsList = [

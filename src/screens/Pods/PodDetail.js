@@ -4,7 +4,7 @@ import RootView from '../../components/RootView'
 import MyText from '../../components/MyText'
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../redux/reducers/userSlice'
-import { POD_DETAIL_V1, POD_ROOM_USER_LIST } from '../../DAL'
+import { EXCLUDE_ROOM_MEMBERS, POD_DETAIL_V1, POD_ROOM_USER_LIST } from '../../DAL'
 import MyLoader from '../../components/MyLoader'
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import { colors } from '../../utilities/colors'
@@ -13,6 +13,9 @@ import ZoomCred from './component/ZoomCred'
 import MemberList from './component/MemberList'
 import SearchView from '../../components/SearchView'
 import utilities from '../../utilities'
+import FAB from '../../components/FAB'
+import { icons } from '../../utilities/icons'
+import showToast from '../../functions/showToast'
 
 
 
@@ -28,12 +31,25 @@ const PodDetail = ({ navigation, route }) => {
   const [footerLoader, setFooterLoader] = useState(false);
   const [pod, setPod] = useState(null);
   const [members, setMembers] = useState([]);
+  const [exMembers, setExMembers] = useState([]);
   const [roomUser, setRoomUsers] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [routes] = React.useState(isBookCall ? bookCalltabs : podtabs);
   const [index, setIndex] = React.useState(0);
   const [searchLoader, setSearchLoader] = useState(false);
+  const [checkedList, setCheckedList] = useState({});
 
+  const onCheckBoxPress = (item) => {
+    if (checkedList[item?._id]) {
+      delete checkedList[item?._id]
+    } else {
+      checkedList[item?._id] = item
+    }
+
+    console.log(checkedList, "checkedList")
+    setCheckedList({ ...checkedList });
+
+  }
 
 
   useEffect(() => {
@@ -42,7 +58,7 @@ const PodDetail = ({ navigation, route }) => {
 
 
   useEffect(() => {
-    if ((isBookCall && (index == 1) || (!isBookCall && (index == 2 || index == 3)))) {
+    if ((isBookCall && (index == 1) || (!isBookCall && (index == 2 || index == 3 || index == 4)))) {
       setLoader(true)
       getPodMemberAndRoomUsers(true, false)
     }
@@ -64,7 +80,7 @@ const PodDetail = ({ navigation, route }) => {
 
   const getPodMemberAndRoomUsers = async (newArray = false, canSearch = true) => {
     let search = canSearch ? searchText : "";
-    let res = await POD_ROOM_USER_LIST({ navigation, token, page, slug, type: index == 2 ? "individual" : "all", searctText: search.trim() });
+    let res = await POD_ROOM_USER_LIST({ navigation, token, page, slug, type: index == 3 ? "excluded" : index == 2 ? "individual" : "all", searctText: search.trim() });
     if (res.code == 200) {
       let listLength = ((isBookCall && index == 1) || (!isBookCall && index == 2)) ? members.length : roomUser.length;
       let length = newArray ? res?.room_user.length : listLength + res?.room_user.length;
@@ -74,10 +90,12 @@ const PodDetail = ({ navigation, route }) => {
       } else {
         canLoadMore = false;
       }
-      if ((isBookCall && index == 1) || (!isBookCall && index == 2)) {
+      if (!isBookCall && index == 3) {
+        setExMembers(newArray ? res?.room_user : [...members, ...res?.room_user]);
+      } else if ((isBookCall && index == 1) || (!isBookCall && index == 2)) {
         setMembers(newArray ? res?.room_user : [...members, ...res?.room_user]);
       }
-      else if (!isBookCall && index == 3) {
+      else if (!isBookCall && index == 4) {
         setRoomUsers(newArray ? res?.room_user : [...roomUser, ...res?.room_user]);
       }
       setLoader(false);
@@ -103,6 +121,27 @@ const PodDetail = ({ navigation, route }) => {
     canLoadMore = false;
     setSearchLoader(true);
     getPodMemberAndRoomUsers(true)
+  }
+
+
+  const excludeTheRoomMembers = async () => {
+    setLoader(true)
+    let res = await EXCLUDE_ROOM_MEMBERS({
+      navigation, token,
+      members: Object.keys(checkedList).map(x => ({ _id: x })),
+      slug, type: "pod",
+    })
+    if (res.code == 200) {
+      showToast({ title: res?.message, type: "success" })
+      let checkedMember = { ...checkedList };
+      setRoomUsers((list) => {
+        return list.slice().filter(x => !checkedMember[x._id])
+      })
+      setLoader(false)
+      setCheckedList({})
+    } else {
+      setLoader(false)
+    }
   }
 
   //* ...../////////   Views
@@ -186,11 +225,18 @@ const PodDetail = ({ navigation, route }) => {
           }])} />
       case 'members':
         return <MemberList list={members} loadmore={loadMore} footerLoader={footerLoader} loader={loader} />
+      case 'exusers':
+        return <MemberList list={exMembers} loadmore={loadMore} footerLoader={footerLoader} loader={loader} />
       case 'users':
-        return <MemberList list={roomUser} loadmore={loadMore} footerLoader={footerLoader} loader={loader} />
+        return <MemberList
+          isCheckBox
+          onCheckBoxPress={onCheckBoxPress}
+          checkedList={checkedList}
+          list={roomUser}
+          loadmore={loadMore}
+          footerLoader={footerLoader}
+          loader={loader} />
     }
-
-
   }
 
   return (
@@ -216,12 +262,13 @@ const PodDetail = ({ navigation, route }) => {
             setIndex(index);
             setMembers([])
             setRoomUsers([]);
+            setExMembers([])
             if (isBookCall) {
               if (index == 1) {
                 setLoader(true)
               }
             } else {
-              if (index == 2 || index == 3) {
+              if (index == 2 || index == 3 || index == 4) {
                 setLoader(true)
               }
             }
@@ -230,6 +277,11 @@ const PodDetail = ({ navigation, route }) => {
         />
       </View>
       <MyLoader enable={loader} />
+      {!isBookCall && index == 4 && Object.keys(checkedList).length > 0 &&
+        <FAB
+          onPress={excludeTheRoomMembers}
+          icon={() => icons.trashFilled(colors.black)}
+        />}
     </RootView>
   )
 }
@@ -247,5 +299,6 @@ const podtabs = [
   { key: 'grplist', title: 'GROUP LIST', index: 0 },
   { key: 'zoom', title: 'ZOOM CREDENTIALS', index: 1 },
   { key: 'members', title: 'INDIVIDUAL MEMBER', index: 2 },
-  { key: 'users', title: 'ROOM USERS', index: 3 },
+  { key: 'exusers', title: 'EXCLUDE USERS', index: 3 },
+  { key: 'users', title: 'ROOM USERS', index: 4 },
 ]

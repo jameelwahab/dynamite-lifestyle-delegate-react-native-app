@@ -67,3 +67,14 @@ export const GET_MEMBERS_AND_PROGRAMMES_LIST_FOR_CALENDAR_GROUP =
       navigation
     })
   }
+
+export const GET_PROGRAMMES_EVENTS_SALEPAGES_LIST_FOR_CALENDAR_GROUP =
+  ({ token, navigation, search = "", type = "", sale_page = undefined }) => {
+    return invokeApi({
+      path: `api/member/list_members_and_programs_v2`,
+      method: "POST",
+      postData: { search, type, sale_page },
+      token,
+      navigation
+    })
+  }

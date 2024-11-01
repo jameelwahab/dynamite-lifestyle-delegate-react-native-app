@@ -11,7 +11,7 @@ const FAB = ({ onPress, icon }) => {
       underlayColor={colors.lightPrimary2}
       onPress={onPress}
       style={__style.rootView}>
-      {icons.plus(colors.black)}
+      {!!icon ? icon() : icons.plus(colors.black)}
     </TouchableHighlight>
   )
 }
@@ -29,7 +29,7 @@ const __style = StyleSheet.create({
     position: "absolute",
     bottom: 10,
     right: 10,
-    zIndex:3
+    zIndex: 3
   },
   icon: {
     height: 20,

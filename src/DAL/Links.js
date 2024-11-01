@@ -45,3 +45,25 @@ export const UPDATE_LINKS_SALES_TEAM_COMMISSION = ({ token, navigation, planId, 
     navigation: navigation,
   })
 }
+
+export const GET_LINKS_SALES_TEAM_LIST_FOR_ACCESS = ({ token, navigation, salePageId }) => {
+  return invokeApi({
+    path: `api/consultant/list_subteam/for_access/${salePageId}`,
+    method: "GET",
+    token: token,
+    navigation: navigation,
+  })
+}
+
+export const UPDATE_LINKS_SALES_TEAM_ACCESS = ({ token, navigation, salePageId, teamIds }) => {
+  return invokeApi({
+    path: `api/consultant/update_consultant/for_access`,
+    postData: {
+      sale_page_id: salePageId,
+      subteam_ids: teamIds
+    },
+    method: "PUT",
+    token: token,
+    navigation: navigation,
+  })
+}

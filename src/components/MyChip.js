@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Pressable } from 'react-native'
 import React from 'react'
 import { icons } from '../utilities/icons'
 import { colors } from '../utilities/colors'
@@ -8,7 +8,8 @@ import MyText from './MyText'
 const MyChip = ({ title, onPress, isCapitalize = false }) => {
 
   return (
-    <View style={__styles.chipView}>
+    <View
+      style={__styles.chipView}>
       <View style={{}}>
         <MyText capitalize={isCapitalize} fontSize={12} color={colors.white} >{title}</MyText>
       </View>

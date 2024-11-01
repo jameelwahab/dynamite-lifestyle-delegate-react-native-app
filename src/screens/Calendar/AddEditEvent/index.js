@@ -51,6 +51,7 @@ const GroupAddEdit = ({ navigation, route }) => {
     status: isEdit && !!event?.status == false ? false : true,
     group: !!event?.group ? event?.group.map(x => x?._id) : [],
     member: !!route?.params?.member ? [route?.params?.member] : !!event?.member ? event?.member.map(x => x?._id) : [],
+    exclude_members: !!route?.params?.exclude_members ? [route?.params?.exclude_members] : !!event?.excluded_members ? event?.excluded_members.map(x => x) : [],
     startDate: !!event?.start_date_time ? convertTimezone2(event?.start_date_time, timezone) : moment(),
     startTime: !!event?.start_date_time ? convertTimezone2(event?.start_date_time, timezone).format("HH:mm") : moment().format("HH:mm"),
     endDate: !!event?.end_date_time ? convertTimezone2(event?.end_date_time, timezone) : moment(),
@@ -316,6 +317,12 @@ const GroupAddEdit = ({ navigation, route }) => {
               label='Members'
               iconOnPress={() => setOptionModal({ isVisible: true, type: "member" })}
             />
+
+            <MyTouchableInput
+              view={() => selectedMemberView(groupData?.exclude_members, "exclude_members")}
+              label='Exclude Members'
+              iconOnPress={() => setOptionModal({ isVisible: true, type: "exclude_members" })}
+            />
           </>}
         <Editor
           initialValue={groupData?.desc}
@@ -354,18 +361,19 @@ const GroupAddEdit = ({ navigation, route }) => {
         }}
         optionList={
           optionModal?.type == "group" ? groupList :
-            optionModal?.type == "member" ? memberList :
+            optionModal?.type == "member" || optionModal?.type == "exclude_members" ? memberList :
               []
         }
         title={
           optionModal?.type == "group" ? "Group" :
-            optionModal?.type == "member" ? "Member" : ""
+            optionModal?.type == "member" || optionModal?.type == "exclude_members" ? "Member" : ""
         }
         renderText={({ item }) => (
           <MyText>
             {optionModal?.type == "group" ?
               `${item?.title}` :
-              optionModal?.type == "member" ? `${item?.first_name} ${item?.last_name} (${item?.email})` : ""}
+              (optionModal?.type == "member" || optionModal?.type == "exclude_members") ?
+                `${item?.first_name} ${item?.last_name} (${item?.email})` : ""}
           </MyText>
         )}
       />

@@ -105,6 +105,15 @@ export const CALENDAR_EVENT_DETAIL_BY_Id = ({ token, navigation, id }) => {
   })
 }
 
+export const CALENDAR_EVENT_DETAIL_BY_Id_V2 = ({ token, navigation, id }) => {
+  return invokeApi({
+    path: `api/event/detail/${id}`,
+    method: "GET",
+    token,
+    navigation,
+  })
+}
+
 
 export const SYNC_GOOGLE_CALENDAR_WITH_SERVER = ({ token, navigation, googleServerCode }) => {
   return invokeApi({

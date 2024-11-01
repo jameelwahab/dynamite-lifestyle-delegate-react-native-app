@@ -4,7 +4,7 @@ import RootView from '../../../components/RootView'
 import MyText from '../../../components/MyText'
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../../redux/reducers/userSlice'
-import { CALENDAR_EVENT_DETAIL_BY_Id, DELETE_CALENDAR_EVENT, GET_EVENT_DETAIL } from '../../../DAL'
+import { CALENDAR_EVENT_DETAIL_BY_Id, CALENDAR_EVENT_DETAIL_BY_Id_V2, DELETE_CALENDAR_EVENT, GET_EVENT_DETAIL } from '../../../DAL'
 import MyLoader from '../../../components/MyLoader'
 import StatView from '../../../components/StatView'
 import { colors } from '../../../utilities/colors'
@@ -43,7 +43,10 @@ const CalendarDetail = ({ navigation, route }) => {
     setLoader(false);
     if (res.code == 200) {
       setIteration(res?.event?.iteration_list.find(x => x._id == iteration_id))
-      setData(res?.event)
+      setData({
+        ...res?.event,
+        excluded_members: res?.excluded_members
+      })
     }
   }
 
@@ -130,8 +133,8 @@ const CalendarDetail = ({ navigation, route }) => {
 
         </View>}
       <MyLoader enable={loader} />
-      <EventOptionModal 
-      ref={ref_eventModal}
+      <EventOptionModal
+        ref={ref_eventModal}
         onAgree={forDelete}
         title={"Delete recurring event?"}
       />

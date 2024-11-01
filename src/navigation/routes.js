@@ -173,6 +173,7 @@ const routes = {
   linksListing: "LINKS_LISTING_SCREEN",
   linksPaymentPlan: "LINKS_PAYMENT_PLAN_LIST",
   linksManageSaleTeamCommission: "LINKS_MANAGE_SALE_TEAM_COMMISSION",
+  linksManageSubTeamAceess: "MANAGE_SUB_TEAM_ACCESS",
 
   //? Subscription
   subscriptionList: "SUBSCRIPTION_LISTING_SCREEN",

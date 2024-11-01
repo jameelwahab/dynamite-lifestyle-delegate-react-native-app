@@ -138,6 +138,8 @@ const CalendarNotifications = ({ navigation, route }) => {
         created_for: "",
         group: data?.group.map(x => ({ group_slug: x?.group_slug })),
         member: data?.member.map(x => ({ member_id: x?._id })),
+        exclude_members: data?.exclude_members.map(x => ({ _id: x?._id })),
+
       }
     }
     setLoader(true)

@@ -95,3 +95,13 @@ export const POD_ROOM_USER_LIST = ({ token, navigation, slug, page, type,searctT
     navigation,
   })
 }
+
+export const EXCLUDE_ROOM_MEMBERS = ({ token, navigation,slug,type, members }) => {
+  return invokeApi({
+    path: `api/challenge/exclude/member`,
+    method: "PUT",
+    postData:{slug,type,members},
+    token,
+    navigation,
+  })
+}
