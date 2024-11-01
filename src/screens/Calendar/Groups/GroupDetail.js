@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux'
 import { selectUser } from '../../../redux/reducers/userSlice'
 import { selectNavbar } from '../../../redux/reducers/navbarSlice'
 import Tabs from '../../../components/Tabs'
-import { GET_CALENDAR_ALL_MEMBER, GET_CALENDAR_DETAIL } from '../../../DAL'
+import { EXCLUDE_GROUP_MEMBERS, GET_CALENDAR_ALL_MEMBER, GET_CALENDAR_DETAIL } from '../../../DAL'
 import MyLoader from '../../../components/MyLoader'
 import { colors } from '../../../utilities/colors'
 import UserImage from '../../../components/UserImage'
@@ -20,6 +20,10 @@ import moment from 'moment'
 import { dateTimeFormat } from '../../../utilities/constants'
 import routes from '../../../navigation/routes'
 import SearchView from '../../../components/SearchView'
+import MyCheckBox from '../../../components/MyCheckBox'
+import FAB from '../../../components/FAB'
+import { icons } from '../../../utilities/icons'
+import ConfirmationModal from '../../../components/ConfirmationModal'
 
 let gdPage = 0;
 let gdCanLoadMore = false;
@@ -35,12 +39,23 @@ const GroupDetail = ({ navigation, route }) => {
   const [footerLoader, setFooterLoader] = useState(false);
   const [detailModal, setDetailModal] = useState({ isVisible: false, list: [] })
   const [searchLoader, setSearchLoader] = useState(false);
+  const [checked, setChecked] = useState({});
+  const [showConfirmModal, setShowConfirmModal] = useState(false)
 
   useEffect(() => {
     setLoader(true);
     getGrpDetail();
   }, [])
 
+
+  const toggleChecked = (item) => {
+    if (!!checked[item?._id]) {
+      delete checked[item?._id]
+    } else {
+      checked[item?._id] = item;
+    }
+    setChecked({ ...checked })
+  }
 
   const onSelected = (item) => {
     setDetailModal({ isVisible: false, list: [] });
@@ -97,20 +112,20 @@ const GroupDetail = ({ navigation, route }) => {
   const changeTab = (tab) => {
     setTabIndex(tab);
     setSearchText("")
-    if (tab == 2) {
+    if (tab == 3 || tab == 2) {
       gdPage = 0;
       gdCanLoadMore = false;
       setAllMembers([])
       setLoader(true)
-      getGrpAllMember(true)
+      getGrpAllMember(true, tab)
     }
   }
 
   const loadMore = () => {
-    if (gdCanLoadMore && tabIndex == 2) {
+    if (gdCanLoadMore && (tabIndex == 3 || tabIndex == 2)) {
       gdCanLoadMore = false;
       setFooterLoader(true);
-      getGrpAllMember()
+      getGrpAllMember(false,)
     }
   }
 
@@ -133,8 +148,13 @@ const GroupDetail = ({ navigation, route }) => {
     }
   }
 
-  const getGrpAllMember = async (newArray = false) => {
-    let res = await GET_CALENDAR_ALL_MEMBER({ navigation, token, page: gdPage, slug: group?.group_slug, searchText: searchText.trim() });
+  const getGrpAllMember = async (newArray = false, tIndex) => {
+    let res = await GET_CALENDAR_ALL_MEMBER({
+      navigation, token, page: gdPage,
+      slug: group?.group_slug,
+      type: !!tIndex ? tablist()[tIndex]?.type : tablist()[tabIndex]?.type,
+      searchText: searchText.trim()
+    });
     if (res.code == 200) {
       let length = newArray ? res?.group_members.length : allMembers.length + res?.group_members.length;
       if (length < res?.total_count) {
@@ -151,6 +171,22 @@ const GroupDetail = ({ navigation, route }) => {
       setLoader(false);
       setFooterLoader(false);
       setSearchLoader(false);
+    }
+  }
+
+  const excludeMembers = async () => {
+    setShowConfirmModal(false)
+    let res = await EXCLUDE_GROUP_MEMBERS({
+      navigation, token, slug: group?.group_slug,
+      members: Object.keys(checked).map(x => ({ _id: x })),
+      type: "group"
+    });
+    setLoader(false)
+    if (res.code == 200) {
+      setAllMembers((list) => {
+        !list.slice().filter(x => !checked[x._id])
+      })
+      setChecked({})
     }
   }
 
@@ -184,36 +220,53 @@ const GroupDetail = ({ navigation, route }) => {
     if (tabIndex == 0)
       return (
         <View style={__styles.listRootView}>
-          <View style={__styles.titleRow}>
-            <UserImage
-              image={group?.group_by == "program" ? item?.program_images?.thumbnail_1 : item?.images?.thumbnail_1}
-              name={item?.title}
-              size={40}
-            />
-            <View style={{ flex: 1, marginLeft: 10 }}>
-              <MyText >{item?.title}</MyText>
-            </View>
-          </View>
-          <View>
-            {/* <MyText>{item?.short_description}</MyText> */}
-            <StatView title={"Description"} value={item?.short_description} />
-          </View>
+          {group?.group_by == "sale_page" ?
+            <>
+              <StatView title={"Sale Page Title"} value={item?.sale_page_title} />
+              <StatView title={"Payment Plan"} value={!!data?.plans && data?.plans?.map(x => {
+                if (x?.sale_page == item?._id) {
+                  return `${x?.plan_title},`
+                }
+              })} />
+            </> :
+            <>
+              <View style={__styles.titleRow}>
+                <UserImage
+                  image={group?.group_by == "program" ? item?.program_images?.thumbnail_1 : item?.images?.thumbnail_1}
+                  name={item?.title}
+                  size={40}
+                />
+                <View style={{ flex: 1, marginLeft: 10 }}>
+                  <MyText >{item?.title}</MyText>
+                </View>
+              </View>
+              <View>
+                {/* <MyText>{item?.short_description}</MyText> */}
+                <StatView title={"Description"} value={item?.short_description} />
+              </View>
+            </>}
         </View>)
-    else if (tabIndex == 1 || tabIndex == 2) {
+    else {
       return (
         <View style={__styles.listRootView}>
           <View style={__styles.titleRow}>
-            <MemberView
-              member={item}
-              size={40}
-            />
-            <View style={{ flex: 1, marginLeft: 10 }}>
-              <MyText >{item?.title}</MyText>
+
+            <View style={{ flex: 1, }}>
+              <MemberView
+                member={item}
+                size={40}
+              />
             </View>
+            {tabIndex == 3 &&
+              <MyCheckBox
+                value={!!checked[item?._id]}
+                onPress={() => toggleChecked(item)}
+              />}
           </View>
           <View>
+            {/* <StatView title={grptype[group?.group_by]?.title} view={() => eventView(item?.[grptype[group?.group_by]?.variable])} /> */}
             {group?.group_by == "program" ?
-              <StatView title={"Programmes / Events"} view={() => eventView(item?.program)} /> :
+              <StatView title={gep} view={() => eventView(item?.program)} /> :
               <StatView title={"Programmes / Events"} view={() => eventView(item?.event)} />}
 
           </View>
@@ -227,20 +280,24 @@ const GroupDetail = ({ navigation, route }) => {
       <SearchView
         search={searchText}
         onChangeText={(text) => setSearchText(text)}
-        hideBtn={tabIndex != 2}
+        hideBtn={tabIndex != 3}
         onSearchPress={onSearchPress}
         loader={searchLoader}
       />
     </View>)
   }
 
-  const searchFromList = (list) => {
+  const searchFromList = (list, type) => {
     let stext = searchText.trim().toLowerCase()
     if (stext == "") {
       return list
     } else {
       if (tabIndex == 0) {
-        return list.slice().filter(x => x.title.toLowerCase().includes(stext))
+        if (type == "sale_page") {
+          return list.slice().filter(x => x.title.toLowerCase().includes(stext))
+        } else {
+          return list.slice().filter(x => x.sale_page_title.toLowerCase().includes(stext))
+        }
       } else if (tabIndex == 1) {
         return list.slice().filter(x => {
           if ((x.first_name + " " + x?.last_name).toLowerCase().includes(stext) || x.email.toLowerCase().includes(stext)) {
@@ -263,10 +320,11 @@ const GroupDetail = ({ navigation, route }) => {
         />
         <View style={{ flex: 1 }}>
           <FlatList
-            data={tabIndex == 0 && group?.group_by == "program" ? searchFromList(data?.group_programs) :
-              tabIndex == 0 && group?.group_by == "event" ? searchFromList(data?.group_events) :
-                tabIndex == 1 ? searchFromList(data?.group_members) :
-                  tabIndex == 2 ? allMembers : []
+            data={tabIndex == 0 && group?.group_by == "program" ? searchFromList(data?.group_programs, group?.group_by) :
+              tabIndex == 0 && group?.group_by == "event" ? searchFromList(data?.group_events, group?.group_by) :
+                tabIndex == 0 && group?.group_by == "sale_page" ? searchFromList(data?.sale_pages, group?.group_by) :
+                  tabIndex == 1 ? searchFromList(data?.group_members) :
+                    (tabIndex == 2 || tabIndex == 3) ? allMembers : []
             }
             renderItem={renderList}
             showsVerticalScrollIndicator={false}
@@ -279,12 +337,25 @@ const GroupDetail = ({ navigation, route }) => {
       </View>
       <MyLoader enable={loader} />
 
+      {tabIndex == 3 && Object.keys(checked).length > 0 &&
+        <FAB
+          icon={() => icons.trashFilled(colors.black)}
+          onPress={() => setShowConfirmModal(true)}
+        />}
+
+      <ConfirmationModal
+        isVisible={showConfirmModal}
+        closeModal={() => setShowConfirmModal(false)}
+        onAgree={excludeMembers}
+        title={"Are you sure you want to exclude these members?"}
+      />
+
       <OptionModal
         isVisible={detailModal.isVisible}
         closeModal={() => setDetailModal({ isVisible: false, list: [] })}
         optionList={detailModal.list}
         multiple
-        multipleLabel={group?.group_by == "program" ? "Programmes" : "Events"}
+        multipleLabel={grptype[group?.group_by]?.title}
         onSelected={onSelected}
         renderText={({ item }) => <View>
           <MyText fontSize={16} >{item?._id?.title}</MyText>
@@ -298,6 +369,24 @@ const GroupDetail = ({ navigation, route }) => {
 }
 
 export default GroupDetail
+
+const grptype = {
+  "program": {
+    tab: "PROGRAMMES LIST",
+    title: "Programmes",
+    variable: "program"
+  },
+  "event": {
+    tab: "EVENTS LIST",
+    title: "Events",
+    variable: "event"
+  },
+  "sale_page": {
+    tab: "SALE PAGES LIST",
+    title: "Sale Pages",
+    variable: "event"
+  },
+}
 
 const __styles = StyleSheet.create({
   listRootView: {
@@ -316,18 +405,25 @@ const tablist = (type) => {
   return [
     {
       key: "0",
-      title: type == "program" ? "PROGRAMMES LIST" : "EVENT LIST",
+      title: grptype[type]?.tab,
       index: 0
     },
     {
       key: "1",
-      title: "MEMBER LIST",
+      title: "GROUP INDIVIDUAL MEMBER LIST",
       index: 1
     },
     {
       key: "2",
+      title: "EXCLUDED MEMBER LIST",
+      index: 2,
+      type: "exclude"
+    },
+    {
+      key: "3",
       title: "ALL MEMBER LIST",
-      index: 2
+      index: 3,
+      type: "all"
     }
   ]
 }

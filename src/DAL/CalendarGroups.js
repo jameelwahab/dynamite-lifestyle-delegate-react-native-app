@@ -18,9 +18,9 @@ export const GET_CALENDAR_DETAIL = ({ token, navigation, slug }) => {
   })
 }
 
-export const GET_CALENDAR_ALL_MEMBER = ({ token, navigation, slug, page, searchText }) => {
+export const GET_CALENDAR_ALL_MEMBER = ({ token, navigation, slug, page, searchText, type }) => {
   return invokeApi({
-    path: `api/group/all_group_members/${slug}?page=${page}&limit=20&search_text=${searchText}`,
+    path: `api/group/all_group_members/${slug}?page=${page}&limit=20&type=${type}&search_text=${searchText}`,
     method: "GET",
     token,
     navigation,
@@ -78,3 +78,13 @@ export const GET_PROGRAMMES_EVENTS_SALEPAGES_LIST_FOR_CALENDAR_GROUP =
       navigation
     })
   }
+
+export const EXCLUDE_GROUP_MEMBERS = ({ token, navigation, slug, type, members }) => {
+  return invokeApi({
+    path: `api/challenge/exclude/member`,
+    method: "PUT",
+    postData: { slug, type, members },
+    token,
+    navigation,
+  })
+}

@@ -11,7 +11,7 @@ const Tabs = ({ list, changeTab, tab }) => {
 
   return (
     <View style={{ marginHorizontal: -10 }}>
-      <View style={{ height: 50,  }}>
+      <View style={{ height: 50, }}>
         <FlatList
           contentContainerStyle={{ paddingHorizontal: 10 }}
           data={list}
@@ -24,10 +24,11 @@ const Tabs = ({ list, changeTab, tab }) => {
                 onPress={() => {
                   menuRef?.current?.scrollToIndex({
                     index: index,
-                    animated: true
+                    animated: true,
+                    viewPosition: 0.5
                   })
                   // setTimeout(() => {
-                    changeTab(index)
+                  changeTab(index)
                   // }, 100);
                 }}
                 style={{ justifyContent: "center", paddingHorizontal: 10 }}>
