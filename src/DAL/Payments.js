@@ -33,7 +33,7 @@ export const GET_PAYMENT_REQUEST_LIST = ({ token, navigation, page, sort }) => {
 
 
 
-export const GET_MEMBER_LIST_FOR_PAYMENT_REQUEST = ({ token, navigation, searchText,memberType }) => {
+export const GET_MEMBER_LIST_FOR_PAYMENT_REQUEST = ({ token, navigation, searchText, memberType }) => {
   return invokeApi({
     path: `api/member/members_list_for_select/delegate?include_members=${memberType}&search_text=${searchText}`,
     method: "GET",
@@ -122,6 +122,27 @@ export const PAY_RECURRING = ({ token, navigation, body: { payment_request_slug,
     navigation
   })
 }
+
+export const CONFIRM_RECURRING_PAYMENT = ({ token, navigation, body: {
+  payment_request_slug, price_id, recurring_price_id,
+  subscription_id
+} }) => {
+  return invokeApi({
+    path: `api/member/confirm_subscription_incomplete_by_consultant`,
+    method: "POST",
+    postData: {
+      payment_request_slug,
+      price_id,
+      recurring_price_id,
+      subscription_id
+    },
+    token,
+    navigation
+  })
+}
+
+
+
 
 export const GET_CLIENT_SECRET_FOR_PAY_ONETIME = ({ token, navigation, body: { payment_request_slug } }) => {
   return invokeApi({

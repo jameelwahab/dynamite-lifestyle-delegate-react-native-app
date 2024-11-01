@@ -2,7 +2,7 @@ import { View, Text, FlatList, ScrollView, StyleSheet } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import RootView from '../../../components/RootView'
 import MyText from '../../../components/MyText'
-import { CHANGE_ONETIME_PAYMNET_STATUS_TO_PAID, GET_CLIENT_SECRET_FOR_PAY_ONETIME, GET_PAYMENT_REQUEST_DETAIL, PAY_RECURRING } from '../../../DAL'
+import { CHANGE_ONETIME_PAYMNET_STATUS_TO_PAID, CONFIRM_RECURRING_PAYMENT, GET_CLIENT_SECRET_FOR_PAY_ONETIME, GET_PAYMENT_REQUEST_DETAIL, PAY_RECURRING } from '../../../DAL'
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../../redux/reducers/userSlice'
 import MyLoader from '../../../components/MyLoader'
@@ -115,12 +115,45 @@ const PaymentrequestDetail = ({ navigation, route }) => {
 
   const payRecurringPaymentFromServer = async (stripeToken) => {
     let res = await PAY_RECURRING({ navigation, token, body: { payment_request_slug: slug, source_token: stripeToken } });
-
     if (res.code == 200) {
       showToast({ title: "Payment Successful", type: "success" });
       getPaymentRequestDeatil(true);
+    } else if (res.code == 210) {
+      const { paymentIntent, error } = await confirmPayment(res?.client_secret, {
+        paymentMethodType: 'Card'
+      });
+
+      if (error) {
+        setLoader(false);
+        showToast({ title: "Payment Failed", body: error?.localizedMessage });
+      } else {
+        confirmRecurringPaymentToServer(res)
+      }
+    }
+    else {
+      setLoader(false);
+      showToast({ title: "Failed", message: res?.message });
     }
   }
+  const confirmRecurringPaymentToServer = async (obj) => {
+    let res = await CONFIRM_RECURRING_PAYMENT({
+      navigation, token, body: {
+        payment_request_slug: slug,
+        price_id: obj?.stripe_initial_price_id,
+        recurring_price_id: obj?.strip_recurring_price_id,
+        subscription_id: obj?.strip_subscription_id,
+      }
+    });
+    if (res.code == 200) {
+      showToast({ title: "Payment Successful", type: "success" });
+      getPaymentRequestDeatil(true);
+    } else {
+      setLoader(false);
+      showToast({ title: "Failed", message: res?.message });
+    }
+  }
+
+
 
   const payOnetime = async () => {
     let res = await GET_CLIENT_SECRET_FOR_PAY_ONETIME({ navigation, token, body: { payment_request_slug: slug } });
@@ -361,8 +394,8 @@ const PaymentrequestDetail = ({ navigation, route }) => {
   return (
     <RootView title={"Payment Request Transaction"} >
       {!!data?.member_info &&
-      <MemberView member={data?.member_info} />}
-      <View style={{ flex: 1,marginTop:10 }}>
+        <MemberView member={data?.member_info} />}
+      <View style={{ flex: 1, marginTop: 10 }}>
         <ScrollView
           showsVerticalScrollIndicator={false}
           automaticallyAdjustKeyboardInsets={true}
