@@ -266,8 +266,8 @@ const GroupDetail = ({ navigation, route }) => {
           <View>
             {/* <StatView title={grptype[group?.group_by]?.title} view={() => eventView(item?.[grptype[group?.group_by]?.variable])} /> */}
             {group?.group_by == "program" ?
-              <StatView title={gep} view={() => eventView(item?.program)} /> :
-              <StatView title={"Programmes / Events"} view={() => eventView(item?.event)} />}
+              <StatView title={"Programmes"} view={() => eventView(item?.program)} /> :
+              <StatView title={"Events"} view={() => eventView(item?.event)} />}
 
           </View>
         </View>
