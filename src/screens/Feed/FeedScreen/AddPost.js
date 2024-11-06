@@ -577,8 +577,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
         : JSON.stringify([postCeatedFor]));
     }
 
-    console.log(moment(pollData?.expiryDate).format(), "expiryDate")
-    console.log(moment(pollData?.expiryTime).format(), "expiryTime")
+
     if (!!pollData) {
       if (postType == "poll") {
         fd.append('poll_info', JSON.stringify({

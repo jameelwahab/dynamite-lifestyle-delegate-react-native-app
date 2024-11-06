@@ -43,7 +43,7 @@ const PollView = forwardRef(({ data, timezone }, ref) => {
       console.log(data, "dataForEdit")
       console.log(moment(data?.expiry_date, "YYYY-MM-DD").format(),)
       setOptions([...data?.options]);
-      setPrivacy(data?.survey_result == "private")
+      setPrivacy(data?.poll_result == "private")
       setIsMultiple(data?.is_multiple_allow);
       setExpiryDate(moment(data?.expiry_date, "YYYY-MM-DD"))
       setExpiryTime(convertTimezone2(moment(data?.expiry_time, "hh:mm"), timezone))
@@ -58,6 +58,7 @@ const PollView = forwardRef(({ data, timezone }, ref) => {
     return {
       options: options,
       isMultiple: isMultiple,
+      privacy:privacy,
       expiryDate: expiryDate,
       expiryTime: expiryTime
     }

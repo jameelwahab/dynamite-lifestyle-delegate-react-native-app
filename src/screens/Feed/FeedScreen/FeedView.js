@@ -319,7 +319,7 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
         </View>
 
         {/* <View style={{ height: 1, width: "100%", backgroundColor: colors.lightGolden3, marginTop: 10 }} /> */}
-        {(item?.survey_info?.survey_result == "public" || (user?._id == item?.action_info?.action_id)) &&
+        {(item?.poll_info?.poll_result == "public" || (user?._id == item?.action_info?.action_id)) &&
           <Pressable
             onPress={() => openPollDetail?.(item)}
             style={{ borderWidth: 1, borderColor: colors.lightPrimary, borderRadius: 5, marginTop: 10, height: 35, alignItems: "center", justifyContent: "center" }} >
