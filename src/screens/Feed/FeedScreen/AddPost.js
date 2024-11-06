@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, TextInput, Pressable, ScrollView, useWindowDimensions } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, TextInput, Pressable, ScrollView, useWindowDimensions, Image } from 'react-native'
 import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import UserImage from '../../../components/UserImage'
 import Modal from 'react-native-modal'
@@ -35,6 +35,7 @@ import { selectSocket } from '../../../redux/reducers/socketSlice'
 import PollView from './PollView'
 import { convertTimezoneToRegion } from '../../../functions/convertTime'
 import OptionModalWithSearch from '../../../components/OptionModalWithSearch'
+import SurveyView from './SurveyView'
 
 
 
@@ -48,6 +49,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   hideAddView,
   cosmosLevelList, selectLevelOptionOnAddPostForCosmos, defaultCosmosFilter,
   isPollAllowed,
+  isSurveyAllowed,
   feedType,
   setFeedType,
   feedTypeMember,
@@ -59,6 +61,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   const { height, width } = useWindowDimensions();
   const inset = useSafeAreaInsets();
   const ref_poll = useRef()
+  const ref_survey = useRef()
 
   const { socket } = useSelector(selectSocket);
   const lvlModalRef = useRef()
@@ -106,8 +109,8 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   const [publishTime, setPublishTime] = useState("12:00 AM");
   const [eventModalVisible, setEventModalVisible] = useState(false)
   const [multipleLevelModalVisiblity, setMultipleLevelModalVisiblity] = useState(false);
-
-  const [pollData, setPollData] = useState(null)
+  const [pollData, setPollData] = useState(null);
+  const [surveyData, setSurveyData] = useState(null);
 
   useEffect(() => {
 
@@ -314,6 +317,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     }
 
     setPollData(item?.poll_info)
+    setSurveyData(item?.survey_info)
   }
 
 
@@ -353,6 +357,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     setIsMentionListVisible(false);
     set_at_index(-1)
     setPollData(null)
+    setSurveyData(null)
     cursor = {
       start: 0,
       end: 0
@@ -447,6 +452,8 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     if (postType == "poll") {
       pollData = ref_poll?.current?.getData();
       console.log(pollData, "Poll Data");
+    } else if (postType == "survey") {
+      pollData = ref_survey?.current?.getData();
     }
     // if (postType == "general" && ) {
     //   showToast({ body: "Please add some text to be posted", title: "Alert", type: "info" });
@@ -488,6 +495,35 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
         showToast({ title: "Alert", body: "All poll option must be unique", type: "info" });
         // Alert.alert('All poll option must be unique');
         return
+      }
+    }
+
+    else if (postType == 'survey') {
+      let time = moment(moment(pollData?.expiryDate).format("YYYY-MM-DD") + " " + moment(pollData?.expiryTime).format("HH:mm"), "YYYY-MM-DD HH:mm").format("YYYY-MM-DD HH:mm");
+      let time2 = convertTimezoneToRegion(moment(), timezone).format("YYYY-MM-DD HH:mm");
+      let isbefore = moment(time).isSameOrBefore(time2);
+      if (isbefore) {
+        showToast({ title: "Alert", body: "Past time selection is not allowed. Please choose a future time.", type: "info" });
+        // Alert.alert('Past time selection is not allowed. Please choose a future time.');
+        return
+      }
+      else {
+        for (let i = 0; i < pollData?.options.length; i++) {
+          let obj = pollData?.options[i];
+          let index = i;
+          console.log(obj, "obj")
+          if (obj?.question_statement.trim() == "") {
+            showToast({ body: `Please add Statement in Question ${index + 1}`, title: "Alert", type: "info" })
+            return
+          } else if (obj?.options.some(x => x.text.trim() == "")) {
+            showToast({ body: `Please add all options in Question ${index + 1}`, title: "Alert", type: "info" })
+            return
+          } else if (areTextValuesUnique(obj?.options) == false) {
+            showToast({ body: `All poll option must be unique in Question ${index + 1}`, title: "Alert", type: "info" })
+            return
+          }
+        }
+
       }
     }
 
@@ -544,15 +580,26 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     console.log(moment(pollData?.expiryDate).format(), "expiryDate")
     console.log(moment(pollData?.expiryTime).format(), "expiryTime")
     if (!!pollData) {
-      fd.append('poll_info', JSON.stringify({
-        ...pollData,
-        expiry_date: moment(pollData?.expiryDate).format("YYYY-MM-DD"),
-        expiry_time: moment(pollData?.expiryTime).format("HH:mm"),
-        // expiry_date_time: moment(pollData?.expiryTime).format("HH:mm"),
-        is_multiple_allow: pollData?.isMultiple,
-        options: pollData?.options,
-        poll_status: "in_progress",
-      }));
+      if (postType == "poll") {
+        fd.append('poll_info', JSON.stringify({
+          ...pollData,
+          expiry_date: moment(pollData?.expiryDate).format("YYYY-MM-DD"),
+          expiry_time: moment(pollData?.expiryTime).format("HH:mm"),
+          poll_result: pollData?.privacy ? "private" : "public",
+          // expiry_date_time: moment(pollData?.expiryTime).format("HH:mm"),
+          is_multiple_allow: pollData?.isMultiple,
+          options: pollData?.options,
+          poll_status: "in_progress",
+        }));
+      } else if (postType == "survey")
+        fd.append('survey_info', JSON.stringify({
+          ...surveyData,
+          expiry_date: moment(pollData?.expiryDate).format("YYYY-MM-DD"),
+          expiry_time: moment(pollData?.expiryTime).format("HH:mm"),
+          // is_multiple_allow: pollData?.isMultiple,
+          survey_result: pollData?.privacy ? "private" : "public",
+          questions: pollData?.options
+        }));
     }
 
     // return;
@@ -680,6 +727,13 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     }
   }
 
+  const changePostType = (type) => {
+    if (type == postType) {
+      setPostType("general")
+    } else {
+      setPostType(type)
+    }
+  }
 
   const btn_cancelEvent = () => {
     setEventTitle("")
@@ -913,8 +967,6 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   const replaceAndHighlight = str => {
     let parts = [];
     let lastIndex = 0;
-
-
     mentionList.forEach(user => {
       let startIndex = user?.offset;
       let endIndex = user?.offset + user?.length
@@ -970,7 +1022,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
               {/* //* Profile view with actions */}
 
-              <View style={[__style.inputRootView,]}>
+              <View style={[__style.inputRootView, { paddingHorizontal: 10, paddingTop: 10 }]}>
                 <UserImage
                   image={user?.image?.thumbnail_1}
                   name={user?.first_name}
@@ -1065,7 +1117,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                 }}
               /> : */}
               <>
-                <View>
+                <View style={{ paddingHorizontal: 10, }}>
 
 
                   <TextInput
@@ -1103,7 +1155,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                       cursor = e.nativeEvent.selection
                     }}
                   ><Text style={[{
-                    color: colors.lightText,
+                    color: colors.text,
                     fontFamily: fonts.regular,
                     includeFontPadding: false
                   }]} >
@@ -1115,8 +1167,9 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
                 {isMentionListVisible && (delegateList.length > 0 || isMentionListLoading) &&
                   <View
-
                     style={{
+                      paddingHorizontal: 15,
+                      marginTop: 10,
                       position: "absolute",
                       zIndex: 3,
                       alignItems: "center",
@@ -1128,7 +1181,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                     }}>
                     {console.log(height, "height")}
                     <View style={{
-                      width: utilities.screenWidth() - 30,
+                      width: utilities.screenWidth() - 40,
                       backgroundColor: colors.darkSecondary,
                       borderRadius: 5,
                       maxHeight: height > 800 ? 190 : 140,
@@ -1170,7 +1223,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
               {/*//*   Schedule View    */}
               {isScheduledFeed &&
-                <View style={{ marginBottom: 10 }}>
+                <View style={{ marginBottom: 10, paddingHorizontal: 10 }}>
                   <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
                     <View style={{ flex: 1 }}>
                       <MyTouchableInput
@@ -1251,7 +1304,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
               {/*//*   Images List     */}
               {postType == "image" &&
-                <View>
+                <View style={{ paddingHorizontal: 10 }}>
                   <View style={{ flexDirection: "row", marginBottom: 5 }}>
                     <ScrollView horizontal
                       contentContainerStyle={{ paddingVertical: 10 }}
@@ -1297,7 +1350,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
 
               {postType == "video" &&
-                <View >
+                <View style={{ paddingHorizontal: 10 }}>
                   <TextInput
                     style={__style.videoInput}
                     autoCapitalize='none'
@@ -1318,7 +1371,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
               {/* //*     Post Embed Code      */}
               {postType == "embed_code" &&
-                <View >
+                <View style={{ paddingHorizontal: 10 }} >
                   <TextInput
                     style={[__style.videoInput, { height: 120 }]}
                     multiline={true}
@@ -1339,37 +1392,49 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                 </View>}
 
               {postType == "poll" &&
-                <View >
+                <View style={{ paddingHorizontal: 10 }} >
                   <PollView ref={ref_poll} data={pollData} timezone={timezone} />
+                </View>}
+
+              {postType == "survey" &&
+                <View >
+                  <SurveyView ref={ref_survey} data={surveyData} timezone={timezone} />
                 </View>}
 
 
               {/* //*     post type action buttonns  */}
-              <View style={__style.typeButtonRow}>
+              <View style={[__style.typeButtonRow, { paddingHorizontal: 10 }]}>
                 <View style={{ flex: 1, flexDirection: "row" }}>
                   <TouchableOpacity
-                    onPress={() => setPostType("image")}
+                    onPress={() => changePostType("image")}
                     style={__style.typeButtonView}>
                     {icons.camera(postType == "image" ? colors.primary : colors.white, 17)}
                   </TouchableOpacity>
 
                   <TouchableOpacity
-                    onPress={() => setPostType("video")}
+                    onPress={() => changePostType("video")}
                     style={[__style.typeButtonView,]}>
                     {icons.video(postType == "video" ? colors.primary : colors.white, 17)}
                   </TouchableOpacity>
 
                   <TouchableOpacity
-                    onPress={() => setPostType("embed_code")}
+                    onPress={() => changePostType("embed_code")}
                     style={__style.typeButtonView}>
                     {icons.code(postType == "embed_code" ? colors.primary : colors.white, 17)}
                   </TouchableOpacity>
 
                   {isPollAllowed &&
                     <TouchableOpacity
-                      onPress={() => setPostType("poll")}
+                      onPress={() => changePostType("poll")}
                       style={__style.typeButtonView}>
                       {icons.poll(postType == "poll" ? colors.primary : colors.white, 17)}
+                    </TouchableOpacity>}
+
+                  {isSurveyAllowed &&
+                    <TouchableOpacity
+                      onPress={() => changePostType("survey")}
+                      style={__style.typeButtonView}>
+                      {icons.survey(postType == "survey" ? colors.primary : colors.white, 17)}
                     </TouchableOpacity>}
                 </View>
                 {!isCosmos && showEventOption &&
@@ -1387,11 +1452,11 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
               {/* //*    add post Button  */}
               {!!editId ?
-                <View style={{ flexDirection: "row", marginVertical: 20, marginHorizontal: 20 }}>
+                <View style={{ flexDirection: "row", marginVertical: 20, paddingHorizontal: 10 }}>
                   <View style={{ flex: 1 }}>
                     <MyButton
                       isLoading={loader}
-                      onPress={addPostBtn}
+                      onPress={closeModal}
                       invert={true} title={"cancel"} />
                   </View>
                   <View style={{ flex: 1, marginLeft: 10 }}>
@@ -1401,7 +1466,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                       invert={true} title={loader ? 'updating...' : 'Update'} />
                   </View>
                 </View> :
-                <View style={{ marginVertical: 20, marginHorizontal: 20 }}>
+                <View style={{ marginVertical: 20, paddingHorizontal: 10 }}>
                   <MyButton
                     isLoading={loader}
                     onPress={addPostBtn}
@@ -1783,7 +1848,7 @@ const __style = StyleSheet.create({
 
   },
   postView: {
-    padding: 15,
+    // padding: 15,
     flex: 1
   },
   modalActionButtonRow: {

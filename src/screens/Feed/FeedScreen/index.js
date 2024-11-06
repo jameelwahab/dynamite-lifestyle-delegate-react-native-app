@@ -29,6 +29,8 @@ import Header from '../../../components/Header'
 import AddPersonalNoteModal from '../AddPersonalNoteModal'
 import MyRefreshControl from '../../../components/MyRefreshControl'
 import PollDetailModal from './PollDetailModal'
+import SurveyModal from './SurveyModal'
+import SurveyDetailModal from './SurveyDetailModal'
 
 
 
@@ -54,8 +56,10 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
 
   const addPostRef = useRef()
   const scheduleModalRef = useRef();
+  const ref_surveymodal = useRef()
   const ref_personalNoteModal = useRef();
   const ref_pollInfo = useRef();
+  const ref_surveyInfo = useRef()
   const { feedFor, feedId, eventId = "" } = route?.params;
   const isCosmos = feedFor == "the_cosmos";
   const isScheduledFeed = feedFor == "scheduled";
@@ -494,15 +498,14 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
     }
 
     ref_pollInfo?.current?.socketActionForPollDetailModal(data)
+    ref_surveyInfo?.current?.socketActionForSurveyDetailModal(data)
 
     if (data.action === 'poll_answered') {
       updateFeedItemsSpecificField(data?.feed_obj?._id, {
         poll_info: data?.feed_obj?.poll_info,
-        // selected_options: data?.feed_obj?.selected_options
       })
       if (data?.action_by?._id == user?._id) {
         updateFeedItemsSpecificField(data?.feed_obj?._id, {
-          // poll_info: data?.feed_obj?.poll_info,
           selected_options: data?.feed_obj?.selected_options
         })
       }
@@ -513,6 +516,26 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           let index = data.feeds.findIndex(item => item.feed_id == x?._id);
           if (index > -1) {
             x.poll_info.poll_status = "expired";
+          }
+        })
+        return [...list]
+      })
+    } else if (data.action === 'survey_answered') {
+      updateFeedItemsSpecificField(data?.feed_obj?._id, {
+        survey_info: data?.feed_obj?.survey_info,
+      })
+      if (data?.action_by?._id == user?._id) {
+        updateFeedItemsSpecificField(data?.feed_obj?._id, {
+          survey_selected_options: data?.feed_obj?.survey_selected_options
+        })
+      }
+
+    } else if (data.action === 'survey_expired') {
+      setFeed((list) => {
+        list.map((x) => {
+          let index = data.feeds.findIndex(item => item.feed_id == x?._id);
+          if (index > -1) {
+            x.survey_info.survey_status = "expired";
           }
         })
         return [...list]
@@ -720,7 +743,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       }, 500);
     } else if (selectedOpt?.type == "edit") {
       setTimeout(() => {
-        console.log(item, "item")
+
         addPostRef?.current?.selectItemForEdit(item)
       }, 500);
     } else if (selectedOpt?.type == "message") {
@@ -863,16 +886,15 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
 
         if (item.type == "edit") {
           if (isMine) {
-            // newList.push(item);
-            if (feed?.feed_type == "poll" && feed?.poll_info?.poll_status != "expired") {
-              newList.push(item);
-            } else if (feed?.feed_type != "poll") {
+            if ((feed?.feed_type == "poll" && feed?.poll_info?.poll_status == "expired") || (feed?.feed_type == "survey" && feed?.survey_info?.survey_status == "expired")) { }
+            else {
               newList.push(item);
             }
           } else {
             if (isAllSourceFeed || isTheSourceFeed) {
               if (access?.edit_delete_option_in_source_all_source_feeds) {
-                if ((feed?.feed_type == "poll" && feed?.poll_info?.poll_status != "expired") || feed?.feed_type != "poll") {
+                if ((feed?.feed_type == "poll" && feed?.poll_info?.poll_status == "expired") || (feed?.feed_type == "survey" && feed?.survey_info?.survey_status == "expired")) { }
+                else {
                   newList.push(item);
                 }
               }
@@ -970,6 +992,17 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
     ref_pollInfo?.current?.openModal(item)
   }
 
+  const onStartQuestionnairPress = (item) => {
+    // ref_pollInfo?.current?.openModal(item)
+    ref_surveymodal?.current?.openModal(item)
+  }
+
+  const openSurveyDetail = (item) => {
+    ref_surveyInfo?.current?.openModal(item)
+    // console.log(ref_surveymodal?.current,'openSurveyDetail')
+
+  }
+
   const filterTheOptionsCount = (feed) => {
 
     let newList = [];
@@ -1004,7 +1037,25 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
         }
       }
 
-      if (item.type == "edit" || item.type == "delete") {
+      if (item.type == "edit") {
+        if (isMine) {
+          if ((feed?.feed_type == "poll" && feed?.poll_info?.poll_status == "expired") || (feed?.feed_type == "survey" && feed?.survey_info?.survey_status == "expired")) { }
+          else {
+            newList.push(item);
+          }
+        } else {
+          if (isAllSourceFeed || isTheSourceFeed) {
+            if (access?.edit_delete_option_in_source_all_source_feeds) {
+              if ((feed?.feed_type == "poll" && feed?.poll_info?.poll_status == "expired") || (feed?.feed_type == "survey" && feed?.survey_info?.survey_status == "expired")) { }
+              else {
+                newList.push(item);
+              }
+            }
+          }
+        }
+      }
+
+      if (item.type == "delete") {
         if (isMine) {
           newList.push(item);
         } else {
@@ -1213,6 +1264,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           defaultCosmosFilter={access?.default_filter}
           selectLevelOptionOnAddPostForCosmos={isCosmos && access?.choose_level_in_cosmos_feeds}
           isPollAllowed={access?.enable_poll_feed}
+          isSurveyAllowed={access?.enable_survey_feed}
           isFeedFilterAllowed={(isAllSourceFeed || isTheSourceFeed) && access?.is_feed_search_allowed}
           feedType={feedType}
           setFeedType={setFeedType}
@@ -1246,6 +1298,8 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       onVotePress={pollAction}
       pollSettings={settings?.pollSettings}
       openPollDetail={openPollDetail}
+      onStartQuestionnairPress={onStartQuestionnairPress}
+      openSurveyDetail={openSurveyDetail}
     />, [feed, inView]);
 
   const viewConfigRef = React.useRef({ viewAreaCoveragePercentThreshold: 50 })
@@ -1356,6 +1410,21 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
 
       <AddPersonalNoteModal
         ref={ref_personalNoteModal}
+      />
+
+
+      <SurveyModal
+        ref={ref_surveymodal}
+        token={token}
+        navigation={navigation}
+      />
+
+      <SurveyDetailModal
+        member={user}
+        token={token}
+        ref={ref_surveyInfo}
+        timezone={timezone}
+        navigation={navigation}
       />
 
       <PollDetailModal

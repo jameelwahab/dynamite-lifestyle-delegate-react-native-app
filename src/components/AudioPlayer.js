@@ -118,7 +118,7 @@ const AudioPlayer = ({ stop = "", url,  }) => {
           value={position}
 
           thumbTintColor="silver"
-          minimumTrackTintColor={colors.golden}
+          minimumTrackTintColor={colors.primary}
           maximumTrackTintColor="gray"
           minimumValue={0}
           thumbStyle={{

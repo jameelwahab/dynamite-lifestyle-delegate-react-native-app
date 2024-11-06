@@ -1,7 +1,7 @@
 import invokeApi from "../functions/invokeAPI";
 
 export const GET_FEED_LIST =
-  ({ token, navigation, level, type, page, eventId,feedTypeAction,feedTypeActionId }) => {
+  ({ token, navigation, level, type, page, eventId, feedTypeAction, feedTypeActionId }) => {
     return invokeApi({
       path: `api/feeds/delegate_portal/feed_listing/v1?page=${page}&limit=10&list_type=${type}&level_or_type=${level}&event=${eventId}&feed_action_type=${feedTypeAction}&feed_action_by=${feedTypeActionId}`,
       method: "GET",
@@ -111,7 +111,8 @@ export const UPLOAD_FEED_IMAGES = ({ token, navigation, formData }) => {
 export const CREATE_FEED = ({ token, navigation, formData }) => {
   return invokeApi({
     // path: `api/feeds/delegate_portal/create`,
-    path: "api/feeds/delegate_portal/create_with_poll",
+    // path: "api/feeds/delegate_portal/create_with_poll",
+    path: "api/feeds/delegate_portal/create_with_poll/v2",
     headers: { 'Content-Type': 'multipart/form-data' },
     method: "POST",
     postData: formData,
@@ -133,7 +134,8 @@ export const FEED_DETAIL = ({ token, navigation, feedId }) => {
 export const UPDATE_FEED = ({ token, navigation, formData, feedId }) => {
   return invokeApi({
     // path: `api/feeds/update_feed_by_delegate/${feedId}`,
-    path: `api/feeds/update_feed_by_delegate_with_poll/${feedId}`,
+    // path: `api/feeds/update_feed_by_delegate_with_poll/${feedId}`,
+    path: `api/feeds/update_feed_by_delegate_with_poll/v2/${feedId}`,
     headers: { 'Content-Type': 'multipart/form-data' },
     method: "PUT",
     postData: formData,
@@ -282,6 +284,49 @@ export const FEED_POLL_DETAIL = ({ token, navigation, id }) => {
   return invokeApi({
     path: `api/feeds/feed_poll_details/${id}`,
     method: 'GET',
+    token,
+    navigation,
+  });
+}
+
+
+export const FEED_SURVEY_DETAIL = ({ token, navigation, id }) => {
+  return invokeApi({
+    path: `api/feeds/feed_survey_details/${id}`,
+    method: 'GET',
+    token,
+    navigation,
+  });
+}
+
+
+export const FEED_SURVEY_ACTION = ({ token, navigation, body: {
+  feed_id, option_id, question_id
+} }) => {
+  return invokeApi({
+    path: `api/feeds/manage_survey_answers`,
+    method: 'POST',
+    postData: {
+      feed_id, option_id, question_id
+    },
+    token,
+    navigation,
+  });
+}
+
+
+export const FEED_SURVEY_MEMBER_LIST = ({ token, navigation, body: {
+  feed_id, option_id, page
+} }) => {
+  return invokeApi({
+    path: `api/feeds/survey_option_users_list`,
+    method: 'POST',
+    postData: {
+      feed_id,
+      option_id,
+      limit: 10,
+      page,
+    },
     token,
     navigation,
   });

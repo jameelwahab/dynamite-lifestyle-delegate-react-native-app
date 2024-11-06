@@ -20,8 +20,14 @@ import { isHtml } from '../../../functions/regex'
 import PostWebView from '../../../components/PostWebView'
 import FeedText from '../../../components/FeedText'
 import numFormatter from '../../../functions/numFormatter'
+import { MyButton } from '../../../components/MyButton'
 
-export const FeedView = ({ item, index, user, token, isInView, timezone, settings, openComments, showLikes, openOptions, onLikebtnPress, isCosmos, sourceLevelIcons, isScheduledFeed, openScheduleTimeModal, onFeedDetail, isEventFeed, filterTheOptions, onVotePress, pollSettings, openPollDetail }) => {
+export const FeedView = ({ item, index, user, token, isInView, timezone, settings,
+  openComments, showLikes, openOptions, onLikebtnPress, isCosmos,
+  sourceLevelIcons, isScheduledFeed, openScheduleTimeModal, onFeedDetail,
+  isEventFeed, filterTheOptions, onVotePress, pollSettings, openPollDetail,
+  onStartQuestionnairPress, openSurveyDetail
+}) => {
 
 
   const [animationState, setAnimationState] = useState(0)
@@ -182,6 +188,13 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
         </View>}
 
 
+      {item.feed_type == "survey" &&
+        <View style={{ margin: 10, }}>
+
+          {surveyFeedView(item)}
+        </View>}
+
+
       {!!item?.event_info?.is_event_info &&
         <View style={__style.eventRootView} >
           <View style={__style.eventTitleView}>
@@ -301,17 +314,58 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
 
           </>}
         <View style={{ alignItems: "center" }}>
-          <MyText fontSize={12} color={colors.gray} >{item?.poll_info?.poll_status == "expired" ? "Poll Expired" :
+          <MyText fontSize={12} color={colors.lightText2} >{item?.poll_info?.poll_status == "expired" ? "Poll Expired" :
             `Poll Expires on ${convertTimezone2(item?.poll_info?.expiry_date_time, timezone).format("DD-MM-YYYY [at] hh:mm A")}`}</MyText>
         </View>
 
         {/* <View style={{ height: 1, width: "100%", backgroundColor: colors.lightGolden3, marginTop: 10 }} /> */}
+        {(item?.survey_info?.survey_result == "public" || (user?._id == item?.action_info?.action_id)) &&
+          <Pressable
+            onPress={() => openPollDetail?.(item)}
+            style={{ borderWidth: 1, borderColor: colors.lightPrimary, borderRadius: 5, marginTop: 10, height: 35, alignItems: "center", justifyContent: "center" }} >
+            <MyText color={colors.primary} >View Details</MyText>
+          </Pressable>}
+      </View>
+    )
 
-        <Pressable
-          onPress={() => openPollDetail?.(item)}
-          style={{ borderWidth: 1, borderColor: colors.lightPrimary, borderRadius: 5, marginTop: 10, height: 35, alignItems: "center", justifyContent: "center" }} >
-          <MyText color={colors.golden} >View details</MyText>
-        </Pressable>
+  }
+
+  const surveyFeedView = (item) => {
+    return (
+      <View style={{ marginTop: 10 }} >
+        {item?.survey_info?.survey_status == "expired" ?
+          <>
+            <View style={{ marginBottom: 10 }}>
+              <MyButton
+                onPress={() => onStartQuestionnairPress(item)}
+                fullWidth
+                // noCapitalize
+                title="View Survey"
+              />
+            </View>
+          </> :
+          <View style={{}}>
+            <MyButton
+              onPress={() => onStartQuestionnairPress(item)}
+              fullWidth
+              // noCapitalize
+              title="Start Survey"
+            />
+          </View>
+        }
+
+        <View style={{ alignItems: "center", marginTop: 10 }}>
+          <MyText fontSize={12} color={colors.lightText2} >{item?.survey_info?.survey_status == "expired" ? "Survey Expired" :
+            `Survey Expires on ${convertTimezone2(item?.survey_info?.expiry_date_time, timezone).format("DD-MM-YYYY [at] hh:mm A")}`}</MyText>
+        </View>
+
+        {(item?.survey_info?.survey_result == "public" || (user?._id == item?.action_info?.action_id)) &&
+          <Pressable
+            onPress={() => openSurveyDetail?.(item)}
+            style={{ borderWidth: 1, borderColor: colors.lightPrimary, borderRadius: 5, marginTop: 10, height: 35, alignItems: "center", justifyContent: "center" }} >
+            <MyText color={colors.primary} >View Details</MyText>
+          </Pressable>}
+
       </View>
     )
 

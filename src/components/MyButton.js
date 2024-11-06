@@ -26,7 +26,8 @@ const MyButton = ({
             <Image source={leftIcon} style={{ height: 17, width: 17, tintColor: colors.primary }} />}
         </View>}
       <Text style={[invert ? __MyButtonStyles.invertTitleText : __MyButtonStyles.titleText, textStyle,
-      { textTransform: noCapitalize ? "none" : "uppercase" }
+      { textTransform: noCapitalize ? "none" : "uppercase" },
+      { letterSpacing: 0.5 }
       ]}>{title}</Text>
       {!!leftIcon && noSpace == false &&
         <View style={__MyButtonStyles.iconView} />}

@@ -60,7 +60,7 @@ const WebPlayer = ({ url, width, height, borderRadius }) => {
           // width: Dimensions.get("screen").width
           width: "100%",
         }}>
-          <ActivityIndicator color={colors.golden} />
+          <ActivityIndicator color={colors.primary} />
         </View>
       )
       }

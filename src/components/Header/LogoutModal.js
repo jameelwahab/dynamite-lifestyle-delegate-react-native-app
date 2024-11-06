@@ -130,7 +130,7 @@ const LogoutModal = forwardRef(({ closeProfileModal }, ref) => {
                 disabled={loading}
                 style={__style.transparntBtn}>
                 {loading ?
-                  <ActivityIndicator color={colors.golden} /> :
+                  <ActivityIndicator color={colors.primary} /> :
                   <MyText color={colors.primary} >AGREE</MyText>}
               </TouchableHighlight>
 

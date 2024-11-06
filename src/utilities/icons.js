@@ -11,6 +11,7 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import Octicons from 'react-native-vector-icons/Octicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import { Image } from 'react-native';
 
 
 export const icons = {
@@ -33,6 +34,7 @@ export const icons = {
   csv: require('../assets/icons/csv.png'),
   broadcast: require('../assets/icons/broadcast.png'),
   gratitude: require('../assets/icons/gratitude.png'),
+
   googleCalendar: require('../assets/icons/google-calendar.png'),
 
   file_csv: require('../assets/icons/csv1.png'),
@@ -50,6 +52,8 @@ export const icons = {
     cosmos: require("../assets/sidebarIcons/cosmos.webp"),
     member: require("../assets/sidebarIcons/member.webp"),
   },
+
+  survey: (color = colors.primary, size = 20) => <Image source={require('../assets/icons/survey.png')} style={{ height: size, width: size, tintColor: color }} />,
 
   user: () => { return (<FontAwesome6 name="user-large" color={colors.primary} size={17} />) },
   backMajor: (color = colors.primary, size = 20) => { return (<Ionicons name="arrow-back-outline" color={color} size={size} />) },
@@ -69,6 +73,7 @@ export const icons = {
   noIcon: () => { return (<MaterialIcons name="cancel" color={colors.transparent} size={20} />) },
   crosss: (color = colors.white, size = 20) => { return (<Ionicons name="close" color={color} size={size} />) },
   plus: (color = colors.white, size = 20) => { return (<Octicons name="plus" color={color} size={size} />) },
+  minus: (color = colors.white, size = 20) => { return (<Entypo name="minus" color={color} size={size} />) },
   search: (color = colors.white, size = 17) => { return (<Feather name="search" color={color} size={size} />) },
   down: (color = colors.white, size = 17) => { return (<Ionicons name="caret-down" color={color} size={size} />) },
   threeDots: (color = colors.primary, size = 12) => { return (<Entypo name="dots-three-vertical" color={color} size={size} />) },

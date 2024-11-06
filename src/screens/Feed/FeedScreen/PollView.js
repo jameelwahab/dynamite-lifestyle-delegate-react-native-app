@@ -22,6 +22,7 @@ const PollView = forwardRef(({ data, timezone }, ref) => {
   const [dateTimePicker, setDateTimePicker] = useState({ isVisible: false, mode: "date", time: moment().toDate() });
   const [expiryDate, setExpiryDate] = useState(convertTimezoneToRegion(moment.utc().add({ day: 1 }), timezone))
   const [expiryTime, setExpiryTime] = useState(convertTimezoneToRegion(moment().utc(), timezone))
+  const [privacy, setPrivacy] = useState(false)
 
   useImperativeHandle(ref, () => {
     return {
@@ -42,6 +43,7 @@ const PollView = forwardRef(({ data, timezone }, ref) => {
       console.log(data, "dataForEdit")
       console.log(moment(data?.expiry_date, "YYYY-MM-DD").format(),)
       setOptions([...data?.options]);
+      setPrivacy(data?.survey_result == "private")
       setIsMultiple(data?.is_multiple_allow);
       setExpiryDate(moment(data?.expiry_date, "YYYY-MM-DD"))
       setExpiryTime(convertTimezone2(moment(data?.expiry_time, "hh:mm"), timezone))
@@ -129,7 +131,6 @@ const PollView = forwardRef(({ data, timezone }, ref) => {
             value={moment(expiryDate).format(dateTimeFormat.date)}
             label="Expiry Date*"
             rootStyle={__styles.dateTimeInput}
-            iconColor={colors.golden}
             icon={() => icons.calendar(colors.primary)} />
         </View>
         <View style={{ width: 10 }} />
@@ -138,9 +139,8 @@ const PollView = forwardRef(({ data, timezone }, ref) => {
             label="Expiry Time*"
             onPress={() => openDateTimePicker("time", expiryTime)}
             value={moment(expiryTime).format(dateTimeFormat.time)}
-            iconColor={colors.golden}
             rootStyle={__styles.dateTimeInput}
-            icon={() => icons.clock()} />
+            icon={() => icons.clock(colors.primary)} />
         </View>
       </View>
 
@@ -164,26 +164,39 @@ const PollView = forwardRef(({ data, timezone }, ref) => {
           </View>
         ))}
       </View>
-      {options.length < 5 &&
-        <View style={__styles.addOptionBtnView}>
-          <MyButton
-            style={{ paddingHorizontal: 10 }}
-            noSpace
-            noCapitalize
-            leftIcon={() => icons.plus(colors.black)}
-            onPress={addOption} fullWidth title="Add Option" />
-        </View>}
+      <View style={{ flexDirection: "row", alignItems: "center" }}>
 
-      <View style={{ marginTop: 10 }}>
+        <View style={{ flex: 1, justifyContent: "center", marginTop: options.length < 5 ? 0 : 15 }}>
+          <MyCheckBox
+            pb={0}
+            title={"Allow Multiple Selection"}
+            value={isMultiple}
+            onPress={() => setIsMultiple((val) => !val)}
+          />
+        </View>
+
+        {options.length < 5 &&
+          <View style={__styles.addOptionBtnView}>
+            <MyButton
+              style={{ paddingHorizontal: 10 }}
+              noSpace
+              noCapitalize
+              invert
+              leftIcon={() => icons.plus(colors.primary)}
+              onPress={addOption} fullWidth title="Add Option" />
+          </View>}
+
+
+      </View>
+      <View style={{ marginTop: options.length < 5 ? 0 : 15 }}>
         <MyCheckBox
-          title={"Allow Selecting Multiple Options"}
-          value={isMultiple}
-          onPress={() => setIsMultiple((val) => !val)}
+          paddingTop={0}
+          title={"Make Result Private"}
+          value={privacy}
+          onPress={() => setPrivacy(!privacy)}
         />
       </View>
-      {/* {console.log(convertTimezoneToRegion(moment(), timezone).format())} */}
-      {/* {getMinimumDate()} */}
-      {console.log(data, dateTimePicker?.mode, (!!data && dateTimePicker?.mode == "date"), "check")}
+
       <DateTimePicker
         isVisible={dateTimePicker?.isVisible}
         minimumDate={dateTimePicker?.mode == "date" ? new Date() : undefined}

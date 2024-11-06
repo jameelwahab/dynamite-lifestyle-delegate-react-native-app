@@ -2,6 +2,7 @@ import { Platform } from "react-native";
 
 export const colors = {
   primary: "#f6bd4b",
+  golden:"#f6bd4b",
   primary2: "#EDBF60",
   lightPrimary: '#F6BD4B99',
   lightPrimary2: '#F6BD4B33',
@@ -12,6 +13,7 @@ export const colors = {
   secondaryVariant: '#252d41',
   secondarySelect: "#2f3851",
   border: "#43464A",
+  transparent:"#FFFFFF00",
   selection: Platform.select({ android: "#3D4250", ios: "#FFFFFF" }),
   text: "#FFFFFF",
   white: "#FFFFFF",

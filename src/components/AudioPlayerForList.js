@@ -182,7 +182,7 @@ const AudioPlayerForList = ({ stop = "", url, id, loop = false, onLoopComplete }
           value={position}
 
           thumbTintColor="silver"
-          minimumTrackTintColor={colors.golden}
+          minimumTrackTintColor={colors.primary}
           maximumTrackTintColor="gray"
           minimumValue={0}
           thumbStyle={{
