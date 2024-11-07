@@ -314,7 +314,8 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
 
           </>}
         <View style={{ alignItems: "center" }}>
-          <MyText fontSize={12} color={colors.lightText2} >{item?.poll_info?.poll_status == "expired" ? "Poll Expired" :
+          <MyText fontSize={12} color={colors.lightText2} >{item?.poll_info?.poll_status == "expired" ?
+            `Poll Expired on ${convertTimezone2(item?.poll_info?.expiry_date_time, timezone).format("DD-MM-YYYY [at] hh:mm A")}` :
             `Poll Expires on ${convertTimezone2(item?.poll_info?.expiry_date_time, timezone).format("DD-MM-YYYY [at] hh:mm A")}`}</MyText>
         </View>
 
@@ -355,7 +356,8 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
         }
 
         <View style={{ alignItems: "center", marginTop: 10 }}>
-          <MyText fontSize={12} color={colors.lightText2} >{item?.survey_info?.survey_status == "expired" ? "Survey Expired" :
+          <MyText fontSize={12} color={colors.lightText2} >{item?.survey_info?.survey_status == "expired" ?
+            `Survey Expired on ${convertTimezone2(item?.survey_info?.expiry_date_time, timezone).format("DD-MM-YYYY [at] hh:mm A")}` :
             `Survey Expires on ${convertTimezone2(item?.survey_info?.expiry_date_time, timezone).format("DD-MM-YYYY [at] hh:mm A")}`}</MyText>
         </View>
 

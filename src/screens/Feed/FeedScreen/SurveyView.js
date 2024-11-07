@@ -139,7 +139,7 @@ const SurveyView = forwardRef(({ data, timezone }, ref) => {
         index: options.length - 1,
         animated: true
       })
-    }, 200);
+    }, 300);
   }
 
   const removeQuesion = (index) => {
@@ -150,7 +150,7 @@ const SurveyView = forwardRef(({ data, timezone }, ref) => {
     setTimeout(() => {
       options.splice(index, 1);
       setOptions([...options])
-    }, 200);
+    }, 300);
   }
 
   const getMinimumDate = () => {

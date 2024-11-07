@@ -1,9 +1,14 @@
 import invokeApi from "../functions/invokeAPI"
 
-export const GET_LINKS_LIST = ({ token, navigation }) => {
+export const GET_LINKS_LIST = ({ token, navigation, pageType, page, searchText }) => {
   return invokeApi({
-    path: `api/consultant/links_listing/`,
-    method: "GET",
+    // path: `api/consultant/links_listing/`,
+    path: `api/consultant/links_list_with_type?page=${page}&limit=20`,
+    method: "POST",
+    postData: {
+      search: searchText,
+      type_of_page: pageType
+    },
     token: token,
     navigation: navigation,
   })

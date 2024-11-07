@@ -1,5 +1,5 @@
 import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import MyText from '../../components/MyText'
 import RootView from '../../components/RootView'
 import { useSelector } from 'react-redux'
@@ -17,23 +17,39 @@ import copyText from '../../functions/copyText'
 import { websiteBaseUrl } from '../../utilities/constants'
 import openUrl from '../../functions/openUrl'
 import routes from '../../navigation/routes'
+import SearchView from '../../components/SearchView'
+import Tabs from '../../components/Tabs'
+import FooterLoader from '../../components/FooterLoader'
+import MyRefreshControl from '../../components/MyRefreshControl'
 
 const LinksList = ({ navigation, route }) => {
   const { key } = route?.params;
+  let pagination = useRef({ page: 0, canLoadMore: false })
   const { navbar } = useSelector(selectNavbar);
   const { token, user } = useSelector(selectUser);
   const [title] = useState(navbar?.find(x => x._id == key)?.title);
   const [list, setList] = useState([]);
   const [loader, setLoader] = useState(true);
   const [affiliate, setAffiliate] = useState(null)
+  const [selectedTab, setSelectedTab] = useState(0);
+  const [searchText, setSearchText] = useState("")
+  const [searchLoader, setSearchLoader] = useState(false);
+  const [total, setTotal] = useState(0)
+  const [footerLoader, setFooterLoader] = useState(false)
+  const [refreshing, setRefreshing] = useState(false);
   const [optionModal, setOptionModal] = useState({
     isVisible: false,
     selectedItem: null,
   })
 
+
   useEffect(() => {
-    getDataFromServer()
-  }, [])
+    pagination.current = { canLoadMore: false, page: 0 }
+    setTotal(0)
+    setList([])
+    setLoader(true);
+    getDataFromServer(true)
+  }, [selectedTab])
 
   const onOptionSelected = (opt) => {
     let item = optionModal?.selectedItem;
@@ -59,14 +75,55 @@ const LinksList = ({ navigation, route }) => {
     }
   }
 
-  const getDataFromServer = async () => {
-    let res = await GET_LINKS_LIST({ navigation, token, });
+  const loadMore = () => {
+    if (pagination?.current?.canLoadMore) {
+      pagination.current.canLoadMore = false;
+      setFooterLoader(true);
+      getDataFromServer();
+    }
+  }
+
+  const onRefresh = () => {
+    pagination.current.page = 0;
+    pagination.current.canLoadMore = false;
+    setRefreshing(true);
+    getDataFromServer(true)
+  }
+
+  const onSearch = () => {
+    pagination.current.page = 0;
+    pagination.current.canLoadMore = false;
+    setSearchLoader(true);
+    getDataFromServer(true)
+  }
+
+  const getDataFromServer = async (newArray = false) => {
+    let res = await GET_LINKS_LIST({
+      navigation, token,
+      pageType: tabs[selectedTab]?.id,
+      page: pagination?.current?.page,
+      searchText: searchText.trim()
+    });
     if (res.code == 200) {
-      setList(res?.sale_pages)
+      let length = newArray ? res?.sale_pages.length : list.length + res?.sale_pages.length;
+      if (length < res?.page_count) {
+        pagination.current.page++;
+        pagination.current.canLoadMore = true;
+      } else {
+        pagination.current.canLoadMore = false;
+      }
+      setList(newArray ? res?.sale_pages : [...list, ...res?.sale_pages])
       setAffiliate(res?.affiliate_object?.affiliate_url_name)
+      setTotal(res?.page_count)
       setLoader(false)
+      setFooterLoader(false)
+      setRefreshing(false);
+      setSearchLoader(false);
     } else {
       setLoader(false)
+      setFooterLoader(false)
+      setRefreshing(false);
+      setSearchLoader(false);
     }
   }
 
@@ -102,11 +159,18 @@ const LinksList = ({ navigation, route }) => {
   }
 
   const filter = (list) => {
-    if (optionModal?.selectedItem?.type_of_page == "book_a_call_page") {
-      return list
+    let item = optionModal?.selectedItem;
+    console.log(item, "item")
+    let newList = []
+    if (item?.type_of_page == "sale_page") {
+      newList = list.slice().filter(x => x.type != "appointment")
+    } else if (user.team_type != "sub_team" && item?.plan_count > 0) {
+      newList = [...list]
     } else {
-      return list.slice().filter(x => x.type != "appointment")
+      newList = list.slice().filter(x => x.type != "commission" && x.type != "sub_team_access")
     }
+    return newList;
+
   }
 
   const copyView = (item) => (
@@ -151,19 +215,57 @@ const LinksList = ({ navigation, route }) => {
     )
   }
 
+  const searchView = () => {
+    return (
+      <View style={{ marginHorizontal: 4 }}>
+        <SearchView
+          onChangeText={(text) => setSearchText(text)}
+          search={searchText}
+          onSearchPress={onSearch}
+          loader={searchLoader}
+        />
+      </View>
+    )
+  }
+
+  const listHeader = () => {
+    return (
+      <View style={{ backgroundColor: colors.darkSecondary }}>
+        {searchView()}
+        <View>
+          <Tabs
+            list={tabs}
+            changeTab={(index) => setSelectedTab(index)}
+            tab={selectedTab}
+          />
+        </View>
+      </View>
+    )
+  }
+
 
   return (
     <RootView hideBackBottomButton
       title={title}
-      subTitle={`Total: ${list.length}`}
+      subTitle={`Showing ${list.length} of ${total}`}
     >
       <View style={{ flex: 1 }}>
         <FlatList
           data={list}
+          ListHeaderComponent={listHeader()}
+          stickyHeaderIndices={[0]}
+          stickyHeaderHiddenOnScroll={true}
+          keyExtractor={(item) => item?._id}
           renderItem={renderLinks}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 80 }}
           ListEmptyComponent={!loader && <EmptyView />}
+          refreshControl={<MyRefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+          />}
+          onEndReached={loadMore}
+          ListFooterComponent={<FooterLoader isVisible={footerLoader} />}
         />
 
 
@@ -183,6 +285,22 @@ const LinksList = ({ navigation, route }) => {
 }
 
 export default LinksList
+
+const tabs = [
+  {
+    id: "sale_page",
+    index: 0,
+    title: "SALE PAGES",
+  },
+  {
+    id: "book_a_call_page",
+    index: 1,
+    title: "BOOKING PAGES",
+  },
+
+]
+
+
 const options = [
   {
     icon: () => icons.eye(colors.primary, 17),
@@ -209,7 +327,7 @@ const __styles = StyleSheet.create({
   cardView: {
     backgroundColor: colors.secondary,
     padding: 10,
-    marginTop: 10,
+    marginBottom: 10,
     borderRadius: 10
   },
   headerView: {
