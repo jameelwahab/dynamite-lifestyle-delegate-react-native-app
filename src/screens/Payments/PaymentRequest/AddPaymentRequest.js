@@ -1,5 +1,5 @@
-import { View, Text, ScrollView, StyleSheet, Pressable } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import { View, Text, ScrollView, StyleSheet, Pressable, TouchableOpacity } from 'react-native'
+import React, { useEffect, useRef, useState } from 'react'
 import RootView from '../../../components/RootView'
 import MyText from '../../../components/MyText'
 import MyTouchableInput from '../../../components/MyTouchableInput'
@@ -17,12 +17,20 @@ import CountryModal from '../../../components/CountryModal'
 import OptionModal from '../../../components/OptionModal'
 import MyLoader from '../../../components/MyLoader'
 import showToast from '../../../functions/showToast'
-import MyKeyboardAvoidingView from '../../../components/MyKeyboardAvoidingView'
+import { selectSettings } from '../../../redux/reducers/settingSlice'
+import InfoModal from '../../../components/InfoModal'
+import TitleView from '../../../components/TitleView'
+import { icons } from '../../../utilities/icons'
+import copyText from '../../../functions/copyText'
+import extractTextFromHTML from '../../../functions/extractTextFromHTML'
 
 
 const AddPaymentRequest = ({ navigation, route }) => {
   const { editItem } = route?.params
-  const { token } = useSelector(selectUser);
+  const ref_info = useRef()
+  const { token, access } = useSelector(selectUser);
+  const { settings } = useSelector(selectSettings);
+  console.log(settings, "settings")
   const [isNewMember, setisNewMember] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -56,14 +64,12 @@ const AddPaymentRequest = ({ navigation, route }) => {
   })
   const setSelected = (updation) => updateSelected({ ...selected, ...updation })
   const onMemberSelected = (member) => {
-    console.log(member, "onMemberSelected")
     setSelectedMember(member);
     setMemberModalVisibility(false);
   }
 
 
   const onOptionSelected = (opt) => {
-    console.log(opt, "opt")
     let { type } = optionModal;
     setOptionModal({ isVisible: false, type: "", titlekey: "", list: [] })
     setSelected({ [type]: opt });
@@ -74,7 +80,7 @@ const AddPaymentRequest = ({ navigation, route }) => {
   }
 
   const getMembers = async (searchText = "") => {
-    let res = await GET_MEMBER_LIST_FOR_PAYMENT_REQUEST({ navigation, token, searchText });
+    let res = await GET_MEMBER_LIST_FOR_PAYMENT_REQUEST({ navigation, token, searchText, memberType: memberTypeObj[access?.show_members_list_for_payment_request] });
     if (res.code == 200) {
       setMemberList(res?.members)
     }
@@ -122,7 +128,6 @@ const AddPaymentRequest = ({ navigation, route }) => {
   const setInstallemtAmount = () => {
     if (selected.installments != "") {
       let installmentAmount = (selected?.totalAmount - selected?.initialAmount) / selected.installments;
-      console.log("installmentAmount", installmentAmount)
       setSelected({ installmentAmount: installmentAmount.toFixed(1) });
       // return installmentAmount;
     } else {
@@ -260,15 +265,62 @@ const AddPaymentRequest = ({ navigation, route }) => {
     getProducts()
   }, [])
 
+
+  const infoheader = () => {
+    return (
+      <View style={{ alignItems: "flex-end", marginTop: 10 }}>
+        {!!settings?.bank_payment_details &&
+          <MyButton
+            onPress={() => copyText(extractTextFromHTML(settings?.bank_payment_details))}
+            invert
+            leftIcon={icons.copy}
+            noCapitalize
+            style={{ paddingHorizontal: 10 }}
+            title='Copy Bank Details'
+          />
+        }
+
+      </View>)
+  }
+
+  const topView = () => {
+    return (
+      <View>
+        <View style={__styles.topView}>
+          <TitleView
+            title={!!editItem ? "Edit Payment Request" : "Add Payment Request"}
+            hideBackBottomButton
+
+          />
+          <View style={__styles.topBtnsView}>
+            {!!settings?.bank_payment_details &&
+              <TouchableOpacity onPress={() => {
+                ref_info?.current?.openModal(settings?.bank_payment_details, undefined, true)
+              }} >
+                {icons.bank(colors.primary, 20)}
+              </TouchableOpacity>
+            }
+          </View>
+        </View>
+
+      </View>
+    )
+  }
+
+
   return (
-    <RootView title={!!editItem ? "Edit Payment Request" : "Add Payment Request"}>
+    <RootView
+      hideSubHeader
+    //  title={!!editItem ? "Edit Payment Request" : "Add Payment Request"}
+    >
+      {topView()}
       <View style={{ flex: 1, }}>
         <KeyboardAwareScrollView
 
           contentContainerStyle={{ paddingBottom: 40, paddingTop: 10, }}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
-          >
+        >
 
           {/* <MyTouchableInput label='Member Type*' /> */}
 
@@ -484,15 +536,21 @@ const AddPaymentRequest = ({ navigation, route }) => {
         titleKey={optionModal.titlekey}
       />
 
-      
+
 
       <MyLoader enable={loader} />
+      <InfoModal footer={infoheader} ref={ref_info} />
 
     </RootView>
   )
 }
 
 export default AddPaymentRequest
+
+const memberTypeObj = {
+  "all_members": "all",
+  "nurture_members": "nurture"
+}
 const statusList = [{ title: "Active", key: true, }, { title: "Inactive", key: false, }];
 const currencyList = [
   { title: "Dollar", key: "usd", },
@@ -527,5 +585,11 @@ const __styles = StyleSheet.create({
   clearbtnView: {
     paddingBottom: 5, paddingLeft: 10, paddingRight: 5
   },
+  topView: {
+    flexDirection: "row", alignItems: "center", backgroundColor: colors.darkSecondary, paddingBottom: 5
+  },
+  topBtnsView: { flexDirection: "row", alignItems: "flex-end", },
+
+
 
 })

@@ -50,7 +50,6 @@ const PaymentRequest = ({ navigation, route }) => {
       navigation, token, page, sort: sort?.selected?.key
     })
     if (res.code == 200) {
-      console.log(list.length, "list.length");
       let length = newArray ? res?.payment_request.length : list.length + res?.payment_request.length;
       if (length < res?.total_payment_request_count) {
         page++;
@@ -58,7 +57,6 @@ const PaymentRequest = ({ navigation, route }) => {
       } else {
         canLoadMore = false;
       }
-      console.log(canLoadMore, "canLoadMore")
       setTotal(res?.total_payment_request_count)
       setList(newArray ? res?.payment_request : [...list, ...res?.payment_request]);
       setLoader(false);

@@ -8,11 +8,11 @@ import { icons } from '../utilities/icons';
 import { colors } from '../utilities/colors';
 import MyWebview from './MyWebview';
 
-const InfoModal = forwardRef(({ header }, ref) => {
+const InfoModal = forwardRef(({ header,footer }, ref) => {
   const [isVisible, setVisiblity] = useState(false);
   const [text, setText] = useState("");
   const [subText, setSubText] = useState("");
-  const [isHtml, setIsHtml] = useState("")
+  const [isHtml, setIsHtml] = useState("");
   useImperativeHandle(ref, () => {
     return {
       openModal,
@@ -67,6 +67,7 @@ const InfoModal = forwardRef(({ header }, ref) => {
               <MyText fontSize={12} type='medium' color={colors.lightGrey} >{subText}</MyText>
             </View>}
           </View>
+          {footer?.()}
         </View>
       </Modal>)
   }

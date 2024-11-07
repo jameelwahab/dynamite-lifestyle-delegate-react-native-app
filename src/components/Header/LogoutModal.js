@@ -43,7 +43,6 @@ const LogoutModal = forwardRef(({ closeProfileModal }, ref) => {
       let token = "";
       try {
         token = await AsyncStorage.getItem("@token");
-        console.log(token, "token")
       } catch (err) {
         console.log(err, "error getting token")
       }

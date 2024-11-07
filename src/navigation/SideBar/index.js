@@ -73,10 +73,10 @@ const index = (props) => {
       console.log("onForegroundEvent", type, detail)
       switch (type) {
         case EventType.DISMISSED:
-          console.log('notifee User dismissed notification', detail.notification);
+
           break;
         case EventType.PRESS:
-          console.log('[onForegroundEvent] notifee User Pressed notification', detail);
+
           notificationHandler(detail.notification, navigation, navbar);
           // this.notificationActions(detail)
           // notificationHandler(detail.notification, this.props.dispatch, setSideBarScreen, this.props.state, this.state.menu_visible)
@@ -88,10 +88,10 @@ const index = (props) => {
       console.log("onBackgroundEvent", type, detail)
       switch (type) {
         case EventType.DISMISSED:
-          console.log('notifee User dismissed notification', detail.notification);
+
           break;
         case EventType.PRESS:
-          console.log('[onBackgroundEvent] notifee User Pressed notification', detail);
+
           // this.notificationActions(detail)
           notificationHandler(detail.notification, navigation, navbar);
           break;
@@ -99,7 +99,6 @@ const index = (props) => {
     });
 
     sub4 = messaging().onNotificationOpenedApp(remoteMessage => {
-      console.log('[onNotificationOpenedApp] Notification caused app to open from background state:', remoteMessage)
       if (remoteMessage) {
         notificationHandler(remoteMessage, navigation, navbar);
       }
@@ -107,7 +106,6 @@ const index = (props) => {
 
 
     messaging().getInitialNotification().then(remoteMessage => {
-      console.log('[firebase getInitialNotification] Notification caused app to open from quit state:', remoteMessage);
       if (remoteMessage) {
         notificationHandler(remoteMessage, navigation, navbar);
       }

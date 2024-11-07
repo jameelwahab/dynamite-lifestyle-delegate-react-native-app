@@ -39,7 +39,6 @@ const Commission = ({ navigation, route }) => {
       navigation, token, page, type: tab == 0 ? "credit" : "paid"
     })
     if (res.code == 200) {
-      console.log(list.length, "list.length");
       let length = newArray ? res?.transaction.length : list.length + res?.transaction.length;
       if (length < res?.total_member_count) {
         page++;
@@ -47,7 +46,6 @@ const Commission = ({ navigation, route }) => {
       } else {
         canLoadMore = false;
       }
-      console.log(canLoadMore, "canLoadMore")
       setTotal(res?.total_member_count)
       setList(newArray ? res?.transaction : [...list, ...res?.transaction]);
       setCommision({ paid: res?.paid_commission, total: res?.total_commission, pending: res?.remaining_commission })
