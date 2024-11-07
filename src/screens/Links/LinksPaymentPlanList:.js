@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import RootView from '../../components/RootView'
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../redux/reducers/userSlice'
-import { GET_LINKS_PAYMENT_PLANS_LIST,  } from '../../DAL'
+import { GET_LINKS_PAYMENT_PLANS_LIST, } from '../../DAL'
 import { colors } from '../../utilities/colors'
 import StatView from '../../components/StatView'
 import SearchView from '../../components/SearchView'
@@ -149,6 +149,7 @@ const TeamList = ({ navigation, route }) => {
       <OptionModal
         optionList={optList}
         isVisible={optionModal?.isVisible}
+        closeModal={() => setOptionModal({ isVisible: false, item: null })}
         onSelected={(opt) => {
           let { item } = optionModal
           setOptionModal({ isVisible: false, item: null })
@@ -171,7 +172,7 @@ export default TeamList
 const optList = [{
   key: "set_commission",
   title: "Manage Sales Team Commission",
-  icon:icons.edit
+  icon: icons.edit
 }]
 
 
