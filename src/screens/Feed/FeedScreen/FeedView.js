@@ -341,7 +341,7 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
                 onPress={() => onStartQuestionnairPress(item)}
                 fullWidth
                 // noCapitalize
-                title="View Survey Questionnair"
+                title="View Survey Questionnaire"
               />
             </View>
           </> :
@@ -350,7 +350,7 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
               onPress={() => onStartQuestionnairPress(item)}
               fullWidth
               // noCapitalize
-              title="Survey Questionnair"
+              title="Survey Questionnaire"
             />
           </View>
         }
