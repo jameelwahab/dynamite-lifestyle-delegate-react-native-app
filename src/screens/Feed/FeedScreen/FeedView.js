@@ -315,8 +315,8 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
           </>}
         <View style={{ alignItems: "center" }}>
           <MyText fontSize={12} color={colors.lightText2} >{item?.poll_info?.poll_status == "expired" ?
-            `Poll Expired on ${convertTimezone2(item?.poll_info?.expiry_date_time, timezone).format("DD-MM-YYYY [at] hh:mm A")}` :
-            `Poll Expires on ${convertTimezone2(item?.poll_info?.expiry_date_time, timezone).format("DD-MM-YYYY [at] hh:mm A")}`}</MyText>
+            `Poll Expired on ${convertTimezone2(item?.poll_info?.expiry_date_time, timezone).format("MMMM DD, YYYY [at] hh:mm A")}` :
+            `Poll Expires on ${convertTimezone2(item?.poll_info?.expiry_date_time, timezone).format("MMMM DD, YYYY [at] hh:mm A")}`}</MyText>
         </View>
 
         {/* <View style={{ height: 1, width: "100%", backgroundColor: colors.lightGolden3, marginTop: 10 }} /> */}
@@ -341,7 +341,7 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
                 onPress={() => onStartQuestionnairPress(item)}
                 fullWidth
                 // noCapitalize
-                title="View Survey"
+                title="View Survey Questionnair"
               />
             </View>
           </> :
@@ -350,15 +350,15 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
               onPress={() => onStartQuestionnairPress(item)}
               fullWidth
               // noCapitalize
-              title="Start Survey"
+              title="Survey Questionnair"
             />
           </View>
         }
 
         <View style={{ alignItems: "center", marginTop: 10 }}>
           <MyText fontSize={12} color={colors.lightText2} >{item?.survey_info?.survey_status == "expired" ?
-            `Survey Expired on ${convertTimezone2(item?.survey_info?.expiry_date_time, timezone).format("DD-MM-YYYY [at] hh:mm A")}` :
-            `Survey Expires on ${convertTimezone2(item?.survey_info?.expiry_date_time, timezone).format("DD-MM-YYYY [at] hh:mm A")}`}</MyText>
+            `Survey Expired on ${convertTimezone2(item?.survey_info?.expiry_date_time, timezone).format("MMMM DD, YYYY [at] hh:mm A")}` :
+            `Survey Expires on ${convertTimezone2(item?.survey_info?.expiry_date_time, timezone).format("MMMM DD, YYYY [at] hh:mm A")}`}</MyText>
         </View>
 
         {(item?.survey_info?.survey_result == "public" || (user?._id == item?.action_info?.action_id)) &&
