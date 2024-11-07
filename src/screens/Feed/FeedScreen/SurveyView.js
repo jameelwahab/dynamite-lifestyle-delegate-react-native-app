@@ -223,6 +223,7 @@ const SurveyView = forwardRef(({ data, timezone }, ref) => {
               <View style={{ width: width, paddingHorizontal: 10, }}>
                 <View style={{ flex: 1, backgroundColor: colors.secondaryVariant, borderRadius: 10, padding: 10 }}>
                   <MyInputs
+                    capitalizeSentence
                     noSpace
                     value={item?.question_statement}
                     style={__styles.dateTimeInput}
@@ -234,6 +235,7 @@ const SurveyView = forwardRef(({ data, timezone }, ref) => {
                       <View style={__styles.optionView}>
                         <View style={{ flex: 1 }}>
                           <MyInputs
+                            capitalizeSentence
                             noSpace
                             value={opt?.text}
                             style={__styles.dateTimeInput}
@@ -305,7 +307,7 @@ const SurveyView = forwardRef(({ data, timezone }, ref) => {
           opacity={index == 0 ? 0.6 : 1}
           onPress={onBackQuestion}
           style={[__styles.btnImageView,]}>
-          {icons.backwardArrow(17,colors.black)}
+          {icons.backwardArrow(17, colors.black)}
         </Pressable>
         <MyText color={colors.silver} ><MyText color={colors.white} type='bold' >{index + 1}</MyText> of {options.length}</MyText>
         <Pressable
@@ -313,7 +315,7 @@ const SurveyView = forwardRef(({ data, timezone }, ref) => {
           opacity={(options.length - 1) == index ? 0.6 : 1}
           onPress={onNextQuestion}
           style={__styles.btnImageView}>
-          {icons.forwardArrow(17,colors.black)}
+          {icons.forwardArrow(17, colors.black)}
         </Pressable>
       </View>
       <View style={{ marginTop: 30, paddingHorizontal: 10, }}>

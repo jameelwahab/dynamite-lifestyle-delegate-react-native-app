@@ -151,6 +151,7 @@ const PollView = forwardRef(({ data, timezone }, ref) => {
             <View style={{ flex: 1 }}>
               <MyInputs
                 noSpace
+                capitalizeSentence
                 value={item?.text}
                 style={__styles.dateTimeInput}
                 onChangeText={text => textHandler(text, index)}

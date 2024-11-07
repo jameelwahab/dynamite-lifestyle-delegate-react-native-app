@@ -28,7 +28,8 @@ const MyInputs = ({
   limited = false,
   customView,
   noLable = false,
-  myref = null
+  myref = null,
+  capitalizeSentence = false
 }) => {
   const [isFocused, setFocused] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
@@ -62,7 +63,7 @@ const MyInputs = ({
           placeholderTextColor={colors.placeholder}
           secureTextEntry={isPassword ? !showPassword : false}
           textAlignVertical={multiline ? "top" : "center"}
-          autoCapitalize="none"
+          autoCapitalize={capitalizeSentence ? "sentences" : "none"}
         />
         {isPassword ?
           <TouchableHighlight

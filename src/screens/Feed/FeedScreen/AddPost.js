@@ -1127,7 +1127,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                       maxHeight: (!isCosmos && height < 800) ? 120 : 150
                     }]}
                     multiline={true}
-                    autoCapitalize='none'
+                    autoCapitalize="sentences"
                     autoComplete="off"
                     textAlignVertical="top"
                     autoCorrect={false}
