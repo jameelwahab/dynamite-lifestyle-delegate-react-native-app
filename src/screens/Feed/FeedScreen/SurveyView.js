@@ -143,10 +143,12 @@ const SurveyView = forwardRef(({ data, timezone }, ref) => {
   }
 
   const removeQuesion = (index) => {
-    ref_flatlist?.current?.scrollToIndex({
-      index: index - 1,
-      animated: true
-    })
+    if (index > 0) {
+      ref_flatlist?.current?.scrollToIndex({
+        index: index - 1,
+        animated: true
+      })
+    }
     setTimeout(() => {
       options.splice(index, 1);
       setOptions([...options])

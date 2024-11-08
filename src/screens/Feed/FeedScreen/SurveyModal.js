@@ -51,7 +51,11 @@ const SurveyModal = forwardRef(({ token, navigation }, ref) => {
     });
 
     if (resp.code == 200) {
-      setData((old) => ({ ...old, survey_selected_options: resp?.feed_obj?.survey_selected_options }));
+      setData((old) => ({
+        ...old,
+        questions: resp?.feed_obj?.survey_info?.questions,
+        survey_selected_options: resp?.feed_obj?.survey_selected_options
+      }));
     } else {
 
     }
