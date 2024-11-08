@@ -470,7 +470,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     //   return
     // }
 
-    if (postText.trim() == "" && images.length == 0 && embededCode.trim() == "" && videoLink.trim() == "") {
+    if (postText.trim() == "" && images.length == 0 && embededCode.trim() == "" && videoLink.trim() == "" && postType != 'survey') {
       showToast({ body: "Please add data to be posted", title: "Alert", type: "info" });
       return
     } else if (!isCosmos && !!!editId && postCeatedForArray.length == 0) {
