@@ -34,6 +34,7 @@ import RNFetchBlob from 'react-native-blob-util';
 import showToast from '../../../functions/showToast'
 import LeadModal from '../Components/LeadModal'
 import LeadHistoryModal from '../Components/LeadHistoryModal'
+import InfoModal from '../../../components/InfoModal'
 
 
 
@@ -42,6 +43,7 @@ let page = 0;
 let isFirst = true;
 let controller;
 const MemberList = ({ navigation, route }) => {
+  const ref_infoModal = useRef()
   const { type } = route?.params;
   const isAllMembers = type == "all-member";
   const isMembers = type == "member";
@@ -82,7 +84,6 @@ const MemberList = ({ navigation, route }) => {
   }
 
   const onOptSelected = (opt) => {
-    console.log(opt, "onOptSelected");
     let { selectedItem: item } = optionModal;
     setOptionModal({ isVisible: false, selectedItem: null });
     if (opt?.key == "notes") {
@@ -251,15 +252,24 @@ const MemberList = ({ navigation, route }) => {
           list.push(nOBj);
         }
       } else if (x == 'status' && typeof (obj[x]) == "boolean") {
+        console.log(obj[x], 'status')
         let nOBj = {
           label: obj[x] ? "Active" : "Inactive",
           value: "statusActive",
           type: x
         }
         list.push(nOBj);
-      } else if (x == 'user_status_type' && !!obj[x]) {
+      } else if (x == 'status' && typeof (obj[x]) == "boolean") {
+        console.log(obj[x], 'status')
         let nOBj = {
-          label: obj[x].charAt(0).toUpperCase() + obj[x].slice(1),
+          label: obj[x] ? "Active" : "Inactive",
+          value: "statusActive",
+          type: x
+        }
+        list.push(nOBj);
+      } else if (x == 'user_status_type') {
+        let nOBj = {
+          label: obj[x],
           value: obj[x],
           type: x
         }
@@ -606,8 +616,10 @@ const MemberList = ({ navigation, route }) => {
       updateFilter({ delegate: null })
     } else if (item.type == "nurture") {
       updateFilter({ nurture: null })
-    } else if (item.type == "status") {
-      updateFilter({ status: "" })
+    } else if (item.type == "nurture") {
+      updateFilter({ nurture: null })
+    } else if (item.type == "downloaded_app") {
+      updateFilter({ downloaded_app: null })
     } else if (item.type == "user_status_type") {
       updateFilter({ user_status_type: "" })
     } else if (item.type == "member_ship_expiry") {
@@ -833,6 +845,18 @@ const MemberList = ({ navigation, route }) => {
             </View>
           </Pressable>
 
+
+
+
+
+          <Pressable
+            onPress={() => ref_infoModal?.current?.openModal(item?.downloaded_app ?
+              "This Member has downloaded the app" :
+              "This Member has not downloaded the app yet")}
+            style={{ marginRight: 10 }}>
+            {item?.downloaded_app ? icons.appDownloadedEmoji(25) : icons.appNotDownloadedEmoji(25)}
+          </Pressable>
+
           {item?.is_wheel_of_life &&
             <View style={{ marginRight: 10 }}>
               <Image source={icons.wheelOfLife} style={{ height: 20, width: 20 }} />
@@ -859,6 +883,7 @@ const MemberList = ({ navigation, route }) => {
 
         <View>
           <StatView title={"Coins"} value={numFormatter(item?.coins_count)} uppercase />
+          {/* <StatView title={"App Downloaded"} value={numFormatter(item?.coins_count)} uppercase /> */}
           {isAllMembers && <StatView title={"Reffered User"} value={!!item?.affliliate?.affiliate_user_info?.first_name ?
             item?.affliliate?.affiliate_user_info?.first_name + " " + item?.affliliate?.affiliate_user_info?.last_name + " (" + item?.affliliate?.affiliate_url_name + ") " : "Master Link"} />}
           {!isNurture && access?.Show_nurture_in_filter && <StatView title={"Nurture"} value={!!item?.nurture ? item?.nurture?.first_name + " " + item?.nurture?.last_name : "N/A"} />}
@@ -912,6 +937,8 @@ const MemberList = ({ navigation, route }) => {
         />
       </View>
       <MyLoader enable={loader} />
+
+      <InfoModal ref={ref_infoModal} />
 
       <SortModal
         ref={sortModalRef}

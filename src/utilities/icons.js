@@ -54,6 +54,8 @@ export const icons = {
   },
 
   survey: (color = colors.primary, size = 20) => <Image source={require('../assets/icons/survey.png')} style={{ height: size, width: size, tintColor: color }} />,
+  appDownloadedEmoji: (size = 20) => <Image source={require('../assets/icons/downloaded.png')} style={{ height: size, width: size, }} />,
+  appNotDownloadedEmoji: (size = 20) => <Image source={require('../assets/icons/notdownloaded.png')} style={{ height: size, width: size, }} />,
 
   user: () => { return (<FontAwesome6 name="user-large" color={colors.primary} size={17} />) },
   backMajor: (color = colors.primary, size = 20) => { return (<Ionicons name="arrow-back-outline" color={color} size={size} />) },

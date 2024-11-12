@@ -38,7 +38,8 @@ const SaveFilterModal = forwardRef(({ tabName, filters, navigation, token, filte
       showToast({ body: "Please enter filter name", title: "Alert", type: "info" });
       return
     }
-    setLoader(true);
+    // setLoader(true);
+
 
     let salePage = !!filters?.event_page
     [0] ? filterData?.sale_pages.find(x => x._id == filters?.event_page
@@ -55,6 +56,12 @@ const SaveFilterModal = forwardRef(({ tabName, filters, navigation, token, filte
       coins: filters?.coins_range ? {
         chip_label: `Start Coins : ${filters?.coins_from} - End Coins :  ${filters?.coins_to}`,
         chip_value: `Start Coins : ${filters?.coins_from} - End Coins :  ${filters?.coins_to}`,
+      } : null,
+      downloaded_app: typeof (filters?.downloaded_app) == "boolean" ? {
+        chip_label: filters?.downloaded_app ? "Downloaded" : "Not Downloaded",
+        chip_value: filters?.downloaded_app,
+        name: filters?.downloaded_app ? "Downloaded" : "Not Downloaded",
+        value: filters?.downloaded_app,
       } : null,
       membership_expiry: filters?.member_ship_expiry == "not_expired" && filters?.expiry_in == "custom" ? {
         chip_label: `Membership Expiry Start Date : ${moment(filters?.membership_purchase_expiry_from).format(dateTimeFormat.date)} - Membership Expiry End Date :  ${moment(filters?.membership_purchase_expiry_to).format(dateTimeFormat.date)}`,
@@ -90,6 +97,7 @@ const SaveFilterModal = forwardRef(({ tabName, filters, navigation, token, filte
           }
         }
       }),
+
       nurture: !!nurture ? {
         ...nurture,
         chip_label: nurture?.first_name + " " + nurture?.last_name,
@@ -100,19 +108,26 @@ const SaveFilterModal = forwardRef(({ tabName, filters, navigation, token, filte
         chip_label: delegate?.first_name + " " + delegate?.last_name,
         chip_value: delegate?._id
       } : delegate,
+      user_status_type: !!filters?.user_status_type ? filters?.user_status_type : null,
       plan: !!plan ? {
         ...plan,
         chip_label: plan?.plan_title,
         chip_value: plan?._id
       } : plan,
-      sort_by: sort
+
+      sort_by: !!sort ? {
+        ...sort,
+        chip_label: sort?.title,
+        chip_value: sort?.key
+      } : sort,
+
     }
     if (isNurture) {
       delete obj.nurture
     } else if (isMembers) {
       delete obj.delegate
     }
-    console.log(obj,"obj")
+    console.log(obj, "obj")
     saveFilterToServer(obj);
   }
   const saveFilterToServer = async (obj) => {
