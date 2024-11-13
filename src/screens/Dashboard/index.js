@@ -25,6 +25,8 @@ import MyChip from '../../components/MyChip'
 import Tabs from '../../components/Tabs'
 import prependCurency from '../../functions/prependCurency'
 import { TransparentButton } from '../../components/MyButton'
+import MemberView from '../../components/MemberView'
+import StatView from '../../components/StatView'
 
 const Dasboard = ({ navigation }) => {
   const { token } = useSelector(selectUser);
@@ -46,11 +48,18 @@ const Dasboard = ({ navigation }) => {
     }
   }
 
-  const onCommissionlist = () => {
-    navigation.jumpTo(routes.commissionNavigator)
+  const changeTab = (stackName) => {
+    navigation.jumpTo(stackName)
   }
 
-
+  const onAnswerScreen = (item) => {
+    console.log(item,"onAnswerScreen")
+    navigation.navigate(routes?.genericQestionListing, {
+      created_for: item?.created_for,
+      id: item?.created_for_id,
+      memberId: item?.member_id
+    })
+  }
 
   useEffect(() => {
 
@@ -152,7 +161,40 @@ const Dasboard = ({ navigation }) => {
   }
 
   const bookingView = ({ item, index }) => {
-    if (bookingTab == 2) {
+    if (bookingTab == 3) {
+      return (
+        <View style={{ marginTop: index != 0 ? 10 : 0, backgroundColor: colors.secondary, padding: 10, borderRadius: 10, }}>
+
+          <Pressable onPress={() => onAnswerScreen(item)} style={{ flexDirection: "row", alignItems: "center" }}>
+            {/* <View style={{ marginTop: 8 }}>
+              <MyText>{index + 1}.</MyText>
+            </View> */}
+            <View style={{ flex: 1 }}>
+              <MemberView
+                member={item}
+              />
+            </View>
+
+            <View style={{}}>
+              {icons.nextArrow(colors.white, 20)}
+            </View>
+          </Pressable>
+          <StatView title={"Module Title"} value={item?.title} />
+          <StatView title={"Answered Date"} value={moment(item?.reply_date).format(dateTimeFormat.date)} />
+          {/* <UserImage
+              image={item?.member_info?.profile_image}
+              name={item?.member_info?.first_name}
+              size={30}
+            /> */}
+          {/* <View style={__style.nameAndAmountView}>
+              <MyText fontSize={14} type='medium' >{item?.member_info?.first_name + " " + item?.member_info?.last_name}</MyText>
+              <MyText fontSize={14} type='medium'>{prependCurency(item?.currency) + " " + item?.amount}</MyText>
+            </View> */}
+
+        </View>
+      )
+    }
+    else if (bookingTab == 2) {
       return (
         <View style={{ marginTop: index != 0 ? 10 : 0, backgroundColor: colors.secondary, padding: 10, borderRadius: 10, }}>
           <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -224,11 +266,11 @@ const Dasboard = ({ navigation }) => {
 
 
   const sectionFooter = () => {
-    if (!loader && bookingTab == 2) {
+    if (!loader && (bookingTab == 2 || bookingTab == 3)) {
       return (
         <View style={{ marginVertical: 10, alignItems: "flex-end" }}>
           <TransparentButton
-            onPress={onCommissionlist}
+            onPress={() => changeTab(bookingTab == 2 ? routes.commissionNavigator : routes?.membersAnswersNavigator)}
             title='View All' />
         </View>
       )
@@ -286,7 +328,9 @@ const Dasboard = ({ navigation }) => {
                 data?.upcomming_booking_list :
                 bookingTab == 2 ?
                   data?.transaction.slice().reverse() :
-                  [] :
+                  bookingTab == 3 ?
+                    data?.member_answer_list :
+                    [] :
             []
           }
           ListHeaderComponent={!!data && view_commissionCounters()}
@@ -318,6 +362,10 @@ const tabs = [{
   title: "Latest Transactions",
   index: 2,
   key: "latest_transactions"
+}, {
+  title: "Latest Member Answers",
+  index: 3,
+  key: "member_answers"
 }]
 
 const __style = StyleSheet.create({

@@ -8,6 +8,7 @@ import { colors } from '../../utilities/colors'
 
 import Dasboard from '../../screens/Dashboard'
 import FilterScreen from '../../screens/Dashboard/FilterScreen'
+import GenericQuetionList from '../../screens/Questions/GenericQuetionList'
 
 
 
@@ -26,7 +27,7 @@ const StackMissionControl = ({ route }) => {
         {/*//? Default Screens End */}
         <DashboardStack.Screen name={routes.missionControlScreen} component={Dasboard} />
         <DashboardStack.Screen name={routes.missionControlfilterScreen} component={FilterScreen} />
-
+        <DashboardStack.Screen name={routes.genericQestionListing} component={GenericQuetionList} />
 
       </DashboardStack.Navigator>
     </View>

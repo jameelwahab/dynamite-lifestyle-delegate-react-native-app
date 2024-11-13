@@ -4,7 +4,7 @@ import Modal from 'react-native-modal';
 import MyText from '../../../../components/MyText';
 import { colors } from '../../../../utilities/colors';
 import { icons } from '../../../../utilities/icons';
-import { GET_PORTAL_CHAT_LIST, GET_PORTAL_EXISTING_CHAT_BY_VIDEO_ID, UPLOAD_FILE_FOR_CHAT } from '../../../../DAL';
+import { ADD_PERSONAL_NOTE_FOR_PORTAL, GET_PORTAL_CHAT_LIST, GET_PORTAL_EXISTING_CHAT_BY_VIDEO_ID, UPLOAD_FILE_FOR_CHAT } from '../../../../DAL';
 import MyLoader, { SimpleLoader } from '../../../../components/MyLoader';
 import { load } from 'react-native-track-player/lib/trackPlayer';
 import CollapsibleText from '../../../../components/CollapsibleText';
@@ -53,7 +53,8 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
   const [confirmationsModal, setConfirmationsModal] = useState({
     isVisible: false,
     item: null,
-    title: ""
+    title: "",
+    type: ""
   })
   const [selectedMsg, setSelectedMsg] = useState(null)
   const [selectedCommentFor, setSelectedCommentFor] = useState("");
@@ -239,8 +240,8 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
   }
 
   const onSelectedOption = (opt) => {
-    console.log(opt, "opt")
     let { item } = optionModal;
+    console.log(opt, item, "opt")
     setOptionModal({ isVisible: false, item: null });
 
     if (opt.type == "delete") {
@@ -248,7 +249,8 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
         setConfirmationsModal({
           isVisible: true,
           title: "Are you sure you want to delete this message?",
-          item: item
+          item: item,
+          type: "delete"
         })
       }, 550);
     }
@@ -262,22 +264,46 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
       }, 550);
     } else if (opt.type == "pin" || opt.type == "unpin") {
       pinUnpinComment(item)
+    } else if (opt.type == "note") {
+      setTimeout(() => {
+        setConfirmationsModal({ isVisible: true, item: item, type: "note", title: "Are you sure you want to add the comment as personal note?" })
+      }, 550);
     }
   }
 
   const onConfirmAgree = () => {
-    let { item } = confirmationsModal;
+    let { item, type } = confirmationsModal;
+
 
     setConfirmationsModal({
       isVisible: false,
       title: "",
-      item: null
+      item: null,
+      type: ""
     })
 
     setTimeout(() => {
-      deleteComment(item?._id);
+      if (type == "delete") {
+        deleteComment(item?._id);
+      } else if (type == "note") {
+        addNotesToServer(item?.message, item?.member?._id)
+      }
     }, 300);
   }
+
+
+  const addNotesToServer = async (msg, memberId) => {
+    setLoader(true);
+    let res = await ADD_PERSONAL_NOTE_FOR_PORTAL({ navigation, token, memberId: memberId, note: `<p>${msg}</p>` });
+    if (res.code == 200) {
+      showToast({ type: "success", title: res?.message })
+      setLoader(false)
+
+    } else {
+      setLoader(false)
+    }
+  }
+
 
   const getLiveChatFromServer = async () => {
 
@@ -466,18 +492,23 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
   }
 
   const filterOptions = (list) => {
-
+    let nlist = []
     if (!!optionModal?.item?.parent_message) {
-      return list.slice().filter(x => x.type != "pin" && x.type != "unpin")
+      nlist = list.slice().filter(x => x.type != "pin" && x.type != "unpin")
 
     } else if (!!optionModal?.item && optionModal?.item?.is_featured) {
-      return list.slice().filter(x => x.type != "pin")
+      nlist = list.slice().filter(x => x.type != "pin")
 
     } else {
-      return list.slice().filter(x => x.type != "unpin")
-
+      nlist = list.slice().filter(x => x.type != "unpin")
     }
 
+    if (optionModal?.item?.action_by != "member") {
+      nlist = nlist.slice().filter(x => x.type != "note")
+    }
+
+
+    return nlist
 
   }
 
@@ -770,7 +801,7 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
                 renderItem={({ item, index }) => commentView(item, index, false)}
                 inverted={isLive ? true : false}
                 ref={chatListRef}
-                onViewableItemsChanged={onViewableItemsChanged}
+                // onViewableItemsChanged={onViewableItemsChanged}
                 onEndReached={loadMore}
                 ListEmptyComponent={!loader && !isLive && <EmptyView />}
                 ListFooterComponent={<View style={{ height: 50 }}>
@@ -995,5 +1026,10 @@ const OptionList = [
     icon: icons.pin,
     title: "Unpin",
     type: "unpin"
+  },
+  {
+    icon: icons.edit,
+    title: "Add as Note",
+    type: "note"
   },
 ]
