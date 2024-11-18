@@ -24,7 +24,6 @@ import OptionModalWithSearch from '../../../components/OptionModalWithSearch'
 
 const AddEditPortal = ({ navigation, route }) => {
   const { item, backScreenFunc } = route.params;
-  console.log(item, 'item')
   let { token } = useSelector(selectUser)
   const [loader, setLoader] = useState(false);
   const calendarRef = useRef();
@@ -97,6 +96,7 @@ const AddEditPortal = ({ navigation, route }) => {
 
   const makeDataForServer = () => {
     let fd = new FormData();
+    console.log(data, "data")
     fd.append("title", data.title.trim())
     fd.append("start_date", moment(data.date).format("YYYY-MM-DD"))
 
@@ -129,10 +129,15 @@ const AddEditPortal = ({ navigation, route }) => {
       }
       if (!!data.banner1?.uri) {
         fd.append("banner1_image", data.banner1);
+      } else if (!!data.banner1 == false) {
+        fd.append("banner1_image", "");
       }
       if (!!data.banner1?.uri) {
         fd.append("banner2_image", data.banner2);
+      } else if (!!data.banner2 == false) {
+        fd.append("banner2_image", "");
       }
+
       fd.append("video_url", data.embedCode)
       fd.append("short_description", data.shortDesc.trim())
       fd.append("detail_description", data.longDesc.trim())
@@ -140,6 +145,8 @@ const AddEditPortal = ({ navigation, route }) => {
         fd.append("order", Number(data?.order))
       }
     }
+
+
     if (!!item) {
       updateEventToServer(fd)
     } else {
