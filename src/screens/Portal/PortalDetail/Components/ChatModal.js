@@ -4,7 +4,7 @@ import Modal from 'react-native-modal';
 import MyText from '../../../../components/MyText';
 import { colors } from '../../../../utilities/colors';
 import { icons } from '../../../../utilities/icons';
-import { ADD_PERSONAL_NOTE_FOR_PORTAL, GET_PORTAL_CHAT_LIST, GET_PORTAL_EXISTING_CHAT_BY_VIDEO_ID, UPLOAD_FILE_FOR_CHAT } from '../../../../DAL';
+import { ADD_PERSONAL_NOTE_FOR_PORTAL, ADD_PERSONAL_NOTE_FOR_PORTAL_CHAT, GET_PORTAL_CHAT_LIST, GET_PORTAL_EXISTING_CHAT_BY_VIDEO_ID, UPLOAD_FILE_FOR_CHAT } from '../../../../DAL';
 import MyLoader, { SimpleLoader } from '../../../../components/MyLoader';
 import { load } from 'react-native-track-player/lib/trackPlayer';
 import CollapsibleText from '../../../../components/CollapsibleText';
@@ -286,15 +286,15 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
       if (type == "delete") {
         deleteComment(item?._id);
       } else if (type == "note") {
-        addNotesToServer(item?.message, item?.member?._id)
+        addNotesToServer(item?._id)
       }
     }, 300);
   }
 
 
-  const addNotesToServer = async (msg, memberId) => {
+  const addNotesToServer = async (messageId) => {
     setLoader(true);
-    let res = await ADD_PERSONAL_NOTE_FOR_PORTAL({ navigation, token, memberId: memberId, note: `<p>${msg}</p>` });
+    let res = await ADD_PERSONAL_NOTE_FOR_PORTAL_CHAT({ navigation, token, messageId });
     if (res.code == 200) {
       showToast({ type: "success", title: res?.message })
       setLoader(false)

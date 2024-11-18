@@ -41,7 +41,7 @@ const AddEditPortal = ({ navigation, route }) => {
     banner1Link: !!item?.banner1_link ? item?.banner1_link : "",
     banner2BtnText: !!item?.banner2_button_text ? item?.banner2_button_text : "",
     banner2Link: !!item?.banner2_link ? item?.banner2_link : "",
-    status: !!!item?.status == false ? false : true,
+    status: item?.status != undefined ? item?.status : true,
     isPurchaseLinkEnabled: !!item?.is_purchase_link ? true : false,
     image: !!item?.images?.thumbnail_1 ? item?.images?.thumbnail_1 : "",
     logo: !!item?.event_logo?.thumbnail_1 ? item?.event_logo?.thumbnail_1 : "",

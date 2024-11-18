@@ -32,8 +32,8 @@ const GenericQuetionList = ({ navigation, route }) => {
   const getQuestionsListFromServer = async () => {
     let res = await QUESTIONS_LIST({
       token, navigation, body: {
-        created_for: created_for,
-        created_for_id: createdForId,
+        created_for: created_for || "",
+        created_for_id: createdForId ||"",
         member_id: memberId
       }
     })

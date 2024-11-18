@@ -314,7 +314,7 @@ const FilterModal = forwardRef(({ token, type, filterTheData, appliedFilter, isM
       setfilterFrom(seletecOpt)
     } else if (selectedFor == "savedfilter") {
       let filterObj = seletecOpt?.filter_object;
-      console.log(filterObj, "filterObj")
+
       setSelectedSavedFilter(seletecOpt);
       setSalePage(filterObj?.event_page);
       setPlan(filterObj?.event_page?.payment_plans.find(x => x._id == filterObj?.plan?._id));
@@ -850,6 +850,7 @@ const filteroObj = {
   "expiry_in": 3,
   "member_ship_expiry": "",
   "user_status_type": "",
+  "downloaded_app": null
 }
 
 

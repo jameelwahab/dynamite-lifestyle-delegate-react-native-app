@@ -170,8 +170,9 @@ const MemberList = ({ navigation, route }) => {
     }
     setFilterChipList([...filterChipList]);
   }
+
   const filterTheData = (obj, data, isSavedFilter, isFilter) => {
-    console.log(data?.lead_status, "leaf_status")
+    // console.log(data?.lead_status, "leaf_status")
     let list = [];
 
     if (!!sorted) {
@@ -183,7 +184,7 @@ const MemberList = ({ navigation, route }) => {
       list.push(nOBj)
     }
     Object.keys(obj).forEach((x, i) => {
-      console.log(obj[x], 'Check');
+      // console.log(obj[x], 'Check');
       if (Array.isArray(obj[x])) {
         if (x == "community") {
           obj[x].forEach((z, j) => {
@@ -259,15 +260,17 @@ const MemberList = ({ navigation, route }) => {
           type: x
         }
         list.push(nOBj);
-      } else if (x == 'status' && typeof (obj[x]) == "boolean") {
-        console.log(obj[x], 'status')
+      } else if (x == 'downloaded_app' && typeof (obj[x]) == "boolean") {
+        console.log(obj[x], 'downloaded_app')
         let nOBj = {
-          label: obj[x] ? "Active" : "Inactive",
-          value: "statusActive",
+          label: obj[x] ? "Downloaded" : "Not Downloaded",
+          value: obj[x],
           type: x
         }
+        console.log(nOBj, "downloaded_app")
         list.push(nOBj);
-      } else if (x == 'user_status_type') {
+      } else if (x == 'user_status_type' && !!obj[x]) {
+        // console.log(obj[x],x,"user_status_type")
         let nOBj = {
           label: obj[x],
           value: obj[x],
@@ -313,6 +316,9 @@ const MemberList = ({ navigation, route }) => {
       }
     })
 
+    console.log(data, "FilterData")
+    console.log(obj, "Filter")
+    console.log(list, "FilterChips")
     setFilterChipList(list);
     setIsFilterApplied(isFilter)
     setIsSavedFilterApplied(isSavedFilter)
@@ -355,6 +361,7 @@ const MemberList = ({ navigation, route }) => {
       setList([])
     }
     let res;
+    console.log(Filter,'Filter')
     Keyboard.dismiss();
     if (isAllMembers) {
       res = await LIST_OF_MEMBERS({
@@ -1024,6 +1031,7 @@ const filteroObj = {
   "coins_to": 0,
   "from_date": null,
   "to_date": null,
+  "downloaded_app": null,
   "membership_purchase_expiry_from": moment(),
   "membership_purchase_expiry_to": moment(),
   "date": null,

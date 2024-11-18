@@ -53,7 +53,8 @@ const Dasboard = ({ navigation }) => {
   }
 
   const onAnswerScreen = (item) => {
-    console.log(item,"onAnswerScreen")
+    console.log(item, "onAnswerScreen")
+    // return
     navigation.navigate(routes?.genericQestionListing, {
       created_for: item?.created_for,
       id: item?.created_for_id,
@@ -179,7 +180,7 @@ const Dasboard = ({ navigation }) => {
               {icons.nextArrow(colors.white, 20)}
             </View>
           </Pressable>
-          <StatView title={"Module Title"} value={item?.title} />
+          <StatView title={"Module Title"} value={!!item?.title ? item?.title : item.created_for.replace(/[_-]/g, " ")} />
           <StatView title={"Answered Date"} value={moment(item?.reply_date).format(dateTimeFormat.date)} />
           {/* <UserImage
               image={item?.member_info?.profile_image}

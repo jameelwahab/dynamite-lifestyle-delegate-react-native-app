@@ -2,7 +2,7 @@ import moment from "moment";
 import invokeApi from "../functions/invokeAPI";
 
 export const LIST_OF_MEMBERS = ({ token, navigation, page, searchText, body: {
-  coins, coins_from = 0, coins_range = false, coins_to = 0, community = [], date = null,
+  coins, coins_from = 0, downloaded_app = null, coins_range = false, coins_to = 0, community = [], date = null,
   event_page = [], expiry_in = 3, filter_From = "", filter_name = null, from_date = null,
   is_date_range = false, lead_status = [], member_ship_expiry = "", membership_expiry = null,
   membership_purchase_expiry_from = moment(), membership_purchase_expiry_to = moment(),
@@ -15,7 +15,7 @@ export const LIST_OF_MEMBERS = ({ token, navigation, page, searchText, body: {
     postData: {
       coins, coins_from, coins_range, coins_to, community, date, event_page, expiry_in, filter_From,
       filter_name, from_date, is_date_range, lead_status, member_ship_expiry, membership_expiry, membership_expiry,
-      membership_purchase_expiry_from, membership_purchase_expiry_to, nurture, delegate, plan, sort_by, status, to_date, user_status_type,
+      membership_purchase_expiry_from, downloaded_app, membership_purchase_expiry_to, nurture, delegate, plan, sort_by, status, to_date, user_status_type,
       search_text
     },
     token,
@@ -24,7 +24,7 @@ export const LIST_OF_MEMBERS = ({ token, navigation, page, searchText, body: {
 }
 
 export const LIST_OF_MEMBERS_ONLY = ({ token, navigation, page, searchText, body: {
-  coins, coins_from = 0, coins_range = false, coins_to = 0, community = [], date = null,
+  coins, coins_from = 0, downloaded_app = null, coins_range = false, coins_to = 0, community = [], date = null,
   event_page = [], expiry_in = 3, filter_From = "", filter_name = null, from_date = null,
   is_date_range = false, lead_status = [], member_ship_expiry = "", membership_expiry = null,
   membership_purchase_expiry_from = moment(), membership_purchase_expiry_to = moment(),
@@ -37,7 +37,7 @@ export const LIST_OF_MEMBERS_ONLY = ({ token, navigation, page, searchText, body
     postData: {
       coins, coins_from, coins_range, coins_to, community, date, event_page, expiry_in, filter_From,
       filter_name, from_date, is_date_range, lead_status, member_ship_expiry, membership_expiry, membership_expiry,
-      membership_purchase_expiry_from, membership_purchase_expiry_to, nurture, plan, sort_by, status, to_date, user_status_type,
+      membership_purchase_expiry_from, downloaded_app, membership_purchase_expiry_to, nurture, plan, sort_by, status, to_date, user_status_type,
       search_text
     },
     token,
@@ -46,7 +46,7 @@ export const LIST_OF_MEMBERS_ONLY = ({ token, navigation, page, searchText, body
 }
 
 export const LIST_OF_NURTURE = ({ token, navigation, page, searchText, body: {
-  coins, coins_from = 0, coins_range = false, coins_to = 0, community = [], date = null,
+  coins, coins_from = 0, downloaded_app = null, coins_range = false, coins_to = 0, community = [], date = null,
   event_page = [], expiry_in = 3, filter_From = "", filter_name = null, from_date = null,
   is_date_range = false, lead_status = [], member_ship_expiry = "", membership_expiry = null,
   membership_purchase_expiry_from = moment(), membership_purchase_expiry_to = moment(),
@@ -59,7 +59,7 @@ export const LIST_OF_NURTURE = ({ token, navigation, page, searchText, body: {
     postData: {
       coins, coins_from, coins_range, coins_to, community, date, event_page, expiry_in, filter_From,
       filter_name, from_date, is_date_range, lead_status, member_ship_expiry, membership_expiry, membership_expiry,
-      membership_purchase_expiry_from, membership_purchase_expiry_to, delegate, plan, sort_by, status, to_date, user_status_type,
+      membership_purchase_expiry_from, downloaded_app, membership_purchase_expiry_to, delegate, plan, sort_by, status, to_date, user_status_type,
       search_text
     },
     token,
