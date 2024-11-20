@@ -16,12 +16,12 @@ import CheckBox from '@react-native-community/checkbox';
 import MyCheckBox from '../../../components/MyCheckBox';
 import MyInputs from '../../../components/MyInputs';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { filterFromlist, levelList, memberStatusList, onlineStatusList, membershipStatusList, expireDaysList } from './list'
+import { filterFromlist, levelList, memberStatusList, onlineStatusList, membershipStatusList, expireDaysList, appDownloadedStatusList } from './list'
 import Toast from 'react-native-toast-message';
 import showToast from '../../../functions/showToast';
 import OptionModalWithSearch from '../../../components/OptionModalWithSearch';
 
-const FilterModal = forwardRef(({ token, type, filterTheData, appliedFilter, isMembers, isNurture, isAllMembers ,isNurtureAccessable}, ref) => {
+const FilterModal = forwardRef(({ token, type, filterTheData, appliedFilter, isMembers, isNurture, isAllMembers, isNurtureAccessable }, ref) => {
   const calendarRef = useRef()
   const [isVisible, setIsVisible] = useState(false);
   const [nurtureModalVisibilty, setNurtureModalVisibilty] = useState(false);
@@ -49,6 +49,7 @@ const FilterModal = forwardRef(({ token, type, filterTheData, appliedFilter, isM
   const [coinsFrom, setCoinsFrom] = useState("0")
   const [coinsTo, setCoinsTo] = useState("0");
   const [isApplied, setApplied] = useState(false)
+  const [isAppDownloaded, setIsAppDownloaded] = useState("")
   const [optionModal, setOptionModal] = useState({
     isVisible: false,
     list: [],
@@ -130,6 +131,7 @@ const FilterModal = forwardRef(({ token, type, filterTheData, appliedFilter, isM
     setShowCoinsRange((prev) => !!appliedFilter?.coins_range ? prev : false);
     setCoinsFrom((prev) => !!appliedFilter?.coins_range ? prev : "0");
     setCoinsTo((prev) => !!appliedFilter?.coins_range ? prev : "0");
+    setIsAppDownloaded((prev) => !!appliedFilter?.downloaded_app ? prev : "");
   }
 
 
@@ -184,6 +186,7 @@ const FilterModal = forwardRef(({ token, type, filterTheData, appliedFilter, isM
       "expiry_in": !!expireIn?.key ? expireIn?.key : 3,
       "member_ship_expiry": !!membershipStatus?.key ? membershipStatus?.key : "",
       "user_status_type": !!onlineStatus?.key ? onlineStatus?.key : "",
+      "downloaded_app": !!isAppDownloaded ? isAppDownloaded?.value : null
     }
     console.log(obj, "filters")
     setApplied(!reset)
@@ -235,6 +238,8 @@ const FilterModal = forwardRef(({ token, type, filterTheData, appliedFilter, isM
       list = membershipStatusList
     } else if (openFor == "expiryin") {
       list = expireDaysList
+    } else if (openFor == "appDownloaded") {
+      list = appDownloadedStatusList
     }
 
     setOptionModal({
@@ -309,6 +314,7 @@ const FilterModal = forwardRef(({ token, type, filterTheData, appliedFilter, isM
       setfilterFrom(seletecOpt)
     } else if (selectedFor == "savedfilter") {
       let filterObj = seletecOpt?.filter_object;
+
       setSelectedSavedFilter(seletecOpt);
       setSalePage(filterObj?.event_page);
       setPlan(filterObj?.event_page?.payment_plans.find(x => x._id == filterObj?.plan?._id));
@@ -336,6 +342,7 @@ const FilterModal = forwardRef(({ token, type, filterTheData, appliedFilter, isM
       setShowCoinsRange(filterObj?.coins_range);
       setCoinsFrom(filterObj?.coins_from.toString());
       setCoinsTo(filterObj?.coins_to.toString());
+      setIsAppDownloaded(!!filterObj?.downloaded_app ? appDownloadedStatusList.find(x => x.value == filterObj?.downloaded_app?.value) : null);
 
     } else if (selectedFor == "salepage") {
       setSalePage(seletecOpt)
@@ -353,6 +360,8 @@ const FilterModal = forwardRef(({ token, type, filterTheData, appliedFilter, isM
       setMembershipStatus(seletecOpt.key == "none" ? "" : seletecOpt)
     } else if (selectedFor == "expiryin") {
       setExpireIn(seletecOpt)
+    } else if (selectedFor == "appDownloaded") {
+      setIsAppDownloaded(seletecOpt)
     }
   }
 
@@ -519,7 +528,7 @@ const FilterModal = forwardRef(({ token, type, filterTheData, appliedFilter, isM
                   </Pressable>
                 )}
               />
-              {!isNurture &&  isNurtureAccessable &&
+              {!isNurture && isNurtureAccessable &&
                 <MyTouchableInput
                   label='Choose Nuture'
                   value={!!nurture ? `${nurture?.first_name} ${nurture?.last_name} | ${nurture?.team_type}` : ""}
@@ -604,6 +613,20 @@ const FilterModal = forwardRef(({ token, type, filterTheData, appliedFilter, isM
                   <Pressable
                     style={__styles.clearbtnView}
                     onPress={() => setOnlineStatus("")}>
+                    <MyText color={colors.primary} >Clear</MyText>
+                  </Pressable>
+                )}
+              />
+
+              <MyTouchableInput
+                label='App Downloaded Status'
+                value={isAppDownloaded?.title}
+                onPress={() => openOptionModal("appDownloaded", "title")}
+                icon={() => icons.down(colors.primary, 15)}
+                subTextView={() => !!isAppDownloaded && (
+                  <Pressable
+                    style={__styles.clearbtnView}
+                    onPress={() => setIsAppDownloaded("")}>
                     <MyText color={colors.primary} >Clear</MyText>
                   </Pressable>
                 )}
@@ -827,6 +850,7 @@ const filteroObj = {
   "expiry_in": 3,
   "member_ship_expiry": "",
   "user_status_type": "",
+  "downloaded_app": null
 }
 
 

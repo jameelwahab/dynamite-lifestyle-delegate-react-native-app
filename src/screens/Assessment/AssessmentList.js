@@ -11,7 +11,7 @@ import { colors } from '../../utilities/colors'
 import MemberView from '../../components/MemberView'
 import { MenuButton } from '../../components/MyButton'
 import moment from 'moment'
-import { dateTimeFormat } from '../../utilities/constants'
+import { communityLevelWithAllObj, dateTimeFormat } from '../../utilities/constants'
 import FooterLoader from '../../components/FooterLoader'
 import EmptyView from '../../components/EmptyView'
 import MyRefreshControl from '../../components/MyRefreshControl'
@@ -155,6 +155,7 @@ const Bookings = ({ navigation, route }) => {
           <StatView title={"Delegate"} value={!!item?.consultant ? item?.consultant?.first_name + " " + item?.consultant?.last_name : "N/A"} />
           <StatView title={"Nurture"} value={!!item?.nurture ? item?.nurture?.first_name + " " + item?.nurture?.last_name : "N/A"} />
           <StatView title={"Completed Date"} value={convertTimezone(item?.activity_date_time, timezone).format(dateTimeFormat.dateTime)} uppercase />
+          <StatView title={"Assessment Level"} value={communityLevelWithAllObj[item?.community_level]} original />
         </View>
       </View>
     )

@@ -54,6 +54,8 @@ export const icons = {
   },
 
   survey: (color = colors.primary, size = 20) => <Image source={require('../assets/icons/survey.png')} style={{ height: size, width: size, tintColor: color }} />,
+  appDownloadedEmoji: (size = 20) => <Image source={require('../assets/icons/downloaded.png')} style={{ height: size, width: size, }} />,
+  appNotDownloadedEmoji: (size = 20) => <Image source={require('../assets/icons/notdownloaded.png')} style={{ height: size, width: size, }} />,
 
   user: () => { return (<FontAwesome6 name="user-large" color={colors.primary} size={17} />) },
   backMajor: (color = colors.primary, size = 20) => { return (<Ionicons name="arrow-back-outline" color={color} size={size} />) },
@@ -89,6 +91,7 @@ export const icons = {
   minusCircle: (color = colors.primary, size = 25) => { return (<Feather name="minus-circle" color={color} size={size} />) },
   plusCircle: (color = colors.primary, size = 25) => { return (<Feather name="plus-circle" color={color} size={size} />) },
   back: (color = colors.white, size = 20) => { return (<MaterialIcons name="arrow-back" color={color} size={size} />) },
+  nextArrow: (color = colors.white, size = 20) => { return (<MaterialIcons name="arrow-forward" color={color} size={size} />) },
   downArrow: (color = colors.white, size = 20) => { return (<AntDesign name="arrowdown" color={color} size={size} />) },
   info: (color = colors.white, size = 20) => { return (<FontAwesome6 name="info" color={color} size={size} />) },
   upward: (color = colors.white, size = 20) => { return (<Ionicons name="caret-up" color={color} size={size} />) },

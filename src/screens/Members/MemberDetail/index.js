@@ -44,7 +44,7 @@ const MemberDetail = ({ navigation, route }) => {
   const [showMorePrograms, setShowMorePrograms] = useState(false);
   const [isOptionModalVisible, setIsOptionModalVisible] = useState(false);
 
-
+console.log(member,"member")
 
   const onOptSelected = (opt) => {
     setIsOptionModalVisible(false)
@@ -364,12 +364,23 @@ const MemberDetail = ({ navigation, route }) => {
       </View>)
   }
 
+  const appDownloadedView = (value) => {
+    return (
+      <View style={{ flexDirection: 'row', alignItems: "center", }}>
+        <View style={{ marginRight: 5 }}>
+          {value ? icons.appDownloadedEmoji(25) : icons.appNotDownloadedEmoji(25)}
+        </View>
+        <MyText fontSize={12} type='medium'>{value ? "Yes" : "No"}</MyText>
+      </View>)
+  }
+
 
   const memberStatView = () => {
     return (
       <View>
         <StatView title={"Coins"} value={numFormatter(member?.coins_count)} uppercase />
-        {isAllMembers && <StatView title={"Reffered User"} value={!!member?.affliliate ?
+        <StatView title={"App Downloaded"} view={() => appDownloadedView(member?.downloaded_app)} uppercase />
+        {isAllMembers && <StatView title={"Reffered User"} value={!!member?.affliliate?.affiliate_user_info ?
           member?.affliliate?.affiliate_user_info?.first_name + " " + member?.affliliate?.affiliate_user_info?.last_name + " (" + member?.affliliate?.affiliate_url_name + ") " : "Master Link"} />}
         {!isNurture && access?.Show_nurture_in_filter && <StatView title={"Nurture"} value={!!member?.nurture ? member?.nurture?.first_name + " " + member?.nurture?.last_name : "N/A"} />}
         {!isMembers && <StatView title={"Delegate"} value={!!member?.consultant ? member?.consultant?.first_name + " " + member?.consultant?.last_name : "N/A"} />}
@@ -409,6 +420,7 @@ const MemberDetail = ({ navigation, route }) => {
     <RootView hideSubHeader >
       {topView()}
       <ScrollView
+        showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingTop: 10, paddingBottom: 30, paddingHorizontal: 5 }}
         indicatorStyle='white'>
         {memberStatView()}

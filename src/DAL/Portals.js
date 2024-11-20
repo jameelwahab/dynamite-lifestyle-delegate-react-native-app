@@ -401,3 +401,15 @@ export const ADD_PERSONAL_NOTE_FOR_PORTAL = ({ token, navigation, memberId, note
     navigation,
   })
 }
+
+export const ADD_PERSONAL_NOTE_FOR_PORTAL_CHAT = ({ token, navigation, messageId }) => {
+  return invokeApi({
+    path: `api/member/add_note/from_portal`,
+    method: "POST",
+    postData: {
+      message_id: messageId
+    },
+    token,
+    navigation,
+  })
+}

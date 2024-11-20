@@ -46,6 +46,16 @@ const onlineStatusList = [{
   title: "Offline",
 }]
 
+const appDownloadedStatusList = [{
+  key: "Downloaded",
+  title: "Downloaded",
+  value: true
+}, {
+  key: "not_downloaded",
+  title: "Not Downloaded",
+  value: false
+}]
+
 const membershipStatusList = [
   {
     key: "expired",
@@ -129,4 +139,4 @@ const optionList = [
 
 ]
 
-export { sortList, filterFromlist, levelList, memberStatusList, onlineStatusList, membershipStatusList, expireDaysList, optionList }
+export { sortList,appDownloadedStatusList, filterFromlist, levelList, memberStatusList, onlineStatusList, membershipStatusList, expireDaysList, optionList }

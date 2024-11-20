@@ -164,10 +164,16 @@ const LinksList = ({ navigation, route }) => {
     let newList = []
     if (item?.type_of_page == "sale_page") {
       newList = list.slice().filter(x => x.type != "appointment")
-    } else if (user.team_type != "sub_team" && item?.plan_count > 0) {
-      newList = [...list]
     } else {
-      newList = list.slice().filter(x => x.type != "commission" && x.type != "sub_team_access")
+      newList = [...list]
+    }
+
+    if (user.team_type != "sub_team") {
+      if (item?.plan_count <= 0) {
+        newList = newList.slice().filter(x => x.type != "commission")
+      }
+    } else {
+      newList = newList.slice().filter(x => x.type != "commission" && x.type != "sub_team_access")
     }
     return newList;
 
