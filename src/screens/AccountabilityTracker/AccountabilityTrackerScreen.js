@@ -33,6 +33,7 @@ import { selectTimeZone } from '../../redux/reducers/timezoneSlice'
 import ConfirmationModal from '../../components/ConfirmationModal'
 import routes from '../../navigation/routes'
 import { convertTimezone } from '../../functions/convertTime'
+import { IMGElementContentError } from 'react-native-render-html'
 
 const getNewStatmentObj = () => {
   return {
@@ -127,7 +128,8 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
     }
 
     for (let i = 0; i < intentions.length; i++) {
-      if (intentions[i].is_required && intentions[i]?.image == "") {
+      console.log(intentions,"intentions")
+      if (intentions[i]?.is_required == true && intentions[i]?.status == false) {
         showToast({ title: intentions[i].statement });
         return
       }
@@ -268,16 +270,22 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
 
 
   const uploadImageToS3 = async (img, index) => {
+    console.log(img, "img")
     setLoader(true);
-    let fd = new FormData();
-    fd.append("image", img);
-    fd.append("width", img.width);
-    let res = await UPLOAD_FILE_TO_S3({
-      navigation, token, body: fd
-    });
+    let APIArray = [];
+    img.forEach((pic, index1) => {
+      let fd = new FormData();
+      fd.append("image", pic);
+      fd.append("width", pic.width);
+      APIArray.push(UPLOAD_FILE_TO_S3({
+        navigation, token, body: fd
+      }))
+    })
+
+    let resp = await Promise.all(APIArray);
     setLoader(false);
-    if (res.code == 200) {
-      intentionHandler(index, { image: res?.image_path })
+    if (resp.every(x => x.code == 200)) {
+      intentionHandler(index, { images: [...intentions[index].images, ...resp.map(x => x?.image_path)] })
     }
   }
 
@@ -370,6 +378,13 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
     let obj = { ...intentions[index], ...changes };
     intentions.splice(index, 1, obj)
     setIntentions([...intentions])
+  }
+
+
+  const removeIntentionImage = (intentionIndex, imgIndex) => {
+    let images = [...intentions[intentionIndex].images];
+    images.splice(imgIndex, 1);
+    intentionHandler(intentionIndex, { images: [...images] })
   }
 
   //* Views
@@ -583,8 +598,9 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
                 showAlert={!item?.status}
                 alertFun={() => showToast({ title: "Please tick the check box before Uploading Image" })}
                 onImagePicked={(img) => uploadImageToS3(img, index)}
-                onRemoveBtnPress={() => intentionHandler(index, { image: "" })}
-                selectedImage={item?.image}
+                onRemoveBtnPress={(imgIndex) => removeIntentionImage(index, imgIndex)}
+                selectedImage={item?.images}
+                multiple={true}
               />
 
               <View>
@@ -641,7 +657,7 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
           {list.map((item, index) => (
             <View key={"activities" + index} style={__styles.activityView} >
               <View style={__styles.activityRow}>
-                <MyText>{moment(item?.date,"DD-MM-YYYY").format(dateTimeFormat.date)}</MyText>
+                <MyText>{moment(item?.date, "DD-MM-YYYY").format(dateTimeFormat.date)}</MyText>
                 <View style={__styles.activityNestedRow}>
                   <MyText>{moment(item?.date_time, "YYYY-MM-DD HH:mm").format(dateTimeFormat.time)}</MyText>
                   <MenuButton

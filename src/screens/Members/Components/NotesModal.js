@@ -10,6 +10,7 @@ import { selectTimeZone } from '../../../redux/reducers/timezoneSlice';
 import { icons } from '../../../utilities/icons';
 import MyWebview from '../../../components/MyWebview';
 import routes from '../../../navigation/routes';
+import AudioPlayerForList from '../../../components/AudioPlayerForList';
 const NotesModal = forwardRef(({ memberId, navigation, updateNotes }, ref) => {
   const [isVisible, setIsVisible] = useState(false);
   const [list, setList] = useState([])
@@ -30,6 +31,15 @@ const NotesModal = forwardRef(({ memberId, navigation, updateNotes }, ref) => {
     setIsVisible(false);
     setList([]);
   }
+
+  const getSrcFromHtml = (html) => {
+    // Regular expression to find the 'src' attribute in the HTML
+    const srcRegex = /<source[^>]+src="([^"]+)"/i;
+    const match = html.match(srcRegex);
+
+    // Return the captured group if a match is found, otherwise return null
+    return match ? match[1] : null;
+  };
 
   return (
     <Modal
@@ -72,23 +82,38 @@ const NotesModal = forwardRef(({ memberId, navigation, updateNotes }, ref) => {
           <FlatList
             data={list}
             contentContainerStyle={{ paddingTop: 10 }}
-            renderItem={({ item, index }) => (
-              <View style={{ paddingHorizontal: 20, }}>
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <View style={__styles.noteView}>
-                    <MyText color={colors.black} fontSize={14} >{index + 1}</MyText>
+            renderItem={({ item, index }) => {
+              let audioUrl = "";
+              if (item?.note.includes("audio")) {
+                audioUrl = getSrcFromHtml(item?.note);
+              }
+              return (
+                <View style={{ paddingHorizontal: 20, }}>
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <View style={__styles.noteView}>
+                      <MyText color={colors.black} fontSize={14} >{index + 1}</MyText>
+                    </View>
+                    <View style={{ marginLeft: 10 }}>
+                      <MyText fontSize={12} color={colors.lightText2} >{convertTimezone(item?.note_date_time, timezone).format(dateTimeFormat.date)}</MyText>
+                    </View>
                   </View>
-                  <View style={{ marginLeft: 10 }}>
-                    <MyText fontSize={12} color={colors.lightText2} >{convertTimezone(item?.note_date_time, timezone).format(dateTimeFormat.date)}</MyText>
+                  <View style={{ marginTop: 5 }}>
+                    {/* <MyText>{}</MyText> */}
+                    <MyWebview fullWidth html={item?.note} />
                   </View>
+                  {audioUrl && (
+                    <View style={{ marginTop: 5 }}>
+                      <AudioPlayerForList
+                        id={audioUrl}
+                        noS3Url={true}
+                        url={audioUrl}
+                      />
+                    </View>
+                  )}
+                  <View style={{ height: 0.7, width: "100%", backgroundColor: colors.lightText, marginTop: 10, marginBottom: 20, borderRadius: 10 }} />
                 </View>
-                <View style={{ marginTop: 5 }}>
-                  {/* <MyText>{}</MyText> */}
-                  <MyWebview fullWidth html={item?.note} />
-                </View>
-                <View style={{ height: 0.7, width: "100%", backgroundColor: colors.lightText, marginTop: 10, marginBottom: 20, borderRadius: 10 }} />
-              </View>
-            )}
+              )
+            }}
           />
         </View>
 

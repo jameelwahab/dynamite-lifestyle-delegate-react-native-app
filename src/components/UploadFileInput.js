@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, Pressable } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Pressable, FlatList } from 'react-native'
 import React, { useState } from 'react'
 import MyText from './MyText'
 import { colors } from '../utilities/colors'
@@ -23,7 +23,8 @@ const UploadFileInput = ({
   onCheckBoxPress = () => { },
   imageString = "",
   showAlert = false,
-  alertFun = () => { }
+  alertFun = () => { },
+  multiple = false
 
 }) => {
   const [isImagePickerVisible, setIsImagePickerVisible] = useState(false);
@@ -66,39 +67,73 @@ const UploadFileInput = ({
             </TouchableOpacity>}
         </View>
 
-        <View style={__styles.imageBox}>
-          {!!selectedImage ?
-            <Pressable onPress={() => setImageForZoom(selectedImage)}>
-              <MyImage
-                source={{ uri: !!selectedImage.uri ? selectedImage.uri : S3_URL + selectedImage }}
-                style={{ height: '100%', width: '100%' }}
 
-              />
-            </Pressable> :
-            <View style={__styles.dummyImage}>
-              <MyImage
-                opacity={0.6}
-                source={icons.photo1}
-                style={{ height: 50, width: 50 }}
-              />
-              <View style={{ marginTop: 5 }}>
-                <MyText fontSize={12} >{!!imageString ? imageString : "No Image Selected"}</MyText>
-              </View>
-            </View>}
+        {(!!selectedImage && Array.isArray(selectedImage)) ?
+          <View style={{ marginTop: 10 }}>
+            <FlatList
+              data={selectedImage}
+              horizontal
+              ListEmptyComponent={
+                <View style={{ alignItems: "center" }}>
+                  <MyText fontSize={12} >{!!imageString ? imageString : "No Image Selected"}</MyText>
+                </View>}
+              renderItem={({ item }) => (
+                <Pressable onPress={() => setImageForZoom(item)}>
+                  <MyImage
+                    source={{ uri: !!item.uri ? item.uri : S3_URL + item }}
+                    style={{ height: 100, width: 100 }}
+                    imageStyle={{ borderRadius: 10, marginRight: 10 }}
 
-          {!!selectedImage && hideRemoveButton == false &&
-            <TouchableOpacity
-              onPress={onRemoveBtnPress}
-              style={__styles.removeIconBtn}>
-              {icons.crosss(colors.white, 25)}
-            </TouchableOpacity>
-          }
-        </View>
+                  />
+
+                  {!!selectedImage && hideRemoveButton == false &&
+                    <TouchableOpacity
+                      hitSlop={{ top: 10, left: 10, right: 10, bottom: 10 }}
+                      onPress={() => onRemoveBtnPress(index)}
+                      style={__styles.removeIconBtnforList}>
+                      {icons.crosss(colors.white, 20)}
+                    </TouchableOpacity>
+                  }
+                </Pressable>
+              )}
+            />
+          </View>
+          :
+
+          <View style={__styles.imageBox}>
+            {!!selectedImage ?
+              <Pressable onPress={() => setImageForZoom(selectedImage)}>
+                <MyImage
+                  source={{ uri: !!selectedImage.uri ? selectedImage.uri : S3_URL + selectedImage }}
+                  style={{ height: '100%', width: '100%' }}
+                />
+              </Pressable>
+              :
+              <View style={__styles.dummyImage}>
+                <MyImage
+                  opacity={0.6}
+                  source={icons.photo1}
+                  style={{ height: 50, width: 50 }}
+                />
+                <View style={{ marginTop: 5 }}>
+                  <MyText fontSize={12} >{!!imageString ? imageString : "No Image Selected"}</MyText>
+                </View>
+              </View>}
+
+            {!!selectedImage && hideRemoveButton == false &&
+              <TouchableOpacity
+                onPress={onRemoveBtnPress}
+                style={__styles.removeIconBtn}>
+                {icons.crosss(colors.white, 25)}
+              </TouchableOpacity>
+            }
+          </View>}
       </View>
 
       <ImageUploadModal
         isVisible={isImagePickerVisible}
         onImagePicked={onImagePicked}
+        multiple={multiple}
         closeModal={() => setIsImagePickerVisible(false)}
 
       />
@@ -148,7 +183,7 @@ const __styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.lightText,
     borderRadius: 5,
-    height: 150,
+    minHeight: 150,
     marginTop: 10
   },
   removeIconBtn: {
@@ -158,6 +193,16 @@ const __styles = StyleSheet.create({
     width: 25,
     borderRadius: 25 / 2,
     right: 5,
+    top: 5
+
+  },
+  removeIconBtnforList: {
+    position: "absolute",
+    backgroundColor: colors.delete,
+    height: 20,
+    width: 20,
+    borderRadius: 20 / 2,
+    right: 15,
     top: 5
 
   }

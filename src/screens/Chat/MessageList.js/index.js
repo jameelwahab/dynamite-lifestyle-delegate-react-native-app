@@ -330,7 +330,7 @@ const MessageList = ({ navigation, route }) => {
         }
       }
       else if (item.message_type == "audio") {
-        options = msgOptionList.slice().filter(x => x.type == 'delete');
+        options = msgOptionList.slice().filter(x => x.type == 'delete' || x.type == 'note');
       } else {
         options = msgOptionList.slice().filter(x => x.type != 'download');
 

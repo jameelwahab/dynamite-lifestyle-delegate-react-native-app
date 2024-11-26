@@ -14,7 +14,7 @@ import { SimpleLoader } from './MyLoader';
 
 let ended = false;
 
-const AudioPlayerForList = ({ stop = "", url, id, loop = false, onLoopComplete }) => {
+const AudioPlayerForList = ({ stop = "", url, id, loop = false, onLoopComplete, noS3Url = false }) => {
   const [duration, setDuration] = useState(0);
   const [position, setPosition] = useState(0);
   const [loading, setLoading] = useState("")
@@ -47,9 +47,11 @@ const AudioPlayerForList = ({ stop = "", url, id, loop = false, onLoopComplete }
 
   const load = async () => {
     setLoading(id);
+    let uri = !!url.uri ? url.uri : noS3Url ? url : S3_URL + url;
+    console.log(uri,"uri")
     await TrackPlayer.add({
       id: id,
-      url: !!url.uri ? url.uri : S3_URL + url,
+      url: uri,
       title: "",
       artist: "",
       album: '',

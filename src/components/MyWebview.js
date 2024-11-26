@@ -1,4 +1,4 @@
-import { Dimensions, TouchableOpacity } from "react-native";
+import { Dimensions, Text, TouchableOpacity } from "react-native";
 import RenderHTML, { HTMLContentModel, HTMLElementModel, defaultSystemFonts } from "react-native-render-html";
 import IframeRenderer, { iframeModel } from '@native-html/iframe-plugin';
 import { colors } from "../utilities/colors";
@@ -8,6 +8,7 @@ import WebView from "react-native-webview";
 import { isUrl } from "../functions/regex";
 import openUrl from "../functions/openUrl";
 import { urlifyWithAchorTag } from "../functions/urlify";
+import AudioPlayer from "./AudioPlayer";
 
 
 
@@ -15,7 +16,7 @@ export class MyWebview extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      
+
     }
   }
   shouldComponentUpdate(nextProps, nextState) {
@@ -25,6 +26,8 @@ export class MyWebview extends Component {
 
   renderers = {
     "iframe": IframeRenderer,
+
+  
 
   };
   customHTMLElementModels = {
@@ -50,6 +53,23 @@ export class MyWebview extends Component {
         return style;
       },
     }),
+    // "audio": (...params) => {
+
+    //   console.log(params," audio props")
+
+    //   return <View/>
+    //   // const src = props?.tnode?.domNode?.children?.[0]?.attribs?.src;
+    //   // return (
+    //   //   <View style={{ marginVertical: 10 }}>
+    //   //     <Text>Audio Player:</Text>
+    //   //     {src ? (
+    //   //       <AudioPlayer
+    //   //         url={src}
+    //   //       />
+    //   //     ) : null}
+    //   //   </View>
+    //   // );
+    // },
 
 
   }
@@ -59,7 +79,7 @@ export class MyWebview extends Component {
   render() {
     let { html, style, baseStyle } = this.props;
     html = "<div>" + html.replace(/padding/g, "") + "</div>";
-  
+
     return (
       <RenderHTML
         WebView={WebView}

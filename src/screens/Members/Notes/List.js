@@ -20,6 +20,7 @@ import EmptyView from '../../../components/EmptyView'
 import { convertTimezone } from '../../../functions/convertTime'
 import { selectTimeZone } from '../../../redux/reducers/timezoneSlice'
 import { dateTimeFormat } from '../../../utilities/constants'
+import AudioPlayerForList from '../../../components/AudioPlayerForList'
 const List = ({ navigation, route }) => {
   const ticket = "";
   const { memberId } = route?.params;
@@ -77,12 +78,25 @@ const List = ({ navigation, route }) => {
     }
   }
 
+  const getSrcFromHtml = (html) => {
+    // Regular expression to find the 'src' attribute in the HTML
+    const srcRegex = /<source[^>]+src="([^"]+)"/i;
+    const match = html.match(srcRegex);
+
+    // Return the captured group if a match is found, otherwise return null
+    return match ? match[1] : null;
+  };
+
   useEffect(() => {
     setLoader(true)
     getNotesFromServer();
   }, [])
 
   const renderList = ({ item, index }) => {
+    let audioUrl = "";
+    if (item?.note.includes("audio")) {
+      audioUrl = getSrcFromHtml(item?.note);
+    }
     return (
       <View style={__styles.itemRootView}>
         <View style={__styles.itemUserView}>
@@ -113,6 +127,16 @@ const List = ({ navigation, route }) => {
             html={item?.note}
           />
         </View>
+
+        {audioUrl && (
+          <View style={{ marginTop: 5 }}>
+            <AudioPlayerForList
+              id={audioUrl}
+              noS3Url={true}
+              url={audioUrl}
+            />
+          </View>
+        )}
 
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 5 }}>
 
