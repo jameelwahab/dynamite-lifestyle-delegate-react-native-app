@@ -77,7 +77,7 @@ const UploadFileInput = ({
                 <View style={{ alignItems: "center" }}>
                   <MyText fontSize={12} >{!!imageString ? imageString : "No Image Selected"}</MyText>
                 </View>}
-              renderItem={({ item }) => (
+              renderItem={({ item, index }) => (
                 <Pressable onPress={() => setImageForZoom(item)}>
                   <MyImage
                     source={{ uri: !!item.uri ? item.uri : S3_URL + item }}
