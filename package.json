@@ -43,7 +43,7 @@
     "@stripe/stripe-react-native": "^0.35.1",
     "add": "^2.0.6",
     "axios": "^1.5.1",
-    "cheerio": "^1.0.0-rc.12",
+    "cheerio": "1.0.0-rc.12",
     "html-entities": "^2.4.0",
     "libphonenumber-js": "^1.10.54",
     "lottie-react-native": "^6.3.1",

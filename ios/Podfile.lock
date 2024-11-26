@@ -515,7 +515,7 @@ PODS:
     - glog
   - react-native-blob-util (0.19.11):
     - React-Core
-  - react-native-cameraroll (7.8.3):
+  - react-native-cameraroll (7.8.4):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
   - react-native-charts-wrapper (0.6.0):
@@ -524,16 +524,17 @@ PODS:
     - SwiftyJSON (= 5.0)
   - react-native-date-picker (4.4.2):
     - React-Core
-  - react-native-document-picker (9.3.0):
+  - react-native-document-picker (9.3.1):
+    - RCT-Folly (= 2021.07.22.00)
     - React-Core
-  - react-native-pager-view (6.3.3):
+  - react-native-pager-view (6.5.1):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
   - react-native-render-html (6.3.4):
     - React-Core
-  - react-native-safe-area-context (4.10.8):
+  - react-native-safe-area-context (4.14.0):
     - React-Core
-  - react-native-slider (4.5.2):
+  - react-native-slider (4.5.5):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
   - react-native-splash-screen (3.3.0):
@@ -547,7 +548,7 @@ PODS:
   - react-native-video/Video (6.0.0-beta.6):
     - PromisesSwift
     - React-Core
-  - react-native-webview (13.10.5):
+  - react-native-webview (13.12.4):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
   - React-perflogger (0.71.19)
@@ -634,16 +635,16 @@ PODS:
     - React-jsi (= 0.71.19)
     - React-logger (= 0.71.19)
     - React-perflogger (= 0.71.19)
-  - RNAudioRecorderPlayer (3.6.10):
+  - RNAudioRecorderPlayer (3.6.12):
     - React-Core
   - RNCAsyncStorage (1.24.0):
     - React-Core
   - RNCCheckbox (0.5.17):
     - BEMCheckBox (~> 1.4)
     - React-Core
-  - RNCClipboard (1.14.1):
+  - RNCClipboard (1.15.0):
     - React-Core
-  - RNCPicker (2.7.7):
+  - RNCPicker (2.9.0):
     - React-Core
   - RNDateTimePicker (8.2.0):
     - React-Core
@@ -670,18 +671,18 @@ PODS:
     - FirebaseCoreExtension (= 10.15.0)
     - React-Core
     - RNFBApp
-  - RNGestureHandler (2.18.1):
+  - RNGestureHandler (2.21.2):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
   - RNGoogleSignin (12.2.1):
     - GoogleSignIn (~> 7.1)
     - React-Core
-  - RNImageCropPicker (0.41.2):
+  - RNImageCropPicker (0.41.5):
     - React-Core
     - React-RCTImage
-    - RNImageCropPicker/QBImagePickerController (= 0.41.2)
+    - RNImageCropPicker/QBImagePickerController (= 0.41.5)
     - TOCropViewController (~> 2.7.4)
-  - RNImageCropPicker/QBImagePickerController (0.41.2):
+  - RNImageCropPicker/QBImagePickerController (0.41.5):
     - React-Core
     - React-RCTImage
     - TOCropViewController (~> 2.7.4)
@@ -692,7 +693,7 @@ PODS:
     - React-Core
   - RNPermissions (4.1.5):
     - React-Core
-  - RNReactNativeHapticFeedback (2.3.0):
+  - RNReactNativeHapticFeedback (2.3.3):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
   - RNReanimated (2.17.0):
@@ -722,13 +723,13 @@ PODS:
     - React-RCTText
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNScreens (3.33.0):
+  - RNScreens (3.35.0):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
     - React-RCTImage
   - RNSVG (14.2.0):
     - React-Core
-  - RNVectorIcons (10.1.0):
+  - RNVectorIcons (10.2.0):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
   - SDWebImage (5.11.1):
@@ -1147,18 +1148,18 @@ SPEC CHECKSUMS:
   React-jsinspector: e591d9ecb571456fc929ee10409d8847a442d6a7
   React-logger: 70ddbe0e07179c8adb94c4bffc36c6abc952d3d4
   react-native-blob-util: 39a20f2ef11556d958dc4beb0aa07d1ef2690745
-  react-native-cameraroll: 6d252600d122f6bc10d99d6ab82cdfd2c8bef70a
+  react-native-cameraroll: 24fadeafaf83448a329371494ba291d8413132ae
   react-native-charts-wrapper: cd83d9b1acb8e06ebd18bf297de597906e1cc87d
   react-native-date-picker: 312c387d2ff873c66c5e4cf78ff6827fa91644e2
-  react-native-document-picker: 5b97e24a7f1a1e4a50a72c540a043f32d29a70a2
-  react-native-pager-view: 2447850409b3311900b6e3273f679ee4c465e576
+  react-native-document-picker: 52eab29bbc53f45399b475b7a3f4e503260f1134
+  react-native-pager-view: e49f302580f9c2088ab1e9c23674ae0814324143
   react-native-render-html: 984dfe2294163d04bf5fe25d7c9f122e60e05ebe
-  react-native-safe-area-context: b7daa1a8df36095a032dff095a1ea8963cb48371
-  react-native-slider: 593253eb5fbc6ea519290e812bd477fc6abafd5a
+  react-native-safe-area-context: 4532f1a0c5d34a46b9324ccaaedcb5582a302b7d
+  react-native-slider: 3ce2efe4e261f6e000622ec44536faca44bb13d3
   react-native-splash-screen: 4312f786b13a81b5169ef346d76d33bc0c6dc457
   react-native-track-player: 97d76dbbd35f27cc709e5f04540615e54264b3f9
   react-native-video: dc3118548cf8864a83f57df4345cf6c692402e8f
-  react-native-webview: f817a7bfd394634877638019ceac547996561372
+  react-native-webview: 60611cd20936609c63914d8927f12b583ac60d0c
   React-perflogger: 0ba097528e325435aca94b32b5330f58f6acb6fb
   React-RCTActionSheet: 805b3a83f3dd7ae5a1213ea9df0ed748eeb74b85
   React-RCTAnimation: 2a0233681dee47e468302b8233652b35b68329cb
@@ -1172,11 +1173,11 @@ SPEC CHECKSUMS:
   React-RCTVibration: 5b2bfab941e938ee5060acefdd7598077b394975
   React-runtimeexecutor: b9be1f58ce9a8b849cb8a37dd998f04ca97e3619
   ReactCommon: bb3d7051c9b8c58ee34f9af76f883bd0fd7c9c31
-  RNAudioRecorderPlayer: f3b4f32d5581a44be0f9eb383dc87f98f941b08b
+  RNAudioRecorderPlayer: 224c7de87722938aedce04000d09baa633148f5b
   RNCAsyncStorage: ec53e44dc3e75b44aa2a9f37618a49c3bc080a7a
   RNCCheckbox: a3ca9978cb0846b981d28da4e9914bd437403d77
-  RNCClipboard: 0a720adef5ec193aa0e3de24c3977222c7e52a37
-  RNCPicker: b7873ba797dc586bfaf3307d737cbdc620a9ff3e
+  RNCClipboard: 69ab8e51324d5b351f6ba72bbdb72478087a2c64
+  RNCPicker: f963e01f78e546a93b98aa201501713dbda14e94
   RNDateTimePicker: 40ffda97d071a98a10fdca4fa97e3977102ccd14
   RNDeviceInfo: b899ce37a403a4dea52b7cb85e16e49c04a5b88e
   RNFastImage: 5c9c9fed9c076e521b3f509fe79e790418a544e8
@@ -1184,16 +1185,16 @@ SPEC CHECKSUMS:
   RNFBApp: 082df9f8ffba99f23f7aee3ecb64df703e7e1adb
   RNFBCrashlytics: 9d5b36a7e280178c5d61695936cb812005bf17ad
   RNFBMessaging: b167065ee2fcc7fe43a32b35d79d5eb23bceb4ad
-  RNGestureHandler: 325d972e9402b427e819c950eae2b07d4c529802
+  RNGestureHandler: 0972b77a2cab0f1a61ca1a3ce348a424614f65c2
   RNGoogleSignin: 08dc4ba7eac2096c7fecfe109f0950fa4683c803
-  RNImageCropPicker: 771e2ca319d2cf92e04ebf334ece892ee9a6728f
+  RNImageCropPicker: a536bb88eade8336e1d18fdeafa77dc893fbc42e
   RNNotifee: 5155e0a5e0a97d0c839030d8192783cd63053999
   RNPermissions: f9a0380dad4d370b6b983acaf4f9bff07aba9a21
-  RNReactNativeHapticFeedback: 5cf02f12ad56b2a8aa1a0321a4f5d75315b7e1e1
+  RNReactNativeHapticFeedback: 35ab91df9e7a1e4513806e3c091293c97fe38c83
   RNReanimated: f186e85d9f28c9383d05ca39e11dd194f59093ec
-  RNScreens: 03acbdcf84e1bf6832ba83dbe3601eae20c55de0
+  RNScreens: 50ad6e3dbea9023272b3aa753e3ee2720b0c9b8f
   RNSVG: 963a95f1f5d512a13d11ffd50d351c87fb5c6890
-  RNVectorIcons: bfb663f3f7b37340cd90120151b720641523dc84
+  RNVectorIcons: 084d874504f21a5452744e400537eb96b45060b6
   SDWebImage: a7f831e1a65eb5e285e3fb046a23fcfbf08e696d
   SDWebImageWebPCoder: 908b83b6adda48effe7667cd2b7f78c897e5111d
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
@@ -1214,4 +1215,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: ae71466e87684840620c5738627efeac08157ebf
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.16.2
