@@ -67,7 +67,7 @@ const UploadFileInput = ({
             </TouchableOpacity>}
         </View>
 
-
+{console.log(selectedImage,"selectedImage")}
         {(!!selectedImage && Array.isArray(selectedImage)) ?
           <View style={{ marginTop: 10 }}>
             <FlatList
@@ -99,7 +99,6 @@ const UploadFileInput = ({
             />
           </View>
           :
-
           <View style={__styles.imageBox}>
             {!!selectedImage ?
               <Pressable onPress={() => setImageForZoom(selectedImage)}>
@@ -183,7 +182,7 @@ const __styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.lightText,
     borderRadius: 5,
-    minHeight: 150,
+    maxHeight: 150,
     marginTop: 10
   },
   removeIconBtn: {

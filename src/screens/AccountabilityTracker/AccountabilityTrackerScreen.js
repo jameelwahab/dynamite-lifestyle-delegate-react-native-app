@@ -128,7 +128,7 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
     }
 
     for (let i = 0; i < intentions.length; i++) {
-      console.log(intentions,"intentions")
+      console.log(intentions, "intentions")
       if (intentions[i]?.is_required == true && intentions[i]?.status == false) {
         showToast({ title: intentions[i].statement });
         return
@@ -285,7 +285,11 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
     let resp = await Promise.all(APIArray);
     setLoader(false);
     if (resp.every(x => x.code == 200)) {
-      intentionHandler(index, { images: [...intentions[index].images, ...resp.map(x => x?.image_path)] })
+      if (intentions[index]?.images) {
+        intentionHandler(index, { images: [...intentions[index]?.images, ...resp.map(x => x?.image_path)] })
+      } else {
+        intentionHandler(index, { images: [...resp.map(x => x?.image_path)] })
+      }
     }
   }
 
@@ -586,7 +590,7 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
         </View>
 
 
-
+        {console.log(intentions, "intentions")}
         {intentions.map((item, index) => (
           <View key={`intenstions${index}`} style={[__styles.reminderView, { marginTop: 5, paddingBottom: 10 }]}>
             <View style={{ marginTop: 5 }}>
