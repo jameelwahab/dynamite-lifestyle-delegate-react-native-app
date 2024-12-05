@@ -527,7 +527,7 @@ PODS:
   - react-native-document-picker (9.3.1):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
-  - react-native-pager-view (6.5.1):
+  - react-native-pager-view (6.3.0):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
   - react-native-render-html (6.3.4):
@@ -548,7 +548,7 @@ PODS:
   - react-native-video/Video (6.0.0-beta.6):
     - PromisesSwift
     - React-Core
-  - react-native-webview (13.12.4):
+  - react-native-webview (13.12.5):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
   - React-perflogger (0.71.19)
@@ -1152,14 +1152,14 @@ SPEC CHECKSUMS:
   react-native-charts-wrapper: cd83d9b1acb8e06ebd18bf297de597906e1cc87d
   react-native-date-picker: 312c387d2ff873c66c5e4cf78ff6827fa91644e2
   react-native-document-picker: 52eab29bbc53f45399b475b7a3f4e503260f1134
-  react-native-pager-view: e49f302580f9c2088ab1e9c23674ae0814324143
+  react-native-pager-view: 40d9ec4a63ed74f8aa2f1e1bba7c1e0b4080d8a6
   react-native-render-html: 984dfe2294163d04bf5fe25d7c9f122e60e05ebe
   react-native-safe-area-context: 4532f1a0c5d34a46b9324ccaaedcb5582a302b7d
   react-native-slider: 3ce2efe4e261f6e000622ec44536faca44bb13d3
   react-native-splash-screen: 4312f786b13a81b5169ef346d76d33bc0c6dc457
   react-native-track-player: 97d76dbbd35f27cc709e5f04540615e54264b3f9
   react-native-video: dc3118548cf8864a83f57df4345cf6c692402e8f
-  react-native-webview: 60611cd20936609c63914d8927f12b583ac60d0c
+  react-native-webview: 22b1df0ae5c60abf7ea63c18eabe72b238c7f999
   React-perflogger: 0ba097528e325435aca94b32b5330f58f6acb6fb
   React-RCTActionSheet: 805b3a83f3dd7ae5a1213ea9df0ed748eeb74b85
   React-RCTAnimation: 2a0233681dee47e468302b8233652b35b68329cb

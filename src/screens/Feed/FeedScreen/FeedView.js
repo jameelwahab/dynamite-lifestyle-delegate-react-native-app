@@ -7,7 +7,7 @@ import { colors } from '../../../utilities/colors'
 import { S3_URL, isDev } from '../../../utilities/constants'
 import ImagesForFeed from './ImagesForFeed'
 import { icons } from '../../../utilities/icons'
-import MyWebview from '../../../components/MyWebview'
+import MyWebview  from '../../../components/MyWebview'
 import MyImage2 from '../../../components/MyImage2'
 import MyImage from '../../../components/MyImage'
 import CollapsibleText from '../../../components/CollapsibleText'
@@ -177,6 +177,7 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
           <MyWebview
             fullWidth
             html={item.embed_code.replace("width", "")}
+
           />
         </View>
       }

@@ -3,12 +3,13 @@ import RenderHTML, { HTMLContentModel, HTMLElementModel, defaultSystemFonts } fr
 import IframeRenderer, { iframeModel } from '@native-html/iframe-plugin';
 import { colors } from "../utilities/colors";
 import { fonts } from "../utilities/fonts";
-import { Component } from "react";
+import { Component, useRef } from "react";
 import WebView from "react-native-webview";
 import { isUrl } from "../functions/regex";
 import openUrl from "../functions/openUrl";
 import { urlifyWithAchorTag } from "../functions/urlify";
 import AudioPlayer from "./AudioPlayer";
+import DeviceInfo from "react-native-device-info";
 
 
 
@@ -27,7 +28,7 @@ export class MyWebview extends Component {
   renderers = {
     "iframe": IframeRenderer,
 
-  
+
 
   };
   customHTMLElementModels = {
@@ -78,18 +79,22 @@ export class MyWebview extends Component {
 
   render() {
     let { html, style, baseStyle } = this.props;
-    html = "<div>" + html.replace(/padding/g, "") + "</div>";
-
+    html = "<div>" + html.replace(/padding:/g, "") + "</div>";
     return (
       <RenderHTML
+
         WebView={WebView}
         contentWidth={this.props.fullWidth ? Dimensions.get("window").width - 40 : !!this.props.width ? this.props.width : Dimensions.get("window").width / 1.5}
-        source={{ html: html }}
+        source={{
+          html: html,
+          baseUrl: ""
+        }}
         customHTMLElementModels={this.customHTMLElementModels}
         renderers={this.renderers}
         enableExperimentalMarginCollapsing={true}
         baseStyle={baseStyle}
         enableExperimentalBRCollapsing={true}
+        // ignoredStyles={["padding"]}
         enableExperimentalGhostLinesPrevention={true}
         tagsStyles={{
           a: {
@@ -144,15 +149,19 @@ export class MyWebview extends Component {
         renderersProps={{
           iframe: {
             // scalesPageToFit: true,
+            javaScriptEnabled: true,
             webViewProps: {
               cacheEnabled: false,
-              startInLoadingState: true,
+              startInLoadingState: false,
               scrollEnabled: false,
               allowsAirPlayForMediaPlayback: true,
               allowsInlineMediaPlayback: true,
-              mediaPlaybackRequiresUserAction: true,
+              // mediaPlaybackRequiresUserAction: true,
               allowsFullscreenVideo: true,
-            },
+              // javaScriptEnabled: true,
+              // sharedCookiesEnabled:true,
+              // applicationNameForUserAgent:'DemoApp/1.1.0'
+            }
 
           }
         }}
