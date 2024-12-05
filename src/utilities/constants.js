@@ -40,7 +40,7 @@ export const communityLevelObj = {
   dynamite: "Dynamite",
   pta: "PTA",
   elite: "Elite",
-  mastery: "Mastery"
+  mastery: "VIP Gold"
 }
 
 export const communityLevelArr = [
@@ -57,7 +57,7 @@ export const communityLevelArr = [
     value: "elite"
   },
   {
-    title: "Mastery",
+    title: "VIP Gold",
     value: "mastery"
   },
 ]
@@ -66,7 +66,7 @@ export const communityLevelWithAllObj = {
   dynamite: "Dynamite",
   pta: "PTA",
   elite: "Elite",
-  mastery: "Mastery",
+  mastery: "VIP Gold",
   all: "All",
 }
 
@@ -88,7 +88,7 @@ export const communityLevelWithAllArr = [
     value: "elite"
   },
   {
-    title: "Mastery",
+    title: "VIP Gold",
     value: "mastery"
   },
 ]

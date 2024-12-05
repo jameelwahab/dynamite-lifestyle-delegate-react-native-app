@@ -154,7 +154,7 @@ const GroupList = ({ navigation, route }) => {
           <StatView title={"Type"} value={item?.group_type} />
           <StatView title={"Group By"} value={groupBy[item?.group_by]} />
           <StatView title={"Members"} value={item?.member.length} />
-          <StatView original title={"community Level"} value={!!item?.community_level ? communityLevelWithAllObj[item?.community_level.toLowerCase()] : ""} />
+          <StatView original title={"Community Level"} value={!!item?.community_level ? communityLevelWithAllObj[item?.community_level.toLowerCase()] : ""} />
           <StatView title={"Status"} view={() => statusView(item?.status)} />
         </View>
       </Pressable>

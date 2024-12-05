@@ -7,7 +7,7 @@ import UserImage from '../../../components/UserImage'
 import { icons } from '../../../utilities/icons'
 import StatView from '../Components/StatView'
 import { convertTimezone } from '../../../functions/convertTime'
-import { dateTimeFormat } from '../../../utilities/constants'
+import { communityLevelWithAllObj, dateTimeFormat } from '../../../utilities/constants'
 import { useSelector } from 'react-redux'
 import { selectTimeZone } from '../../../redux/reducers/timezoneSlice'
 import LeadModal from '../Components/LeadModal'
@@ -384,7 +384,7 @@ console.log(member,"member")
           member?.affliliate?.affiliate_user_info?.first_name + " " + member?.affliliate?.affiliate_user_info?.last_name + " (" + member?.affliliate?.affiliate_url_name + ") " : "Master Link"} />}
         {!isNurture && access?.Show_nurture_in_filter && <StatView title={"Nurture"} value={!!member?.nurture ? member?.nurture?.first_name + " " + member?.nurture?.last_name : "N/A"} />}
         {!isMembers && <StatView title={"Delegate"} value={!!member?.consultant ? member?.consultant?.first_name + " " + member?.consultant?.last_name : "N/A"} />}
-        <StatView title={"Community Level"} value={member?.community_level} uppercase={member?.community_level == 'pta'} />
+        <StatView title={"Community Level"} value={communityLevelWithAllObj[member?.community_level]} noFontTransform  />
         <StatView title={"Wheel of life"} view={wheelOfLifeStatus} />
         <StatView title={"Last Login Activity"} uppercase value={convertTimezone(member?.last_login_activity, timezone).format(dateTimeFormat.dateTime)} />
         <StatView title={"Phone Number"} view={() => contactNumberView(member?.contact_number, !!member?.call_history?.is_checked)} />

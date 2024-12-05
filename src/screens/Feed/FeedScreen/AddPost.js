@@ -15,7 +15,7 @@ import OptionModal from '../../../components/OptionModal'
 import Toast from 'react-native-toast-message'
 import { CREATE_FEED, FEED_DETAIL, GET_DELEGATES_LIST_FROM_SERVER_FOR_MENTION_V1, UPDATE_FEED, UPLOAD_FEED_IMAGES } from '../../../DAL'
 import showToast from '../../../functions/showToast'
-import { S3_URL, dateTimeFormat } from '../../../utilities/constants'
+import { S3_URL, communityLevelWithAllObj, dateTimeFormat } from '../../../utilities/constants'
 import LevelModal from './LevelModal'
 import MyTouchableInput from '../../../components/MyTouchableInput'
 import Editor from '../../../components/Editor'
@@ -1558,7 +1558,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
               <View style={__style.levlBtnLabel}>
                 <MyText color={colors.lightText2} fontSize={12} >Select Level</MyText>
               </View>
-              <MyText type={"medium"} style={{ textTransform: feedLevel == "pta" ? "uppercase" : "capitalize" }} >{feedLevel.split("_").join(" ")}</MyText>
+              <MyText type={"medium"} >{isCosmos? feedLevel.split("_").join(" "):communityLevelWithAllObj[feedLevel]}</MyText>
               {icons.down(colors.lightText2)}
             </Pressable>}
 
@@ -1733,7 +1733,7 @@ const PostCretedForSourceFeed = [
     type: "elite"
   },
   {
-    title: "Mastery",
+    title: "VIP Gold",
     type: "mastery"
   },
 ]

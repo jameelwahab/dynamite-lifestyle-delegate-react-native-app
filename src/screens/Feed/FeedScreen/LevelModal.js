@@ -5,6 +5,7 @@ import utilities from '../../../utilities';
 import Modal from 'react-native-modal';
 import { fonts } from '../../../utilities/fonts';
 import MyText from '../../../components/MyText';
+import { communityLevelWithAllObj } from '../../../utilities/constants';
 const LevelModal = forwardRef(({ feedLevel, selectFeedlevel, isCosmos, cosmosLevelList }, ref) => {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -35,9 +36,14 @@ const LevelModal = forwardRef(({ feedLevel, selectFeedlevel, isCosmos, cosmosLev
           backgroundColor: feedLevel == item ? colors.secondarySelect : undefined,
           paddingVertical: 20, alignItems: "center"
         }} >
-        <MyText align='center' style={{ textTransform: item == "pta" ? "uppercase" : "capitalize" }} type='medium' >
-          {`${item.split("_").join(" ")}${item == "marketing" ? " Team" : ""}`}
-        </MyText>
+        {isCosmos ?
+          <MyText align='center' style={{ textTransform: item == "pta" ? "uppercase" : "capitalize" }} type='medium' >
+            {`${item.split("_").join(" ")}${item == "marketing" ? " Team" : ""}`}
+          </MyText> :
+          <MyText align='center' type='medium' >
+            { communityLevelWithAllObj[item]}
+          </MyText>
+        }
       </Pressable>
     )
   }

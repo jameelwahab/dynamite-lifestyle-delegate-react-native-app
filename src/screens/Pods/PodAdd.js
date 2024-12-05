@@ -645,7 +645,7 @@ const communityLevels = [
     key: "elite"
   },
   {
-    title: "Mastery",
+    title: "VIP Gold",
     key: "mastery"
   },
 ]

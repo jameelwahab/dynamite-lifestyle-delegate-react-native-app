@@ -15,7 +15,7 @@ import routes from '../../../navigation/routes'
 import StatView from '../Components/StatView'
 import { convertTimezone } from '../../../functions/convertTime'
 import { selectTimeZone } from '../../../redux/reducers/timezoneSlice'
-import { dateTimeFormat } from '../../../utilities/constants'
+import { communityLevelWithAllObj, dateTimeFormat } from '../../../utilities/constants'
 import MyInputs from '../../../components/MyInputs'
 import SortModal from '../Components/SortModal'
 import debounce from '../../../functions/debounce'
@@ -895,7 +895,7 @@ const MemberList = ({ navigation, route }) => {
             item?.affliliate?.affiliate_user_info?.first_name + " " + item?.affliliate?.affiliate_user_info?.last_name + " (" + item?.affliliate?.affiliate_url_name + ") " : "Master Link"} />}
           {!isNurture && access?.Show_nurture_in_filter && <StatView title={"Nurture"} value={!!item?.nurture ? item?.nurture?.first_name + " " + item?.nurture?.last_name : "N/A"} />}
           {!isMembers && <StatView title={"Delegate"} value={!!item?.consultant ? item?.consultant?.first_name + " " + item?.consultant?.last_name : "N/A"} />}
-          <StatView title={"Community Level"} value={item?.community_level} uppercase={item?.community_level == 'pta'} />
+          <StatView title={"Community Level"} value={communityLevelWithAllObj[item?.community_level]} noFontTransform />
           <StatView title={"Last Login Activity"} uppercase value={convertTimezone(item?.last_login_activity, timezone).format(dateTimeFormat.dateTime)} />
           <StatView title={"Lead Status"} view={() => leadStatusView(item)} />
           <StatView title={"Membership Expire"} value={!!item?.membership_purchase_expiry ?

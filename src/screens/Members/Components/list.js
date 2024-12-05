@@ -26,7 +26,7 @@ const levelList = [{
 },
 {
   key: "mastery",
-  title: "Mastery",
+  title: "VIP Gold",
 }]
 
 const memberStatusList = [{
