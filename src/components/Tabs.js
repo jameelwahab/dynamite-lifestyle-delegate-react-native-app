@@ -7,8 +7,6 @@ import { colors } from "../utilities/colors";
 
 const Tabs = ({ list, changeTab, tab }) => {
   const menuRef = useRef()
-
-
   return (
     <View style={{ marginHorizontal: -10 }}>
       <View style={{ height: 50, }}>
@@ -33,7 +31,7 @@ const Tabs = ({ list, changeTab, tab }) => {
                 }}
                 style={{ justifyContent: "center", paddingHorizontal: 10 }}>
                 <MyText fontSize={15} type={index == tab ? 'medium' : 'regular'} color={index == tab ? colors.primary2 : colors.lightText} >
-                  {item.title}
+                  {item?.title}
                 </MyText>
 
                 <View style={{ borderRadius: 10, marginTop: 3, height: 3, backgroundColor: index == tab ? colors.primary : colors.transparent }} />

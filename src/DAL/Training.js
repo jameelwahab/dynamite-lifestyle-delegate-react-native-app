@@ -1,8 +1,8 @@
 import invokeApi from "../functions/invokeAPI"
 
-export const GET_TRAINING_LIST = ({ token, navigation, }) => {
+export const GET_TRAINING_LIST = ({ token, navigation, page, search = "" }) => {
   return invokeApi({
-    path: `api/consultant/v1/delegate_traning_list`,
+    path: `api/consultant/delegate_training/list?page=${page}&limit=10&search_text=${search}`,
     method: "GET",
     token: token,
     navigation: navigation,

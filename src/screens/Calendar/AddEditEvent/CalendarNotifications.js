@@ -28,8 +28,6 @@ import useBackHandler from '../../../hooks/useBackHandler'
 
 const CalendarNotifications = ({ navigation, route }) => {
   const { data, event, iteration_id, type: eventType, notifications: savedNotifications } = route?.params;
-  console.log(navigation, " route?.params")
-
   const isDelegateEvents = eventType == "consultant_user";
   const { token } = useSelector(selectUser);
   const timezone = useSelector(selectTimeZone)

@@ -12,6 +12,7 @@ import TrainingDetail from '../../screens/Training/TrainingDetail'
 import TrainingLessonDetail from '../../screens/Training/TrainingLessionDetail'
 import TrainingLessonList from '../../screens/Training/TrainingLessonList'
 import TrainingLessonRecordings from '../../screens/Training/TrainingLessonRecordings'
+import Detail from '../../screens/Feed/Detail'
 
 
 
@@ -29,6 +30,7 @@ const StackTraining = ({ route }) => {
         <TrainingStack.Screen name={routes.trainingLessonDetail} component={TrainingLessonDetail} />
         <TrainingStack.Screen name={routes.trainingLessonsList} component={TrainingLessonList} />
         <TrainingStack.Screen name={routes.trainingLessonRecording} component={TrainingLessonRecordings} />
+        <TrainingStack.Screen name={routes.feedDetailScreen} component={Detail} />
 
         {/*//? Default Screens Start */}
         {defaultScreens.map((x, i) => (

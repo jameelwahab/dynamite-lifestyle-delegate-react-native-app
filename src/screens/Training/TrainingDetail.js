@@ -1,5 +1,5 @@
 import { View, Text, ScrollView, FlatList, StyleSheet, Pressable, TouchableOpacity } from 'react-native'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import RootView from '../../components/RootView'
 import MyText from '../../components/MyText'
 import { useSelector } from 'react-redux'
@@ -21,10 +21,14 @@ import openUrl from '../../functions/openUrl'
 import VimeoWithPip from '../../components/VimeoWithPip'
 import { useFocusEffect } from '@react-navigation/native'
 import EmptyView from '../../components/EmptyView'
+import FeedScreen from '../Feed/FeedScreen'
 
-const TrainingDetail = ({ navigation, route }) => {
+const TrainingDetail = (props) => {
+  const { navigation, route } = props;
+  console.log(route, "route")
   let { slug } = route?.params;
   let { token, user } = useSelector(selectUser);
+  const isFirtTime = useRef(true);
   const [loader, setLoader] = useState(true);
   const [program, setProgram] = useState(null);
   const [lessons, setLessons] = useState([])
@@ -40,6 +44,8 @@ const TrainingDetail = ({ navigation, route }) => {
     getDataFromServer()
   }, [mySlug])
 
+  console.log(tabs, "tabs")
+
 
   useFocusEffect(useCallback(() => {
     setIsFocused(true);
@@ -50,18 +56,20 @@ const TrainingDetail = ({ navigation, route }) => {
 
 
   const onTabClick = (index) => {
-    console.log(index, "index")
-    let link = tabs[index]?.button_url;
-
-    console.log(link, "Link")
-    if (!!link) {
-      if (link.includes("dynamitelifestyle.com") && link.includes("delegates")) {
-        if (link.includes("delegate-training")) {
-          let slug = link.split("/").pop();
-          setSlug(slug)
+    let tabObj = tabs[index]
+    if (tabObj?.type == "general") {
+      setSelectedTabIndex(index)
+    } else {
+      let link = tabObj?.button_url;
+      if (!!link) {
+        if (link.includes("dynamitelifestyle.com") && link.includes("delegates")) {
+          if (link.includes("delegate-training")) {
+            let slug = link.split("/").pop();
+            setSlug(slug)
+          }
+        } else {
+          openUrl(link)
         }
-      } else {
-        openUrl(link)
       }
     }
   }
@@ -69,14 +77,38 @@ const TrainingDetail = ({ navigation, route }) => {
   const getDataFromServer = async () => {
     let res = await GET_TRAINING_DETAIL({ navigation, token, slug: mySlug });
     if (res.code == 200) {
+      let tabArr = [
+        {
+          title: "Overview",
+          _id: "delegate_overview_tab_by_me",
+          section_slug: "delegate_overview_tab_by_me",
+          type: "general"
+        },
+        {
+          title: "Community",
+          _id: "delegate_feed_tab_by_me",
+          section_slug: "delegate_overview_tab_by_me",
+          type: "general"
+        },
+        {
+          title: res?.program?.delegate_first_tab_heading,
+          _id: "delegate_first_tab",
+          section_slug: "delegate_first_tab",
+          type: "general"
+        },
+        ...res?.program_section];
+      if (isFirtTime?.current) {
+        isFirtTime.current = false;
+        if (route?.params?.curtab) {
+          let index = tabArr.findIndex(x => x._id == route?.params?.curtab)
+          if (index > -1) {
+            setSelectedTabIndex(index)
+          }
+        }
+      }
       setProgram(res?.program);
       setLessons(res?.lesson);
-      setTabs([{
-        title: res?.program?.delegate_first_tab_heading,
-        _id: "delegate_first_tab",
-        section_slug: "delegate_first_tab"
-      },
-      ...res?.program_section]);
+      setTabs(tabArr);
       setLoader(false);
     } else {
       setLoader(false)
@@ -96,11 +128,11 @@ const TrainingDetail = ({ navigation, route }) => {
   }
 
 
-  const headerView = () => {
+  const overView = () => {
     return (
-      <View style={{}}>
+      <View style={{ flex: 1 }}>
         {!!program &&
-          <View style={{}}>
+          <ScrollView showsVerticalScrollIndicator={false} >
             {!!program?.video_url ?
               <>
                 {program?.video_url.includes("vimeo") ?
@@ -124,17 +156,35 @@ const TrainingDetail = ({ navigation, route }) => {
               </View>
             }
 
-            <Tabs
-              tab={selectedTabIndex}
-              changeTab={onTabClick}
-              list={tabs} />
-          </View>
+
+          </ScrollView>
         }
       </View>
     )
   }
 
-  const footerView = () => {
+  const feedView = () => {
+    console.log("feedView")
+    return (
+      <View style={{ flex: 1, }}>
+        <FeedScreen
+          isScheduleFeedTabAllowed={false}
+          hideTabs
+          navigation={navigation}
+          route={{
+            ...route,
+            params: {
+              ...route?.params,
+              feedFor: "program",
+              eventId: program?._id
+            }
+          }}
+        />
+      </View>
+    )
+  }
+
+  const footerView1 = () => {
     let data = selectedTabIndex > 0 ? tabs[selectedTabIndex] : null
     return (
       <View>
@@ -199,19 +249,55 @@ const TrainingDetail = ({ navigation, route }) => {
     )
   }
 
+  const lessonView = () => {
+    return (
+      <View style={{ flex: 1 }}>
+        <FlatList
+          keyExtractor={(item) => item?._id}
+          showsVerticalScrollIndicator={false}
+          data={lessons}
+          renderItem={renderlessons}
+        />
+      </View>
+    )
+  }
+
+  const renderView = () => {
+    return (<>
+      {tabs[selectedTabIndex]?._id == "delegate_feed_tab_by_me" ? feedView() :
+        tabs[selectedTabIndex]?._id == "delegate_first_tab" ? lessonView() :
+          tabs[selectedTabIndex]?._id == "delegate_overview_tab_by_me" ? overView() :
+            null
+      }
+    </>)
+  }
+
   return (
     <RootView titleView={titleView}  >
       <View style={{ flex: 1, }}>
         {!!program ?
+          <View style={{ flex: 1 }}>
+            <Tabs
+              tab={selectedTabIndex}
+              changeTab={onTabClick}
+              list={tabs} />
+
+            {renderView()}
+          </View> : loader == false &&
+          <EmptyView label={`Nothing Found`} />
+        }
+
+        {/* {!!program ?
           <FlatList
             showsVerticalScrollIndicator={false}
             ListHeaderComponent={headerView()}
-            data={lessons}
+            data={tabs[selectedTabIndex]?._id == "delegate_first_tab" ? lessons : []}
+            ListFooterComponent={footerView()}
             renderItem={renderlessons}
           /> :
           loader == false &&
           <EmptyView label={`Nothing Found`} />
-        }
+        } */}
 
       </View>
       <MyLoader enable={loader} />

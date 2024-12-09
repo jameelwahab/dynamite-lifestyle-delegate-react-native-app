@@ -25,7 +25,6 @@ import AudioPlayerForList from '../../../components/AudioPlayerForList'
 
 const PortalDetail = (props) => {
   const { navigation, route } = props;
-  console.log(props, "props")
   const { eventId } = route?.params
   const { token, user } = useSelector(selectUser);
   const timezone = useSelector(selectTimeZone);

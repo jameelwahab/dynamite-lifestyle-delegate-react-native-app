@@ -5,17 +5,17 @@ export const isDev = true;
 // export const isDev = false;
 let domain, socketUrl, S3_URL, appName, websiteBaseUrl
 if (isDev) {
-  // domain = "https://apidevfeatures.dynamitelifestyle.com/";
-  // socketUrl = "https://apidevfeatures.dynamitelifestyle.com"
-  // S3_URL = "https://dd-feature-app-bucket.s3.amazonaws.com/"
-  // websiteBaseUrl = "https://galaxy.dynamitelifestyle.com/"
-  // appName = displayName;
-
-  domain = "https://apidev.dynamitelifestyle.com/";
-  socketUrl = "https://apidev.dynamitelifestyle.com";
-  S3_URL = "https://dynamite-lifestyle-dev-app-bucket.s3.amazonaws.com/";
+  domain = "https://apidevfeatures.dynamitelifestyle.com/";
+  socketUrl = "https://apidevfeatures.dynamitelifestyle.com"
+  S3_URL = "https://dd-feature-app-bucket.s3.amazonaws.com/"
+  websiteBaseUrl = "https://galaxy.dynamitelifestyle.com/"
   appName = displayName;
-  websiteBaseUrl = "https://sourcedev.dynamitelifestyle.com/"
+
+  // domain = "https://apidev.dynamitelifestyle.com/";
+  // socketUrl = "https://apidev.dynamitelifestyle.com";
+  // S3_URL = "https://dynamite-lifestyle-dev-app-bucket.s3.amazonaws.com/";
+  // appName = displayName;
+  // websiteBaseUrl = "https://sourcedev.dynamitelifestyle.com/"
 } else {
   domain = "https://api.dynamitelifestyle.com/";
   socketUrl = "https://apicron.dynamitelifestyle.com";

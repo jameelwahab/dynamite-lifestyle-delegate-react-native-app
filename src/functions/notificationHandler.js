@@ -11,8 +11,9 @@ const notificationHandler = (remoteMessage, navigation, navbar) => {
       navigator = routes.feedNavigator;
     } else if (data?.tab_type == "event") {
       navigator = routes.portalNavigator;
-    }
-    else {
+    } else if (data?.tab_type == "program") {
+      navigator = routes.trainingNavigator;
+    } else {
       if (!!navbar.find(x => x.value == "all_source_feed"))
         navigator = routes.allSourcesFeedNavigator;
       else if (!!navbar.find(x => x.value == "the_source_feed"))
@@ -21,6 +22,9 @@ const notificationHandler = (remoteMessage, navigation, navbar) => {
     if (!!navigator) {
       let params = { feedId: data?.feed_id };
       if (data?.tab_type == "event") {
+        params["eventId"] = data?.event_id
+        params["feedFor"] = "event"
+      } else if (data?.tab_type == "program") {
         params["eventId"] = data?.event_id
         params["feedFor"] = "event"
       }
@@ -50,8 +54,30 @@ const notificationHandler = (remoteMessage, navigation, navbar) => {
             }
           }],
         })
-      }
-      else {
+      } else if (data?.tab_type == "program") {
+        navigation.reset({
+          routes: [{
+            name: navigator,
+            state: {
+              routes: [
+                {
+                  name: routes.traininglist,
+                },
+                {
+                  name: routes.trainingDetail,
+                  params: {
+                    slug: data?.program_slug,
+                    curtab: "delegate_feed_tab_by_me",
+                  }
+                },
+                {
+                  name: routes.feedDetailScreen,
+                  params: params
+                }],
+            }
+          }],
+        })
+      } else {
         navigation.reset({
           routes: [{
             name: routes.mainScreen,
@@ -205,5 +231,5 @@ const notificationHandler = (remoteMessage, navigation, navbar) => {
 }
 
 export default notificationHandler;
-const feedType = ["commentlike", "addcomment", "feedlike", "gratitude", "addcommentreply", "feed_mentioned", "feed_comment_mentioned", "poll_answer","survey_answer"];
+const feedType = ["commentlike", "addcomment", "feedlike", "gratitude", "addcommentreply", "feed_mentioned", "feed_comment_mentioned", "poll_answer", "survey_answer"];
 const SupportTicketType = ["send_support_ticket_reminder", "close_support_ticket", "support_ticket_comment", "add_support_ticket", "support_ticket_internal_note"];

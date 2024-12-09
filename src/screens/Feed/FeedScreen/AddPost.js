@@ -45,7 +45,7 @@ let cursor = {
   end: 0
 };
 
-const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, selectFeedlevel, feedLevel, tab, isCosmos, isScheduledFeed, timezone, removeFromList, isSuperDelegate, hideLevelView, isEventFeed, eventId, isMultipleSelectAllowed, showEventOption,
+const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, selectFeedlevel, feedLevel, tab, isCosmos, isScheduledFeed, timezone, removeFromList, isSuperDelegate, hideLevelView, isEventFeed, isProgramFeed, eventId, isMultipleSelectAllowed, showEventOption,
   hideAddView,
   cosmosLevelList, selectLevelOptionOnAddPostForCosmos, defaultCosmosFilter,
   isPollAllowed,
@@ -54,10 +54,11 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   setFeedType,
   feedTypeMember,
   setFeedTypeMember,
-  isFeedFilterAllowed
+  isFeedFilterAllowed,
+  isNoteMainFeed
 
 }, ref) => {
-
+console.log(isNoteMainFeed,"isNoteMainFeed")
   const { height, width } = useWindowDimensions();
   const inset = useSafeAreaInsets();
   const ref_poll = useRef()
@@ -621,9 +622,11 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     }
     if (!(!!editId)) {
       fd.append("is_publish", isScheduledFeed ? "false" : "true");
-      fd.append("feed_created_for", isEventFeed ? "event" : isCosmos ? "delegate" : "general");
+      fd.append("feed_created_for", isProgramFeed ? "program" : isEventFeed ? "event" : isCosmos ? "delegate" : "general");
       if (isEventFeed) {
         fd.append("event_id", eventId);
+      } else if (isProgramFeed) {
+        fd.append("program_id", eventId);
       }
     }
 
@@ -696,9 +699,10 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     let res = await GET_DELEGATES_LIST_FROM_SERVER_FOR_MENTION_V1({
       navigation, token, data: {
         search_text: text,
-        community_levels: isEventFeed ? undefined : isCosmos ? [postCeatedFor] : !!editId ? [postCeatedFor] : postCeatedForArray.map(x => x.type),
-        event_id: isEventFeed ? eventId : undefined,
+        community_levels: isNoteMainFeed ? undefined : isCosmos ? [postCeatedFor] : !!editId ? [postCeatedFor] : postCeatedForArray.map(x => x.type),
+        event_id: isNoteMainFeed ? eventId : undefined,
         list_type: isCosmos ? "the_cosmos" : "the_source",
+        type: isEventFeed ? "event" : isProgramFeed ? "program" : undefined
       }
     });
     setMentionListLoading(false);
@@ -1062,7 +1066,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                         </TouchableOpacity>
                       </View>}
                   </View>
-                  {!isCosmos && !isEventFeed &&
+                  {!isCosmos && !isNoteMainFeed &&
                     <View style={{ marginTop: 10 }}>
                       <TouchableOpacity
                         onPress={() => setMultipleLevelModalVisiblity(true)}
@@ -1172,7 +1176,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                       position: "absolute",
                       zIndex: 3,
                       alignItems: "center",
-                      top: isCosmos || isEventFeed ?
+                      top: isCosmos || isNoteMainFeed ?
                         (inputHeight + 80) :
                         height < 800 ?
                           inputHeight == 120 ? (inputHeight + 90) :
@@ -1202,7 +1206,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                               onPress={() => onPressOnMentions(item)}
                               style={{ paddingVertical: 4 }}>
                               <MemberView
-                                secondText={!isEventFeed ? isCosmos ? makeCosmosLevel(item?.team_type) : ` (${item?.community_level})` : ""}
+                                secondText={!isNoteMainFeed ? isCosmos ? makeCosmosLevel(item?.team_type) : ` (${item?.community_level})` : ""}
                                 size={30}
                                 titleSize={12}
                                 member={item}
@@ -1558,7 +1562,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
               <View style={__style.levlBtnLabel}>
                 <MyText color={colors.lightText2} fontSize={12} >Select Level</MyText>
               </View>
-              <MyText type={"medium"} >{isCosmos? feedLevel.split("_").join(" "):communityLevelWithAllObj[feedLevel]}</MyText>
+              <MyText type={"medium"} >{isCosmos ? feedLevel.split("_").join(" ") : communityLevelWithAllObj[feedLevel]}</MyText>
               {icons.down(colors.lightText2)}
             </Pressable>}
 

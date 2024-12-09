@@ -30,7 +30,6 @@ import { selectTimeZone } from '../../../redux/reducers/timezoneSlice'
 
 const GroupAddEdit = ({ navigation, route }) => {
   const { event, iteration_id, type: eventType } = route?.params;
-  console.log(route?.params, "route?.params")
   const isDelegateEvents = eventType == "consultant_user";
   const isEdit = !!event;
   const isEditIteration = !!iteration_id;

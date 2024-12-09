@@ -100,25 +100,31 @@ const NotificationList = ({ navigation, route }) => {
         navigator = routes.feedNavigator;
       } else if (item?.tab_type == "event") {
         navigator = routes.portalNavigator;
-      }
-      else {
+      } else if (item?.tab_type == "program") {
+        navigator = routes.trainingNavigator;
+      } else {
         if (!!navbar.find(x => x.value == "all_source_feed"))
           navigator = routes.allSourcesFeedNavigator;
         else if (!!navbar.find(x => x.value == "the_source_feed"))
           navigator = routes.sourceFeedNavigator;
-
       }
+
+      console.log(navigator, "navigator")
 
       if (!!navigator) {
         let params = { feedId: item?.feeds?._id };
         if (item?.tab_type == "event") {
           params["eventId"] = item?.module_id
           params["feedFor"] = "event"
+        } else if (item?.tab_type == "program") {
+          params["eventId"] = item?.module_id
+          params["feedFor"] = "program"
         }
         if (notification_type == "addcomment" || notification_type == "addcommentreply" || notification_type == "commentlike" || notification_type == "feed_comment_mentioned") {
           params["openCommentModal"] = true;
         }
         if (item?.tab_type == "event") {
+          console.log(item?.tab_type, "isEvent")
           navigation.reset({
             routes: [{
               name: navigator,
@@ -132,6 +138,30 @@ const NotificationList = ({ navigation, route }) => {
                     params: {
                       eventId: item?.module_id,
                       feedFor: "event"
+                    }
+                  },
+                  {
+                    name: routes.feedDetailScreen,
+                    params: params
+                  }
+                ],
+              }
+            }],
+          })
+        } else if (item?.tab_type == "program") {
+          navigation.reset({
+            routes: [{
+              name: navigator,
+              state: {
+                routes: [
+                  {
+                    name: routes.traininglist,
+                  },
+                  {
+                    name: routes.trainingDetail,
+                    params: {
+                      slug: item?.module_info?.program_slug,
+                      curtab: "delegate_feed_tab_by_me",
                     }
                   },
                   {
@@ -575,5 +605,5 @@ const __styles = StyleSheet.create({
 
 
 
-const feedType = ["commentlike", "addcomment", "feedlike", "gratitude", "addcommentreply", "feed_mentioned", "feed_comment_mentioned", "poll_answer","survey_answer"];
+const feedType = ["commentlike", "addcomment", "feedlike", "gratitude", "addcommentreply", "feed_mentioned", "feed_comment_mentioned", "poll_answer", "survey_answer"];
 const SupportTicketType = ["support_ticket_internal_note", "send_support_ticket_reminder", "close_support_ticket", "support_ticket_comment", "add_support_ticket", "support_ticket"];

@@ -25,7 +25,7 @@ import { MyButton } from '../../../components/MyButton'
 export const FeedView = ({ item, index, user, token, isInView, timezone, settings,
   openComments, showLikes, openOptions, onLikebtnPress, isCosmos,
   sourceLevelIcons, isScheduledFeed, openScheduleTimeModal, onFeedDetail,
-  isEventFeed, filterTheOptions, onVotePress, pollSettings, openPollDetail,
+  isNoteMainFeed, filterTheOptions, onVotePress, pollSettings, openPollDetail,
   onStartQuestionnairPress, openSurveyDetail
 }) => {
 
@@ -91,7 +91,7 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
             style={{ tintColor: colors.primary, height: 25, width: 25 }}
           />
         </TouchableOpacity>}
-      {!(!!isEventFeed) &&
+      {!(!!isNoteMainFeed) &&
         <View >
           <MyImage
             indicatorProps={{ color: colors.secondaryVariant }}

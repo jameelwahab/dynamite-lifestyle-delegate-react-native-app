@@ -244,12 +244,13 @@ export const GET_DELEGATES_LIST_FROM_SERVER_FOR_MENTION_V1 = ({ token, navigatio
   community_levels = undefined,
   list_type = undefined,
   search_text = undefined,
-  event_id = undefined
+  event_id = undefined,
+  type = undefined
 } }) => {
   return invokeApi({
     path: `api/feeds/delegate_or_member/list`,
     method: "POST",
-    postData: { community_levels, list_type, search_text, event_id },
+    postData: { community_levels, list_type, search_text, event_id, type },
     token,
     navigation,
   })

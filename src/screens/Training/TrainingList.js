@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, Dimensions, Pressable } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import RootView from '../../components/RootView'
 import MyText from '../../components/MyText'
 import { useSelector } from 'react-redux'
@@ -16,35 +16,104 @@ import { colors } from '../../utilities/colors'
 import utilities from '../../utilities'
 import MyImage from '../../components/MyImage'
 import routes from '../../navigation/routes'
+import FooterLoader from '../../components/FooterLoader'
+import MyRefreshControl from '../../components/MyRefreshControl'
+import SearchView from '../../components/SearchView'
+import breakReference from '../../functions/breakReference'
 
 const TrainingList = ({ navigation, route }) => {
   const { key } = route?.params;
+  const pagination = useRef({ page: 0, canLoadMore: false })
   const { navbar } = useSelector(selectNavbar);
   const { token } = useSelector(selectUser);
   const [title] = useState(navbar?.find(x => x._id == key)?.title);
-  const [loader, setLoader] = useState(true);
+  const [loader,] = useState(true);
   const [list, setList] = useState([]);
+  const [total, setTotal] = useState(0);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchText, setSearchText] = useState("");
+  const [loaders, updateLoaders] = useState({
+    overall: true,
+    pagination: false,
+    refreshing: false,
+    searching: false
+  })
+
+  const setLoader = (type) => {
+    let loadersObj = breakReference(loaders);
+    for (const key in loadersObj) {
+      if (key == type) {
+        loadersObj[key] = true
+      } else {
+        loadersObj[key] = false
+      }
+
+    }
+    updateLoaders(loadersObj)
+
+  }
+
+
 
   useEffect(() => {
+    pagination.current.page = 0
+    pagination.current.canLoadMore = false
     getDataFromServer()
   }, [])
 
+
+
   const getDataFromServer = async () => {
 
-    let res = await GET_TRAINING_LIST({ navigation, token });
+    let res = await GET_TRAINING_LIST({ navigation, token, page: pagination?.current?.page, search: searchText.trim() });
     if (res.code == 200) {
-      setList(res?.program)
-      setLoader(false)
-    } else {
-      setLoader(false)
+      let array = pagination.current.page == 0 ? res?.program : [...list, ...res?.program];
+      pagination.current.page++;
 
+      console.log(array.length, res?.total_program_count, "Check")
+      if (array.length < res?.total_program_count) {
+        pagination.current.canLoadMore = true;
+      } else {
+        pagination.current.canLoadMore = false;
+      }
+      setList(array)
+      setTotal(res?.total_program_count)
+      setLoader("")
+    } else {
+      setLoader("")
     }
   }
+  const onRefresh = () => {
+    pagination.current.page = 0
+    pagination.current.canLoadMore = false
+    setLoader("refreshing");
+    getDataFromServer()
+  }
+
+  const onSearchPress = () => {
+    pagination.current.page = 0
+    pagination.current.canLoadMore = false
+    setLoader("searching");
+    getDataFromServer()
+  }
+
+
+  const onEndReached = () => {
+
+    if (pagination.current.canLoadMore) {
+      pagination.current.canLoadMore = false;
+      setLoader("pagination");
+      getDataFromServer()
+    }
+  }
+
 
   const onTrainingDetail = (item) => {
     if (!item?.locked_status) {
       navigation.navigate(routes.trainingDetail, {
-        slug: item?.program_slug
+        slug: item?.program_slug,
       })
     }
   }
@@ -92,11 +161,23 @@ const TrainingList = ({ navigation, route }) => {
     )
   }
 
+  const listHeader = () => {
+    return (
+      <View style={{backgroundColor:colors.darkSecondary,paddingBottom:5}}>
+        <SearchView
+          onChangeText={(text) => setSearchText(text)}
+          onSearchPress={onSearchPress}
+          loader={loaders?.searching}
+          search={searchText}
+        />
+      </View>)
+  }
   return (
     <RootView
       title={title}
+      subTitle={`Showing ${list.length} of ${total}`}
       hideBackBottomButton>
-      <View style={{ flex: 1}}>
+      <View style={{ flex: 1 }}>
         <FlatList
           data={list}
           renderItem={renderTraining}
@@ -104,9 +185,18 @@ const TrainingList = ({ navigation, route }) => {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 50 }}
           ListEmptyComponent={!loader && <EmptyView />}
+          onEndReached={onEndReached}
+          refreshControl={<MyRefreshControl
+            refreshing={loaders?.refreshing}
+            onRefresh={onRefresh}
+          />}
+          ListHeaderComponent={listHeader()}
+          stickyHeaderHiddenOnScroll={true}
+          stickyHeaderIndices={[0]}
+          ListFooterComponent={<FooterLoader isVisible={loaders?.pagination} />}
         />
       </View>
-      <MyLoader enable={loader} />
+      <MyLoader enable={loaders?.overall} />
     </RootView>
   )
 }

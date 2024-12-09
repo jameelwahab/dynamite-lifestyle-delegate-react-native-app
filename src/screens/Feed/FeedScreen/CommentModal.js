@@ -52,7 +52,7 @@ const CommentModal = ({
   updateFeedItemsSpecificField,
   socketEmittersForAction,
   isCosmos,
-  isEventFeed,
+  isNoteMainFeed,
   eventId,
   feedCreatedFor,
   onCommentMessagePress
@@ -244,8 +244,8 @@ const CommentModal = ({
     let res = await GET_DELEGATES_LIST_FROM_SERVER_FOR_MENTION_V1({
       navigation, token, data: {
         search_text: text,
-        community_levels: !isEventFeed ? [feedCreatedFor] : undefined,
-        event_id: isEventFeed ? eventId : undefined,
+        community_levels: !isNoteMainFeed ? [feedCreatedFor] : undefined,
+        event_id: isNoteMainFeed ? eventId : undefined,
         list_type: isCosmos ? "the_cosmos" : "the_source",
       }
     });
@@ -670,7 +670,7 @@ const CommentModal = ({
               </View>
             </View>
 
-            {((user?._id == item?.user_info_action_for?.action_id) || (!isCosmos && !isEventFeed && user?.is_super_delegate)) &&
+            {((user?._id == item?.user_info_action_for?.action_id) || (!isCosmos && !isNoteMainFeed && user?.is_super_delegate)) &&
               <TouchableOpacity
                 onPress={() => setOptions({ isVisible: true, selectedItem: item })}
                 style={__style.menuIconBtn}>
@@ -840,7 +840,7 @@ const CommentModal = ({
                           onPress={() => onPressOnMentions(item)}
                           style={{ paddingVertical: 4 }}>
                           <MemberView
-                            secondText={!isCosmos && !isEventFeed ? ` (${item?.community_level})` : ""}
+                            secondText={!isCosmos && !isNoteMainFeed ? ` (${item?.community_level})` : ""}
                             size={30}
                             titleSize={12}
                             member={item}
@@ -942,7 +942,7 @@ const CommentModal = ({
                     }}
                   >
                     <Text style={[{
-                      color: colors.lightText,
+                      color: colors.white,
                       fontFamily: fonts.regular,
                       includeFontPadding: false
                     }]} >

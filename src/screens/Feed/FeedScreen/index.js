@@ -53,7 +53,6 @@ let likeVar = {
   actionType: ""
 }
 const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, upcomingEvents, currentEvents, hideTabs = false, isScheduleFeedTabAllowed = false, schedulePost = false, }) => {
-
   const addPostRef = useRef()
   const scheduleModalRef = useRef();
   const ref_surveymodal = useRef()
@@ -65,7 +64,10 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
   const isScheduledFeed = feedFor == "scheduled";
   const isAllSourceFeed = feedFor == "all_source";
   const isTheSourceFeed = feedFor == "the_source";
+  const isNoteMainFeed = (feedFor == "event" || feedFor == "program")
   const isEventFeed = feedFor == "event";
+  const isProgramFeed = feedFor == "program";
+
   const { token, user, access, isChatAllowed } = useSelector(selectUser);
 
   const { socket } = useSelector(selectSocket);
@@ -75,7 +77,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
   const [feedData, setFeedData] = useState(null);
   const [loader, setLoader] = useState(true);
   const [feedLevel, setFeedLevel] = useState(
-    isEventFeed ? "all" :
+    isNoteMainFeed ? "all" :
       isCosmos ? access?.cosmos_feeds_filters ? access?.default_filter : user?.team_type :
         isAllSourceFeed ? "all" : "dynamite"
   );
@@ -915,7 +917,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
         }
 
         if (item.type == "notes") {
-          if (isEventFeed) {
+          if (isNoteMainFeed) {
             newList.push(item);
           }
         }
@@ -1068,7 +1070,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       }
 
       if (item.type == "notes") {
-        if (isEventFeed) {
+        if (isNoteMainFeed) {
           newList.push(item);
         }
       }
@@ -1252,12 +1254,14 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           hideAddView={!!feedId}
           isCosmos={isCosmos}
           isScheduledFeed={isScheduledFeed || schedulePost}
+          isNoteMainFeed={isNoteMainFeed}
           isEventFeed={isEventFeed}
-          eventId={isEventFeed ? eventId : ""}
+          isProgramFeed={isProgramFeed}
+          eventId={isNoteMainFeed ? eventId : ""}
           timezone={timezone}
           removeFromList={removeFromList}
           isSuperDelegate={user?.is_super_delegate}
-          hideLevelView={isEventFeed || (isCosmos && !access?.cosmos_feeds_filters)}
+          hideLevelView={isNoteMainFeed || (isCosmos && !access?.cosmos_feeds_filters)}
           isMultipleSelectAllowed={access?.multiple_levels_in_source_all_source_scadule_feeds}
           showEventOption={access?.event_info_in_source_all_source_scadule_feeds}
           cosmosLevelList={access?.cosmos_feed_filters}
@@ -1290,7 +1294,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       openOptions={openOptions}
       onLikebtnPress={onLikebtnPress}
       isCosmos={isCosmos}
-      isEventFeed={isEventFeed}
+      isNoteMainFeed={isNoteMainFeed}
       isScheduledFeed={isScheduledFeed}
       sourceLevelIcons={feedData?.feed_setting}
       openScheduleTimeModal={scheduleModalRef?.current?.openScheduleTimeModal}
@@ -1367,7 +1371,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
         updateFeedItemsSpecificField={updateFeedItemsSpecificField}
         socketEmittersForAction={socketEmittersForAction}
         isCosmos={isCosmos}
-        isEventFeed={isEventFeed}
+        isNoteMainFeed={isNoteMainFeed}
         eventId={eventId}
         feedCreatedFor={commentVar?.level}
         onCommentMessagePress={onCommentMessagePress}
