@@ -100,9 +100,11 @@ const ListForAllTypes = ({ navigation, route }) => {
     setConfirmModal({ isVisible: false, item: null, statement: "", type: "" });
     if (type == "incomplete") {
       incompleteFromServer(item)
-    } else if (type == "reminder") {
-      sendReminder(item)
-    } else if (type == "save") {
+    } 
+    // else if (type == "reminder") {
+    //   sendReminder(item)
+    // } 
+    else if (type == "save") {
       SaveAndCompleteFromServer(item)
     }
   }
