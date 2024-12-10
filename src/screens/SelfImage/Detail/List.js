@@ -21,7 +21,8 @@ import { dateTimeFormat } from '../../../utilities/constants'
 import AudioPlayerForList from '../../../components/AudioPlayerForList'
 import { QUESTIONS_DELETE_DYNAMIYE_REPLY } from '../../../DAL/Questions'
 import showToast from '../../../functions/showToast'
-const List = ({ list, refresh, }) => {
+const List = ({ list, refresh, type}) => {
+  const isResponded = type == "responded";
   const navigation = useNavigation();
   const { token } = useSelector(selectUser);
   const [loader, setLoader] = useState(false)

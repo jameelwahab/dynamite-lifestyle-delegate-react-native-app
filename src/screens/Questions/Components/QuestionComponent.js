@@ -19,7 +19,7 @@ import openUrl from '../../../functions/openUrl'
 import { S3_URL } from '../../../utilities/constants'
 
 
-const QuestionComponent = ({ item, index, showRepliesbtns = false, onShowReplyPress, onRelpyBtnPress }) => {
+const QuestionComponent = ({ item, index, showRepliesbtns = false, onShowReplyPress, onRelpyBtnPress, hideRepliesCheckBox = false }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const findCollapsed = (id) => {
@@ -123,13 +123,13 @@ const QuestionComponent = ({ item, index, showRepliesbtns = false, onShowReplyPr
           style={__styles.btn}
           noCapitalize
         />
-
-        <MyCheckBox
-          title='Show Replies to Client'
-          onPress={() => onShowReplyPress?.(item)}
-          pb={0}
-          value={!!item?.answer?.show_replies}
-        />
+        {!hideRepliesCheckBox &&
+          <MyCheckBox
+            title='Show Replies to Client'
+            onPress={() => onShowReplyPress?.(item)}
+            pb={0}
+            value={!!item?.answer?.show_replies}
+          />}
       </View>)
   }
 

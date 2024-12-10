@@ -13,19 +13,23 @@ import { TabBar, TabView } from 'react-native-tab-view'
 import RepliesView from './RepliesView'
 import { colors } from '../../../utilities/colors'
 import MyText from '../../../components/MyText'
+import { SELF_IMAGE_RESPONDED_MEMBER_DETAIL } from '../../../DAL/SelfImage'
+import moment from 'moment'
 // import QuestionComponent from './Components/QuestionComponent'
 
 
 const SelfImageDetail = ({ navigation, route }) => {
   const { token, user } = useSelector(selectUser);
   const layout = useWindowDimensions();
-  const { created_for, id: createdForId, memberId } = route?.params
+  const { created_for, id: createdForId, memberId, type } = route?.params
+  const isResponded = type == "responded";
   const [loader, setLoader] = useState(false);
   const [list, setList] = useState([])
   const [member, setMember] = useState(null)
-  const [myTabs] = useState([
-    { key: 'questions', title: 'Questions', index: 0 },
-    { key: 'replies', title: `${user?.first_name}'s Reply`, index: 1 }]);
+  const [myTabs] = useState(isResponded ?
+    [{ key: 'questions', title: 'Questions', index: 0 }] : [
+      { key: 'questions', title: 'Questions', index: 0 },
+      { key: 'replies', title: `${user?.first_name}'s Reply`, index: 1 }]);
   const [index, setIndex] = useState(0);
   const [replies, setReplies] = useState([])
 
@@ -63,14 +67,19 @@ const SelfImageDetail = ({ navigation, route }) => {
   }
 
   const getQuestionsListFromServer = async () => {
-    let res = await QUESTIONS_LIST({
-      token, navigation, body: {
-        created_for: created_for,
-        created_for_id: createdForId,
-        member_id: memberId,
-        check_user: true
-      }
-    })
+    let res = null;
+    if (isResponded) {
+      res = await SELF_IMAGE_RESPONDED_MEMBER_DETAIL({ token, navigation, memberId })
+    } else {
+      res = await QUESTIONS_LIST({
+        token, navigation, body: {
+          created_for: created_for,
+          created_for_id: createdForId,
+          member_id: memberId,
+          check_user: true
+        }
+      })
+    }
     if (res.code == 200) {
 
       setList(res?.questionnaire)
@@ -121,10 +130,14 @@ const SelfImageDetail = ({ navigation, route }) => {
   const renderScene = ({ route, }) => {
     switch (route.key) {
       case 'questions':
-        return <QuestionView list={list} loader={loader} onShowReplyPress={onShowReplyPress} member={member}
+        return <QuestionView
+          hideRepliesCheckBox={isResponded}
+          disableReplies={isResponded}
+          list={list} loader={loader} onShowReplyPress={onShowReplyPress} member={member}
           refresh={getQuestionsListFromServer} />
       case 'replies':
         return <RepliesView
+          type={type}
           list={replies}
           loader={loader}
           navigation={navigation}
@@ -139,7 +152,12 @@ const SelfImageDetail = ({ navigation, route }) => {
   const topView = () => {
     return (
       <View>
-        {!!member && <MemberView member={member} />}
+        {!!member &&
+          <View>
+            <MemberView member={member} />
+            {/* <MyText  >{isResponded ? `Completed on ` : ""}</MyText> */}
+          </View>
+        }
       </View>
     )
   }

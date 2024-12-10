@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import RootView from '../../../components/RootView'
 import { selectUser } from '../../../redux/reducers/userSlice';
 import { useSelector } from 'react-redux';
-import { GET_USER_LISTING_WHO_ASNWERED_BY_MODULE, PORTAL_DELETE_EVENT, PORTAL_EVENT_DELETE_MEMBER, PORTAL_EVENT_LIST, PORTAL_MEMBER_LISTING, SELF_IMAGE_INCOMPLETE, SELF_IMAGE_SAVE_AND_CLOSE } from '../../../DAL';
+import { GET_USER_LISTING_WHO_ASNWERED_BY_MODULE, PORTAL_DELETE_EVENT, PORTAL_EVENT_DELETE_MEMBER, PORTAL_EVENT_LIST, PORTAL_MEMBER_LISTING, SELF_IMAGE_INCOMPLETE, SELF_IMAGE_RESPONDED_MEMBER_LIST, SELF_IMAGE_SAVE_AND_CLOSE } from '../../../DAL';
 import MyLoader from '../../../components/MyLoader';
 import MyText from '../../../components/MyText';
 import { colors } from '../../../utilities/colors';
@@ -111,7 +111,8 @@ const ListForAllTypes = ({ navigation, route }) => {
     let obj = {
       created_for: item?.created_for,
       id: "",
-      memberId: item?.member_id
+      memberId: item?.member_id,
+      type:type
     };
     navigation.navigate(routes.selfImageDetail, obj)
   }
