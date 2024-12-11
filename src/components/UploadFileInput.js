@@ -67,7 +67,7 @@ const UploadFileInput = ({
             </TouchableOpacity>}
         </View>
 
-{console.log(selectedImage,"selectedImage")}
+
         {(!!selectedImage && Array.isArray(selectedImage)) ?
           <View style={{ marginTop: 10 }}>
             <FlatList

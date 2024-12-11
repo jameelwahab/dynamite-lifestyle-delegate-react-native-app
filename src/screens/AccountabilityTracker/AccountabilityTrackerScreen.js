@@ -17,7 +17,7 @@ import {
   ADD_ACCOUNTABILITY_TRACKER, DELETE_ACCOUNTABILITY_TRACKER,
   GET_ACCOUNTABILITY_TRACKER_BY_DATE, MOVE_TO_TOMMORROW,
   SET_ACCOUNTABILITY_TRACKER_REMINDER, UPDATE_ACCOUNTABILITY_TRACKER,
-  UPLOAD_FILE_TO_S3
+  UPLOAD_FILE_TO_S3,
 } from '../../DAL'
 import MyLoader from '../../components/MyLoader'
 import uuid from 'react-native-uuid';
@@ -75,7 +75,6 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
     time: "00:00"
   })
 
-  console.log(intentions, "intentions")
 
   useEffect(() => {
     setLoader(true)
@@ -128,7 +127,6 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
     }
 
     for (let i = 0; i < intentions.length; i++) {
-      console.log(intentions, "intentions")
       if (intentions[i]?.is_required == true && intentions[i]?.status == false) {
         showToast({ title: intentions[i].statement });
         return
@@ -590,7 +588,7 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
         </View>
 
 
-        {console.log(intentions, "intentions")}
+
         {intentions.map((item, index) => (
           <View key={`intenstions${index}`} style={[__styles.reminderView, { marginTop: 5, paddingBottom: 10 }]}>
             <View style={{ marginTop: 5 }}>

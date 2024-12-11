@@ -36,9 +36,7 @@ const AudioPlayerForList = ({ stop = "", url, id, loop = false, onLoopComplete, 
 
     if (active?.id == id) {
       let duration = parseInt(progress.duration);
-      console.log(duration, "duration")
       let position = progress.position;
-      console.log(position, "position")
       setDuration(duration);
       setPosition(position);
     }
@@ -46,20 +44,32 @@ const AudioPlayerForList = ({ stop = "", url, id, loop = false, onLoopComplete, 
 
 
   const load = async () => {
-    setLoading(id);
-    let uri = !!url.uri ? url.uri : noS3Url ? url : S3_URL + url;
-    console.log(uri,"uri")
-    await TrackPlayer.add({
-      id: id,
-      url: uri,
-      title: "",
-      artist: "",
-      album: '',
-      genre: '',
-      artwork: "",
-    });
-    TrackPlayer.play();
-    ended = false;
+    try {
+
+
+      setLoading(id);
+      let uri = !!url.uri ? url.uri : noS3Url ? url : S3_URL + url;
+      console.log(uri, "uri")
+      await TrackPlayer.add({
+        id: id,
+        url: uri,
+        // title: "",
+        // artist: "",
+        // album: '',
+        // genre: '',
+        // artwork: "",
+      });
+      TrackPlayer.play();
+      ended = false;
+    } catch (error) {
+      console.log(error, "trackplayer error")
+      TrackPlayer.reset();
+      TrackPlayer.stop()
+      setTimeout(() => {
+        setPlaying(false)
+        setLoading("")
+      }, 2000);
+    }
   }
 
 
@@ -78,6 +88,7 @@ const AudioPlayerForList = ({ stop = "", url, id, loop = false, onLoopComplete, 
 
 
   const { state: playerState } = usePlaybackState();
+  console.log(playerState, "playerState")
   if (playerState === "ready" && loading != "") {
     setLoading("")
   }
@@ -92,6 +103,11 @@ const AudioPlayerForList = ({ stop = "", url, id, loop = false, onLoopComplete, 
       repeat()
     }
   }
+  //  else if (playerState == "stopped" && loading != "") {
+  //   setLoading("")
+  //   setPlaying(false)
+  //   TrackPlayer.reset()
+  // }
 
 
   // useEffect(() => {

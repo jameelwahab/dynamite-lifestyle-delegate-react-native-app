@@ -82,3 +82,14 @@ export const GET_PAST_ACTIVITIES = ({ token, navigation }) => {
 }
 
 
+export const TRACK_HISTORY = ({ token, navigation, body: { content, date, id } }) => {
+  return invokeApi({
+    path: `api/daily_dynamite_tracker/update_tracker_history`,
+    method: "POST",
+    postData: { content, date, id },
+    token,
+    navigation,
+  })
+}
+
+
