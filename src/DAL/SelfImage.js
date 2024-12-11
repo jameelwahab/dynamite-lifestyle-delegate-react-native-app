@@ -20,9 +20,9 @@ export const SELF_IMAGE_RESPONDED_MEMBER_DETAIL = ({ token, navigation, memberId
 }
 
 
-export const SELF_IMAGE_SAVE_AND_CLOSE = ({ token, navigation, memberId,isNotify }) => {
+export const SELF_IMAGE_SAVE_AND_CLOSE = ({ token, navigation, memberId,type }) => {
   return invokeApi({
-    path: `api/questionnaire/self_image/responded/${memberId}?is_notify_user=${isNotify}`,
+    path: `api/questionnaire/self_image/responded/${memberId}?type=${type}`,
     method: "GET",
     token,
     navigation,

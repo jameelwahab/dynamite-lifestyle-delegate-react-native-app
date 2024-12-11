@@ -110,10 +110,10 @@ const ListForAllTypes = ({ navigation, route }) => {
     //   sendReminder(item)
     // } 
     else if (type == "save") {
-      SaveAndCompleteFromServer(item, true)
+      SaveAndCompleteFromServer(item, "close_and_notify")
     }
     else if (type == "close") {
-      SaveAndCompleteFromServer(item, false)
+      SaveAndCompleteFromServer(item, "close")
     }
   }
 
@@ -158,9 +158,9 @@ const ListForAllTypes = ({ navigation, route }) => {
     }
   }
 
-  const SaveAndCompleteFromServer = async (member, isNotify) => {
+  const SaveAndCompleteFromServer = async (member, type) => {
     setLoader(true);
-    let res = await SELF_IMAGE_SAVE_AND_CLOSE({ navigation, token, memberId: member?.member_id, isNotify })
+    let res = await SELF_IMAGE_SAVE_AND_CLOSE({ navigation, token, memberId: member?.member_id, type })
     if (res.code == 200) {
       showToast({ type: 'success', title: res.message });
       setList((old) => old.filter(x => x._id != member?._id))
