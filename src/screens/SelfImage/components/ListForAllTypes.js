@@ -81,7 +81,12 @@ const ListForAllTypes = ({ navigation, route }) => {
       if (opt.key == "save") {
         setConfirmModal({
           isVisible: true, item, type: opt.key,
-          statement: "Are you sure you want save and close?"
+          statement: "Are you sure you want save and notify user?"
+        })
+      } if (opt.key == "close") {
+        setConfirmModal({
+          isVisible: true, item, type: opt.key,
+          statement: "Are you sure you want close?"
         })
       } else if (opt.key == "incomplete") {
         setConfirmModal({
@@ -100,12 +105,15 @@ const ListForAllTypes = ({ navigation, route }) => {
     setConfirmModal({ isVisible: false, item: null, statement: "", type: "" });
     if (type == "incomplete") {
       incompleteFromServer(item)
-    } 
+    }
     // else if (type == "reminder") {
     //   sendReminder(item)
     // } 
     else if (type == "save") {
-      SaveAndCompleteFromServer(item)
+      SaveAndCompleteFromServer(item, true)
+    }
+    else if (type == "close") {
+      SaveAndCompleteFromServer(item, false)
     }
   }
 
@@ -114,7 +122,7 @@ const ListForAllTypes = ({ navigation, route }) => {
       created_for: item?.created_for,
       id: "",
       memberId: item?.member_id,
-      type:type
+      type: type
     };
     navigation.navigate(routes.selfImageDetail, obj)
   }
@@ -150,9 +158,9 @@ const ListForAllTypes = ({ navigation, route }) => {
     }
   }
 
-  const SaveAndCompleteFromServer = async (member) => {
+  const SaveAndCompleteFromServer = async (member, isNotify) => {
     setLoader(true);
-    let res = await SELF_IMAGE_SAVE_AND_CLOSE({ navigation, token, memberId: member?.member_id })
+    let res = await SELF_IMAGE_SAVE_AND_CLOSE({ navigation, token, memberId: member?.member_id, isNotify })
     if (res.code == 200) {
       showToast({ type: 'success', title: res.message });
       setList((old) => old.filter(x => x._id != member?._id))
@@ -317,10 +325,19 @@ const optionsListForComplete = [
     icon: icons.edit
   },
   {
-    title: "Save & Close",
+    title: "Close",
+    key: "close",
+    icon: icons.edit
+  },
+  {
+    title: "Save & Notify",
     key: "save",
     icon: icons.edit
   },
+
+
+
+
   {
     title: "Incomplete",
     key: "incomplete",
