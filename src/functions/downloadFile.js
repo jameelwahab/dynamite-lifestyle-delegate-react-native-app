@@ -2,7 +2,7 @@ import { View, Text } from 'react-native'
 import React from 'react'
 import ReactNativeBlobUtil from "react-native-blob-util"
 import showToast from './showToast';
-const downloadFile = (url, path) => {
+const downloadFile = async (url, path) => {
 
 
 
@@ -24,7 +24,7 @@ const downloadFile = (url, path) => {
       }
     }
 
-    config(options).fetch('GET', url).then(async (res) => {
+    await config(options).fetch('GET', url).then(async (res) => {
       showToast({ title: "Downloaded", body: "File downloaded", type: "success" });
     }).catch((errorMessage, statusCode) => {
 
@@ -47,7 +47,7 @@ const downloadFile = (url, path) => {
       path: ReactNativeBlobUtil.fs.dirs.DocumentDir + "/" + path + ext,
     }
 
-    config(options).fetch('GET', url).then(async (res) => {
+    await config(options).fetch('GET', url).then(async (res) => {
 
 
       showToast({ title: "Downloaded", body: "Recources downloaded", type: "success" });

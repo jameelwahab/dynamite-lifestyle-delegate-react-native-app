@@ -57,12 +57,17 @@ const Comments = ({ commentsList, ticket, user, autoMessages, addMessage, listRo
   }
 
   const toggleDownloer = (path) => {
+
+    downloader[path] = true
+
+    setDownloader({ ...downloader })
+  }
+
+  const toggleOffDownloer = (path) => {
     if (downloader[path]) {
       delete downloader[path]
-    } else {
-      downloader[path] = true
+      setDownloader({ ...downloader })
     }
-    setDownloader({ ...downloader })
   }
 
   const updateMsg = (msg) => {
@@ -141,15 +146,18 @@ const Comments = ({ commentsList, ticket, user, autoMessages, addMessage, listRo
                 {!!fileIcon &&
                   <View style={{ position: "absolute", right: 10, bottom: 10, zIndex: 2 }}>
                     <TouchableOpacity
-                      onPress={() => {
+                      disabled={isDownloading}
+                      onPress={async () => {
+                        toggleDownloer(x?.thumbnail_1)
                         if (fileIcon) {
-                          downloadFile(S3_URL + x?.thumbnail_1)
+                          await downloadFile(S3_URL + x?.thumbnail_1)
                         } else {
-                          downloadImage(S3_URL + x?.thumbnail_1)
+                          await downloadImage(S3_URL + x?.thumbnail_1)
                         }
+                        toggleOffDownloer(x?.thumbnail_1)
                       }}
                       style={{ height: 35, width: 35, alignItems: "center", justifyContent: "center", backgroundColor: colors.lightPrimary3, borderRadius: 35 / 2 }}>
-                      {icons.download()}
+                      {isDownloading?<SimpleLoader/>:icons.download()}
                     </TouchableOpacity>
                   </View>}
                 <Pressable
@@ -183,17 +191,19 @@ const Comments = ({ commentsList, ticket, user, autoMessages, addMessage, listRo
 
                     <View style={{ height: "100%", aspectRatio: 1, alignItems: "center", justifyContent: "center" }}>
                       <TouchableOpacity
-                        onPress={() => {
-                          // toggleDownloer(x?.thumbnail_1)
+                        disabled={isDownloading}
+                        onPress={async () => {
+                          toggleDownloer(x?.thumbnail_1)
                           if (fileIcon) {
-                            downloadFile(S3_URL + x?.thumbnail_1)
+                            await downloadFile(S3_URL + x?.thumbnail_1)
                           } else {
-                            downloadImage(S3_URL + x?.thumbnail_1)
+                            await downloadImage(S3_URL + x?.thumbnail_1)
                           }
-                          // toggleDownloer(x?.thumbnail_1)
+                          console.log("hi")
+                          toggleOffDownloer(x?.thumbnail_1)
                         }}
                         style={{ height: 35, width: 35, alignItems: "center", justifyContent: "center", backgroundColor: colors.lightPrimary3, borderRadius: 35 / 2 }}>
-                        {icons.download()}
+                        {isDownloading?<SimpleLoader/>: icons.download()}
                       </TouchableOpacity>
                     </View>
                   </View>}

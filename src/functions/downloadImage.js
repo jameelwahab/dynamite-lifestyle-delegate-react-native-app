@@ -7,7 +7,6 @@ import ReactNativeBlobUtil from "react-native-blob-util"
 
 const downloadImage = async (url) => {
   // if (Platform.OS === "android") {
-  console.log(ReactNativeBlobUtil.fs.dirs, "dirs")
   let granted = await requestWritePermission()
   if (granted) {
     const { config, fs } = ReactNativeBlobUtil;
@@ -23,7 +22,7 @@ const downloadImage = async (url) => {
         description: 'downloading_file'
       }
     };
-    config(options)
+    await config(options)
       .fetch('GET', url)
       .then(async res => {
         if (!!res.path()) {
