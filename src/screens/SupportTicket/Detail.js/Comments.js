@@ -23,6 +23,9 @@ import showToast from '../../../functions/showToast'
 import ImageZoomer from '../../../components/ImageZoomer'
 import EmptyView from '../../../components/EmptyView'
 import { convertTimezone } from '../../../functions/convertTime'
+import getFileIconByType from '../../../functions/getFileIconByType'
+import downloadFile from '../../../functions/downloadFile'
+import { openUrl } from '@ronradtke/react-native-markdown-display'
 const Comments = ({ commentsList, ticket, user, autoMessages, addMessage, listRoute, timezone, isMine }) => {
   const { token } = useSelector(selectUser)
   const navigation = useNavigation()
@@ -119,40 +122,67 @@ const Comments = ({ commentsList, ticket, user, autoMessages, addMessage, listRo
 
 
         <View style={{ marginTop: 10 }}>
-          {!!item?.comment_image && item?.comment_image.map((x, i) => (
-            <View
-              key={x?.thumbnail_1}
-              style={{
-                backgroundColor: colors.secondaryVariant, height: 200, borderRadius: 10, marginBottom: 15,
-                shadowColor: "#FFF",
-                shadowOffset: {
-                  width: 0,
-                  height: 1,
-                },
-                shadowOpacity: 0.20,
-                shadowRadius: 1.41,
+          {!!item?.comment_image && item?.comment_image.map((x, i) => {
+            let fileIcon = getFileIconByType(x?.thumbnail_1);
+            return (
+              <View
+                key={x?.thumbnail_1}
+                style={{
+                  backgroundColor: colors.secondaryVariant, height: 200, borderRadius: 10, marginBottom: 15,
+                  shadowColor: "#FFF",
+                  shadowOffset: {
+                    width: 0,
+                    height: 1,
+                  },
+                  shadowOpacity: 0.20,
+                  shadowRadius: 1.41,
 
-                elevation: 2,
-              }}>
-              <Pressable onPress={() => setModalImage(x?.thumbnail_1)}>
-                <MyImage source={{ uri: S3_URL + x?.thumbnail_1 }} style={{ height: 150, width: "100%" }}
-                  imageStyle={{ borderTopLeftRadius: 10, borderTopRightRadius: 10, }} />
-              </Pressable>
-              <View style={{ flex: 1, flexDirection: "row", justifyContent: "space-between" }}>
-                <View style={{ height: "100%", aspectRatio: 1, alignItems: "center", justifyContent: "center" }}>
-                  <Image opacity={0.7} source={icons.photo} style={{ height: 25, width: 25 }} />
-                </View>
+                  elevation: 2,
+                }}>
+                <Pressable onPress={() => {
+                  if (fileIcon) {
+                    openUrl(S3_URL + x?.thumbnail_1)
+                  } else {
+                    setModalImage(x?.thumbnail_1)
+                  }
+                }}>
+                  {fileIcon ?
+                    <View style={{ height: 150, width: "100%", borderTopLeftRadius: 10, borderTopRightRadius: 10, justifyContent: "center", alignItems: "center" }}>
+                      <Image
+                        source={fileIcon}
+                        resizeMode="contain"
+                        style={{
+                          height: 100, width: 100,
+                        }}
+                      />
+                    </View> :
+                    <MyImage source={{ uri: S3_URL + x?.thumbnail_1 }} style={{ height: 150, width: "100%" }}
+                      imageStyle={{ borderTopLeftRadius: 10, borderTopRightRadius: 10, }} />}
+                </Pressable>
+                <View style={{ flex: 1, flexDirection: "row", justifyContent: "space-between" }}>
+                  {!!fileIcon ?
+                    <View /> :
+                    <View style={{ height: "100%", aspectRatio: 1, alignItems: "center", justifyContent: "center" }}>
+                      <Image opacity={0.7} source={icons.photo} style={{ height: 25, width: 25 }} />
+                    </View>}
 
-                <View style={{ height: "100%", aspectRatio: 1, alignItems: "center", justifyContent: "center" }}>
-                  <TouchableOpacity
-                    onPress={() => downloadImage(S3_URL + x?.thumbnail_1)}
-                    style={{ height: 35, width: 35, alignItems: "center", justifyContent: "center", backgroundColor: colors.lightPrimary3, borderRadius: 35 / 2 }}>
-                    {icons.download()}
-                  </TouchableOpacity>
+                  <View style={{ height: "100%", aspectRatio: 1, alignItems: "center", justifyContent: "center" }}>
+                    <TouchableOpacity
+                      onPress={() => {
+                        if (fileIcon) {
+                          downloadFile(S3_URL + x?.thumbnail_1)
+                        } else {
+                          downloadImage(S3_URL + x?.thumbnail_1)
+                        }
+                      }}
+                      style={{ height: 35, width: 35, alignItems: "center", justifyContent: "center", backgroundColor: colors.lightPrimary3, borderRadius: 35 / 2 }}>
+                      {icons.download()}
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </View>
-            </View>
-          ))}
+            )
+          })}
         </View>
       </View>
     )

@@ -515,7 +515,7 @@ PODS:
     - glog
   - react-native-blob-util (0.19.11):
     - React-Core
-  - react-native-cameraroll (7.8.4):
+  - react-native-cameraroll (7.9.0):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
   - react-native-charts-wrapper (0.6.0):
@@ -527,12 +527,12 @@ PODS:
   - react-native-document-picker (9.3.1):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
-  - react-native-pager-view (6.3.0):
+  - react-native-pager-view (6.4.1):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
   - react-native-render-html (6.3.4):
     - React-Core
-  - react-native-safe-area-context (4.14.0):
+  - react-native-safe-area-context (4.14.1):
     - React-Core
   - react-native-slider (4.5.5):
     - RCT-Folly (= 2021.07.22.00)
@@ -644,7 +644,7 @@ PODS:
     - React-Core
   - RNCClipboard (1.15.0):
     - React-Core
-  - RNCPicker (2.9.0):
+  - RNCPicker (2.10.2):
     - React-Core
   - RNDateTimePicker (8.2.0):
     - React-Core
@@ -671,18 +671,20 @@ PODS:
     - FirebaseCoreExtension (= 10.15.0)
     - React-Core
     - RNFBApp
+  - RNFileViewer (2.1.5):
+    - React-Core
   - RNGestureHandler (2.21.2):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
   - RNGoogleSignin (12.2.1):
     - GoogleSignIn (~> 7.1)
     - React-Core
-  - RNImageCropPicker (0.41.5):
+  - RNImageCropPicker (0.41.6):
     - React-Core
     - React-RCTImage
-    - RNImageCropPicker/QBImagePickerController (= 0.41.5)
+    - RNImageCropPicker/QBImagePickerController (= 0.41.6)
     - TOCropViewController (~> 2.7.4)
-  - RNImageCropPicker/QBImagePickerController (0.41.5):
+  - RNImageCropPicker/QBImagePickerController (0.41.6):
     - React-Core
     - React-RCTImage
     - TOCropViewController (~> 2.7.4)
@@ -875,6 +877,7 @@ DEPENDENCIES:
   - "RNFBApp (from `../node_modules/@react-native-firebase/app`)"
   - "RNFBCrashlytics (from `../node_modules/@react-native-firebase/crashlytics`)"
   - "RNFBMessaging (from `../node_modules/@react-native-firebase/messaging`)"
+  - RNFileViewer (from `../node_modules/react-native-file-viewer`)
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - "RNGoogleSignin (from `../node_modules/@react-native-google-signin/google-signin`)"
   - RNImageCropPicker (from `../node_modules/react-native-image-crop-picker`)
@@ -1063,6 +1066,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-firebase/crashlytics"
   RNFBMessaging:
     :path: "../node_modules/@react-native-firebase/messaging"
+  RNFileViewer:
+    :path: "../node_modules/react-native-file-viewer"
   RNGestureHandler:
     :path: "../node_modules/react-native-gesture-handler"
   RNGoogleSignin:
@@ -1148,13 +1153,13 @@ SPEC CHECKSUMS:
   React-jsinspector: e591d9ecb571456fc929ee10409d8847a442d6a7
   React-logger: 70ddbe0e07179c8adb94c4bffc36c6abc952d3d4
   react-native-blob-util: 39a20f2ef11556d958dc4beb0aa07d1ef2690745
-  react-native-cameraroll: 24fadeafaf83448a329371494ba291d8413132ae
+  react-native-cameraroll: 0789488d9f5e79caed73c078daaf58f79ed3c61c
   react-native-charts-wrapper: cd83d9b1acb8e06ebd18bf297de597906e1cc87d
   react-native-date-picker: 312c387d2ff873c66c5e4cf78ff6827fa91644e2
   react-native-document-picker: 52eab29bbc53f45399b475b7a3f4e503260f1134
-  react-native-pager-view: 40d9ec4a63ed74f8aa2f1e1bba7c1e0b4080d8a6
+  react-native-pager-view: d1e43158dd108b1b7377d7972157317e06dcc579
   react-native-render-html: 984dfe2294163d04bf5fe25d7c9f122e60e05ebe
-  react-native-safe-area-context: 4532f1a0c5d34a46b9324ccaaedcb5582a302b7d
+  react-native-safe-area-context: 141eca0fd4e4191288dfc8b96a7c7e1c2983447a
   react-native-slider: 3ce2efe4e261f6e000622ec44536faca44bb13d3
   react-native-splash-screen: 4312f786b13a81b5169ef346d76d33bc0c6dc457
   react-native-track-player: 97d76dbbd35f27cc709e5f04540615e54264b3f9
@@ -1177,7 +1182,7 @@ SPEC CHECKSUMS:
   RNCAsyncStorage: ec53e44dc3e75b44aa2a9f37618a49c3bc080a7a
   RNCCheckbox: a3ca9978cb0846b981d28da4e9914bd437403d77
   RNCClipboard: 69ab8e51324d5b351f6ba72bbdb72478087a2c64
-  RNCPicker: f963e01f78e546a93b98aa201501713dbda14e94
+  RNCPicker: d162737e03e48797110dbb60e5ddc03012e87e0b
   RNDateTimePicker: 40ffda97d071a98a10fdca4fa97e3977102ccd14
   RNDeviceInfo: b899ce37a403a4dea52b7cb85e16e49c04a5b88e
   RNFastImage: 5c9c9fed9c076e521b3f509fe79e790418a544e8
@@ -1185,9 +1190,10 @@ SPEC CHECKSUMS:
   RNFBApp: 082df9f8ffba99f23f7aee3ecb64df703e7e1adb
   RNFBCrashlytics: 9d5b36a7e280178c5d61695936cb812005bf17ad
   RNFBMessaging: b167065ee2fcc7fe43a32b35d79d5eb23bceb4ad
+  RNFileViewer: ce7ca3ac370e18554d35d6355cffd7c30437c592
   RNGestureHandler: 0972b77a2cab0f1a61ca1a3ce348a424614f65c2
   RNGoogleSignin: 08dc4ba7eac2096c7fecfe109f0950fa4683c803
-  RNImageCropPicker: a536bb88eade8336e1d18fdeafa77dc893fbc42e
+  RNImageCropPicker: 8e39c01f205e00d739c31e682f068aac315587bf
   RNNotifee: 5155e0a5e0a97d0c839030d8192783cd63053999
   RNPermissions: f9a0380dad4d370b6b983acaf4f9bff07aba9a21
   RNReactNativeHapticFeedback: 35ab91df9e7a1e4513806e3c091293c97fe38c83

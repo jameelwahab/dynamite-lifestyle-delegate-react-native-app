@@ -98,7 +98,6 @@ const ChatList = ({ navigation }) => {
   }
 
   const loadmore = () => {
-    console.log("loadmore", canLoadMore && __firstTime == false)
     if (canLoadMore && __firstTime == false) {
       canLoadMore = false;
       setFooterLoader(true);
@@ -111,7 +110,6 @@ const ChatList = ({ navigation }) => {
 
   useEffect(() => {
     if (!__firstTime) {
-      console.log("HI", __firstTime)
       page = 0;
       canLoadMore = false;
       debounce(() => api_ChatList(true))
@@ -120,7 +118,6 @@ const ChatList = ({ navigation }) => {
 
   useEffect(() => {
     if (!__firstTime) {
-      console.log("HI 2", __firstTime)
       page = 0;
       canLoadMore = false;
       setLoader(true);
@@ -131,7 +128,6 @@ const ChatList = ({ navigation }) => {
 
 
   useEffect(() => {
-    console.log("HI 3", __firstTime)
     page = 0;
     canLoadMore = false;
     setLoader(true);
@@ -159,16 +155,12 @@ const ChatList = ({ navigation }) => {
   }
 
   const readMsgSingnal = (data) => {
-    console.log("chat_message_status", data);
     if (data.status == "read") {
       setChatList((chatList) => {
         let index = chatList.findIndex(chat => chat._id == data.chat_id);
         if (index > -1) {
-          console.log(chatList[index], "chatObj")
           if (chatList[index].last_message_sender == user?._id) {
             chatList[index].last_message_status = "read";
-
-            console.log(chatList, "read 2")
           }
         }
         return [...chatList]
@@ -178,7 +170,6 @@ const ChatList = ({ navigation }) => {
   }
 
   const newMsgReceive = (data) => {
-    console.log(data, "whatsapp_chat_message_event_receiver", "chatlisting")
 
     if (!!data?.data?.response) {
       let newChatObj = data?.data?.response;

@@ -97,8 +97,11 @@ const List = ({ navigation, route }) => {
     if (item?.note.includes("audio")) {
       audioUrl = getSrcFromHtml(item?.note);
     }
+    let isColoredNote = item.action_source_type && item.action_source_type === "member_user"
     return (
-      <View style={__styles.itemRootView}>
+      <View style={[__styles.itemRootView, {
+        backgroundColor: isColoredNote ? "#e4e6eb" : colors.secondary
+      }]}>
         <View style={__styles.itemUserView}>
           <UserImage
             image={item?.action_info?.profile_image}
@@ -111,7 +114,7 @@ const List = ({ navigation, route }) => {
               <MyText color={colors.primary} fontSize={14} >
                 {`${item?.action_info?.name} ${item?.action_by == "admin_user" ? "(Admin)" : "(Delegate)"} `}
               </MyText>
-              <MyText fontSize={10} color={colors.lightText2} >{"Created at: " + convertTimezone(item?.note_date_time, timezone).format(dateTimeFormat.dateTime)}</MyText>
+              <MyText fontSize={10} color={isColoredNote ? colors.grey : colors.lightText2} >{"Created at: " + convertTimezone(item?.note_date_time, timezone).format(dateTimeFormat.dateTime)}</MyText>
             </View>
 
             {item?.action_by != "admin_user" &&
@@ -124,6 +127,7 @@ const List = ({ navigation, route }) => {
         </View>
         <View style={{ paddingVertical: 5 }}>
           <MyWebview
+            invert={isColoredNote}
             html={item?.note}
           />
         </View>

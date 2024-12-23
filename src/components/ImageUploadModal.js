@@ -4,7 +4,7 @@ import Modal from 'react-native-modal'
 import { colors } from '../utilities/colors'
 import ImageCropPicker from 'react-native-image-crop-picker'
 import showToast from '../functions/showToast'
-import DocumentPicker from 'react-native-document-picker'
+import DocumentPicker, { types } from 'react-native-document-picker'
 
 import MyText from './MyText'
 import { icons } from '../utilities/icons'
@@ -110,10 +110,20 @@ const ImageUploadModal = ({
 
   }
 
+  
+
   const openDocument = async () => {
     try {
-      let res = await DocumentPicker.pick();
-      onImagePicked(res[0])
+      let res = await DocumentPicker.pick({
+        allowMultiSelection: multiple,
+        type: [types.csv, types.doc, types.docx, types.xls, types.xlsx, types.images, types.pdf],
+      });
+      console.log(res, "document")
+      if (multiple) {
+        onImagePicked(res)
+      } else {
+        onImagePicked(res[0])
+      }
     } catch (e) {
       console.log(e, "e")
     }

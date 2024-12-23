@@ -19,6 +19,8 @@ import MyLoader from '../../../components/MyLoader';
 import { S3_URL } from '../../../utilities/constants';
 import MyImage from '../../../components/MyImage';
 import ImageZoomer from '../../../components/ImageZoomer';
+import getFileIconByType from '../../../functions/getFileIconByType';
+import previewLocalFile from '../../../functions/previewLocalFile';
 
 
 
@@ -146,7 +148,7 @@ const TicketReply = ({ navigation, route }) => {
         <View>
           {showEditor && EditorView()}
           <View style={{ paddingVertical: 10 }}>
-            <MyText color={colors.primary} fontSize={16} type='medium' >Upload Images
+            <MyText color={colors.primary} fontSize={16} type='medium' >Attachments
               <MyText color={colors.primary} fontSize={12}> (1000x670)</MyText>
             </MyText>
           </View>
@@ -178,34 +180,51 @@ const TicketReply = ({ navigation, route }) => {
                 </View>
               )
             } else {
+              let uri = !!item?.thumbnail_1 ? S3_URL + item?.thumbnail_1 : item.uri;
+              let fileIcon = getFileIconByType(uri, item?.name || undefined);
+
               return (
                 <View
                   style={{ width: oneFourthOfScreen, height: oneFourthOfScreen }}>
                   <View style={{ margin: 5, flex: 1, borderRadius: 10, alignItems: "center", justifyContent: "center", }}>
                     <Pressable onPress={() => {
-                      if (!!item?.thumbnail_1) {
+                      if (fileIcon) {
+                        if (item?.thumbnail_1) {
+                          openUrl(uri)
+                        } else {
+                          previewLocalFile(uri)
+                        }
+                      }
+                      else if (!!item?.thumbnail_1) {
                         setModalImage({ uri: item?.thumbnail_1, noUrl: false });
                       } else {
                         setModalImage({ uri: item.uri, noUrl: true });
                       }
                     }}
-                      style={{ height: "100%", width: '100%', }}
-                    >
-                      <MyImage
-                        source={{
-                          uri: !!item?.thumbnail_1 ?
-                            S3_URL + item?.thumbnail_1 :
-                            item.uri
-                        }}
-                        style={{ height: "100%", width: '100%', }}
-                        imageStyle={{ borderRadius: 10, }}
-                      />
+                      style={{ height: "100%", width: '100%', }}>
+                      {fileIcon ?
+                        <View style={{ height: "100%", width: '100%', alignItems: "center", justifyContent: "center", backgroundColor: colors.secondary, borderRadius: 10 }}>
+                          <Image
+                            source={fileIcon}
+                            resizeMode="contain"
+                            style={{ borderRadius: 10, height: "80%", width: "80%", }}
+                          />
+                        </View>
+                        :
+                        <MyImage
+                          source={{
+                            uri: !!item?.thumbnail_1 ?
+                              S3_URL + item?.thumbnail_1 :
+                              item.uri
+                          }}
+                          style={{ height: "100%", width: '100%', }}
+                          imageStyle={{ borderRadius: 10, }}
+                        />}
                     </Pressable>
 
                     <Pressable
                       onPress={() => removeImage(index)}
-                      style={{ position: "absolute", height: 25, width: 25, backgroundColor: colors.delete, alignItems: "center", justifyContent: "center", top: -5, right: -5, borderRadius: 25 / 2 }}
-                    >
+                      style={{ position: "absolute", height: 25, width: 25, backgroundColor: colors.delete, alignItems: "center", justifyContent: "center", top: -5, right: -5, borderRadius: 25 / 2 }}>
                       {icons.crosss()}
                     </Pressable>
                   </View>
@@ -226,6 +245,7 @@ const TicketReply = ({ navigation, route }) => {
         onImagePicked={(image) => setImages([...images, ...image])}
         closeModal={() => setIsImageModalVisible(false)}
         multiple={true}
+        enableDocument={true}
       />
       <ImageZoomer
         closeModal={() => setModalImage({ isUrl: false, uri: "" })}

@@ -5,7 +5,7 @@ import MyText from '../../../components/MyText'
 import invokeApi from '../../../functions/invokeAPI'
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../../redux/reducers/userSlice'
-import { IS_CHAT_EXIST, LIST_OF_MEMBERS, LIST_OF_MEMBERS_ONLY, LIST_OF_NURTURE } from '../../../DAL'
+import { IS_CHAT_EXIST, LIST_OF_MEMBERS, LIST_OF_MEMBERS_ONLY, LIST_OF_NURTURE, UPDATE_CALL_FUNCTIONALITY } from '../../../DAL'
 import { colors } from '../../../utilities/colors'
 import numFormatter from '../../../functions/numFormatter'
 import UserImage from '../../../components/UserImage'
@@ -35,6 +35,9 @@ import showToast from '../../../functions/showToast'
 import LeadModal from '../Components/LeadModal'
 import LeadHistoryModal from '../Components/LeadHistoryModal'
 import InfoModal from '../../../components/InfoModal'
+import ConfirmationModal2 from '../../../components/ConfirmationModal2'
+import OptionModal2 from '../../../components/OptionModal2'
+import breakReference from '../../../functions/breakReference'
 
 
 
@@ -44,6 +47,8 @@ let isFirst = true;
 let controller;
 const MemberList = ({ navigation, route }) => {
   const ref_infoModal = useRef()
+  const ref_optionModal = useRef()
+  const ref_confirmModal = useRef()
   const { type } = route?.params;
   const isAllMembers = type == "all-member";
   const isMembers = type == "member";
@@ -72,20 +77,31 @@ const MemberList = ({ navigation, route }) => {
     value: sort.key,
     type: "sort"
   }])
-  const [optionModal, setOptionModal] = useState({
-    isVisible: false,
-    selectedItem: null,
-  })
 
   const updateFilter = (updation) => {
-    // console.log(updation,"updateFilter")
     setFilter((filter) => ({ ...filter, ...updation }))
     setIsSavedFilterApplied(false)
   }
 
-  const onOptSelected = (opt) => {
-    let { selectedItem: item } = optionModal;
-    setOptionModal({ isVisible: false, selectedItem: null });
+  const updateCallAPI = async (member) => {
+
+    let res = await UPDATE_CALL_FUNCTIONALITY({
+      token, navigation, body: {
+        is_call_allowed: !member?.is_call_allowed,
+        member_id: member?._id,
+      }
+    });
+    if (res?.code == 200) {
+      showToast({ type: "success", title: res?.message });
+      let data = breakReference(member);
+      data["is_call_allowed"] = !data["is_call_allowed"]
+      updateData(data)
+    } else {
+
+    }
+  }
+
+  const onOptSelected = (opt, item) => {
     if (opt?.key == "notes") {
       navigation.navigate(routes.memberNotesListing, {
         for: "members",
@@ -105,13 +121,21 @@ const MemberList = ({ navigation, route }) => {
       navigation.navigate(routes.memberProfile, {
         memberId: item?._id,
       })
+    } else if (opt?.key == "update_call") {
+      setTimeout(() => {
+        
+      
+      ref_confirmModal?.current?.openModal({
+        title: `Are you sure you want to ${item?.is_call_allowed ? "disable" : "enable"} call functionality for this user?`,
+        agreeFunc: () => updateCallAPI(item)
+      })
+    }, 500);
     }
 
   }
 
   const updateData = (memberObj) => {
     let index = list.findIndex(x => x._id === memberObj?._id);
-    console.log(list[index], memberObj, "updateData")
     if (index > -1) {
       list.splice(index, 1, memberObj);
       setList([...list]);
@@ -131,7 +155,6 @@ const MemberList = ({ navigation, route }) => {
         `${RNFetchBlob.fs.dirs.DocumentDir}/CSV/data.csv` :
         `${RNFetchBlob.fs.dirs.DownloadDir}/CSV/data.csv`;
 
-    console.log(file, "file")
 
     RNFetchBlob.fs
       .writeFile(pathToWrite, file, 'utf8')
@@ -146,11 +169,8 @@ const MemberList = ({ navigation, route }) => {
             pathToWrite // Path to the file being copied in the apps own storage
           );
           showToast({ title: "CSV File Downloaded", type: "success" })
-          console.log(result)
         } else if (Platform.OS == "ios") {
-          console.log(res, "res")
           showToast({ title: "CSV File Downloaded", type: "success" })
-          console.log(await RNFetchBlob.fs.ls(RNFetchBlob.fs.dirs.DocumentDir + "/CSV"))
         }
       })
       .catch(error => console.error(error));
@@ -172,7 +192,6 @@ const MemberList = ({ navigation, route }) => {
   }
 
   const filterTheData = (obj, data, isSavedFilter, isFilter) => {
-    // console.log(data?.lead_status, "leaf_status")
     let list = [];
 
     if (!!sorted) {
@@ -184,7 +203,6 @@ const MemberList = ({ navigation, route }) => {
       list.push(nOBj)
     }
     Object.keys(obj).forEach((x, i) => {
-      // console.log(obj[x], 'Check');
       if (Array.isArray(obj[x])) {
         if (x == "community") {
           obj[x].forEach((z, j) => {
@@ -200,7 +218,6 @@ const MemberList = ({ navigation, route }) => {
           let id = obj[x][0]
           if (!!id) {
             let label = data?.sale_pages.find((x) => x._id == id)?.sale_page_title;
-            console.log(label, "event_page")
             let nOBj = {
               label: label,
               value: id,
@@ -211,7 +228,6 @@ const MemberList = ({ navigation, route }) => {
         } else if (x == "lead_status") {
           obj[x].forEach((z, j) => {
             let label = data?.lead_status.find(y => y._id == z)?.title;
-            console.log(label, "lead_status")
             if (label) {
               let nOBj = {
                 label: label,
@@ -253,7 +269,6 @@ const MemberList = ({ navigation, route }) => {
           list.push(nOBj);
         }
       } else if (x == 'status' && typeof (obj[x]) == "boolean") {
-        console.log(obj[x], 'status')
         let nOBj = {
           label: obj[x] ? "Active" : "Inactive",
           value: "statusActive",
@@ -261,16 +276,13 @@ const MemberList = ({ navigation, route }) => {
         }
         list.push(nOBj);
       } else if (x == 'downloaded_app' && typeof (obj[x]) == "boolean") {
-        console.log(obj[x], 'downloaded_app')
         let nOBj = {
           label: obj[x] ? "Downloaded" : "Not Downloaded",
           value: obj[x],
           type: x
         }
-        console.log(nOBj, "downloaded_app")
         list.push(nOBj);
       } else if (x == 'user_status_type' && !!obj[x]) {
-        // console.log(obj[x],x,"user_status_type")
         let nOBj = {
           label: obj[x],
           value: obj[x],
@@ -315,10 +327,6 @@ const MemberList = ({ navigation, route }) => {
         list.push(nOBj);
       }
     })
-
-    console.log(data, "FilterData")
-    console.log(obj, "Filter")
-    console.log(list, "FilterChips")
     setFilterChipList(list);
     setIsFilterApplied(isFilter)
     setIsSavedFilterApplied(isSavedFilter)
@@ -361,7 +369,6 @@ const MemberList = ({ navigation, route }) => {
       setList([])
     }
     let res;
-    console.log(Filter,'Filter')
     Keyboard.dismiss();
     if (isAllMembers) {
       res = await LIST_OF_MEMBERS({
@@ -465,7 +472,6 @@ const MemberList = ({ navigation, route }) => {
   }
 
   useEffect(() => {
-    console.log(sorted, "sorted")
     page = 0;
     canLoadMore = false
     getMembers(true)
@@ -827,7 +833,7 @@ const MemberList = ({ navigation, route }) => {
 
   const renderMemberList = useCallback(({ item, index }) => {
     return (
-      <View style={__styles.memberRootView}>
+      <View style={[__styles.memberRootView]}>
 
         <View style={__styles.memberProfileView}>
           <Pressable
@@ -879,10 +885,7 @@ const MemberList = ({ navigation, route }) => {
           <MenuButton
             size={20}
             onPress={() => {
-              setOptionModal({
-                isVisible: true,
-                selectedItem: item
-              })
+              ref_optionModal?.current?.openModal?.(item)
             }}
           />
 
@@ -925,6 +928,8 @@ const MemberList = ({ navigation, route }) => {
     <RootView hideBackBottomButton titleView={topView}>
       <View style={{ flex: 1 }}>
         <FlatList
+          removeClippedSubviews={true}
+          windowSize={10}
           keyExtractor={(item) => item?._id}
           keyboardShouldPersistTaps="handled"
           ListHeaderComponent={headerView()}
@@ -946,11 +951,11 @@ const MemberList = ({ navigation, route }) => {
       <MyLoader enable={loader} />
 
       <InfoModal ref={ref_infoModal} />
+      <ConfirmationModal2 ref={ref_confirmModal} />
 
       <SortModal
         ref={sortModalRef}
         onSelected={(selected) => {
-          console.log(selected, 'selected')
           setSorted(selected)
           setSortfilter(selected)
         }}
@@ -982,9 +987,8 @@ const MemberList = ({ navigation, route }) => {
         isAllMembers={isAllMembers}
       />
 
-      <OptionModal
-        closeModal={() => setOptionModal({ isVisible: false, selectedItem: null })}
-        isVisible={optionModal?.isVisible}
+      <OptionModal2
+        ref={ref_optionModal}
         onSelected={onOptSelected}
         optionList={filterTheList(optionList)}
       />

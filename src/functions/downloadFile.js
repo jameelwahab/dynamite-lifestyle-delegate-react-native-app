@@ -26,7 +26,7 @@ const downloadFile = (url, path) => {
 
     config(options).fetch('GET', url).then(async (res) => {
       console.log(res, "res")
-      showToast({ title: "Downloaded", body: "Recources downloaded", type: "success" });
+      showToast({ title: "Downloaded", body: "File downloaded", type: "success" });
     }).catch((errorMessage, statusCode) => {
 
       alert("error in dowload!")
