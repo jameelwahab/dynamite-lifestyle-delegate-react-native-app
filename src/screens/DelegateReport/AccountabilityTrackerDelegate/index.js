@@ -38,7 +38,6 @@ const getNewStatmentObj = () => {
 }
 
 const AccountabilityTrackerDelegate = ({ navigation, route }) => {
-  console.log(route?.params, "params")
   const { item, user } = route?.params;
   const { token } = useSelector(selectUser);
   const ref_infoModal = useRef();

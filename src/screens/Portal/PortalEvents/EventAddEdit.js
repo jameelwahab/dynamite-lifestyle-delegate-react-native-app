@@ -17,7 +17,6 @@ import MyCheckBox from '../../../components/MyCheckBox'
 
 const EventAddEdit = ({ route, navigation }) => {
   let { item, slug, eventId } = route.params;
-console.log("hi")
   let { token } = useSelector(selectUser);
   const [loader, setLoader] = useState(false);
   const [data, updateData] = useState({
@@ -46,9 +45,9 @@ console.log("hi")
     if (!!data.image?.uri) {
       fd.append("image", data.image);
     }
-    console.log(!!item,"checking order") 
+
     if (!!item) {
-      console.log("checking order") 
+
       fd.append("order", item?.order);
     }
     if (!!item) {

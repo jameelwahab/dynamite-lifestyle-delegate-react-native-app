@@ -96,7 +96,6 @@ const AddEditPortal = ({ navigation, route }) => {
 
   const makeDataForServer = () => {
     let fd = new FormData();
-    console.log(data, "data")
     fd.append("title", data.title.trim())
     fd.append("start_date", moment(data.date).format("YYYY-MM-DD"))
 

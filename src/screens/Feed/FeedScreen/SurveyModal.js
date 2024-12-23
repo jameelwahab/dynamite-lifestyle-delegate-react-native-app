@@ -71,7 +71,7 @@ const SurveyModal = forwardRef(({ token, navigation }, ref) => {
 
 
   const openModal = (feed) => {
-    // console.log(feed)
+
     feedObj.current = feed
 
     setIsVisible(true);

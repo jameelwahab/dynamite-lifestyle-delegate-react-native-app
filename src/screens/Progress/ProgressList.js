@@ -109,7 +109,6 @@ const ProgressList = ({ navigation, route }) => {
   }
 
   const onNotes = (item) => {
-    console.log(item, "onNotes")
     navigation.navigate(routes.progresssNotesList, {
       reportId: item?._id,
       list: item?.internal_note,

@@ -60,7 +60,6 @@ const AudioPlayer = ({ stop = "", url,  }) => {
 
 
     return () => {
-      console.log("playerState dead")
       TrackPlayer.reset();
     }
 
@@ -86,7 +85,6 @@ const AudioPlayer = ({ stop = "", url,  }) => {
 
   const playPauseFunction = async () => {
     const status = await TrackPlayer.getState();
-    console.log(status, "track player")
     if (status == State.Playing) {
       TrackPlayer.pause()
       setPlaying(false)

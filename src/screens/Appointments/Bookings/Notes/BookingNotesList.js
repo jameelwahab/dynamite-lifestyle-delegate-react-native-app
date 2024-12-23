@@ -22,7 +22,6 @@ import { useSelector } from 'react-redux'
 import moment from 'moment'
 
 const BookingNotesList = ({ navigation, route }) => {
-  console.log(route, "route")
   const { bookingId, userInfo } = route?.params;
   const timezone = useSelector(selectTimeZone)
   const { token } = useSelector(selectUser);
@@ -87,7 +86,6 @@ const BookingNotesList = ({ navigation, route }) => {
   }, [])
 
   const renderList = ({ item, index }) => {
-    console.log(item?.user_info?.action_by)
     return (
       <View style={__styles.itemRootView}>
         <View style={__styles.itemUserView}>

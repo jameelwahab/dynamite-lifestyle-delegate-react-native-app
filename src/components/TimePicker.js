@@ -26,15 +26,12 @@ const TimePicker = forwardRef(({ onAgree }, ref) => {
 
   const onAgreeClick = () => {
     let result = moment(hours + ":" + mins + " " + amPm, "hh:mm A").format("HH:mm");
-    console.log(result, "result")
     onAgree?.(result, type);
     closeModal?.()
   }
 
   const openModal = (time, type = "") => {
     if (time) {
-      // console.log(time,"time")
-      // console.log(moment(time, "HH:mm").format("hh")+":"+moment(time, "HH:mm").format("mm")+" "+moment(time, "HH:mm").format("A"))
       setMins(moment(time, "HH:mm").format("mm"))
       setHours(moment(time, "HH:mm").format("hh"))
       setAmPm(moment(time, "HH:mm").format("A"))

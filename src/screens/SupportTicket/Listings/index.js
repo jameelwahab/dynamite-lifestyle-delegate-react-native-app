@@ -51,7 +51,6 @@ const TicketsList = ({ navigation, route }) => {
 
 
   const loadMore = () => {
-    console.log("loadMore", canLoadMore)
     if (canLoadMore) {
       canLoadMore = false;
       getSupportTickets(false, true);
@@ -94,17 +93,13 @@ const TicketsList = ({ navigation, route }) => {
 
 
     if (res?.code == 200) {
-      console.log(page, "page1")
+
       page++;
-      console.log(page, "page2")
-      console.log((page > (res?.total_pages - 1)), page, res?.total_pages, "CHECK")
       if (page > (res?.total_pages - 1)) {
         canLoadMore = false
       } else {
         canLoadMore = true
       }
-      console.log(page, "page3")
-      console.log(canLoadMore, "canLoadMore")
       setLoader(-1)
       setFooterLoader(-1)
       if (isLoadingMore) {

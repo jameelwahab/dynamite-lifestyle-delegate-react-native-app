@@ -128,7 +128,6 @@ const WheelofLife = ({ member, settings }) => {
           <View style={WheelofLifeStyle.assessmentHeadingView}>
             <MyText style={WheelofLifeStyle.assessmentHeading} >Intention Statement</MyText>
           </View>
-          {console.log(settings, 'check')}
           <MyWebview fullWidth
             html={settings?.wheel_of_life_intention_statement} />
 

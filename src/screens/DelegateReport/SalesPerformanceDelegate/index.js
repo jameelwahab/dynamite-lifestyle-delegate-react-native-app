@@ -228,7 +228,6 @@ const SalesPerformanceDelegate = ({ navigation, route }) => {
       }
     }
 
-    console.log(dataSet, "dataSet")
 
     setkeyToValues(KeyToValues)
     setGraphData(dataSet)

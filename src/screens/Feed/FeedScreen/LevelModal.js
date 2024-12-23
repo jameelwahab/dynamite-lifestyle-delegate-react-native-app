@@ -19,7 +19,6 @@ const LevelModal = forwardRef(({ feedLevel, selectFeedlevel, isCosmos, cosmosLev
   }
 
   const openLvlModal = () => {
-    console.log("openLvlModal func")
     setIsVisible(true)
   }
 

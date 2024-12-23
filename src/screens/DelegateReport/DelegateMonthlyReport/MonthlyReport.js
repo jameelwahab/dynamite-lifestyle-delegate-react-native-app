@@ -108,9 +108,6 @@ const MonthlyReport = ({ data: data1, currentMonYear }) => {
         }
       ]
 
-      // console.log(attitudeArray,
-      //   "attitudeArray"
-      // )
       setLineChartLabels(labels)
       setLinechartDate(dataArr)
       // setLinechartDate(attitudeArray)

@@ -90,7 +90,6 @@ const CategoryList = ({ navigation, route }) => {
 
   const onAgree = () => {
     let { selectedItem: item, type } = confirmModal;
-    console.log(item, "item")
     if (type == "delete") {
       deleteCategoryFromServer(item.dynamite_event_category_slug);
     }

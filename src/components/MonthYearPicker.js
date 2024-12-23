@@ -24,7 +24,6 @@ const MonthYearPicker = forwardRef(({ onAgree }, ref) => {
     if (year == moment().format("YYYY")) {
       let cur_month = moment().format("M");
       let list = months.slice(0, (cur_month ));
-      console.log(list,"list")
       setMonthList([...list]);
     } else {
       setMonthList(months)

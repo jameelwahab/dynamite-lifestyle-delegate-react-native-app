@@ -61,7 +61,6 @@ const AudioPlayerForList = ({ stop = "", url, id, loop = false, onLoopComplete, 
       TrackPlayer.play();
       ended = false;
     } catch (error) {
-      console.log(error, "trackplayer error")
       TrackPlayer.reset();
       TrackPlayer.stop()
       setTimeout(() => {

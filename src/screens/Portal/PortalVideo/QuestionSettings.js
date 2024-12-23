@@ -18,7 +18,6 @@ import showToast from '../../../functions/showToast'
 
 const QuestionSettings = ({ route, navigation }) => {
   let { config, eventId, slug, videoId } = route.params;
-  console.log(eventId, slug, videoId, " eventId, slug, videoId")
   let { token } = useSelector(selectUser);
   const [loader, setLoader] = useState(true);
   const [data, updateData] = useState({

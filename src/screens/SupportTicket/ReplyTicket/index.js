@@ -100,7 +100,6 @@ const TicketReply = ({ navigation, route }) => {
       }
     }
     let res;
-    console.log(!!msg, "!!msg")
     if (!!msg) {
       res = await EDIT_TICKET_COMMENT({
         token, navigation,

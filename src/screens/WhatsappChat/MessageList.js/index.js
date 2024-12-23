@@ -37,7 +37,7 @@ let page = 0;
 let canLoadMore = false;
 let isNewChat = false;
 const MessageList = ({ navigation, route }) => {
-  console.log(route?.params, "params")
+
   const [showTemplateView, setShowTemplateView] = useState(!!route?.params?.showTemplate);
   const [member, setMember] = useState(route?.params);
   const insets = useSafeAreaInsets();
@@ -66,14 +66,14 @@ const MessageList = ({ navigation, route }) => {
     socketEvents()
     return () => {
       try {
-        console.log("return")
+
         setChat([])
         isNewChat = false
         removeSocketEvents();
         TrackPlayer.pause()
         TrackPlayer.reset()
       } catch (e) {
-        console.log(e, "error")
+
       }
     }
   }, [])
@@ -92,7 +92,7 @@ const MessageList = ({ navigation, route }) => {
 
 
   const sendMessageReceiverForSender = (data) => {
-    console.log(data, "sendMessageReceiverForSender")
+
 
     setChat((chat) => {
       if (chat.length == 0) {
@@ -104,10 +104,10 @@ const MessageList = ({ navigation, route }) => {
   }
 
   const onMessageStatus = (data) => {
-    console.log(data, "whatsapp_message_status")
+
     setChat((chats) => {
       let index = chats.findIndex(chat => chat?.whatssapp_message_id == data?.whatssapp_message_id);
-      console.log(index, "index")
+
       if (index > -1) {
         chats.splice(index, 1, { ...chats[index], status: data?.status, failed_reason: data?.failed_reason })
       }
@@ -120,7 +120,6 @@ const MessageList = ({ navigation, route }) => {
   //! //////// APIS
   const loadMore = () => {
     if (canLoadMore) {
-      console.log("onEndRech")
       canLoadMore = false;
       setFooterLoader(true);
       getMemberList()
@@ -170,7 +169,7 @@ const MessageList = ({ navigation, route }) => {
 
 
   const onSelectedTemplate = (item) => {
-    // console.log(item, "item")
+
     setSelectedTemplate(item)
     setIsTemplateModalShown(false)
   }
@@ -180,9 +179,7 @@ const MessageList = ({ navigation, route }) => {
   //? /////// ACTIONS
 
   const optionAction = (opt) => {
-    console.log(opt, "msgAction")
     let item = opitonModal.item
-    console.log(item, "msgAction")
     setOptionModal({ ...opitonModal, opt: opt.type, item: null, isVisible: false, })
 
 
@@ -275,7 +272,7 @@ const MessageList = ({ navigation, route }) => {
       await TrackPlayer.pause();
       await TrackPlayer.reset()
       setState({ selected_audio: audio, isPlaying: id });
-      console.log(S3_URL + audio, "audio")
+
       await TrackPlayer.add({
         id: id,
         url: S3_URL + audio,
@@ -285,7 +282,6 @@ const MessageList = ({ navigation, route }) => {
     }
     else {
       let playerState = await TrackPlayer.getState();
-      // console.log(await TrackPlayer.getActiveTrack(), 'state')
       if (playerState === TrackPlayer.STATE_PAUSED || playerState === "ready" || playerState == "paused") {
         await TrackPlayer.play();
         setState({ isPlaying: id });
@@ -302,7 +298,7 @@ const MessageList = ({ navigation, route }) => {
       await TrackPlayer.reset()
     }
     catch (err) {
-      console.log(err, "err")
+
     }
     setState({ isPlaying: "", selected_audio: null })
   }
@@ -323,7 +319,7 @@ const MessageList = ({ navigation, route }) => {
         message_type: "template"
       }
 
-      console.log('whatsapp_chat_message_event', postData)
+
       socket.emit('whatsapp_chat_message_event', postData)
       setSelectedTemplate(null);
       setShowTemplateView(false)

@@ -50,10 +50,7 @@ const TrainingDetail = ({ navigation, route }) => {
 
 
   const onTabClick = (index) => {
-    console.log(index, "index")
     let link = tabs[index]?.button_url;
-
-    console.log(link, "Link")
     if (!!link) {
       if (link.includes("dynamitelifestyle.com") && link.includes("delegates")) {
         if (link.includes("delegate-training")) {

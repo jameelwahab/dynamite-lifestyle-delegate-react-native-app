@@ -22,7 +22,6 @@ import MyCheckBox from '../../../components/MyCheckBox'
 const AddBooking = ({ navigation, route }) => {
   const ref_calendar = useRef();
   const { token, access, user } = useSelector(selectUser);
-  console.log(access, user, "access")
   const { editableItem, type } = route?.params;
   const isEdit = type == "edit";
   const isPass = type == "pass";
@@ -51,7 +50,6 @@ const AddBooking = ({ navigation, route }) => {
       getBookingConsutantFromServer();
     }
     else {
-      console.log(optionModal?.isVisble, "optionModal?.isVisble")
       if (optionModal?.isVisble) {
         if (optionModal?.type != "Booking Page" && optionModal?.type != "Time Slot") {
           getBookingsPagesFromServer()
@@ -229,7 +227,6 @@ const AddBooking = ({ navigation, route }) => {
       }
     });
     if (res.code == 200) {
-      console.log(optionModal?.type, "optionModal?.type")
       if (optionModal?.type == "Delegate") {
         setConsultantList(res?.data)
       } else if (optionModal?.type == "Member") {

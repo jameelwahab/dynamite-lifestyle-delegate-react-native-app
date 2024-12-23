@@ -74,13 +74,13 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
     socket.emit("live_event_room", eventId);
 
     socket.on("live_event_message_receiver", async (data) => {
-      console.log('On socket message receive', data)
+
 
 
       setList((list) => {
         if (!!data?.parent_message) {
           let index = list.findIndex(x => x._id == data?.parent_message);
-          console.log(index, "index")
+
           if (index > -1) {
             if (!!list[index]?.replies) {
               list[index].replies = [...list[index]?.replies, data?.comment_id]
@@ -96,7 +96,7 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
     });
 
     socket.on("live_event_message_update_receiver", (data) => {
-      console.log('On socket update receive', data)
+
       setList((list) => {
         if (!!data?.comment_id?.parent_message) {
           let parentIndex = list.findIndex(x => x._id == data?.comment_id?.parent_message);
@@ -135,7 +135,7 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
     });
 
     socket.on("live_event_message_delete_receiver", (data) => {
-      console.log('On socket delete message', data)
+
       setList((list) => {
         list.forEach((x, i) => {
           if (x._id == data.comment_id) {
@@ -169,12 +169,12 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
     });
 
     socket.on("make_message_featured_unfeatured_receiver", (data) => {
-      console.log("On make_message_featured_unfeatured_receiver --->\n", data)
+
       getLiveChatFromServer()
     });
 
     socket.on("live_event_message_like_receiver", (data) => {
-      console.log("On live_event_message_like_receiver --->\n", data)
+
       setList(list => {
         if (!!data?.parent_message == false) {
           let index = list.findIndex(x => x._id == data.comment_id);
@@ -241,7 +241,7 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
 
   const onSelectedOption = (opt) => {
     let { item } = optionModal;
-    console.log(opt, item, "opt")
+
     setOptionModal({ isVisible: false, item: null });
 
     if (opt.type == "delete") {
@@ -365,7 +365,7 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
   }
 
   const onModalHide = () => {
-    console.log("onModalHide")
+
     setList([]);
     setPinList([]);
     setLoader(false);
@@ -398,8 +398,7 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
 
 
   const likeChatComment = (item, isChild) => {
-    console.log(item, "item");
-    console.log(user, "user")
+
     let socketObj = {
       event_id: eventId,
       video_id: videoId,
@@ -416,7 +415,7 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
       socketObj['parent_message'] = item.parent_message;
     }
 
-    console.log("like Chat sent", socketObj)
+
     socket.emit("live_event_message_like", socketObj)
   }
 
@@ -472,7 +471,7 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
       socketObj.parent_message = selectedMsg?._id;
     }
     socket.emit(socketEventString, socketObj);
-    console.log(socketEventString, socketObj)
+
 
     setsendMsgLoader(false);
     setText("");

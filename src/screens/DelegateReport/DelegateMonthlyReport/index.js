@@ -15,7 +15,6 @@ import MemberView from '../../../components/MemberView';
 
 const DelegateMonthlyReport = ({ navigation, route }) => {
   const { item } = route?.params;
-  console.log(item, "item")
   const { token } = useSelector(selectUser);
   const ref_monthPicker = useRef();
   const [loader, setLoader] = useState(false);

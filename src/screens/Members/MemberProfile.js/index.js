@@ -85,7 +85,7 @@ const MemberProfile = ({ navigation, route }) => {
         }
       })
 
-      console.log(newlist, "newlist")
+
       set_90DayGraph(newlist);
       setEvents(newArray)
       setMember(res)
@@ -97,12 +97,10 @@ const MemberProfile = ({ navigation, route }) => {
   }
 
   const onWhatsappChatScreen = async () => {
-    console.log(member, "member?.contact_numbe")
     if (isValidNumber("+" + member?.member?.contact_number)) {
       setLoader(true)
       let res = await INITIATE_WHATSAPP_CHAT({ token, navigation, receiver_id: memberId, });
       setLoader(false)
-      console.log(res, "res")
       if (!res.data.error) {
         let rMember = res.data?.receiver_info;
         navigation.navigate(routes.whtasappChatMessageList, {

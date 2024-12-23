@@ -77,12 +77,12 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
   })
 
 
-  // useEffect(() => {
-  //   setLoader(true)
-  //   setSettings(null)
-  //   getAccountabilityTracker();
+  useEffect(() => {
+    setLoader(true)
+    setSettings(null)
+    getAccountabilityTracker();
 
-  // }, [date])
+  }, [date])
 
 
   useEffect(() => {

@@ -26,15 +26,15 @@ import { convertTimezone } from '../../../functions/convertTime'
 import getFileIconByType from '../../../functions/getFileIconByType'
 import downloadFile from '../../../functions/downloadFile'
 import { openUrl } from '@ronradtke/react-native-markdown-display'
+import { SimpleLoader } from '../../../components/MyLoader'
 const Comments = ({ commentsList, ticket, user, autoMessages, addMessage, listRoute, timezone, isMine }) => {
   const { token } = useSelector(selectUser)
   const navigation = useNavigation()
-  console.log(listRoute, "listRoute")
   const [modalImage, setModalImage] = useState("")
   const [comments, setComments] = useState(commentsList)
   const [msgOptionModal, setMsgOptionModal] = useState({ isVisible: false, selectedItem: null })
   const [isConfirmationModalVisible, setConfirmationModalVisibility] = useState(false)
-
+  const [downloader, setDownloader] = useState({});
 
   const actionOfMsgOptions = (selectedOpt) => {
     if (selectedOpt.type == "delete") {
@@ -56,9 +56,16 @@ const Comments = ({ commentsList, ticket, user, autoMessages, addMessage, listRo
     }
   }
 
+  const toggleDownloer = (path) => {
+    if (downloader[path]) {
+      delete downloader[path]
+    } else {
+      downloader[path] = true
+    }
+    setDownloader({ ...downloader })
+  }
 
   const updateMsg = (msg) => {
-    console.log(msg, "updateMsg")
     let index = comments.findIndex(x => x._id === msg._id);
     if (index > -1) {
       comments.splice(index, 1, msg);
@@ -79,7 +86,6 @@ const Comments = ({ commentsList, ticket, user, autoMessages, addMessage, listRo
   }
 
   const deleteMessage = async () => {
-    console.log(msgOptionModal.selectedItem, "msgOptionModal.selectedItem")
     await api_deleteMessage(msgOptionModal.selectedItem)
     setMsgOptionModal({ selectedItem: null, isVisible: false })
     setConfirmationModalVisibility(false);
@@ -124,28 +130,36 @@ const Comments = ({ commentsList, ticket, user, autoMessages, addMessage, listRo
         <View style={{ marginTop: 10 }}>
           {!!item?.comment_image && item?.comment_image.map((x, i) => {
             let fileIcon = getFileIconByType(x?.thumbnail_1);
+            let isDownloading = downloader[x?.thumbnail_1];
+
             return (
               <View
                 key={x?.thumbnail_1}
                 style={{
-                  backgroundColor: colors.secondaryVariant, height: 200, borderRadius: 10, marginBottom: 15,
-                  shadowColor: "#FFF",
-                  shadowOffset: {
-                    width: 0,
-                    height: 1,
-                  },
-                  shadowOpacity: 0.20,
-                  shadowRadius: 1.41,
-
-                  elevation: 2,
+                  backgroundColor: colors.secondaryVariant, height: fileIcon ? 150 : 200, borderRadius: 10, marginBottom: 15,
                 }}>
-                <Pressable onPress={() => {
-                  if (fileIcon) {
-                    openUrl(S3_URL + x?.thumbnail_1)
-                  } else {
-                    setModalImage(x?.thumbnail_1)
-                  }
-                }}>
+                {!!fileIcon &&
+                  <View style={{ position: "absolute", right: 10, bottom: 10, zIndex: 2 }}>
+                    <TouchableOpacity
+                      onPress={() => {
+                        if (fileIcon) {
+                          downloadFile(S3_URL + x?.thumbnail_1)
+                        } else {
+                          downloadImage(S3_URL + x?.thumbnail_1)
+                        }
+                      }}
+                      style={{ height: 35, width: 35, alignItems: "center", justifyContent: "center", backgroundColor: colors.lightPrimary3, borderRadius: 35 / 2 }}>
+                      {icons.download()}
+                    </TouchableOpacity>
+                  </View>}
+                <Pressable
+                  onPress={() => {
+                    if (fileIcon) {
+                      openUrl(S3_URL + x?.thumbnail_1)
+                    } else {
+                      setModalImage(x?.thumbnail_1)
+                    }
+                  }}>
                   {fileIcon ?
                     <View style={{ height: 150, width: "100%", borderTopLeftRadius: 10, borderTopRightRadius: 10, justifyContent: "center", alignItems: "center" }}>
                       <Image
@@ -159,27 +173,30 @@ const Comments = ({ commentsList, ticket, user, autoMessages, addMessage, listRo
                     <MyImage source={{ uri: S3_URL + x?.thumbnail_1 }} style={{ height: 150, width: "100%" }}
                       imageStyle={{ borderTopLeftRadius: 10, borderTopRightRadius: 10, }} />}
                 </Pressable>
-                <View style={{ flex: 1, flexDirection: "row", justifyContent: "space-between" }}>
-                  {!!fileIcon ?
-                    <View /> :
+                {!fileIcon &&
+                  <View style={{ flex: 1, flexDirection: "row", justifyContent: "space-between" }}>
+
+
                     <View style={{ height: "100%", aspectRatio: 1, alignItems: "center", justifyContent: "center" }}>
                       <Image opacity={0.7} source={icons.photo} style={{ height: 25, width: 25 }} />
-                    </View>}
+                    </View>
 
-                  <View style={{ height: "100%", aspectRatio: 1, alignItems: "center", justifyContent: "center" }}>
-                    <TouchableOpacity
-                      onPress={() => {
-                        if (fileIcon) {
-                          downloadFile(S3_URL + x?.thumbnail_1)
-                        } else {
-                          downloadImage(S3_URL + x?.thumbnail_1)
-                        }
-                      }}
-                      style={{ height: 35, width: 35, alignItems: "center", justifyContent: "center", backgroundColor: colors.lightPrimary3, borderRadius: 35 / 2 }}>
-                      {icons.download()}
-                    </TouchableOpacity>
-                  </View>
-                </View>
+                    <View style={{ height: "100%", aspectRatio: 1, alignItems: "center", justifyContent: "center" }}>
+                      <TouchableOpacity
+                        onPress={() => {
+                          // toggleDownloer(x?.thumbnail_1)
+                          if (fileIcon) {
+                            downloadFile(S3_URL + x?.thumbnail_1)
+                          } else {
+                            downloadImage(S3_URL + x?.thumbnail_1)
+                          }
+                          // toggleDownloer(x?.thumbnail_1)
+                        }}
+                        style={{ height: 35, width: 35, alignItems: "center", justifyContent: "center", backgroundColor: colors.lightPrimary3, borderRadius: 35 / 2 }}>
+                        {icons.download()}
+                      </TouchableOpacity>
+                    </View>
+                  </View>}
               </View>
             )
           })}

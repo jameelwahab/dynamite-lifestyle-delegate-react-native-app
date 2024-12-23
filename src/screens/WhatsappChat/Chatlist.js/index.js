@@ -178,7 +178,6 @@ const ChatList = ({ navigation }) => {
       setChatList((chatList) => {
         list = [...chatList];
         let index = list.findIndex(x => x?._id == newChatObj?.whatssapp_chat);
-        console.log(index, "index")
         if (index > -1) {
           let chatobj = {
             ...list[index],
@@ -202,9 +201,7 @@ const ChatList = ({ navigation }) => {
           if(list.length==1){
             refresh?.()
           }
-          // console.log(list,"list")
         }
-        console.log(list, "listlistlistlist")
         return [...list]
       });
     }
@@ -216,7 +213,6 @@ const ChatList = ({ navigation }) => {
   const resetCountToZero = (chatId) => {
     setChatList((chatList) => {
       let index = chatList.findIndex(x => x._id == chatId);
-      console.log(index, "index", "resetCountToZero")
       if (index > -1) {
         let chatobj = { ...chatList[index] };
         chatobj.sender_info.unread_message_count = 0;
@@ -228,9 +224,7 @@ const ChatList = ({ navigation }) => {
 
 
   const makeChatAccepted = (chatId) => {
-    console.log("makeChatAccepted",)
     let index = chatList.findIndex(x => x._id == chatId);
-    console.log(index, "index makeChatAccepted")
     if (index > -1) {
       let chatobj = { ...chatList[index] };
       chatobj.receiver_info.whatsapp_chat_status = "accepted";

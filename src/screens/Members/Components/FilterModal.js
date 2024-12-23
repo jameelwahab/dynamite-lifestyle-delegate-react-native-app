@@ -93,7 +93,7 @@ const FilterModal = forwardRef(({ token, type, filterTheData, appliedFilter, isM
   }
 
   const checkFiltersApplied = () => {
-    console.log(appliedFilter, "checkFiltersApplied")
+
     setfilterFrom(appliedFilter?.isSavedFilterApplied ? filterFromlist[1] : filterFromlist[0]);
     setSelectedSavedFilter((prev) => appliedFilter?.isSavedFilterApplied ? prev : null);
 
@@ -188,7 +188,7 @@ const FilterModal = forwardRef(({ token, type, filterTheData, appliedFilter, isM
       "user_status_type": !!onlineStatus?.key ? onlineStatus?.key : "",
       "downloaded_app": !!isAppDownloaded ? isAppDownloaded?.value : null
     }
-    console.log(obj, "filters")
+
     setApplied(!reset)
     filterTheData(obj, filterData, !!selectedSavedFilter, !reset);
     setIsVisible(false);
@@ -278,7 +278,7 @@ const FilterModal = forwardRef(({ token, type, filterTheData, appliedFilter, isM
       })
     }
 
-    console.log(list, "list")
+
 
     setSearchOptionModal({
       isVisible: true,
@@ -380,7 +380,7 @@ const FilterModal = forwardRef(({ token, type, filterTheData, appliedFilter, isM
   }
 
   const onDateSelected = (date) => {
-    console.log(date, "onDateSelected")
+
 
     if (calenderFor == "SD") {
       setStartDate(date)

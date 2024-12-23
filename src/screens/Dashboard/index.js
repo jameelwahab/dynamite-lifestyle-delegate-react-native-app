@@ -53,7 +53,7 @@ const Dasboard = ({ navigation }) => {
   }
 
   const onAnswerScreen = (item) => {
-    console.log(item, "onAnswerScreen")
+
     // return
     navigation.navigate(routes?.genericQestionListing, {
       created_for: item?.created_for,
@@ -73,7 +73,6 @@ const Dasboard = ({ navigation }) => {
 
 
   const filterTheData = (obj) => {
-    console.log(obj, "filter Obj")
     setFilter(obj);
   }
 

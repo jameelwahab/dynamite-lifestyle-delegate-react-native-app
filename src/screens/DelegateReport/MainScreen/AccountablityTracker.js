@@ -67,7 +67,6 @@ const AccountablityTracker = ({ data, navigation, user }) => {
               xAxisLabelsVerticalShift={30}
               xAxisLabelTextStyle={{ color: colors.lightText, fontSize: 10, }}
               onPress={(item) => {
-                console.log(item, "item")
                 let str = `${item?.label}: ${item?.value} Times\n\n${item?.title}`
                 ref_infoModal?.current?.openModal(str)
               }}

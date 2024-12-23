@@ -75,7 +75,6 @@ const PorgressNotesList = ({ navigation, route }) => {
 
 
   const renderList = ({ item, index }) => {
-    console.log(item?.user_info?.action_by)
     return (
       <View style={__styles.itemRootView}>
         <View style={__styles.itemUserView}>

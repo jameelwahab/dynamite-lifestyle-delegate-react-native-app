@@ -5,7 +5,6 @@ import MyText from '../../../components/MyText'
 import GenericQuetionListByModule from '../../Questions/GenericQuetionListByModule'
 
 const ManageQuestions = ({ navigation, route }) => {
-  console.log(route.params,"ManageQuestions")
   const {  _id } = route.params;
   return (
     <RootView title={"Dynamite Event Video Questions"}>

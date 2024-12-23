@@ -49,7 +49,6 @@ const EmailModal = forwardRef(({ onReminderSavePress }, ref) => {
   const openModal = (data) => {
     setIsVisible(true);
     if (!!data) {
-      console.log(data, "data")
       setSubject(!!data?.email_subject ? data?.email_subject : "");
       setHeading(!!data?.title ? data?.title : "");
       setEmail(!!data?.main_email ? data?.main_email : "");

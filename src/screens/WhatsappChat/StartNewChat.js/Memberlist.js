@@ -14,12 +14,10 @@ const Memberlist = ({ list, loader, navigation, token, refresh, resetCountToZero
   const [isLoading, setIsLoading] = useState(false)
 
   const onChatScreen = async (item) => {
-    console.log(item.contact_number, isValidNumber("+" + item.contact_number), "isValidNumber")
     if (isValidNumber("+" + item.contact_number)) {
       setIsLoading(true)
       let res = await INITIATE_WHATSAPP_CHAT({ token, navigation, receiver_id: item?._id });
       setIsLoading(false)
-      console.log(res, "res")
       if (!res.data.error) {
         let member = res.data?.receiver_info;
         navigation.navigate(routes.whtasappChatMessageList, {

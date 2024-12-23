@@ -7,7 +7,7 @@ const previewLocalFile = (path) => {
 
     })
     .catch((error) => {
-      console.log(error, "Error opening gile")
+
     });
 }
 

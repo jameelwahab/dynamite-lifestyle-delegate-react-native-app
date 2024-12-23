@@ -33,10 +33,10 @@ const LeadModal = forwardRef(({ token, navigation, updateLeadStatus, memberId, o
 
 
   useEffect(() => {
-    console.log(oldLead, "oldLead")
+
     if (isVisible) {
       if (edit) {
-        console.log(moment(oldLead?.changed_date_time).format(dateTimeFormat.date), "oldLead")
+
         setSelectedLead(!!oldLead ? oldLead?.lead_status : null)
 
         setIcome(!!oldLead?.income_value ? oldLead?.income_value.toString() : "0")

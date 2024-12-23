@@ -46,7 +46,6 @@ const PodDetail = ({ navigation, route }) => {
       checkedList[item?._id] = item
     }
 
-    console.log(checkedList, "checkedList")
     setCheckedList({ ...checkedList });
 
   }

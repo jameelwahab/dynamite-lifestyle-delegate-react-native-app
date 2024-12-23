@@ -57,11 +57,9 @@ class PostWebView extends Component {
   }
 
   toggleCollapse = (event, href) => {
-    console.log("toggleCollapse", event.currentTarget, href, isUrl(href))
     if (isUrl(href)) {
       openUrl(href)
     } else {
-      console.log(this.state.isCollapsed, "this.state.isCollapsed ")
       this.setState({ isCollapsed: !this.state.isCollapsed });
     }
   }
@@ -82,7 +80,6 @@ class PostWebView extends Component {
     let { html, style, baseStyle } = this.props;
     html = urlifyWithAchorTag(html);
     html = "<div>" + html.replace(/padding/g, "") + "</div>";
-    console.log(html, "length");
     let ammededHtml = ""
     if (this.state.collapedEnabled && html.length > 150) {
       if (this.state.isCollapsed) {
@@ -166,7 +163,6 @@ class PostWebView extends Component {
               if (isUrl(href)) {
                 openUrl(href)
               } else {
-                console.log(this.state.isCollapsed, "this.state.isCollapsed ")
                 this.setState({ isCollapsed: !this.state.isCollapsed });
               }
             }

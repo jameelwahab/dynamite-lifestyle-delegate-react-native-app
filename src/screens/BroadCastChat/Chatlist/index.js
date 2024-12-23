@@ -37,7 +37,6 @@ let isNewChat = false;
 
 const ChatList = ({ navigation, route }) => {
   const { key } = route?.params;
-  console.log(key, "key")
   const { token, user } = useSelector(selectUser);
   const { socket } = useSelector(selectSocket);
   const { navbar } = useSelector(selectNavbar);
@@ -101,7 +100,6 @@ const ChatList = ({ navigation, route }) => {
 
   useEffect(() => {
     if (!firstTime) {
-      console.log("HI")
       page = 0;
       canLoadMore = false;
       debounce(() => api_ChatList(true))

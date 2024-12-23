@@ -163,9 +163,8 @@ const CalendarScreen = ({ navigation, route }) => {
         if (!!user)
           await GoogleSignin.revokeAccess();
         await GoogleSignin.signOut()
-        console.log(GoogleSignin.getCurrentUser(), "GoogleSignin.getCurrentUser()")
       } catch (error) {
-        console.log(error, "error")
+
       }
     } else {
       setLoader(false);
@@ -180,7 +179,7 @@ const CalendarScreen = ({ navigation, route }) => {
         showPlayServicesUpdateDialog: true,
       });
       const userInfo = await GoogleSignin.signIn();
-      console.log("GoogleUser...", userInfo);
+
 
       const isCalendarPermissionGranted = googleScopes.every((val) => userInfo?.scopes.includes(val));
       if (isCalendarPermissionGranted) {

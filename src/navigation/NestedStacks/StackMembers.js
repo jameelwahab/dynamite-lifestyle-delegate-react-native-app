@@ -25,7 +25,6 @@ const MemberStack = createNativeStackNavigator()
 
 const StackMembers = ({ route }) => {
   const { user } = useSelector(selectUser);
-  console.log(user, "user")
   return (
     <View style={{ flex: 1, backgroundColor: colors.darkSecondary }}>
       <MemberStack.Navigator
