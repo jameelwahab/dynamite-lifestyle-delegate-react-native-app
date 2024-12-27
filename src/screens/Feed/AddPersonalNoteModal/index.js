@@ -1,5 +1,5 @@
 import { View, Text, SafeAreaView, Pressable } from 'react-native'
-import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
+import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import Modal from 'react-native-modal'
 import { colors } from '../../../utilities/colors';
 import { icons } from '../../../utilities/icons';
@@ -19,6 +19,7 @@ import Toast from 'react-native-toast-message';
 let text = "";
 const AddPersonalNoteModal = forwardRef(({ }, ref) => {
   const navigation = useNavigation();
+  const feed_Id = useRef("")
   const { token } = useSelector(selectUser);
   const [isVisible, setIsVisible] = useState(false);
   const [loader, setLoader] = useState(false);
@@ -35,13 +36,15 @@ const AddPersonalNoteModal = forwardRef(({ }, ref) => {
 
 
 
-  const openModal = (note) => {
+  const openModal = (note, feedId) => {
     text = note;
+    feed_Id.current = feedId
     setIsVisible(true);
   }
 
   const closeModal = () => {
     text = "";
+    feed_Id.current = "";
     setSelectedMember(null)
     setIsVisible(false);
   }
@@ -62,7 +65,7 @@ const AddPersonalNoteModal = forwardRef(({ }, ref) => {
       return
     }
     setLoader(true);
-    let res = await ADD_PERSONAL_NOTE_FOR_PORTAL({ navigation, token, memberId: selectedMember?._id, note: `<p>${text}</p>` });
+    let res = await ADD_PERSONAL_NOTE_FOR_PORTAL({ navigation, token, feedId: feed_Id?.current, memberId: selectedMember?._id, note: `<p>${text}</p>` });
     if (res.code == 200) {
       closeModal?.()
       setLoader(false)

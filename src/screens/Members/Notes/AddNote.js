@@ -40,6 +40,7 @@ const AddNote = ({ navigation, route }) => {
       });
     } else {
       res = await MEMBER_ADD_NOTE({
+
         token, navigation,
         member_id: memberId,
         personal_note: note

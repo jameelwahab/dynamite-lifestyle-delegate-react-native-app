@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import RootView from '../../../components/RootView'
 import MyText from '../../../components/MyText'
 import MyLoader, { SimpleLoader } from '../../../components/MyLoader'
-import { GET_FEED_LIST, GET_COMMENT_LIST, GET_LIKE_LIST, GET_COMMENT_LIKES_LIST, FEED_ACTIONS, DELETE_FEED_POST, FEED_LIKE_ACTIONS, GET_FEED_EXTRA_DATA, IS_CHAT_EXIST, GET_FEED_DETAIL, FEED_POLL_ACTIONS } from '../../../DAL'
+import { GET_FEED_LIST, GET_COMMENT_LIST, GET_LIKE_LIST, GET_COMMENT_LIKES_LIST, FEED_ACTIONS, DELETE_FEED_POST, FEED_LIKE_ACTIONS, GET_FEED_EXTRA_DATA, IS_CHAT_EXIST, GET_FEED_DETAIL, FEED_POLL_ACTIONS, ADD_PERSONAL_NOTE_FOR_PORTAL } from '../../../DAL'
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../../redux/reducers/userSlice'
 import FeedView from './FeedView'
@@ -29,6 +29,8 @@ import MyRefreshControl from '../../../components/MyRefreshControl'
 import PollDetailModal from './PollDetailModal'
 import SurveyModal from './SurveyModal'
 import SurveyDetailModal from './SurveyDetailModal'
+import ConfirmationModal2 from '../../../components/ConfirmationModal2'
+import { S3_URL } from '../../../utilities/constants'
 
 
 
@@ -58,6 +60,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
   const ref_personalNoteModal = useRef();
   const ref_pollInfo = useRef();
   const ref_surveyInfo = useRef()
+  const ref_confirmModal = useRef();
   const { feedFor, feedId, eventId = "" } = route?.params;
   const isCosmos = feedFor == "the_cosmos";
   const isScheduledFeed = feedFor == "scheduled";
@@ -274,6 +277,33 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
     }
   }
 
+
+  const addNotesToServer = async (feed) => {
+    let notes = "";
+    if (feed?.feed_type == "image") {
+      feed.feed_images.forEach((item) => {
+        notes += `<img src='${S3_URL + item?.thumbnail_1}'><br/>`
+      })
+    }
+    if (feed?.description) {
+      notes += `<p>${feed?.description}</p>`
+    }
+
+
+    setLoader(true);
+    let res = await ADD_PERSONAL_NOTE_FOR_PORTAL({
+      navigation, token,
+      feedId: feed?._id,
+      memberId: feed?.action_info?.action_id, note: notes
+    });
+    if (res.code == 200) {
+      setLoader(false)
+      showToast({ type: "success", title: res?.message })
+
+    } else {
+      setLoader(false)
+    }
+  }
   const resetCounts = () => {
     feedVar = {
       page: 0,
@@ -747,9 +777,29 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
     } else if (selectedOpt?.type == "message") {
       onChatScreen(item?.action_info?.action_id)
     } else if (selectedOpt?.type == "notes") {
-      setTimeout(() => {
-        ref_personalNoteModal?.current?.openModal(item?.description)
-      }, 500);
+      console.log(item, "feed")
+      if (item?.action_info?.action_by == "consultant_user") {
+        setTimeout(() => {
+          let notes = "";
+          if (item?.feed_type == "image") {
+            item.feed_images.forEach((item) => {
+              notes += `<img src='${S3_URL + item?.thumbnail_1}'><br/>`
+            })
+          }
+          if (item?.description) {
+            notes += `<p>${item?.description}</p>`
+          }
+
+          ref_personalNoteModal?.current?.openModal(notes, item?._id)
+        }, 500);
+      } else {
+        setTimeout(() => {
+          ref_confirmModal?.current?.openModal({
+            title: `Are you sure you want to add as ${item?.action_info?.name}'s personal note ?`,
+            agreeFunc: () => addNotesToServer(item)
+          })
+        }, 500);
+      }
     }
   }
 
@@ -914,17 +964,17 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
 
         if (item.type == "notes") {
           if (isEventFeed) {
-            if (!isMine && item.action_info?.action_by != "consultant_user") {
-              if (feed?.feed_type != "poll" && feed?.feed_type != "survey") {
-                newList.push(item);
-              }
+            // if (!isMine && item.action_info?.action_by != "consultant_user") {
+            if (feed?.feed_type != "poll" && feed?.feed_type != "survey") {
+              newList.push(item);
             }
+            // }
           }
         }
 
         if (item.type == "message") {
-          if (isChatAllowed) {
-            if (!isMine && item.action_info?.action_by != "consultant_user") {
+          if (isChatAllowed && user?.is_super_delegate) {
+            if (!isMine && feed.action_info?.action_by != "consultant_user") {
               newList.push(item);
             }
           }
@@ -934,75 +984,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       })
 
       return newList
-
-      //   if ((isEventFeed && feedOptionModal?.selectedItem?.action_info?.action_id == user?._id) || !isEventFeed) {
-      //     if (access?.feed_pin_unpin_option) {
-      //       if (feedOptionModal?.selectedItem?.is_feature)
-      //         newList = newList.slice().filter(x => x.type != "pin");
-      //       else if (!feedOptionModal?.selectedItem?.is_feature)
-      //         newList = newList.slice().filter(x => x.type != "unpin");
-      //     } else {
-      //       newList = newList.slice().filter(x => x.type != "pin" && x.type != "unpin");
-      //     }
-      //   }else{
-      //     newList = newList.slice().filter(x => x.type != "pin" && x.type != "unpin");
-      //   }
-      //   if (!isEventFeed) {
-      //     newList = newList.slice().filter(x => x.type != "notes");
-      //   }
-
-
-      //   newList = newList.slice().filter(x => {
-      //     if ((x.type == "message" && user?._id == feedOptionModal?.selectedItem?.action_info?.action_id) || (!!isChatAllowed == false && x.type == "message")) {
-      //       return false
-      //     }
-      //     else if (
-      //      ( !isCosmos && !isScheduledFeed && !isEventFeed )&&
-      //       (!access?.edit_delete_option_in_source_all_source_feeds && feedOptionModal?.selectedItem?.action_info?.action_id != user?._id) &&
-      //       (x.type == "edit" || x.type == "delete")) {
-      //       return false
-      //     }
-      //     return true
-      //   });
-
-      //  
-      //   // if(!access?.feed_pin_unpin_option){
-      //   //   newList = newList.slice().filter(x => {
-      //   //     if (x.type == "message" && user?._id == feedOptionModal?.selectedItem?.action_info?.action_id) {
-      //   //       return false
-      //   //     }
-      //   //     return true
-      //   //   });
-      //   // }
-      //   
-      //   return newList
-      // } else {
-      //   return []
     }
-  }
-
-  const pollAction = async (feedId, optionId) => {
-    let resp = await FEED_POLL_ACTIONS({ token, navigation, feedId, optionId })
-    if (resp.code == 200) {
-
-    } else {
-
-    }
-  }
-
-  const openPollDetail = (item) => {
-    ref_pollInfo?.current?.openModal(item)
-  }
-
-  const onStartQuestionnairPress = (item) => {
-    // ref_pollInfo?.current?.openModal(item)
-    ref_surveymodal?.current?.openModal(item)
-  }
-
-  const openSurveyDetail = (item) => {
-    ref_surveyInfo?.current?.openModal(item)
-
-
   }
 
   const filterTheOptionsCount = (feed) => {
@@ -1071,67 +1053,51 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
 
       if (item.type == "notes") {
         if (isEventFeed) {
-          newList.push(item);
+          // if (!isMine && item.action_info?.action_by != "consultant_user") {
+          if (feed?.feed_type != "poll" && feed?.feed_type != "survey") {
+            newList.push(item);
+          }
+          // }
         }
       }
 
       if (item.type == "message") {
-        if (isChatAllowed) {
-          if (!isMine) {
+        if (isChatAllowed && user?.is_super_delegate) {
+          if (!isMine && feed.action_info?.action_by != "consultant_user") {
             newList.push(item);
           }
         }
       }
 
-
     })
     return newList.length
+  }
 
-    //   if ((isEventFeed && feedOptionModal?.selectedItem?.action_info?.action_id == user?._id) || !isEventFeed) {
-    //     if (access?.feed_pin_unpin_option) {
-    //       if (feedOptionModal?.selectedItem?.is_feature)
-    //         newList = newList.slice().filter(x => x.type != "pin");
-    //       else if (!feedOptionModal?.selectedItem?.is_feature)
-    //         newList = newList.slice().filter(x => x.type != "unpin");
-    //     } else {
-    //       newList = newList.slice().filter(x => x.type != "pin" && x.type != "unpin");
-    //     }
-    //   }else{
-    //     newList = newList.slice().filter(x => x.type != "pin" && x.type != "unpin");
-    //   }
-    //   if (!isEventFeed) {
-    //     newList = newList.slice().filter(x => x.type != "notes");
-    //   }
+  const pollAction = async (feedId, optionId) => {
+    let resp = await FEED_POLL_ACTIONS({ token, navigation, feedId, optionId })
+    if (resp.code == 200) {
 
+    } else {
 
-    //   newList = newList.slice().filter(x => {
-    //     if ((x.type == "message" && user?._id == feedOptionModal?.selectedItem?.action_info?.action_id) || (!!isChatAllowed == false && x.type == "message")) {
-    //       return false
-    //     }
-    //     else if (
-    //      ( !isCosmos && !isScheduledFeed && !isEventFeed )&&
-    //       (!access?.edit_delete_option_in_source_all_source_feeds && feedOptionModal?.selectedItem?.action_info?.action_id != user?._id) &&
-    //       (x.type == "edit" || x.type == "delete")) {
-    //       return false
-    //     }
-    //     return true
-    //   });
+    }
+  }
 
-    //
-    //   // if(!access?.feed_pin_unpin_option){
-    //   //   newList = newList.slice().filter(x => {
-    //   //     if (x.type == "message" && user?._id == feedOptionModal?.selectedItem?.action_info?.action_id) {
-    //   //       return false
-    //   //     }
-    //   //     return true
-    //   //   });
-    //   // }
-    //   
-    //   return newList
-    // } else {
-    //   return []
+  const openPollDetail = (item) => {
+    ref_pollInfo?.current?.openModal(item)
+  }
+
+  const onStartQuestionnairPress = (item) => {
+    // ref_pollInfo?.current?.openModal(item)
+    ref_surveymodal?.current?.openModal(item)
+  }
+
+  const openSurveyDetail = (item) => {
+    ref_surveyInfo?.current?.openModal(item)
+
 
   }
+
+
 
 
   const onLikebtnPress = async (feedId, isLike) => {
@@ -1404,7 +1370,10 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
         isVisible={confirmation.isVisible}
         onAgree={confirmationAction}
         title={confirmation.title}
+      />
 
+      <ConfirmationModal2
+        ref={ref_confirmModal}
       />
 
       <ScheduleModal ref={scheduleModalRef} />
