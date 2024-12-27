@@ -17,7 +17,7 @@ const AudioChatView = ({ url, onPress, totalDuration, currentPlaying, currentTra
   const { state: playState } = usePlaybackState();
 
   const getTrack = async () => {
-    console.log(await TrackPlayer.getActiveTrack(), "state")
+
   }
   useEffect(() => {
     getTrack()

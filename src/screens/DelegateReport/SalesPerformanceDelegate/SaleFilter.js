@@ -104,7 +104,6 @@ const SaleFilter = ({ navigation, route }) => {
         return !(!!filters?.pages.find(x => x._id == item._id));
       })
     } else {
-      console.log(list, "list")
       return list
     }
   }

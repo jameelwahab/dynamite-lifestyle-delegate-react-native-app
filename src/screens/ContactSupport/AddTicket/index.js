@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, FlatList, TouchableOpacity, Pressable, SafeAreaView, TouchableHighlight } from 'react-native'
+import { View, Text, ScrollView, FlatList, TouchableOpacity, Pressable, SafeAreaView, TouchableHighlight, Image } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import RootView from '../../../components/RootView'
 import MyTouchableInput from '../../../components/MyTouchableInput';
@@ -20,6 +20,10 @@ import MyLoader from '../../../components/MyLoader';
 import OptionModal from '../../../components/OptionModal';
 import { EDIT_TICKET_CONTECT_SUPPORT } from '../../../DAL/ContactSupport';
 import MyInputs from '../../../components/MyInputs';
+import getFileIconByType from '../../../functions/getFileIconByType';
+import openUrl from '../../../functions/openUrl';
+import FileViewer from "react-native-file-viewer";
+
 
 const oneFourthOfScreen = (utilities.windowWidth() - 40) / 4;
 const AddTicket = ({ navigation, route }) => {
@@ -207,7 +211,7 @@ const AddTicket = ({ navigation, route }) => {
         />
 
 
-        <MyText isLabel >{"Image (1000X670)"}</MyText>
+        <MyText isLabel >{"Attachments (1000X670)"}</MyText>
       </View>
     )
   }
@@ -245,12 +249,21 @@ const AddTicket = ({ navigation, route }) => {
               </View>
             )
           } else {
+            let uri = !!item?.thumbnail_1 ? S3_URL + item?.thumbnail_1 : item.uri;
+            let fileIcon = getFileIconByType(uri, item?.name || undefined);
             return (
               <View
                 style={{ width: oneFourthOfScreen, height: oneFourthOfScreen }}>
                 <View style={{ margin: 5, flex: 1, borderRadius: 10, alignItems: "center", justifyContent: "center", }}>
                   <Pressable onPress={() => {
-                    if (!!item?.thumbnail_1) {
+                    if (fileIcon) {
+                      if (item?.thumbnail_1) {
+                        openUrl(uri)
+                      } else {
+                        FileViewer.open(uri)
+                      }
+                    }
+                    else if (!!item?.thumbnail_1) {
                       setModalImage({ uri: item?.thumbnail_1, noUrl: false });
                     } else {
                       setModalImage({ uri: item.uri, noUrl: true });
@@ -258,15 +271,23 @@ const AddTicket = ({ navigation, route }) => {
                   }}
                     style={{ height: "100%", width: '100%', }}
                   >
-                    <MyImage
-                      source={{
-                        uri: !!item?.thumbnail_1 ?
-                          S3_URL + item?.thumbnail_1 :
-                          item.uri
-                      }}
-                      style={{ height: "100%", width: '100%', }}
-                      imageStyle={{ borderRadius: 10, }}
-                    />
+                    {fileIcon ?
+                      <View style={{ height: "100%", width: '100%', alignItems: "center", justifyContent: "center", backgroundColor: colors.secondary, borderRadius: 10 }}>
+                        <Image
+                          source={fileIcon}
+                          resizeMode="contain"
+                          style={{ borderRadius: 10, height: "80%", width: "80%", }}
+                        />
+                      </View> :
+                      <MyImage
+                        source={{
+                          uri: !!item?.thumbnail_1 ?
+                            S3_URL + item?.thumbnail_1 :
+                            item.uri
+                        }}
+                        style={{ height: "100%", width: '100%', }}
+                        imageStyle={{ borderRadius: 10, }}
+                      />}
                   </Pressable>
 
                   <Pressable
@@ -292,6 +313,7 @@ const AddTicket = ({ navigation, route }) => {
         onImagePicked={(image) => setImages([...images, ...image])}
         closeModal={() => setIsImageModalVisible(false)}
         multiple={true}
+        enableDocument={true}
       />
       <ImageZoomer
         closeModal={() => setModalImage({ isUrl: false, uri: "" })}

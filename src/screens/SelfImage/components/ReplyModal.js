@@ -66,7 +66,6 @@ const ReplyModal = forwardRef(({ member, question, refresh, list, onClose, disab
 
   const onSelected = (opt) => {
     let { item } = optionModal;
-    console.log(item, "item")
     closeOptionModal();
 
     if (opt.key === "edit") {

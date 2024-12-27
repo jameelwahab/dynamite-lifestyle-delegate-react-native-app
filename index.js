@@ -10,7 +10,6 @@ import TrackPlayer from 'react-native-track-player';
 import notifee from '@notifee/react-native';
 
 messaging().setBackgroundMessageHandler(async remoteMessage => {
-  console.log('Message handled in the background!', remoteMessage);
    notifee.incrementBadgeCount()
 });
 

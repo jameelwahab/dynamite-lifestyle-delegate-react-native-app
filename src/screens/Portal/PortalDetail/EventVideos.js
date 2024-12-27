@@ -18,7 +18,7 @@ const EventVideos = ({ selectedEvent: event, navigation }) => {
       video: video
     })
   }
-  console.log(event, "event")
+
   return (
     <View>
       {!!event && (

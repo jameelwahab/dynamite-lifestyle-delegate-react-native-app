@@ -80,7 +80,6 @@ const EevntList = ({ navigation, route }) => {
 
   const onAgree = () => {
     let { selectedItem: item, type } = confirmModal;
-    console.log(item, "item")
     if (type == "delete") {
       deleteEventFromServer(item.event_slug);
     }

@@ -25,7 +25,6 @@ const PhoneInput = ({ placeholder = "", label, value, onChange, onCountryChange,
         setPhoneNumber(parsed?.nationalNumber);
         setCountry(countriesList.find(country => country.dial_code == "+" + parsed?.countryCallingCode))
       } catch (e) {
-        console.log(e, "error parsing phone number")
         if (!!userCountry) {
           getByCountry()
         } else {

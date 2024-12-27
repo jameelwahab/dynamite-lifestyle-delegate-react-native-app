@@ -7,7 +7,6 @@ import routes from '../navigation/routes';
 
 
 const logoutAction = async (token = "", navigation) => {
-  console.log(token,'hi')
   if (!!token) {
     let res = await LOGOUT(token, navigation);
     await AsyncStorage.multiRemove(["token"])

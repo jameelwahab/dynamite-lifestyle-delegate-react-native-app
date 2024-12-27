@@ -11,7 +11,7 @@ import ResponsiveImage2 from '../../../components/ResponsiveImage2'
 import openUrl from '../../../functions/openUrl'
 
 const FeedEvents = ({ upcomingEvents, currentEvent, noticeboard, isEventFeed }) => {
-  console.log(upcomingEvents, "upcomingEvents")
+
 
 
   const eventView = (item, index) => {
@@ -40,7 +40,7 @@ const FeedEvents = ({ upcomingEvents, currentEvent, noticeboard, isEventFeed }) 
       </View>
     )
   }
-  console.log(noticeboard, "noticeboard")
+
   return (
     <View style={{ marginHorizontal: 10 }}>
       {!isEventFeed &&

@@ -160,7 +160,6 @@ const LinksList = ({ navigation, route }) => {
 
   const filter = (list) => {
     let item = optionModal?.selectedItem;
-    console.log(item, "item")
     let newList = []
     if (item?.type_of_page == "sale_page") {
       newList = list.slice().filter(x => x.type != "appointment")

@@ -389,13 +389,14 @@ export const GET_MEMBER_LIST_FOR_PERSONAL_NOTES = ({ token, navigation, searchTe
   })
 }
 
-export const ADD_PERSONAL_NOTE_FOR_PORTAL = ({ token, navigation, memberId, note }) => {
+export const ADD_PERSONAL_NOTE_FOR_PORTAL = ({ token, navigation, memberId, note, feedId }) => {
   return invokeApi({
     path: `api/member/update_personal_note`,
     method: "POST",
     postData: {
       member_id: memberId,
-      personal_note: note
+      personal_note: note,
+      feed_id: feedId || undefined
     },
     token,
     navigation,

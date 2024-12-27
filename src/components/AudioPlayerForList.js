@@ -14,7 +14,7 @@ import { SimpleLoader } from './MyLoader';
 
 let ended = false;
 
-const AudioPlayerForList = ({ stop = "", url, id, loop = false, onLoopComplete, noS3Url = false }) => {
+const AudioPlayerForList = ({ stop = "", url, id, loop = false, onLoopComplete, noS3Url = false, onEnded, item }) => {
   const [duration, setDuration] = useState(0);
   const [position, setPosition] = useState(0);
   const [loading, setLoading] = useState("")
@@ -49,7 +49,6 @@ const AudioPlayerForList = ({ stop = "", url, id, loop = false, onLoopComplete, 
 
       setLoading(id);
       let uri = !!url.uri ? url.uri : noS3Url ? url : S3_URL + url;
-      console.log(uri, "uri")
       await TrackPlayer.add({
         id: id,
         url: uri,
@@ -62,7 +61,6 @@ const AudioPlayerForList = ({ stop = "", url, id, loop = false, onLoopComplete, 
       TrackPlayer.play();
       ended = false;
     } catch (error) {
-      console.log(error, "trackplayer error")
       TrackPlayer.reset();
       TrackPlayer.stop()
       setTimeout(() => {
@@ -88,7 +86,6 @@ const AudioPlayerForList = ({ stop = "", url, id, loop = false, onLoopComplete, 
 
 
   const { state: playerState } = usePlaybackState();
-  console.log(playerState, "playerState")
   if (playerState === "ready" && loading != "") {
     setLoading("")
   }
@@ -97,7 +94,11 @@ const AudioPlayerForList = ({ stop = "", url, id, loop = false, onLoopComplete, 
   } else if (playerState == "playing" && isPlaying == false) {
     setPlaying(true)
   } else if (playerState == "ended") {
-    console.log(repeatMode, "repeatMode")
+    if (active?.id == id) {
+      if (ended == false) {
+        onEnded?.(item)
+      }
+    }
     if (repeatMode && active.id == id && progress != 0 && ended == false) {
       ended = true;
       repeat()

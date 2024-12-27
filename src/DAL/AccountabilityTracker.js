@@ -89,6 +89,7 @@ export const TRACK_HISTORY = ({ token, navigation, body: { content, date, id } }
     postData: { content, date, id },
     token,
     navigation,
+    noAlerts:true
   })
 }
 

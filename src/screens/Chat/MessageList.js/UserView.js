@@ -23,16 +23,13 @@ const UserView = ({ member, timezone }) => {
   }, [])
 
   const memberOnlineSignal = (data) => {
-    console.log(data, "memberOnlineSignal")
-    console.log(member, "member")
+    
     if (member?.memberId == data?.user_id) {
       setOnlineStatus(true)
     }
   }
 
   const memberOfflineSignal = (data) => {
-    console.log(data, "memberOfflineSignal")
-    console.log(member, "member")
     if (member?.memberId == data?.user_id) {
       setOnlineStatus(false)
     }

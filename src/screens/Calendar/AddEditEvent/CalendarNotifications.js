@@ -28,7 +28,6 @@ import useBackHandler from '../../../hooks/useBackHandler'
 
 const CalendarNotifications = ({ navigation, route }) => {
   const { data, event, iteration_id, type: eventType, notifications: savedNotifications } = route?.params;
-  console.log(navigation, " route?.params")
 
   const isDelegateEvents = eventType == "consultant_user";
   const { token } = useSelector(selectUser);
@@ -167,7 +166,6 @@ const CalendarNotifications = ({ navigation, route }) => {
   }
 
   const onBackPress = () => {
-    console.log("onBackPress")
     navigation.navigate(routes.calendarEventsAddEdit, {
       notifications, event, iteration_id,
     })
@@ -207,7 +205,6 @@ const CalendarNotifications = ({ navigation, route }) => {
 
   const notifcatioDataTypeHandler = (data, index, type) => {
     let obj = breakReference({ ...notifications[index] })
-    console.log(obj, index)
     let iindex = obj.notification_send_type.findIndex(x => x.name == type);
     if (iindex > -1) {
       obj.notification_send_type[iindex] = {

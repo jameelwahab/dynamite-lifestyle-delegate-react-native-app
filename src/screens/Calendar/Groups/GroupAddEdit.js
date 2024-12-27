@@ -21,7 +21,6 @@ import { communityLevelArr, communityLevelObj } from '../../../utilities/constan
 
 const GroupAddEdit = ({ navigation, route }) => {
   const { group, ammendList } = route?.params;
-  console.log(group, "group")
   const isEdit = !!group;
   const { token, access } = useSelector(selectUser);
   const [loader, setLoader] = useState(false);

@@ -58,9 +58,7 @@ const MessageModal = forwardRef(({ onReminderSavePress }, ref) => {
 
     if (!!selection && type == "bold") {
       let textToReplace = msg.slice(selection?.start, selection?.end);
-      console.log(textToReplace, "textToReplace")
       let newTextToBeAddedd = "**" + textToReplace + "**";
-      console.log(textToReplace, "textToReplace")
       let message = msg;
       let newMessage = message.replace(textToReplace, newTextToBeAddedd);
       setMsg(newMessage)

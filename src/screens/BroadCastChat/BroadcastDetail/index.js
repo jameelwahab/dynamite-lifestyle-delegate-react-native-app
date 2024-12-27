@@ -47,7 +47,6 @@ const BroadcastDetail = ({ navigation, route }) => {
 
     if (res.code == 200) {
       let length = newArray ? res?.broadcast_members.length : list.length + res?.broadcast_members.length;
-      console.log(length < res?.total_count, "length < res?.total_count")
       if (length < res?.total_count) {
         page++;
         canLoadMore = true;

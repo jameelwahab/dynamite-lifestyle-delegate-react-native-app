@@ -55,7 +55,6 @@ const NotificationModal = forwardRef(({ onReminderSavePress }, ref) => {
   const openModal = (data, dIndex = undefined) => {
     setIsVisible(true);
     setIndex(dIndex)
-    console.log(data,"data")
     if (!!data) {
       setTitle(!!data?.notification_title ? data?.notification_title : "");
       setMessage(!!data?.description ? data?.description : "")

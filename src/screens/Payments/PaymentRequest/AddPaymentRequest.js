@@ -30,7 +30,6 @@ const AddPaymentRequest = ({ navigation, route }) => {
   const ref_info = useRef()
   const { token, access } = useSelector(selectUser);
   const { settings } = useSelector(selectSettings);
-  console.log(settings, "settings")
   const [isNewMember, setisNewMember] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");

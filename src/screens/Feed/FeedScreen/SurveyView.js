@@ -43,7 +43,6 @@ const SurveyView = forwardRef(({ data, timezone }, ref) => {
 
   useEffect(() => {
     if (!!data) {
-      console.log(data, "data")
       setOptions([...data?.questions]);
       setPrivacy(data?.survey_result == "private")
       // setIsMultiple(data?.is_multiple_allow);
@@ -167,16 +166,13 @@ const SurveyView = forwardRef(({ data, timezone }, ref) => {
       minute: date.minute(),
       second: date.second()
     }
-    console.log(obj, "obj")
     let dateObj = new Date(date.format("YYYY-MM-DD"))
-    // console.log(obj)
     return dateObj
 
 
   }
 
   const onViewCallBack = React.useCallback(({ viewableItems }) => {
-    console.log(viewableItems)
     if (viewableItems.length == 1) {
       setIndex(viewableItems[0]?.index)
     }

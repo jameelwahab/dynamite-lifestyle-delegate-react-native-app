@@ -78,7 +78,6 @@ const QuestionConfig = ({
   const AnswerTheQuestions = (item, answer = undefined, fileURL = undefined) => {
     let array = [...answers];
     let index = array.findIndex(x => x._id == item._id);
-    console.log(item, "item")
     let obj;
     if (item.question_type != "checkbox") {
 
@@ -128,7 +127,6 @@ const QuestionConfig = ({
         } else {
           checkboxArray.push(answer);
         }
-        console.log(checkboxArray, "checkboxArray")
         obj.answer_statement = checkboxArray
       }
       if (fileURL != undefined) {
@@ -141,7 +139,6 @@ const QuestionConfig = ({
         array.push(obj)
       }
     }
-    console.log(array, "array")
     setAnswers([...array]);
   }
 

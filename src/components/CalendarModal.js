@@ -49,8 +49,6 @@ const CalendarModal = forwardRef(({ onDateSelected, minimum, maximun }, ref) => 
   useEffect(() => {
     if (showYearView) {
       let index = Yearlist.findIndex(x => x == moment(date).format("YYYY"));
-      console.log(index, "index")
-      console.log(flatlistRef?.current, "flatlistRef?.current")
 
       // setTimeout(() => {
       //   flatlistRef?.current?.scrollToIndex({

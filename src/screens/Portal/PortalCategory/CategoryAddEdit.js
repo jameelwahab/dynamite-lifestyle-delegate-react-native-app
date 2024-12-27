@@ -18,7 +18,6 @@ import showToast from '../../../functions/showToast'
 
 const CategoryAddEdit = ({ route, navigation }) => {
   let { item, slug, eventId, backScreenFunc } = route.params;
-  console.log(item, "item")
   let { token } = useSelector(selectUser);
   const [loader, setLoader] = useState(false);
   const [data, updateData] = useState({

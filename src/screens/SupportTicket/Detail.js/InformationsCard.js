@@ -9,6 +9,9 @@ import MyImage from '../../../components/MyImage'
 import { S3_URL } from '../../../utilities/constants'
 import { MyButton, TransparentButton } from '../../../components/MyButton'
 import ImageZoomer from '../../../components/ImageZoomer'
+import getFileIconByType from '../../../functions/getFileIconByType'
+import { Image } from 'react-native'
+import { openUrl } from '@ronradtke/react-native-markdown-display'
 
 const InformationsCard = ({ ticket, user, moveToMarkResolve, listRoute }) => {
 
@@ -85,18 +88,35 @@ const InformationsCard = ({ ticket, user, moveToMarkResolve, listRoute }) => {
                     <MyText color={colors.primary} type='medium'  >Attachments</MyText>
                     <View style={{ flexDirection: "row", flexWrap: "wrap", height: 100, marginTop: 5 }}>
                       <ScrollView horizontal >
-                        {ticket?.ticket_images.map((x, i) => (
-                          <View style={{ height: 100, aspectRatio: 1, }}>
-                            <Pressable
-                              onPress={() => setModalListImages({ list: ticket?.ticket_images, index: i })}
-                              style={{ margin: 5, borderRadius: 10, overflow: "hidden" }}>
-                              <MyImage
-                                source={{ uri: S3_URL + x.thumbnail_1 }}
-                                style={{ height: "100%", width: "100%" }}
-                              />
-                            </Pressable>
-                          </View>
-                        ))}
+                        {ticket?.ticket_images.map((x, i) => {
+                          let fileIcon = getFileIconByType(x.thumbnail_1);
+                          return (
+                            <View style={{ height: 100, aspectRatio: 1, }}>
+                              <Pressable
+                                onPress={() => {
+                                  if (fileIcon) {
+                                    openUrl(S3_URL + x.thumbnail_1)
+                                  } else {
+                                    setModalListImages({ list: ticket?.ticket_images, index: i })
+                                  }
+                                }}
+                                style={{ margin: 5, borderRadius: 10, overflow: "hidden" }}>
+                                {fileIcon ?
+                                  <View style={{ height: "100%", width: '100%', alignItems: "center", justifyContent: "center", backgroundColor: colors.secondary, borderRadius: 10 }}>
+                                    <Image
+                                      resizeMode="contain"
+                                      source={fileIcon}
+                                      style={{ height: "80%", width: "80%" }}
+                                    />
+                                  </View> :
+                                  <MyImage
+                                    source={{ uri: S3_URL + x.thumbnail_1 }}
+                                    style={{ height: "100%", width: "100%" }}
+                                  />}
+                              </Pressable>
+                            </View>
+                          )
+                        })}
                       </ScrollView>
                     </View>
                   </View>

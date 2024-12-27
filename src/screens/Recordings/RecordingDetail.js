@@ -12,7 +12,6 @@ import { MyButton } from '../../components/MyButton'
 
 const RecordingDetail = ({ navigation, route }) => {
   const { recording } = route?.params;
-  console.log(recording, "recording")
   return (
     <RootView title={recording?.title} >
       <ScrollView showsVerticalScrollIndicator={false}>

@@ -105,32 +105,38 @@ export class MyWebview extends Component {
             margin: 0,
           },
           div: {
-            color: colors.white,
+            color: this.props?.invert ? colors.black : colors.white,
             fontFamily: this.props.html.includes("<b>") ? undefined : fonts.regular,
             margin: 0,
             // padding: 0,
           },
           p: {
             margin: 0,
+            color: this.props?.invert ? colors.black : colors.white,
           },
           h1: {
-            margin: 0
+            margin: 0,
+            color: this.props?.invert ? colors.black : colors.white,
           },
           h2: {
             margin: 0,
             color: colors.primary
           },
           h3: {
-            margin: 0
+            margin: 0,
+            color: this.props?.invert ? colors.black : colors.white,
           },
           h4: {
-            margin: 0
+            margin: 0,
+            color: this.props?.invert ? colors.black : colors.white,
           },
           h5: {
-            margin: 0
+            margin: 0,
+            color: this.props?.invert ? colors.black : colors.white,
           },
           h6: {
-            margin: 0
+            margin: 0,
+            color: this.props?.invert ? colors.black : colors.white,
           },
           img: {
             marginTop: 5,

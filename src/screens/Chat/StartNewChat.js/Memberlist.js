@@ -12,7 +12,7 @@ const Memberlist = ({ list, loader, statusColor, navigation, token, refresh, res
   const [isLoading, setIsLoading] = useState(false)
 
   const onChatScreen = async (item) => {
-    console.log(item)
+
     setIsLoading(true)
     let res = await IS_CHAT_EXIST({ token, navigation, memberId: item?._id });
     setIsLoading(false)
