@@ -6,8 +6,10 @@ export const __styles = StyleSheet.create({
   topBtn: {
     width: 30,
     height: 30,
+    borderRadius: 15,
     justifyContent: "center",
     alignItems: "center",
+    marginRight: 5
   },
   tabRootView: {
     backgroundColor: colors.secondaryVariant,
@@ -35,7 +37,7 @@ export const __styles = StyleSheet.create({
 
 export const calendarStyles = StyleSheet.create({
   typeView: {
-    flexDirection: "row",  borderWidth: 1, borderColor: colors.primary, borderRadius: 5,
+    flexDirection: "row", borderWidth: 1, borderColor: colors.primary, borderRadius: 5,
     marginBottom: 10
   },
   typeBtn: {

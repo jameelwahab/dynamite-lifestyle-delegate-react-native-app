@@ -123,6 +123,7 @@ export const icons = {
   goto: (color = colors.primary, size = 17) => { return (<Ionicons name="open-outline" color={color} size={size} />) },
   message: (color = colors.primary, size = 17) => { return (<MaterialIcons name="message" color={color} size={size} />) },
   history: (color = colors.primary, size = 17) => { return (<FontAwesome5 name="history" color={color} size={size} />) },
+  sms: (color = colors.primary, size = 17) => { return (<FontAwesome5 name="sms" color={color} size={size} />) },
   editpencil: (color = colors.primary, size = 17) => { return (<MaterialIcons name="mode-edit" color={color} size={size} />) },
   sort: (color = colors.primary, size = 17) => { return (<Octicons name="sort-desc" color={color} size={size} />) },
   eye: (color = colors.primary, size = 17) => { return (<Ionicons name="eye" color={color} size={size} />) },
