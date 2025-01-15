@@ -5,9 +5,9 @@ import MyText from './MyText'
 import { S3_URL } from '../utilities/constants'
 import { colors } from '../utilities/colors'
 
-const UserImage = ({ image, name, size = 40, backgroundTransparent = false, noS3 = false }) => {
+const UserImage = ({ image, name, size = 40, backgroundTransparent = false, noS3 = false, borderWidth = 1 / 4, borderColor = colors.primary }) => {
   return (
-    <View style={{ height: size, width: size, borderRadius: size / 2, overflow: "hidden", borderWidth: 1 / 4, borderColor: colors.primary, alignItems: "center", justifyContent: "center", backgroundColor: backgroundTransparent ? "#00000000" : colors.grey }}>
+    <View style={{ height: size, width: size, borderRadius: size / 2, overflow: "hidden", borderWidth: borderWidth, borderColor: borderColor, alignItems: "center", justifyContent: "center", backgroundColor: backgroundTransparent ? "#00000000" : colors.grey }}>
       {!!image ?
         <MyImage
           source={{ uri: noS3 ? image : S3_URL + image }}

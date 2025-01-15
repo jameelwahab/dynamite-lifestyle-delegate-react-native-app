@@ -25,15 +25,18 @@ import OptionModalWithSearch from '../../components/OptionModalWithSearch'
 import MyChip from '../../components/MyChip'
 import routes from '../../navigation/routes'
 import showToast from '../../functions/showToast'
+import isArray from '../../functions/isArray'
+import breakReference from '../../functions/breakReference'
 
 const PodAdd = ({ navigation, route }) => {
   const ref_calendar = useRef();
   const { editableItem, type } = route.params;
   const isEdit = type == 'edit';
-  const { token } = useSelector(selectUser);
+  const { token, access } = useSelector(selectUser);
   const [loader, setLoader] = useState(true);
   const [optionModal, setOptionModal] = useState({ isVisible: false, type: "", list: [], });
   const [multipleOptionModal, setMultipleOptionModal] = useState(false);
+  const [communityLevelModal, setCommunityLevelModal] = useState(false);
   const [memberModalVisibility, setMemberModalVisibility] = useState(false);
   const [exMemberModalVisibility, setExMemberModalVisibility] = useState(false);
   const [timePicker, setTimePicker] = useState(false);
@@ -47,7 +50,7 @@ const PodAdd = ({ navigation, route }) => {
     zoomlink: "",
     password: "",
     isRecurring: false,
-    communityLvl: communityLevels[0],
+    communityLvl: isArray(access?.badge_levels) ? [access?.badge_levels[0]] : [],
     startDate: moment(),
     startTime: "00:00",
     hours: hourslist[0],
@@ -197,7 +200,7 @@ const PodAdd = ({ navigation, route }) => {
         zoomlink: !!room?.zoom_link ? room?.zoom_link : "",
         password: !!room?.password ? room?.password : "",
         isRecurring: !!room?.is_recurring ? true : false,
-        communityLvl: !!room?.community_level ? communityLevels.find(x => x.key == room?.community_level) : communityLevels[0],
+        communityLvl: !!room?.badge_levels ? room?.badge_levels : isArray(access?.badge_levels) ? access?.badge_levels[0] : [],
         startDate: !!room?.start_date ? moment(room?.start_date, "YYYY/MM/DD") : moment(),
         startTime: !!room?.start_time ? room?.start_time : "00:00",
         hours: !!room?.duration_hour ? hourslist.find(x => x.key == room?.duration_hour) : hourslist[0],
@@ -238,7 +241,7 @@ const PodAdd = ({ navigation, route }) => {
     fd.append("start_time", startTime)
     fd.append("duration_hour", hours.key)
     fd.append("duration_minute", minutes.key)
-    fd.append("community_level", communityLvl?.key)
+    fd.append("badge_levels", JSON.stringify(communityLvl))
     fd.append("recurring_type", recurrenceType?.key)
     fd.append("weekdays", JSON.stringify(recurrenceDays))
     fd.append("start_date", moment(startDate).format("YYYY-MM-DD"))
@@ -285,6 +288,28 @@ const PodAdd = ({ navigation, route }) => {
       setLoader(false)
 
     }
+  }
+
+
+  const removeItem = (index, type) => {
+    cred[type].splice(index, 1);
+    setCred({ [type]: [...cred[type]] })
+  }
+
+
+
+  const selectedMemberView = (list, type, variable) => {
+    console.log(list, "list")
+    return (
+      <View pointerEvents="auto" style={__styles.chipsLisView}>
+        {list.map((item, index) =>
+          <MyChip
+            title={!!variable ? item[variable] : `${item?.first_name} ${item?.last_name} (${item?.email})`}
+            onPress={() => removeItem(index, type)}
+          />
+        )}
+      </View>
+    )
   }
 
   return (
@@ -359,11 +384,19 @@ const PodAdd = ({ navigation, route }) => {
           </View>
         </View>
 
+
         <MyTouchableInput
-          label='Community Level*'
+          iconOnPress={() => setCommunityLevelModal(true)}
+          label='Badge Level*'
+          view={() => selectedMemberView(communityLvl, "communityLvl", "title")}
+        // value={!!groupData?.communityLevel ? communityLevelObj[groupData?.communityLevel] : ""}
+        />
+
+        {/* <MyTouchableInput
+          label='Group Level*'
           value={communityLvl?.title}
           onPress={() => setOptionModal({ isVisible: true, list: communityLevels, type: "communityLvl", })}
-        />
+        /> */}
 
         <View style={__styles.section} >
           <View style={__styles.sectionView}>
@@ -569,6 +602,27 @@ const PodAdd = ({ navigation, route }) => {
         onSelected={onOptionSelect}
         checkSelected={(item) => item?.key == cred[optionModal?.type]?.key}
         noIcon
+      />
+
+      <OptionModal
+        multiple
+        onSelected={(item) => {
+          let arr = breakReference(communityLvl);
+          let index = arr?.findIndex(x => x?._id == item?._id);
+          if (index > -1) {
+            arr.splice(index, 1);
+          } else {
+            arr.push(item)
+          }
+          setCred({ communityLvl: arr })
+        }}
+        checkSelected={(item) => {
+          return communityLvl.some(x => x?._id == item?._id)
+        }}
+        noIcon
+        isVisible={communityLevelModal}
+        closeModal={() => setCommunityLevelModal(false)}
+        optionList={access?.badge_levels || []}
       />
 
       <OptionModal
@@ -794,6 +848,12 @@ const weekdays = [{
 const __styles = StyleSheet.create({
   radioRootView: {
     marginBottom: 15
+  },
+  chipsLisView: {
+    flex: 1,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    paddingVertical: 5
   },
   radioView: {
     flexDirection: "row",

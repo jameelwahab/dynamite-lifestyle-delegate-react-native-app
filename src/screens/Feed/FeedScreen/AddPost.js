@@ -58,7 +58,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   isNoteMainFeed
 
 }, ref) => {
-console.log(isNoteMainFeed,"isNoteMainFeed")
+  console.log(isNoteMainFeed, "isNoteMainFeed")
   const { height, width } = useWindowDimensions();
   const inset = useSafeAreaInsets();
   const ref_poll = useRef()
@@ -291,7 +291,9 @@ console.log(isNoteMainFeed,"isNoteMainFeed")
     setEditId(item._id);
     setEditFeed(item);
     setPostCategory(item?.feed_appear_by == "public" ? "general" : "win");
+    // if (isCosmos) {
     setPostCreatedFor(item?.created_for_level_or_type == "both" ? "delegate" : item?.created_for_level_or_type);
+    // }
     setPostCreatedForArray([PostCretedForSourceFeed.find(x => x.type == item?.created_for_level_or_type)])
     setPostType(item?.feed_type);
     setPostText(item?.description.replace(/\r\n/g, "\n").replace(/\r/g, "\n"));
@@ -568,14 +570,17 @@ console.log(isNoteMainFeed,"isNoteMainFeed")
     fd.append("embed_code", postType == "embed_code" ? embededCode : "");
     fd.append("feed_images", postType == 'image' ? JSON.stringify(uploadedImages) : "[]");
     fd.append("mentioned_users", JSON.stringify(mentionList));
-    if (!isCosmos && !!editId == false) {
-      fd.append("created_for_level_or_type", JSON.stringify(postCeatedForArray.map(x => x.type)));
-    } else if (!!editId) {
-      fd.append("created_for_level_or_type", postCeatedFor);
-    } else {
-      fd.append("created_for_level_or_type", isCosmos ?
-        JSON.stringify([postCeatedFor])
-        : JSON.stringify([postCeatedFor]));
+    // if (!isCosmos && !!editId == false) {
+    //   fd.append("created_for_level_or_type", JSON.stringify(postCeatedForArray.map(x => x.type)));
+    // } else 
+    if (isCosmos) {
+      if (!!editId) {
+        fd.append("created_for_level_or_type", postCeatedFor);
+      } else {
+        fd.append("created_for_level_or_type", isCosmos ?
+          JSON.stringify([postCeatedFor])
+          : JSON.stringify([postCeatedFor]));
+      }
     }
 
 
@@ -1037,13 +1042,13 @@ console.log(isNoteMainFeed,"isNoteMainFeed")
                   <MyText fontSize={16} type="bold">{user?.first_name + " " + user?.last_name}</MyText>
                   <View style={__style.modalActionButtonRow}>
 
-                    <TouchableOpacity
+                    {/* <TouchableOpacity
                       onPress={() => openOptionModal("category")}
                       style={__style.modalDropBtns}>
                       <MyText style={{ textTransform: "capitalize" }}>
                         {postCategory}</MyText>
                       {icons.downwardArrow(17, colors.white)}
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
 
                     {(isCosmos || !!editId) && !hideLevelView && selectLevelOptionOnAddPostForCosmos &&
                       <TouchableOpacity
@@ -1058,6 +1063,8 @@ console.log(isNoteMainFeed,"isNoteMainFeed")
                           </MyText>}
                         {icons.downwardArrow(17, colors.white)}
                       </TouchableOpacity>}
+
+
                     {!!!editId &&
                       <View opacity={0.7}>
                         <TouchableOpacity
@@ -1066,7 +1073,8 @@ console.log(isNoteMainFeed,"isNoteMainFeed")
                         </TouchableOpacity>
                       </View>}
                   </View>
-                  {!isCosmos && !isNoteMainFeed &&
+
+                  {/* {!isCosmos && !isNoteMainFeed &&
                     <View style={{ marginTop: 10 }}>
                       <TouchableOpacity
                         onPress={() => setMultipleLevelModalVisiblity(true)}
@@ -1083,7 +1091,7 @@ console.log(isNoteMainFeed,"isNoteMainFeed")
                         {icons.downwardArrow(17, colors.white)}
                       </TouchableOpacity>
                     </View>
-                  }
+                  } */}
                 </View>
 
               </View>

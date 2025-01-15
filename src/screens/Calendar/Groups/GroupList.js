@@ -18,8 +18,7 @@ import routes from '../../../navigation/routes'
 import { icons } from '../../../utilities/icons'
 import MyRefreshControl from '../../../components/MyRefreshControl'
 import showToast from '../../../functions/showToast'
-import SearchView from '../../../components/SearchView'
-import { communityLevelWithAllObj } from '../../../utilities/constants'
+import isArray from '../../../functions/isArray'
 
 const GroupList = ({ navigation, route }) => {
   const { key, parentKey } = route?.params
@@ -144,7 +143,7 @@ const GroupList = ({ navigation, route }) => {
           />
         </View>
         <View style={__styles.statView}>
-          <StatView title={groupBy[item?.group_by]+"s"}
+          <StatView title={groupBy[item?.group_by] + "s"}
             view={() => eventView(
               item?.group_by == "event" ? item?.event
                 : item?.group_by == "program" ? item?.program
@@ -154,7 +153,7 @@ const GroupList = ({ navigation, route }) => {
           <StatView title={"Type"} value={item?.group_type} />
           <StatView title={"Group By"} value={groupBy[item?.group_by]} />
           <StatView title={"Members"} value={item?.member.length} />
-          <StatView original title={"Community Level"} value={!!item?.community_level ? communityLevelWithAllObj[item?.community_level.toLowerCase()] : ""} />
+          <StatView original title={"Community Level"} value={isArray(item?.badge_levels) ? item?.badge_levels.map(item => item?.title + ", ") : ""} />
           <StatView title={"Status"} view={() => statusView(item?.status)} />
         </View>
       </Pressable>

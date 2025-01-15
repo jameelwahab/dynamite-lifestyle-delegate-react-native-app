@@ -64,6 +64,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
   const isScheduledFeed = feedFor == "scheduled";
   const isAllSourceFeed = feedFor == "all_source";
   const isTheSourceFeed = feedFor == "the_source";
+  const isForSource = (isScheduledFeed || isAllSourceFeed || isTheSourceFeed);
   const isNoteMainFeed = (feedFor == "event" || feedFor == "program")
   const isEventFeed = feedFor == "event";
   const isProgramFeed = feedFor == "program";
@@ -220,7 +221,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
     let res = await GET_FEED_LIST({
       navigation, token,
       type: schedulePost ? "scheduled" : feedFor,
-      level: feedLevel,
+      level: isCosmos ? feedLevel : undefined,
       page: feedVar.page,
       eventId: eventId,
       feedTypeAction: feedType?.value,
@@ -1261,7 +1262,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           timezone={timezone}
           removeFromList={removeFromList}
           isSuperDelegate={user?.is_super_delegate}
-          hideLevelView={isNoteMainFeed || (isCosmos && !access?.cosmos_feeds_filters)}
+          hideLevelView={isNoteMainFeed || isForSource || (isCosmos && !access?.cosmos_feeds_filters)}
           isMultipleSelectAllowed={access?.multiple_levels_in_source_all_source_scadule_feeds}
           showEventOption={access?.event_info_in_source_all_source_scadule_feeds}
           cosmosLevelList={access?.cosmos_feed_filters}

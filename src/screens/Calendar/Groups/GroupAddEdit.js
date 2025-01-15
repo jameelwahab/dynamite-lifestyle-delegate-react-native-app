@@ -17,11 +17,11 @@ import showToast from '../../../functions/showToast'
 import MyLoader from '../../../components/MyLoader'
 import { selectSettings } from '../../../redux/reducers/settingSlice'
 import OptionModal from '../../../components/OptionModal'
-import { communityLevelArr, communityLevelObj } from '../../../utilities/constants'
+import { communityLevelObj } from '../../../utilities/constants'
+import breakReference from '../../../functions/breakReference'
 
 const GroupAddEdit = ({ navigation, route }) => {
   const { group, ammendList } = route?.params;
-  console.log(group, "group")
   const isEdit = !!group;
   const { token, access } = useSelector(selectUser);
   const [loader, setLoader] = useState(false);
@@ -48,7 +48,7 @@ const GroupAddEdit = ({ navigation, route }) => {
     member: !!group?.member ? group?.member.map(x => x?._id) : [],
     exclude_members: !!group?.exclude_members ? group?.exclude_members.map(x => x?._id) : [],
     memberType: !!group?.group_for_member ? group?.group_for_member : memberTypeList[0]?.value,
-    communityLevel: !!group?.community_level ? group?.community_level : ""
+    communityLevel: !!group?.badge_levels ? group?.badge_levels : []
   })
   const setGroupData = (update) => updateGroupData({ ...groupData, ...update });
 
@@ -139,7 +139,7 @@ const GroupAddEdit = ({ navigation, route }) => {
         status: groupData.status,
         member: groupData.member.map(member => ({ member_id: member?._id })),
         exclude_members: groupData.exclude_members.map(member => member?._id),
-        community_level: groupData?.communityLevel,
+        badge_levels: groupData?.communityLevel,
         group_for_member: groupData?.memberType,
 
       };
@@ -217,18 +217,21 @@ const GroupAddEdit = ({ navigation, route }) => {
   }
 
 
-  const selectedMemberView = (list, type) => {
+  const selectedMemberView = (list, type, variable) => {
     return (
       <View pointerEvents="auto" style={__styles.chipsLisView}>
         {list.map((item, index) =>
           <MyChip
-            title={`${item?.first_name} ${item?.last_name} (${item?.email})`}
+            title={!!variable ? item[variable] : `${item?.first_name} ${item?.last_name} (${item?.email})`}
             onPress={() => removeItem(index, type)}
           />
         )}
       </View>
     )
   }
+
+
+
 
 
   return (
@@ -302,9 +305,10 @@ const GroupAddEdit = ({ navigation, route }) => {
 
         {access?.allow_community_level_in_group &&
           <MyTouchableInput
-            onPress={() => setCommunityLevelModal(true)}
-            label='Community Level'
-            value={!!groupData?.communityLevel ? communityLevelObj[groupData?.communityLevel] : ""}
+            iconOnPress={() => setCommunityLevelModal(true)}
+            label='Badge Level'
+            view={() => selectedMemberView(groupData?.communityLevel, "communityLevel", "title")}
+          // value={!!groupData?.communityLevel ? communityLevelObj[groupData?.communityLevel] : ""}
           />}
 
         {groupData.groupBy == "program" ?
@@ -417,15 +421,24 @@ const GroupAddEdit = ({ navigation, route }) => {
 
       {/* Community level modal */}
       <OptionModal
+        multiple
         onSelected={(item) => {
-          setCommunityLevelModal(false);
-          setGroupData({ ...groupData, communityLevel: item?.value })
+          let arr = breakReference(groupData?.communityLevel);
+          let index = arr?.findIndex(x => x?._id == item?._id);
+          if (index > -1) {
+            arr.splice(index, 1);
+          } else {
+            arr.push(item)
+          }
+          setGroupData({ ...groupData, communityLevel: arr })
         }}
-        checkSelected={(item) => item?.value == groupData?.communityLevel}
+        checkSelected={(item) => {
+          return groupData?.communityLevel.some(x => x?._id == item?._id)
+        }}
         noIcon
         isVisible={communityLevelModal}
         closeModal={() => setCommunityLevelModal(false)}
-        optionList={communityLevelArr}
+        optionList={access?.badge_levels || []}
       />
 
 

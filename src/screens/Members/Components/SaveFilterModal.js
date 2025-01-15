@@ -14,7 +14,7 @@ import { dateTimeFormat } from '../../../utilities/constants';
 import MyLoader from '../../../components/MyLoader';
 import { SAVE_FILTER } from '../../../DAL/Members';
 
-const SaveFilterModal = forwardRef(({ tabName, filters, navigation, token, filterData, searchText, sort, isMembers, isNurture, isAllMembers }, ref) => {
+const SaveFilterModal = forwardRef(({ access, tabName, filters, navigation, token, filterData, searchText, sort, isMembers, isNurture, isAllMembers }, ref) => {
   const [isVisible, setIsVisible] = useState(false);
   const [title, setTitle] = useState("")
   const [loader, setLoader] = useState(false)
@@ -67,13 +67,13 @@ const SaveFilterModal = forwardRef(({ tabName, filters, navigation, token, filte
         chip_label: `Membership Expiry Start Date : ${moment(filters?.membership_purchase_expiry_from).format(dateTimeFormat.date)} - Membership Expiry End Date :  ${moment(filters?.membership_purchase_expiry_to).format(dateTimeFormat.date)}`,
         chip_value: `Membership Expiry Start Date : ${moment(filters?.membership_purchase_expiry_from).format(dateTimeFormat.date)} - Membership Expiry End Date :  ${moment(filters?.membership_purchase_expiry_to).format(dateTimeFormat.date)}`,
       } : filters?.membership_expiry,
-      community: filters.community.map((x) => {
-        let lvl = levelList.find(y => y.key == x);
+      badge_levels: filters?.badge_levels.map((x) => {
+        let lvl = access?.badge_levels.find(y => y._id == x);
         if (!!lvl) {
           return {
             chip_label: lvl?.title,
-            chip_value: lvl?.key,
-            name: lvl?.key,
+            chip_value: lvl?._id,
+            _id: lvl?._id,
             title: lvl?.title
           }
         }
@@ -87,7 +87,7 @@ const SaveFilterModal = forwardRef(({ tabName, filters, navigation, token, filte
         chip_label: salePage?.sale_page_title,
         chip_value: salePage?._id
       } : {},
-      lead_status: filters.lead_status.map((x) => {
+      lead_status: filters?.lead_status.map((x) => {
         let lead = filterData?.lead_status.find(y => y._id == x);
         if (!!lead) {
           return {

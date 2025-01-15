@@ -186,11 +186,13 @@ const MemberList = ({ navigation, route }) => {
     Object.keys(obj).forEach((x, i) => {
       // console.log(obj[x], 'Check');
       if (Array.isArray(obj[x])) {
-        if (x == "community") {
+        if (x == "badge_levels") {
+
           obj[x].forEach((z, j) => {
+            let obj = access?.badge_levels.find(y => y?._id == z)
             let nOBj = {
-              label: levelList.find(y => y.key == z).title,
-              value: z,
+              label: obj?.title,
+              value: obj?._id,
               type: x
             }
             list.push(nOBj);
@@ -200,7 +202,6 @@ const MemberList = ({ navigation, route }) => {
           let id = obj[x][0]
           if (!!id) {
             let label = data?.sale_pages.find((x) => x._id == id)?.sale_page_title;
-            console.log(label, "event_page")
             let nOBj = {
               label: label,
               value: id,
@@ -211,7 +212,6 @@ const MemberList = ({ navigation, route }) => {
         } else if (x == "lead_status") {
           obj[x].forEach((z, j) => {
             let label = data?.lead_status.find(y => y._id == z)?.title;
-            console.log(label, "lead_status")
             if (label) {
               let nOBj = {
                 label: label,
@@ -361,7 +361,7 @@ const MemberList = ({ navigation, route }) => {
       setList([])
     }
     let res;
-    console.log(Filter,'Filter')
+    console.log(Filter, 'Filter')
     Keyboard.dismiss();
     if (isAllMembers) {
       res = await LIST_OF_MEMBERS({
@@ -611,8 +611,8 @@ const MemberList = ({ navigation, route }) => {
   const filterRemoveAction = (item) => {
     if (item.type == "sort") {
       setSorted(null)
-    } else if (item.type == "community") {
-      updateFilter({ community: Filter?.community.slice().filter(z => z != item.value) });
+    } else if (item.type == "badge_levels") {
+      updateFilter({ badge_levels: Filter?.badge_levels.slice().filter(z => z != item.value) });
     } else if (item.type == "event_page") {
       updateFilter({ event_page: [] })
     } else if (item.type == "lead_status") {
@@ -895,7 +895,7 @@ const MemberList = ({ navigation, route }) => {
             item?.affliliate?.affiliate_user_info?.first_name + " " + item?.affliliate?.affiliate_user_info?.last_name + " (" + item?.affliliate?.affiliate_url_name + ") " : "Master Link"} />}
           {!isNurture && access?.Show_nurture_in_filter && <StatView title={"Nurture"} value={!!item?.nurture ? item?.nurture?.first_name + " " + item?.nurture?.last_name : "N/A"} />}
           {!isMembers && <StatView title={"Delegate"} value={!!item?.consultant ? item?.consultant?.first_name + " " + item?.consultant?.last_name : "N/A"} />}
-          <StatView title={"Community Level"} value={communityLevelWithAllObj[item?.community_level]} noFontTransform />
+          <StatView title={"Badge Level"} value={item?.membership_level_badge_info?.membership_level_badge_title} noFontTransform />
           <StatView title={"Last Login Activity"} uppercase value={convertTimezone(item?.last_login_activity, timezone).format(dateTimeFormat.dateTime)} />
           <StatView title={"Lead Status"} view={() => leadStatusView(item)} />
           <StatView title={"Membership Expire"} value={!!item?.membership_purchase_expiry ?
@@ -980,6 +980,7 @@ const MemberList = ({ navigation, route }) => {
         isMembers={isMembers}
         isNurture={isNurture}
         isAllMembers={isAllMembers}
+        access={access}
       />
 
       <OptionModal
@@ -1019,7 +1020,8 @@ const sort = {
 }
 
 const filteroObj = {
-  "community": [],
+  // "community": [],
+  "badge_levels": [],
   "event_page": [],
   "lead_status": [],
   "plan": null,

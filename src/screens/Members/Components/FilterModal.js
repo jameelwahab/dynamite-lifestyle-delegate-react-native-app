@@ -16,13 +16,16 @@ import CheckBox from '@react-native-community/checkbox';
 import MyCheckBox from '../../../components/MyCheckBox';
 import MyInputs from '../../../components/MyInputs';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { filterFromlist, levelList, memberStatusList, onlineStatusList, membershipStatusList, expireDaysList, appDownloadedStatusList } from './list'
+import { filterFromlist, memberStatusList, onlineStatusList, membershipStatusList, expireDaysList, appDownloadedStatusList } from './list'
 import Toast from 'react-native-toast-message';
 import showToast from '../../../functions/showToast';
 import OptionModalWithSearch from '../../../components/OptionModalWithSearch';
+import { useSelector } from 'react-redux';
+import { access, selectUser } from '../../../redux/reducers/userSlice';
 
 const FilterModal = forwardRef(({ token, type, filterTheData, appliedFilter, isMembers, isNurture, isAllMembers, isNurtureAccessable }, ref) => {
   const calendarRef = useRef()
+  const { access: { badge_levels: levelList } } = useSelector(selectUser);
   const [isVisible, setIsVisible] = useState(false);
   const [nurtureModalVisibilty, setNurtureModalVisibilty] = useState(false);
   const [deletegateModalVisibility, setDeletegateModalVisibility] = useState(false)
@@ -93,7 +96,7 @@ const FilterModal = forwardRef(({ token, type, filterTheData, appliedFilter, isM
   }
 
   const checkFiltersApplied = () => {
-    console.log(appliedFilter, "checkFiltersApplied")
+
     setfilterFrom(appliedFilter?.isSavedFilterApplied ? filterFromlist[1] : filterFromlist[0]);
     setSelectedSavedFilter((prev) => appliedFilter?.isSavedFilterApplied ? prev : null);
 
@@ -113,7 +116,7 @@ const FilterModal = forwardRef(({ token, type, filterTheData, appliedFilter, isM
     setSelectedLevel((prev) => {
       let list = [];
       prev.forEach((x) => {
-        if (appliedFilter?.community?.findIndex(y => y == x.key) > -1) {
+        if (appliedFilter?.badge_levels?.findIndex(y => y == x._id) > -1) {
           list.push(x)
         }
       })
@@ -162,7 +165,8 @@ const FilterModal = forwardRef(({ token, type, filterTheData, appliedFilter, isM
       }
     }
     let obj = {
-      "community": selectedLevel.map((x) => x.key),
+      // "community": [],
+      "badge_levels": selectedLevel.map((x) => x._id),
       "event_page": salePage ? [salePage?._id] : [],
       "lead_status": leadStatus.map((x) => x._id),
       "plan": !!plan ? plan?._id : null,
@@ -188,7 +192,6 @@ const FilterModal = forwardRef(({ token, type, filterTheData, appliedFilter, isM
       "user_status_type": !!onlineStatus?.key ? onlineStatus?.key : "",
       "downloaded_app": !!isAppDownloaded ? isAppDownloaded?.value : null
     }
-    console.log(obj, "filters")
     setApplied(!reset)
     filterTheData(obj, filterData, !!selectedSavedFilter, !reset);
     setIsVisible(false);
@@ -272,13 +275,12 @@ const FilterModal = forwardRef(({ token, type, filterTheData, appliedFilter, isM
     } else if (openFor == "level") {
       heading = "Level"
       levelList.forEach(x => {
-        if (selectedLevel.findIndex(y => y.key == x.key) == -1) {
+        if (selectedLevel.findIndex(y => y?._id == x?._id) == -1) {
           list.push(x)
         }
       })
     }
 
-    console.log(list, "list")
 
     setSearchOptionModal({
       isVisible: true,
@@ -314,7 +316,7 @@ const FilterModal = forwardRef(({ token, type, filterTheData, appliedFilter, isM
       setfilterFrom(seletecOpt)
     } else if (selectedFor == "savedfilter") {
       let filterObj = seletecOpt?.filter_object;
-
+      console.log(filterObj, "filterObj")
       setSelectedSavedFilter(seletecOpt);
       setSalePage(filterObj?.event_page);
       setPlan(filterObj?.event_page?.payment_plans.find(x => x._id == filterObj?.plan?._id));
@@ -323,8 +325,10 @@ const FilterModal = forwardRef(({ token, type, filterTheData, appliedFilter, isM
       setLeadStatus(filterObj?.lead_status);
       setSelectedLevel(() => {
         let list = []
+        console.log(levelList, "levelList")
         levelList.forEach((item) => {
-          if (!!filterObj?.community.find(x => x.name == item?.key)) {
+          if (filterObj?.badge_levels.some(x => x._id == item?._id)) {
+            console.log(item, "item")
             list.push(item);
           }
         })
@@ -460,7 +464,7 @@ const FilterModal = forwardRef(({ token, type, filterTheData, appliedFilter, isM
               <Pressable
                 style={__styles.chipBtn}
                 hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                onPress={() => setSelectedLevel((prev) => prev.filter(x => x.key != item?.key))}>
+                onPress={() => setSelectedLevel((prev) => prev.filter(x => x._id != item?._id))}>
                 {icons.crosss(colors.black, 20)}
               </Pressable>
             </View>
@@ -577,7 +581,7 @@ const FilterModal = forwardRef(({ token, type, filterTheData, appliedFilter, isM
               />
 
               <MyTouchableInput
-                label='Levels'
+                label='Badge Levels'
                 view={selectedlevelView}
                 iconOnPress={() => openSearchOptionModal("level", "title")}
                 icon={() => icons.down(colors.primary, 15)}
@@ -829,7 +833,8 @@ const FilterModal = forwardRef(({ token, type, filterTheData, appliedFilter, isM
 export default FilterModal;
 
 const filteroObj = {
-  "community": [],
+  // "community": [],
+  "badge_levels": [],
   "event_page": [],
   "lead_status": [],
   "plan": null,

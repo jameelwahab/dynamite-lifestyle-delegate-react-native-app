@@ -3,7 +3,8 @@ import invokeApi from "../functions/invokeAPI";
 export const GET_FEED_LIST =
   ({ token, navigation, level, type, page, eventId, feedTypeAction, feedTypeActionId }) => {
     return invokeApi({
-      path: `api/feeds/delegate_portal/feed_listing/v1?page=${page}&limit=10&list_type=${type}&level_or_type=${level}&event=${eventId}&feed_action_type=${feedTypeAction}&feed_action_by=${feedTypeActionId}`,
+      // path: `api/feeds/delegate_portal/feed_listing/v1?page=${page}&limit=10&list_type=${type}&level_or_type=${level}&event=${eventId}&feed_action_type=${feedTypeAction}&feed_action_by=${feedTypeActionId}`,
+         path: `api/feeds/delegate_portal/feed_listing/v2?page=${page}&limit=10&list_type=${type}&level_or_type=${level}&event=${eventId}&feed_action_type=${feedTypeAction}&feed_action_by=${feedTypeActionId}`,
       method: "GET",
       token,
       navigation,
@@ -112,7 +113,7 @@ export const CREATE_FEED = ({ token, navigation, formData }) => {
   return invokeApi({
     // path: `api/feeds/delegate_portal/create`,
     // path: "api/feeds/delegate_portal/create_with_poll",
-    path: "api/feeds/delegate_portal/create_with_poll/v2",
+    path: "api/feeds/delegate_portal/create_with_poll/v3",
     headers: { 'Content-Type': 'multipart/form-data' },
     method: "POST",
     postData: formData,
@@ -248,9 +249,11 @@ export const GET_DELEGATES_LIST_FROM_SERVER_FOR_MENTION_V1 = ({ token, navigatio
   type = undefined
 } }) => {
   return invokeApi({
-    path: `api/feeds/delegate_or_member/list`,
+    path: `api/feeds/delegate_or_member/list/v1`,
     method: "POST",
-    postData: { community_levels, list_type, search_text, event_id, type },
+    postData: {
+      //  community_levels,
+       list_type, search_text, event_id, type },
     token,
     navigation,
   })
