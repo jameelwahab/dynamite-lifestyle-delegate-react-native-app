@@ -17,7 +17,6 @@ const AddNote = ({ navigation, route }) => {
   const ticket = "";
   const { token } = useSelector(selectUser);
   const { note: oldNote, memberId, autoResponderMsg } = route?.params;
-  console.log(oldNote, "oldNote")
   const [note, setNote] = useState(!!oldNote ? oldNote?.note : "");
   const [loader, setLoader] = useState(false);
 
@@ -41,6 +40,7 @@ const AddNote = ({ navigation, route }) => {
       });
     } else {
       res = await MEMBER_ADD_NOTE({
+
         token, navigation,
         member_id: memberId,
         personal_note: note

@@ -38,7 +38,6 @@ const SubscriptionList = ({ navigation, route }) => {
   const [total, setTotal] = useState(0)
 
   const onSelectedOpt = (opt) => {
-    console.log(opt, "opt");
     let { selectedItem } = optionModal;
     setOptionModal({ isVisible: false, selectedItem: null })
     if (opt.key == "delete") {
@@ -77,7 +76,6 @@ const SubscriptionList = ({ navigation, route }) => {
     let res = await MEMBER_SUBSCRIPTION_LIST({ token, navigation, memberId: memberId, page: page, searchText: searchText })
     if (res.code == 200) {
       let listLength = firstTime ? (0 + res.event_subscriber.length) : (list.length + res.event_subscriber.length);
-      console.log(listLength, "listLength")
       if (res?.total_count > listLength) {
         page = page + 1;
         canLoadMore = true
@@ -189,7 +187,6 @@ const SubscriptionList = ({ navigation, route }) => {
             stickyHeaderIndices={[0]}
             ListHeaderComponent={listHeaderView()}
             onEndReached={() => {
-              console.log(canLoadMore, "onEndReached")
               if (canLoadMore) {
                 canLoadMore = false;
                 setFooterLoader(true)

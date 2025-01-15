@@ -17,7 +17,6 @@ const ZoomSettings = ({ navigation }) => {
   const [publicKey, setPublicKey] = useState(user?.zoom_api_key)
   const [secretKey, setSecretKey] = useState(user?.zoom_api_secret)
   const [accountId, setAccountId] = useState(user?.zoom_account_id)
-  console.log(user, "user")
   const btn_submit = async () => {
     setLoader(true)
     let cred = {

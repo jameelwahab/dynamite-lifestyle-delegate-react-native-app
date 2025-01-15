@@ -56,9 +56,7 @@ const Commission = ({ navigation, route }) => {
       setFooterLoader(false);
     }
   }
-  useEffect(() => {
-    console.log(list, "list")
-  })
+
   const loadMore = () => {
     if (canLoadMore) {
       canLoadMore = false;

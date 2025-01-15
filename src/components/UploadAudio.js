@@ -22,10 +22,8 @@ const UploadAudio = ({
   const onUplaodPress = async () => {
     try {
       let res = await DocumentPicker.pick({ type: Platform.OS === 'ios' ? 'public.mp3' : 'audio/mpeg' })
-      console.log(res, "res")
       onAudioPicked?.(res[0])
     } catch (e) {
-      console.log(e, "e")
       // if (e.code != "DOCUMENT_PICKER_CANCELED") {
       // showToast({ body: e.message.replace(/e.domain/g, ""), title: "" })
       // }

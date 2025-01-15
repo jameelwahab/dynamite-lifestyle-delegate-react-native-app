@@ -104,7 +104,6 @@ const KanbanBoard = () => {
 
   const handleDrag = (task, column, index) => {
     setDraggingTaskIndex(index);
-    console.log('Dragging task:', task, 'from column:', column);
   };
 
   const handleDrop = (task, column, index, x, y) => {

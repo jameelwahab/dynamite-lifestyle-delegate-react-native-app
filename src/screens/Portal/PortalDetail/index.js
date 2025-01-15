@@ -64,7 +64,6 @@ const PortalDetail = (props) => {
         })
 
       })
-      console.log(eventTabs, "eventTabs")
       setIsScheduledFeedAllowd(res?.scheduled_feed)
       setEventTabs(eventTabs)
       setEvent(res?.member_dynamite_event);

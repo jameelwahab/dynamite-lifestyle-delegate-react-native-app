@@ -384,7 +384,7 @@ const FilterModal = forwardRef(({ token, type, filterTheData, appliedFilter, isM
   }
 
   const onDateSelected = (date) => {
-    console.log(date, "onDateSelected")
+
 
     if (calenderFor == "SD") {
       setStartDate(date)

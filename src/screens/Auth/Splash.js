@@ -37,7 +37,6 @@ const Splash = ({ navigation }) => {
       let token = await AsyncStorage.getItem("@token");
       if (token != null) {
         let resp = await InitWithAuth(token, navigation, () => { }, dispatch);
-        console.log(resp,'resp')
         if (resp?.code == "error") {
           Alert.alert("Something went wrong",
             resp?.message,

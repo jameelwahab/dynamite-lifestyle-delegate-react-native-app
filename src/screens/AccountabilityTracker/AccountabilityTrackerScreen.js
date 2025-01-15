@@ -16,8 +16,8 @@ import MyInputs from '../../components/MyInputs'
 import {
   ADD_ACCOUNTABILITY_TRACKER, DELETE_ACCOUNTABILITY_TRACKER,
   GET_ACCOUNTABILITY_TRACKER_BY_DATE, MOVE_TO_TOMMORROW,
-  SET_ACCOUNTABILITY_TRACKER_REMINDER, UPDATE_ACCOUNTABILITY_TRACKER,
-  UPLOAD_FILE_TO_S3
+  SET_ACCOUNTABILITY_TRACKER_REMINDER, TRACK_HISTORY, UPDATE_ACCOUNTABILITY_TRACKER,
+  UPLOAD_FILE_TO_S3,
 } from '../../DAL'
 import MyLoader from '../../components/MyLoader'
 import uuid from 'react-native-uuid';
@@ -34,6 +34,7 @@ import ConfirmationModal from '../../components/ConfirmationModal'
 import routes from '../../navigation/routes'
 import { convertTimezone } from '../../functions/convertTime'
 import { IMGElementContentError } from 'react-native-render-html'
+import breakReference from '../../functions/breakReference'
 
 const getNewStatmentObj = () => {
   return {
@@ -75,7 +76,6 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
     time: "00:00"
   })
 
-  console.log(intentions, "intentions")
 
   useEffect(() => {
     setLoader(true)
@@ -128,7 +128,6 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
     }
 
     for (let i = 0; i < intentions.length; i++) {
-      console.log(intentions, "intentions")
       if (intentions[i]?.is_required == true && intentions[i]?.status == false) {
         showToast({ title: intentions[i].statement });
         return
@@ -205,6 +204,19 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
     }
   }
 
+  const onPlayEnd = async (item) => {
+    let res = await TRACK_HISTORY({
+      navigation, token, body: {
+        content: item?.content,
+        date: moment(date).format("DD-MM-YYYY"),
+        id: item?.id,
+      },
+    });
+    if (res.code == 200) {
+
+    }
+  }
+
 
   const addTrackerToServer = async () => {
     setLoader(true);
@@ -270,7 +282,6 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
 
 
   const uploadImageToS3 = async (img, index) => {
-    console.log(img, "img")
     setLoader(true);
     let APIArray = [];
     img.forEach((pic, index1) => {
@@ -590,7 +601,7 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
         </View>
 
 
-        {console.log(intentions, "intentions")}
+
         {intentions.map((item, index) => (
           <View key={`intenstions${index}`} style={[__styles.reminderView, { marginTop: 5, paddingBottom: 10 }]}>
             <View style={{ marginTop: 5 }}>
@@ -609,18 +620,29 @@ const AccountabilityTrackerScreen = ({ navigation, route }) => {
 
               <View>
                 {item?.content_type == "audio" ?
-                  <AudioPlayerForList
-                    url={item?.content}
-                    id={item.content}
-                    loop={true}
-                    onLoopComplete={(url) => onLoopComplete(url)}
-                  /> :
+                  <View>
+                    <AudioPlayerForList
+                      item={item}
+                      url={item?.content}
+                      id={item.content}
+                      loop={true}
+                      onEnded={onPlayEnd}
+                      onLoopComplete={(url) => onLoopComplete(url)}
+                    />
+                    <View style={{ marginTop: 10 }}>
+                      <MyText color={colors.primary} >{`Play Count : ${item?.listen_count} Times`}</MyText>
+                    </View>
+                  </View> :
                   <View style={{ alignSelf: "flex-end" }}>
                     <TransparentButton
                       onPress={() => ref_infoModal?.current?.openModal(item?.content, "", true)}
                       title='View Content'
                     />
                   </View>}
+
+
+
+
 
                 <View>
                   {item?.is_text_box_shown &&

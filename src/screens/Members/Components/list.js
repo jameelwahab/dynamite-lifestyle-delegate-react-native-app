@@ -132,6 +132,11 @@ const optionList = [
     icon: () => icons.eye(colors.primary, 20)
   },
   {
+    key: "update_call",
+    title: "Update Call Functionality",
+    icon: () => icons.phone(colors.primary, 20)
+  },
+  {
     key: "question-answer",
     title: "Questions Answers",
     icon: () => icons.lock(colors.primary, 20)
@@ -139,4 +144,4 @@ const optionList = [
 
 ]
 
-export { sortList,appDownloadedStatusList, filterFromlist, levelList, memberStatusList, onlineStatusList, membershipStatusList, expireDaysList, optionList }
+export { sortList, appDownloadedStatusList, filterFromlist, levelList, memberStatusList, onlineStatusList, membershipStatusList, expireDaysList, optionList }

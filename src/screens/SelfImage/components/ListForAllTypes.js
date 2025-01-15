@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import RootView from '../../../components/RootView'
 import { selectUser } from '../../../redux/reducers/userSlice';
 import { useSelector } from 'react-redux';
-import { GET_USER_LISTING_WHO_ASNWERED_BY_MODULE, PORTAL_DELETE_EVENT, PORTAL_EVENT_DELETE_MEMBER, PORTAL_EVENT_LIST, PORTAL_MEMBER_LISTING, SELF_IMAGE_INCOMPLETE, SELF_IMAGE_SAVE_AND_CLOSE } from '../../../DAL';
+import { GET_USER_LISTING_WHO_ASNWERED_BY_MODULE, PORTAL_DELETE_EVENT, PORTAL_EVENT_DELETE_MEMBER, PORTAL_EVENT_LIST, PORTAL_MEMBER_LISTING, SELF_IMAGE_INCOMPLETE, SELF_IMAGE_RESPONDED_MEMBER_LIST, SELF_IMAGE_SAVE_AND_CLOSE } from '../../../DAL';
 import MyLoader from '../../../components/MyLoader';
 import MyText from '../../../components/MyText';
 import { colors } from '../../../utilities/colors';
@@ -81,7 +81,12 @@ const ListForAllTypes = ({ navigation, route }) => {
       if (opt.key == "save") {
         setConfirmModal({
           isVisible: true, item, type: opt.key,
-          statement: "Are you sure you want save and close?"
+          statement: "Are you sure you want save and notify user?"
+        })
+      } if (opt.key == "close") {
+        setConfirmModal({
+          isVisible: true, item, type: opt.key,
+          statement: "Are you sure you want close?"
         })
       } else if (opt.key == "incomplete") {
         setConfirmModal({
@@ -100,10 +105,15 @@ const ListForAllTypes = ({ navigation, route }) => {
     setConfirmModal({ isVisible: false, item: null, statement: "", type: "" });
     if (type == "incomplete") {
       incompleteFromServer(item)
-    } else if (type == "reminder") {
-      sendReminder(item)
-    } else if (type == "save") {
-      SaveAndCompleteFromServer(item)
+    }
+    // else if (type == "reminder") {
+    //   sendReminder(item)
+    // } 
+    else if (type == "save") {
+      SaveAndCompleteFromServer(item, "close_and_notify")
+    }
+    else if (type == "close") {
+      SaveAndCompleteFromServer(item, "close")
     }
   }
 
@@ -111,7 +121,8 @@ const ListForAllTypes = ({ navigation, route }) => {
     let obj = {
       created_for: item?.created_for,
       id: "",
-      memberId: item?.member_id
+      memberId: item?.member_id,
+      type: type
     };
     navigation.navigate(routes.selfImageDetail, obj)
   }
@@ -147,9 +158,9 @@ const ListForAllTypes = ({ navigation, route }) => {
     }
   }
 
-  const SaveAndCompleteFromServer = async (member) => {
+  const SaveAndCompleteFromServer = async (member, type) => {
     setLoader(true);
-    let res = await SELF_IMAGE_SAVE_AND_CLOSE({ navigation, token, memberId: member?.member_id })
+    let res = await SELF_IMAGE_SAVE_AND_CLOSE({ navigation, token, memberId: member?.member_id, type })
     if (res.code == 200) {
       showToast({ type: 'success', title: res.message });
       setList((old) => old.filter(x => x._id != member?._id))
@@ -314,10 +325,19 @@ const optionsListForComplete = [
     icon: icons.edit
   },
   {
-    title: "Save & Close",
+    title: "Close",
+    key: "close",
+    icon: icons.edit
+  },
+  {
+    title: "Save & Notify",
     key: "save",
     icon: icons.edit
   },
+
+
+
+
   {
     title: "Incomplete",
     key: "incomplete",

@@ -14,7 +14,7 @@ import { SimpleLoader } from './MyLoader';
 
 let ended = false;
 
-const AudioPlayerForList = ({ stop = "", url, id, loop = false, onLoopComplete, noS3Url = false }) => {
+const AudioPlayerForList = ({ stop = "", url, id, loop = false, onLoopComplete, noS3Url = false, onEnded, item }) => {
   const [duration, setDuration] = useState(0);
   const [position, setPosition] = useState(0);
   const [loading, setLoading] = useState("")
@@ -36,9 +36,7 @@ const AudioPlayerForList = ({ stop = "", url, id, loop = false, onLoopComplete, 
 
     if (active?.id == id) {
       let duration = parseInt(progress.duration);
-      console.log(duration, "duration")
       let position = progress.position;
-      console.log(position, "position")
       setDuration(duration);
       setPosition(position);
     }
@@ -46,20 +44,30 @@ const AudioPlayerForList = ({ stop = "", url, id, loop = false, onLoopComplete, 
 
 
   const load = async () => {
-    setLoading(id);
-    let uri = !!url.uri ? url.uri : noS3Url ? url : S3_URL + url;
-    console.log(uri,"uri")
-    await TrackPlayer.add({
-      id: id,
-      url: uri,
-      title: "",
-      artist: "",
-      album: '',
-      genre: '',
-      artwork: "",
-    });
-    TrackPlayer.play();
-    ended = false;
+    try {
+
+
+      setLoading(id);
+      let uri = !!url.uri ? url.uri : noS3Url ? url : S3_URL + url;
+      await TrackPlayer.add({
+        id: id,
+        url: uri,
+        // title: "",
+        // artist: "",
+        // album: '',
+        // genre: '',
+        // artwork: "",
+      });
+      TrackPlayer.play();
+      ended = false;
+    } catch (error) {
+      TrackPlayer.reset();
+      TrackPlayer.stop()
+      setTimeout(() => {
+        setPlaying(false)
+        setLoading("")
+      }, 2000);
+    }
   }
 
 
@@ -86,12 +94,21 @@ const AudioPlayerForList = ({ stop = "", url, id, loop = false, onLoopComplete, 
   } else if (playerState == "playing" && isPlaying == false) {
     setPlaying(true)
   } else if (playerState == "ended") {
-    console.log(repeatMode, "repeatMode")
+    if (active?.id == id) {
+      if (ended == false) {
+        onEnded?.(item)
+      }
+    }
     if (repeatMode && active.id == id && progress != 0 && ended == false) {
       ended = true;
       repeat()
     }
   }
+  //  else if (playerState == "stopped" && loading != "") {
+  //   setLoading("")
+  //   setPlaying(false)
+  //   TrackPlayer.reset()
+  // }
 
 
   // useEffect(() => {

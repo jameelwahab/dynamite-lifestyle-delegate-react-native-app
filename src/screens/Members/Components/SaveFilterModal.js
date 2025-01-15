@@ -127,7 +127,7 @@ const SaveFilterModal = forwardRef(({ access, tabName, filters, navigation, toke
     } else if (isMembers) {
       delete obj.delegate
     }
-    console.log(obj, "obj")
+
     saveFilterToServer(obj);
   }
   const saveFilterToServer = async (obj) => {

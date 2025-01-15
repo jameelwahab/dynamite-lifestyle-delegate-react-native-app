@@ -77,7 +77,6 @@ const PaymentRequest = ({ navigation, route }) => {
     if (res.code == 200) {
       showToast({ "body": res?.message, type: "success" })
       if (res?.status == "inactive") {
-        console.log('inactive')
         if (item.status) {
           setList((list) => {
             let index = list.findIndex(x => x._id == item?._id);
@@ -233,7 +232,6 @@ const PaymentRequest = ({ navigation, route }) => {
   }
 
   const onSelectedOption = (opt) => {
-    console.log(opt, "onSelectedOption")
     let { selectedItem } = optionModal;
 
     if (opt.key == "edit") {
@@ -247,7 +245,6 @@ const PaymentRequest = ({ navigation, route }) => {
     } else if (opt.key == "bank") {
       getRequestDeatilForBankPayment(selectedItem?._id)
       // bankOptionModalRef?.current?.openModal(selectedItem)
-      // console.log(bankOptionModalRef,"bankOptionModalRef");
       // copyBankLinkFromServer(selectedItem?._id);
     } else if (opt.key == "markAsPaid") {
       navigation.navigate(routes?.markAsPaidScreen, {
@@ -291,7 +288,6 @@ const PaymentRequest = ({ navigation, route }) => {
   }
 
   const openOptionModal = (item) => {
-    console.log(item, "item")
     let list = [];
     if (item?.payment_status == "paid" || item?.is_first_paid) {
       list = optionsList.slice().filter(x => x.key != "edit");

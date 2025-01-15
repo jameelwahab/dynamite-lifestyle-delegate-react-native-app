@@ -30,7 +30,7 @@ const PollView = forwardRef(({ data, timezone }, ref) => {
     }
   })
   const openDateTimePicker = (mode, datetime) => {
-    console.log(datetime, "datetime")
+
     setDateTimePicker({
       isVisible: true,
       mode: mode,
@@ -40,8 +40,6 @@ const PollView = forwardRef(({ data, timezone }, ref) => {
 
   useEffect(() => {
     if (!!data) {
-      console.log(data, "dataForEdit")
-      console.log(moment(data?.expiry_date, "YYYY-MM-DD").format(),)
       setOptions([...data?.options]);
       setPrivacy(data?.poll_result == "private")
       setIsMultiple(data?.is_multiple_allow);
@@ -105,7 +103,7 @@ const PollView = forwardRef(({ data, timezone }, ref) => {
 
   const getMinimumDate = () => {
     let date = convertTimezoneToRegion(moment(), timezone);
-    console.log(timezone?.userTimeZone, "timezone?.userTimeZone")
+
 
     let obj = {
       year: date.year(),
@@ -115,9 +113,9 @@ const PollView = forwardRef(({ data, timezone }, ref) => {
       minute: date.minute(),
       second: date.second()
     }
-    console.log(obj, "obj")
+
     let dateObj = new Date(date.format("YYYY-MM-DD"))
-    // console.log(obj)
+
     return dateObj
 
 

@@ -57,7 +57,6 @@ const CommentModal = ({
   feedCreatedFor,
   onCommentMessagePress
 }) => {
-  console.log(user, "user")
   const cmtTextInputRef = useRef();
   const likeModalRef = useRef();
   const [commentText, setCommentText] = useState("");
@@ -240,7 +239,6 @@ const CommentModal = ({
 
   const getTheDelegateListFromServer = async (text) => {
     setMentionListLoading(true);
-    console.log(feedCreatedFor, "feedCreatedFor")
     let res = await GET_DELEGATES_LIST_FROM_SERVER_FOR_MENTION_V1({
       navigation, token, data: {
         search_text: text,
@@ -301,7 +299,6 @@ const CommentModal = ({
   }
 
   const onLikePress = async (commentForlike, index) => {
-    console.log(commentForlike, "commentForlike")
     if (!!commentForlike?.parent_comment) {
       setComments((obj) => {
         let parentIndex = obj.list.findIndex(cmt => cmt?._id == commentForlike?.parent_comment);
@@ -383,7 +380,7 @@ const CommentModal = ({
       //       obj.list[index2].child_comment = newComment.child_comment
       //     }
       //   }
-      //   console.log(obj, "obj")
+      //   
       //   return { ...obj };
       // })
       setSelectedComment(null);
@@ -478,8 +475,8 @@ const CommentModal = ({
     //     parent_comment: selectedComment?._id
     //   }
     // }
-    // console.log(!!selectedComment, 'check')
-    // console.log(body, "body", selectedComment)
+    // 
+    // 
     let action = "add_comment";
     let formData = new FormData();
     formData.append("feed", feedId);
@@ -581,7 +578,7 @@ const CommentModal = ({
         obj['profile_image'] = mUser?.profile_image
       }
 
-      console.log(obj, "user obj")
+    
       while (mentionList.length > 0) {
         mentionList.pop()
       }
@@ -621,7 +618,7 @@ const CommentModal = ({
             comment["child_comment"] = childCommnetPage == 0 ? [...res?.comment] : [...comment?.child_comment, ...res?.comment];
             // comment["child_comments_count"] = comment.child_comment.length + res.comment.length
           }
-          console.log(obj, "obj")
+        
         })
         return { ...obj }
       })

@@ -263,3 +263,16 @@ export const ADD_CALL_HISTORY_NOTE = ({ token, navigation, memberId, body: {
   })
 }
 
+
+export const UPDATE_CALL_FUNCTIONALITY = ({ token, navigation, body: {
+  is_call_allowed, member_id
+} }) => {
+  return invokeApi({
+    path: `api/member/update_member_call_alowed`,
+    method: "POST",
+    postData: { is_call_allowed, member_id },
+    token,
+    navigation,
+  })
+}
+

@@ -18,6 +18,7 @@ import AddReply from '../../screens/SelfImage/Detail/AddReply'
 
 
 
+
 const SelfImageRespondedStack = createNativeStackNavigator()
 
 const StackSelfImageResponded = ({ route }) => {
@@ -29,6 +30,7 @@ const StackSelfImageResponded = ({ route }) => {
           name={routes.selfImageResponedScreen} component={Responded} />
         <SelfImageRespondedStack.Screen name={routes.selfImageDetail} component={SelfImageDetail} />
         <SelfImageRespondedStack.Screen name={routes.selfImageAddReply} component={AddReply} />
+
 
         {/*//? Default Screens Start */}
         {defaultScreens.map((x, i) => (

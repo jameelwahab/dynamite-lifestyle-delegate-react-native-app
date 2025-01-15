@@ -37,7 +37,6 @@ const PortalChat = ({ navigation, route }) => {
 
 
   const onChatScreen = async (item) => {
-    console.log(item)
     setLoader(true)
     let res = await IS_CHAT_EXIST({ token, navigation, memberId: item?._id });
     setLoader(false)

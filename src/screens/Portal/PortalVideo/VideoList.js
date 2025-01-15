@@ -46,7 +46,6 @@ const VideoList = ({ navigation, route }) => {
     let item = optionModal?.selectedItem;
     setOptionModal({ isVisible: false, selectedItem: null });
     setTimeout(() => {
-console.log(opt.type,"opt.type")
       if (opt.type == "edit") {
         onAddEditScreen(item)
       } else if (opt.type == "delete") {
@@ -70,7 +69,6 @@ console.log(opt.type,"opt.type")
   }
 
   const onUserAnswerScreen = (item) => {
-    console.log("onUserAnswerScreen")
     navigation.navigate(routes.answeredUserListing, {
       _id: item?._id,
       module: "dynamite_event_video"
@@ -103,7 +101,6 @@ console.log(opt.type,"opt.type")
 
   const onAgree = () => {
     let { selectedItem: item, type } = confirmModal;
-    console.log(item, "item")
     if (type == "delete") {
       deleteCategoryFromServer(item);
     }

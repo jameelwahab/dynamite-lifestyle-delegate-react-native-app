@@ -52,7 +52,6 @@ const Filter = ({ navigation, route }) => {
 
   const onOptionSelected = (opt) => {
     let { titleKey } = optionModal;
-    console.log(opt, "check")
     closeOptionModal()
     setTimeout(() => {
       if (titleKey == "sale_page_title") {

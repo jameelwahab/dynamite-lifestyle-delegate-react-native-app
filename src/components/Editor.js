@@ -54,7 +54,6 @@ const Editor = ({
 
   const onImagePicked = async (image) => {
     setLoader(true);
-    console.log(image, "imagePicked");
     let fd = new FormData();
     fd.append("width", image.width);
     fd.append("image", image);

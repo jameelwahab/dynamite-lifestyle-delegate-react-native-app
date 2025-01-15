@@ -18,9 +18,7 @@ import showToast from '../../../functions/showToast'
 import UploadAudio from '../../../components/UploadAudio'
 
 const VideoAddEdit = ({ route, navigation }) => {
-  console.log(route.params, " route.params")
   let { item, slug, eventId, catId, backScreenFunc } = route.params;
-  console.log(item, "item")
   let { token } = useSelector(selectUser);
   const [loader, setLoader] = useState(false);
   const [data, updateData] = useState({

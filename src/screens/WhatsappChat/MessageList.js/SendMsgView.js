@@ -73,7 +73,6 @@ const SendMsgView = ({ receiver, navigation, edit, clearEdit }) => {
       try {
         stopReorder()
       } catch (e) {
-        console.log(e, "error")
       }
     }
   }, [])
@@ -106,7 +105,6 @@ const SendMsgView = ({ receiver, navigation, edit, clearEdit }) => {
       }
     } else {
       let granted = await request(PERMISSIONS.IOS.MICROPHONE);
-      console.log(granted, "granted")
       if (granted == 'granted') {
         return true
       } else {
@@ -156,7 +154,7 @@ const SendMsgView = ({ receiver, navigation, edit, clearEdit }) => {
 
 
       audioRecorderPlayer.addRecordBackListener((e) => {
-        // console.log(audioRecorderPlayer.mmssss(Math.floor(e.currentPosition)), "audioRecorderPlayer")
+
 
         if (e.currentPosition >= 300000) {
           audioRecorderPlayer.pauseRecorder()
@@ -175,7 +173,6 @@ const SendMsgView = ({ receiver, navigation, edit, clearEdit }) => {
 
 
     } catch (error) {
-      console.log('Uh-oh! Failed to start recording:', error);
       showToast({ body: error.message, title: "Error" })
       setRecording(false)
     }
@@ -193,7 +190,7 @@ const SendMsgView = ({ receiver, navigation, edit, clearEdit }) => {
         time: miliis
       };
     } catch (e) {
-      console.log(e, "erro on stop")
+
     }
   }
 
@@ -241,7 +238,6 @@ const SendMsgView = ({ receiver, navigation, edit, clearEdit }) => {
 
 
 
-      console.log('whatsapp_chat_message_event', postData)
       socket.emit('whatsapp_chat_message_event', postData)
       setMsg({ text: "", image: "" })
 

@@ -9,7 +9,6 @@ import { websiteBaseUrl } from '../../../utilities/constants'
 import openUrl from '../../../functions/openUrl'
 
 const Leaderboard = ({ monthlyCounts, weeklyCounts, pages, isCosmos, user, affiliateMember }) => {
-  console.log(user, "user")
   const userCountsView = (item, index) => {
     return (
       <View style={__styles.countRootView}>

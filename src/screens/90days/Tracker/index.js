@@ -188,7 +188,6 @@ const _90daysTracker = ({ navigation, route }) => {
         diff = 1;
       }
 
-      console.log(chartData, "chartData")
       setChartData(chartData);
       setChartWidth(chartBlockWidth);
       setLatestDay(diff);

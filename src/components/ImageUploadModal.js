@@ -4,7 +4,7 @@ import Modal from 'react-native-modal'
 import { colors } from '../utilities/colors'
 import ImageCropPicker from 'react-native-image-crop-picker'
 import showToast from '../functions/showToast'
-import DocumentPicker from 'react-native-document-picker'
+import DocumentPicker, { types } from 'react-native-document-picker'
 
 import MyText from './MyText'
 import { icons } from '../utilities/icons'
@@ -50,19 +50,15 @@ const ImageUploadModal = ({
 
         })
           .then(image => {
-
-            console.log(image, "image")
             onImagePicked(multiple ? [image] : makeImageObject(image));
             setTimeout(() =>
               closeModal(), 500)
           })
           .catch(e => {
             closeModal()
-            console.log(e, "error")
             if (e?.code == 'E_NO_CAMERA_PERMISSION') {
               showToast({ body: e.message, title: 'Permission not granted' });
             }
-            console.log('Error', e);
           });
       }, 500);
     } else {
@@ -83,7 +79,6 @@ const ImageUploadModal = ({
       maxFiles: 20
     })
       .then(image => {
-        console.log(image, "image")
         if (!multiple) {
           onImagePicked(makeImageObject(image));
         } else {
@@ -97,7 +92,6 @@ const ImageUploadModal = ({
           500)
       })
       .catch(e => {
-        console.log('HI', e);
         closeModal()
         if (e.code == 'E_NO_LIBRARY_PERMISSION') {
           showToast({
@@ -110,12 +104,21 @@ const ImageUploadModal = ({
 
   }
 
+  
+
   const openDocument = async () => {
     try {
-      let res = await DocumentPicker.pick();
-      onImagePicked(res[0])
+      let res = await DocumentPicker.pick({
+        allowMultiSelection: multiple,
+        type: [types.csv, types.doc, types.docx, types.xls, types.xlsx, types.images, types.pdf],
+      });
+      if (multiple) {
+        onImagePicked(res)
+      } else {
+        onImagePicked(res[0])
+      }
     } catch (e) {
-      console.log(e, "e")
+
     }
     setTimeout(() =>
       closeModal(),
@@ -137,7 +140,6 @@ const ImageUploadModal = ({
       height: image.height,
       width: image.width,
     }
-    console.log("ImagePicked", obj);
     return obj
   }
   return (

@@ -70,9 +70,7 @@ const PaymentrequestDetail = ({ navigation, route }) => {
     }
   }
   const striperInitilizer = async () => {
-    console.log(settings?.stripeKey, "stripeKey")
     let initilize = await initStripe({ publishableKey: settings?.stripeKey });
-    console.log(initilize, "initilize")
   }
   useEffect(() => {
     striperInitilizer();
@@ -82,7 +80,7 @@ const PaymentrequestDetail = ({ navigation, route }) => {
 
   const onPayPress = () => {
     setLoader(true);
-    console.log(data, "data?.payment?.request_type")
+
     if (data?.payment_request?.request_type == "onetime") {
       payOnetime()
 
@@ -98,18 +96,15 @@ const PaymentrequestDetail = ({ navigation, route }) => {
       setLoader(true);
       let res = await createToken({ type: "Card" });
       if (!!res?.token?.id) {
-        console.log(res, "create token")
         payRecurringPaymentFromServer(res?.token?.id)
       }
       else {
         setLoader(false);
         showToast({ title: "Failed", message: res?.message });
-        console.log(res, "createToken error");
       }
     } catch (e) {
       setLoader(false);
       showToast({ title: "Failed", message: e?.message });
-      console.log(e, "createToken error");
     }
   }
 
@@ -164,11 +159,9 @@ const PaymentrequestDetail = ({ navigation, route }) => {
         });
 
         if (error) {
-          console.log(error, "stripe payment error")
           setLoader(false);
           showToast({ title: "Payment Failed", body: error?.localizedMessage });
         } else {
-          console.log(paymentIntent, "paymentIntent")
           changePayementStatusToServer()
         }
 

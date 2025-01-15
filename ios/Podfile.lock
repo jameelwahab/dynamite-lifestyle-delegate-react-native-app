@@ -671,6 +671,8 @@ PODS:
     - FirebaseCoreExtension (= 10.15.0)
     - React-Core
     - RNFBApp
+  - RNFileViewer (2.1.5):
+    - React-Core
   - RNGestureHandler (2.21.2):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
@@ -875,6 +877,7 @@ DEPENDENCIES:
   - "RNFBApp (from `../node_modules/@react-native-firebase/app`)"
   - "RNFBCrashlytics (from `../node_modules/@react-native-firebase/crashlytics`)"
   - "RNFBMessaging (from `../node_modules/@react-native-firebase/messaging`)"
+  - RNFileViewer (from `../node_modules/react-native-file-viewer`)
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - "RNGoogleSignin (from `../node_modules/@react-native-google-signin/google-signin`)"
   - RNImageCropPicker (from `../node_modules/react-native-image-crop-picker`)
@@ -1063,6 +1066,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-firebase/crashlytics"
   RNFBMessaging:
     :path: "../node_modules/@react-native-firebase/messaging"
+  RNFileViewer:
+    :path: "../node_modules/react-native-file-viewer"
   RNGestureHandler:
     :path: "../node_modules/react-native-gesture-handler"
   RNGoogleSignin:
@@ -1185,6 +1190,7 @@ SPEC CHECKSUMS:
   RNFBApp: 082df9f8ffba99f23f7aee3ecb64df703e7e1adb
   RNFBCrashlytics: 9d5b36a7e280178c5d61695936cb812005bf17ad
   RNFBMessaging: b167065ee2fcc7fe43a32b35d79d5eb23bceb4ad
+  RNFileViewer: ce7ca3ac370e18554d35d6355cffd7c30437c592
   RNGestureHandler: 0972b77a2cab0f1a61ca1a3ce348a424614f65c2
   RNGoogleSignin: 08dc4ba7eac2096c7fecfe109f0950fa4683c803
   RNImageCropPicker: 8e39c01f205e00d739c31e682f068aac315587bf

@@ -24,13 +24,15 @@ import DailyDynamiteGraph from './DailyDynamiteGraph'
 import routes from '../../../navigation/routes'
 import { isValidNumber } from 'libphonenumber-js'
 import showToast from '../../../functions/showToast'
+import SmsModal from './SmsModal'
 
 
 const MemberProfile = ({ navigation, route }) => {
-  let { token, user, isChatAllowed, isWhatsappChatAllowed } = useSelector(selectUser);
+  let { token, user, isChatAllowed, isWhatsappChatAllowed, access } = useSelector(selectUser);
   const timezone = useSelector(selectTimeZone)
   const { memberId } = route?.params
   const tabRef = useRef()
+  const ref_sms = useRef()
   const [loader, setLoader] = useState(false);
   const [member, setMember] = useState(null);
   const [date, setDate] = useState(moment().format("YYYY-MM-DD"));
@@ -38,6 +40,7 @@ const MemberProfile = ({ navigation, route }) => {
   const [events, setEvents] = useState(null);
   const [type, setType] = useState('month')
   const [_90DayGraph, set_90DayGraph] = useState([])
+  
   const geMemberDataFromServer = async (selectedDate, ttype) => {
     let sDATE = moment(selectedDate).subtract({ month: 1 }).endOf(ttype).format('YYYY-MM-DD');
     let eDATE = moment(selectedDate).endOf(ttype).format('YYYY-MM-DD');
@@ -85,7 +88,7 @@ const MemberProfile = ({ navigation, route }) => {
         }
       })
 
-      console.log(newlist, "newlist")
+
       set_90DayGraph(newlist);
       setEvents(newArray)
       setMember(res)
@@ -97,12 +100,10 @@ const MemberProfile = ({ navigation, route }) => {
   }
 
   const onWhatsappChatScreen = async () => {
-    console.log(member, "member?.contact_numbe")
     if (isValidNumber("+" + member?.member?.contact_number)) {
       setLoader(true)
       let res = await INITIATE_WHATSAPP_CHAT({ token, navigation, receiver_id: memberId, });
       setLoader(false)
-      console.log(res, "res")
       if (!res.data.error) {
         let rMember = res.data?.receiver_info;
         navigation.navigate(routes.whtasappChatMessageList, {
@@ -144,6 +145,11 @@ const MemberProfile = ({ navigation, route }) => {
     geMemberDataFromServer(date, ntype);
   }
 
+  const onSmsModal = ()=>{
+    console.log(ref_sms?.current,"ref")
+    ref_sms?.current?.openModal()
+  }
+
   useEffect(() => {
     setLoader(true);
     geMemberDataFromServer(date, type)
@@ -158,15 +164,22 @@ const MemberProfile = ({ navigation, route }) => {
         {isWhatsappChatAllowed &&
           <Pressable
             onPress={() => onWhatsappChatScreen()}
-            style={__styles.topBtn}>
-            {icons.whatsapp(colors.primary, 22)}
+            style={[__styles.topBtn, { backgroundColor: "#61D467" }]}>
+            {icons.whatsapp(colors.white, 18)}
           </Pressable>}
         {isChatAllowed &&
           <Pressable
             onPress={() => onChatScreen(memberId, token, navigation, user?._id)}
-            style={__styles.topBtn}>
-            {icons.message(colors.primary, 22)}
+            style={[__styles.topBtn, { backgroundColor: "#EDBF60" }]}>
+            {icons.message(colors.white, 18)}
           </Pressable>}
+
+        {/* {access?.allow_to_send_sms &&
+          <Pressable
+            onPress={() => onSmsModal(memberId, token, navigation, user?._id)}
+            style={[__styles.topBtn, { backgroundColor: "#366FB1" }]}>
+            {icons.sms(colors.white, 18)}
+          </Pressable>} */}
       </View>
     )
   }
@@ -256,6 +269,7 @@ const MemberProfile = ({ navigation, route }) => {
           </ScrollView>
         </View>}
       <MyLoader enable={loader} />
+      <SmsModal ref={ref_sms} />
     </RootView>
   )
 }

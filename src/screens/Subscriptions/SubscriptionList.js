@@ -66,7 +66,6 @@ const List = ({ navigation, route }) => {
 
 
   useEffect(() => {
-    console.log(route?.params?.appliedFilters, "route")
     if (!!route?.params?.appliedFilters) {
       setFilters(route?.params?.appliedFilters);
     } else {

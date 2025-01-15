@@ -32,7 +32,6 @@ export class VimeoIFrame extends Component {
 
       return res?.video_id;
     } catch (e) {
-      console.log(e, "Vimeo Error")
     }
   }
 

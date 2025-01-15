@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import RootView from '../../../components/RootView'
 import MyText from '../../../components/MyText'
 import MyLoader, { SimpleLoader } from '../../../components/MyLoader'
-import { GET_FEED_LIST, GET_COMMENT_LIST, GET_LIKE_LIST, GET_COMMENT_LIKES_LIST, FEED_ACTIONS, DELETE_FEED_POST, FEED_LIKE_ACTIONS, GET_FEED_EXTRA_DATA, IS_CHAT_EXIST, GET_FEED_DETAIL, FEED_POLL_ACTIONS } from '../../../DAL'
+import { GET_FEED_LIST, GET_COMMENT_LIST, GET_LIKE_LIST, GET_COMMENT_LIKES_LIST, FEED_ACTIONS, DELETE_FEED_POST, FEED_LIKE_ACTIONS, GET_FEED_EXTRA_DATA, IS_CHAT_EXIST, GET_FEED_DETAIL, FEED_POLL_ACTIONS, ADD_PERSONAL_NOTE_FOR_PORTAL } from '../../../DAL'
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../../redux/reducers/userSlice'
 import FeedView from './FeedView'
@@ -17,7 +17,6 @@ import ConfirmationModal from '../../../components/ConfirmationModal'
 import showToast from '../../../functions/showToast'
 import AddPost from './AddPost'
 import { selectSocket } from '../../../redux/reducers/socketSlice'
-import { useNavigation } from '@react-navigation/native'
 import FeedTabs from '../FeedTabs'
 import FeedEvents from '../FeedEvents'
 import Leaderboard from '../Leaderboard.js'
@@ -25,12 +24,13 @@ import EmptyView from '../../../components/EmptyView'
 import { colors } from '../../../utilities/colors'
 import routes from '../../../navigation/routes'
 import ScheduleModal from './ScheduleModal'
-import Header from '../../../components/Header'
 import AddPersonalNoteModal from '../AddPersonalNoteModal'
 import MyRefreshControl from '../../../components/MyRefreshControl'
 import PollDetailModal from './PollDetailModal'
 import SurveyModal from './SurveyModal'
 import SurveyDetailModal from './SurveyDetailModal'
+import ConfirmationModal2 from '../../../components/ConfirmationModal2'
+import { S3_URL } from '../../../utilities/constants'
 
 
 
@@ -59,6 +59,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
   const ref_personalNoteModal = useRef();
   const ref_pollInfo = useRef();
   const ref_surveyInfo = useRef()
+  const ref_confirmModal = useRef();
   const { feedFor, feedId, eventId = "" } = route?.params;
   const isCosmos = feedFor == "the_cosmos";
   const isScheduledFeed = feedFor == "scheduled";
@@ -135,7 +136,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           canLoadMore: false
         }
       }
-      console.log("comments?.modalVisibility", commentVar?.page, comments?.modalVisibility)
+
       setComments({
         modalVisibility: true,
         list: !append ? res?.comment : [...comments?.list, ...res?.comment],
@@ -243,7 +244,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           canLoadMore: false
         }
       }
-      // console.log(feedVar,"feedVar")
+
       setFeed(feedVar.page <= 1 ? res?.feeds : [...feed, ...res?.feeds])
       setLoader(false);
       setRefreshing(false);
@@ -279,6 +280,33 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
     }
   }
 
+
+  const addNotesToServer = async (feed) => {
+    let notes = "";
+    if (feed?.feed_type == "image") {
+      feed.feed_images.forEach((item) => {
+        notes += `<img src='${S3_URL + item?.thumbnail_1}'><br/>`
+      })
+    }
+    if (feed?.description) {
+      notes += `<p>${feed?.description}</p>`
+    }
+
+
+    setLoader(true);
+    let res = await ADD_PERSONAL_NOTE_FOR_PORTAL({
+      navigation, token,
+      feedId: feed?._id,
+      memberId: feed?.action_info?.action_id, note: notes
+    });
+    if (res.code == 200) {
+      setLoader(false)
+      showToast({ type: "success", title: res?.message })
+
+    } else {
+      setLoader(false)
+    }
+  }
   const resetCounts = () => {
     feedVar = {
       page: 0,
@@ -311,7 +339,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       token: token,
       ...extra
     }
-    console.log(isCosmos, "Emitted Socket data", socketData)
+
     if (isCosmos) {
       socket.emit("delegate_feed_room_action_event", socketData);
     } else {
@@ -377,7 +405,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           let index = nList.findIndex(x => x._id == eeditedComment?._id);
           if (index > -1) {
             const filterArr = !!nList[index]?.child_comment ? nList[index]?.child_comment.filter(x => x._id != data?.comment) : [];
-            console.log(filterArr, "filterArr")
+
             nList[index].child_comment = filterArr;
             nList[index].child_comments_count = eeditedComment?.child_comments_count
             // nList.splice(index, 1, { ...nList[index], ...eeditedComment });
@@ -405,7 +433,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           if (index > -1) {
             nList.splice(index, 1, { ...nList[index], child_comment: [newChildComment, ...nList[index].child_comment] });
           }
-          console.log(obj.list, index, "check edited")
+
           return {
             ...obj,
             list: nList
@@ -460,7 +488,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           }
           else {
             let index = nList.findIndex(x => x._id == editedComment?.comment);
-            console.log(index, "index")
+
             if (index > -1) {
               nList.splice(index, 1, {
                 ...nList[index],
@@ -487,7 +515,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
   }
 
   const socketReceiverAction = (data) => {
-    console.log("%csocketReceiverAction", 'background:#624B2D; color: #FFF', data);
+
     if (data?.action == "feedlike" || data?.action == "feedunlike") {
       updateFeedItemsSpecificField(data?.feed_id, {
         is_liked: data?.action_response?.is_liked,
@@ -613,7 +641,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
 
 
   const changeTab = (newTab) => {
-    console.log(newTab, "newTab")
+
     setTab(newTab);
   }
 
@@ -682,7 +710,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
   }
 
   const onLikesEndReached = () => {
-    console.log("onLikesEndReached", likes, likeVar)
+
     if (likeVar?.canLoadMore && likes?.modalVisibility == true) {
       likeVar = {
         ...likeVar,
@@ -752,14 +780,34 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
     } else if (selectedOpt?.type == "message") {
       onChatScreen(item?.action_info?.action_id)
     } else if (selectedOpt?.type == "notes") {
-      setTimeout(() => {
-        ref_personalNoteModal?.current?.openModal(item?.description)
-      }, 500);
+      console.log(item, "feed")
+      if (item?.action_info?.action_by == "consultant_user") {
+        setTimeout(() => {
+          let notes = "";
+          if (item?.feed_type == "image") {
+            item.feed_images.forEach((item) => {
+              notes += `<img src='${S3_URL + item?.thumbnail_1}'><br/>`
+            })
+          }
+          if (item?.description) {
+            notes += `<p>${item?.description}</p>`
+          }
+
+          ref_personalNoteModal?.current?.openModal(notes, item?._id)
+        }, 500);
+      } else {
+        setTimeout(() => {
+          ref_confirmModal?.current?.openModal({
+            title: `Are you sure you want to add as ${item?.action_info?.name}'s personal note ?`,
+            agreeFunc: () => addNotesToServer(item)
+          })
+        }, 500);
+      }
     }
   }
 
   const onMessagePress = (item) => {
-    console.log(item, "item")
+
     if (!!item?.user_info_action_by?.action_id) {
       onChatScreen(item?.user_info_action_by?.action_id)
       setLikes({
@@ -918,14 +966,18 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
         }
 
         if (item.type == "notes") {
-          if (isNoteMainFeed) {
-            newList.push(item);
+          if (isEventFeed) {
+            // if (!isMine && item.action_info?.action_by != "consultant_user") {
+            if (feed?.feed_type != "poll" && feed?.feed_type != "survey") {
+              newList.push(item);
+            }
+            // }
           }
         }
 
         if (item.type == "message") {
-          if (isChatAllowed) {
-            if (!isMine) {
+          if (isChatAllowed && user?.is_super_delegate) {
+            if (!isMine && feed.action_info?.action_by != "consultant_user") {
               newList.push(item);
             }
           }
@@ -935,75 +987,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       })
 
       return newList
-
-      //   if ((isEventFeed && feedOptionModal?.selectedItem?.action_info?.action_id == user?._id) || !isEventFeed) {
-      //     if (access?.feed_pin_unpin_option) {
-      //       if (feedOptionModal?.selectedItem?.is_feature)
-      //         newList = newList.slice().filter(x => x.type != "pin");
-      //       else if (!feedOptionModal?.selectedItem?.is_feature)
-      //         newList = newList.slice().filter(x => x.type != "unpin");
-      //     } else {
-      //       newList = newList.slice().filter(x => x.type != "pin" && x.type != "unpin");
-      //     }
-      //   }else{
-      //     newList = newList.slice().filter(x => x.type != "pin" && x.type != "unpin");
-      //   }
-      //   if (!isEventFeed) {
-      //     newList = newList.slice().filter(x => x.type != "notes");
-      //   }
-
-
-      //   newList = newList.slice().filter(x => {
-      //     if ((x.type == "message" && user?._id == feedOptionModal?.selectedItem?.action_info?.action_id) || (!!isChatAllowed == false && x.type == "message")) {
-      //       return false
-      //     }
-      //     else if (
-      //      ( !isCosmos && !isScheduledFeed && !isEventFeed )&&
-      //       (!access?.edit_delete_option_in_source_all_source_feeds && feedOptionModal?.selectedItem?.action_info?.action_id != user?._id) &&
-      //       (x.type == "edit" || x.type == "delete")) {
-      //       return false
-      //     }
-      //     return true
-      //   });
-
-      //   console.log(newList, "newList 4")
-      //   // if(!access?.feed_pin_unpin_option){
-      //   //   newList = newList.slice().filter(x => {
-      //   //     if (x.type == "message" && user?._id == feedOptionModal?.selectedItem?.action_info?.action_id) {
-      //   //       return false
-      //   //     }
-      //   //     return true
-      //   //   });
-      //   // }
-      //   console.log(newList, "newList")
-      //   return newList
-      // } else {
-      //   return []
     }
-  }
-
-  const pollAction = async (feedId, optionId) => {
-    let resp = await FEED_POLL_ACTIONS({ token, navigation, feedId, optionId })
-    if (resp.code == 200) {
-
-    } else {
-
-    }
-  }
-
-  const openPollDetail = (item) => {
-    ref_pollInfo?.current?.openModal(item)
-  }
-
-  const onStartQuestionnairPress = (item) => {
-    // ref_pollInfo?.current?.openModal(item)
-    ref_surveymodal?.current?.openModal(item)
-  }
-
-  const openSurveyDetail = (item) => {
-    ref_surveyInfo?.current?.openModal(item)
-    // console.log(ref_surveymodal?.current,'openSurveyDetail')
-
   }
 
   const filterTheOptionsCount = (feed) => {
@@ -1071,68 +1055,52 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       }
 
       if (item.type == "notes") {
-        if (isNoteMainFeed) {
-          newList.push(item);
+        if (isEventFeed) {
+          // if (!isMine && item.action_info?.action_by != "consultant_user") {
+          if (feed?.feed_type != "poll" && feed?.feed_type != "survey") {
+            newList.push(item);
+          }
+          // }
         }
       }
 
       if (item.type == "message") {
-        if (isChatAllowed) {
-          if (!isMine) {
+        if (isChatAllowed && user?.is_super_delegate) {
+          if (!isMine && feed.action_info?.action_by != "consultant_user") {
             newList.push(item);
           }
         }
       }
 
-
     })
     return newList.length
+  }
 
-    //   if ((isEventFeed && feedOptionModal?.selectedItem?.action_info?.action_id == user?._id) || !isEventFeed) {
-    //     if (access?.feed_pin_unpin_option) {
-    //       if (feedOptionModal?.selectedItem?.is_feature)
-    //         newList = newList.slice().filter(x => x.type != "pin");
-    //       else if (!feedOptionModal?.selectedItem?.is_feature)
-    //         newList = newList.slice().filter(x => x.type != "unpin");
-    //     } else {
-    //       newList = newList.slice().filter(x => x.type != "pin" && x.type != "unpin");
-    //     }
-    //   }else{
-    //     newList = newList.slice().filter(x => x.type != "pin" && x.type != "unpin");
-    //   }
-    //   if (!isEventFeed) {
-    //     newList = newList.slice().filter(x => x.type != "notes");
-    //   }
+  const pollAction = async (feedId, optionId) => {
+    let resp = await FEED_POLL_ACTIONS({ token, navigation, feedId, optionId })
+    if (resp.code == 200) {
 
+    } else {
 
-    //   newList = newList.slice().filter(x => {
-    //     if ((x.type == "message" && user?._id == feedOptionModal?.selectedItem?.action_info?.action_id) || (!!isChatAllowed == false && x.type == "message")) {
-    //       return false
-    //     }
-    //     else if (
-    //      ( !isCosmos && !isScheduledFeed && !isEventFeed )&&
-    //       (!access?.edit_delete_option_in_source_all_source_feeds && feedOptionModal?.selectedItem?.action_info?.action_id != user?._id) &&
-    //       (x.type == "edit" || x.type == "delete")) {
-    //       return false
-    //     }
-    //     return true
-    //   });
+    }
+  }
 
-    //   console.log(newList, "newList 4")
-    //   // if(!access?.feed_pin_unpin_option){
-    //   //   newList = newList.slice().filter(x => {
-    //   //     if (x.type == "message" && user?._id == feedOptionModal?.selectedItem?.action_info?.action_id) {
-    //   //       return false
-    //   //     }
-    //   //     return true
-    //   //   });
-    //   // }
-    //   console.log(newList, "newList")
-    //   return newList
-    // } else {
-    //   return []
+  const openPollDetail = (item) => {
+    ref_pollInfo?.current?.openModal(item)
+  }
+
+  const onStartQuestionnairPress = (item) => {
+    // ref_pollInfo?.current?.openModal(item)
+    ref_surveymodal?.current?.openModal(item)
+  }
+
+  const openSurveyDetail = (item) => {
+    ref_surveyInfo?.current?.openModal(item)
+
 
   }
+
+
 
 
   const onLikebtnPress = async (feedId, isLike) => {
@@ -1326,7 +1294,6 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           ListHeaderComponent={headerView()}
           ListEmptyComponent={!loader && tab == 0 && <EmptyView label={"Posts not found"} />}
           onEndReached={() => {
-            console.log(feedId, feedVar?.canLoadMore, tab, "OnEndReached")
             if (!!!feedId && feedVar?.canLoadMore && tab == 0) {
               feedVar = {
                 ...feedVar,
@@ -1408,7 +1375,10 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
         isVisible={confirmation.isVisible}
         onAgree={confirmationAction}
         title={confirmation.title}
+      />
 
+      <ConfirmationModal2
+        ref={ref_confirmModal}
       />
 
       <ScheduleModal ref={scheduleModalRef} />

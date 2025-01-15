@@ -147,7 +147,6 @@ const TransactionAddEdit = ({ navigation, route }) => {
         noIcon
         title='Sales Team'
         onSelected={(opt) => {
-          console.log(opt, "onSelected")
           setPayouts({ member: opt })
           setSalesTeamModalShown(false)
         }}

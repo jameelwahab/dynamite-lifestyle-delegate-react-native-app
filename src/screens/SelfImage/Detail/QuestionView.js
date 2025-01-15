@@ -11,7 +11,7 @@ import QuestionComponent from '../../Questions/Components/QuestionComponent'
 import ReplyModal from '../components/ReplyModal'
 
 
-const QuestionView = ({ list, loader, onShowReplyPress, member, refresh }) => {
+const QuestionView = ({ hideRepliesCheckBox = false, disableReplies = false, list, loader, onShowReplyPress, member, refresh }) => {
   const ref_replyModal = useRef();
 
   const [sIndex, setSIndex] = useState(-1);
@@ -21,6 +21,7 @@ const QuestionView = ({ list, loader, onShowReplyPress, member, refresh }) => {
         <FlatList
           data={list}
           renderItem={({ item, index }) => <QuestionComponent
+            hideRepliesCheckBox={hideRepliesCheckBox}
             item={item}
             index={index}
             showRepliesbtns={true}
@@ -37,6 +38,7 @@ const QuestionView = ({ list, loader, onShowReplyPress, member, refresh }) => {
       </View>
 
       <ReplyModal
+        disableReplies={disableReplies}
         ref={ref_replyModal}
         member={member}
         refresh={refresh}

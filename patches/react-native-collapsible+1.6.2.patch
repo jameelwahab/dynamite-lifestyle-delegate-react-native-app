@@ -1,14 +1,15 @@
 diff --git a/node_modules/react-native-collapsible/Collapsible.js b/node_modules/react-native-collapsible/Collapsible.js
-index dc4d3b8..11d5c39 100644
+index dc4d3b8..fb0dc82 100644
 --- a/node_modules/react-native-collapsible/Collapsible.js
 +++ b/node_modules/react-native-collapsible/Collapsible.js
-@@ -26,6 +26,12 @@ export default class Collapsible extends Component {
+@@ -26,6 +26,13 @@ export default class Collapsible extends Component {
      };
    }
  
 +  componentDidMount(){
 +    if(!this.props.collapsed){
-+      this._toggleCollapsed(this.props.collapsed)
++      // this._toggleCollapsed(this.props.collapsed)
++      this._componentDidUpdate({collapsed:true});
 +    }
 +  }
 +  

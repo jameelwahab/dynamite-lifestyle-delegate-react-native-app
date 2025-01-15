@@ -6,39 +6,42 @@ import ReactNativeBlobUtil from "react-native-blob-util"
 
 
 const downloadImage = async (url) => {
-  if (Platform.OS === "android") {
-
-    let granted = await requestWritePermission()
-    if (granted) {
-      const { config, fs } = ReactNativeBlobUtil;
-      let PictureDir = fs.dirs.PictureDir;
-      let picName = url.split("/").pop();
-      let options = {
-        fileCache: true,
-        addAndroidDownloads: {
-          useDownloadManager: true,
-          notification: true,
-          path: PictureDir + "/" + picName,
-          description: 'downloading_file'
-        }
-      };
-      config(options)
-        .fetch('GET', url)
-        .then(res => {
-          console.log(res.path(), "download")
-          if (!!res.path()) {
-            saveImage(res.path())
+  // if (Platform.OS === "android") {
+  let granted = await requestWritePermission()
+  if (granted) {
+    const { config, fs } = ReactNativeBlobUtil;
+    let PictureDir = Platform.OS === "android" ? fs.dirs.PictureDir : fs.dirs.DownloadDir;
+    let picName = url.split("/").pop();
+    let options = {
+      fileCache: true,
+      appendExt: picName = url.split(".").pop(),
+      addAndroidDownloads: {
+        useDownloadManager: true,
+        notification: true,
+        path: PictureDir + "/" + picName,
+        description: 'downloading_file'
+      }
+    };
+    await config(options)
+      .fetch('GET', url)
+      .then(async res => {
+        if (!!res.path()) {
+          if (Platform.OS == "android") {
+            await saveImage(res.path())
           } else {
-            showToast({ title: "Image Download failed", body: res?.message, type: "error" })
+            await saveImage(res.path())
           }
-        });
-    } else {
-      showToast({ title: "Permission denied", type: "info" })
-    }
-
-  } else if (Platform.OS === "ios") {
-    saveImage(url)
+        } else {
+          showToast({ title: "Image Download failed", body: res?.message, type: "error" })
+        }
+      });
+  } else {
+    showToast({ title: "Permission denied", type: "info" })
   }
+
+  // } else if (Platform.OS === "ios") {
+  //   saveImage(url)
+  // }
 
 
 
@@ -46,11 +49,11 @@ const downloadImage = async (url) => {
 
 export default downloadImage
 
-const saveImage = (image) => {
-  CameraRoll.save(image, { album: appName }).then((res) => {
-    console.log(res, "res")
+const saveImage = async (image) => {
+  await CameraRoll.saveAsset(image, { album: appName, type: "auto" }).then((res) => {
     showToast({ title: "Image Downloaded", body: "Image Saved to Gallery", type: "success" })
   }).catch((err) => {
+    console.log(err, "err")
     showToast({ title: "Image Download failed", body: err?.message, type: "error" })
   })
 }
@@ -60,7 +63,6 @@ export const requestWritePermission = async () => {
     try {
       const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE);
-      console.log(granted, "granted")
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
         return true
       } else {

@@ -68,7 +68,6 @@ const GroupList = ({ navigation, route }) => {
 
   const ammendList = (group) => {
     let index = list.findIndex(x => x?._id == group._id);
-    console.log(group, index, "ammendList")
     if (index > -1) {
       list.splice(index, 1, group);
     } else {

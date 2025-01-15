@@ -31,7 +31,6 @@ const ScheduleModal = forwardRef(({ }, ref) => {
 
 
   const modalSchedule = () => {
-    console.log(time, "")
     return (
       <Modal
         isVisible={isVisible}

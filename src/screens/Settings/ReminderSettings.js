@@ -25,7 +25,6 @@ const ReminderSettings = ({ navigation }) => {
   const dispatch = useDispatch()
   const { user, token } = useSelector(selectUser);
   const [loader, setLoader] = useState(false);
-  console.log(user, "user")
   const [list, setList] = useState(user?.welcome_reminder_setting.length == 0 ? [{
     ...reminderObj
   }] : JSON.parse(JSON.stringify(user?.welcome_reminder_setting)));

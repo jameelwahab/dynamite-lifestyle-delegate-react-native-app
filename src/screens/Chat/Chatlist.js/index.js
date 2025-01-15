@@ -111,7 +111,6 @@ const ChatList = ({ navigation }) => {
 
    useEffect(() => {
     if (!firstTime) {
-      console.log("HI")
       clpage = 0;
       clcanLoadMore = false;
       debounce(() => api_ChatList(true))

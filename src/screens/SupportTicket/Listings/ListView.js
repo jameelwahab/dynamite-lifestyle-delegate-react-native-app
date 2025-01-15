@@ -44,12 +44,7 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
   //? Actions functions
 
   const ticketActions = (option) => {
-    console.log(option, "option", isOptionModalShown.for)
-
-
-
     if (option?.key == "change-department") {
-      console.log(isOptionModalShown, "isOptionModalShown")
       setIsOptionModal({ ...isOptionModalShown, isVisible: false, })
       setTimeout(() => {
         setIsDepartmentModalShown(true)
@@ -352,7 +347,6 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
 
                 }}
                 onDayPress={(day) => {
-                  console.log(day, "onDayPress")
                   setDate(day.dateString)
                 }}
               />

@@ -57,7 +57,7 @@ const Login = ({ navigation }) => {
       try {
         fcm_token = await messaging().getToken();
       } catch (err) {
-        console.log("fcm_token error", err)
+
       }
       let fd = new FormData();
       fd.append("fcm_token", fcm_token)

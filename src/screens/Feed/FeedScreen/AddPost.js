@@ -287,7 +287,6 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   }
 
   const selectItemForEdit = (item) => {
-    console.log(item, "selectItemForEdit")
     setEditId(item._id);
     setEditFeed(item);
     setPostCategory(item?.feed_appear_by == "public" ? "general" : "win");
@@ -454,7 +453,6 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     let pollData = null;
     if (postType == "poll") {
       pollData = ref_poll?.current?.getData();
-      console.log(pollData, "Poll Data");
     } else if (postType == "survey") {
       pollData = ref_survey?.current?.getData();
     }
@@ -514,7 +512,6 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
         for (let i = 0; i < pollData?.options.length; i++) {
           let obj = pollData?.options[i];
           let index = i;
-          console.log(obj, "obj")
           if (obj?.question_statement.trim() == "") {
             showToast({ body: `Please add Statement in Question ${index + 1}`, title: "Alert", type: "info" })
             return
@@ -1152,7 +1149,6 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                     onContentSizeChange={({ nativeEvent: { contentSize: { height } } }) => {
                       if (inputHeight != height) {
                         let boxHeight = (!isCosmos && height < 800) ? 120 : 150;
-                        console.log(boxHeight, "boxHeight")
                         if (height > boxHeight) {
                           setInputHeight(boxHeight)
                         } else {
@@ -1190,7 +1186,6 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                           inputHeight == 120 ? (inputHeight + 90) :
                             (inputHeight + 125) : (inputHeight + 130)
                     }}>
-                    {console.log(height, "height")}
                     <View style={{
                       width: utilities.screenWidth() - 40,
                       backgroundColor: colors.darkSecondary,

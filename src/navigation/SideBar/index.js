@@ -70,7 +70,6 @@ const index = (props) => {
 
 
     sub2 = notifee.onForegroundEvent(({ type, detail }) => {
-      console.log("onForegroundEvent", type, detail)
       switch (type) {
         case EventType.DISMISSED:
 
@@ -139,7 +138,6 @@ const index = (props) => {
     });
 
     const unsubscribe = messaging().onMessage(async remoteMessage => {
-      console.log("Remote Notification: ", remoteMessage)
       notifee.displayNotification({
         title: remoteMessage?.notification?.title,
         body: remoteMessage?.notification?.body,
@@ -193,7 +191,6 @@ const index = (props) => {
   }
 
   const handleSocketEvents = async (data, event) => {
-    console.log(event, "event")
     if (data?.action_response?.unread_notification_count != undefined) {
       if (typeof (data?.action_response?.unread_notification_count) == "number") {
         setCount(data?.action_response?.unread_notification_count)
@@ -216,9 +213,7 @@ const index = (props) => {
     }
   }
   const handleMentionNotificationCount = (data, event) => {
-    console.log(data, event)
     let notification = data?.action_response?.notification_users.find(x => x?.user_id == user?._id);
-    console.log(notification,"notification")
     if (!!notification && notification?.unread_notification_count > -1) {
       setCount(notification?.unread_notification_count)
     }
@@ -256,7 +251,6 @@ const index = (props) => {
   }
 
   const onOptionClick = async (screen, isCollpasable) => {
-    console.log(screen, "screen")
     if (isCollpasable) {
       toggleCollapse(screen)
     } else {

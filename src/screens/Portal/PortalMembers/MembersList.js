@@ -101,7 +101,6 @@ const MembersList = ({ navigation, route }) => {
 
   const onAgree = () => {
     let { selectedItem: item, type } = confirmModal;
-    console.log(item, "item")
     if (type == "delete") {
       deleteEventFromServer(item);
     }
@@ -150,7 +149,6 @@ const MembersList = ({ navigation, route }) => {
   }
 
   const loadMore = () => {
-    console.log("onENd", canLoadMore, page)
     if (canLoadMore && page != 0) {
       canLoadMore = false;
       setFooterLoader(true);

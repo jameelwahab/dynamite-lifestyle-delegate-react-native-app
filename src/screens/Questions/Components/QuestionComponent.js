@@ -1,16 +1,8 @@
-import { View, Text, FlatList, StyleSheet, Pressable, TouchableOpacity, Image } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import RootView from '../../../components/RootView'
+import { View, StyleSheet, Pressable, } from 'react-native'
+import React, { useState } from 'react'
 import MyText from '../../../components/MyText'
-import MyLoader from '../../../components/MyLoader'
-import { QUESTIONS_LIST } from '../../../DAL'
-import { useSelector } from 'react-redux'
-import { selectUser } from '../../../redux/reducers/userSlice'
-import EmptyView from '../../../components/EmptyView'
 import { colors } from '../../../utilities/colors'
 import MyWebview from '../../../components/MyWebview'
-import { fonts } from '../../../utilities/fonts'
-import MyInputs from '../../../components/MyInputs'
 import MyCheckBox from '../../../components/MyCheckBox'
 import Collapsible from 'react-native-collapsible'
 import { icons } from '../../../utilities/icons'
@@ -19,7 +11,7 @@ import openUrl from '../../../functions/openUrl'
 import { S3_URL } from '../../../utilities/constants'
 
 
-const QuestionComponent = ({ item, index, showRepliesbtns = false, onShowReplyPress, onRelpyBtnPress }) => {
+const QuestionComponent = ({ item, index, showRepliesbtns = false, onShowReplyPress, onRelpyBtnPress, hideRepliesCheckBox = false }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const findCollapsed = (id) => {
@@ -123,13 +115,13 @@ const QuestionComponent = ({ item, index, showRepliesbtns = false, onShowReplyPr
           style={__styles.btn}
           noCapitalize
         />
-
-        <MyCheckBox
-          title='Show Replies to Client'
-          onPress={() => onShowReplyPress?.(item)}
-          pb={0}
-          value={!!item?.answer?.show_replies}
-        />
+        {!hideRepliesCheckBox &&
+          <MyCheckBox
+            title='Show Replies to Client'
+            onPress={() => onShowReplyPress?.(item)}
+            pb={0}
+            value={!!item?.answer?.show_replies}
+          />}
       </View>)
   }
 
@@ -171,6 +163,7 @@ const QuestionComponent = ({ item, index, showRepliesbtns = false, onShowReplyPr
                   item?.question_type == "textarea" ? textAreaView(item, index)
                     : null}
           </View>
+
           {item?.answer?.document_url && (
             <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
               <MyButton

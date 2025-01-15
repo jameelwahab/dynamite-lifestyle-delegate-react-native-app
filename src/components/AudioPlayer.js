@@ -60,7 +60,6 @@ const AudioPlayer = ({ stop = "", url,  }) => {
 
 
     return () => {
-      console.log("playerState dead")
       TrackPlayer.reset();
     }
 
@@ -71,11 +70,11 @@ const AudioPlayer = ({ stop = "", url,  }) => {
     await TrackPlayer.add({
       id: "1",
       url: !!url.uri ? url.uri : S3_URL + url,
-      title: "",
-      artist: "",
-      album: '',
-      genre: '',
-      artwork: "",
+      // title: "",
+      // artist: "",
+      // album: '',
+      // genre: '',
+      // artwork: "",
     });
 
   }
@@ -86,7 +85,6 @@ const AudioPlayer = ({ stop = "", url,  }) => {
 
   const playPauseFunction = async () => {
     const status = await TrackPlayer.getState();
-    console.log(status, "track player")
     if (status == State.Playing) {
       TrackPlayer.pause()
       setPlaying(false)

@@ -267,7 +267,6 @@ const NotificationList = ({ navigation, route }) => {
         nestedNavigator = routes?.ticketList
         params["isMine"] = true;
       } else if (!isMineTicket && !!navbar.find(x => x.value == "internal-tickets")) {
-        console.log(params, "params", isMineTicket)
         navigator = routes.internalTicketNavigator;
         nestedNavigator = routes?.supportTicketList
       }

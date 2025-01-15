@@ -24,7 +24,7 @@ const LikeModal = ({
   footerLoader,
   onMessagePress
 }) => {
-  console.log(user, "user")
+
 
   const userLikeView = ({ item, index }) => {
     return (

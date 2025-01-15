@@ -98,7 +98,6 @@ const ChatList = ({ navigation }) => {
   }
 
   const loadmore = () => {
-    console.log("loadmore", canLoadMore && __firstTime == false)
     if (canLoadMore && __firstTime == false) {
       canLoadMore = false;
       setFooterLoader(true);
@@ -111,7 +110,6 @@ const ChatList = ({ navigation }) => {
 
   useEffect(() => {
     if (!__firstTime) {
-      console.log("HI", __firstTime)
       page = 0;
       canLoadMore = false;
       debounce(() => api_ChatList(true))
@@ -120,7 +118,6 @@ const ChatList = ({ navigation }) => {
 
   useEffect(() => {
     if (!__firstTime) {
-      console.log("HI 2", __firstTime)
       page = 0;
       canLoadMore = false;
       setLoader(true);
@@ -131,7 +128,6 @@ const ChatList = ({ navigation }) => {
 
 
   useEffect(() => {
-    console.log("HI 3", __firstTime)
     page = 0;
     canLoadMore = false;
     setLoader(true);
@@ -159,16 +155,12 @@ const ChatList = ({ navigation }) => {
   }
 
   const readMsgSingnal = (data) => {
-    console.log("chat_message_status", data);
     if (data.status == "read") {
       setChatList((chatList) => {
         let index = chatList.findIndex(chat => chat._id == data.chat_id);
         if (index > -1) {
-          console.log(chatList[index], "chatObj")
           if (chatList[index].last_message_sender == user?._id) {
             chatList[index].last_message_status = "read";
-
-            console.log(chatList, "read 2")
           }
         }
         return [...chatList]
@@ -178,7 +170,6 @@ const ChatList = ({ navigation }) => {
   }
 
   const newMsgReceive = (data) => {
-    console.log(data, "whatsapp_chat_message_event_receiver", "chatlisting")
 
     if (!!data?.data?.response) {
       let newChatObj = data?.data?.response;
@@ -187,7 +178,6 @@ const ChatList = ({ navigation }) => {
       setChatList((chatList) => {
         list = [...chatList];
         let index = list.findIndex(x => x?._id == newChatObj?.whatssapp_chat);
-        console.log(index, "index")
         if (index > -1) {
           let chatobj = {
             ...list[index],
@@ -211,9 +201,7 @@ const ChatList = ({ navigation }) => {
           if(list.length==1){
             refresh?.()
           }
-          // console.log(list,"list")
         }
-        console.log(list, "listlistlistlist")
         return [...list]
       });
     }
@@ -225,7 +213,6 @@ const ChatList = ({ navigation }) => {
   const resetCountToZero = (chatId) => {
     setChatList((chatList) => {
       let index = chatList.findIndex(x => x._id == chatId);
-      console.log(index, "index", "resetCountToZero")
       if (index > -1) {
         let chatobj = { ...chatList[index] };
         chatobj.sender_info.unread_message_count = 0;
@@ -237,9 +224,7 @@ const ChatList = ({ navigation }) => {
 
 
   const makeChatAccepted = (chatId) => {
-    console.log("makeChatAccepted",)
     let index = chatList.findIndex(x => x._id == chatId);
-    console.log(index, "index makeChatAccepted")
     if (index > -1) {
       let chatobj = { ...chatList[index] };
       chatobj.receiver_info.whatsapp_chat_status = "accepted";

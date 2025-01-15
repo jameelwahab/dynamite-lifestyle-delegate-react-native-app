@@ -417,8 +417,6 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
 };
 
 function areEqual(prevProps, nextProps) {
-  console.log(prevProps, "prevProps");
-  console.log(nextProps, "nextProps");
   if (JSON.stringify(prevProps) == JSON.stringify(nextProps)) {
     return true
   }

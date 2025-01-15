@@ -100,7 +100,6 @@ const PortalListing = ({ navigation, route }) => {
 
   const onAgree = () => {
     let { selectedItem: item, type } = confirmModal;
-    console.log(item, "item")
     if (type == "delete") {
       deletePortalEventFromServer(item.event_slug);
     } else if (type == "dublicate") {

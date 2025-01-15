@@ -25,7 +25,6 @@ const CalenderView = ({ selectedDate, events, setDate, timezone, onArrowPress, t
   const [modalEvent, setModalEvent] = useState(null)
 
   const openInfoModal = (item) => {
-    console.log(item, "item")
     setIsVisible(true);
     setModalLoader(true);
     getEventDetailFRomServer(item?.event_slug)
@@ -70,7 +69,6 @@ const CalenderView = ({ selectedDate, events, setDate, timezone, onArrowPress, t
 
             </Pressable>
             <View style={{ paddingHorizontal: 10, flex: 1 }}>
-              {console.log(modalEvent, "modal Event")}
               {!!modalEvent &&
                 <View>
                   <MyText align='center' color={colors.primary} fontSize={18} type='bold' >{modalEvent?.title}</MyText>
@@ -344,7 +342,7 @@ const CalenderView = ({ selectedDate, events, setDate, timezone, onArrowPress, t
             </View>
             : null
       }
-      {console.log(Object.keys(events), "Events")}
+
       <View style={{ marginTop: 5 }}>
         <FlatList
           data={type == "week" ? Object.keys(events) : !!events[selectedDate]?.list ? events[selectedDate]?.list : []}

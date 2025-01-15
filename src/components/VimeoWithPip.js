@@ -36,11 +36,7 @@ export default class VimeoWithPip extends Component {
   }
 
   componentDidMount() {
-    console.log(PipModule, "PipModule")
     this.stateEvent = AppState.addEventListener("change", (appstate) => {
-      console.log(appstate, "appstate")
-      console.log(this.player, "Player")
-      console.log(this.isPlaying, "isPlaying")
       // return
       if (Platform.OS === "android" && !!this.player) {
         if (appstate == "background" && this.isPlaying) {
@@ -87,7 +83,7 @@ export default class VimeoWithPip extends Component {
         })
 
       } catch (e) {
-        console.log(e, "Vimeo error")
+
         this.setState({ loading: false, error: true })
       }
 
@@ -106,7 +102,7 @@ export default class VimeoWithPip extends Component {
 
       return res?.video_id;
     } catch (e) {
-      console.log(e, "Vimeo Error")
+
     }
   }
 
@@ -136,7 +132,6 @@ export default class VimeoWithPip extends Component {
 
   componentDidUpdate(prevProp) {
     if (prevProp.focused == true && this.props.focused == false) {
-      console.log('not focused');
       this.setState({ started: false })
     }
   }
@@ -180,7 +175,7 @@ export default class VimeoWithPip extends Component {
                 // } else if (this.state.haveToSeek && Platform.OS == "android") {
                 //   this.setState({ haveToSeek: false })
                 //   if (Number(this.playedTime) > 0) {
-                //     console.log(this.playedTime, "playedTime")
+                //    
                 //     this.player?.current?.seek((this.playedTime - 1))
                 //   }
                 // }
@@ -265,10 +260,10 @@ export default class VimeoWithPip extends Component {
   }
 
   onBuffer = (buffer) => {
-    console.log(buffer, "Buffer")
+
   }
   videoError = (err) => {
-    console.log(err, "err")
+
     this.setState({ loading: false })
   }
 

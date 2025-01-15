@@ -71,7 +71,6 @@ const MainScreen = ({ navigation, route }) => {
 
 
   useEffect(() => {
-    console.log(route.params?.filters)
     if (!!route.params?.filters) {
       setfilter(route.params?.filters)
     }

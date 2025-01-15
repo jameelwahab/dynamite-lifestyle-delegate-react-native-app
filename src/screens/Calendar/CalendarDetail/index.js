@@ -20,7 +20,6 @@ import { event } from 'react-native-reanimated'
 
 const CalendarDetail = ({ navigation, route }) => {
   const { eventId, iteration_id, type: eventType } = route?.params;
-  console.log(eventId, "eventId")
   const isDelegateEvents = eventType == "consultant_user";
   const ref_eventModal = useRef()
   const { token } = useSelector(selectUser);

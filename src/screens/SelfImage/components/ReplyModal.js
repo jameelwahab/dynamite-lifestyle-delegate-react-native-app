@@ -22,7 +22,7 @@ import OptionModal from '../../../components/OptionModal';
 
 
 
-const ReplyModal = forwardRef(({ member, question, refresh, list, onClose }, ref) => {
+const ReplyModal = forwardRef(({ member, question, refresh, list, onClose, disableReplies = false }, ref) => {
   const navigation = useNavigation();
   const { token } = useSelector(selectUser);
   const [isVisible, setIsVisible] = useState(false);
@@ -66,7 +66,6 @@ const ReplyModal = forwardRef(({ member, question, refresh, list, onClose }, ref
 
   const onSelected = (opt) => {
     let { item } = optionModal;
-    console.log(item, "item")
     closeOptionModal();
 
     if (opt.key === "edit") {
@@ -192,9 +191,10 @@ const ReplyModal = forwardRef(({ member, question, refresh, list, onClose }, ref
               <MyText fontSize={12} >{moment(item.createdAt).format(dateTimeFormat.dateTime)}</MyText>
             </View>
           </View>
+          {!disableReplies &&
           <MenuButton
             onPress={() => setOptionModal({ isVisible: item, item })}
-          />
+          />}
           {/* <TouchableOpacity
             onPress={() => setConfirmation({ isVisible: true, item: item })}
             style={__styles.deleteBtn}>
@@ -221,7 +221,7 @@ const ReplyModal = forwardRef(({ member, question, refresh, list, onClose }, ref
       avoidKeyboard
       style={{ margin: 0 }}>
       <SafeAreaView style={{ flex: 1, backgroundColor: colors.secondaryVariant }}>
-        <View style={{ flex: 1 ,paddingBottom:10}}>
+        <View style={{ flex: 1, paddingBottom: 10 }}>
           <View style={__styles.header}>
             <MyText isHeading>Replies</MyText>
             <MyText>{member?.first_name + " " + member?.last_name}</MyText>
@@ -246,41 +246,41 @@ const ReplyModal = forwardRef(({ member, question, refresh, list, onClose }, ref
                 showsVerticalScrollIndicator={false}
               />
             </View>
+            {disableReplies == false &&
+              <View style={{ paddingHorizontal: 10, marginTop: 5 }}>
+                {editor &&
+                  <Editor
+                    label='Reply'
+                    height={120}
+                    initialValue={desc}
+                    onChange={(text) => setDesc(text)}
 
-            <View style={{ paddingHorizontal: 10,marginTop:5 }}>
-            {editor &&
-                <Editor
-                label='Reply'
-                  height={120}
-                  initialValue={desc}
-                  onChange={(text) => setDesc(text)}
+                  />}
+                {!!editId ?
+                  <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
+                    <MyButton
+                      onPress={cancelEditing}
+                      invert
+                      title='Cancel'
+                      style={{ paddingHorizontal: 20, }}
+                    />
 
-                />}
-              {!!editId ?
-                <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
-                  <MyButton
-                    onPress={cancelEditing}
-                    invert
-                    title='Cancel'
-                    style={{ paddingHorizontal: 20, }}
-                  />
-
-                  <MyButton
-                    onPress={editCommnent}
-                    invert
-                    title='Update'
-                    style={{ paddingHorizontal: 20, marginLeft: 10 }}
-                  />
-                </View> :
-                <View style={{ alignItems: "flex-end" }}>
-                  <MyButton
-                    onPress={addCommnent}
-                    invert
-                    title='Submit'
-                    style={{ paddingHorizontal: 20 }}
-                  />
-                </View>}
-            </View>
+                    <MyButton
+                      onPress={editCommnent}
+                      invert
+                      title='Update'
+                      style={{ paddingHorizontal: 20, marginLeft: 10 }}
+                    />
+                  </View> :
+                  <View style={{ alignItems: "flex-end" }}>
+                    <MyButton
+                      onPress={addCommnent}
+                      invert
+                      title='Submit'
+                      style={{ paddingHorizontal: 20 }}
+                    />
+                  </View>}
+              </View>}
           </View>
           <MyLoader enable={loader} />
         </View>
