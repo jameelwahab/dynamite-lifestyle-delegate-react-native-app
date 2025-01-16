@@ -200,11 +200,11 @@ const MissionReport = ({ navigation, route }) => {
               </View>
             </View>))}
 
-            {isArray(schedules) > 0 &&
-            <View style={{marginTop:10}}>
-              <MyText fontSize={18} type='bold' color={colors.primary} >Mission Report Detail Overview</MyText>
-            </View>
-          }
+        {isArray(schedules) > 0 &&
+          <View style={{ marginTop: 10 }}>
+            <MyText fontSize={18} type='bold' color={colors.primary} >Mission Report Detail Overview</MyText>
+          </View>
+        }
 
       </View>
     )
@@ -215,6 +215,7 @@ const MissionReport = ({ navigation, route }) => {
         <View style={{ flex: 1 }}>
           <FlatList
             ListHeaderComponent={headerView()}
+            contentContainerStyle={{ paddingBottom: 30 }}
             showsVerticalScrollIndicator={false}
             data={schedules}
             keyExtractor={(item) => item?._id}
@@ -237,20 +238,25 @@ const QuestionsView = ({ schedule, index }) => {
   const [isCollapsed, setIsCollapsed] = useState(true);
 
   const scheduleActions = () => {
-    if (!!schedule.general_allowed_actions && schedule.general_allowed_actions.length > 0) {
+    let arr = schedule.general_allowed_actions;
+    // let arr = [{
+    //   action_statement: "test",
+    //   action_type: "general"
+    // }, {
+    //   action_statement: "test",
+    //   action_type: "general"
+    // }, {
+    //   action_statement: "test",
+    //   action_type: "general"
+    // }]
+    if (isArray(arr)) {
       return (
         <View style={__styles.cardView} >
           {!!schedule?.content_settings?.action_statement_heading && schedule?.general_allowed_actions?.length > 0 &&
-            <Text style={{}} >{schedule?.content_settings?.action_statement_heading}</Text>}
+            <MyText type='medium' color={colors.primary} >{schedule?.content_settings?.action_statement_heading}</MyText>}
           <View>
-            {schedule?.general_allowed_actions?.map((x, i) => {
+            {arr?.map((x, i) => {
               if (x.action_type == "general") {
-                let statement = "";
-                // if (this.state.answers[x?._id]) {
-                //   statement = this.state.answers[x?._id]?.statement
-                // } else if (this.state.localAnswers[x?._id]) {
-                //   statement = this.state.localAnswers[x?._id]?.statement
-                // }
                 return (
                   <View
                     style={__styles.box2}
@@ -258,9 +264,9 @@ const QuestionsView = ({ schedule, index }) => {
                     <MyCheckBox
                       color={colors.primary2}
                       value={true}
-                      onPress={() => this.toggleAnswer(x, [])}
-                      // required={x?.is_required}
-                      label={x?.action_statement} />
+                      pb={0}
+                      title={x?.action_statement}
+                    />
 
                     {/*  <View style={{ paddingHorizontal: 10, paddingBottom: 10 }}>
                   <MyTextField
@@ -517,6 +523,13 @@ const __styles = StyleSheet.create({
     backgroundColor: colors.secondary,
     borderRadius: 10,
   },
+  box2: {
+    backgroundColor: colors.secondaryVariant,
+    borderRadius: 10,
+    marginTop: 10,
+    padding: 10
+
+  }
 
 })
 

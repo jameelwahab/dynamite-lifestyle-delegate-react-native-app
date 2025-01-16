@@ -129,7 +129,7 @@ const MissionRewardView = ({ badges = [], showEarnedBadges = true, badgesEarned 
                       {badges.length > 1 &&
                         <Pressable
                           style={{ marginLeft: 5 }}
-                          onPress={() => ref_info?.current?.openModal("", "", false, "", null, badgesView(badges))}
+                          onPress={() => ref_info?.current?.openModal("", "", false, badgesView(badges))}
                         >
                           <Text style={[main.description, { textDecorationLine: "underline", color: colors.primary2 }]} >More</Text>
                         </Pressable>

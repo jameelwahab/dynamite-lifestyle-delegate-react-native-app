@@ -14,17 +14,24 @@ const InfoModal = forwardRef(({ header, footer }, ref) => {
   const [text, setText] = useState("");
   const [subText, setSubText] = useState("");
   const [isHtml, setIsHtml] = useState("");
+  const [extra, setExtra] = useState({
+    view: null
+  })
   useImperativeHandle(ref, () => {
     return {
       openModal,
     }
   }, [])
 
-  const openModal = (str, str2 = "", isHtml = false) => {
+  const openModal = (str, str2 = "", isHtml = false, view) => {
+    console.log(view, "view")
     setVisiblity(true)
     setText(str)
     setSubText(str2)
     setIsHtml(isHtml)
+    if (view) {
+      setExtra({ view: view })
+    }
   }
 
   const closeScheduleTimeModal = () => {
@@ -62,23 +69,26 @@ const InfoModal = forwardRef(({ header, footer }, ref) => {
               {header?.()}
             </View>
             <View style={{ paddingBottom: 10, paddingHorizontal: 10 }}>
-              {isHtml ?
-                <View style={{ alignItems: "center" }}>
-                  <MyWebview
-                    // width={screen.width - 40}
-                    fullWidth
-                    html={text} />
-                </View> :
-                <MyText>{text}</MyText>}
+              {!!extra?.view ? extra?.view :
+                <>
+                  {isHtml ?
+                    <View style={{ alignItems: "center" }}>
+                      <MyWebview
+                        // width={screen.width - 40}
+                        fullWidth
+                        html={text} />
+                    </View> :
+                    <MyText>{text}</MyText>}
 
-              {!!subText && <View style={{ marginTop: 5 }}>
-                <MyText fontSize={12} type='medium' color={colors.lightGrey} >{subText}</MyText>
-              </View>}
+                  {!!subText && <View style={{ marginTop: 5 }}>
+                    <MyText fontSize={12} type='medium' color={colors.lightGrey} >{subText}</MyText>
+                  </View>}
+                </>}
             </View>
             {footer?.()}
           </View>
         </View>
-      </Modal>)
+      </Modal >)
   }
 
 
