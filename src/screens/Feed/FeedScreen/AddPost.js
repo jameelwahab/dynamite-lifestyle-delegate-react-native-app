@@ -574,8 +574,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
       if (!!editId) {
         fd.append("created_for_level_or_type", postCeatedFor);
       } else {
-        fd.append("created_for_level_or_type", isCosmos ?
-          JSON.stringify([postCeatedFor])
+        fd.append("created_for_level_or_type", isCosmos ? postCeatedFor
           : JSON.stringify([postCeatedFor]));
       }
     }

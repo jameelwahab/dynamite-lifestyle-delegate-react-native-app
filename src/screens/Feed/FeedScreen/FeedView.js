@@ -73,8 +73,8 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
           image={item?.action_info?.profile_image}
           name={item?.action_info?.name}
           backgroundTransparent={true}
-          borderWidth={2}
-          borderColor={item?.badge_level_info?.color_code}
+          borderWidth={isCosmos || isNoteMainFeed ? 1 / 4 : 2}
+          borderColor={!(isCosmos || isNoteMainFeed) ? item?.badge_level_info?.color_code : undefined}
           size={35}
         />
         <View style={__style.profileNameView}>
@@ -93,23 +93,24 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
             style={{ tintColor: colors.primary, height: 25, width: 25 }}
           />
         </TouchableOpacity>}
-      {(!(!!isNoteMainFeed) && !!item?.badge_level_info?.icon?.thumbnail_1) &&
+      {(!(!!isNoteMainFeed) && (!!item?.badge_level_info?.icon?.thumbnail_1 || isCosmos)) &&
         <View >
           <MyImage
             indicatorProps={{ color: colors.secondaryVariant }}
+            resizeMode={"contain"}
             source={{
               uri:
-                // isCosmos ?
-                //   // item?.created_for_level_or_type == "delegate" ?
-                //   // S3_URL + settings?.delegate_feed_icon :
-                //   // item?.created_for_level_or_type == "consultant" ?
-                //   //   S3_URL + settings?.consultant_feed_icon :
-                //   //   item?.created_for_level_or_type == "marketing" ?
-                //   //     S3_URL + settings?.marketing_feed_icon :
-                //   //     item?.created_for_level_or_type == "inner_circle" ?
-                //   //       S3_URL + settings?.inner_circle_feed_icon :
-                //   S3_URL + settings?.[`${item?.created_for_level_or_type}_feed_icon`] :
-                S3_URL + item?.badge_level_info?.icon?.thumbnail_1
+                isCosmos ?
+                  //   // item?.created_for_level_or_type == "delegate" ?
+                  //   // S3_URL + settings?.delegate_feed_icon :
+                  //   // item?.created_for_level_or_type == "consultant" ?
+                  //   //   S3_URL + settings?.consultant_feed_icon :
+                  //   //   item?.created_for_level_or_type == "marketing" ?
+                  //   //     S3_URL + settings?.marketing_feed_icon :
+                  //   //     item?.created_for_level_or_type == "inner_circle" ?
+                  //   //       S3_URL + settings?.inner_circle_feed_icon :
+                  S3_URL + settings?.[`${item?.created_for_level_or_type}_feed_icon`] :
+                  S3_URL + item?.badge_level_info?.icon?.thumbnail_1
             }}
             style={__style.feedTypeIcon}
           />

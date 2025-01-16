@@ -515,13 +515,19 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
   }
 
   const socketReceiverAction = (data) => {
+    console.log(data, "data")
 
     if (data?.action == "feedlike" || data?.action == "feedunlike") {
-      updateFeedItemsSpecificField(data?.feed_id, {
-        is_liked: data?.action_response?.is_liked,
+      let obj = {
         like_count: data?.action_response?.like_count,
         top_liked_user: data?.action_response?.top_liked_user
-      })
+      }
+      console.log(data?.action_response?.creator_id, user?._id, "check");
+      if (data?.action_by == user?._id) {
+        obj["is_liked"] = data?.action_response?.is_liked
+      }
+      console.log(obj, 'obj')
+      updateFeedItemsSpecificField(data?.feed_id, obj)
     }
 
     if (data?.action.includes("comment")) {

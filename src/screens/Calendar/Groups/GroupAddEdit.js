@@ -19,6 +19,7 @@ import { selectSettings } from '../../../redux/reducers/settingSlice'
 import OptionModal from '../../../components/OptionModal'
 import { communityLevelObj } from '../../../utilities/constants'
 import breakReference from '../../../functions/breakReference'
+import isArray from '../../../functions/isArray'
 
 const GroupAddEdit = ({ navigation, route }) => {
   const { group, ammendList } = route?.params;
@@ -407,6 +408,7 @@ const GroupAddEdit = ({ navigation, route }) => {
       />
 
       {/* Group By level modal */}
+
       <OptionModal
         noIcon
         isVisible={isGrpModalVisible}
@@ -438,7 +440,7 @@ const GroupAddEdit = ({ navigation, route }) => {
         noIcon
         isVisible={communityLevelModal}
         closeModal={() => setCommunityLevelModal(false)}
-        optionList={access?.badge_levels || []}
+        optionList={isArray(access?.badge_levels) ? access?.badge_levels.slice().filter(x => x?.is_access) : []}
       />
 
 

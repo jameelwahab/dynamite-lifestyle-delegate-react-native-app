@@ -22,6 +22,7 @@ import showToast from '../../../functions/showToast';
 import OptionModalWithSearch from '../../../components/OptionModalWithSearch';
 import { useSelector } from 'react-redux';
 import { access, selectUser } from '../../../redux/reducers/userSlice';
+import isArray from '../../../functions/isArray';
 
 const FilterModal = forwardRef(({ token, type, filterTheData, appliedFilter, isMembers, isNurture, isAllMembers, isNurtureAccessable }, ref) => {
   const calendarRef = useRef()
@@ -275,8 +276,10 @@ const FilterModal = forwardRef(({ token, type, filterTheData, appliedFilter, isM
     } else if (openFor == "level") {
       heading = "Level"
       levelList.forEach(x => {
-        if (selectedLevel.findIndex(y => y?._id == x?._id) == -1) {
-          list.push(x)
+        if (x?.is_access) {
+          if (selectedLevel.findIndex(y => y?._id == x?._id) == -1) {
+            list.push(x)
+          }
         }
       })
     }
@@ -579,6 +582,7 @@ const FilterModal = forwardRef(({ token, type, filterTheData, appliedFilter, isM
                   </Pressable>
                 )}
               />
+
 
               <MyTouchableInput
                 label='Badge Levels'

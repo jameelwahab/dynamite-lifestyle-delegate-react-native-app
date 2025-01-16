@@ -50,7 +50,7 @@ const PodAdd = ({ navigation, route }) => {
     zoomlink: "",
     password: "",
     isRecurring: false,
-    communityLvl: isArray(access?.badge_levels) ? [access?.badge_levels[0]] : [],
+    // communityLvl: isArray(access?.badge_levels) ? [access?.badge_levels[0]] : [],
     startDate: moment(),
     startTime: "00:00",
     hours: hourslist[0],
@@ -66,7 +66,7 @@ const PodAdd = ({ navigation, route }) => {
     longDesc: "",
   })
 
-  const { title, status, zoomlink, password, isRecurring, communityLvl, startDate, startTime, hours, minutes, recurrenceType, recurrenceDays, recurrenceEndDate, groups, members, excludedMembers, logo, shortDesc, longDesc } = cred;
+  const { title, status, zoomlink, password, isRecurring, startDate, startTime, hours, minutes, recurrenceType, recurrenceDays, recurrenceEndDate, groups, members, excludedMembers, logo, shortDesc, longDesc } = cred;
   const setCred = (updation) => updateCred((old) => ({ ...old, ...updation }));
 
   useEffect(() => {
@@ -200,7 +200,7 @@ const PodAdd = ({ navigation, route }) => {
         zoomlink: !!room?.zoom_link ? room?.zoom_link : "",
         password: !!room?.password ? room?.password : "",
         isRecurring: !!room?.is_recurring ? true : false,
-        communityLvl: !!room?.badge_levels ? room?.badge_levels : isArray(access?.badge_levels) ? access?.badge_levels[0] : [],
+        // communityLvl: !!room?.badge_levels ? room?.badge_levels : isArray(access?.badge_levels) ? access?.badge_levels[0] : [],
         startDate: !!room?.start_date ? moment(room?.start_date, "YYYY/MM/DD") : moment(),
         startTime: !!room?.start_time ? room?.start_time : "00:00",
         hours: !!room?.duration_hour ? hourslist.find(x => x.key == room?.duration_hour) : hourslist[0],
@@ -241,7 +241,7 @@ const PodAdd = ({ navigation, route }) => {
     fd.append("start_time", startTime)
     fd.append("duration_hour", hours.key)
     fd.append("duration_minute", minutes.key)
-    fd.append("badge_levels", JSON.stringify(communityLvl))
+    // fd.append("badge_levels", JSON.stringify(communityLvl))
     fd.append("recurring_type", recurrenceType?.key)
     fd.append("weekdays", JSON.stringify(recurrenceDays))
     fd.append("start_date", moment(startDate).format("YYYY-MM-DD"))
@@ -385,12 +385,12 @@ const PodAdd = ({ navigation, route }) => {
         </View>
 
 
-        <MyTouchableInput
-          iconOnPress={() => setCommunityLevelModal(true)}
-          label='Badge Level*'
-          view={() => selectedMemberView(communityLvl, "communityLvl", "title")}
-        // value={!!groupData?.communityLevel ? communityLevelObj[groupData?.communityLevel] : ""}
-        />
+        {/* <MyTouchableInput
+            iconOnPress={() => setCommunityLevelModal(true)}
+            label='Badge Level'
+            view={() => selectedMemberView(communityLvl, "communityLvl", "title")}
+          // value={!!groupData?.communityLevel ? communityLevelObj[groupData?.communityLevel] : ""}
+          /> */}
 
         {/* <MyTouchableInput
           label='Group Level*'
@@ -604,7 +604,7 @@ const PodAdd = ({ navigation, route }) => {
         noIcon
       />
 
-      <OptionModal
+      {/* <OptionModal
         multiple
         onSelected={(item) => {
           let arr = breakReference(communityLvl);
@@ -623,7 +623,7 @@ const PodAdd = ({ navigation, route }) => {
         isVisible={communityLevelModal}
         closeModal={() => setCommunityLevelModal(false)}
         optionList={access?.badge_levels || []}
-      />
+      /> */}
 
       <OptionModal
         optionList={groupList}
