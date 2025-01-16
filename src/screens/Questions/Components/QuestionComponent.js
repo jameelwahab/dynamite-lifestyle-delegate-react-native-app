@@ -11,9 +11,8 @@ import openUrl from '../../../functions/openUrl'
 import { S3_URL } from '../../../utilities/constants'
 
 
-const QuestionComponent = ({ item, index, showRepliesbtns = false, onShowReplyPress, onRelpyBtnPress, hideRepliesCheckBox = false }) => {
+const QuestionComponent = ({ item, index, showRepliesbtns = false, onShowReplyPress, onRelpyBtnPress, hideRepliesCheckBox = false, hideCollapse = false, noQuestionStatement = false,padding=10 }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
-
   const findCollapsed = (id) => {
     return !!isCollapsed.find(x => x == id)
   }
@@ -126,12 +125,14 @@ const QuestionComponent = ({ item, index, showRepliesbtns = false, onShowReplyPr
   }
 
   return (
-    <View style={{ backgroundColor: colors.secondary, padding: 10, marginTop: 10, borderRadius: 10 }}>
+    <View style={{ backgroundColor: colors.secondary, padding:padding, marginTop: 10, borderRadius: 10 }}>
       <Pressable
+        disabled={hideCollapse}
         onPress={() => setIsCollapsed(!isCollapsed)}
         style={{ flexDirection: "row", alignItems: "center" }}>
         <View style={{ flex: 1 }}>
-          <MyText type='medium' >{"Question Statement"}</MyText>
+          {!noQuestionStatement &&
+          <MyText type='medium' >{"Question Statement"}</MyText>}
           <View style={{ marginTop: 5 }}>
             {!!item?.question_statement &&
               <MyWebview
@@ -150,9 +151,10 @@ const QuestionComponent = ({ item, index, showRepliesbtns = false, onShowReplyPr
               />}
           </View>
         </View>
-        <View>
-          {isCollapsed ? icons.downwardArrow() : icons.upwardArrow()}
-        </View>
+        {hideCollapse &&
+          <View>
+            {isCollapsed ? icons.downwardArrow() : icons.upwardArrow()}
+          </View>}
       </Pressable>
       <View style={{ marginTop: 10 }}>
         <Collapsible collapsed={isCollapsed} >

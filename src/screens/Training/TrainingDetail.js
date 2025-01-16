@@ -77,16 +77,11 @@ const TrainingDetail = (props) => {
   const getDataFromServer = async () => {
     let res = await GET_TRAINING_DETAIL({ navigation, token, slug: mySlug });
     if (res.code == 200) {
+
       let tabArr = [
         {
           title: "Overview",
           _id: "delegate_overview_tab_by_me",
-          section_slug: "delegate_overview_tab_by_me",
-          type: "general"
-        },
-        {
-          title: "Community",
-          _id: "delegate_feed_tab_by_me",
           section_slug: "delegate_overview_tab_by_me",
           type: "general"
         },
@@ -97,6 +92,21 @@ const TrainingDetail = (props) => {
           type: "general"
         },
         ...res?.program_section];
+      let community = null;
+      res?.program?.program_configration.forEach((x) => {
+        if (x?.community_tab_status) {
+          community = {
+            title: x?.community_tab_title,
+            _id: "delegate_feed_tab_by_me",
+            section_slug: "delegate_overview_tab_by_me",
+            type: "general"
+          }
+        }
+      })
+      if (community) {
+        tabArr.splice(1, 0, community);
+      }
+
       if (isFirtTime?.current) {
         isFirtTime.current = false;
         if (route?.params?.curtab) {

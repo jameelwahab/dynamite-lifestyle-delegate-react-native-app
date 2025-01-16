@@ -53,10 +53,12 @@ import StackCalendarGroups from "../NestedStacks/StackCalendarGroups";
 import StackCalendarEvents from "../NestedStacks/StackCalendarEvents";
 import StackDelegateEvents from "../NestedStacks/StackDelegateEvents";
 import StackLeadCenter from "../NestedStacks/StackLeadCenter";
+import StackMissionReport from "../NestedStacks/SackMisisonReport";
 
 
 
 export const ParentComponents = {
+
   "867a0259-dafe-40c0-82e4-55bc1d4e548f": {
     key: routes.dasboardNavigator,
     component: StackMissionControl,
@@ -361,6 +363,14 @@ export const ParentComponents = {
       value: "/sales",
       key: "aadbd7a3-91c1-499dd-bf24-7846756776677887"
     }
+  },
+  "5bd62bab-3f70-471a-ad80-d788cd481c39": {
+    key: routes.missionReportNavigator,
+    component: StackMissionReport,
+    params: {
+      value: "mission_member_report",
+      key: "5bd62bab-3f70-471a-ad80-d788cd481c39"
+    },
   },
   // "aadbd7a3-444444-40dd-bf24-7846756776677887": {
   //   key: routes.leadcenterNavigator,

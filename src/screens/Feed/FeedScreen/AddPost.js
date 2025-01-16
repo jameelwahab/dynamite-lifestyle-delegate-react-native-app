@@ -1208,7 +1208,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                               onPress={() => onPressOnMentions(item)}
                               style={{ paddingVertical: 4 }}>
                               <MemberView
-                                secondText={!isNoteMainFeed ? isCosmos ? makeCosmosLevel(item?.team_type) : ` (${item?.community_level})` : ""}
+                                secondText={!isNoteMainFeed ? isCosmos ? makeCosmosLevel(item?.team_type) : ` ${!!item?.membership_level_badge_info?.membership_level_badge_title ? "(" + item?.membership_level_badge_info?.membership_level_badge_title + ")" : ""}` : ""}
                                 size={30}
                                 titleSize={12}
                                 member={item}

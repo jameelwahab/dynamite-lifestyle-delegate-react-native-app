@@ -58,7 +58,15 @@ const routes = {
   salesPaidCommissionsNavigator: "SALE_PAID_COMMISSION_NAVIGATOR",
   salesTeamTransactionsNavigator: "SALES_TEAM_TRANSACTION_NAVIGATOR",
   leadcenterNavigator: "LEADCENTER_NAVIGATOR",
+  missionReportNavigator: "MISSION_REPORT_NAVIGATOR",
+
+
   //! ///    Screens'
+
+  //? Mission Report
+  missionMembers: "MISSION_MEMBERS_LIST",
+  missionList: "MISSION_LIST_SCREEN",
+  missionReportScreen: "MISSION_REPORT_SCREEN",
 
   //? Lead center
 

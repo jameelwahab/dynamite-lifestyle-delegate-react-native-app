@@ -837,7 +837,7 @@ const CommentModal = ({
                           onPress={() => onPressOnMentions(item)}
                           style={{ paddingVertical: 4 }}>
                           <MemberView
-                            secondText={!isCosmos && !isNoteMainFeed ? ` (${item?.community_level})` : ""}
+                            secondText={!isCosmos && !isNoteMainFeed ? ` ${!!item?.membership_level_badge_info?.membership_level_badge_title ? "(" + item?.membership_level_badge_info?.membership_level_badge_title + ")" : ""}` : ""}
                             size={30}
                             titleSize={12}
                             member={item}
