@@ -54,6 +54,7 @@ import StackCalendarEvents from "../NestedStacks/StackCalendarEvents";
 import StackDelegateEvents from "../NestedStacks/StackDelegateEvents";
 import StackLeadCenter from "../NestedStacks/StackLeadCenter";
 import StackMissionReport from "../NestedStacks/SackMisisonReport";
+import StackMission from "../NestedStacks/StackMission"
 
 
 
@@ -365,12 +366,21 @@ export const ParentComponents = {
     }
   },
   "5bd62bab-3f70-471a-ad80-d788cd481c39": {
-    key: routes.missionReportNavigator,
-    component: StackMissionReport,
+    key: null,
+    component: null,
     params: {
       value: "mission_member_report",
       key: "5bd62bab-3f70-471a-ad80-d788cd481c39"
     },
+  },
+
+  "1a9f0806-f359-4bab-8ffa-987f8db5b671": {
+    key: routes.missionNavigator,
+    component: StackMission,
+    params: {
+      value: "missions",
+      key: "1a9f0806-f359-4bab-8ffa-987f8db5b671",
+    }
   },
   // "aadbd7a3-444444-40dd-bf24-7846756776677887": {
   //   key: routes.leadcenterNavigator,
@@ -383,6 +393,25 @@ export const ParentComponents = {
 }
 
 export const ChildComponents = {
+  "hhfhhfhfhf-31d9-4154-b3a9-81619gdhb4va": {
+    key: routes.InProgressMissionReportNavigator,
+    component: StackMissionReport,
+    params: {
+      type: "in_progress",
+      key: "hhfhhfhfhf-31d9-4154-b3a9-81619gdhb4va",
+      parentKey: "5bd62bab-3f70-471a-ad80-d788cd481c39"
+    }
+  },
+  "hhfhhfhfhf-31d9-41bb-b3c9-81619fd1b49c": {
+    key: routes.completeMissionReportNavigator,
+    component: StackMissionReport,
+    params: {
+      type: "completed",
+      parentValue: "members",
+      key: "hhfhhfhfhf-31d9-41bb-b3c9-81619fd1b49c",
+      parentKey: "5bd62bab-3f70-471a-ad80-d788cd481c39"
+    }
+  },
   "5f063d7b-640b-4088-a821-0b77a08b18c7": {
     key: routes.memberNavigator,
     component: StackMembers,

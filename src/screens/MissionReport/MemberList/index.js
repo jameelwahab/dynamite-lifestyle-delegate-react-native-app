@@ -1,4 +1,4 @@
-import { View,  FlatList, StyleSheet, Pressable } from 'react-native'
+import { View, FlatList, StyleSheet, Pressable } from 'react-native'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import RootView from '../../../components/RootView'
 import { useSelector } from 'react-redux'
@@ -15,17 +15,24 @@ import TitleView from '../../../components/TitleView'
 import { icons } from '../../../utilities/icons'
 import SearchView from '../../../components/SearchView'
 import FooterLoader from '../../../components/FooterLoader'
+import StatView from '../../Members/Components/StatView'
+import { Flex, Row } from '../../../UIComponents/FlexViews'
+import { convertTimezone2 } from '../../../functions/convertTime'
+import { selectTimeZone } from '../../../redux/reducers/timezoneSlice'
+import { dateTimeFormat } from '../../../utilities/constants'
 
 
 
 
 
 const MemberList = ({ navigation, route }) => {
-  const { key } = route.params
+  const { key, parentKey, type } = route.params
+  const isCompleted = type == "completed";
   const paging = useRef({ page: 0, canLoadMore: false })?.current;
   const { navbar } = useSelector(selectNavbar);
   const { user, token, access } = useSelector(selectUser);
-  const [title] = useState(navbar?.find(x => x._id == key)?.title);
+  const timezone = useSelector(selectTimeZone);
+  const [title] = useState(navbar?.find(x => x._id == parentKey)?.child_options?.find(y => y._id == key)?.title);
   const [searchText, setSearchText] = useState("")
   const [list, setList] = useState([]);
   const [loader, setLoader] = useState(false);
@@ -34,10 +41,16 @@ const MemberList = ({ navigation, route }) => {
   const [footerLoader, setFooterLoader] = useState(false);
   const [searching, setSearching] = useState(false);
 
-  const onMissionList = (member) => {
-    navigation.navigate(routes?.missionList, {
-      member: member,
-      memberId: member?._id
+  const onMissionList = (item) => {
+    // console.log(item,"item")
+    // navigation.navigate(routes?.missionList, {
+    //   member: item?.member,
+    //   memberId: member?._id
+    // })
+
+    navigation.navigate(routes?.missionReportScreen, {
+      missionId: item?.mission_info?._id,
+      memberId: item?.member?._id
     })
   }
 
@@ -77,7 +90,8 @@ const MemberList = ({ navigation, route }) => {
     let res = await GET_MEMBER_LIST_FOR_MISSION({
       navigation, token, page: paging.page,
       search_text: searchText,
-      type: memberTypeObj[access?.show_members_list_for_payment_request]
+      type: memberTypeObj[access?.show_members_list_for_payment_request],
+      missionType: type
     })
     if (res.code == 200) {
       let length = newArray ? res?.members.length : list.length + res?.members.length;
@@ -115,12 +129,20 @@ const MemberList = ({ navigation, route }) => {
   const renderProgress = useCallback(({ item, index }) => {
     return (
       <Pressable onPress={() => onMissionList(item)} style={__styles.itemView}>
-        <View style={{ flex: 1 }}>
-          <MemberView member={item} />
-        </View>
-        {icons.forwardArrow()}
-        {/* <StatView /> */}
-
+        <Row >
+          <Flex flex={1}>
+            <MemberView member={item?.member} />
+          </Flex>
+          {icons.forwardArrow()}
+        </Row>
+        {/* <StatView title={"Badge Level"} value={item?.mission_info?.membership_level_info?.badge_level_info?.title} /> */}
+        <StatView title={"Mission Title"} value={item?.mission_info?.title} />
+        <StatView title={"Duration"} value={item?.mission_duration + " days"} />
+        <StatView title={"Coins Earned"} value={item?.mission_attracted_coins} />
+        <StatView title={"Acheivable Coins"} value={item?.mission_reward_coins} />
+        <StatView title={"Mission Start Date"} value={convertTimezone2(item?.mission_start_date, timezone).format(dateTimeFormat.date)} />
+        {isCompleted &&
+        <StatView title={"Mission Completed Date"} value={convertTimezone2(item?.mission_completed_date, timezone).format(dateTimeFormat.date)} />}
       </Pressable>
     )
   }, [JSON.stringify(list)])
@@ -194,8 +216,6 @@ const __styles = StyleSheet.create({
     padding: 10,
     borderRadius: 10,
     marginTop: 10,
-    flexDirection: "row",
-    alignItems: "center"
   },
   topView: {
     flexDirection: "row", alignItems: "center", backgroundColor: colors.darkSecondary, paddingBottom: 5

@@ -8,18 +8,16 @@ import ParsedText from 'react-native-parsed-text';
 
 const CollapsibleText = ({ style, children }) => {
   const [showFull, setShowFull] = useState(false)
-
-
   if (Platform.OS == "android") {
     return (
       <MyText fontSize={13} dataDetectorType="all" userSelect={"all"} selectable={true} style={style}>
-        <MyText >
-
+        <MyText numberofLines={2}>
+	    {showFull ? children : children.slice(0,40) }
         </MyText>
         {children.length > 150 && (
           <MyText
             onPress={() => setShowFull(!showFull)}
-            style={{ color: colors.primary, fontSize: 14, includeFontPadding: false, fontFamily: fonts.medium, marginLeft: -5 }} >
+            style={{ color: colors.primary, fontSize: 14, includeFontPadding: false, fontFamily: fonts.medium, marginLeft: -5, }} >
             {showFull ? " See Less" : " See More"}
           </MyText>
         )}

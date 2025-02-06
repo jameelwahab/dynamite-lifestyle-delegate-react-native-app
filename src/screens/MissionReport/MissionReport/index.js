@@ -22,6 +22,7 @@ import MyInputs from '../../../components/MyInputs';
 import GenericQuetionList from '../../Questions/GenericQuetionList';
 import QuestionComponent from '../../Questions/Components/QuestionComponent';
 import MissionRewardView from '../../../components/Mission/MissionRewardView';
+import isObject from '../../../functions/isObject';
 
 const MissionReport = ({ navigation, route }) => {
   const { missionId, memberId } = route.params;
@@ -34,6 +35,7 @@ const MissionReport = ({ navigation, route }) => {
   const [schedules, setSchedules] = useState([]);
   const [mission, setMission] = useState(null);
   const [badgesEarned, setBadgesEarned] = useState([])
+  const [user, setUser] = useState(null)
 
 
   const prepareLineChartData = (dataset) => {
@@ -131,6 +133,7 @@ const MissionReport = ({ navigation, route }) => {
     if (res.code == 200) {
       // setList(res?.missions);
       // setMembers(res?.user_data)
+      setUser(res?.member_user)
       setMission(res?.mission)
       setBadgesEarned(res?.mission_badges_earned)
       makeGraphData(res?.structured_graph_data)
@@ -210,7 +213,9 @@ const MissionReport = ({ navigation, route }) => {
     )
   }
   return (
-    <RootView title={mission ? mission?.title + "'s Report" : ""} >
+    <RootView
+      subTitle={mission ? mission?.title : ""}
+      title={isObject(user) ? user?.first_name + " " + user?.last_name + "'s Report" : ""} >
       {!loader &&
         <View style={{ flex: 1 }}>
           <FlatList

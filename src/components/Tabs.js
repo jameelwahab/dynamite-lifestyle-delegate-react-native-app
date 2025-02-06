@@ -5,10 +5,10 @@ import { colors } from "../utilities/colors";
 
 
 
-const Tabs = ({ list, changeTab, tab }) => {
+const Tabs = ({ list, changeTab, tab, style }) => {
   const menuRef = useRef()
   return (
-    <View style={{ marginHorizontal: -10 }}>
+    <View style={[{ marginHorizontal: -10 }, style]}>
       <View style={{ height: 50, }}>
         <FlatList
           contentContainerStyle={{ paddingHorizontal: 10 }}

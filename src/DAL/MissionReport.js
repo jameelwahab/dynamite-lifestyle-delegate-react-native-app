@@ -1,8 +1,9 @@
 import invokeApi from "../functions/invokeAPI";
 
-export const GET_MEMBER_LIST_FOR_MISSION = ({ token, navigation, search_text, type, page }) => {
+export const GET_MEMBER_LIST_FOR_MISSION = ({ token, navigation, search_text, type, page, missionType }) => {
   return invokeApi({
-    path: `api/consultant/member/list?page=${page}&limit=20&include_members=${type}&search_text=${search_text}`,
+    // path: `api/consultant/member/list?page=${page}&limit=20&include_members=${type}&search_text=${search_text}`,
+    path: `api/consultant/member_missions/list?page=${page}&limit=20&include_members=${type}&mission_type=${missionType}&search_text=${search_text}`,
     method: "GET",
     token: token,
     navigation: navigation,
