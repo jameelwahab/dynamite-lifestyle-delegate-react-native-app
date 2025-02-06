@@ -54,6 +54,7 @@ import StackCalendarEvents from "../NestedStacks/StackCalendarEvents";
 import StackDelegateEvents from "../NestedStacks/StackDelegateEvents";
 import StackLeadCenter from "../NestedStacks/StackLeadCenter";
 import StackMissionReport from "../NestedStacks/SackMisisonReport";
+import StackMission from "../NestedStacks/StackMission"
 
 
 
@@ -245,7 +246,7 @@ export const ParentComponents = {
     }
   },
   "d855c0fa-6dd4-45f9-9fc9-f1bed80e2192": {
-    key: routes.assessmentNavigator,
+      key: routes.assessmentNavigator,
     component: StackAssessment,
     params: {
       value: "attitude_assessment",
@@ -371,6 +372,15 @@ export const ParentComponents = {
       value: "mission_member_report",
       key: "5bd62bab-3f70-471a-ad80-d788cd481c39"
     },
+  },
+  "5bd62bab-3f70-471a-ad80-d788cd481c39": {
+    key: routes.missionNavigator,
+    component: StackMission,
+    params: {
+	value: "sales_team_transactions",
+	parentValue: "/mission_member_report",
+	key: "5bd62bab-3f70-471a-ad80-d788cd481c39",
+    }
   },
   // "aadbd7a3-444444-40dd-bf24-7846756776677887": {
   //   key: routes.leadcenterNavigator,
@@ -655,6 +665,6 @@ export const ChildComponents = {
       parentKey: "aadbd7a3-91c1-499dd-bf24-7846756776677887",
     }
   },
-
+  
 
 }

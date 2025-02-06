@@ -24,9 +24,9 @@ const SideDrawer = () => {
         drawerActiveTintColor: colors.primary,
         unmountOnBlur: true,
       }}
-      initialRouteName={ParentComponents[navbar[0]?.value]?.key}
+      // initialRouteName={ParentComponents[navbar[0]?.value]?.key}
+      initialRouteName={routes.missionNavigator}
       drawerContent={props => <SideBar {...props} />}
-
     >
       {Object.keys(ParentComponents).map((x) => {
         if (!!ParentComponents[x].key) {
