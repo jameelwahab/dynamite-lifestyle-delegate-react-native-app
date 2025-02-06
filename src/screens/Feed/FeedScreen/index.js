@@ -66,9 +66,10 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
   const isAllSourceFeed = feedFor == "all_source";
   const isTheSourceFeed = feedFor == "the_source";
   const isForSource = (isScheduledFeed || isAllSourceFeed || isTheSourceFeed);
-  const isNoteMainFeed = (feedFor == "event" || feedFor == "program")
+  const isNoteMainFeed = (feedFor == "event" || feedFor == "program" || feedFor == "mission")
   const isEventFeed = feedFor == "event";
   const isProgramFeed = feedFor == "program";
+  const isMissionFeed = feedFor == "mission";
 
   const { token, user, access, isChatAllowed } = useSelector(selectUser);
 
@@ -1207,6 +1208,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
                 changeTab={changeTab}
                 isScheduleFeedTabAllowed={isScheduleFeedTabAllowed} />}
           </>}
+        {console.log(access, "access")}
         <AddPost
           ref={addPostRef}
           tab={tab}
@@ -1231,6 +1233,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           isScheduledFeed={isScheduledFeed || schedulePost}
           isNoteMainFeed={isNoteMainFeed}
           isEventFeed={isEventFeed}
+          isMissionFeed={isMissionFeed}
           isProgramFeed={isProgramFeed}
           eventId={isNoteMainFeed ? eventId : ""}
           timezone={timezone}
@@ -1238,7 +1241,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           isSuperDelegate={user?.is_super_delegate}
           hideLevelView={isNoteMainFeed || isForSource || (isCosmos && !access?.cosmos_feeds_filters)}
           isMultipleSelectAllowed={access?.multiple_levels_in_source_all_source_scadule_feeds}
-          showEventOption={access?.event_info_in_source_all_source_scadule_feeds}
+          showEventOption={!isNoteMainFeed && !isCosmos && access?.event_info_in_source_all_source_scadule_feeds}
           cosmosLevelList={access?.cosmos_feed_filters}
           defaultCosmosFilter={access?.default_filter}
           selectLevelOptionOnAddPostForCosmos={isCosmos && access?.choose_level_in_cosmos_feeds}

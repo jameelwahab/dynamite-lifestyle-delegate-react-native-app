@@ -55,7 +55,8 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   feedTypeMember,
   setFeedTypeMember,
   isFeedFilterAllowed,
-  isNoteMainFeed
+  isNoteMainFeed,
+  isMissionFeed
 
 }, ref) => {
   console.log(isNoteMainFeed, "isNoteMainFeed")
@@ -623,11 +624,13 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     }
     if (!(!!editId)) {
       fd.append("is_publish", isScheduledFeed ? "false" : "true");
-      fd.append("feed_created_for", isProgramFeed ? "program" : isEventFeed ? "event" : isCosmos ? "delegate" : "general");
+      fd.append("feed_created_for", isMissionFeed ? "mission" : isProgramFeed ? "program" : isEventFeed ? "event" : isCosmos ? "delegate" : "general");
       if (isEventFeed) {
         fd.append("event_id", eventId);
       } else if (isProgramFeed) {
         fd.append("program_id", eventId);
+      } else if (isMissionFeed) {
+        fd.append("mission_id", eventId);
       }
     }
 
