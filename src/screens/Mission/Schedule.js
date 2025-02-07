@@ -1,9 +1,14 @@
 import RootView from "../../components/RootView"
 import MyText from "../../components/MyText"
 import MyWebview from "../../components/MyWebview"
+import MyRefreshControl from "../../components/MyRefreshControl"
 import TitleView from "../../components/TitleView"
 import EmptyView from "../../components/EmptyView"
 import MyCheckBox from"../../components/MyCheckBox" 
+import AudioPlayer from "../../components/AudioPlayer"
+import ResponsiveImage from "../../components/ResponsiveImage"
+import {S3_URL} from "../../utilities/constants"
+import VimeoIFrame from"../../components/VimeoIFrame" 
 import extractTextFromHtml from "../../functions/extractTextFromHTML.js"
 import {colors} from "../../utilities/colors"
 import {fonts} from "../../utilities/fonts"
@@ -29,29 +34,46 @@ const Scheduler = ({navigation, route})=> {
     const getResult = async(loader) => {
 	setLoading(loader)
 	GET_MISSION_SCHEDULE({
-	    token, navigation, id:"66b4b985269b5455d39d6f27"
+	    token, navigation, id:route.params.id
 	}).then(res=> {
 	    setResult(res)
 	    setLoading(false)
+	    setRefreshing(false)
 	})
     }
     useEffect(()=>{
+	console.log(route.params.id)
 	getResult(true)
     },[])
+    const onRefresh = ()=>{
+	setRefreshing(true)
+	getResult(false)
+    }
     if(loading) return <MyLoader enable={loading} />
-    if(!loading && res.length==0) return <EmptyView />
     return(
 	<View style={__styles.container}>
 	    <FlatList 
 		ListHeaderComponent={
 		    <>
+		    <TitleView title={res?.mission_schedule?.main_heading} />
 		    <View style={{height:15}}/>
-		    <Video url={res.mission.video_url}/>
+		    { res?.mission?.video_url != "" ?
+			<VimeoIFrame url={res?.mission?.video_url}/> :
+			<ResponsiveImage
+			    uri={S3_URL + res?.mission_schedule?.image?.thumbnail_1}
+			    />
+		    }
+		    {res?.mission_schedule?.audio_url!="" && <AudioPlayer url={res?.mission_schedule?.audio_url} />}
 		    <View style={{height:15}}/>
 		    <Overview res={res}/>
 		    </>
 		}
-		data={[1]}
+		data={[res]}
+		refreshControl={<MyRefreshControl
+		    refreshing={refreshing}
+		    onRefresh={onRefresh}
+		/>}
+		ListEmptyComponent={!loading && <EmptyView />}
 		showsVerticalScrollIndicator={false}
 		renderItem={({_})=>
 		    <>
@@ -78,16 +100,16 @@ const Overview = ({res}) => {
 		<View style={{height:5}}/>
 		<MyWebview
 		    fullWidth
-		    html={res.mission_schedule.detailed_description || ""} />
+		    html={res?.mission_schedule?.detailed_description || ""} />
 		<View style={{height:10}}/>
 		<View style={__styles.sched_img_container}>
 		    <Badge 
 			img={require("../../assets/icons/calendar.png")}
-			context={`${res.mission_schedule.total_number_of_days} day`} 
+			context={`${res?.mission_schedule?.total_number_of_days} day`} 
 			/>
 		    <Badge 
 			img={require("../../assets/icons/coin.png")}
-			context={`${res.mission_schedule.reward_coins} Reward Coins`} 
+			context={`${res?.mission_schedule?.reward_coins} Reward Coins`} 
 		/>
 		</View>
 	</View>
@@ -104,18 +126,12 @@ const Badge = ({img, context}) => {
     )
 }
 
-const Video = ({url}) => {
-    return(
-	<MyWebview
-	    fullWidth
-	    html={`<iframe src=\"https://player.vimeo.com/video/${url.split('/')[3]}\" width=\"640\" height=\"360\" frameborder=\"0\" allowfullscreen=\"allowfullscreen\"></iframe>`} />)
-}
 
 const QNASection = ({res, content=false}) => {
     return (
 	<View style={__styles.qna_container}>
 	    <FlatList 
-		data={res.mission_schedule.schedule_questions}
+		data={res?.mission_schedule?.schedule_questions}
 		scrollEnabled={false}
 		ListHeaderComponentStyle={{paddingBottom:10}}
 		ListHeaderComponent={

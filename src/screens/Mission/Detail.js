@@ -5,6 +5,7 @@ import MyLoader from "../../components/MyLoader"
 import EmptyView from '../../components/EmptyView'
 import Tabs from "../../components/Tabs"
 import MyText from "../../components/MyText"
+import VimeoIFrame from"../../components/VimeoIFrame" 
 import Contributor from  "../../components/Contributor"
 import MyWebview from "../../components/MyWebview"
 import {fonts} from "../../utilities/fonts"
@@ -89,9 +90,7 @@ const TrackerList = ({res}) => {
 const Header = ({res})=>{
 	return res!=null &&(
 	    <>
-		<MyWebview
-		    fullWidth
-		    html={`<iframe src=\"https://player.vimeo.com/video/${res.video_url.split('/')[3]}\" width=\"640\" height=\"360\" frameborder=\"0\" allowfullscreen=\"allowfullscreen\"></iframe>`} />
+		<VimeoIFrame url={res.video_url} />
 		<View style={{height:10}}/>
 		<MissionRewardView 
 		    duration={res.mission_duration}
@@ -149,7 +148,6 @@ const Overview = ({token,navigation,id}) => {
     )
 }
 
-// <TrackerList res={item}/>
 const Community = () => {
     return (
 	<MyText 
