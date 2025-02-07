@@ -1,4 +1,4 @@
-import {View, Text, StyleSheet,FlatList, Image} from "react-native"
+import {View, Text, StyleSheet,FlatList, Image,Pressable} from "react-native"
 import TitleView from "../../components/TitleView"
 import RootView from "../../components/RootView"
 import MyLoader from "../../components/MyLoader"
@@ -17,6 +17,8 @@ import MissionRewardView from "../../components/MissionRewardView"
 import FooterLoader from "../../components/FooterLoader"
 import MyRefreshControl from "../../components/MyRefreshControl"
 import {useState, useRef} from "react"
+import routes from "../../navigation/routes"
+import {useNavigation} from "@react-navigation/native"
 
 const List = (props) =>{
     return (
@@ -55,6 +57,8 @@ const MissionDetail = ({navigation, route}) => {
 }
 
 const TrackerList = ({res}) => {
+    const nav = useNavigation()
+    const handlePress= (item) => nav.navigate(routes.missionSchedule, {id: item._id})
 	return(
 	    <FlatList
 		scrollEnabled={false}
@@ -70,10 +74,12 @@ const TrackerList = ({res}) => {
 		KeyExtraction={(_,index)=> index.toString()}
 		ItemSeparatorComponent={<View style={{height:20}}/>}
 		renderItem={({item})=>
-		    <View style={__styles.card_container}>
+		    <Pressable onPress={()=>handlePress(item)}>
+		    <View  style={__styles.card_container}>
 			<Text style={__styles.card_heading}>{item.main_heading}</Text>
 			<Text style={{color:"white"}}>{item.short_description}</Text>
 		    </View> 
+		    </Pressable>
 		}
 	    />
 	)
@@ -81,7 +87,6 @@ const TrackerList = ({res}) => {
 
 
 const Header = ({res})=>{
-    console.log(res.promo_video)
 	return res!=null &&(
 	    <>
 		<MyWebview

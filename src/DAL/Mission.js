@@ -25,3 +25,8 @@ export const GET_MISSION_INFO = ({token, navigation, id}) => invokeApi({
     navigation: navigation,
 }) 
 
+export const GET_MISSION_SCHEDULE = ({token,navigation,id})=> invokeApi({
+    path:`api/consultant/mission_schedule/details/${id}`,
+    token:token,
+    navigation:navigation,
+})
