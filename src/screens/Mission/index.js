@@ -2,6 +2,7 @@ import RootView from "../../components/RootView"
 import TitleView from "../../components/TitleView.js"
 import LessonView from "../../components/LessonView.js"
 import MyLoader from "../../components/MyLoader"
+import MyRefreshControl from '../../components/MyRefreshControl'
 import { selectUser } from '../../redux/reducers/userSlice'
 import {View, FlatList, Text, StyleSheet, TouchableWithoutFeedback} from "react-native"
 import { useSelector } from 'react-redux'
@@ -24,18 +25,25 @@ const MissionLevel =  ({navigation}) => {
     const { token } = useSelector(selectUser);
     const [res, setResult] = useState([])
     const [loading,setLoading] = useState(false)
-    const getMission = async () => {
-	setLoading(true)
+    const [refreshing,setRefreshing] = useState(false)
+    const getMission = async (loader) => {
+	setLoading(loader)
 	let res = await GET_MISSION_LIST({token, navigation})
-	setResult(res)
-	setLoading(false)
+	if(res.code == 200){
+	    setResult(res)
+	    setLoading(false)
+	    setRefreshing(false)
+	}
     }
     useEffect(()=>{
-	getMission()
+	getMission(true)
     },[])
+    const onRefresh = ()=>{
+	setRefreshing(true)
+	getMission(false)
+    }
     return (
 	<View style={__styles.container}>
-	{ !loading  &&
 	    <FlatList 
 	    showsVerticalScrollIndicator={false}
 	    ListHeaderComponent={()=> 
@@ -45,6 +53,10 @@ const MissionLevel =  ({navigation}) => {
 	    data={res.level_badges}
 	    keyExtraction={item=> item}
 	    ItemSeparatorComponent={()=> <View style={{height:20}}/>}
+	    refreshControl={<MyRefreshControl
+		refreshing={refreshing}
+		onRefresh={onRefresh}
+	    />}
 	    renderItem={({item})=>
 		    <LessonView
 		handlePress={()=>nav.navigate(routes.missionList,
@@ -58,8 +70,8 @@ const MissionLevel =  ({navigation}) => {
 			icon={item.icon.thumbnail_1}
 			desc={item.short_description}
 		    />
-	    } />}
-	<MyLoader enable={loading} />
+	    } />
+	    <MyLoader enable={loading} />
 	</View>
     )
 }

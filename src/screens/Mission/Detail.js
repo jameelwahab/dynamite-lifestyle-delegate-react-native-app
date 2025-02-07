@@ -2,6 +2,7 @@ import {View, Text, StyleSheet,FlatList, Image} from "react-native"
 import TitleView from "../../components/TitleView"
 import RootView from "../../components/RootView"
 import MyLoader from "../../components/MyLoader"
+import EmptyView from '../../components/EmptyView'
 import Tabs from "../../components/Tabs"
 import MyText from "../../components/MyText"
 import Contributor from  "../../components/Contributor"
@@ -28,36 +29,6 @@ const List = (props) =>{
 const MissionDetail = ({navigation, route}) => {
     const { token } = useSelector(selectUser);
     const [tab, setTab] = useState(0)
-    const [res, setResult] = useState([])
-    const [loading,setLoading] = useState(true)
-    const [footerLoader, setFooterLoader] = useState(false)
-    const [refreshing, setRefreshing]=useState(false)
-
-    const getMissionDetail = useCallback(async (tab) => {
-	setLoading(true)
-	const res = await GET_MISSION_DETAIL({
-	    token, navigation, id:route.params.id
-	})
-	if(res.code == 200){
-	    setResult(res.mission)
-	    setRefreshing(false)
-	    setLoading(false)
-	}
-    })
-    const getList = async () => {
-	setLoading(true)
-	const res = await GET_MISSION_INFO({
-	    token, navigation, id
-	})
-	setResult(tab==2 ? res.streak_leader_board_stats : res.coins_leader_board_stats)
-	setLoading(false)
-	setRefreshing(false);
-    }
-    useEffect(()=>{
-	setRefreshing(false)
-	if(tab==0) getMissionDetail()
-	if(tab > 1) getList()
-    },[tab])
 
     const tab_list = [
 	{title:"Mission Overview",tab:0},
@@ -65,36 +36,19 @@ const MissionDetail = ({navigation, route}) => {
 	{title:"Completed", tab:2},
 	{title:"Progress", tab:3},
     ]
-    const loadMore = () => {
-	setFooterLoader(true)
-    }
+
     return ( 
 	<View style={__styles.container}> 
-	    <FlatList 
-		data={[1]}
-		keyExtraction={(_,index)=> index.toString()}
-		ListHeaderComponent={
-		    <Tabs 
-			list={tab_list}
-			tab={tab}
-			style={{zIndex:10}}
-			changeTab={(e)=> setTab(e)}
-		    />
-		}
-		refreshControl={<MyRefreshControl
-		    refreshing={refreshing}
-		    onRefresh={()=> setRefreshing(true)}
-		/>}
-		renderItem={({_})=>
-		    (tab==0  && <Overview res={res} loading={loading}/>) ||
-		    (tab==1 && <Community />) ||
-		    (tab > 1  && 
-			<MissionContributor 
-			    res={res}
-			    loading={loading}
-			/>
-		    )}
-	/>	
+	    <Tabs 
+		list={tab_list}
+		tab={tab}
+		style={{zIndex:10}}
+		changeTab={(e)=> setTab(e)}
+	    />
+	{tab==0  && <Overview token={token} navigation={navigation} id={route.params.id} /> }
+	{tab==1 && <Community />}
+	{tab > 1  && 
+		<MissionContributor token={token} navigation={navigation} id={route.params.id} tab={tab}/>}
 	</View>
     )
 
@@ -127,37 +81,71 @@ const TrackerList = ({res}) => {
 
 
 const Header = ({res})=>{
-	return(
+    console.log(res.promo_video)
+	return res!=null &&(
 	    <>
-		<MyWebview fullWidth html={`<iframe src=\"https://player.vimeo.com/video/1048341542\" width=\"640\" height=\"360\" frameborder=\"0\" allowfullscreen=\"allowfullscreen\"></iframe>`} />
+		<MyWebview
+		    fullWidth
+		    html={`<iframe src=\"https://player.vimeo.com/video/${res.video_url.split('/')[3]}\" width=\"640\" height=\"360\" frameborder=\"0\" allowfullscreen=\"allowfullscreen\"></iframe>`} />
 		<View style={{height:10}}/>
 		<MissionRewardView 
 		    duration={res.mission_duration}
 		    acheivedCoins={res.rewarded_coins}
 		    badgesEarned={res.badge_configration}
 		/>
-		<MyWebview fullWidth html={res.detailed_description.toString()} />
+		<MyWebview fullWidth html={res?.detailed_description?.toString()} />
 	    </>
 	)
     }
 
-const Overview = ({res,loading}) => {
+const Overview = ({token,navigation,id}) => {
+    const [res, setResult] = useState([])
+    const [loading,setLoading] = useState(true)
+    const [refreshing, setRefreshing]=useState(false)
+
+    const getMissionDetail = async (loader) => {
+	setLoading(loader)
+	const res = await GET_MISSION_DETAIL({
+	    token, navigation, id
+	})
+	if(res.code == 200){
+	    setResult(res.mission)
+	    setLoading(false)
+	    setRefreshing(false);
+	}
+    }
+    useEffect(()=>{
+	getMissionDetail(true)
+    },[])
+    const onRefresh = () => {
+	setRefreshing(true);
+	getMissionDetail(false)
+    }
     if(loading) return <MyLoader enable={loading} />
-	return  (
-	    <FlatList 
-		scrollEnabled={false}
-		style={{marginTop:10}}
-		showsVerticalScrollIndicator={false}
-		ListHeaderComponent={<Header res={res}/>}
-		data={[1]}
-		ListHeaderComponentStyle={{marginBottom:20}}
-		keyExtraction={(_,index)=> index.toString()}
-		renderItem={({item})=> <TrackerList res={res}/>}
-	    />
-	    )
+    return  (
+	<FlatList 
+	style={{marginTop:10}}
+	showsVerticalScrollIndicator={false}
+	data={[1]}
+	ListEmptyComponent={!loading && <EmptyView />}
+	ListHeaderComponent={
+	    <Header res={res}/>
+	}
+	refreshControl={<MyRefreshControl
+	    refreshing={refreshing}
+	    onRefresh={onRefresh}
+	    />}
+	ListHeaderComponentStyle={{marginBottom:20}}
+	keyExtraction={(_,index)=> index.toString()}
+	renderItem={({_})=> 
+	    <TrackerList res={res}/>
+	}
+	/>
+    )
 }
 
-const Community = ({token, navigation,id}) => {
+// <TrackerList res={item}/>
+const Community = () => {
     return (
 	<MyText 
 	fontSize={16} color={colors.primary}
@@ -166,18 +154,43 @@ const Community = ({token, navigation,id}) => {
     )
 }
 
-const MissionContributor = ({res,loading, loadMore, footerLoad}) =>{
+const MissionContributor = ({token,tab, navigation,id}) =>{
+    const [res, setResult] = useState([])
+    const [loading,setLoading] = useState(true)
+    const [refreshing, setRefreshing]=useState(false)
+
+    const getList = async (loader) => {
+	setLoading(loader)
+	const res = await GET_MISSION_INFO({
+	    token, navigation, id
+	})
+	if(res.code==200){
+	    setResult(tab==2 ? res.streak_leader_board_stats : res.coins_leader_board_stats)
+	    setLoading(false)
+	    setRefreshing(false);
+	}
+    }
+    useEffect(()=>{
+	if(tab > 1) getList(true)
+    },[tab])
+    const onRefresh = () => {
+	setRefreshing(true);
+	getList(false)
+    }
+    
     if(loading) return <MyLoader enable={loading} />
     return(
 	<>
 	<FlatList 
 	    data={res}
-	    scrollEnabled={false}
 	    keyExtraction={(_,index)=> index.toString()}
 	    showsVerticalScrollIndicator={false}
 	    ItemSeparatorComponent={<View style={{height:10}}/>}
-	    onEndReached={loadMore}
-	    ListFooterComponent={<FooterLoader isVisible={footerLoad} />}
+	    ListEmptyComponent={!loading && <EmptyView />}
+	    refreshControl={<MyRefreshControl
+		refreshing={refreshing}
+		onRefresh={onRefresh}
+		/>}
 	    renderItem={({item,index})=> 
 		<Contributor 
 		num={index+1}
@@ -185,7 +198,6 @@ const MissionContributor = ({res,loading, loadMore, footerLoad}) =>{
 		img={item.user_info.profile_image}
 		points={item.mission_attracted_coins}/>
 	    }/>
-	    <MyLoader enable={loading} />
 	</>
     );
 }

@@ -1,6 +1,7 @@
 import {View, Text, TouchableOpacity, FlatList, StyleSheet} from "react-native"
 import LessonView from "../../components/LessonView.js"
 import TitleView from "../../components/TitleView"
+import MyRefreshControl from "../../components/MyRefreshControl"
 import MyLoader from "../../components/MyLoader"
 import MyWebview from "../../components/MyWebview"
 import {colors} from "../../utilities/colors"
@@ -27,24 +28,31 @@ export default List
 
 const MissionList = ({navigation, route}) => {
     const nav = useNavigation()
+    const { token } = useSelector(selectUser);
     const [res, setResult] = useState([])
     const [loading, setLoading] = useState(true)
-    const { token } = useSelector(selectUser);
-    const getMissionList = async () => {
-	setLoading(true)
-	setResult([])
+    const [refreshing, setRefreshing] = useState(false)
+    const getMissionList = async (loader) => {
+	setLoading(loader)
 	let res = await GET_MISSION_LIST_ID({
 	    token,
 	    navigation,
 	    id:route.params.id
 	})
-	setResult(res)
-	setLoading(false)
+	if(res.code ==200){
+	    setResult(res)
+	    setRefreshing(false)
+	    setLoading(false)
+	}
     }
 
     useEffect(()=>{
-	getMissionList()
+	getMissionList(true)
     },[])
+    const onRefresh = ()=>{
+	setRefreshing(true)
+	getMissionList(false)
+    }
 
     const Header = () => (
 	<>
@@ -52,15 +60,14 @@ const MissionList = ({navigation, route}) => {
 	    hideBackBottomButton
 	    title={res?.badge_level?.title}
 	    titleIcon={route.params.icon}
-	    customStyle={{borderBottomWidth:1, borderColor: colors.border, marginBottom:10,marginHorizontal: 0, }}
-    
-	    />
+	    customStyle={{borderBottomWidth:1, borderColor: colors.border, marginBottom:10,marginHorizontal: 0, }}/>
 	<MyWebview 
 	    fullWidth
-	    html={res.badge_level.detailed_description.toString()}
+	    html={res?.badge_level?.detailed_description?.toString()}
 	    />
 	</>
     )
+
     if(loading) return <MyLoader enable={loading}/>
     return  (
 	<>
@@ -71,6 +78,10 @@ const MissionList = ({navigation, route}) => {
 	    keyExtraction={(_,index)=>index.toString()}
 	    ListHeaderComponentStyle={{marginBottom:20}}
 	    ItemSeparatorComponent={()=> <View style={{height:20}}/>}
+	    refreshControl={<MyRefreshControl
+		refreshing={refreshing}
+		onRefresh={onRefresh}
+	    />}
 	    renderItem={({item})=>
 		 <LessonView
 		    handlePress={()=> nav.navigate(routes.missionDetail, {id:item._id})}
