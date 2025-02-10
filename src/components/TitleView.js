@@ -1,7 +1,7 @@
-import { View,Image, Text, StyleSheet, Pressable } from 'react-native'
+import { View, Image, Text, StyleSheet, Pressable } from 'react-native'
 import React from 'react'
 import { icons } from '../utilities/icons'
-import {S3_URL} from "../utilities/constants"
+import { S3_URL } from "../utilities/constants"
 import { colors } from '../utilities/colors'
 import { useNavigation } from '@react-navigation/native'
 import { fonts } from '../utilities/fonts'
@@ -23,25 +23,20 @@ const TitleView = ({
           style={__header.leftButtonView}>
           {icons.backMajor(colors.primary, 25)}
         </Pressable>}
-      {titleIcon && 
-	<Image source={{uri: S3_URL + titleIcon}} style={__header.icon}/>
+      {titleIcon &&
+        <Image source={{ uri: S3_URL + titleIcon }} style={__header.icon} />
       }
-      {
-	
-        !!title ?
-          <View style={__header.titleView}>
-            <Text style={__header.titleText}>{<Text style={__header.titleText}>{title}</Text>
-            }</Text>
-
-            {!!subTitle && <Text style={__header.subTitle}>{subTitle}</Text>}
-          </View>
-
-          :
-          <View style={{ flex: 1 }}>
-            {titleView?.()}
-          </View>
+      {!!title ?
+        <View style={__header.titleView}>
+          <Text style={__header.titleText}>{<Text style={__header.titleText}>{title}</Text>}
+          </Text>
+          {!!subTitle && <Text style={__header.subTitle}>{subTitle}</Text>}
+        </View> :
+        <View style={{ flex: 1 }}>
+          {titleView?.()}
+        </View>
       }
-    </View >
+    </View>
   )
 }
 
@@ -55,7 +50,7 @@ const __header = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginHorizontal: -10,
-    flex:1
+    flex: 1
   },
   titleView: {
     flex: 1,
@@ -76,7 +71,7 @@ const __header = StyleSheet.create({
     color: colors.lightText2,
     fontFamily: fonts.medium,
     includeFontPadding: false,
-    marginTop:3
+    marginTop: 3
   },
   leftButtonView: {
     width: 50,
@@ -84,9 +79,9 @@ const __header = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center"
   },
-    icon:{
-	width:20,
-	height:20,
-    },
+  icon: {
+    width: 20,
+    height: 20,
+  },
 
 })
