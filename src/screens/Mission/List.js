@@ -49,11 +49,10 @@ const List = ({ navigation, route }) => {
 	const Header = () => (
 		<>
 			<TitleView
-				// hideBackBottomButton
 				title={res?.badge_level?.title}
 				titleIcon={route.params.icon}
-				customStyle={{ borderBottomWidth: 1, borderColor: colors.border, marginBottom: 10, marginHorizontal: 0, }} />
-			{!!res?.badge_level?.detailed_description &&
+				/>
+				{!!res?.badge_level?.detailed_description &&
 				<MyWebview
 					fullWidth
 					html={res?.badge_level?.detailed_description?.toString()}
@@ -77,7 +76,11 @@ const List = ({ navigation, route }) => {
 				/>}
 				renderItem={({ item }) =>
 					<LessonView
-						handlePress={() => nav.navigate(routes.missionDetail, { id: item._id })}
+						handlePress={() => nav.navigate(routes.missionDetail,
+							{ 
+							    id: item._id,
+							    heading:item.title
+							})}
 						heading={item.title}
 						image={item.image.thumbnail_1}
 						desc={item.short_description}

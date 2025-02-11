@@ -3,13 +3,17 @@ import MyText from "../../components/MyText"
 import MyWebview from "../../components/MyWebview"
 import MyRefreshControl from "../../components/MyRefreshControl"
 import TitleView from "../../components/TitleView"
+import isArray from '../../functions/isArray';
 import EmptyView from "../../components/EmptyView"
 import MyCheckBox from"../../components/MyCheckBox" 
 import AudioPlayer from "../../components/AudioPlayer"
+import ScheduleView from "../../components/Mission/ScheduleView"
 import ResponsiveImage from "../../components/ResponsiveImage"
 import {S3_URL} from "../../utilities/constants"
-import VimeoIFrame from"../../components/VimeoIFrame" 
+import VimeoWithPip from"../../components/VimeoWithPip" 
+import WebPlayer from"../../components/WebPlayer" 
 import extractTextFromHtml from "../../functions/extractTextFromHTML.js"
+import utilities from "../../utilities"
 import {colors} from "../../utilities/colors"
 import {fonts} from "../../utilities/fonts"
 import { GET_MISSION_SCHEDULE } from "../../DAL"
@@ -17,7 +21,7 @@ import {useState} from "react"
 import { selectUser } from '../../redux/reducers/userSlice'
 import { useSelector } from 'react-redux'
 import {useEffect} from "react"
-import {View,FlatList, Image,StyleSheet} from "react-native"
+import {View,FlatList, Image, StyleSheet, Text} from "react-native"
 import MyLoader from "../../components/MyLoader"
 const Schedule = (props) => {
     return (
@@ -33,16 +37,21 @@ const Scheduler = ({navigation, route})=> {
     const [refreshing, setRefreshing] = useState(false)
     const getResult = async(loader) => {
 	setLoading(loader)
-	GET_MISSION_SCHEDULE({
-	    token, navigation, id:route.params.id
-	}).then(res=> {
+	const res = await GET_MISSION_SCHEDULE({
+	    token, navigation, id: route.params.id
+	})
+	if(res.code === 200){
 	    setResult(res)
 	    setLoading(false)
 	    setRefreshing(false)
-	})
+	}
+	else{
+	    setResult([])
+	    setLoading(false)
+	    setRefreshing(false)
+	}
     }
     useEffect(()=>{
-	console.log(route.params.id)
 	getResult(true)
     },[])
     const onRefresh = ()=>{
@@ -55,10 +64,16 @@ const Scheduler = ({navigation, route})=> {
 	    <FlatList 
 		ListHeaderComponent={
 		    <>
-		    <TitleView title={res?.mission_schedule?.main_heading} />
+		    <TitleView title={res?.mission_schedule?.main_heading || "The Source Code"} />
 		    <View style={{height:15}}/>
 		    { res?.mission?.video_url != "" ?
-			<VimeoIFrame url={res?.mission?.video_url}/> :
+			(res?.mission?.video_url.includes("vimeo") ?
+			    <VimeoWithPip
+				url={res?.mission?.video_url}
+				focused={true} id={res?.mission?._id} 
+				/> :
+			    <WebPlayer width={utilities.screenWidth() - 20} url={res?.mission?.video_url} />
+			) :
 			<ResponsiveImage
 			    uri={S3_URL + res?.mission_schedule?.image?.thumbnail_1}
 			    />
@@ -75,15 +90,14 @@ const Scheduler = ({navigation, route})=> {
 		/>}
 		ListEmptyComponent={!loading && <EmptyView />}
 		showsVerticalScrollIndicator={false}
-		renderItem={({_})=>
+		renderItem={({item,index})=>
 		    <>
-		    <View style={{height:15}}/>
-		    <QNASection res={res}  />
-		    <View style={{height:15}}/>
-		    <QNASection res={res} content/>
+		    <ScheduleView 
+			schedule={res?.mission_schedule}
+			index={index}
+			/>
 		    </>
-		}
-	    />
+		} />
 	</View>
     )
 }
@@ -122,54 +136,6 @@ const Badge = ({img, context}) => {
 	    <Image style={__styles.schedule_img} source={img}  />
 		<View style={{width:5}}/>
 	    <MyText>{context}</MyText>
-	</View>
-    )
-}
-
-
-const QNASection = ({res, content=false}) => {
-    return (
-	<View style={__styles.qna_container}>
-	    <FlatList 
-		data={res?.mission_schedule?.schedule_questions}
-		scrollEnabled={false}
-		ListHeaderComponentStyle={{paddingBottom:10}}
-		ListHeaderComponent={
-		<MyText 
-		    fontSize={16}
-		    style={{fontFamily: fonts.bold}}
-		    color={colors.primary}>
-		    {content ? "Content Question" : "Interactive Learning Experience"}
-		</MyText>
-		}
-		showsVerticalScrollIndicator={false}
-		ItemSeparatorComponent={<View style={{height:10}}/>}
-		keyExtraction={(_,index)=> index.toString()}
-		renderItem={({item})=> content == item.show_in_graph &&
-		    <>
-			<MyText style={__styles.qna_ques_text}>
-			{extractTextFromHtml(item.question_statement)}
-			</MyText>
-			<View style={{height:10}}/>
-			<Options list={item.options} />
-		    {item.question_type=="scaling" && <Scaling />}
-		    </>
-		}
-	    />
-	</View>
-	)
-}
-const Scaling = ({max,min}) => {
-    return (
-	<View>
-	    <FlatList 
-		data={[...Array(10)]}
-		keyExtraction={(_,index)=> index.toString()}
-		horizontal
-		renderItem={({_})=>
-		    <MyCheckBox circle/>
-		}
-	    />
 	</View>
     )
 }
@@ -223,20 +189,6 @@ const __styles=StyleSheet.create({
 	borderRadius:30,
 	opacity:0.8
     },
-    qna_container:{
-	padding:10,
-	backgroundColor:colors.secondary,
-	borderRadius:10,
-    },
-    qna_ques_text:{
-	flex:1,
-	padding:10,
-	backgroundColor:colors.secondaryVariant,
-	borderRadius:10,
-    },
-    radio_container:{
-	flexDirection:"row"
-    }
 })
 
 

@@ -96,7 +96,7 @@ const QuestionComponent = ({ item, index, showRepliesbtns = false, onShowReplyPr
             noSpace
           /> */}
           <View style={{ borderWidth: 1 / 2, borderRadius: 10, borderColor: colors.white, minHeight: 100, padding: 10 }}>
-            <MyText color={colors.white} >{item?.answer?.answer_statement}</MyText>
+            <MyText color={colors.white} style={{opacity:0.8}} >{item?.answer?.answer_statement || item?.question_placeholder}</MyText>
           </View>
         </View>
       </View>
