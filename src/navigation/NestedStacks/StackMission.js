@@ -36,6 +36,8 @@ const StackMission = ({ route }) => {
 				component={Schedule}
 			/>
 
+			{/* ye extra screens hoti hain jo har jaga se call ki jaye */}
+
 			{defaultScreens.map((x, i) => (
 				<MissionStack.Screen key={x.name} name={x.name} component={x.component} />
 			))}
