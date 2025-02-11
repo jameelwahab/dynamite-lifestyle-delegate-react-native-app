@@ -13,6 +13,7 @@ const MissionStack = createNativeStackNavigator()
 const StackMission = ({ route }) => {
 	return (
 		<MissionStack.Navigator
+			// initialRouteName={routes.missionSchedule}
 			screenOptions={{ headerShown: false }}
 		>
 			<MissionStack.Screen

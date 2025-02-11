@@ -4,8 +4,9 @@ import RootView from "../../components/RootView"
 import MyLoader from "../../components/MyLoader"
 import EmptyView from '../../components/EmptyView'
 import Tabs from "../../components/Tabs"
+import utilities from "../../utilities"
 import MyText from "../../components/MyText"
-import VimeoIFrame from "../../components/VimeoIFrame"
+import VimeoWithPip from "../../components/VimeoWithPip"
 import Contributor from "../../components/Contributor"
 import MyWebview from "../../components/MyWebview"
 import { fonts } from "../../utilities/fonts"
@@ -42,6 +43,11 @@ const MissionDetail = ({ navigation, route }) => {
 
 	return (
 		<View style={__styles.container}>
+			<View style={{height:20, marginBottom:5}}>
+			    <TitleView
+				title={route.params.heading}
+				/>
+			</View>
 			<Tabs
 				list={tab_list}
 				tab={tab}
@@ -87,9 +93,13 @@ const TrackerList = ({ res }) => {
 
 
 const Header = ({ res }) => {
-	return res != null && (
+    console.log(res.video_url, res._id)
+	return  (
 		<>
-			<VimeoIFrame url={res.video_url} />
+			{res?.video_url.includes("vimeo") ?
+			    <VimeoWithPip url={res?.video_url} focused={true} id={res?._id} /> :
+			    <WebPlayer width={utilities.screenWidth() - 20} url={res?.video_url} />
+			}
 			<View style={{ height: 10 }} />
 			<MissionRewardView
 				duration={res?.mission_duration}

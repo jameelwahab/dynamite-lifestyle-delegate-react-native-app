@@ -77,6 +77,7 @@ export default class VimeoWithPip extends Component {
           excludeBaseURL: true,
         })
         let data = await extractVimeoData(res);
+        console.log("data:",data)
         this.setState({
           videoUrl: data.request.files.hls.cdns[data.request.files.hls.default_cdn].url,
           poster: data.video.thumbs['640']
