@@ -6,6 +6,7 @@ import Mission from "../../screens/Mission"
 import List from "../../screens/Mission/List.js"
 import Schedule from "../../screens/Mission/Schedule.js"
 import Detail from "../../screens/Mission/Detail.js"
+import { defaultScreens } from "./defaultScreens"
 
 const MissionStack = createNativeStackNavigator()
 
@@ -34,6 +35,11 @@ const StackMission = ({ route }) => {
 				name={routes.missionSchedule}
 				component={Schedule}
 			/>
+
+			{defaultScreens.map((x, i) => (
+				<MissionStack.Screen key={x.name} name={x.name} component={x.component} />
+			))}
+
 		</MissionStack.Navigator>
 	)
 }
