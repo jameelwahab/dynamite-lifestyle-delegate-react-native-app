@@ -9,6 +9,7 @@ import MyText from "../../components/MyText"
 import VimeoWithPip from "../../components/VimeoWithPip"
 import Contributor from "../../components/Contributor"
 import MyWebview from "../../components/MyWebview"
+import WebPlayer from "../../components/WebPlayer"
 import { fonts } from "../../utilities/fonts"
 import { colors } from "../../utilities/colors"
 import { GET_MISSION_DETAIL, GET_MISSION_INFO } from "../../DAL"
@@ -24,7 +25,7 @@ import FeedScreen from "../Feed/FeedScreen"
 
 const List = (props) => {
 	return (
-		<RootView hideSubHeader>
+		<RootView hideSubHeader hideHeader>
 			<MissionDetail {...props} />
 		</RootView>
 	)
@@ -35,15 +36,16 @@ const MissionDetail = ({ navigation, route }) => {
 	const [tab, setTab] = useState(0)
 
 	const tab_list = [
-		{ title: "Mission Overview", tab: 0 },
-		{ title: "Community", tab: 1 },
-		{ title: "Completed", tab: 2 },
-		{ title: "In Progress", tab: 3 },
+		{ title: "Mission Overview" },
+		{ title: "Community" },
+		{ title: "Completed"},
+		route.params.type !="quest" && 
+		{ title: "In Progress" },
 	]
 
 	return (
 		<View style={__styles.container}>
-			<View style={{height:20, marginBottom:5}}>
+			<View style={{height:30, marginBottom:5}}>
 			    <TitleView
 				title={route.params.heading}
 				/>
@@ -54,8 +56,13 @@ const MissionDetail = ({ navigation, route }) => {
 				style={{ zIndex: 10 }}
 				changeTab={(e) => setTab(e)}
 			/>
-			{tab == 0 && <Overview token={token} navigation={navigation} id={route.params.id} />}
-			{tab == 1 && <Community route={route} />}
+			{tab == 0 && <Overview 
+					token={token}
+					navigation={navigation}
+					id={route.params.id}
+					type={route.params.type}
+				    />}
+			{tab == 1 && <Community route={route} navigation={navigation}/>}
 			{tab > 1 && <MissionContributor token={token} navigation={navigation} id={route.params.id} tab={tab} />}
 		</View>
 	)
@@ -92,8 +99,7 @@ const TrackerList = ({ res }) => {
 }
 
 
-const Header = ({ res }) => {
-    console.log(res.video_url, res._id)
+const Header = ({ res, show }) => {
 	return  (
 		<>
 			{res?.video_url.includes("vimeo") ?
@@ -101,18 +107,19 @@ const Header = ({ res }) => {
 			    <WebPlayer width={utilities.screenWidth() - 20} url={res?.video_url} />
 			}
 			<View style={{ height: 10 }} />
-			<MissionRewardView
+			{show && 
+			    <MissionRewardView
 				duration={res?.mission_duration}
 				acheivedCoins={res?.rewarded_coins}
 				badgesEarned={res?.badge_configration}
-			/>
-			{!!res?.detailed_description &&
+			    />}
+			{show && !!res?.detailed_description &&
 				<MyWebview fullWidth html={res?.detailed_description?.toString()} />}
 		</>
 	)
 }
 
-const Overview = ({ token, navigation, id }) => {
+const Overview = ({ token, navigation, id, type }) => {
 	const [res, setResult] = useState([])
 	const [loading, setLoading] = useState(true)
 	const [refreshing, setRefreshing] = useState(false)
@@ -124,6 +131,11 @@ const Overview = ({ token, navigation, id }) => {
 		})
 		if (res.code == 200) {
 			setResult(res.mission)
+			setLoading(false)
+			setRefreshing(false);
+		}
+		else{
+			setResult([])
 			setLoading(false)
 			setRefreshing(false);
 		}
@@ -148,7 +160,7 @@ const Overview = ({ token, navigation, id }) => {
 			data={[1]}
 			ListEmptyComponent={!loading && <EmptyView />}
 			ListHeaderComponent={
-				<Header res={res} />
+				<Header res={res} show={type=="mission"} />
 			}
 			refreshControl={<MyRefreshControl
 				refreshing={refreshing}
@@ -157,7 +169,7 @@ const Overview = ({ token, navigation, id }) => {
 			ListHeaderComponentStyle={{ marginBottom: 20 }}
 			keyExtraction={(_, index) => index.toString()}
 			renderItem={({ _ }) =>
-				<TrackerList res={res} />
+				 res?.mission_schedules?.length !=0 &&  <TrackerList res={res} /> 
 			}
 		/>
 	)

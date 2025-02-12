@@ -25,7 +25,7 @@ import {View,FlatList, Image, StyleSheet, Text} from "react-native"
 import MyLoader from "../../components/MyLoader"
 const Schedule = (props) => {
     return (
-	<RootView hideSubHeader>
+	<RootView hideSubHeader hideHeader>
 	    <Scheduler {...props}/>
 	</RootView>
     )

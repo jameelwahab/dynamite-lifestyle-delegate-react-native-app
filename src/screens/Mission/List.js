@@ -1,9 +1,11 @@
-import { View, Text, TouchableOpacity, FlatList, StyleSheet } from "react-native"
+import { View, Text, TouchableOpacity, SectionList, StyleSheet } from "react-native"
 import LessonView from "../../components/LessonView.js"
 import TitleView from "../../components/TitleView"
+import MyText from "../../components/MyText"
 import MyRefreshControl from "../../components/MyRefreshControl"
 import MyLoader from "../../components/MyLoader"
 import MyWebview from "../../components/MyWebview"
+import EmptyView from '../../components/EmptyView'
 import { colors } from "../../utilities/colors"
 import { fonts } from "../../utilities/fonts"
 import { GET_MISSION_LIST_ID } from "../../DAL"
@@ -35,6 +37,11 @@ const List = ({ navigation, route }) => {
 			setRefreshing(false)
 			setLoading(false)
 		}
+		else{
+			setResult([])
+			setLoading(false)
+			setRefreshing(false)
+		}
 	}
 
 	useEffect(() => {
@@ -48,10 +55,12 @@ const List = ({ navigation, route }) => {
 
 	const Header = () => (
 		<>
+		    <View style={{height:10}} />
 			<TitleView
 				title={res?.badge_level?.title}
 				titleIcon={route.params.icon}
 				/>
+		    <View style={{height:5}} />
 				{!!res?.badge_level?.detailed_description &&
 				<MyWebview
 					fullWidth
@@ -59,16 +68,43 @@ const List = ({ navigation, route }) => {
 				/>}
 		</>
 	)
-
-
 	return (
-		<RootView hideSubHeader >
-			<FlatList
+		<RootView hideSubHeader hideHeader>
+			{loading ?  <MyLoader enable={loading} /> :
+			<SectionList
 				style={__styles.container}
-				data={res.missions}
-				ListHeaderComponent={<Header />}
-				keyExtraction={(_, index) => index.toString()}
+				sections={[
+				    {
+					title:"Questss",
+					data: res.quests
+				    },
+				    {
+					title:"Missionss",
+					data: res.missions
+				    },
+				]}
+				refreshControl={<MyRefreshControl
+				    refreshing={refreshing}
+				    onRefresh={onRefresh}
+				/>}
+				ListHeaderComponent={
+				    <>
+				    <Header />
+				    <View style={{height:10}} />
+				    <MyText 
+					color={colors.primary}
+					fontSize={16}
+					style={{fontFamily:fonts.bold}}
+					>
+					{(res.quests.length!=0 && "Quest") || (res.missions.length!=0 && "Missions")}
+				    </MyText>
+				    </>
+				}
+				keyExtractor={(item) => item?._id}
 				ListHeaderComponentStyle={{ marginBottom: 20 }}
+				ListEmptyComponent={<EmptyView />}
+				stickySectionHeadersEnabled={false}
+				showsVerticalScrollIndicator={false}
 				ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
 				refreshControl={<MyRefreshControl
 					refreshing={refreshing}
@@ -79,16 +115,15 @@ const List = ({ navigation, route }) => {
 						handlePress={() => nav.navigate(routes.missionDetail,
 							{ 
 							    id: item._id,
-							    heading:item.title
+							    heading:item.title,
+							    type: res.quests.length!=0 ? "quest" : "mission"
 							})}
 						heading={item.title}
 						image={item.image.thumbnail_1}
 						desc={item.short_description}
 						duration={item.mission_duration}
 					/>}
-			/>
-
-			<MyLoader enable={loading} />
+			/>}
 		</RootView>
 	)
 }
