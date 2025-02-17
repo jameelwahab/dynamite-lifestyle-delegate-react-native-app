@@ -8,6 +8,7 @@ import { colors } from '../../utilities/colors'
 
 import MemberList from '../../screens/MissionReport/MemberList'
 import MissisonList from '../../screens/MissionReport/MissisonList'
+import FilterScreen from '../../screens/MissionReport/MemberList/FilterScreen'
 import MissionReport from '../../screens/MissionReport/MissionReport'
 
 
@@ -24,6 +25,10 @@ const StackMissionReport = ({ route }) => {
         {/*//? Default Screens End */}
         <MissionReportStack.Screen initialParams={route?.params} name={routes.missionMembers} component={MemberList} />
         <MissionReportStack.Screen name={routes.missionList} component={MissisonList} />
+        <MissionReportStack.Screen 
+	    name={routes.missionMembersFilterScreen} 
+	    component={FilterScreen}
+	    />
         <MissionReportStack.Screen name={routes.missionReportScreen} component={MissionReport} />
 
 
