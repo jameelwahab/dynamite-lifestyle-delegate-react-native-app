@@ -12,8 +12,10 @@ import MyWebview from "../../components/MyWebview"
 import WebPlayer from "../../components/WebPlayer"
 import { fonts } from "../../utilities/fonts"
 import { colors } from "../../utilities/colors"
+import { icons } from "../../utilities/icons"
 import { GET_MISSION_DETAIL, GET_MISSION_INFO } from "../../DAL"
 import { selectUser } from '../../redux/reducers/userSlice'
+import LiveChat from "../../components/LiveChat"
 import { useSelector } from 'react-redux'
 import { useEffect, useCallback } from "react"
 import MissionRewardView from "../../components/MissionRewardView"
@@ -32,9 +34,9 @@ const List = (props) => {
 }
 
 const MissionDetail = ({ navigation, route }) => {
-	const { token } = useSelector(selectUser);
+	const { token, user } = useSelector(selectUser);
 	const [tab, setTab] = useState(0)
-
+	const [showChat,setShowChat] = useState(false)
 	const tab_list = [
 		{ title: "Mission Overview" },
 		{ title: "Community" },
@@ -45,11 +47,26 @@ const MissionDetail = ({ navigation, route }) => {
 
 	return (
 		<View style={__styles.container}>
-			<View style={{height:30, marginBottom:5}}>
-			    <TitleView
-				title={route.params.heading}
-				/>
+		    <LiveChat
+			isVisible={showChat}
+			closeModal={()=> setShowChat(false)}
+			eventId={route.params.id}
+			token={token}
+			user={user}
+			type={route.params.type}
+			naivgation={navigation}
+		    />
+		    <View style={{flexDirection:"row", justifyContent:"space-between", alignItems:'center'}}>
+			<View style={{flex:0.95}}>
+			    <TitleView title={route.params.heading || "The Source Code"} />
 			</View>
+			{ route.params.type=="quest" && 
+			    <Pressable onPress={()=> setShowChat(true)}>
+				{icons.chat(colors.primary, 23)}
+			    </Pressable>
+			}
+		    </View>
+
 			<Tabs
 				list={tab_list}
 				tab={tab}
@@ -69,9 +86,9 @@ const MissionDetail = ({ navigation, route }) => {
 
 }
 
-const TrackerList = ({ res }) => {
+const TrackerList = ({ res, type }) => {
 	const nav = useNavigation()
-	const handlePress = (item) => nav.navigate(routes.missionSchedule, { id: item._id })
+	const handlePress = (item) => nav.navigate(routes.missionSchedule, { id: item._id, type:type })
 	return (
 		<FlatList
 			scrollEnabled={false}
@@ -79,9 +96,7 @@ const TrackerList = ({ res }) => {
 			showsVerticalScrollIndicator={false}
 			data={res?.mission_schedules}
 			ListHeaderComponent={
-				<>
-					<Text style={__styles.heading}>{res.content_settings.schedule_heading}</Text>
-				</>
+				<Text style={__styles.heading}>{res.content_settings.schedule_heading}</Text>
 			}
 			ListHeaderComponentStyle={{ marginBottom: 10 }}
 			KeyExtraction={(_, index) => index.toString()}
@@ -104,7 +119,7 @@ const Header = ({ res, show }) => {
 		<>
 			{res?.video_url.includes("vimeo") ?
 			    <VimeoWithPip url={res?.video_url} focused={true} id={res?._id} /> :
-			    <WebPlayer width={utilities.screenWidth() - 20} url={res?.video_url} />
+			    <WebPlayer width={utilities?.screenWidth() - 20} url={res?.video_url} />
 			}
 			<View style={{ height: 10 }} />
 			{show && 
@@ -169,7 +184,7 @@ const Overview = ({ token, navigation, id, type }) => {
 			ListHeaderComponentStyle={{ marginBottom: 20 }}
 			keyExtraction={(_, index) => index.toString()}
 			renderItem={({ _ }) =>
-				 res?.mission_schedules?.length !=0 &&  <TrackerList res={res} /> 
+				 res?.mission_schedules?.length !=0 &&  <TrackerList res={res} type={type} /> 
 			}
 		/>
 	)

@@ -9,6 +9,7 @@ import MyCheckBox from"../../components/MyCheckBox"
 import AudioPlayer from "../../components/AudioPlayer"
 import ScheduleView from "../../components/Mission/ScheduleView"
 import ResponsiveImage from "../../components/ResponsiveImage"
+import LiveChat from "../../components/LiveChat"
 import {S3_URL} from "../../utilities/constants"
 import VimeoWithPip from"../../components/VimeoWithPip" 
 import WebPlayer from"../../components/WebPlayer" 
@@ -17,11 +18,12 @@ import utilities from "../../utilities"
 import {colors} from "../../utilities/colors"
 import {fonts} from "../../utilities/fonts"
 import { GET_MISSION_SCHEDULE } from "../../DAL"
+import { icons } from '../../utilities/icons'
 import {useState} from "react"
 import { selectUser } from '../../redux/reducers/userSlice'
 import { useSelector } from 'react-redux'
 import {useEffect} from "react"
-import {View,FlatList, Image, StyleSheet, Text} from "react-native"
+import {View,FlatList, Image, StyleSheet, Text, Pressable} from "react-native"
 import MyLoader from "../../components/MyLoader"
 const Schedule = (props) => {
     return (
@@ -32,9 +34,10 @@ const Schedule = (props) => {
 }
 const Scheduler = ({navigation, route})=> {
     const [loading, setLoading] = useState(false)
-    const { token } = useSelector(selectUser);
+    const { token, user } = useSelector(selectUser);
     const [res, setResult] = useState([])
     const [refreshing, setRefreshing] = useState(false)
+    const [showChat,setShowChat] = useState(false)
     const getResult = async(loader) => {
 	setLoading(loader)
 	const res = await GET_MISSION_SCHEDULE({
@@ -61,10 +64,24 @@ const Scheduler = ({navigation, route})=> {
     if(loading) return <MyLoader enable={loading} />
     return(
 	<View style={__styles.container}>
+	    <LiveChat
+		isVisible={true}
+		closeModal={()=> setShowChat(false)}
+		eventId={route.params.id}
+		token={token}
+		naivgation={navigation}
+	    />
 	    <FlatList 
 		ListHeaderComponent={
 		    <>
-		    <TitleView title={res?.mission_schedule?.main_heading || "The Source Code"} />
+		    <View style={{flexDirection:"row", justifyContent:"space-between", alignItems:'center'}}>
+			<View style={{flex:0.95}}>
+			    <TitleView title={res?.mission_schedule?.main_heading || "The Source Code"} />
+			</View>
+		     <Pressable onPress={()=> setShowChat(true)}>
+			    {icons.chat(colors.primary, 23)}
+			</Pressable>
+		    </View>
 		    <View style={{height:15}}/>
 		    { res?.mission?.video_url != "" ?
 			(res?.mission?.video_url.includes("vimeo") ?

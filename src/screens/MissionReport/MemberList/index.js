@@ -44,12 +44,6 @@ const MemberList = ({ navigation, route }) => {
   const [searching, setSearching] = useState(false);
 
   const onMissionList = (item) => {
-    // console.log(item,"item")
-    // navigation.navigate(routes?.missionList, {
-    //   member: item?.member,
-    //   memberId: member?._id
-    // })
-
     navigation.navigate(routes?.missionReportScreen, {
       missionId: item?.mission_info?._id,
       memberId: item?.member?._id
