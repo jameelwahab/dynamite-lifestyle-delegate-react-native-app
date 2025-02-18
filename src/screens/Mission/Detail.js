@@ -7,12 +7,15 @@ import Tabs from "../../components/Tabs"
 import utilities from "../../utilities"
 import MyText from "../../components/MyText"
 import VimeoWithPip from "../../components/VimeoWithPip"
+import LessonView from "../../components/LessonView"
 import Contributor from "../../components/Contributor"
 import MyWebview from "../../components/MyWebview"
 import WebPlayer from "../../components/WebPlayer"
+import MyImage from "../../components/MyImage"
 import { fonts } from "../../utilities/fonts"
 import { colors } from "../../utilities/colors"
 import { icons } from "../../utilities/icons"
+import { S3_URL } from "../../utilities/constants"
 import { GET_MISSION_DETAIL, GET_MISSION_INFO } from "../../DAL"
 import { selectUser } from '../../redux/reducers/userSlice'
 import LiveChat from "../../components/LiveChat"
@@ -47,7 +50,7 @@ const MissionDetail = ({ navigation, route }) => {
 
 	return (
 		<View style={{ flex: 1 }}>
-			<LiveChat
+	    {tab==0 && <LiveChat
 				flex={0.59}
 				isVisible={showChat}
 				closeModal={() => setShowChat(false)}
@@ -56,16 +59,21 @@ const MissionDetail = ({ navigation, route }) => {
 				user={user}
 				type={route.params.type}
 				naivgation={navigation}
-			/>
+			/> }
 			<View style={__styles.container}>
 				<View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: 'center' }}>
-					<View style={{ flex: 0.95 }}>
-						<TitleView title={route.params.heading || "The Source Code"} />
+					<View style={{flexDirection:'row', alignItems:"center"}}>
+					    <Pressable 
+						    onPress={() => navigation.goBack()} >
+						    {icons.backMajor(colors.primary, 26)}
+					    </Pressable>
+					    <View style={{width:5}}/>
+					    <MyText type="bold" fontSize={16} color={colors.primary}> {route.params.heading || "The Source Code"} </MyText>
 					</View>
-					{route.params.type == "quest" &&
+					{(tab==0 && route.params.type == "quest")  ?
 						<Pressable onPress={() => setShowChat(true)}>
 							{icons.chat(colors.primary, 23)}
-						</Pressable>
+						</Pressable> : <View />
 					}
 				</View>
 
@@ -105,12 +113,15 @@ const TrackerList = ({ res, type }) => {
 			KeyExtraction={(_, index) => index.toString()}
 			ItemSeparatorComponent={<View style={{ height: 20 }} />}
 			renderItem={({ item }) =>
-				<Pressable onPress={() => handlePress(item)}>
 					<View style={__styles.card_container}>
-						<Text style={__styles.card_heading}>{item.main_heading}</Text>
-						<Text style={{ color: "white" }}>{item.short_description}</Text>
+					    <LessonView 
+						image={type=="quest" ? item?.image?.thumbnail_1 : ""}
+						txtlen={type=="quest" ? 30 : 55}
+						heading={item.main_heading}
+						desc={item.short_description}
+						handlePress={() => handlePress(item)}
+						/>
 					</View>
-				</Pressable>
 			}
 		/>
 	)
@@ -118,11 +129,18 @@ const TrackerList = ({ res, type }) => {
 
 
 const Header = ({ res, show }) => {
+	console.log(res.video_url!="")
 	return (
 		<>
-			{res?.video_url.includes("vimeo") ?
-				<VimeoWithPip url={res?.video_url} focused={true} id={res?._id} /> :
-				<WebPlayer width={utilities?.screenWidth() - 20} url={res?.video_url} />
+			{res.video_url!="" ?
+			    <>
+				{ res?.video_url.includes("vimeo") ?
+				    <VimeoWithPip url={res?.video_url} focused={true} id={res?._id} /> :
+				    <WebPlayer width={utilities?.screenWidth() - 20} url={res?.video_url} />
+				}
+			    </> :
+			    <MyImage source={{ uri: S3_URL + res.image?.thumbnail_1 }}  
+			    style={{width:"100%",height:250}}/>
 			}
 			<View style={{ height: 10 }} />
 			{show &&

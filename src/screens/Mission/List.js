@@ -101,7 +101,7 @@ const List = ({ navigation, route }) => {
 				    </>
 				}
 				keyExtractor={(item) => item?._id}
-				ListHeaderComponentStyle={{ marginBottom: 20 }}
+				ListHeaderComponentStyle={{ marginBottom: 10 }}
 				ListEmptyComponent={<EmptyView />}
 				stickySectionHeadersEnabled={false}
 				showsVerticalScrollIndicator={false}
