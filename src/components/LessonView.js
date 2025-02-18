@@ -5,8 +5,9 @@ import { S3_URL } from "../utilities/constants";
 import { useState } from "react";
 import MyImage from "./MyImage";
 import MyText from "./MyText";
+import ResponsiveImage3 from "./ResponsiveImage3";
 
-const LessonView = ({ title, heading, icon, desc, image, handlePress, duration }) => {
+const LessonView = ({ title, heading, icon, desc, txtlen = 55, image, handlePress, duration }) => {
 	const [show, setShow] = useState()
 	return (
 		<>
@@ -19,17 +20,25 @@ const LessonView = ({ title, heading, icon, desc, image, handlePress, duration }
 			<Pressable onPress={handlePress}>
 				<View style={__styles.container}>
 					<View>
-						<MyImage source={{ uri: S3_URL + image }} style={__styles.img} />
+						{image && 
+						// <MyImage source={{ uri: S3_URL + image }} style={__styles.img} />
+						<ResponsiveImage3
+						width={150}
+						defaultSize={{ width: 150, height: 80 }}
+						style={{ width: "100%" }}
+						source={{ uri: S3_URL + image }}
+						/>
+						}
 						{duration &&
 							<View style={__styles.imgTag}>
 								<MyText fontSize={10} type="medium" color={colors.black} >{duration} Days</MyText>
-							</View>}
-
+							</View>
+						}
 					</View>
 					<View style={__styles.sub_container}>
 						<MyText style={__styles.heading}>{heading}</MyText>
 						<View>
-							<Text style={__styles.desc}>{show ? desc : desc.slice(0, 55)}</Text>
+							<Text style={__styles.desc}>{show ? desc : desc.slice(0, txtlen)}</Text>
 							{desc.length > 55 &&
 								<Text
 									onPress={() => setShow(!show)}
