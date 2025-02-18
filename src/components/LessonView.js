@@ -3,8 +3,8 @@ import { fonts } from "../utilities/fonts";
 import { colors } from "../utilities/colors";
 import { S3_URL } from "../utilities/constants";
 import { useState } from "react";
-import CollapsibleText from "./CollapsibleText";
-import LottieView from "lottie-react-native";
+import MyImage from "./MyImage";
+import MyText from "./MyText";
 
 const LessonView = ({ title, heading, icon, desc, image, handlePress, duration }) => {
 	const [show, setShow] = useState()
@@ -19,15 +19,15 @@ const LessonView = ({ title, heading, icon, desc, image, handlePress, duration }
 			<Pressable onPress={handlePress}>
 				<View style={__styles.container}>
 					<View>
-						<Image source={{ uri: S3_URL + image }} style={__styles.img} />
+						<MyImage source={{ uri: S3_URL + image }} style={__styles.img} />
 						{duration &&
 							<View style={__styles.imgTag}>
-								<Text style={__styles.imgTitle}>{duration} Days Mission </Text>
-							</View>
-						}
+								<MyText fontSize={10} type="medium" color={colors.black} >{duration} Days</MyText>
+							</View>}
+
 					</View>
 					<View style={__styles.sub_container}>
-						<Text style={__styles.heading}>{heading}</Text>
+						<MyText style={__styles.heading}>{heading}</MyText>
 						<View>
 							<Text style={__styles.desc}>{show ? desc : desc.slice(0, 55)}</Text>
 							{desc.length > 55 &&
@@ -71,12 +71,12 @@ const __styles = StyleSheet.create({
 	},
 	imgTag: {
 		position: "absolute",
-		top: 0,
-		left: 0,
-		borderRadiusLeft: 10,
+		right: 10,
+		bottom: 10,
+		borderRadius: 3,
 		paddingHorizontal: 10,
 		paddingVertical: 2,
-		backgroundColor: colors.primary
+		backgroundColor: colors.lightText2
 	},
 	imgTitle: {
 		fontSize: 10,
@@ -87,14 +87,15 @@ const __styles = StyleSheet.create({
 		padding: 4,
 	},
 	heading: {
-		color: colors.primary,
-		fontFamily: fonts.medium,
+		color: colors.white,
+		fontFamily: fonts.bold,
 		fontSize: 14,
 	},
 	desc: {
+		marginTop: 2,
 		fontSize: 12,
-		color: colors.white,
-		opacity: 0.8,
+		color: colors.lightText2,
+		// opacity: 0.8,
 		fontFamily: fonts.medium,
 	},
 	showText: {
