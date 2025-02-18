@@ -26,12 +26,14 @@ import showToast from '../functions/showToast';
 import ConfirmationModal from './ConfirmationModal';
 import Toast from 'react-native-toast-message';
 import EmptyView from './EmptyView';
+import FooterLoader from './FooterLoader';
 
 
 let page = 0;
 let canLoadMore = false;
 
 const LiveChat = ({ isVisible, closeModal, type, token, navigation, videoId, timezone, purchaseLink, linkImage, eventId, user, flex = 0.6 }) => {
+  const paging = useRef({ page: 0, canLoadMore: false })?.current;
   const { socket } = useSelector(selectSocket);
   const likeModalRef = useRef();
   const chatListRef = useRef();
@@ -297,43 +299,44 @@ const LiveChat = ({ isVisible, closeModal, type, token, navigation, videoId, tim
 
 
   const getLiveChatFromServer = async (onlyPinMessages = false) => {
-
-    let res = await GET_LIVE_CHAT_LIST({ token, navigation, module_id: eventId, user_id: user?._id });
+    let res = await GET_LIVE_CHAT_LIST({ token, navigation, module_id: eventId, user_id: user?._id, page: paging?.page });
     if (res.code == 200) {
       if (!onlyPinMessages) {
-        setList(res?.chat_list.slice().reverse());
+        setList(paging?.page == 0 ? res?.chat_list.slice().reverse() : [...list, ...res?.chat_list.slice().reverse()]);
+        let length = paging?.page == 0 ? res?.chat_list.length : list.length + res?.chat_list.length;
+        if (length < res?.total_count) {
+          paging.page++;
+          paging.canLoadMore = true;
+        } else {
+          paging.canLoadMore = false;
+        }
+
       }
       setPinList(res?.featured_chat);
+    } else {
+      showToast({ body: res?.message, title: "Error", type: "error" })
     }
+    setFooterLoader(false)
     setLoader(false);
   }
 
-  const getOldChatFromServer = async () => {
-    let res = await GET_POdTAL_EXISTING_CHAT_BY_VIDEO_ID({ token, navigation, videoId, page: 0 });
-    if (res.code == 200) {
-      setList(page == 0 ? res?.dynamite_event_category_video_chat : [...list, ...res?.dynamite_event_category_video_chat]);
-      setPinList(res?.dynamite_event_category_video_featured_chat);
-      if (res.total_pages > page) {
-        canLoadMore = true;
-        page = page + 1;
-      } else {
-        canLoadMore = false;
-      }
-
-
-
-    }
-    setFooterLoader(false);
-    setLoader(false);
+  const callAPi = () => {
+    paging.canLoadMore = false;
+    paging.page = 0;
+    setList([])
+    setLoader(true);
+    getLiveChatFromServer()
   }
 
   const loadMore = () => {
-    if (!isLive && canLoadMore) {
-      canLoadMore = false;
+    if (paging.canLoadMore) {
+      paging.canLoadMore = false;
       setFooterLoader(true);
-      getOldChatFromServer();
+      getLiveChatFromServer()
     }
   }
+
+
 
   const enableEocketEvents = () => {
     socketEvents()
@@ -350,10 +353,10 @@ const LiveChat = ({ isVisible, closeModal, type, token, navigation, videoId, tim
   const onModalShow = () => {
     setLoader(true);
     if (isLive) {
-      getLiveChatFromServer()
+      callAPi()
       enableEocketEvents()
     } else {
-      getOldChatFromServer()
+      // getOldChatFromServer()
     }
   }
 
@@ -366,6 +369,7 @@ const LiveChat = ({ isVisible, closeModal, type, token, navigation, videoId, tim
     setSelectedMsg(null);
     setImage("")
     offSocketEvents()
+    setFooterLoader(false);
     setShowScroller(false)
   }
 
@@ -802,9 +806,7 @@ const LiveChat = ({ isVisible, closeModal, type, token, navigation, videoId, tim
                 // onViewableItemsChanged={onViewableItemsChanged}
                 onEndReached={loadMore}
                 ListEmptyComponent={!loader && !isLive && <EmptyView />}
-                ListFooterComponent={<View style={{ height: 50 }}>
-                  {footerLoader && <SimpleLoader />}
-                </View>}
+                ListFooterComponent={<FooterLoader isVisible={footerLoader} />}
 
 
               />
