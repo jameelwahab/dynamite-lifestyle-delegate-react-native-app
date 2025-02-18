@@ -1,15 +1,12 @@
 import invokeApi from "../functions/invokeAPI";
 
-export const GET_MEMBER_LIST_FOR_MISSION = ({ token, navigation, search_text, type, page, missionType }) => {
-  return invokeApi({
-    // path: `api/consultant/member/list?page=${page}&limit=20&include_members=${type}&search_text=${search_text}`,
-    path: `api/consultant/member_missions/list?page=${page}&limit=20&include_members=${type}&mission_type=${missionType}&search_text=${search_text}`,
-    method: "GET",
+export const GET_MEMBER_LIST_FOR_MISSION = ({token, navigation,page, mission_type,search_txt, body})=> invokeApi({
+    path:`api/consultant/member_mission/report?page=${page}&limit=50&include_members=nurture&search_text=${search_txt}&mission_type=${mission_type}`,
+    method: "POST",
     token: token,
     navigation: navigation,
-  })
-}
-
+    postData: body
+})
 
 export const GET_MISSION_LIST_BY_MEMBER = ({ token, navigation, memberId }) => {
   return invokeApi({
@@ -35,3 +32,10 @@ export const GET_MISSION_DETAIL_BY_ID = ({ token, navigation, missionId, memberI
     }
   })
 }
+
+export const GET_MISSION_FILTER_LIST = ({ token, navigation, missionId, memberId }) => invokeApi({
+    path: "api/consultant/missions/list",
+    token,
+    navigation,
+}) 
+

@@ -18,7 +18,8 @@ const MyTouchableInput = ({
   clearbutton,
   onClearButtonPress = () => { },
   disabled = false,
-  error = false
+  error = false,
+  style
 }) => {
   const [isFocused, setFocused] = useState(false)
   return (
@@ -26,7 +27,7 @@ const MyTouchableInput = ({
       onPress={onPress}
       disabled={disabled}
       opacity={disabled ? 0.6 : 1}
-      style={{ marginBottom: noSpace ? 0 : 15 }}>
+      style={[{ marginBottom: noSpace ? 0 : 15 },style]}>
       <View pointerEvents={disabled ? "none" : "auto"} style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
         <Text pointerEvents={!!iconOnPress ? "auto" : "none"} style={[__MyInputStyles.labelText, isFocused ? __MyInputStyles.focusedLabelText : undefined, error ? __MyInputStyles.TextError : undefined,]}>{label}</Text>
         {!!clearbutton && !disabled ?

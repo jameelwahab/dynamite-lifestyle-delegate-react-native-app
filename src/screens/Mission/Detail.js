@@ -9,10 +9,13 @@ import MyText from "../../components/MyText"
 import VimeoWithPip from "../../components/VimeoWithPip"
 import Contributor from "../../components/Contributor"
 import MyWebview from "../../components/MyWebview"
+import WebPlayer from "../../components/WebPlayer"
 import { fonts } from "../../utilities/fonts"
 import { colors } from "../../utilities/colors"
+import { icons } from "../../utilities/icons"
 import { GET_MISSION_DETAIL, GET_MISSION_INFO } from "../../DAL"
 import { selectUser } from '../../redux/reducers/userSlice'
+import LiveChat from "../../components/LiveChat"
 import { useSelector } from 'react-redux'
 import { useEffect, useCallback } from "react"
 import MissionRewardView from "../../components/MissionRewardView"
@@ -24,47 +27,71 @@ import FeedScreen from "../Feed/FeedScreen"
 
 const List = (props) => {
 	return (
-		<RootView hideSubHeader>
+		<RootView hideSubHeader hideHeader>
 			<MissionDetail {...props} />
 		</RootView>
 	)
 }
 
 const MissionDetail = ({ navigation, route }) => {
-	const { token } = useSelector(selectUser);
+	const { token, user } = useSelector(selectUser);
 	const [tab, setTab] = useState(0)
-
+	const [showChat, setShowChat] = useState(false)
 	const tab_list = [
-		{ title: "Mission Overview", tab: 0 },
-		{ title: "Community", tab: 1 },
-		{ title: "Completed", tab: 2 },
-		{ title: "In Progress", tab: 3 },
+		{ title: "Mission Overview" },
+		{ title: "Community" },
+		{ title: "Completed" },
+		route.params.type != "quest" &&
+		{ title: "In Progress" },
 	]
 
 	return (
-		<View style={__styles.container}>
-			<View style={{height:20, marginBottom:5}}>
-			    <TitleView
-				title={route.params.heading}
-				/>
-			</View>
-			<Tabs
-				list={tab_list}
-				tab={tab}
-				style={{ zIndex: 10 }}
-				changeTab={(e) => setTab(e)}
+		<View style={{ flex: 1 }}>
+			<LiveChat
+				flex={0.59}
+				isVisible={showChat}
+				closeModal={() => setShowChat(false)}
+				eventId={route.params.id}
+				token={token}
+				user={user}
+				type={route.params.type}
+				naivgation={navigation}
 			/>
-			{tab == 0 && <Overview token={token} navigation={navigation} id={route.params.id} />}
-			{tab == 1 && <Community route={route} />}
-			{tab > 1 && <MissionContributor token={token} navigation={navigation} id={route.params.id} tab={tab} />}
+			<View style={__styles.container}>
+				<View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: 'center' }}>
+					<View style={{ flex: 0.95 }}>
+						<TitleView title={route.params.heading || "The Source Code"} />
+					</View>
+					{route.params.type == "quest" &&
+						<Pressable onPress={() => setShowChat(true)}>
+							{icons.chat(colors.primary, 23)}
+						</Pressable>
+					}
+				</View>
+
+				<Tabs
+					list={tab_list}
+					tab={tab}
+					style={{ zIndex: 10 }}
+					changeTab={(e) => setTab(e)}
+				/>
+				{tab == 0 && <Overview
+					token={token}
+					navigation={navigation}
+					id={route.params.id}
+					type={route.params.type}
+				/>}
+				{tab == 1 && <Community route={route} navigation={navigation} />}
+				{tab > 1 && <MissionContributor token={token} navigation={navigation} id={route.params.id} tab={tab} />}
+			</View>
 		</View>
 	)
 
 }
 
-const TrackerList = ({ res }) => {
+const TrackerList = ({ res, type }) => {
 	const nav = useNavigation()
-	const handlePress = (item) => nav.navigate(routes.missionSchedule, { id: item._id })
+	const handlePress = (item) => nav.navigate(routes.missionSchedule, { id: item._id, type: type })
 	return (
 		<FlatList
 			scrollEnabled={false}
@@ -72,9 +99,7 @@ const TrackerList = ({ res }) => {
 			showsVerticalScrollIndicator={false}
 			data={res?.mission_schedules}
 			ListHeaderComponent={
-				<>
-					<Text style={__styles.heading}>{res.content_settings.schedule_heading}</Text>
-				</>
+				<Text style={__styles.heading}>{res.content_settings.schedule_heading}</Text>
 			}
 			ListHeaderComponentStyle={{ marginBottom: 10 }}
 			KeyExtraction={(_, index) => index.toString()}
@@ -92,27 +117,27 @@ const TrackerList = ({ res }) => {
 }
 
 
-const Header = ({ res }) => {
-    console.log(res.video_url, res._id)
-	return  (
+const Header = ({ res, show }) => {
+	return (
 		<>
 			{res?.video_url.includes("vimeo") ?
-			    <VimeoWithPip url={res?.video_url} focused={true} id={res?._id} /> :
-			    <WebPlayer width={utilities.screenWidth() - 20} url={res?.video_url} />
+				<VimeoWithPip url={res?.video_url} focused={true} id={res?._id} /> :
+				<WebPlayer width={utilities?.screenWidth() - 20} url={res?.video_url} />
 			}
 			<View style={{ height: 10 }} />
-			<MissionRewardView
-				duration={res?.mission_duration}
-				acheivedCoins={res?.rewarded_coins}
-				badgesEarned={res?.badge_configration}
-			/>
-			{!!res?.detailed_description &&
+			{show &&
+				<MissionRewardView
+					duration={res?.mission_duration}
+					acheivedCoins={res?.rewarded_coins}
+					badgesEarned={res?.badge_configration}
+				/>}
+			{show && !!res?.detailed_description &&
 				<MyWebview fullWidth html={res?.detailed_description?.toString()} />}
 		</>
 	)
 }
 
-const Overview = ({ token, navigation, id }) => {
+const Overview = ({ token, navigation, id, type }) => {
 	const [res, setResult] = useState([])
 	const [loading, setLoading] = useState(true)
 	const [refreshing, setRefreshing] = useState(false)
@@ -124,6 +149,11 @@ const Overview = ({ token, navigation, id }) => {
 		})
 		if (res.code == 200) {
 			setResult(res.mission)
+			setLoading(false)
+			setRefreshing(false);
+		}
+		else {
+			setResult([])
 			setLoading(false)
 			setRefreshing(false);
 		}
@@ -148,7 +178,7 @@ const Overview = ({ token, navigation, id }) => {
 			data={[1]}
 			ListEmptyComponent={!loading && <EmptyView />}
 			ListHeaderComponent={
-				<Header res={res} />
+				<Header res={res} show={type == "mission"} />
 			}
 			refreshControl={<MyRefreshControl
 				refreshing={refreshing}
@@ -157,7 +187,7 @@ const Overview = ({ token, navigation, id }) => {
 			ListHeaderComponentStyle={{ marginBottom: 20 }}
 			keyExtraction={(_, index) => index.toString()}
 			renderItem={({ _ }) =>
-				<TrackerList res={res} />
+				res?.mission_schedules?.length != 0 && <TrackerList res={res} type={type} />
 			}
 		/>
 	)

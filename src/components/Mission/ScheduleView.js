@@ -1,8 +1,9 @@
 import {useState} from "react"
 import {colors} from "../../utilities/colors"
+import {fonts} from "../../utilities/fonts"
 import {icons} from "../../utilities/icons"
 import isArray from "../../functions/isArray"
-import {View, StyleSheet, Pressable} from "react-native";
+import {View,TextInput, StyleSheet, Pressable} from "react-native";
 import QuestionComponent from "../../screens/Questions/Components/QuestionComponent"
 import MyText from "../MyText"
 import MyInputs from "../MyInputs"
@@ -78,6 +79,7 @@ const ScheduleView = ({ schedule, index }) => {
                       <MyText   >{labels?.gratitudeLabels[index]}</MyText>
                       <TextInput
                         placeholder={index + 1 + ". "}
+		      placeholderTextColor="white"
                         // multiline={true}
                         multiline={true}
                         value={item?.option}
@@ -126,6 +128,7 @@ const ScheduleView = ({ schedule, index }) => {
                       <MyText  >{labels?.dailyDynamiteLabels[index]}</MyText>
                       <TextInput
                         placeholder={index + 1 + ". "}
+			placeholderTextColor="white"
                         multiline={true}
                         value={item?.option}
                         style={{
@@ -202,6 +205,7 @@ const ScheduleView = ({ schedule, index }) => {
               <MyText type='medium' color={colors.primary2} >{(schedule?.content_settings?.general_note_title || "Journal")}</MyText>
               <View style={{ marginTop: 5 }}>
                 <MyInputs
+		  placeholder={labels.journal}
                   noLable
                   noSpace
                   multiline={true}
@@ -285,4 +289,17 @@ const __styles = StyleSheet.create({
   }
 })
 
+const labels = {
+  gratitudeLabels: [
+    "What are you grateful for today?",
+    "Who do you want to send love to today?",
+    "What do you desire most out of today?",
+  ],
+  dailyDynamiteLabels: [
+    "Where will I focus my energy today?",
+    "What am I committed to achieving today?",
+    "What 1 decision or action can I take today?"
+  ],
+  journal: "What did you take away from todays lesson? Keep a note of all your aha moments! "
+}
 export default ScheduleView;

@@ -29,12 +29,13 @@ const MyInputs = ({
   customView,
   noLable = false,
   myref = null,
-  capitalizeSentence = false
+  capitalizeSentence = false,
+  style
 }) => {
   const [isFocused, setFocused] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   return (
-    <View pointerEvents={editable ? "auto" : "none"} style={{ marginBottom: noSpace ? 0 : 15 }}>
+    <View pointerEvents={editable ? "auto" : "none"} style={[{ marginBottom: noSpace ? 0 : 15 }, style]}>
       {!noLable &&
         <Text style={[__MyInputStyles.labelText, isFocused ? __MyInputStyles.focusedLabelText : undefined]}>{label}</Text>}
       {!!customView && customView()}

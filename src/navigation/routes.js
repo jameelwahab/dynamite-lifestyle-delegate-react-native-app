@@ -73,6 +73,7 @@ const routes = {
 
   //? Mission Report
   missionMembers: "MISSION_MEMBERS_LIST",
+  missionMembersFilterScreen: "MISSION_MEMBERS_LIST_FILTER_SCREEN",
   missionList: "MISSION_LIST_SCREEN",
   missionReportScreen: "MISSION_REPORT_SCREEN",
 

@@ -1,4 +1,4 @@
-import { View, FlatList, StyleSheet, Pressable } from 'react-native'
+import { View, FlatList, StyleSheet, Pressable, TouchableOpacity } from 'react-native'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import RootView from '../../../components/RootView'
 import { useSelector } from 'react-redux'
@@ -20,6 +20,7 @@ import { Flex, Row } from '../../../UIComponents/FlexViews'
 import { convertTimezone2 } from '../../../functions/convertTime'
 import { selectTimeZone } from '../../../redux/reducers/timezoneSlice'
 import { dateTimeFormat } from '../../../utilities/constants'
+import MyChip from "../../../components/MyChip"
 
 
 
@@ -37,17 +38,12 @@ const MemberList = ({ navigation, route }) => {
   const [list, setList] = useState([]);
   const [loader, setLoader] = useState(false);
   const [total, setTotal] = useState(0);
+  const [filter, setFilter] = useState({});
   const [refreshing, setRefreshing] = useState(false);
   const [footerLoader, setFooterLoader] = useState(false);
   const [searching, setSearching] = useState(false);
 
   const onMissionList = (item) => {
-    // console.log(item,"item")
-    // navigation.navigate(routes?.missionList, {
-    //   member: item?.member,
-    //   memberId: member?._id
-    // })
-
     navigation.navigate(routes?.missionReportScreen, {
       missionId: item?.mission_info?._id,
       memberId: item?.member?._id
@@ -89,9 +85,14 @@ const MemberList = ({ navigation, route }) => {
 
     let res = await GET_MEMBER_LIST_FOR_MISSION({
       navigation, token, page: paging.page,
-      search_text: searchText,
+      search_txt: searchText,
       type: memberTypeObj[access?.show_members_list_for_payment_request],
-      missionType: type
+      mission_type: type,
+      body:{
+	  from_day: filter?.to,
+	  mission_id: filter?._id,
+	  to_day: filter?.from
+      },
     })
     if (res.code == 200) {
       let length = newArray ? res?.members.length : list.length + res?.members.length;
@@ -116,15 +117,20 @@ const MemberList = ({ navigation, route }) => {
     }
   }
 
-
-
-
-
   useEffect(() => {
     callAPi()
-  }, [])
+  }, [filter])
 
+  useEffect(()=> {
+      setFilter(route?.params?.filter)
+  }, [route])
 
+  const filterTheData = (obj) => {
+    setFilter(obj);
+  }
+  const onFilterScreen = () => {
+    navigation.navigate(routes.missionMembersFilterScreen, { filter, filter })
+  }
 
   const renderProgress = useCallback(({ item, index }) => {
     return (
@@ -149,14 +155,36 @@ const MemberList = ({ navigation, route }) => {
 
   const topView = () => {
     return (
-      <View>
+      <View >
         <View style={__styles.topView}>
           <TitleView
             title={title}
             hideBackBottomButton
             subTitle={`Showing ${list.length} of ${total}`}
           />
+	{type == "in_progress" && 
+	 <TouchableOpacity
+		onPress={onFilterScreen}
+		style={__styles.filterButton}
+		hitSlop={{ bottom: 5, top: 5, left: 5, right: 5 }}
+		>
+		{icons.filterCircle(colors.primary, 30)}
+	    </TouchableOpacity>  }
         </View>
+	    <View style={{flexDirection:'row'}}>
+	    {!!filter?.from && filter?.to &&
+		<MyChip
+		    onPress={() => filterTheData({})}
+		    title={filter?.title}
+		    />
+	    }
+	    {!!filter?.from && filter?.to &&
+		<MyChip
+		    onPress={() => filterTheData({})}
+		    title={`Days: ${filter?.from}-${filter?.to}`}
+		    />
+	    }
+	    </View> 
 
       </View>
     )
@@ -218,7 +246,22 @@ const __styles = StyleSheet.create({
     marginTop: 10,
   },
   topView: {
-    flexDirection: "row", alignItems: "center", backgroundColor: colors.darkSecondary, paddingBottom: 5
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: colors.darkSecondary,
+      paddingBottom: 5
+  },
+  filterButton: {
+    height: "100%",
+    justifyContent: "center",
+    // width: 50,
+    alignItems: "center",
+    flexDirection: "row",
+    // borderWidth: 1,
+    borderColor: colors.primary,
+    borderRadius: 10,
+    paddingHorizontal: 15,
+    // paddingVertical: 8
   },
 
 })

@@ -6,6 +6,7 @@ import { icons } from '../utilities/icons';
 import { colors } from '../utilities/colors';
 import invokeApi from '../functions/invokeAPI';
 import extractVimeoData from '../functions/extractVimeoData';
+import isObject from '../functions/isObject';
 
 
 const { PipModule } = NativeModules;
@@ -77,14 +78,14 @@ export default class VimeoWithPip extends Component {
           excludeBaseURL: true,
         })
         let data = await extractVimeoData(res);
-        console.log("data:",data)
+        console.log("data:", data.request.files.hls.cdns[data.request.files.hls.default_cdn].url, data)
         this.setState({
           videoUrl: data.request.files.hls.cdns[data.request.files.hls.default_cdn].url,
-          poster: data.video.thumbs['640']
+          poster: isObject(data.video.thumbs) ? data.video.thumbs['640'] : !!data?.thumbnail_url ? data?.thumbnail_url : ""
         })
 
       } catch (e) {
-
+        console.log(e, "Vimer Error")
         this.setState({ loading: false, error: true })
       }
 
