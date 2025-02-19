@@ -158,7 +158,7 @@ const MemberList = ({ navigation, route }) => {
       <View >
         <View style={__styles.topView}>
           <TitleView
-            title={title}
+            title={`${title} Report`}
             hideBackBottomButton
             subTitle={`Showing ${list.length} of ${total}`}
           />
