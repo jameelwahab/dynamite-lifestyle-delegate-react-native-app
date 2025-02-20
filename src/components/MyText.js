@@ -47,6 +47,7 @@ const MyText = ({
         marginLeft: 2,
 
       }]}
+      
       {...props}
     >{children}</Text>
   )

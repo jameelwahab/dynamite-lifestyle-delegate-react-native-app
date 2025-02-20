@@ -19,16 +19,16 @@ const LessonView = ({ title, style, heading, icon, desc, txtlen = 50, image, han
 			}
 			<Pressable onPress={handlePress}>
 				<View style={[__styles.container, style]} >
-					<View style={{ height: 80, overflow:'hidden'}}>
-						{image && 
-						// <MyImage source={{ uri: S3_URL + image }} style={__styles.img} />
-						<ResponsiveImage3
-						width={150}
-						defaultSize={{ width: 150, height: 80 }}
-						style={{ width: "100%" }}
-						source={{ uri: S3_URL + image }}
-						/>
-						}
+					<View style={{ height: 80, overflow: 'hidden' }}>
+						{image &&
+							// <MyImage source={{ uri: S3_URL + image }} style={__styles.img} />
+							<ResponsiveImage3
+								width={150}
+								defaultSize={{ width: 150, height: 80 }}
+								style={{ width: "100%" }}
+								source={{ uri: S3_URL + image }}
+							/>}
+
 						{duration &&
 							<View style={__styles.imgTag}>
 								<MyText fontSize={10} type="medium" color={colors.black} >{duration} Days</MyText>
@@ -36,9 +36,9 @@ const LessonView = ({ title, style, heading, icon, desc, txtlen = 50, image, han
 						}
 					</View>
 					<View style={__styles.sub_container}>
-						<MyText style={__styles.heading}>{(show || heading.length <= 20) ? heading : `${heading.slice(0,20)}...`}</MyText>
+						<MyText numberOfLines={2} style={__styles.heading}>{heading}</MyText>
 						<View>
-							<Text style={__styles.desc}>{show ? desc :`${ desc.slice(0, txtlen)}...`}</Text>
+							<Text style={__styles.desc}>{show ? desc : `${desc.slice(0, txtlen)}...`}</Text>
 							{desc.length > txtlen &&
 								<Text
 									onPress={() => setShow(!show)}
