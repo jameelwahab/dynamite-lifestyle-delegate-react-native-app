@@ -23,7 +23,7 @@
     "@react-native-camera-roll/camera-roll": "^7.9.0",
     "@react-native-clipboard/clipboard": "^1.12.1",
     "@react-native-community/checkbox": "^0.5.17",
-    "@react-native-community/datetimepicker": "^8.0.0",
+    "@react-native-community/datetimepicker": "8.0.0",
     "@react-native-community/hooks": "^3.0.0",
     "@react-native-community/slider": "^4.4.3",
     "@react-native-firebase/analytics": "18.5.0",

@@ -3,6 +3,7 @@ import TitleView from "../../components/TitleView"
 import RootView from "../../components/RootView"
 import MyLoader from "../../components/MyLoader"
 import EmptyView from '../../components/EmptyView'
+import FooterLoader from '../../components/FooterLoader'
 import Tabs from "../../components/Tabs"
 import utilities from "../../utilities"
 import MyText from "../../components/MyText"
@@ -115,6 +116,7 @@ const TrackerList = ({ res, type }) => {
 			renderItem={({ item }) =>
 				// <View style={__styles.card_container}>
 					<LessonView
+						style={type != "quest" && {paddingHorizontal:10, paddingVertical:5}}
 						image={type == "quest" ? item?.image?.thumbnail_1 : ""}
 						txtlen={type == "quest" ? 30 : 55}
 						heading={item.main_heading}
@@ -129,7 +131,6 @@ const TrackerList = ({ res, type }) => {
 
 
 const Header = ({ res, show }) => {
-	console.log(res.video_url != "")
 	return (
 		<>
 			{res.video_url != "" ?
@@ -146,8 +147,10 @@ const Header = ({ res, show }) => {
 			{show &&
 				<MissionRewardView
 					duration={res?.mission_duration}
-					acheivedCoins={res?.rewarded_coins}
-					badgesEarned={res?.badge_configration}
+					totalCoins={res?.rewarded_coins}
+					badges={res?.badge_configration}
+					showEarnedBadges={false}
+					showBadgesEarned={false}
 				/>}
 			{show && !!res?.detailed_description &&
 				<MyWebview fullWidth html={res?.detailed_description?.toString()} />}
@@ -234,6 +237,7 @@ const MissionContributor = ({ token, tab, navigation, id }) => {
 	const [res, setResult] = useState([])
 	const [loading, setLoading] = useState(true)
 	const [refreshing, setRefreshing] = useState(false)
+	const [page, setPage] = useState(1)
 
 	const getList = async (loader) => {
 		setLoading(loader)
@@ -257,7 +261,7 @@ const MissionContributor = ({ token, tab, navigation, id }) => {
 		setRefreshing(true);
 		getList(false)
 	}
-
+	const handleReachEnd = () => console.log("Yoko")
 	if (loading) return <MyLoader enable={loading} />
 	return (
 		<>
@@ -267,6 +271,8 @@ const MissionContributor = ({ token, tab, navigation, id }) => {
 				showsVerticalScrollIndicator={false}
 				ItemSeparatorComponent={<View style={{ height: 10 }} />}
 				ListEmptyComponent={!loading && <EmptyView />}
+				ListFooterComponent={<FooterLoader isVisible={true} />}
+				onEndReached={handleReachEnd}
 				refreshControl={<MyRefreshControl
 					refreshing={refreshing}
 					onRefresh={onRefresh}

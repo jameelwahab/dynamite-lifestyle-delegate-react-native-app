@@ -81,9 +81,9 @@ const Scheduler = ({ navigation, route }) => {
 							<View style={{ flex: 0.95 }}>
 								<TitleView title={res?.mission_schedule?.main_heading || "The Source Code"} />
 							</View>
-							<Pressable onPress={() => setShowChat(true)}>
+						{route.params.type == "quest" && <Pressable onPress={() => setShowChat(true)}>
 								{icons.chat(colors.primary, 23)}
-							</Pressable>
+							</Pressable> }
 						</View>
 						<View style={{ height: 15 }} />
 						{res?.mission?.video_url != "" ?

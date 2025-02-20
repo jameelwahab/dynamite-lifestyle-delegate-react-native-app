@@ -7,7 +7,7 @@ import MyImage from "./MyImage";
 import MyText from "./MyText";
 import ResponsiveImage3 from "./ResponsiveImage3";
 
-const LessonView = ({ title, heading, icon, desc, txtlen = 55, image, handlePress, duration }) => {
+const LessonView = ({ title, style, heading, icon, desc, txtlen = 50, image, handlePress, duration }) => {
 	const [show, setShow] = useState()
 	return (
 		<>
@@ -18,8 +18,8 @@ const LessonView = ({ title, heading, icon, desc, txtlen = 55, image, handlePres
 				</View>
 			}
 			<Pressable onPress={handlePress}>
-				<View style={__styles.container}>
-					<View>
+				<View style={[__styles.container, style]} >
+					<View style={{ height: 80, overflow:'hidden'}}>
 						{image && 
 						// <MyImage source={{ uri: S3_URL + image }} style={__styles.img} />
 						<ResponsiveImage3
@@ -36,10 +36,10 @@ const LessonView = ({ title, heading, icon, desc, txtlen = 55, image, handlePres
 						}
 					</View>
 					<View style={__styles.sub_container}>
-						<MyText style={__styles.heading}>{heading}</MyText>
+						<MyText style={__styles.heading}>{(show || heading.length <= 20) ? heading : `${heading.slice(0,20)}...`}</MyText>
 						<View>
-							<Text style={__styles.desc}>{show ? desc : desc.slice(0, txtlen)}</Text>
-							{desc.length > 55 &&
+							<Text style={__styles.desc}>{show ? desc :`${ desc.slice(0, txtlen)}...`}</Text>
+							{desc.length > txtlen &&
 								<Text
 									onPress={() => setShow(!show)}
 									style={__styles.showText}>
