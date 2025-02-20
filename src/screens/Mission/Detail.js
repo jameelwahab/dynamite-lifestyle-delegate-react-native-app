@@ -237,31 +237,43 @@ const MissionContributor = ({ token, tab, navigation, id }) => {
 	const [res, setResult] = useState([])
 	const [loading, setLoading] = useState(true)
 	const [refreshing, setRefreshing] = useState(false)
-	const [page, setPage] = useState(1)
+	const [page, setPage] = useState(0)
+	const [canLoadMore, setCanLoadMore] = useState(true)
 
-	const getList = async (loader) => {
+	const getList = async ({loader=false, pageToLoad}) => {
 		setLoading(loader)
-		const res = await GET_MISSION_INFO({
-			token, navigation, id
+		const resu = await GET_MISSION_INFO({
+			token, navigation, id, page:pageToLoad,limit:10, type: tab==2  ? "mission_leaderboard": "coins_leaderboard"
 		})
-		if (res.code == 200) {
-			setResult(tab == 2 ? res.streak_leader_board_stats : res.coins_leader_board_stats)
+		if (resu.code == 200) {
+			const result = tab == 2 ? resu.streak_leader_board_stats : resu.coins_leader_board_stats
+			if(pageToLoad!=0)
+			    setResult([...res, ...result])
+			else setResult(result)
 			setLoading(false)
 			setRefreshing(false);
+			setCanLoadMore(tab==2 ? resu.streak_load_more != "" : resu.coins_load_more!="")
 		}
 	}
 
 
 	useEffect(() => {
-		if (tab > 1) getList(true)
+		setPage(0)
+		if (tab > 1) getList({loader:true, pageToLoad:0})
 	}, [tab])
 
 
 	const onRefresh = () => {
 		setRefreshing(true);
-		getList(false)
+		getList({loader:false, pageToLoad:0})
+		setPage(0)
 	}
-	const handleReachEnd = () => console.log("Yoko")
+	const handleReachEnd = () =>{
+	   if(canLoadMore){
+	       getList({loader:false, pageToLoad:page+1})
+	       setPage(page+1)
+	   } 
+	} 
 	if (loading) return <MyLoader enable={loading} />
 	return (
 		<>
@@ -271,7 +283,7 @@ const MissionContributor = ({ token, tab, navigation, id }) => {
 				showsVerticalScrollIndicator={false}
 				ItemSeparatorComponent={<View style={{ height: 10 }} />}
 				ListEmptyComponent={!loading && <EmptyView />}
-				ListFooterComponent={<FooterLoader isVisible={true} />}
+				ListFooterComponent={<FooterLoader isVisible={canLoadMore} />}
 				onEndReached={handleReachEnd}
 				refreshControl={<MyRefreshControl
 					refreshing={refreshing}
