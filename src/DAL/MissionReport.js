@@ -1,7 +1,7 @@
 import invokeApi from "../functions/invokeAPI";
 
-export const GET_MEMBER_LIST_FOR_MISSION = ({token, navigation,page, mission_type,search_txt, body})=> invokeApi({
-    path:`api/consultant/member_mission/report?page=${page}&limit=50&include_members=nurture&search_text=${search_txt}&mission_type=${mission_type}`,
+export const GET_MEMBER_LIST_FOR_MISSION = ({token, navigation,page, mission_type,type,search_txt, body})=> invokeApi({
+    path:`api/consultant/member_mission/report?page=${page}&limit=50&include_members=${type}&search_text=${search_txt}&mission_type=${mission_type}`,
     method: "POST",
     token: token,
     navigation: navigation,
