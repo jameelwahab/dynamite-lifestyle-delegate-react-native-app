@@ -158,6 +158,7 @@ const MissionReport = ({ navigation, route }) => {
 
 
   const headerView = () => {
+    const alert = "Note: This member has not enabled content viewing for this mission, so the content is currently not visible to you. Once the member grants access, you will be able to view the content.."
     return (
       <View>
 
@@ -169,40 +170,53 @@ const MissionReport = ({ navigation, route }) => {
           acheivedCoins={mission?.attracted_coins}
         />
 
-
-        {!!compareChartData && isArray(compareChartData?.datasets) &&
-          <View style={{}}>
-            <MyText fontSize={18} type='bold' color={colors.primary} >Comparison Graph</MyText>
-            <View style={__styles.boxView}>
-              <ComparisonChart data={compareChartData} />
-            </View>
-          </View>}
-
-
-        {!!barChartData && isArray(barChartData?.barChartData) &&
-          <View style={{ marginTop: 10 }}>
-            <MyText fontSize={18} type='bold' color={colors.primary} >Mission Report Graph Overview</MyText>
-            <View style={__styles.boxView}>
-              <BarChartForMission
-                noheading={true}
-                data={barChartData?.barChartData}
-                questions={barChartData?.questionsForBarChart}
-              />
-            </View>
+        {!hasPermission &&
+          <View style={{ flexDirection: "row", borderRadius: 10, overflow: 'hidden', marginVertical: 10, backgroundColor: colors.secondary }}>
+            <View style={{ width: 4, height: "100%", backgroundColor: colors.primary }} />
+            <MyText style={{ padding: 10, backgroundColor: colors.secondary }}>{alert}</MyText>
           </View>
         }
 
-        {pieData.length > 0 &&
-          pieData.map((x) => (
-            <View style={{ marginTop: 10 }}>
-              {!(!!barChartData && isArray(barChartData?.barChartData)) &&
-                <View style={{ marginTop: 10 }}>
-                  <MyText fontSize={18} type='bold' color={colors.primary} >Mission Report Graph Overview</MyText>
-                </View>}
-              <View style={[__styles.boxView, { alignItems: "center" }]}>
-                <PieGraph data={x} />
+
+        {!hasPermission &&
+          <>
+            {!!compareChartData && isArray(compareChartData?.datasets) &&
+              <View style={{}}>
+                <MyText fontSize={18} type='bold' color={colors.primary} >Comparison Graph</MyText>
+                <View style={__styles.boxView}>
+                  <ComparisonChart data={compareChartData} />
+                </View>
+              </View>}
+
+
+
+
+            {!!barChartData && isArray(barChartData?.barChartData) &&
+              <View style={{ marginTop: 10 }}>
+                <MyText fontSize={18} type='bold' color={colors.primary} >Mission Report Graph Overview</MyText>
+                <View style={__styles.boxView}>
+                  <BarChartForMission
+                    noheading={true}
+                    data={barChartData?.barChartData}
+                    questions={barChartData?.questionsForBarChart}
+                  />
+                </View>
               </View>
-            </View>))}
+            }
+
+            {pieData.length > 0 &&
+              pieData.map((x) => (
+                <View style={{ marginTop: 10 }}>
+                  {!(!!barChartData && isArray(barChartData?.barChartData)) &&
+                    <View style={{ marginTop: 10 }}>
+                      <MyText fontSize={18} type='bold' color={colors.primary} >Mission Report Graph Overview</MyText>
+                    </View>}
+                  <View style={[__styles.boxView, { alignItems: "center" }]}>
+                    <PieGraph data={x} />
+                  </View>
+                </View>))}
+          </>}
+
 
         {isArray(schedules) > 0 &&
           <View style={{ marginTop: 10 }}>
@@ -210,13 +224,14 @@ const MissionReport = ({ navigation, route }) => {
           </View>
         }
 
+
       </View>
     )
   }
   return (
     <RootView
       subTitle={mission ? mission?.title : ""}
-      title={isObject(user) ? user?.first_name + " " + user?.last_name + `${route.params.type=="report" ? 's Report' : ''}` : ""} >
+      title={isObject(user) ? user?.first_name + " " + user?.last_name + `${route.params.type == "report" ? 's Report' : ''}` : ""} >
       {!loader &&
         <View style={{ flex: 1 }}>
           <FlatList
@@ -240,7 +255,7 @@ const MissionReport = ({ navigation, route }) => {
 export default MissionReport
 
 
-const QuestionsView = ({ schedule, isAllow=false, index }) => {
+const QuestionsView = ({ schedule, isAllow = false, index }) => {
   const [isCollapsed, setIsCollapsed] = useState(true);
 
   const scheduleActions = () => {
@@ -393,56 +408,50 @@ const QuestionsView = ({ schedule, isAllow=false, index }) => {
         </View>
       </View>)
   }
-  const alert = "Note: This member has not enabled content viewing for this mission, so the content is currently not visible to you. Once the member grants access, you will be able to view the content.."
+
   return (
     <>
-      {!isAllow && 
-     <View style={{flexDirection:"row", borderRadius:10, overflow:'hidden', marginVertical:10, backgroundColor: colors.secondary}}>
-	<View style={{ width:4, height:"100%", backgroundColor:colors.primary}}/>
-	<MyText style={{padding:10, backgroundColor: colors.secondary}}>{!isAllow && alert}</MyText>
-      </View>
-      }
-     
-    <View style={__styles.boxView}>
-      <Pressable style={__styles.rowView}
-        hitSlop={{ left: 10, right: 10, top: 10, right: 10 }}
-        onPress={() => isAllow && setIsCollapsed(!isCollapsed)}>
-        <View style={{ flex: 1 }}>
-          <MyText fontSize={16} type='bold'>{schedule?.title}</MyText>
-        </View>
-        <View style={{ transform: [{ rotate: isCollapsed ? '0deg' : '180deg' }] }}>
-          {isAllow ? icons.down() : icons.lock()}
-          {/* <Image source={ic_down} style={{
+
+      <View style={__styles.boxView}>
+        <Pressable style={__styles.rowView}
+          hitSlop={{ left: 10, right: 10, top: 10, right: 10 }}
+          onPress={() => isAllow && setIsCollapsed(!isCollapsed)}>
+          <View style={{ flex: 1 }}>
+            <MyText fontSize={16} type='bold'>{schedule?.title}</MyText>
+          </View>
+          <View style={{ transform: [{ rotate: isCollapsed ? '0deg' : '180deg' }] }}>
+            {isAllow ? icons.down() : icons.lock()}
+            {/* <Image source={ic_down} style={{
             height: 15, width: 15,
             tintColor: colors.lightText2
           }} /> */}
-        </View>
-      </Pressable>
-      {/* <Collapsible collapsed={isCollapsed} > */}
-      {!isCollapsed &&
-        <View>
+          </View>
+        </Pressable>
+        {/* <Collapsible collapsed={isCollapsed} > */}
+        {!isCollapsed &&
+          <View>
 
-          {scheduleActions()}
+            {scheduleActions()}
 
 
-          {isArray(schedule?.questions?.questions) &&
-            <View style={{ marginTop: 10 }}>
-              <MyText type='medium' color={colors.primary} >{schedule?.content_settings?.onscreen_question_title || "Content Questions"}</MyText>
-              {schedule.questions?.questions.map((item, index) => {
-                let answers = schedule?.questions?.question_replies.find(x => x?._id == item?._id);
-                return (<QuestionComponent
-                  padding={0}
-                  noQuestionStatement={true}
-                  hideRepliesCheckBox={true}
-                  item={{ ...item, answer: answers }}
-                  index={index}
-                  showRepliesbtns={false}
-                  hideCollpase={true}
-                />)
-              })}
-            </View>}
+            {isArray(schedule?.questions?.questions) &&
+              <View style={{ marginTop: 10 }}>
+                <MyText type='medium' color={colors.primary} >{schedule?.content_settings?.onscreen_question_title || "Content Questions"}</MyText>
+                {schedule.questions?.questions.map((item, index) => {
+                  let answers = schedule?.questions?.question_replies.find(x => x?._id == item?._id);
+                  return (<QuestionComponent
+                    padding={0}
+                    noQuestionStatement={true}
+                    hideRepliesCheckBox={true}
+                    item={{ ...item, answer: answers }}
+                    index={index}
+                    showRepliesbtns={false}
+                    hideCollpase={true}
+                  />)
+                })}
+              </View>}
 
-          {/* {!!schedule?.questions?.questions && schedule?.questions?.questions.length > 0 &&
+            {/* {!!schedule?.questions?.questions && schedule?.questions?.questions.length > 0 &&
             <View style={{ marginTop: 10 }}>
               <Text style={main.titleGolden} >{schedule?.content_settings?.onscreen_question_title || "Content Questions"}</Text>
               <MissionQuestions2
@@ -455,56 +464,56 @@ const QuestionsView = ({ schedule, isAllow=false, index }) => {
               />
             </View>} */}
 
-          {schedule?.growth_tool_allowed_actions.map((item, index) => {
-            if (item?.tool == "dynamite_dairy") {
-              return (
-                <View>
-                  {growthToolIntentions(item, index)}
-                </View>
-              )
-            } else return null
-          })}
+            {schedule?.growth_tool_allowed_actions.map((item, index) => {
+              if (item?.tool == "dynamite_dairy") {
+                return (
+                  <View>
+                    {growthToolIntentions(item, index)}
+                  </View>
+                )
+              } else return null
+            })}
 
-          {schedule?.content_settings?.is_show_general_note &&
-            <View style={{ marginTop: 15 }} >
-              <MyText type='medium' color={colors.primary2} >{(schedule?.content_settings?.general_note_title || "Journal")}</MyText>
-              <View style={{ marginTop: 5 }}>
-                <MyInputs
-                  noLable
-                  noSpace
-                  multiline={true}
-                  value={schedule?.general_note}
-                />
-                {/* <MyAutoGrowTextField
+            {schedule?.content_settings?.is_show_general_note &&
+              <View style={{ marginTop: 15 }} >
+                <MyText type='medium' color={colors.primary2} >{(schedule?.content_settings?.general_note_title || "Journal")}</MyText>
+                <View style={{ marginTop: 5 }}>
+                  <MyInputs
+                    noLable
+                    noSpace
+                    multiline={true}
+                    value={schedule?.general_note}
+                  />
+                  {/* <MyAutoGrowTextField
                   style={{ backgroundColor: colors.box2, minHeight: 40, maxHeight: undefined, padding: 10 }}
                   value={schedule?.general_note}
                   editable={false}
                 /> */}
 
-              </View>
-            </View>}
+                </View>
+              </View>}
 
 
 
-          {isArray(schedule?.questions?.after_action_questions) &&
-            <View style={{ marginTop: 10 }}>
-              <MyText type='medium' color={colors.primary} >{"Interactive Learning Experience"}</MyText>
-              {schedule.questions?.after_action_questions.map((item, index) => {
-                let answers = schedule?.questions?.question_replies.find(x => x?._id == item?._id);
+            {isArray(schedule?.questions?.after_action_questions) &&
+              <View style={{ marginTop: 10 }}>
+                <MyText type='medium' color={colors.primary} >{"Interactive Learning Experience"}</MyText>
+                {schedule.questions?.after_action_questions.map((item, index) => {
+                  let answers = schedule?.questions?.question_replies.find(x => x?._id == item?._id);
 
-                return (<QuestionComponent
-                  padding={0}
-                  noQuestionStatement={true}
-                  hideRepliesCheckBox={true}
-                  item={{ ...item, answer: answers }}
-                  index={index}
-                  showRepliesbtns={false}
-                  hideCollpase={true}
-                />)
-              })}
-            </View>}
+                  return (<QuestionComponent
+                    padding={0}
+                    noQuestionStatement={true}
+                    hideRepliesCheckBox={true}
+                    item={{ ...item, answer: answers }}
+                    index={index}
+                    showRepliesbtns={false}
+                    hideCollpase={true}
+                  />)
+                })}
+              </View>}
 
-          {/* 
+            {/* 
           {!!schedule?.questions?.after_action_questions && schedule?.questions?.after_action_questions.length > 0 &&
             <View style={{ marginTop: 10 }}>
               <Text style={main.titleGolden} >{"Interactive Learning Experience"}</Text>
@@ -518,11 +527,11 @@ const QuestionsView = ({ schedule, isAllow=false, index }) => {
               />
             </View>} */}
 
-        </View>
-      }
-      {/* // </Collapsible> */}
-    </View >
-      </>
+          </View>
+        }
+        {/* // </Collapsible> */}
+      </View >
+    </>
   )
 }
 
