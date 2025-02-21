@@ -29,6 +29,7 @@ import ConfirmationModal2 from '../../../components/ConfirmationModal2'
 import OptionModal2 from '../../../components/OptionModal2'
 import showToast from '../../../functions/showToast'
 import breakReference from '../../../functions/breakReference'
+import country from '../../../assets/data/countryList.json'
 
 const MemberDetail = ({ navigation, route }) => {
   const { type } = route?.params;
@@ -79,7 +80,11 @@ const MemberDetail = ({ navigation, route }) => {
       })
     } else if (opt?.key == "subscription") {
       navigation.navigate(routes.memberSubscribersListing, {
-        memberId: member?._id
+        memberId: member?._id,
+      })
+    } else if(opt?.key == "manage-mission" ){
+	  navigation.navigate(routes.memberManage,{
+	    memberId: member?._id,
       })
     } else if (opt?.key == "question-answer") {
       navigation.navigate(routes.memberQuestionListing, {
@@ -217,6 +222,8 @@ const MemberDetail = ({ navigation, route }) => {
             style={{ flexDirection: "row", flex: 1, alignItems: "center" }}>
             <View>
               <UserImage
+		borderWidth={1}
+		borderColor={colors.delete}
                 image={member?.profile_image}
                 name={member?.first_name}
                 size={30} />
@@ -228,7 +235,9 @@ const MemberDetail = ({ navigation, route }) => {
               {isAllMembers && <MyText fontSize={12} >{member?.email}</MyText>}
             </View>
           </Pressable>
-
+	  <MyText style={{marginRight:10}}>
+	    {country.find((el)=> el.code === member?.country).flag}
+	  </MyText>
           <TouchableOpacity style={{ marginRight: 10 }} onPress={() => onChatScreen(member?._id)}>
             {icons.message(colors.primary, 20)}
           </TouchableOpacity>
@@ -415,7 +424,10 @@ const MemberDetail = ({ navigation, route }) => {
           member?.affliliate?.affiliate_user_info?.first_name + " " + member?.affliliate?.affiliate_user_info?.last_name + " (" + member?.affliliate?.affiliate_url_name + ") " : "Master Link"} />}
         {!isNurture && access?.Show_nurture_in_filter && <StatView title={"Nurture"} value={!!member?.nurture ? member?.nurture?.first_name + " " + member?.nurture?.last_name : "N/A"} />}
         {!isMembers && <StatView title={"Delegate"} value={!!member?.consultant ? member?.consultant?.first_name + " " + member?.consultant?.last_name : "N/A"} />}
-        <StatView title={"Badge Level"} value={member?.membership_level_badge_info?.membership_level_badge_title} noFontTransform />
+        <StatView
+	    title={"Badge Level"}
+	    icon_img={member?.membership_level_badge_info?.membership_level_badge_icon?.thumbnail_1}
+	    value={member?.membership_level_badge_info?.membership_level_badge_title} noFontTransform />
         <StatView title={"Wheel of life"} view={wheelOfLifeStatus} />
         <StatView title={"Last Login Activity"} uppercase value={convertTimezone(member?.last_login_activity, timezone).format(dateTimeFormat.dateTime)} />
         <StatView title={"Phone Number"} view={() => contactNumberView(member?.contact_number, !!member?.call_history?.is_checked, member?.is_call_allowed)} />

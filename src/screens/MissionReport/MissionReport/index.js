@@ -128,7 +128,7 @@ const MissionReport = ({ navigation, route }) => {
     let res = await GET_MISSION_DETAIL_BY_ID({
       navigation, token,
       memberId: memberId,
-      missionId: missionId
+      missionId: missionId,
     })
     if (res.code == 200) {
       // setList(res?.missions);
@@ -150,7 +150,10 @@ const MissionReport = ({ navigation, route }) => {
 
 
   useEffect(() => {
-
+    console.log({
+      memberId: memberId,
+      missionId: missionId
+    })
     setLoader(true)
     getMissionMembersFromServer()
   }, [])
@@ -215,7 +218,7 @@ const MissionReport = ({ navigation, route }) => {
   return (
     <RootView
       subTitle={mission ? mission?.title : ""}
-      title={isObject(user) ? user?.first_name + " " + user?.last_name + "'s Report" : ""} >
+      title={isObject(user) ? user?.first_name + " " + user?.last_name + `${route.params.type=="report" ? 's Report' : ''}` : ""} >
       {!loader &&
         <View style={{ flex: 1 }}>
           <FlatList

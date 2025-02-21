@@ -19,8 +19,8 @@ export const GET_MISSION_DETAIL = ({token, navigation, id}) => invokeApi({
     navigation,
 }) 
 
-export const GET_MISSION_INFO = ({token, navigation, id}) => invokeApi({
-    path: `api/feeds/delegate_portal/extra_data/get?list_type=mission&mission_id=${id}`,
+export const GET_MISSION_INFO = ({token, navigation, id, page=0, limit=20, type}) => invokeApi({
+    path: `api/consultant/mission_leaderboard/get/${id}?page=${page}&limit=${limit}&type=${type}`,
     token,
     navigation,
 }) 

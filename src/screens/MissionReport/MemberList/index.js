@@ -46,7 +46,8 @@ const MemberList = ({ navigation, route }) => {
   const onMissionList = (item) => {
     navigation.navigate(routes?.missionReportScreen, {
       missionId: item?.mission_info?._id,
-      memberId: item?.member?._id
+      memberId: item?.member?._id,
+      type: "report",
     })
   }
 
