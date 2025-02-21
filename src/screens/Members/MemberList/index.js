@@ -38,6 +38,7 @@ import InfoModal from '../../../components/InfoModal'
 import ConfirmationModal2 from '../../../components/ConfirmationModal2'
 import OptionModal2 from '../../../components/OptionModal2'
 import breakReference from '../../../functions/breakReference'
+import countries from "../../../assets/data/countryList.json"
 
 
 
@@ -117,7 +118,13 @@ const MemberList = ({ navigation, route }) => {
         memberId: item?._id,
         member: item
       })
-    } else if (opt?.key == "profile") {
+    }
+      else if(opt?.key == "manage-mission" ){
+	  navigation.navigate(routes.memberManage,{
+	    memberId: item?._id,
+	  })
+      
+      }  else if (opt?.key == "profile") {
       navigation.navigate(routes.memberProfile, {
         memberId: item?._id,
       })
@@ -849,6 +856,8 @@ const MemberList = ({ navigation, route }) => {
             style={{ flexDirection: "row", flex: 1, alignItems: "center" }}>
             <View>
               <UserImage
+		borderWidth={1}
+		borderColor={colors.delete}
                 image={item?.profile_image}
                 name={item?.first_name}
                 size={30} />
@@ -864,7 +873,9 @@ const MemberList = ({ navigation, route }) => {
 
 
 
-
+	  <MyText style={{ marginRight: 10 }} >
+		{countries.find((el)=> el.code===item?.country)?.flag || ""}	
+	  </MyText>
           <Pressable
             onPress={() => ref_infoModal?.current?.openModal(item?.downloaded_app ?
               "This Member has downloaded the app" :
@@ -901,7 +912,10 @@ const MemberList = ({ navigation, route }) => {
             item?.affliliate?.affiliate_user_info?.first_name + " " + item?.affliliate?.affiliate_user_info?.last_name + " (" + item?.affliliate?.affiliate_url_name + ") " : "Master Link"} />}
           {!isNurture && access?.Show_nurture_in_filter && <StatView title={"Nurture"} value={!!item?.nurture ? item?.nurture?.first_name + " " + item?.nurture?.last_name : "N/A"} />}
           {!isMembers && <StatView title={"Delegate"} value={!!item?.consultant ? item?.consultant?.first_name + " " + item?.consultant?.last_name : "N/A"} />}
-          <StatView title={"Badge Level"} value={item?.membership_level_badge_info?.membership_level_badge_title} noFontTransform />
+          <StatView title={"Badge Level"}
+		icon_img={item?.membership_level_badge_info?.membership_level_badge_icon?.thumbnail_1}
+		value={item?.membership_level_badge_info?.membership_level_badge_title} 
+		noFontTransform />
           <StatView title={"Last Login Activity"} uppercase value={convertTimezone(item?.last_login_activity, timezone).format(dateTimeFormat.dateTime)} />
           <StatView title={"Lead Status"} view={() => leadStatusView(item)} />
           <StatView title={"Membership Expire"} value={!!item?.membership_purchase_expiry ?

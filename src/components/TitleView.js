@@ -55,7 +55,7 @@ const __header = StyleSheet.create({
   titleView: {
     flex: 1,
     justifyContent: "center",
-    marginHorizontal: 15
+    marginHorizontal: 10
   },
   titleText: {
     color: colors.primary,

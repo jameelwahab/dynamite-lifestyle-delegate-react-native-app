@@ -12,10 +12,11 @@ import AddNote from '../../screens/Members/Notes/AddNote'
 import List from '../../screens/Members/Notes/List'
 import SubscriptionList from '../../screens/Members/Subscriptions'
 import QuestionsList from '../../screens/Members/QuestionsList'
+import MemberManage from '../../screens/Members/MemberManage'
 import GenericQuetionList from '../../screens/Questions/GenericQuetionList'
 import MemberProfile from '../../screens/Members/MemberProfile.js'
 import MessageList from '../../screens/WhatsappChat/MessageList.js'
-
+import MissionReport from '../../screens/MissionReport/MissionReport'
 
 
 
@@ -30,6 +31,7 @@ const StackAllMember = ({ route }) => {
         screenOptions={{ headerShown: false }}>
         <AllMemberStack.Screen initialParams={route.params} name={routes.allMemberScreens} component={MemberList} />
         <AllMemberStack.Screen initialParams={route.params} name={routes.memberDetails} component={MemberDetail} />
+        <AllMemberStack.Screen name={routes.memberManage} component={MemberManage} />
         <AllMemberStack.Screen name={routes.memberNotesListing} component={List} />
         <AllMemberStack.Screen name={routes.memberAddNote} component={AddNote} />
         <AllMemberStack.Screen name={routes.memberSubscribersListing} component={SubscriptionList} />
@@ -37,6 +39,7 @@ const StackAllMember = ({ route }) => {
         <AllMemberStack.Screen name={routes.genericQestionListing} component={GenericQuetionList} />
         <AllMemberStack.Screen name={routes.memberProfile} component={MemberProfile} />
         <AllMemberStack.Screen name={routes.whtasappChatMessageList} component={MessageList} />
+        <AllMemberStack.Screen name={routes.missionReportScreen} component={MissionReport} />
         {/*//? Default Screens Start */}
         {defaultScreens.map((x, i) => (
           <AllMemberStack.Screen key={x.name} name={x.name} component={x.component} />

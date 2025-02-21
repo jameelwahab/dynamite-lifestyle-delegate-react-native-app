@@ -276,3 +276,11 @@ export const UPDATE_CALL_FUNCTIONALITY = ({ token, navigation, body: {
   })
 }
 
+export const MEMBER_MISSION_QUEST = ({ token, navigation, member_id }) =>invokeApi({
+    path: `api/member/get/member_missions_and_quests`,
+    method: "POST",
+    token,
+    navigation,
+    postData:{ member_id }
+  })
+

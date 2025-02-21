@@ -141,6 +141,11 @@ const optionList = [
     title: "Questions Answers",
     icon: () => icons.lock(colors.primary, 20)
   },
+  {
+    key: "manage-mission",
+    title: "Manage Mission",
+    icon: () => icons.lock(colors.primary, 20)
+  },
 
 ]
 
