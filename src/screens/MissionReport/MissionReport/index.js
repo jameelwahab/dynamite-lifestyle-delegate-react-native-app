@@ -33,6 +33,7 @@ const MissionReport = ({ navigation, route }) => {
   const [pieData, setPieData] = useState([])
   const [refreshing, setRefreshing] = useState(false);
   const [schedules, setSchedules] = useState([]);
+  const [hasPermission, setHasPermission] = useState(false)
   const [mission, setMission] = useState(null);
   const [badgesEarned, setBadgesEarned] = useState([])
   const [user, setUser] = useState(null)
@@ -140,6 +141,7 @@ const MissionReport = ({ navigation, route }) => {
       prepareLineChartData(res?.on_screen_graph_data)
       setPieData(res?.mcq_graph_data)
       setSchedules(res?.report_data)
+      setHasPermission(res?.permission_to_view_content)
       setLoader(false);
       setRefreshing(false)
     } else {
@@ -150,10 +152,6 @@ const MissionReport = ({ navigation, route }) => {
 
 
   useEffect(() => {
-    console.log({
-      memberId: memberId,
-      missionId: missionId
-    })
     setLoader(true)
     getMissionMembersFromServer()
   }, [])
@@ -229,7 +227,7 @@ const MissionReport = ({ navigation, route }) => {
             keyExtractor={(item) => item?._id}
             renderItem={({ item, index }) => {
               return (
-                <QuestionsView schedule={item} index={index} />
+                <QuestionsView schedule={item} isAllow={hasPermission} index={index} />
               )
             }}
           />
@@ -242,7 +240,7 @@ const MissionReport = ({ navigation, route }) => {
 export default MissionReport
 
 
-const QuestionsView = ({ schedule, index }) => {
+const QuestionsView = ({ schedule, isAllow=false, index }) => {
   const [isCollapsed, setIsCollapsed] = useState(true);
 
   const scheduleActions = () => {
@@ -395,17 +393,25 @@ const QuestionsView = ({ schedule, index }) => {
         </View>
       </View>)
   }
-
+  const alert = "Note: This member has not enabled content viewing for this mission, so the content is currently not visible to you. Once the member grants access, you will be able to view the content.."
   return (
+    <>
+      {!isAllow && 
+     <View style={{flexDirection:"row", borderRadius:10, overflow:'hidden', marginVertical:10, backgroundColor: colors.secondary}}>
+	<View style={{ width:4, height:"100%", backgroundColor:colors.primary}}/>
+	<MyText style={{padding:10, backgroundColor: colors.secondary}}>{!isAllow && alert}</MyText>
+      </View>
+      }
+     
     <View style={__styles.boxView}>
       <Pressable style={__styles.rowView}
         hitSlop={{ left: 10, right: 10, top: 10, right: 10 }}
-        onPress={() => setIsCollapsed(!isCollapsed)}>
+        onPress={() => isAllow && setIsCollapsed(!isCollapsed)}>
         <View style={{ flex: 1 }}>
           <MyText fontSize={16} type='bold'>{schedule?.title}</MyText>
         </View>
         <View style={{ transform: [{ rotate: isCollapsed ? '0deg' : '180deg' }] }}>
-          {icons.down()}
+          {isAllow ? icons.down() : icons.lock()}
           {/* <Image source={ic_down} style={{
             height: 15, width: 15,
             tintColor: colors.lightText2
@@ -516,6 +522,7 @@ const QuestionsView = ({ schedule, index }) => {
       }
       {/* // </Collapsible> */}
     </View >
+      </>
   )
 }
 
