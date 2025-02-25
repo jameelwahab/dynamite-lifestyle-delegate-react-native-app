@@ -55,6 +55,9 @@ import StackDelegateEvents from "../NestedStacks/StackDelegateEvents";
 import StackLeadCenter from "../NestedStacks/StackLeadCenter";
 import StackMissionReport from "../NestedStacks/SackMisisonReport";
 import StackMission from "../NestedStacks/StackMission"
+import StackContentReview from "../NestedStacks/StackFeedReview"
+import StackFeedReview from "../NestedStacks/StackFeedReview";
+import StackCommentReview from "../NestedStacks/StackCommentReview";
 
 
 
@@ -382,6 +385,16 @@ export const ParentComponents = {
       key: "1a9f0806-f359-4bab-8ffa-987f8db5b671",
     }
   },
+
+  "52f27c5a-44ba-44ba-b0f0-b0b150ea031b": {
+    key: null,
+    component: null,
+    params: {
+      value: "",
+      key: "52f27c5a-44ba-44ba-b0f0-b0b150ea031b"
+    },
+  },
+
   // "aadbd7a3-444444-40dd-bf24-7846756776677887": {
   //   key: routes.leadcenterNavigator,
   //   component: StackLeadCenter,
@@ -393,6 +406,32 @@ export const ParentComponents = {
 }
 
 export const ChildComponents = {
+
+  "43a6bd01-07f9-4ef0-9279-905b683575ce": {
+    key: routes.feedReviewNavigator,
+    component: StackFeedReview,
+    params: {
+      value: "review_feeds",
+      parentValue: "",
+      key: "43a6bd01-07f9-4ef0-9279-905b683575ce",
+      parentKey: "52f27c5a-44ba-44ba-b0f0-b0b150ea031b"
+    }
+  },
+
+
+
+  "43a6bd01-07f9-4ef0-lkklklklkl-905b683575ce": {
+    key: routes.commentsReviewNavigator,
+    component: StackCommentReview,
+    params: {
+      value: "review_comments",
+      parentValue: "",
+      key: "43a6bd01-07f9-4ef0-lkklklklkl-905b683575ce",
+      parentKey: "52f27c5a-44ba-44ba-b0f0-b0b150ea031b"
+    }
+  },
+
+
   "hhfhhfhfhf-31d9-4154-b3a9-81619gdhb4va": {
     key: routes.InProgressMissionReportNavigator,
     component: StackMissionReport,

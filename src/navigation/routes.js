@@ -61,9 +61,17 @@ const routes = {
   missionNavigator: "MISSION_NAVIGATOR",
   InProgressMissionReportNavigator: "INPROGRESS_MISSION_REPORT_NAVIGATOR",
   completeMissionReportNavigator: "COMPLETED_MISSION_REPORT_NAVIGATOR",
+  feedReviewNavigator:"FEED_REVIEW_NAVIGATOR",
+  commentsReviewNavigator:"COMMENTS_REVIEW_NAVIGATOR",
 
 
   //! ///    Screens'
+
+   //? Feed Review
+   feedReviewScreen:"FEED_REVIEW_SCREEN",
+
+   //? Comment Review
+   comentReviewSceen:"COMMENTS_REVIEW_SCREEN",
 
   //? Mission Report
   missionLevel: "MISSION_LEVEL",
@@ -123,6 +131,10 @@ const routes = {
   //? Mission Control
   missionControlScreen: "MISSION_CONTROL_SCREEN",
   missionControlfilterScreen: "MISSION_CONTROL_FILTER_SCREEN",
+
+  //? Content Review  
+  contentReviewFeed: "CONTENT_REVIEW_FEED",
+  contentReviewComment: "CONTENT_REVIEW_COMMENT",
 
   //? Feed 
   feedScreen: "COSMOS_FEED_SCREEN",
