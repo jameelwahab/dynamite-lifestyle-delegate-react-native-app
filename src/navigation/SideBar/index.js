@@ -307,7 +307,7 @@ const index = (props) => {
 
     return (
       <Pressable
-        key={item.value}
+        key={item._id}
         onPress={() => onOptionClick(item, isCollaseable)}
         style={[{ backgroundColor: isSelected && isCollaseable == false ? colors.lightPrimary3 : undefined, }, __styles.itemRootView]}>
         <MyImage
@@ -334,9 +334,9 @@ const index = (props) => {
     if (!!ChildComponents[item._id]) {
       let isSelected = ChildComponents[item._id].key == props.state.routeNames[props.state.index]
       return (
-        <Collapsible key={item.value} collapsed={findCollapsed(parentItem)}>
+        <Collapsible key={item._id} collapsed={findCollapsed(parentItem)}>
           <Pressable
-            key={item.value}
+            key={item._id}
             onPress={() => changeSideBarChildScreen(item)}
             style={[{ backgroundColor: isSelected ? colors.lightPrimary3 : undefined, }, __styles.itemRootView, __styles.nestedView]}>
             <MyImage source={{ uri: S3_URL + item?.icon }} style={__styles.itemIcon} />
@@ -390,7 +390,7 @@ const index = (props) => {
           if (!!ParentComponents[x._id]) {
             let isCollaseable = Array.isArray(x.child_options);
             return (
-              <View key={x.value}>
+              <View key={x._id}>
                 {optionView(x, i, isCollaseable, user[showDotArray[x?.value]])}
                 {isCollaseable && x?.child_options.map((y, j) => nestedOptionView(y, i, x))}
               </View>)
