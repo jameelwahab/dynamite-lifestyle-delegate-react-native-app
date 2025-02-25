@@ -15,6 +15,7 @@ import routes from "../../navigation/routes"
 import { useNavigation } from "@react-navigation/native"
 import { useEffect, useState } from "react"
 import RootView from "../../components/RootView"
+import isArray from "../../functions/isArray.js"
 
 
 const List = ({ navigation, route }) => {
@@ -37,7 +38,7 @@ const List = ({ navigation, route }) => {
 			setRefreshing(false)
 			setLoading(false)
 		}
-		else{
+		else {
 			setResult([])
 			setLoading(false)
 			setRefreshing(false)
@@ -55,75 +56,79 @@ const List = ({ navigation, route }) => {
 
 	const Header = () => (
 		<>
-		    <View style={{height:10}} />
+			<View style={{ height: 10 }} />
 			<TitleView
 				title={res?.badge_level?.title}
 				titleIcon={route.params.icon}
-				/>
-		    <View style={{height:5}} />
-				{!!res?.badge_level?.detailed_description &&
+			/>
+			<View style={{ height: 5 }} />
+			{!!res?.badge_level?.detailed_description &&
 				<MyWebview
 					fullWidth
 					html={res?.badge_level?.detailed_description?.toString()}
 				/>}
 		</>
 	)
+
+	sectionHeader = ({ section }) => {
+		if (isArray(section?.data)) {
+			return (
+				<View style={{ marginTop: 20, marginBottom: 10 }} >
+					<MyText
+						color={colors.primary}
+						fontSize={16}
+						style={{ fontFamily: fonts.bold }} >{section?.title}</MyText>
+				</View>
+			)
+		}
+		else return null
+	}
+
 	return (
 		<RootView hideSubHeader hideHeader>
-			{loading ?  <MyLoader enable={loading} /> :
-			<SectionList
-				style={__styles.container}
-				sections={[
-				    {
-					title:"Questss",
-					data: res.quests
-				    },
-				    {
-					title:"Missionss",
-					data: res.missions
-				    },
-				]}
-				refreshControl={<MyRefreshControl
-				    refreshing={refreshing}
-				    onRefresh={onRefresh}
-				/>}
-				ListHeaderComponent={
-				    <>
-				    <Header />
-				    <View style={{height:10}} />
-				    <MyText 
-					color={colors.primary}
-					fontSize={16}
-					style={{fontFamily:fonts.bold}}
-					>
-					{(res.quests.length!=0 && "Quest") || (res.missions.length!=0 && "Missions")}
-				    </MyText>
-				    </>
-				}
-				keyExtractor={(item) => item?._id}
-				ListHeaderComponentStyle={{ marginBottom: 10 }}
-				ListEmptyComponent={<EmptyView />}
-				stickySectionHeadersEnabled={false}
-				showsVerticalScrollIndicator={false}
-				ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
-				refreshControl={<MyRefreshControl
-					refreshing={refreshing}
-					onRefresh={onRefresh}
-				/>}
-				renderItem={({ item }) =>
-					<LessonView
-						handlePress={() => nav.navigate(routes.missionDetail,
-							{ 
-							    id: item._id,
-							    heading:item.title,
-							    type: res.quests.length!=0 ? "quest" : "mission"
-							})}
-						heading={item.title}
-						image={item.image.thumbnail_1}
-						desc={item.short_description}
-						duration={item.mission_duration}
+			{loading ? <MyLoader enable={loading} /> :
+				<SectionList
+					style={__styles.container}
+					renderSectionHeader={sectionHeader}
+					sections={[
+						{
+							title: "Quests",
+							data: res.quests
+						},
+						{
+							title: "Missions",
+							data: res.missions
+						},
+					]}
+					refreshControl={<MyRefreshControl
+						refreshing={refreshing}
+						onRefresh={onRefresh}
 					/>}
-			/>}
+					ListHeaderComponent={
+						<>
+							<Header />
+						</>
+					}
+
+					keyExtractor={(item) => item?._id}
+
+					ListEmptyComponent={<EmptyView />}
+					stickySectionHeadersEnabled={false}
+					showsVerticalScrollIndicator={false}
+					ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
+					renderItem={({ item }) =>
+						<LessonView
+							handlePress={() => nav.navigate(routes.missionDetail, {
+								id: item._id,
+								heading: item.title,
+								type: res.quests.length != 0 ? "quest" : "mission"
+							})}
+							heading={item?.title}
+							image={item?.image?.thumbnail_1}
+							desc={item?.short_description}
+							duration={item?.mission_duration}
+						/>}
+				/>}
 		</RootView>
 	)
 }
