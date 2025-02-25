@@ -10,7 +10,7 @@ import MyRefreshControl from '../../../components/MyRefreshControl'
 import FooterLoader from '../../../components/FooterLoader'
 import {colors} from "../../../utilities/colors"
 import { dateTimeFormat } from "../../../utilities/constants"
-import {GET_REVIEW_FEEDS} from '../../../DAL'
+import {GET_REVIEW_FEEDS, APPROVE_REVIEW_FEEDS, DELETE_REVIEW_FEEDS} from '../../../DAL'
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../../redux/reducers/userSlice'
 import { useState, useEffect, useRef } from "react"
@@ -27,7 +27,7 @@ const ReviewFeeds = ({navigation, route}) => {
     const [page, setPage] =useState(0)
     const getFeeds = async ({load=false, pageCount}) => {
 	setLoading(load)
-	const res = await GET_REVIEW_FEEDS({token, navigation, limit:5, page:pageCount})
+	const res = await GET_REVIEW_FEEDS({token, navigation, limit:10, page:pageCount})
 	if(res.code == 200){
 	    if(pageCount==0 || result.length===0) setResult(res?.feeds)
 	    else setResult([...result, ...res?.feeds])
@@ -54,11 +54,11 @@ const ReviewFeeds = ({navigation, route}) => {
     }
     const ref = useRef(null)
     const closeModal = () => setShowModal(false)
-    const handleClick = ()=> ref.current.openModal?.(["Approved", "Disapprove"]);
-    const modalTitle = [{title:"Approved", key:"ap"},{title:"Disapprove", key: "dis"}]
-    const handleSelect=(opt)=> {
-	if(opt.key=="ap") console.log("approved")
-	else if(opt.key=="dis") console.log("disapproved")
+    const handleClick = (id)=> ref.current.openModal?.(id);
+    const modalTitle = [{title:"Approved", key:"ap"},{title:"Delete", key: "del"}]
+    const handleSelect=(opt, id)=> {
+	if(opt.key=="ap")  APPROVE_REVIEW_FEEDS({token, navigation, id}).then(()=> setResult(result.filter(el=> el._id !== id && el))) 
+	else if(opt.key=="del") DELETE_REVIEW_FEEDS({token, navigation, id}).then(()=> setResult(result.filter(el=> el._id !== id && el))) 
     }
     const handleEndReach = () => {
 	if(!loading){
@@ -87,7 +87,7 @@ const ReviewFeeds = ({navigation, route}) => {
 				/>}
 		keyExtractor={(_,index)=> index.toString()}
 		renderItem={({item,index})=> 
-		    renderPosts({feed:item,index, handleClick})}
+		    renderPosts({feed:item,index, handleClick:()=>handleClick(item._id) })}
 	    />
 	    <MyLoader enable={loading}/>
 	</RootView>
@@ -123,10 +123,12 @@ const renderPosts = ({feed, index, handleClick}) => {
 		/>
 	    <StatView title="Appear by" value={feed?.feed_appear_by}/>
 	    <StatView title="Reason" value={feed?.review_info.reason}/>
+	    <View style={{height:10}}/>
+	    <TouchableOpacity activeOpacity={0.5} style={{alignItems:"flex-end"}}>
+		<MyText fontSize={12} color={colors.primary}>View more ...</MyText>
+	    </TouchableOpacity>
 	</View>
     )
 }
-
-
 
 export default ReviewFeeds

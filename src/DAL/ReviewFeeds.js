@@ -8,3 +8,17 @@ export const GET_REVIEW_FEEDS =
       navigation,
     })
   }
+
+export const DELETE_REVIEW_FEEDS =  ({ token, navigation, id}) => invokeApi({
+    path:`api/feeds/${id}`,
+    method:"DELETE",
+    token,
+    navigation,
+})
+
+export const APPROVE_REVIEW_FEEDS = ({token, navigation, id}) => invokeApi({
+    path:`api/feeds/approve/${id}`,
+    method:"GET",
+    token,
+    navigation,
+})
