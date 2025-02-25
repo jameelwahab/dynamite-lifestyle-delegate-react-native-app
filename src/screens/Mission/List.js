@@ -56,12 +56,7 @@ const List = ({ navigation, route }) => {
 
 	const Header = () => (
 		<>
-			<View style={{ height: 10 }} />
-			<TitleView
-				title={res?.badge_level?.title}
-				titleIcon={route.params.icon}
-			/>
-			<View style={{ height: 5 }} />
+			<View style={{height:5}}/>	
 			{!!res?.badge_level?.detailed_description &&
 				<MyWebview
 					fullWidth
@@ -73,7 +68,7 @@ const List = ({ navigation, route }) => {
 	sectionHeader = ({ section }) => {
 		if (isArray(section?.data)) {
 			return (
-				<View style={{ marginTop: 20, marginBottom: 10 }} >
+				<View style={{ marginTop: 15, marginBottom: 10 }} >
 					<MyText
 						color={colors.primary}
 						fontSize={16}
@@ -86,6 +81,13 @@ const List = ({ navigation, route }) => {
 
 	return (
 		<RootView hideSubHeader hideHeader>
+		    {!loading && <View style={{height:40, justifyContent:"center"}}>
+			<TitleView
+			    title={res?.badge_level?.title}
+			    titleIcon={route.params.icon}
+			    />
+			</View> 
+		    }
 			{loading ? <MyLoader enable={loading} /> :
 				<SectionList
 					style={__styles.container}
@@ -93,29 +95,23 @@ const List = ({ navigation, route }) => {
 					sections={[
 						{
 							title: "Quests",
-							data: res.quests
+							data: res?.quests
 						},
 						{
 							title: "Missions",
-							data: res.missions
+							data: res?.missions
 						},
 					]}
 					refreshControl={<MyRefreshControl
 						refreshing={refreshing}
 						onRefresh={onRefresh}
 					/>}
-					ListHeaderComponent={
-						<>
-							<Header />
-						</>
-					}
-
-					keyExtractor={(item) => item?._id}
-
-					ListEmptyComponent={<EmptyView />}
 					stickySectionHeadersEnabled={false}
+					ListHeaderComponent={<Header />}
+					keyExtractor={(item) => item?._id}
+					ListEmptyComponent={<EmptyView />}
+					ItemSeparatorComponent={()=><View style={{height:10}}/>}
 					showsVerticalScrollIndicator={false}
-					ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
 					renderItem={({ item }) =>
 						<LessonView
 							handlePress={() => nav.navigate(routes.missionDetail, {

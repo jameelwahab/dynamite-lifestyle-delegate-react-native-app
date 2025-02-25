@@ -7,6 +7,7 @@ import UserImage from '../../../components/UserImage'
 import StatView from '../../../components/StatView'
 import OptionModal2 from '../../../components/OptionModal2'
 import MyRefreshControl from '../../../components/MyRefreshControl'
+import FooterLoader from '../../../components/FooterLoader'
 import {colors} from "../../../utilities/colors"
 import { dateTimeFormat } from "../../../utilities/constants"
 import {GET_REVIEW_FEEDS} from '../../../DAL'
@@ -22,38 +23,64 @@ const ReviewFeeds = ({navigation, route}) => {
     const [loading, setLoading] = useState(false)
     const [refreshing, setRefresh] = useState(false)
     const [showModal, setShowModal] = useState(false)
-    const getFeeds = async ({load=false}) => {
+    const [showFooterLoader,setShowFooterLoader] = useState(false)
+    const [page, setPage] =useState(0)
+    const getFeeds = async ({load=false, pageCount}) => {
 	setLoading(load)
-	const res = await GET_REVIEW_FEEDS({token, navigation})
+	const res = await GET_REVIEW_FEEDS({token, navigation, limit:5, page:pageCount})
 	if(res.code == 200){
-	    setResult(res?.feeds)
+	    if(pageCount==0 || result.length===0) setResult(res?.feeds)
+	    else setResult([...result, ...res?.feeds])
+	    setLoading(false)
+	    setRefresh(false)
+	    setShowFooterLoader(false)
+	}
+	else{
+	    setResult([])
+	    setPage(0)
 	    setLoading(false)
 	    setRefresh(false)
 	}
     }
 
     useEffect(()=>{
-	getFeeds({load:true})
+	setPage(0)
+	getFeeds({load:true,pageCount:0})
     },[])
 
     const onRefresh = () => {
 	setRefresh(true)
-	getFeeds({load:false})
+	getFeeds({load:false, pageCount:page+1})
     }
     const ref = useRef(null)
     const closeModal = () => setShowModal(false)
     const handleClick = ()=> ref.current.openModal?.(["Approved", "Disapprove"]);
+    const modalTitle = [{title:"Approved", key:"ap"},{title:"Disapprove", key: "dis"}]
+    const handleSelect=(opt)=> {
+	if(opt.key=="ap") console.log("approved")
+	else if(opt.key=="dis") console.log("disapproved")
+    }
+    const handleEndReach = () => {
+	if(!loading){
+	    setShowFooterLoader(true)
+	    setPage(page+1)
+	    getFeeds({load:false})
+	}
+    } 
     return (
 	<RootView hideBackBottomButton title="Review Posts">
 	    <OptionModal2
 		ref={ref}
-		onSelected={(e)=> console.log(e)}
-		optionList={["Approved", "Disapprove"]}
+		onSelected={handleSelect}
+		optionList={modalTitle}
 		/>
 	    <FlatList 
 		data={result}
+		showsVerticalScrollIndicator={false}
 		ListEmptyComponent={!loading && <EmptyView />}
 		ItemSeparatorComponent={<View style={{height:12}}/>}
+		ListFooterComponent={!loading && <FooterLoader isVisible={showFooterLoader}/>}
+		onEndReached={handleEndReach}
 		refreshControl = {<MyRefreshControl 
 					refreshing={refreshing}
 					onRefresh={onRefresh}
@@ -88,7 +115,7 @@ const renderPosts = ({feed, index, handleClick}) => {
 	    </View>
 	    <View style={{height:10}}/>
 	    <StatView title="Description" value={feed?.description}/>
-	    <StatView title="Created For" value={feed?.feed_created_for === "general" && "The Source Code"}/>
+	    <StatView title="Created For" value={feed?.feed_created_for === "general" ? "The Source Code": feed?.feed_created_for}/>
 	    <StatView
 		title="Created At"
 		value={moment(new Date(feed?.createdAt))
