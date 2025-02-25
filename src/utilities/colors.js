@@ -1,8 +1,8 @@
 import { Platform } from "react-native";
 
 export const colors = {
-  primary: "#f6bd4b",
-  golden:"#f6bd4b",
+  primary: "#EDBF60",
+  golden:"#EDBF60",
   primary2: "#EDBF60",
   lightPrimary: '#F6BD4B99',
   lightPrimary2: '#F6BD4B33',
