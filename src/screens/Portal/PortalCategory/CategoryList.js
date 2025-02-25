@@ -22,7 +22,7 @@ import ImageZoomer from '../../../components/ImageZoomer';
 
 
 const CategoryList = ({ navigation, route }) => {
-  const { eventId, slug } = route?.params;
+   const { eventId, slug } = route?.params;
   const { token } = useSelector(selectUser);
   const [loader, setLoader] = useState(true);
   const [list, setList] = useState([]);
