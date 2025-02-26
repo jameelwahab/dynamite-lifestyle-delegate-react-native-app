@@ -92,9 +92,9 @@ const MemberList = ({ navigation, route }) => {
       type: memberTypeObj[access?.show_members_list_for_payment_request],
       mission_type: type,
       body: {
-        from_day: filter?.to,
+        to_day: filter?.to,
         mission_id: filter?._id,
-        to_day: filter?.from
+        from_day: filter?.from
       },
     })
     if (res.code == 200) {
