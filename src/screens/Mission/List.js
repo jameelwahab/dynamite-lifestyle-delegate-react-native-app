@@ -56,7 +56,7 @@ const List = ({ navigation, route }) => {
 
 	const Header = () => (
 		<>
-			<View style={{height:5}}/>	
+			<View style={{ height: 5 }} />
 			{!!res?.badge_level?.detailed_description &&
 				<MyWebview
 					fullWidth
@@ -81,13 +81,13 @@ const List = ({ navigation, route }) => {
 
 	return (
 		<RootView hideSubHeader hideHeader>
-		    {!loading && <View style={{height:40, justifyContent:"center"}}>
-			<TitleView
-			    title={res?.badge_level?.title}
-			    titleIcon={route.params.icon}
-			    />
-			</View> 
-		    }
+			{!loading && <View style={{ height: 40, justifyContent: "center" }}>
+				<TitleView
+					title={res?.badge_level?.title}
+					titleIcon={route.params.icon}
+				/>
+			</View>
+			}
 			{loading ? <MyLoader enable={loading} /> :
 				<SectionList
 					style={__styles.container}
@@ -110,7 +110,7 @@ const List = ({ navigation, route }) => {
 					ListHeaderComponent={<Header />}
 					keyExtractor={(item) => item?._id}
 					ListEmptyComponent={<EmptyView />}
-					ItemSeparatorComponent={()=><View style={{height:10}}/>}
+					ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
 					showsVerticalScrollIndicator={false}
 					renderItem={({ item }) =>
 						<LessonView
