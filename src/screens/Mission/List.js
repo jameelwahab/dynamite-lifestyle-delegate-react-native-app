@@ -8,6 +8,7 @@ import MyWebview from "../../components/MyWebview"
 import EmptyView from '../../components/EmptyView'
 import { colors } from "../../utilities/colors"
 import { fonts } from "../../utilities/fonts"
+import { textSize } from "../../utilities/styles"
 import { GET_MISSION_LIST_ID } from "../../DAL"
 import { selectUser } from '../../redux/reducers/userSlice'
 import { useSelector } from 'react-redux'
@@ -71,7 +72,7 @@ const List = ({ navigation, route }) => {
 				<View style={{ marginTop: 15, marginBottom: 10 }} >
 					<MyText
 						color={colors.primary}
-						fontSize={16}
+						fontSize={textSize.title}
 						style={{ fontFamily: fonts.bold }} >{section?.title}</MyText>
 				</View>
 			)

@@ -6,6 +6,7 @@ import { useState } from "react";
 import MyImage from "./MyImage";
 import MyText from "./MyText";
 import ResponsiveImage3 from "./ResponsiveImage3";
+import { textSize } from "../utilities/styles"
 
 const LessonView = ({ title, style, heading, icon, desc, txtlen = 50, image, handlePress, duration }) => {
 	const [show, setShow] = useState()
@@ -19,16 +20,12 @@ const LessonView = ({ title, style, heading, icon, desc, txtlen = 50, image, han
 			}
 			<Pressable onPress={handlePress}>
 				<View style={[__styles.container, style]} >
-					<View style={{ height: 80, overflow: 'hidden' }}>
+					<View style={{ overflow: 'hidden' }}>
 						{image &&
-							// <MyImage source={{ uri: S3_URL + image }} style={__styles.img} />
-							<ResponsiveImage3
-								width={150}
-								defaultSize={{ width: 150, height: 80 }}
-								style={{ width: "100%" }}
+							<Image
+								style={{ width:145, height:95 }}
 								source={{ uri: S3_URL + image }}
 							/>}
-
 						{duration &&
 							<View style={__styles.imgTag}>
 								<MyText fontSize={10} type="medium" color={colors.black} >{duration} Days</MyText>
@@ -38,7 +35,7 @@ const LessonView = ({ title, style, heading, icon, desc, txtlen = 50, image, han
 					<View style={__styles.sub_container}>
 						<MyText numberOfLines={2} style={__styles.heading}>{heading}</MyText>
 						<View>
-							<Text style={__styles.desc}>{show ? desc : `${desc.slice(0, txtlen)}...`}</Text>
+							<Text numberOfLines={!show && 2} style={__styles.desc}>{desc}</Text>
 							{desc.length > txtlen &&
 								<Text
 									onPress={() => setShow(!show)}
@@ -72,7 +69,7 @@ const __styles = StyleSheet.create({
 	icon_heading: {
 		color: colors.primary,
 		fontFamily: fonts.medium,
-		fontSize: 14,
+		fontSize: textSize.title,
 	},
 	img: {
 		width: 140,
@@ -98,7 +95,7 @@ const __styles = StyleSheet.create({
 	heading: {
 		color: colors.white,
 		fontFamily: fonts.bold,
-		fontSize: 14,
+		fontSize: textSize.title,
 	},
 	desc: {
 		marginTop: 2,

@@ -5,7 +5,7 @@ import { S3_URL } from "../utilities/constants"
 import MyText from "./MyText"
 import MemberView from "./MemberView"
 import { icons } from "../utilities/icons"
-const Contributor = ({ num, name, img, points, user, secondaryText }) => {
+const Contributor = ({ num, name, img, points, user, showBadge=true, secondaryText }) => {
 	const first = require("../assets/icons/1.png")
 	const second = require("../assets/icons/2.png")
 	const third = require("../assets/icons/3.png")
@@ -15,9 +15,9 @@ const Contributor = ({ num, name, img, points, user, secondaryText }) => {
 		<View style={__styles.comp_card}>
 			<View style={__styles.compl_sub}>
 				<View style={__styles.num_cont}>
-					{num == 1 ? icons.firstRank(25) :
-						num == 2 ? icons.secondRank(25) :
-							num == 3 ? icons.thirdRank(25) :
+					{(num == 1 && showBadge) ? icons.firstRank(25) :
+						(num == 2 && showBadge) ? icons.secondRank(25) :
+							(num == 3 && showBadge) ? icons.thirdRank(25) :
 								<MyText>{num}.</MyText>}
 				</View>
 				<MemberView

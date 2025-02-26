@@ -3,6 +3,8 @@ import React from 'react'
 import { colors } from '../utilities/colors'
 import { fonts } from '../utilities/fonts'
 import { icons } from '../utilities/icons'
+import  MyText from './MyText'
+import { textSize } from '../utilities/styles'
 
 
 const MyButton = ({
@@ -63,6 +65,24 @@ const MyClearButton = ({
   )
 }
 
+const MyButton2 = ({
+  title = "",
+  icon = () => { },
+  onPress = () => { },
+  style = {},
+  color = colors.lightPrimary2
+}) => {
+  return (
+    <TouchableOpacity
+      activeOpacity={0.3}
+      onPress={onPress}>
+      <View style={{backgroundColor:color,paddingHorizontal:10, paddingVertical:5, borderRadius:30,}} >
+        {icon?.()}
+        {!!title && <MyText color={colors.primary}  fontSize={textSize.mini}>{title}</MyText>}
+      </View>
+    </TouchableOpacity>
+  )
+}
 
 const TransparentButton = ({
   title = "",
@@ -84,7 +104,7 @@ const TransparentButton = ({
   )
 }
 
-const MenuButton = ({ backgroundColor = colors.lightPrimary3, size = 25, onPress = () => { }, style, touchgap = 15 }) => {
+const MenuButton = ({ backgroundColor = colors.lightPrimary3, title, textStyle, noCapitalize,  size = 25, onPress = () => { }, style, touchgap = 15 }) => {
   return (
     <TouchableOpacity
       onPress={onPress}
@@ -101,7 +121,9 @@ const MenuButton = ({ backgroundColor = colors.lightPrimary3, size = 25, onPress
   )
 }
 
-export { MyButton, TransparentButton, MenuButton, MyClearButton }
+export { MyButton, MyButton2, TransparentButton, MenuButton, MyClearButton }
+
+
 
 const __MyButtonStyles = StyleSheet.create({
   rootView: {
