@@ -12,6 +12,8 @@ import MyWebview from "../../components/MyWebview"
 import WebPlayer from "../../components/WebPlayer"
 import MyImage from "../../components/MyImage"
 import {MyButton2} from "../../components/MyButton"
+import moment from 'moment'
+import { dateTimeFormat, months } from "../../utilities/constants"
 import { fonts } from "../../utilities/fonts"
 import { colors } from "../../utilities/colors"
 import { icons } from "../../utilities/icons"
@@ -158,9 +160,10 @@ const TrackerList = ({ res, type }) => {
 }
 
 
-const Header = ({ res, show, showBadges }) => {
-
+const Header = ({ res, show, showBadges,quest }) => {
     
+	const startDate =  `${moment(res?.start_date).format(dateTimeFormat.date).split('-')[0]} ${months[Number(moment(res?.start_date).format(dateTimeFormat.date).split('-')[1])-1].short}`
+	const endDate =  `${moment(res?.end_date).format(dateTimeFormat.date).split('-')[0]} ${months[Number(moment(res?.end_date).format(dateTimeFormat.date).split('-')[1])-1].short}`
 
 	return (
 		<>
@@ -181,8 +184,8 @@ const Header = ({ res, show, showBadges }) => {
 					totalCoins={res?.rewarded_coins}
 					badges={res?.badge_configration}
 					questReplayAccessDays={res.replay_days}
-					dateString={`${res.end_date}`}
-					isQuest={type=="quest"}
+					dateString={`${startDate} - ${endDate}`}
+					isQuest={quest}
 					showEarnedBadges={false}
 					showBadgesEarned={false}
 				/>}
@@ -233,7 +236,7 @@ const Overview = ({ token, navigation, id, type, showBadges }) => {
 			data={[1]}
 			ListEmptyComponent={!loading && <EmptyView />}
 			ListHeaderComponent={
-				<Header res={res} show={type == "mission" } showBadges={showBadges}/>
+				<Header res={res} show={type == "mission" } quest={type=="quest"} showBadges={showBadges}/>
 			}
 			refreshControl={<MyRefreshControl
 				refreshing={refreshing}

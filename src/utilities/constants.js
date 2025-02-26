@@ -451,3 +451,78 @@ export const TimeZones = [
   "Pacific/Apia",
   "Africa/Johannesburg",
 ];
+
+export const months = [
+   {
+    name: "January",
+    short: "JAN",
+    number: 1,
+    days: 31
+  },
+   {
+    name: "February",
+    short: "FEB",
+    number: 2,
+    days: 28
+  },
+   {
+    name: "March",
+    short: "MAR",
+    number: 3,
+    days: 31
+  },
+   {
+    name: "April",
+    short: "APR",
+    number: 4,
+    days: 30
+  },
+   {
+    name: "May",
+    short: "MAY",
+    number: 5,
+    days: 31
+  },
+   {
+    name: "June",
+    short: "JUN",
+    number: 6,
+    days: 30
+  },
+   {
+    name: "July",
+    short: "JUL",
+    number: 7,
+    days: 31
+  },
+   {
+    name: "August",
+    short: "AUG",
+    number: 8,
+    days: 31
+  },
+  {
+    name: "September",
+    short: "SEP",
+    number: 9,
+    days: 30
+  },
+  {
+    name: "October",
+    short: "OCT",
+    number: 10,
+    days: 31
+  },
+  {
+    name: "November",
+    short: "NOV",
+    number: 11,
+    days: 30
+  },
+  {
+    name: "December",
+    short: "DEC",
+    number: 12,
+    days: 31
+  }
+]
