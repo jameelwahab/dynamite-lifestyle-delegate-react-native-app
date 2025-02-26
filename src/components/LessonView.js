@@ -36,7 +36,7 @@ const LessonView = ({ title, style, heading, icon, desc, txtlen = 50, hanldeCopy
 					<View style={__styles.sub_container}>
 						<MyText numberOfLines={2} style={__styles.heading}>{heading}</MyText>
 						<View>
-						    <Text numberOfLines={!show && 2} style={__styles.desc}>{desc}</Text>
+						    <Text numberOfLines={!show ? 2 : 100} style={__styles.desc}>{desc}</Text>
 						    {copyEnable && <View style={{height:5}}/>}
 						    <View style={{flexDirection:'row', alignItems:'center',justifyContent:desc.length > txtlen ? "space-between" : "flex-end"}}>
 							{desc.length > txtlen &&
