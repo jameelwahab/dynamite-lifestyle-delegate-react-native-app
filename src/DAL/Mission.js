@@ -31,3 +31,10 @@ export const GET_MISSION_SCHEDULE = ({token,navigation,id})=> invokeApi({
     navigation,
 })
 
+export const GET_MISSION_APP_LINK = ({token , navigation, mission_id, type}) => invokeApi({
+    path:"api/member/create/branch_code_v1",
+    method:"POST",
+    token,
+    navigation,
+    postData:{ type, mission_id }
+})

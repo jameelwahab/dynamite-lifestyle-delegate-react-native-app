@@ -9,7 +9,8 @@ import EmptyView from '../../components/EmptyView'
 import { colors } from "../../utilities/colors"
 import { fonts } from "../../utilities/fonts"
 import { textSize } from "../../utilities/styles"
-import { GET_MISSION_LIST_ID } from "../../DAL"
+import copyText from "../../functions/copyText"
+import { GET_MISSION_LIST_ID,GET_MISSION_APP_LINK } from "../../DAL"
 import { selectUser } from '../../redux/reducers/userSlice'
 import { useSelector } from 'react-redux'
 import routes from "../../navigation/routes"
@@ -44,6 +45,18 @@ const List = ({ navigation, route }) => {
 			setLoading(false)
 			setRefreshing(false)
 		}
+	}
+	const handleCopyMethod = (link,mission_id, type) => {
+	    if(link){
+		copyText(link)
+	    }
+	    else{
+		GET_MISSION_APP_LINK({token, navigation,mission_id, type }).then(res=> {
+		    if(res.code==200){
+			copyText(res.url)
+		    }
+		})
+	    }
 	}
 
 	useEffect(() => {
@@ -118,8 +131,10 @@ const List = ({ navigation, route }) => {
 							handlePress={() => nav.navigate(routes.missionDetail, {
 								id: item._id,
 								heading: item.title,
-								type: res.quests.length != 0 ? "quest" : "mission"
+								type: item.type
 							})}
+							copyEnable={true}
+							hanldeCopy={()=> handleCopyMethod(item.app_branch_url, item._id, item.type)}
 							heading={item?.title}
 							image={item?.image?.thumbnail_1}
 							desc={item?.short_description}
