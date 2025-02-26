@@ -99,7 +99,7 @@ const MissionDetail = ({ navigation, route }) => {
 					token={token}
 					navigation={navigation}
 					id={route.params.id}
-					showBadges={(route.params.type == "quest" && tab == 1)}
+					showBadges={tab == 1}
 					type={route.params.type}
 				/>}
 				{ ( (route.params.type=="quest" && tab == 2) || (route.params.type == "mission" && tab==1) ) && <Community route={route} navigation={navigation} />}
@@ -236,7 +236,7 @@ const Overview = ({ token, navigation, id, type, showBadges }) => {
 			data={[1]}
 			ListEmptyComponent={!loading && <EmptyView />}
 			ListHeaderComponent={
-				<Header res={res} show={type == "mission" } quest={type=="quest"} showBadges={showBadges}/>
+				<Header res={res} show={type == "mission" } quest={type=="quest"} showBadges={showBadges || type=="mission"}/>
 			}
 			refreshControl={<MyRefreshControl
 				refreshing={refreshing}
