@@ -127,6 +127,18 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
     </View>
   )
 
+  const inRevivewView = () => {
+    console.log(item, "feed")
+    return (
+      <View style={__style.review}>
+        <MyText color={colors.primary} fontSize={16} type='medium' >Reivew Reason</MyText>
+        <View style={{ marginTop: 3 }}>
+          <MyText color={colors.lightText2} type='regular' >{item?.review_info?.reason}</MyText>
+        </View>
+      </View>
+    )
+  }
+
   const descriptionView = () => (
     <View style={__style.descriptionRootView}>
       {!!item?.description &&
@@ -405,7 +417,9 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
           <View >
             {profileView()}
             {descriptionView()}
-            {item?.is_publish &&
+            {item?.review_status == "pending" ?
+              inRevivewView() :
+              item?.is_publish &&
               <>
                 {statsView()}
                 {actionView()}
@@ -558,5 +572,14 @@ const __style = StyleSheet.create({
   likeView: { flexDirection: "row", alignItems: "center", paddingVertical: 2, },
   likeImagesView: { flexDirection: "row", alignItems: "center", marginLeft: 5 },
   likeImageView: { width: 18, height: 18, borderRadius: 18 / 2, overflow: "hidden", borderWidth: 2, borderColor: colors.white },
-  likeImage: { width: 16, height: 16 }
+  likeImage: { width: 16, height: 16 },
+  review: {
+    marginTop: 10,
+    // backgroundColor:colors.lightPrimary2
+    borderLeftWidth: 3,
+    borderLeftColor: colors.primary,
+    borderRadius: 5,
+    padding: 5,
+    backgroundColor: colors.primary + "0F"
+  }
 })

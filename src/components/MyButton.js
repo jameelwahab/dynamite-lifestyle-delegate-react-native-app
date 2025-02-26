@@ -84,7 +84,7 @@ const TransparentButton = ({
   )
 }
 
-const MenuButton = ({ backgroundColor = colors.lightPrimary3, size = 25, onPress = () => { }, style, touchgap = 15 }) => {
+const MenuButton = ({ marginHorizontal = 5, backgroundColor = colors.lightPrimary3, size = 25, onPress = () => { }, style, touchgap = 15 }) => {
   return (
     <TouchableOpacity
       onPress={onPress}
@@ -92,7 +92,7 @@ const MenuButton = ({ backgroundColor = colors.lightPrimary3, size = 25, onPress
       style={[{
         height: size, width: size, borderRadius: size / 2, alignItems: "center", justifyContent: "center",
         backgroundColor: backgroundColor,
-        marginHorizontal: 5,
+        marginHorizontal: marginHorizontal,
       }, style]}
 
     >

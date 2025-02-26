@@ -149,4 +149,5 @@ export const icons = {
   messageFilled: (color = colors.white, size = 20) => { return (<Ionicons name="chatbox" color={color} size={size} />) },
   warnOuline: (color = colors.white, size = 20) => { return (<Ionicons name="warning-outline" color={color} size={size} />) },
   unread: (color = colors.white, size = 20) => { return (<MaterialCommunityIcons name="message-badge-outline" color={color} size={size} />) },
+  check_circle: (color = colors.primary, size = 17) => { return (<Octicons name="check-circle" color={color} size={size} />) },
 }
