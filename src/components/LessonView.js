@@ -1,13 +1,15 @@
-import { Image, Platform, Pressable, StyleSheet, Text, TouchableWithoutFeedback, View } from "react-native"
+import { Image, Platform, Pressable, StyleSheet, Text, TouchableWithoutFeedback, TouchableOpacity, View } from "react-native"
 import { fonts } from "../utilities/fonts";
 import { colors } from "../utilities/colors";
+import { icons } from "../utilities/icons";
 import { S3_URL } from "../utilities/constants";
 import { useState } from "react";
 import MyImage from "./MyImage";
 import MyText from "./MyText";
 import ResponsiveImage3 from "./ResponsiveImage3";
+import { textSize } from "../utilities/styles"
 
-const LessonView = ({ title, style, heading, icon, desc, txtlen = 50, image, handlePress, duration }) => {
+const LessonView = ({ title, style, heading, icon, desc, txtlen = 50, hanldeCopy, copyEnable=false, image, handlePress, duration }) => {
 	const [show, setShow] = useState()
 	return (
 		<>
@@ -19,16 +21,12 @@ const LessonView = ({ title, style, heading, icon, desc, txtlen = 50, image, han
 			}
 			<Pressable onPress={handlePress}>
 				<View style={[__styles.container, style]} >
-					<View style={{ height: 80, overflow: 'hidden' }}>
+					<View style={{ overflow: 'hidden' }}>
 						{image &&
-							// <MyImage source={{ uri: S3_URL + image }} style={__styles.img} />
-							<ResponsiveImage3
-								width={150}
-								defaultSize={{ width: 150, height: 80 }}
-								style={{ width: "100%" }}
+							<Image
+								style={{ width:145, height:95 }}
 								source={{ uri: S3_URL + image }}
 							/>}
-
 						{duration &&
 							<View style={__styles.imgTag}>
 								<MyText fontSize={10} type="medium" color={colors.black} >{duration} Days</MyText>
@@ -38,14 +36,25 @@ const LessonView = ({ title, style, heading, icon, desc, txtlen = 50, image, han
 					<View style={__styles.sub_container}>
 						<MyText numberOfLines={2} style={__styles.heading}>{heading}</MyText>
 						<View>
-							<Text style={__styles.desc}>{show ? desc : `${desc.slice(0, txtlen)}...`}</Text>
+						    <Text numberOfLines={!show && 2} style={__styles.desc}>{desc}</Text>
+						    {copyEnable && <View style={{height:5}}/>}
+						    <View style={{flexDirection:'row', alignItems:'center',justifyContent:desc.length > txtlen ? "space-between" : "flex-end"}}>
 							{desc.length > txtlen &&
-								<Text
-									onPress={() => setShow(!show)}
-									style={__styles.showText}>
-									{show ? "See Less" : "See More"}
-								</Text>
+							    <Text
+								onPress={() => setShow(!show)}
+								style={__styles.showText}>
+								{show ? "See Less" : "See More"}
+							    </Text>
 							}
+							{copyEnable &&
+								<TouchableOpacity
+								    style={{marginRight:5}}
+								    onPress={hanldeCopy}
+								    activeOpacity={0.5}
+									>
+								    {icons.copyOulined(15)}
+								</TouchableOpacity>}
+						    </View>
 						</View>
 					</View>
 				</View>
@@ -72,7 +81,7 @@ const __styles = StyleSheet.create({
 	icon_heading: {
 		color: colors.primary,
 		fontFamily: fonts.medium,
-		fontSize: 14,
+		fontSize: textSize.title,
 	},
 	img: {
 		width: 140,
@@ -98,7 +107,7 @@ const __styles = StyleSheet.create({
 	heading: {
 		color: colors.white,
 		fontFamily: fonts.bold,
-		fontSize: 14,
+		fontSize: textSize.title,
 	},
 	desc: {
 		marginTop: 2,

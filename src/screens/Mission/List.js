@@ -8,7 +8,9 @@ import MyWebview from "../../components/MyWebview"
 import EmptyView from '../../components/EmptyView'
 import { colors } from "../../utilities/colors"
 import { fonts } from "../../utilities/fonts"
-import { GET_MISSION_LIST_ID } from "../../DAL"
+import { textSize } from "../../utilities/styles"
+import copyText from "../../functions/copyText"
+import { GET_MISSION_LIST_ID,GET_MISSION_APP_LINK } from "../../DAL"
 import { selectUser } from '../../redux/reducers/userSlice'
 import { useSelector } from 'react-redux'
 import routes from "../../navigation/routes"
@@ -44,6 +46,18 @@ const List = ({ navigation, route }) => {
 			setRefreshing(false)
 		}
 	}
+	const handleCopyMethod = (link,mission_id, type) => {
+	    if(link){
+		copyText(link)
+	    }
+	    else{
+		GET_MISSION_APP_LINK({token, navigation,mission_id, type }).then(res=> {
+		    if(res.code==200){
+			copyText(res.url)
+		    }
+		})
+	    }
+	}
 
 	useEffect(() => {
 		getMissionList(true)
@@ -71,7 +85,7 @@ const List = ({ navigation, route }) => {
 				<View style={{ marginTop: 15, marginBottom: 10 }} >
 					<MyText
 						color={colors.primary}
-						fontSize={16}
+						fontSize={textSize.title}
 						style={{ fontFamily: fonts.bold }} >{section?.title}</MyText>
 				</View>
 			)
@@ -117,8 +131,10 @@ const List = ({ navigation, route }) => {
 							handlePress={() => nav.navigate(routes.missionDetail, {
 								id: item._id,
 								heading: item.title,
-								type: res.quests.length != 0 ? "quest" : "mission"
+								type: item.type
 							})}
+							copyEnable={true}
+							hanldeCopy={()=> handleCopyMethod(item.app_branch_url, item._id, item.type)}
 							heading={item?.title}
 							image={item?.image?.thumbnail_1}
 							desc={item?.short_description}

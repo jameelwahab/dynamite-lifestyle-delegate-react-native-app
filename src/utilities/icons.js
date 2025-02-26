@@ -59,6 +59,8 @@ export const icons = {
   firstRank: (size = 20) => <Image source={require('../assets/icons/1.png')} style={{ height: size, width: size, }} />,
   secondRank: (size = 20) => <Image source={require('../assets/icons/2.png')} style={{ height: size, width: size, }} />,
   thirdRank: (size = 20) => <Image source={require('../assets/icons/3.png')} style={{ height: size, width: size, }} />,
+  casinoWhite: (size = 20) => <Image source={require('../assets/icons/casinoWhite.png')} style={{ height: size, width: size, }} />,
+  casinoPrimary: (size = 20) => <Image source={require('../assets/icons/casinoPrimary.png')} style={{ height: size, width: size, }} />,
   user: () => { return (<FontAwesome6 name="user-large" color={colors.primary} size={17} />) },
   backMajor: (color = colors.primary, size = 20) => { return (<Ionicons name="arrow-back-outline" color={color} size={size} />) },
   copy: (color = colors.primary, size = 17) => { return (<Ionicons name="copy" color={color} size={size} />) },

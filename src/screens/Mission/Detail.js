@@ -1,10 +1,8 @@
-import { View, Text, StyleSheet, FlatList, Image, Pressable } from "react-native"
-import TitleView from "../../components/TitleView"
+import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, Pressable } from "react-native"
 import RootView from "../../components/RootView"
 import MyLoader from "../../components/MyLoader"
 import EmptyView from '../../components/EmptyView'
 import FooterLoader from '../../components/FooterLoader'
-import Tabs from "../../components/Tabs"
 import utilities from "../../utilities"
 import MyText from "../../components/MyText"
 import VimeoWithPip from "../../components/VimeoWithPip"
@@ -13,10 +11,12 @@ import Contributor from "../../components/Contributor"
 import MyWebview from "../../components/MyWebview"
 import WebPlayer from "../../components/WebPlayer"
 import MyImage from "../../components/MyImage"
+import {MyButton2} from "../../components/MyButton"
 import { fonts } from "../../utilities/fonts"
 import { colors } from "../../utilities/colors"
 import { icons } from "../../utilities/icons"
 import { S3_URL } from "../../utilities/constants"
+import { textSize } from "../../utilities/styles"
 import { GET_MISSION_DETAIL, GET_MISSION_INFO } from "../../DAL"
 import { selectUser } from '../../redux/reducers/userSlice'
 import LiveChat from "../../components/LiveChat"
@@ -28,6 +28,8 @@ import { useState, useRef } from "react"
 import routes from "../../navigation/routes"
 import { useNavigation } from "@react-navigation/native"
 import FeedScreen from "../Feed/FeedScreen"
+import Dashboard from "react-native-vector-icons/MaterialCommunityIcons"
+import Feather from "react-native-vector-icons/Feather"
 
 const List = (props) => {
 	return (
@@ -37,21 +39,40 @@ const List = (props) => {
 	)
 }
 
+
 const MissionDetail = ({ navigation, route }) => {
 	const { token, user } = useSelector(selectUser);
 	const [tab, setTab] = useState(0)
 	const [showChat, setShowChat] = useState(false)
 	const tab_list = [
-		{ title: "Mission Overview" },
-		{ title: "Community" },
-		{ title: "Completed" },
-		route.params.type != "quest" &&
-		{ title: "In Progress" },
+		{ title: <Dashboard name="view-dashboard-outline" size={20} color={tab== 0 ? colors.primary : colors.white} /> } ,
+		{ title: <Feather name="target" size={20} color={tab== 1 ? colors.primary : colors.white} /> },
+		{ title: <Feather name="users" size={20} color={tab== 2 ? colors.primary : colors.white} /> },
 	]
-
+	const tab_mission = [
+		{ title: <Feather name="target" size={20} color={tab== 1 ? colors.primary : colors.white} /> },
+		{ title: <Feather name="users" size={20} color={tab== 2 ? colors.primary : colors.white} /> },
+	]
+	const Tabs = ({list, tab, style, changeTab})=> {
+	    return (
+		<View style={[{flexDirection:"row", alignItems:"center"}, style]}>
+		     {list.map((el,index)=> (route.params.type!="missino" && index!=0) &&
+			<TouchableOpacity
+			    onPress={ ()=> changeTab(index) }
+			    key={index}
+			    style={{alignItems:"center",  marginLeft:index!=0 ? 30 : 0}}
+			    >
+				{el.title}
+			    <View style={{height:3}} />
+			    <View style={{width:50, height:3,borderRadius:10, backgroundColor:index == tab ? colors.primary : colors.transparent }}/>
+			</TouchableOpacity>
+	    )}
+	</View>
+    )
+}
 	return (
 		<View style={{ flex: 1 }}>
-			{tab == 0 && <LiveChat
+			{tab < 2 && <LiveChat
 				flex={0.59}
 				isVisible={showChat}
 				closeModal={() => setShowChat(false)}
@@ -69,9 +90,9 @@ const MissionDetail = ({ navigation, route }) => {
 							{icons.backMajor(colors.primary, 26)}
 						</Pressable>
 						<View style={{ width: 5 }} />
-						<MyText type="bold" fontSize={16} color={colors.primary}> {route.params.heading || "The Source Code"} </MyText>
+						<MyText type="bold" fontSize={textSize.title} color={colors.primary}> {route.params.heading || "The Source Code"} </MyText>
 					</View>
-					{(tab == 0 && route.params.type == "quest") ?
+					{(tab < 2 && route.params.type == "quest") ?
 						<Pressable onPress={() => setShowChat(true)}>
 							{icons.chat(colors.primary, 23)}
 						</Pressable> : <View />
@@ -81,22 +102,24 @@ const MissionDetail = ({ navigation, route }) => {
 				<Tabs
 					list={tab_list}
 					tab={tab}
-					style={{ zIndex: 10 }}
+					style={{ marginTop:15,marginBottom:10,  borderBottomWidth:0.5, borderColor:colors.border }}
 					changeTab={(e) => setTab(e)}
 				/>
-				{tab == 0 && <Overview
+				{tab < 2 && <Overview
 					token={token}
 					navigation={navigation}
 					id={route.params.id}
 					type={route.params.type}
 				/>}
-				{tab == 1 && <Community route={route} navigation={navigation} />}
-				{tab > 1 && <MissionContributor token={token} navigation={navigation} id={route.params.id} tab={tab} />}
+				{tab == 2 && <Community route={route} navigation={navigation} />}
+				{tab == 3 && <MissionContributor token={token} navigation={navigation} type={route.params.type} id={route.params.id} tab={tab} />}
 			</View>
 		</View>
 	)
 
 }
+
+
 
 const TrackerList = ({ res, type }) => {
 	const nav = useNavigation()
@@ -108,7 +131,7 @@ const TrackerList = ({ res, type }) => {
 			showsVerticalScrollIndicator={false}
 			data={res?.mission_schedules}
 			ListHeaderComponent={
-				<Text style={__styles.heading}>{res.content_settings.schedule_heading}</Text>
+				<MyText color={colors.primary} type="bold" fontSize={textSize.title}>{res?.content_settings?.schedule_heading}</MyText>
 			}
 			ListHeaderComponentStyle={{ marginBottom: 10 }}
 			KeyExtraction={(_, index) => index.toString()}
@@ -208,7 +231,7 @@ const Overview = ({ token, navigation, id, type }) => {
 			ListHeaderComponentStyle={{ marginBottom: 20 }}
 			keyExtraction={(_, index) => index.toString()}
 			renderItem={({ _ }) =>
-				res?.mission_schedules?.length != 0 && <TrackerList res={res} type={type} />
+				 <TrackerList res={res} type={type} />
 			}
 		/>
 	)
@@ -233,26 +256,29 @@ const Community = ({ navigation, route }) => {
 	)
 }
 
-const MissionContributor = ({ token, tab, navigation, id }) => {
+const MissionContributor = ({ token, tab, navigation, id,type }) => {
 	const [res, setResult] = useState([])
 	const [loading, setLoading] = useState(true)
 	const [refreshing, setRefreshing] = useState(false)
 	const [page, setPage] = useState(0)
 	const [canLoadMore, setCanLoadMore] = useState(true)
+	const [enablePagination, setEnablePagination]=useState(true)
 
 	const getList = async ({loader=false, pageToLoad}) => {
 		setLoading(loader)
 		const resu = await GET_MISSION_INFO({
-			token, navigation, id, page:pageToLoad,limit:10, type: tab==2  ? "mission_leaderboard": "coins_leaderboard"
+			token, navigation, id, page:pageToLoad,limit:15, type: "mission_leaderboard" 
 		})
 		if (resu.code == 200) {
-			const result = tab == 2 ? resu.streak_leader_board_stats : resu.coins_leader_board_stats
-			if(pageToLoad!=0)
+			const result =  resu.streak_leader_board_stats
+			if(pageToLoad!=0 && enablePagination)
 			    setResult([...res, ...result])
-			else setResult(result)
+			else if(!enablePagination)  setResult(result)
+			else  setResult(result)
+
 			setLoading(false)
 			setRefreshing(false);
-			setCanLoadMore(tab==2 ? resu.streak_load_more != "" : resu.coins_load_more!="")
+			setCanLoadMore(resu.streak_load_more != "")
 		}
 	}
 
@@ -269,12 +295,23 @@ const MissionContributor = ({ token, tab, navigation, id }) => {
 		setPage(0)
 	}
 	const handleReachEnd = () =>{
-	   if(canLoadMore){
+	   if(canLoadMore && enablePagination){
 	       getList({loader:false, pageToLoad:page+1})
 	       setPage(page+1)
 	   } 
 	} 
 	if (loading) return <MyLoader enable={loading} />
+	const Heading = () => {
+	    return (
+		<View style={{flexDirection:"row", justifyContent:"space-between", marginVertical:8}}>
+		    <MyText type="bold" color={colors.primary} fontSize={textSize.title}>Quest Members</MyText>
+		    <MyButton2
+			title={ `View ${enablePagination ? "Less" : "More"}`}
+			onPress={()=> setEnablePagination(!enablePagination) || (enablePagination && (setResult(res.slice(0,15)) || setPage(0) ) )}
+		    />
+		</View>
+	    )
+	}
 	return (
 		<>
 			<FlatList
@@ -283,7 +320,8 @@ const MissionContributor = ({ token, tab, navigation, id }) => {
 				showsVerticalScrollIndicator={false}
 				ItemSeparatorComponent={<View style={{ height: 10 }} />}
 				ListEmptyComponent={!loading && <EmptyView />}
-				ListFooterComponent={<FooterLoader isVisible={canLoadMore} />}
+				ListFooterComponent={<FooterLoader isVisible={canLoadMore && enablePagination} />}
+				ListHeaderComponent={<Heading />}
 				onEndReached={handleReachEnd}
 				refreshControl={<MyRefreshControl
 					refreshing={refreshing}
@@ -291,12 +329,13 @@ const MissionContributor = ({ token, tab, navigation, id }) => {
 				/>}
 				renderItem={({ item, index }) =>
 					<Contributor
-						secondaryText={tab == 3 ? `${item?.completed_mission_days}/${item?.mission_duration}` : ""}
+						secondaryText={type=="mission" ? `${item?.completed_mission_days}/${item?.mission_duration}` : ""}
 						num={index + 1}
+						showBadge={false}
 						name={`${item.user_info.first_name} ${item.user_info.last_name}`}
 						user={item?.user_info}
 						img={item.user_info.profile_image}
-						points={item.mission_attracted_coins} />
+						points={type == "mission" ? item.mission_attracted_coins : ""} />
 				} />
 		</>
 	);

@@ -84,12 +84,9 @@ const ReviewFeeds = ({ navigation, route }) => {
 
 	const onDetail = (feed) => {
 		navigation.navigate(routes?.feedDetailScreen, {
-			// feed,
 			feedId: feed?._id,
 			feedFor: feed?.feed_created_for == "general" ? "all_source" : feed?.feed_created_for,
 			reviewCallback: removeFromList
-			// eventId:,
-			// feedFor:,
 		})
 
 	}
@@ -172,31 +169,19 @@ const renderPosts = ({ feed, index, handleClick, onDetail }) => {
 
 	}
 	return (
-		<View style={{ backgroundColor: colors.secondary, padding: 10, borderRadius: 10 }}>
+		<View style={{ backgroundColor: colors.secondary, padding: 10, borderRadius: 10 }} key={index}>
 			<View style={{ flexDirection: "row", aligItems: "center", justifyContent: "space-between" }}>
 				<MemberView
-					// borderColor={feed?.badge_level_info?.color_code}
 					member={feed.action_info}
 					hideEmail
 				/>
-				{/* <View style={{ flexDirection: "row", alignItems: 'center' }}>
-					<UserImage size={30} image={feed.action_info.profile_image} />
-					<View style={{ width: 10 }} />
-					<MyText fontSize={14} type='bold'>{feed.action_info.name}</MyText>
-				</View> */}
+				
 				<MenuButton
 					marginHorizontal={0}
 					onPress={handleClick}
 					size={20}
 				/>
-				{/* <TouchableOpacity
-					onPress={handleClick}
-					activeOpacity={0.5} style={{ backgroundColor: colors.border, width: 24.5, height: 24.5, borderRadius: 33, alignItems: "center", justifyContent: "center" }}>
-					{[...Array(3)].map((el, index) =>
-						<View key={index} style={{ width: 3, height: 3, borderRadius: 30, backgroundColor: colors.primary, marginTop: index == 0 ? 0 : 2.5 }} />
-					)}
-				</TouchableOpacity> */}
-			</View>
+			 </View>
 			<View style={{ height: 10 }} />
 			<StatView title="Description" value={feed?.description} numberOfLinesValues={2} />
 			<StatView title="Created For" value={getFeedType(feed)} />
