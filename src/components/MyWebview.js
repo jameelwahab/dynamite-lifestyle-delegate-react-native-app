@@ -101,7 +101,7 @@ export class MyWebview extends Component {
             color: colors.primary,
             textDecorationColor: colors.primary,
             fontFamily: this.props.html.includes("<b>") ? undefined : fonts.regular,
-            fontSize: 14,
+            fontSize: 16,
             margin: 0,
           },
           div: {
@@ -110,33 +110,89 @@ export class MyWebview extends Component {
             margin: 0,
             // padding: 0,
           },
+          span: {
+
+            fontFamily: !!this.props?.html.includes("<b>") ? undefined : fonts.light,
+            margin: 0,
+            // marginTop: 5,
+            lineHeight: 20,
+            fontSize: 13,
+            color: this.props?.invert ? colors.black : colors.lightText,
+
+          },
           p: {
             margin: 0,
-            color: this.props?.invert ? colors.black : colors.white,
+            fontSize: 13,
+            marginTop: 5,
+            lineHeight: 20,
+            color: this.props?.invert ? colors.black : colors.lightText,
+          },
+
+          ul: {
+            margin: 0,
+            marginTop: 5,
+            fontFamily: fonts.regular,
+            lineHeight: 20,
+            fontSize: 13,
+            color: this.props?.invert ? colors.black : colors.lightText,
+            // textAlign: "center"
           },
           h1: {
             margin: 0,
-            color: this.props?.invert ? colors.black : colors.white,
+            marginTop: 5,
+            color: this.props?.invert ? colors.black : colors.primary,
+            fontWeight: Platform.OS == "android" ? "normal" : undefined,
+            fontFamily: fonts.bold,
           },
           h2: {
             margin: 0,
-            color: colors.primary
+            color: colors.primary,
+            marginTop: 5,
+            fontSize: 18,
+            fontWeight: Platform.OS == "android" ? "normal" : undefined,
+            fontFamily: fonts.bold,
           },
           h3: {
             margin: 0,
-            color: this.props?.invert ? colors.black : colors.white,
+            marginTop: 5,
+            fontSize: 16,
+            fontFamily: fonts.bold,
+            fontWeight: Platform.OS == "android" ? "normal" : undefined,
+            color: this.props?.invert ? colors.black : colors.primary,
           },
           h4: {
             margin: 0,
+            marginTop: 5,
+            fontSize: 14,
+            fontFamily: fonts.medium,
+            fontWeight: Platform.OS == "android" ? "normal" : undefined,
             color: this.props?.invert ? colors.black : colors.white,
           },
           h5: {
             margin: 0,
+            marginTop: 5,
+            fontSize: 12,
+            fontFamily: fonts.medium,
+            fontWeight: Platform.OS == "android" ? "normal" : undefined,
             color: this.props?.invert ? colors.black : colors.white,
           },
           h6: {
             margin: 0,
+            marginTop: 5,
+            fontSize: 10,
+            fontFamily: fonts.medium,
+            fontWeight: Platform.OS == "android" ? "normal" : undefined,
             color: this.props?.invert ? colors.black : colors.white,
+          },
+          strong: {
+
+            fontFamily: fonts.bold,
+            fontWeight: Platform.OS == "android" ? "normal" : undefined,
+
+          },
+          b: {
+            fontFamily: fonts.bold,
+            fontWeight: Platform.OS == "android" ? "normal" : undefined,
           },
           img: {
             marginTop: 5,
