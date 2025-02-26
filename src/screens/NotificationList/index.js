@@ -96,12 +96,15 @@ const NotificationList = ({ navigation, route }) => {
     let { notification_type } = item;
     if (feedType.includes(notification_type)) {
       let navigator = "";
+      console.log(item,"item")
       if ((item?.tab_type == "the_cosmos" || item?.notification_type == "feed_mentioned") && !!navbar.find(x => x.value == "the_cosmos")) {
         navigator = routes.feedNavigator;
       } else if (item?.tab_type == "event") {
         navigator = routes.portalNavigator;
       } else if (item?.tab_type == "program") {
         navigator = routes.trainingNavigator;
+      } else if (item?.tab_type == "mission") {
+        navigator = routes.missionNavigator;
       } else {
         if (!!navbar.find(x => x.value == "all_source_feed"))
           navigator = routes.allSourcesFeedNavigator;
@@ -109,7 +112,7 @@ const NotificationList = ({ navigation, route }) => {
           navigator = routes.sourceFeedNavigator;
       }
 
-      console.log(navigator, "navigator")
+
 
       if (!!navigator) {
         let params = { feedId: item?.feeds?._id };
@@ -119,7 +122,12 @@ const NotificationList = ({ navigation, route }) => {
         } else if (item?.tab_type == "program") {
           params["eventId"] = item?.module_id
           params["feedFor"] = "program"
+        } else if (item?.tab_type == "mission") {
+          params["eventId"] = item?.module_id
+          params["feedFor"] = "mission"
         }
+
+
         if (notification_type == "addcomment" || notification_type == "addcommentreply" || notification_type == "commentlike" || notification_type == "feed_comment_mentioned") {
           params["openCommentModal"] = true;
         }
@@ -171,25 +179,57 @@ const NotificationList = ({ navigation, route }) => {
               }
             }],
           })
-        } else {
+        } else if (item?.tab_type == "mission") {
+          console.log(navigator,"navigator")
           navigation.reset({
             routes: [{
               name: navigator,
               state: {
-                routes: [{
-                  name: routes.feedScreen,
-                },
-                {
-                  name: routes.feedDetailScreen,
-                  params: params
-                }],
+                routes: [
+                  {
+                    name: routes.missionLevel,
+                  },
+                  {
+                    name: routes.missionList,
+                    params: {
+                      id: item?.module_info?.level_id,
+                    }
+                  },
+                  {
+                    name: routes.missionDetail,
+                    params: {
+                      id: item?.module_info?.mission_id,
+                      type: item?.module_info?.type,
+                      curTab: "community"
+                    }
+                  },
+                  {
+                    name: routes.feedDetailScreen,
+                    params: params
+                  }],
               }
             }],
           })
         }
+      } else {
+        navigation.reset({
+          routes: [{
+            name: navigator,
+            state: {
+              routes: [{
+                name: routes.feedScreen,
+              },
+              {
+                name: routes.feedDetailScreen,
+                params: params
+              }],
+            }
+          }],
+        })
       }
+    }
 
-    } else if (notification_type === "goal_statement_completed") {
+    else if (notification_type === "goal_statement_completed") {
       navigation.reset({
         routes: [{
           name: routes.goalStatementCompleteNavigator,
