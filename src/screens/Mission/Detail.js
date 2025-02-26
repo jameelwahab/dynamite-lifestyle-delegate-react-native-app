@@ -44,33 +44,21 @@ const MissionDetail = ({ navigation, route }) => {
 	const { token, user } = useSelector(selectUser);
 	const [tab, setTab] = useState(0)
 	const [showChat, setShowChat] = useState(false)
-	const tab_list = [
+
+	const tab_quest = [
 		{ title: <Dashboard name="view-dashboard-outline" size={20} color={tab== 0 ? colors.primary : colors.white} /> } ,
 		{ title: <Feather name="target" size={20} color={tab== 1 ? colors.primary : colors.white} /> },
 		{ title: <Feather name="users" size={20} color={tab== 2 ? colors.primary : colors.white} /> },
 	]
+
 	const tab_mission = [
-		{ title: <Feather name="target" size={20} color={tab== 1 ? colors.primary : colors.white} /> },
-		{ title: <Feather name="users" size={20} color={tab== 2 ? colors.primary : colors.white} /> },
+		{ title: <Feather name="target" size={20} color={tab== 0 ? colors.primary : colors.white} /> },
+		{ title: <Feather name="users" size={20} color={tab== 1 ? colors.primary : colors.white} /> },
 	]
-	const Tabs = ({list, tab, style, changeTab})=> {
+	
+	console.log( ((route.params.type == "quest" && tab==0 ) || ( route.params.type == "mission" && tab == 0 )) && "hello")
+
 	    return (
-		<View style={[{flexDirection:"row", alignItems:"center"}, style]}>
-		     {list.map((el,index)=> (route.params.type!="missino" && index!=0) &&
-			<TouchableOpacity
-			    onPress={ ()=> changeTab(index) }
-			    key={index}
-			    style={{alignItems:"center",  marginLeft:index!=0 ? 30 : 0}}
-			    >
-				{el.title}
-			    <View style={{height:3}} />
-			    <View style={{width:50, height:3,borderRadius:10, backgroundColor:index == tab ? colors.primary : colors.transparent }}/>
-			</TouchableOpacity>
-	    )}
-	</View>
-    )
-}
-	return (
 		<View style={{ flex: 1 }}>
 			{tab < 2 && <LiveChat
 				flex={0.59}
@@ -100,25 +88,42 @@ const MissionDetail = ({ navigation, route }) => {
 				</View>
 
 				<Tabs
-					list={tab_list}
+					list={ route.params.type=="mission" ? tab_mission : tab_quest }
 					tab={tab}
 					style={{ marginTop:15,marginBottom:10,  borderBottomWidth:0.5, borderColor:colors.border }}
 					changeTab={(e) => setTab(e)}
 				/>
-				{tab < 2 && <Overview
+				{ ( (route.params.type == "quest" && tab < 2) || (route.params.type == "mission" && tab == 0) ) && <Overview
 					token={token}
 					navigation={navigation}
 					id={route.params.id}
+					showBadges={(route.params.type == "quest" && tab == 1)}
 					type={route.params.type}
 				/>}
-				{tab == 2 && <Community route={route} navigation={navigation} />}
-				{tab == 3 && <MissionContributor token={token} navigation={navigation} type={route.params.type} id={route.params.id} tab={tab} />}
+				{ ( (route.params.type=="quest" && tab == 2) || (route.params.type == "mission" && tab==1) ) && <Community route={route} navigation={navigation} />}
 			</View>
 		</View>
 	)
 
 }
 
+const Tabs = ({list, tab, style, changeTab})=> {
+	    return (
+		<View style={[{flexDirection:"row", alignItems:"center"}, style]}>
+		     {list.map((el,index)=>
+			<TouchableOpacity
+			    onPress={ ()=> changeTab(index) }
+			    key={index}
+			    style={{alignItems:"center",  marginLeft:index!=0 ? 30 : 0}}
+			    >
+				{el.title}
+			    <View style={{height:3}} />
+			    <View style={{width:50, height:3,borderRadius:10, backgroundColor:index == tab ? colors.primary : colors.transparent }}/>
+			</TouchableOpacity>
+	    )}
+	</View>
+    )
+}
 
 
 const TrackerList = ({ res, type }) => {
@@ -153,7 +158,10 @@ const TrackerList = ({ res, type }) => {
 }
 
 
-const Header = ({ res, show }) => {
+const Header = ({ res, show, showBadges }) => {
+
+    
+
 	return (
 		<>
 			{res.video_url != "" ?
@@ -167,11 +175,14 @@ const Header = ({ res, show }) => {
 					style={{ width: "100%", height: 250 }} />
 			}
 			<View style={{ height: 10 }} />
-			{show &&
+			{showBadges &&
 				<MissionRewardView
 					duration={res?.mission_duration}
 					totalCoins={res?.rewarded_coins}
 					badges={res?.badge_configration}
+					questReplayAccessDays={res.replay_days}
+					dateString={`${res.end_date}`}
+					isQuest={type=="quest"}
 					showEarnedBadges={false}
 					showBadgesEarned={false}
 				/>}
@@ -181,7 +192,7 @@ const Header = ({ res, show }) => {
 	)
 }
 
-const Overview = ({ token, navigation, id, type }) => {
+const Overview = ({ token, navigation, id, type, showBadges }) => {
 	const [res, setResult] = useState([])
 	const [loading, setLoading] = useState(true)
 	const [refreshing, setRefreshing] = useState(false)
@@ -222,7 +233,7 @@ const Overview = ({ token, navigation, id, type }) => {
 			data={[1]}
 			ListEmptyComponent={!loading && <EmptyView />}
 			ListHeaderComponent={
-				<Header res={res} show={type == "mission"} />
+				<Header res={res} show={type == "mission" } showBadges={showBadges}/>
 			}
 			refreshControl={<MyRefreshControl
 				refreshing={refreshing}
@@ -256,90 +267,6 @@ const Community = ({ navigation, route }) => {
 	)
 }
 
-const MissionContributor = ({ token, tab, navigation, id,type }) => {
-	const [res, setResult] = useState([])
-	const [loading, setLoading] = useState(true)
-	const [refreshing, setRefreshing] = useState(false)
-	const [page, setPage] = useState(0)
-	const [canLoadMore, setCanLoadMore] = useState(true)
-	const [enablePagination, setEnablePagination]=useState(true)
-
-	const getList = async ({loader=false, pageToLoad}) => {
-		setLoading(loader)
-		const resu = await GET_MISSION_INFO({
-			token, navigation, id, page:pageToLoad,limit:15, type: "mission_leaderboard" 
-		})
-		if (resu.code == 200) {
-			const result =  resu.streak_leader_board_stats
-			if(pageToLoad!=0 && enablePagination)
-			    setResult([...res, ...result])
-			else if(!enablePagination)  setResult(result)
-			else  setResult(result)
-
-			setLoading(false)
-			setRefreshing(false);
-			setCanLoadMore(resu.streak_load_more != "")
-		}
-	}
-
-
-	useEffect(() => {
-		setPage(0)
-		if (tab > 1) getList({loader:true, pageToLoad:0})
-	}, [tab])
-
-
-	const onRefresh = () => {
-		setRefreshing(true);
-		getList({loader:false, pageToLoad:0})
-		setPage(0)
-	}
-	const handleReachEnd = () =>{
-	   if(canLoadMore && enablePagination){
-	       getList({loader:false, pageToLoad:page+1})
-	       setPage(page+1)
-	   } 
-	} 
-	if (loading) return <MyLoader enable={loading} />
-	const Heading = () => {
-	    return (
-		<View style={{flexDirection:"row", justifyContent:"space-between", marginVertical:8}}>
-		    <MyText type="bold" color={colors.primary} fontSize={textSize.title}>Quest Members</MyText>
-		    <MyButton2
-			title={ `View ${enablePagination ? "Less" : "More"}`}
-			onPress={()=> setEnablePagination(!enablePagination) || (enablePagination && (setResult(res.slice(0,15)) || setPage(0) ) )}
-		    />
-		</View>
-	    )
-	}
-	return (
-		<>
-			<FlatList
-				data={res}
-				keyExtraction={(_, index) => index.toString()}
-				showsVerticalScrollIndicator={false}
-				ItemSeparatorComponent={<View style={{ height: 10 }} />}
-				ListEmptyComponent={!loading && <EmptyView />}
-				ListFooterComponent={<FooterLoader isVisible={canLoadMore && enablePagination} />}
-				ListHeaderComponent={<Heading />}
-				onEndReached={handleReachEnd}
-				refreshControl={<MyRefreshControl
-					refreshing={refreshing}
-					onRefresh={onRefresh}
-				/>}
-				renderItem={({ item, index }) =>
-					<Contributor
-						secondaryText={type=="mission" ? `${item?.completed_mission_days}/${item?.mission_duration}` : ""}
-						num={index + 1}
-						showBadge={false}
-						name={`${item.user_info.first_name} ${item.user_info.last_name}`}
-						user={item?.user_info}
-						img={item.user_info.profile_image}
-						points={type == "mission" ? item.mission_attracted_coins : ""} />
-				} />
-		</>
-	);
-}
 
 const __styles = StyleSheet.create({
 	container: {
