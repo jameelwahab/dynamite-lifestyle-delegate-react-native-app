@@ -132,7 +132,7 @@ const ReviewFeeds = ({ navigation, route }) => {
 						refreshing={refreshing}
 						onRefresh={onRefresh}
 					/>}
-					keyExtractor={(item) => item?._id}
+					keyExtractor={(_,index) => index.toString()}
 					renderItem={({ item, index }) =>
 						renderPosts({
 							feed: item, index,
