@@ -22,6 +22,7 @@ import MemberView from '../../../components/MemberView';
 import { icons } from '../../../utilities/icons';
 
 const ReviewFeeds = ({ navigation, route }) => {
+	const ref = useRef(null)
 	const { token, access } = useSelector(selectUser);
 	const [result, setResult] = useState()
 	const [loading, setLoading] = useState(false)
@@ -49,23 +50,22 @@ const ReviewFeeds = ({ navigation, route }) => {
 		}
 	}
 
-	useEffect(() => {
-		setPage(0)
-		getFeeds({ load: true, pageCount: 0 })
-	}, [])
 
+	
 	const onRefresh = () => {
 		setRefresh(true)
 		getFeeds({ load: false, pageCount: page + 1 })
 	}
 
-	const ref = useRef(null)
+
 
 	const closeModal = () => {
 		setShowModal(false)
 	}
 
-	const handleClick = (id) => ref.current.openModal?.(id);
+	const handleClick = (id) => {
+		ref.current.openModal?.(id);
+	}
 
 
 
@@ -112,31 +112,43 @@ const ReviewFeeds = ({ navigation, route }) => {
 		})
 	}
 
+	useEffect(() => {
+		setPage(0)
+		getFeeds({ load: true, pageCount: 0 })
+	}, [])
+
+
+
+
 	return (
 		<RootView hideBackBottomButton title="Review Posts">
+
+			<View style={{ flex: 1 }}>
+				<FlatList
+					data={result}
+					showsVerticalScrollIndicator={false}
+					ListEmptyComponent={!loading && <EmptyView />}
+					ItemSeparatorComponent={<View style={{ height: 12 }} />}
+					ListFooterComponent={!loading && <FooterLoader isVisible={showFooterLoader} />}
+					onEndReached={handleEndReach}
+					refreshControl={<MyRefreshControl
+						refreshing={refreshing}
+						onRefresh={onRefresh}
+					/>}
+					keyExtractor={(item) => item?._id}
+					renderItem={({ item, index }) =>
+						renderPosts({
+							feed: item, index,
+							handleClick: () => handleClick(item._id),
+							onDetail: () => onDetail(item),
+						})}
+				/>
+			</View>
+
 			<OptionModal2
 				ref={ref}
 				onSelected={handleSelect}
 				optionList={filterOptions()}
-			/>
-			<FlatList
-				data={result}
-				showsVerticalScrollIndicator={false}
-				ListEmptyComponent={!loading && <EmptyView />}
-				ItemSeparatorComponent={<View style={{ height: 12 }} />}
-				ListFooterComponent={!loading && <FooterLoader isVisible={showFooterLoader} />}
-				onEndReached={handleEndReach}
-				refreshControl={<MyRefreshControl
-					refreshing={refreshing}
-					onRefresh={onRefresh}
-				/>}
-				keyExtractor={(item) => item?._id}
-				renderItem={({ item, index }) =>
-					renderPosts({
-						feed: item, index,
-						handleClick: () => handleClick(item._id),
-						onDetail: () => onDetail(item),
-					})}
 			/>
 			<MyLoader enable={loading} />
 		</RootView>

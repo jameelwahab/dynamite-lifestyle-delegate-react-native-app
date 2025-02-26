@@ -6,6 +6,7 @@ import Mission from "../../screens/Mission"
 import List from "../../screens/Mission/List.js"
 import Schedule from "../../screens/Mission/Schedule.js"
 import Detail from "../../screens/Mission/Detail.js"
+import FeedDetail from "../../screens/Feed/Detail"
 import { defaultScreens } from "./defaultScreens"
 
 const MissionStack = createNativeStackNavigator()
@@ -35,6 +36,11 @@ const StackMission = ({ route }) => {
 				initialParams={routes.params}
 				name={routes.missionSchedule}
 				component={Schedule}
+			/>
+
+			<MissionStack.Screen
+				name={routes.feedDetailScreen}
+				component={FeedDetail}
 			/>
 
 			{/* ye extra screens hoti hain jo har jaga se call ki jaye */}

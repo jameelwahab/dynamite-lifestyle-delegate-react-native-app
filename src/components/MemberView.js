@@ -9,7 +9,7 @@ const MemberView = ({ member, borderColor = null, showPhoneNumber = false, margi
   return (
 
     <View style={{ marginLeft, height: 35, flexDirection: "row", alignItems: "center", }}>
-      <UserImage image={image} borderColor={borderColor} borderWidth={!!borderColor ? 2 : 0} name={!!member?.name ? member?.name : member?.first_name} size={size} />
+      <UserImage image={image} borderColor={borderColor} borderWidth={!!borderColor ? 2 : 0} name={!!member?.name ? member?.name : member?.first_name} size={!!borderColor ? size + 2 : size} />
       <View style={{ marginLeft: 10 }}>
         <View style={{ flexDirection: "row" }}>
           <MyText type='bold' fontSize={titleSize} >{!!member?.name ? member?.name : `${member?.first_name} ${member?.last_name}`}</MyText>

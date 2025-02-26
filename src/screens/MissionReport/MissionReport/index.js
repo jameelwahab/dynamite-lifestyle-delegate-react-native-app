@@ -178,7 +178,7 @@ const MissionReport = ({ navigation, route }) => {
         }
 
 
-        {!hasPermission &&
+        {hasPermission &&
           <>
             {!!compareChartData && isArray(compareChartData?.datasets) &&
               <View style={{}}>

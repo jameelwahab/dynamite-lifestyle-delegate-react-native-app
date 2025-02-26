@@ -15,13 +15,14 @@ import TitleView from '../../../components/TitleView'
 import { icons } from '../../../utilities/icons'
 import SearchView from '../../../components/SearchView'
 import FooterLoader from '../../../components/FooterLoader'
-import StatView from '../../Members/Components/StatView'
+// import StatView from '../../Members/Components/StatView'
 import { Flex, Row } from '../../../UIComponents/FlexViews'
 import { convertTimezone2 } from '../../../functions/convertTime'
 import { selectTimeZone } from '../../../redux/reducers/timezoneSlice'
 import { dateTimeFormat, S3_URL } from '../../../utilities/constants'
 import MyChip from "../../../components/MyChip"
 import MyImage from '../../../components/MyImage'
+import StatView from '../../../components/StatView'
 
 
 
@@ -33,7 +34,6 @@ const MemberList = ({ navigation, route }) => {
   const paging = useRef({ page: 0, canLoadMore: false })?.current;
   const { navbar } = useSelector(selectNavbar);
   const { user, token, access } = useSelector(selectUser);
-  console.log(access, "access")
   const timezone = useSelector(selectTimeZone);
   const [title] = useState(navbar?.find(x => x._id == parentKey)?.child_options?.find(y => y._id == key)?.title);
   const [searchText, setSearchText] = useState("")
@@ -138,25 +138,29 @@ const MemberList = ({ navigation, route }) => {
   const renderProgress = useCallback(({ item, index }) => {
     return (
       <Pressable onPress={() => onMissionList(item)} style={__styles.itemView}>
-        <Row >
+        <Row alignItems="center" >
           <Flex flex={1}>
-            <MemberView member={item?.member} />
+            <MemberView
+              member={item?.member}
+              borderColor={item?.member?.membership_level_badge_info?.membership_level_badge_color_code}
+            />
           </Flex>
 
-          <MyImage source={{ uri: S3_URL + item?.member?.membership_level_badge_info?.membership_level_badge_icon?.thumbnail_1 }}
+          <MyImage
+            source={{ uri: S3_URL + item?.member?.membership_level_badge_info?.membership_level_badge_icon?.thumbnail_1 }}
             style={{ height: 20, width: 20, marginHorizontal: 5 }}
             resizeMode="contain"
           />
           {icons.forwardArrow()}
         </Row>
         {/* <StatView title={"Badge Level"} value={item?.mission_info?.membership_level_info?.badge_level_info?.title} /> */}
-        <StatView title={"Mission Title"} value={item?.mission_info?.title} />
+        <StatView title={"Mission Title"} value={item?.mission_info?.title}  original />
         <StatView title={"Duration"} value={item?.mission_duration + " days"} />
         <StatView title={"Coins Earned"} value={item?.mission_attracted_coins} />
         <StatView title={"Acheivable Coins"} value={item?.mission_reward_coins} />
-        <StatView title={"Mission Start Date"} value={convertTimezone2(item?.mission_start_date, timezone).format(dateTimeFormat.date)} />
+        <StatView title={"Start Date"} value={convertTimezone2(item?.mission_start_date, timezone).format(dateTimeFormat.date)} />
         {isCompleted &&
-          <StatView title={"Mission Completed Date"} value={convertTimezone2(item?.mission_completed_date, timezone).format(dateTimeFormat.date)} />}
+          <StatView title={"Completed Date"} value={convertTimezone2(item?.mission_completed_date, timezone).format(dateTimeFormat.date)} />}
       </Pressable>
     )
   }, [JSON.stringify(list)])
@@ -174,11 +178,12 @@ const MemberList = ({ navigation, route }) => {
             <TouchableOpacity
               onPress={onFilterScreen}
               style={__styles.filterButton}
-              hitSlop={{ bottom: 5, top: 5, left: 5, right: 5 }}
-            >
+              hitSlop={{ bottom: 5, top: 5, left: 5, right: 5 }}>
               {icons.filterCircle(colors.primary, 30)}
             </TouchableOpacity>}
         </View>
+
+
         <View style={{ flexDirection: 'row' }}>
           {!!filter?.from && filter?.to &&
             <MyChip
@@ -186,12 +191,12 @@ const MemberList = ({ navigation, route }) => {
               title={filter?.title}
             />
           }
+
           {!!filter?.from && filter?.to &&
             <MyChip
               onPress={() => filterTheData({})}
               title={`Days: ${filter?.from}-${filter?.to}`}
-            />
-          }
+            />}
         </View>
 
       </View>
@@ -268,7 +273,7 @@ const __styles = StyleSheet.create({
     // borderWidth: 1,
     borderColor: colors.primary,
     borderRadius: 10,
-    paddingHorizontal: 15,
+    // paddingHorizontal: 15,
     // paddingVertical: 8
   },
 

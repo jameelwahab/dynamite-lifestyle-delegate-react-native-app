@@ -1,11 +1,21 @@
 import { View, Text, TouchableOpacity } from 'react-native'
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import MyInputs from './MyInputs'
 import { icons } from '../utilities/icons'
 import { colors } from '../utilities/colors'
 import { SimpleLoader } from './MyLoader'
 
 const SearchView = ({ search = "", onChangeText, onSearchPress, loader = false, hideBtn = false }) => {
+
+  const crossBtn = useRef({ isPressed: false })?.current;
+
+  useEffect(() => {
+    if (crossBtn.isPressed) {
+      crossBtn.isPressed = false
+      onSearchPress?.()
+    }
+  }, [search])
+
   return (
     <View style={{ flexDirection: "row", alignItems: "center" }}>
       <View style={{ flex: 1, marginTop: -15, }}>
@@ -14,7 +24,10 @@ const SearchView = ({ search = "", onChangeText, onSearchPress, loader = false, 
           value={search}
           placeholder='Search...'
           onChangeText={onChangeText}
-          rightIconOnPress={() => onChangeText("")}
+          rightIconOnPress={() => {
+            crossBtn.isPressed = true
+            onChangeText("")
+          }}
           noSpace
           isSearch={true}
           onSubmitEditing={onSearchPress}

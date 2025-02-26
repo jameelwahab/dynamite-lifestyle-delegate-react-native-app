@@ -73,8 +73,8 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
           image={item?.action_info?.profile_image}
           name={item?.action_info?.name}
           backgroundTransparent={true}
-          borderWidth={isCosmos || isNoteMainFeed ? 1 / 4 : 2}
-          borderColor={!(isCosmos || isNoteMainFeed) ? item?.badge_level_info?.color_code : undefined}
+          borderWidth={isCosmos ? 1 / 4 : 2}
+          borderColor={!isCosmos ? item?.badge_level_info?.color_code : undefined}
           size={35}
         />
         <View style={__style.profileNameView}>
@@ -93,7 +93,7 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
             style={{ tintColor: colors.primary, height: 25, width: 25 }}
           />
         </TouchableOpacity>}
-      {(!(!!isNoteMainFeed) && (!!item?.badge_level_info?.icon?.thumbnail_1 || isCosmos)) &&
+      {(!!item?.badge_level_info?.icon?.thumbnail_1 || isCosmos) &&
         <View >
           <MyImage
             indicatorProps={{ color: colors.secondaryVariant }}

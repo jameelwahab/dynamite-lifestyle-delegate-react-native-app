@@ -1,13 +1,13 @@
 import {
-    View, Text,StyleSheet, FlatList,
-    ScrollView, TouchableOpacity,
-    SafeAreaView, Pressable,
-    TextInput,
+	View, Text, StyleSheet, FlatList,
+	ScrollView, TouchableOpacity,
+	SafeAreaView, Pressable,
+	TextInput,
 } from "react-native"
 import Modal from 'react-native-modal'
-import {MyButton, MyClearButton } from '../../../components/MyButton'
-import {useState, useEffect} from "react"
-import {GET_MISSION_FILTER_LIST} from "../../../DAL"
+import { MyButton, MyClearButton } from '../../../components/MyButton'
+import { useState, useEffect } from "react"
+import { GET_MISSION_FILTER_LIST } from "../../../DAL"
 import { colors } from '../../../utilities/colors'
 import { icons } from '../../../utilities/icons'
 import { fonts } from '../../../utilities/fonts'
@@ -20,229 +20,230 @@ import MyLoader from '../../../components/MyLoader'
 import MyText from '../../../components/MyText'
 import routes from "../../../navigation/routes"
 
-const FilterScreen = ({navigation,route}) => {
-    const [isCalendarModalVisible, setCalendarModalVisiblity] = useState(false)
-    const { token } = useSelector(selectUser);
-    const [duration, setDuration] = useState({from:"", to:"" })
-    const [select, setSelected] = useState({
-	title: "", from: 0, to: 0, _id:"",
-	end_limit:0,
-    })
-    const [list, setList] = useState([])
+const FilterScreen = ({ navigation, route }) => {
+	const [isCalendarModalVisible, setCalendarModalVisiblity] = useState(false)
+	const { token } = useSelector(selectUser);
+	const [duration, setDuration] = useState({ from: "", to: "" })
+	const [select, setSelected] = useState({
+		title: "", from: 0, to: 0, _id: "",
+		end_limit: 0,
+	})
+	const [list, setList] = useState([])
 
-    const getList = async () => {
-	const res = await GET_MISSION_FILTER_LIST({token,navigation})
-	if(res.code == 200){
-	    setList(res.missions)
-	}
-	else{
-	    navigation.goBack()
-	}
-    }
-
-    useEffect(()=>{
-	getList()
-    },[])
-    useEffect(()=> {
-	setSelected(route.params.filter)
-	setDuration({from : route?.params?.filter?.from || "", to: route?.params?.filter?.end_limit || ""})
-    },[route])
-
-    const handleSubmit = () => {
-	navigation.navigate(routes.missionMembers, {filter: {...select, end_limit:duration.to}})
-    }
-
-  const CalendarModal = () => {
-    return (
-      <Modal
-        isVisible={isCalendarModalVisible}
-        onBackdropPress={() => setCalendarModalVisiblity(false)}
-        onBackButtonPress={() => setCalendarModalVisiblity(false)}
-        useNativeDriverForBackdrop={true}
-        animationIn='slideInUp'
-        animationOut='slideOutDown'
-        animationInTiming={300}
-        animationOutTiming={300}
-        style={{ margin: 10 }}>
-        <SafeAreaView style={{ backgroundColor: colors.secondaryVariant, borderRadius: 10, }} >
-	    <View style={{ margin: 10 }}>
-	    <Pressable
-		onPress={() => {
-		setCalendarModalVisiblity(false)
-	    }}
-	    style={{ padding: 5, alignSelf: "flex-end" }}>
-		{icons.crosss(colors.primary)}
-	    </Pressable>
-	    <FlatList 
-		data={list}
-		showsVerticalScrollIndicator={false}
-		style={{height:300}}
-		keyExtractor={item=> item?._id}
-		renderItem={({item})=>
-		    <TouchableOpacity
-			onPress={()=>{
-			    setCalendarModalVisiblity(false)
-			    setSelected({_id:item?._id, title:item?.title, from: 1, to:item?.mission_duration })
-			    setDuration({from: 1, to:item?.mission_duration })
-			}}
-			style={__style.list_sub_container}>
-			<MyText>{item?.title}</MyText>
-		    </TouchableOpacity>
+	const getList = async () => {
+		const res = await GET_MISSION_FILTER_LIST({ token, navigation })
+		if (res.code == 200) {
+			setList(res.missions)
 		}
-	    />
-	    </View>
-	</SafeAreaView>
-      </Modal>
-    )
-  }
-    return (
-    <RootView title='Filter' >
-	{CalendarModal()}
-      <View style={{ flex: 1 }}>
-        <ScrollView contentContainerStyle={{ paddingHorizontal: 10 }}>
-	    <View style={{height:10}}/> 
-	    <View style={__style.top_view_con}>
-		<Pressable 
-		    style={{flex:0.8,}}
-		    onPress={()=> setCalendarModalVisiblity(true)}>
-		    <MyText>{select?.title || "Missions"}</MyText>
-		</Pressable>
-		<View style={{flexDirection:'row'}}>
-		    {select?.title &&
-		    <Pressable style={__style.icons_container} onPress={()=> setSelected({title:"", from:0, to:0})}>
-			<Icon name="close" size={15} color={colors.lightText} />
-		    </Pressable>
-		    }
-		    <View style={{width:15}}/> 
-			<Pressable 
-			    style={__style.icons_container}
-			    onPress={()=> setCalendarModalVisiblity(true) }>
-			    <Icon name="caretdown" size={12} color={colors.primary} />
-			</Pressable>
-		</View>
-	    </View>
-	    <View style={{height:25}}/> 
-	    {select?.title && 
-	    <>
-		<MyText color={colors.primary}>Duration from {duration.from} to {duration.to}</MyText>
-		<View style={{height:10}}/> 
-		<View style={__style.date_form_con}>
-		    <MyInputs
-			handleTextChange={(txt)=>
-			    txt<duration.to
-			    &&
-			    setSelected({...select, from:txt})
-			}
-			label='From*'
-			max_length={select.to.toString().length}
-			placeholder={"1"}
-			keyboardType="phone-pad"
-			icon={() => icons.calendar(colors.primary, 20)}
-			value={select.from}
-		    />
-		<View style={{width:10}}/> 
-		<MyInputs
-		    label='To*'
-		    max_length={2}
-		    handleTextChange={(txt)=>
-			txt <= duration.to
-			&&
-			setSelected({...select, to:txt})
-		    }
-		    placeholder={"7"}
-		    icon={() => icons.calendar(colors.primary, 20)}
-		    value={select.to}
-		/>
-	    </View>
-	    </>
-	    }
+		else {
+			navigation.goBack()
+		}
+	}
 
-	    <View style={{height:10}}/> 
+	useEffect(() => {
+		getList()
+	}, [])
+	
+	useEffect(() => {
+		setSelected(route.params.filter)
+		setDuration({ from: route?.params?.filter?.from || "", to: route?.params?.filter?.end_limit || "" })
+	}, [route])
 
-	    <View style={{ flexDirection: "row", marginTop: 10 }}>
-		<MyClearButton
-		    onPress={()=>setSelected({
-			title: "", from: 0, to: 0, _id:"",
-			end_limit:0,
-			})}
-		    style={{ flex: 1, marginRight: 10 }}
-		    title='Clear Filter'
-		/>
-		<View style={{ flex: 1 }}>
-		<MyButton
-		    onPress={handleSubmit}
-		    title='Submit'
-		/>
-            </View>
+	const handleSubmit = () => {
+		navigation.navigate(routes.missionMembers, { filter: { ...select, end_limit: duration.to } })
+	}
 
-          </View>
+	const CalendarModal = () => {
+		return (
+			<Modal
+				isVisible={isCalendarModalVisible}
+				onBackdropPress={() => setCalendarModalVisiblity(false)}
+				onBackButtonPress={() => setCalendarModalVisiblity(false)}
+				useNativeDriverForBackdrop={true}
+				animationIn='slideInUp'
+				animationOut='slideOutDown'
+				animationInTiming={300}
+				animationOutTiming={300}
+				style={{ margin: 10 }}>
+				<SafeAreaView style={{ backgroundColor: colors.secondaryVariant, borderRadius: 10, }} >
+					<View style={{ margin: 10 }}>
+						<Pressable
+							onPress={() => {
+								setCalendarModalVisiblity(false)
+							}}
+							style={{ padding: 5, alignSelf: "flex-end" }}>
+							{icons.crosss(colors.primary)}
+						</Pressable>
+						<FlatList
+							data={list}
+							showsVerticalScrollIndicator={false}
+							style={{ height: 300 }}
+							keyExtractor={item => item?._id}
+							renderItem={({ item }) =>
+								<TouchableOpacity
+									onPress={() => {
+										setCalendarModalVisiblity(false)
+										setSelected({ _id: item?._id, title: item?.title, from: 1, to: item?.mission_duration })
+										setDuration({ from: 1, to: item?.mission_duration })
+									}}
+									style={__style.list_sub_container}>
+									<MyText>{item?.title}</MyText>
+								</TouchableOpacity>
+							}
+						/>
+					</View>
+				</SafeAreaView>
+			</Modal>
+		)
+	}
+	return (
+		<RootView title='Filter' >
+			{CalendarModal()}
+			<View style={{ flex: 1 }}>
+				<ScrollView contentContainerStyle={{ paddingHorizontal: 10 }}>
+					<View style={{ height: 10 }} />
+					<View style={__style.top_view_con}>
+						<Pressable
+							style={{ flex: 0.8, }}
+							onPress={() => setCalendarModalVisiblity(true)}>
+							<MyText>{select?.title || "Missions"}</MyText>
+						</Pressable>
+						<View style={{ flexDirection: 'row' }}>
+							{select?.title &&
+								<Pressable style={__style.icons_container} onPress={() => setSelected({ title: "", from: 0, to: 0 })}>
+									<Icon name="close" size={15} color={colors.lightText} />
+								</Pressable>
+							}
+							<View style={{ width: 15 }} />
+							<Pressable
+								style={__style.icons_container}
+								onPress={() => setCalendarModalVisiblity(true)}>
+								<Icon name="caretdown" size={12} color={colors.primary} />
+							</Pressable>
+						</View>
+					</View>
+					<View style={{ height: 25 }} />
+					{select?.title &&
+						<>
+							<MyText color={colors.primary}>Duration from {duration.from} to {duration.to}</MyText>
+							<View style={{ height: 10 }} />
+							<View style={__style.date_form_con}>
+								<MyInputs
+									handleTextChange={(txt) =>
+										txt < duration.to
+										&&
+										setSelected({ ...select, from: txt })
+									}
+									label='From*'
+									max_length={select.to.toString().length}
+									placeholder={"1"}
+									keyboardType="phone-pad"
+									icon={() => icons.calendar(colors.primary, 20)}
+									value={select.from}
+								/>
+								<View style={{ width: 10 }} />
+								<MyInputs
+									label='To*'
+									max_length={2}
+									handleTextChange={(txt) =>
+										txt <= duration.to
+										&&
+										setSelected({ ...select, to: txt })
+									}
+									placeholder={"7"}
+									icon={() => icons.calendar(colors.primary, 20)}
+									value={select.to}
+								/>
+							</View>
+						</>
+					}
 
-        </ScrollView>
-      </View>
+					<View style={{ height: 10 }} />
 
-    </RootView>
-    );
+					<View style={{ flexDirection: "row", marginTop: 10 }}>
+						<MyClearButton
+							onPress={() => setSelected({
+								title: "", from: 0, to: 0, _id: "",
+								end_limit: 0,
+							})}
+							style={{ flex: 1, marginRight: 10 }}
+							title='Clear Filter'
+						/>
+						<View style={{ flex: 1 }}>
+							<MyButton
+								onPress={handleSubmit}
+								title='Submit'
+							/>
+						</View>
+
+					</View>
+
+				</ScrollView>
+			</View>
+
+		</RootView>
+	);
 }
 
-const MyInputs = ({placeholder,label, handleTextChange, value, max_length=1}) => {
-    const [isFocused, setFocused] = useState(false)
-    const [val, setVal] = useState(value)
-    useEffect(()=>{
-	setVal(value)
-    },[value])
-    return (
-	<View style={{flexDirection:"column", flex:1,}}>
-	<MyText color={isFocused ? colors.primary : colors.lightText} style={{marginLeft:5, marginBottom:10}}>{label}</MyText>
-	<TextInput 
-	    onFocus={() => setFocused(true)}
-	    onBlur={() => setFocused(false)}
-	    maxLength={max_length}
-	    keyboardType="phone-pad"
-	    placeholderTextColor={colors.placeholder}
-	    value={val.toString()}
-	    onChangeText={handleTextChange}
-	    style={[ __style.input, { borderColor: isFocused ? colors.primary : colors.lightText } ]}
-	/>
-	</View>
-    );
+const MyInputs = ({ placeholder, label, handleTextChange, value, max_length = 1 }) => {
+	const [isFocused, setFocused] = useState(false)
+	const [val, setVal] = useState(value)
+	useEffect(() => {
+		setVal(value)
+	}, [value])
+	return (
+		<View style={{ flexDirection: "column", flex: 1, }}>
+			<MyText color={isFocused ? colors.primary : colors.lightText} style={{ marginLeft: 5, marginBottom: 10 }}>{label}</MyText>
+			<TextInput
+				onFocus={() => setFocused(true)}
+				onBlur={() => setFocused(false)}
+				maxLength={max_length}
+				keyboardType="phone-pad"
+				placeholderTextColor={colors.placeholder}
+				value={val.toString()}
+				onChangeText={handleTextChange}
+				style={[__style.input, { borderColor: isFocused ? colors.primary : colors.lightText }]}
+			/>
+		</View>
+	);
 }
 // Don't try to read it. Just rewrite the code i am too lazy to add variables
 
 
 const __style = StyleSheet.create({
-    date_form_con:{
-	flex:1,
-	alignItem:"center",
-	flexDirection:"row",
-	justifyContent:"space-between"
-    },
-    top_view_con:{
-	height:50,
-	flexDirection:"row",
-	alignItems:'center',
-	justifyContent:"space-between",
-	borderWidth:1,
-	padding:10,
-	borderColor: colors.lightText,
-	borderRadius:5,
-    },
-    list_sub_container:{
-	padding:10
-    },
-    input: {
-	height: 45,
-	fontFamily: fonts.regular,
-	includeFontPadding: false,
-	flex: 1,
-	paddingHorizontal: 10,
-	color: colors.text,
-	borderWidth: 1,
-	borderRadius:5
-    },
-    icons_container:{
-	height:45,
-	justifyContent:'center'
-    }
+	date_form_con: {
+		flex: 1,
+		alignItem: "center",
+		flexDirection: "row",
+		justifyContent: "space-between"
+	},
+	top_view_con: {
+		height: 50,
+		flexDirection: "row",
+		alignItems: 'center',
+		justifyContent: "space-between",
+		borderWidth: 1,
+		padding: 10,
+		borderColor: colors.lightText,
+		borderRadius: 5,
+	},
+	list_sub_container: {
+		padding: 10
+	},
+	input: {
+		height: 45,
+		fontFamily: fonts.regular,
+		includeFontPadding: false,
+		flex: 1,
+		paddingHorizontal: 10,
+		color: colors.text,
+		borderWidth: 1,
+		borderRadius: 5
+	},
+	icons_container: {
+		height: 45,
+		justifyContent: 'center'
+	}
 })
 
 export default FilterScreen

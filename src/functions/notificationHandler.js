@@ -13,6 +13,8 @@ const notificationHandler = (remoteMessage, navigation, navbar) => {
       navigator = routes.portalNavigator;
     } else if (data?.tab_type == "program") {
       navigator = routes.trainingNavigator;
+    } else if (item?.tab_type == "mission") {
+      navigator = routes.missionNavigator;
     } else {
       if (!!navbar.find(x => x.value == "all_source_feed"))
         navigator = routes.allSourcesFeedNavigator;
@@ -27,7 +29,11 @@ const notificationHandler = (remoteMessage, navigation, navbar) => {
       } else if (data?.tab_type == "program") {
         params["eventId"] = data?.event_id
         params["feedFor"] = "event"
+      } else if (item?.tab_type == "mission") {
+        params["eventId"] = item?.module_id
+        params["feedFor"] = "mission"
       }
+
       if (data?.type == "addcomment" || data?.type == "addcommentreply" || data?.type == "commentlike" || data?.type == 'feed_comment_mentioned') {
         params["openCommentModal"] = true;
       }
@@ -68,6 +74,36 @@ const notificationHandler = (remoteMessage, navigation, navbar) => {
                   params: {
                     slug: data?.program_slug,
                     curtab: "delegate_feed_tab_by_me",
+                  }
+                },
+                {
+                  name: routes.feedDetailScreen,
+                  params: params
+                }],
+            }
+          }],
+        })
+      } else if (item?.tab_type == "mission") {
+        navigation.reset({
+          routes: [{
+            name: navigator,
+            state: {
+              routes: [
+                {
+                  name: routes.missionLevel,
+                },
+                {
+                  name: routes.missionList,
+                  params: {
+                    id: item?.module_info?.level_id,
+                  }
+                },
+                {
+                  name: routes.missionDetail,
+                  params: {
+                    id: item?.module_info?.mission_id,
+                    type: item?.module_info?.type,
+                    curTab: "community"
                   }
                 },
                 {
