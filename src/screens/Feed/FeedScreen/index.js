@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import RootView from '../../../components/RootView'
 import MyText from '../../../components/MyText'
 import MyLoader, { SimpleLoader } from '../../../components/MyLoader'
-import { GET_FEED_LIST, GET_COMMENT_LIST, GET_LIKE_LIST, GET_COMMENT_LIKES_LIST, FEED_ACTIONS, DELETE_FEED_POST, FEED_LIKE_ACTIONS, GET_FEED_EXTRA_DATA, IS_CHAT_EXIST, GET_FEED_DETAIL, FEED_POLL_ACTIONS, ADD_PERSONAL_NOTE_FOR_PORTAL } from '../../../DAL'
+import { GET_FEED_LIST, GET_COMMENT_LIST, GET_LIKE_LIST, GET_COMMENT_LIKES_LIST, FEED_ACTIONS, DELETE_FEED_POST, FEED_LIKE_ACTIONS, GET_FEED_EXTRA_DATA, IS_CHAT_EXIST, GET_FEED_DETAIL, FEED_POLL_ACTIONS, ADD_PERSONAL_NOTE_FOR_PORTAL, APPROVE_REVIEW_FEEDS } from '../../../DAL'
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../../redux/reducers/userSlice'
 import FeedView from './FeedView'
@@ -273,11 +273,28 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
     }
   }
 
+  const approvePostAPI = async (id) => {
+    let res = await APPROVE_REVIEW_FEEDS({ navigation, token, id });
+    if (res.code == 200) {
+      showToast({ title: res?.message, type: "success" })
+      if (!!feedId) {
+        route?.params?.reviewCallback?.(id)
+        navigation.goBack()
+      }
+      // setFeed((list) => list.filter(f => f._id != id));
+    }
+  }
+
+
   const deleteFeedPostAPI = async (id) => {
     let res = await DELETE_FEED_POST({ navigation, token, feedId: id });
     if (res.code == 200) {
       showToast({ title: res?.message, type: "success" })
       setFeed((list) => list.filter(f => f._id != id));
+      if (!!feedId) {
+        route?.params?.reviewCallback?.(id)
+        navigation.goBack()
+      }
     }
   }
 
@@ -744,6 +761,8 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       feedAction(fd)
     } else if (confirmation.type == "delete") {
       deleteFeedPostAPI(confirmation?.item?._id)
+    } else if (confirmation?.type == "approve") {
+      approvePostAPI(confirmation?.item?._id)
     }
 
     setConfirmation({
@@ -810,6 +829,15 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           })
         }, 500);
       }
+    } else if (selectedOpt?.type == "approve") {
+      setTimeout(() => {
+        setConfirmation({
+          isVisible: true,
+          item: item,
+          title: `Are you sure you want to approve this post?`,
+          type: selectedOpt?.type
+        })
+      }, 500);
     }
   }
 
@@ -914,7 +942,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       let isMine = feed?.action_info?.action_id == user?._id;
 
       options.forEach((item) => {
-        if (item.type == "pin") {
+        if (item.type == "pin" && feed?.review_status == "approved") {
           if (access?.feed_pin_unpin_option) {
             if (!feed?.is_feature) {
               if (isAllSourceFeed || isTheSourceFeed) {
@@ -928,7 +956,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           }
         }
 
-        if (item.type == "unpin") {
+        if (item.type == "unpin" && feed?.review_status == "approved") {
           if (access?.feed_pin_unpin_option) {
             if (feed?.is_feature) {
               if (isAllSourceFeed || isTheSourceFeed) {
@@ -942,14 +970,14 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           }
         }
 
-        if (item.type == "edit") {
+        if (item.type == "edit" ) {
           if (isMine) {
             if ((feed?.feed_type == "poll" && feed?.poll_info?.poll_status == "expired") || (feed?.feed_type == "survey" && feed?.survey_info?.survey_status == "expired")) { }
             else {
               newList.push(item);
             }
           } else {
-            if (isAllSourceFeed || isTheSourceFeed) {
+            if (!isCosmos) {
               if (access?.edit_delete_option_in_source_all_source_feeds) {
                 if ((feed?.feed_type == "poll" && feed?.poll_info?.poll_status == "expired") || (feed?.feed_type == "survey" && feed?.survey_info?.survey_status == "expired")) { }
                 else {
@@ -964,7 +992,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           if (isMine) {
             newList.push(item);
           } else {
-            if (isAllSourceFeed || isTheSourceFeed) {
+            if (!isCosmos) {
               if (access?.edit_delete_option_in_source_all_source_feeds) {
                 newList.push(item);
               }
@@ -972,7 +1000,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           }
         }
 
-        if (item.type == "notes") {
+        if (item.type == "notes" && feed?.review_status == "approved") {
           if (isEventFeed) {
             // if (!isMine && item.action_info?.action_by != "consultant_user") {
             if (feed?.feed_type != "poll" && feed?.feed_type != "survey") {
@@ -982,7 +1010,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           }
         }
 
-        if (item.type == "message") {
+        if (item.type == "message" && feed?.review_status == "approved") {
           if (isChatAllowed && user?.is_super_delegate) {
             if (!isMine && feed.action_info?.action_by != "consultant_user") {
               newList.push(item);
@@ -990,6 +1018,9 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           }
         }
 
+        if (item.type == "approve" && feed?.review_status == "pending") {
+          newList.push(item);
+        }
 
       })
 
@@ -1003,7 +1034,8 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
     let isMine = feed?.action_info?.action_id == user?._id;
 
     feedOptionList.forEach((item) => {
-      if (item.type == "pin") {
+      console.log(feed?.review_status, "review_status")
+      if (item.type == "pin" && feed?.review_status == "approved") {
         if (access?.feed_pin_unpin_option) {
           if (!feed?.is_feature) {
             if (isAllSourceFeed || isTheSourceFeed) {
@@ -1017,7 +1049,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
         }
       }
 
-      if (item.type == "unpin") {
+      if (item.type == "unpin" && feed?.review_status == "approved") {
         if (access?.feed_pin_unpin_option) {
           if (feed?.is_feature) {
             if (isAllSourceFeed || isTheSourceFeed) {
@@ -1038,7 +1070,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
             newList.push(item);
           }
         } else {
-          if (isAllSourceFeed || isTheSourceFeed) {
+          if (!isCosmos) {
             if (access?.edit_delete_option_in_source_all_source_feeds) {
               if ((feed?.feed_type == "poll" && feed?.poll_info?.poll_status == "expired") || (feed?.feed_type == "survey" && feed?.survey_info?.survey_status == "expired")) { }
               else {
@@ -1053,7 +1085,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
         if (isMine) {
           newList.push(item);
         } else {
-          if (isAllSourceFeed || isTheSourceFeed) {
+          if (!isCosmos) {
             if (access?.edit_delete_option_in_source_all_source_feeds) {
               newList.push(item);
             }
@@ -1061,7 +1093,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
         }
       }
 
-      if (item.type == "notes") {
+      if (item.type == "notes" && feed?.review_status == "approved") {
         if (isEventFeed) {
           // if (!isMine && item.action_info?.action_by != "consultant_user") {
           if (feed?.feed_type != "poll" && feed?.feed_type != "survey") {
@@ -1071,7 +1103,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
         }
       }
 
-      if (item.type == "message") {
+      if (item.type == "message" && feed?.review_status == "approved") {
         if (isChatAllowed && user?.is_super_delegate) {
           if (!isMine && feed.action_info?.action_by != "consultant_user") {
             newList.push(item);
@@ -1079,6 +1111,9 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
         }
       }
 
+      if (item.type == "approve" && feed?.review_status == "pending") {
+        newList.push(item);
+      }
     })
     return newList.length
   }
@@ -1459,4 +1494,12 @@ const feedOptionList = [{
   title: "Add as Personal Notes",
   type: "notes"
 },
+
+{
+  icon: () => icons.check_circle(colors.primary, 17),
+  title: "Approve",
+  type: "approve"
+},
+
+
 ]

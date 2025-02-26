@@ -1611,12 +1611,12 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
               <TouchableOpacity
                 onPress={() => openModal("general")}
                 style={__style.inputView}>
-                <MyText adjustsFontSizeToFit={true} fontSize={13} >
+                <MyText type='medium' adjustsFontSizeToFit={true} fontSize={14} >
                   {`What's on your mind${!!user?.first_name ? ", " + user?.first_name : ""}?`}
                 </MyText>
               </TouchableOpacity>
             </View>
-            <View style={[__style.inputRootView, { marginTop: 10 }]}>
+            {/* <View style={[__style.inputRootView, { marginTop: 10 }]}>
               <View style={__style.buttonsRow} >
 
                 <TouchableOpacity
@@ -1638,9 +1638,9 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                   style={__style.buttonView}>
                   {icons.code(colors.white, 18)}
                 </TouchableOpacity>
-                {/* </View> */}
+
               </View>
-            </View>
+            </View> */}
             {/* <View style={__style.divider} /> */}
 
 
@@ -1785,7 +1785,7 @@ const __style = StyleSheet.create({
   },
   inputView: {
     backgroundColor: colors.secondaryVariant,
-    height: 40,
+    minHeight: 40,
     paddingHorizontal: 10,
     justifyContent: "center",
     marginLeft: 10,

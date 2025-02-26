@@ -4,12 +4,12 @@ import MyText from './MyText'
 import UserImage from './UserImage'
 import { colors } from '../utilities/colors'
 
-const MemberView = ({ member, showPhoneNumber = false, marginLeft = 5, size = 30, titleSize = 12, customImage = "", hideEmail = false, secondText = "", subText }) => {
+const MemberView = ({ member, borderColor = null, showPhoneNumber = false, marginLeft = 5, size = 30, titleSize = 12, customImage = "", hideEmail = false, secondText = "", subText }) => {
   let image = !!customImage ? customImage : member?.profile_image
   return (
 
     <View style={{ marginLeft, height: 35, flexDirection: "row", alignItems: "center", }}>
-      <UserImage image={image} borderColor={colors.delete} borderWidth={1} name={!!member?.name ? member?.name : member?.first_name} size={size} />
+      <UserImage image={image} borderColor={borderColor} borderWidth={!!borderColor ? 2 : 0} name={!!member?.name ? member?.name : member?.first_name} size={size} />
       <View style={{ marginLeft: 10 }}>
         <View style={{ flexDirection: "row" }}>
           <MyText type='bold' fontSize={titleSize} >{!!member?.name ? member?.name : `${member?.first_name} ${member?.last_name}`}</MyText>
