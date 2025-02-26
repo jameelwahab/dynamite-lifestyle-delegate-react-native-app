@@ -29,7 +29,6 @@ import routes from "../../navigation/routes"
 import { useNavigation } from "@react-navigation/native"
 import FeedScreen from "../Feed/FeedScreen"
 import Dashboard from "react-native-vector-icons/MaterialCommunityIcons"
-import Casino from "./Casino"
 import Feather from "react-native-vector-icons/Feather"
 
 const List = (props) => {
@@ -46,12 +45,31 @@ const MissionDetail = ({ navigation, route }) => {
 	const [tab, setTab] = useState(0)
 	const [showChat, setShowChat] = useState(false)
 	const tab_list = [
-		{ title: <Dashboard name="view-dashboard-outline" size={23} color={tab== 0 ? colors.primary : colors.white} /> },
-		{ title: <Feather name="target" size={23} color={tab== 1 ? colors.primary : colors.white} /> },
-		{ title: <Feather name="users" size={23} color={tab== 2 ? colors.primary : colors.white} /> },
-		{ title: tab==3 ? icons.casinoPrimary(23) : icons.casinoWhite(23),},
+		{ title: <Dashboard name="view-dashboard-outline" size={20} color={tab== 0 ? colors.primary : colors.white} /> } ,
+		{ title: <Feather name="target" size={20} color={tab== 1 ? colors.primary : colors.white} /> },
+		{ title: <Feather name="users" size={20} color={tab== 2 ? colors.primary : colors.white} /> },
 	]
-
+	const tab_mission = [
+		{ title: <Feather name="target" size={20} color={tab== 1 ? colors.primary : colors.white} /> },
+		{ title: <Feather name="users" size={20} color={tab== 2 ? colors.primary : colors.white} /> },
+	]
+	const Tabs = ({list, tab, style, changeTab})=> {
+	    return (
+		<View style={[{flexDirection:"row", alignItems:"center"}, style]}>
+		     {list.map((el,index)=> (route.params.type!="missino" && index!=0) &&
+			<TouchableOpacity
+			    onPress={ ()=> changeTab(index) }
+			    key={index}
+			    style={{alignItems:"center",  marginLeft:index!=0 ? 30 : 0}}
+			    >
+				{el.title}
+			    <View style={{height:3}} />
+			    <View style={{width:50, height:3,borderRadius:10, backgroundColor:index == tab ? colors.primary : colors.transparent }}/>
+			</TouchableOpacity>
+	    )}
+	</View>
+    )
+}
 	return (
 		<View style={{ flex: 1 }}>
 			{tab < 2 && <LiveChat
@@ -101,24 +119,7 @@ const MissionDetail = ({ navigation, route }) => {
 
 }
 
-const Tabs = ({list, tab, style, changeTab})=> {
-    return (
-	<View style={[{flexDirection:"row", paddingHorizontal:5, justifyContent:"space-between"}, style]}>
-	    
-	    {list.map((el,index)=> 
-		<TouchableOpacity
-		    onPress={ ()=> changeTab(index) }
-		    key={index}
-		    style={{alignItems:"center"}}
-		    >
-			{el.title}
-		    <View style={{height:5}} />
-		    <View style={{width:50, height:3,borderRadius:10, backgroundColor:index == tab ? colors.primary : colors.transparent }}/>
-		</TouchableOpacity>
-	    )}
-	</View>
-    )
-}
+
 
 const TrackerList = ({ res, type }) => {
 	const nav = useNavigation()
@@ -130,7 +131,7 @@ const TrackerList = ({ res, type }) => {
 			showsVerticalScrollIndicator={false}
 			data={res?.mission_schedules}
 			ListHeaderComponent={
-				<Text style={__styles.heading}>{res.content_settings.schedule_heading}</Text>
+				<MyText color={colors.primary} type="bold" fontSize={textSize.title}>{res?.content_settings?.schedule_heading}</MyText>
 			}
 			ListHeaderComponentStyle={{ marginBottom: 10 }}
 			KeyExtraction={(_, index) => index.toString()}
@@ -230,7 +231,7 @@ const Overview = ({ token, navigation, id, type }) => {
 			ListHeaderComponentStyle={{ marginBottom: 20 }}
 			keyExtraction={(_, index) => index.toString()}
 			renderItem={({ _ }) =>
-				res?.mission_schedules?.length != 0 && <TrackerList res={res} type={type} />
+				 <TrackerList res={res} type={type} />
 			}
 		/>
 	)
