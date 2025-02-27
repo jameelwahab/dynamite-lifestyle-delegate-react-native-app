@@ -59,7 +59,7 @@ const LessonView = ({ title, style, heading, icon, iconTextColor = colors.white,
 		<View
 		    style={{
 			width: '100%',
-		        paddingHorizontal: 5,
+		        paddingHorizontal: image ? 5 : 0,
 			 paddingVertical: 1,
 			flex: 1
 		    }}>

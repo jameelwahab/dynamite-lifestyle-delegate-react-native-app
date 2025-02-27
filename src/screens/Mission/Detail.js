@@ -140,9 +140,9 @@ const TrackerList = ({ res, type }) => {
 			ListHeaderComponent={
 				<MyText color={colors.primary} type="bold" fontSize={textSize.title}>{res?.content_settings?.schedule_heading}</MyText>
 			}
-			ListHeaderComponentStyle={{ marginBottom: 10 }}
+			ListHeaderComponentStyle={{ marginBottom: 15 }}
 			KeyExtraction={(_, index) => index.toString()}
-			ItemSeparatorComponent={<View style={{ height: 20 }} />}
+			ItemSeparatorComponent={<View style={{ height: 10 }} />}
 			renderItem={({ item }) =>
 					<LessonView
 						image={type == "quest" ? item?.image?.thumbnail_1 : ""}
