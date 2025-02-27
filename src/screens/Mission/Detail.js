@@ -169,7 +169,7 @@ const Header = ({ res, show, showBadges,quest }) => {
 		<>
 			{res.video_url != "" ?
 				<>
-					{res?.video_url.includes("vimeo") ?
+					{res?.video_url?.includes("vimeo") ?
 						<VimeoWithPip url={res?.video_url} focused={true} id={res?._id} /> :
 						<WebPlayer width={utilities?.screenWidth() - 20} url={res?.video_url} />
 					}
@@ -187,7 +187,7 @@ const Header = ({ res, show, showBadges,quest }) => {
 					dateString={`${startDate} - ${endDate}`}
 					isQuest={quest}
 					showEarnedBadges={false}
-					showBadgesEarned={false}
+					// showBadgesEarned={false}
 				/>}
 			{show && !!res?.detailed_description &&
 				<MyWebview fullWidth html={res?.detailed_description?.toString()} />}

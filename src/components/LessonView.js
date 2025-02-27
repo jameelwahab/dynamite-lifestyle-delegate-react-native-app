@@ -9,14 +9,15 @@ import MyText from "./MyText";
 import ResponsiveImage3 from "./ResponsiveImage3";
 import { textSize } from "../utilities/styles"
 
-const LessonView = ({ title, style, heading, icon, desc, txtlen = 50, hanldeCopy, copyEnable=false, image, handlePress, duration }) => {
+const LessonView = ({ title, style, heading, icon,iconTextColor=colors.white, desc, txtlen = 50, hanldeCopy, copyEnable=false, image, handlePress, duration }) => {
 	const [show, setShow] = useState()
 	return (
 		<>
 			{icon &&
 				<View style={__styles.icon_container}>
 					<Image source={{ uri: S3_URL + icon }} style={__styles.icon} />
-					<Text style={[__styles.icon_heading, { marginLeft: 10 }]}>{title}</Text>
+					<View style={{marginLeft:10}}/>
+					<MyText fontSize={textSize.title} style={{letterSpacing:1}} type="bold" uppercase={true} color={iconTextColor}>{title}</MyText>
 				</View>
 			}
 			<Pressable onPress={handlePress}>
@@ -77,11 +78,6 @@ const __styles = StyleSheet.create({
 	icon: {
 		width: 20,
 		height: 20,
-	},
-	icon_heading: {
-		color: colors.primary,
-		fontFamily: fonts.medium,
-		fontSize: textSize.title,
 	},
 	img: {
 		width: 140,

@@ -154,7 +154,7 @@ const ScheduleView = ({ schedule, index }) => {
   }
 
   return (
-    <View style={__styles.boxView}>
+    <View>
       {/* <Collapsible collapsed={isCollapsed} > */}
         <View>
 
@@ -162,7 +162,7 @@ const ScheduleView = ({ schedule, index }) => {
 
 
           {isArray(schedule?.schedule_questions) &&
-            <View style={{ marginTop: 10 }}>
+            <View style={[__styles.boxView, {marginTop:15}]}>
               <MyText type='medium' color={colors.primary} fontSize={16} >{"Content Questions"}</MyText>
               {schedule.schedule_questions.map((item, index) => {
                 return item.show_on=="on_screen" && (<QuestionComponent
@@ -201,7 +201,7 @@ const ScheduleView = ({ schedule, index }) => {
           })}
 
           {schedule?.content_settings?.is_show_general_note &&
-            <View style={{ marginTop: 15 }} >
+            <View style={[__styles.boxView, {marginTop:15}]} >
               <MyText type='medium' color={colors.primary2} >{(schedule?.content_settings?.general_note_title || "Journal")}</MyText>
               <View style={{ marginTop: 5 }}>
                 <MyInputs
@@ -223,7 +223,7 @@ const ScheduleView = ({ schedule, index }) => {
 
 
           {isArray(schedule?.schedule_questions) &&
-            <View style={{ marginTop: 10 }}>
+            <View style={[__styles.boxView, {marginTop:15}]}>
               <MyText 
 		type='medium'
 		color={colors.primary}

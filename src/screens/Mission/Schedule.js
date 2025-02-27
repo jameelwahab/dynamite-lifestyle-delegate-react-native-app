@@ -86,13 +86,13 @@ const Scheduler = ({ navigation, route }) => {
 							</Pressable> }
 						</View>
 						<View style={{ height: 15 }} />
-						{res?.mission?.video_url != "" ?
-							(res?.mission?.video_url.includes("vimeo") ?
+						{res?.mission?.promo_video != "" ?
+							(res?.mission?.promo_video.includes("vimeo") ?
 								<VimeoWithPip
-									url={res?.mission?.video_url}
+									url={res?.mission?.promo_video}
 									focused={true} id={res?.mission?._id}
 								/> :
-								<WebPlayer width={utilities.screenWidth() - 20} url={res?.mission?.video_url} />
+								<WebPlayer width={utilities.screenWidth() - 20} url={res?.mission?.promo_video} />
 							) :
 							<ResponsiveImage
 								uri={S3_URL + res?.mission_schedule?.image?.thumbnail_1}
@@ -197,8 +197,8 @@ const __styles = StyleSheet.create({
 		justifyContent: "space-between"
 	},
 	schedule_img: {
-		width: 25,
-		height: 25,
+		width: 20,
+		height: 20,
 	},
 	badge: {
 		flexDirection: 'row',

@@ -125,7 +125,7 @@ export class MyWebview extends Component {
             fontSize: 13,
             marginTop: 5,
             lineHeight: 20,
-            color: this.props?.invert ? colors.black : colors.lightText,
+            color: this.props?.invert ? colors.black : colors.lightText2,
           },
 
           ul: {
