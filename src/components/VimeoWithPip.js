@@ -81,7 +81,7 @@ export default class VimeoWithPip extends Component {
         console.log("data:", data.request.files.hls.cdns[data.request.files.hls.default_cdn].url, data)
         this.setState({
           videoUrl: data.request.files.hls.cdns[data.request.files.hls.default_cdn].url,
-          poster: isObject(data.video.thumbs) ? data.video.thumbs['640'] : !!data?.thumbnail_url ? data?.thumbnail_url : ""
+          poster: isObject(data.video.thumbs) ? data.video.thumbs['640'] : !!data?.thumbnail_url ? data?.thumbnail_url : !!data?.video?.thumbnail_url ?data?.video?.thumbnail_url : ""
         })
 
       } catch (e) {

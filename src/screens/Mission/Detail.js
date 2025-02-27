@@ -49,13 +49,13 @@ const MissionDetail = ({ navigation, route }) => {
 
 	const tab_quest = [
 		{ title: <Dashboard name="view-dashboard-outline" size={20} color={tab== 0 ? colors.primary : colors.white} /> } ,
-		{ title: <Feather name="target" size={20} color={tab== 1 ? colors.primary : colors.white} /> },
-		{ title: <Feather name="users" size={20} color={tab== 2 ? colors.primary : colors.white} /> },
+		{ title: <Feather name="target" size={20} color={tab== 1 ? colors.primary : colors.lightText2} /> },
+		{ title: <Feather name="users" size={20} color={tab== 2 ? colors.primary : colors.lightText2} /> },
 	]
 
 	const tab_mission = [
-		{ title: <Feather name="target" size={20} color={tab== 0 ? colors.primary : colors.white} /> },
-		{ title: <Feather name="users" size={20} color={tab== 1 ? colors.primary : colors.white} /> },
+		{ title: <Feather name="target" size={20} color={tab== 0 ? colors.primary : colors.lightText2} /> },
+		{ title: <Feather name="users" size={20} color={tab== 1 ? colors.primary : colors.lightText2} /> },
 	]
 	
 	console.log( ((route.params.type == "quest" && tab==0 ) || ( route.params.type == "mission" && tab == 0 )) && "hello")
@@ -92,7 +92,7 @@ const MissionDetail = ({ navigation, route }) => {
 				<Tabs
 					list={ route.params.type=="mission" ? tab_mission : tab_quest }
 					tab={tab}
-					style={{ marginTop:15,marginBottom:10,  borderBottomWidth:0.5, borderColor:colors.border }}
+					style={{ marginTop:15, borderBottomWidth:0.5, borderColor:colors.border, }}
 					changeTab={(e) => setTab(e)}
 				/>
 				{ ( (route.params.type == "quest" && tab < 2) || (route.params.type == "mission" && tab == 0) ) && <Overview
@@ -111,12 +111,12 @@ const MissionDetail = ({ navigation, route }) => {
 
 const Tabs = ({list, tab, style, changeTab})=> {
 	    return (
-		<View style={[{flexDirection:"row", alignItems:"center"}, style]}>
+		<View style={[{flexDirection:"row", alignItems:"center", justifyContent:"space-between"}, style]}>
 		     {list.map((el,index)=>
 			<TouchableOpacity
 			    onPress={ ()=> changeTab(index) }
 			    key={index}
-			    style={{alignItems:"center",  marginLeft:index!=0 ? 30 : 0}}
+			    style={ {alignItems:"center",  paddingHorizontal:list.length==2 ? 55: 35} }
 			    >
 				{el.title}
 			    <View style={{height:3}} />
@@ -144,16 +144,14 @@ const TrackerList = ({ res, type }) => {
 			KeyExtraction={(_, index) => index.toString()}
 			ItemSeparatorComponent={<View style={{ height: 20 }} />}
 			renderItem={({ item }) =>
-				// <View style={__styles.card_container}>
 					<LessonView
-						style={type != "quest" && {paddingHorizontal:10, paddingVertical:5}}
 						image={type == "quest" ? item?.image?.thumbnail_1 : ""}
+						missionDetail={type=="mission"}
 						txtlen={type == "quest" ? 30 : 55}
 						heading={item.main_heading}
 						desc={item.short_description}
 						handlePress={() => handlePress(item)}
 					/>
-				// </View>
 			}
 		/>
 	)
@@ -231,7 +229,7 @@ const Overview = ({ token, navigation, id, type, showBadges }) => {
 	if (loading) return <MyLoader enable={loading} />
 	return (
 		<FlatList
-			style={{ marginTop: 10 }}
+			style={{ paddingTop: 15 }}
 			showsVerticalScrollIndicator={false}
 			data={[1]}
 			ListEmptyComponent={!loading && <EmptyView />}
@@ -286,13 +284,6 @@ const __styles = StyleSheet.create({
 		color: colors.primary,
 		fontSize: 16,
 		fontFamily: fonts.bold
-	},
-	card_container: {
-		// paddingVertical: 5,
-		// paddingHorizontal: 10,
-		// borderWidth: 1,
-		// borderColor: colors.border,
-		// borderRadius: 10,
 	},
 	card_heading: {
 		color: colors.primary,

@@ -125,15 +125,27 @@ export class MyWebview extends Component {
             fontSize: 13,
             marginTop: 5,
             lineHeight: 20,
-            color: this.props?.invert ? colors.black : colors.lightText2,
+            color: this.props?.invert ? colors.black : colors.lightText,
           },
 
+          
+          ol: {
+            margin: 0,
+            marginTop: 5,
+            fontFamily: fonts.regular,
+            lineHeight: 20,
+            fontSize: 13,
+            fontWeight: Platform.OS == "android" ? "normal" : undefined,
+            color: this.props?.invert ? colors.black : colors.lightText,
+            // textAlign: "center"
+          },
           ul: {
             margin: 0,
             marginTop: 5,
             fontFamily: fonts.regular,
             lineHeight: 20,
             fontSize: 13,
+            fontWeight: Platform.OS == "android" ? "normal" : undefined,
             color: this.props?.invert ? colors.black : colors.lightText,
             // textAlign: "center"
           },

@@ -10,9 +10,10 @@ import AudioPlayer from "../../components/AudioPlayer"
 import ScheduleView from "../../components/Mission/ScheduleView"
 import ResponsiveImage from "../../components/ResponsiveImage"
 import LiveChat from "../../components/LiveChat"
-import { S3_URL } from "../../utilities/constants"
+import { S3_URL, dateTimeFormat, months } from "../../utilities/constants"
 import VimeoWithPip from "../../components/VimeoWithPip"
 import WebPlayer from "../../components/WebPlayer"
+import MyLoader from "../../components/MyLoader"
 import extractTextFromHtml from "../../functions/extractTextFromHTML.js"
 import utilities from "../../utilities"
 import { colors } from "../../utilities/colors"
@@ -24,7 +25,9 @@ import { selectUser } from '../../redux/reducers/userSlice'
 import { useSelector } from 'react-redux'
 import { useEffect } from "react"
 import { View, FlatList, Image, StyleSheet, Text, Pressable } from "react-native"
-import MyLoader from "../../components/MyLoader"
+import moment from "moment"
+import ItemCountView from "../../components/ItemCountView"
+
 const Schedule = (props) => {
 	return (
 		<RootView hideSubHeader hideHeader>
@@ -86,18 +89,20 @@ const Scheduler = ({ navigation, route }) => {
 							</Pressable> }
 						</View>
 						<View style={{ height: 15 }} />
-						{res?.mission?.promo_video != "" ?
-							(res?.mission?.promo_video.includes("vimeo") ?
+
+						{res?.mission_schedule?.video_url != "" ?
+							(res?.mission_schedule?.video_url.includes("vimeo") ?
 								<VimeoWithPip
-									url={res?.mission?.promo_video}
+									url={res?.mission_schedule?.video_url}
 									focused={true} id={res?.mission?._id}
 								/> :
-								<WebPlayer width={utilities.screenWidth() - 20} url={res?.mission?.promo_video} />
+								<WebPlayer width={utilities.screenWidth() - 20} url={res?.mission_schedule?.video_url} />
 							) :
 							<ResponsiveImage
 								uri={S3_URL + res?.mission_schedule?.image?.thumbnail_1}
 							/>
 						}
+
 						{res?.mission_schedule?.audio_url != "" && <AudioPlayer url={res?.mission_schedule?.audio_url} />}
 						<View style={{ height: 15 }} />
 						<Overview res={res} />
@@ -123,6 +128,11 @@ const Scheduler = ({ navigation, route }) => {
 }
 
 const Overview = ({ res }) => {
+    const formatDate = (date)=> {
+	const result = moment(date).format(dateTimeFormat.date).split('-')
+	console.log(result)
+	return  `${result[0]} ${months[result[1]-1].short2}, ${result[2]}`
+    }
 	return (
 		<View style={__styles.schedule_container}>
 			<MyText
@@ -137,14 +147,18 @@ const Overview = ({ res }) => {
 				html={res?.mission_schedule?.detailed_description || ""} />
 			<View style={{ height: 10 }} />
 			<View style={__styles.sched_img_container}>
-				<Badge
-					img={require("../../assets/icons/calendar.png")}
-					context={`${res?.mission_schedule?.total_number_of_days} day`}
-				/>
-				<Badge
-					img={require("../../assets/icons/coin.png")}
-					context={`${res?.mission_schedule?.reward_coins} Reward Coins`}
-				/>
+				<ItemCountView
+				    text1={formatDate(res?.mission_schedule?.createdAt)}
+				    backgroundColor={colors.secondary}
+				    text2={"Create Date"}
+				    img={require("../../assets/icons/calendar.png")}
+				    />
+				<ItemCountView
+				    text1={`${res?.mission_schedule?.reward_coins}`}
+				    backgroundColor={colors.secondary}
+				    text2={"Coins Rewards"}
+				    img={require("../../assets/icons/coin.png")}
+				    />
 			</View>
 		</View>
 	)
