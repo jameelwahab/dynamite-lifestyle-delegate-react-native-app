@@ -31,6 +31,7 @@ const ScheduleView = ({ schedule, index }) => {
               if (x.action_type == "general") {
                 return (
                   <View
+										key={i}
                     style={__styles.box2}
                     pointerEvents={"none"}>
                     <MyCheckBox
@@ -75,7 +76,7 @@ const ScheduleView = ({ schedule, index }) => {
               <>
                 {arr_gratitude.map((item, index) => {
                   return (
-                    <View style={{ marginTop: index != 0 ? 10 : 0 }}>
+                    <View style={{ marginTop: index != 0 ? 10 : 0 }} key={index}>
                       <MyText   >{labels?.gratitudeLabels[index]}</MyText>
                       <TextInput
                         placeholder={index + 1 + ". "}
@@ -113,7 +114,7 @@ const ScheduleView = ({ schedule, index }) => {
               <View style={{ marginTop: 10, }} >
                 {arr.map((item, index) => {
                   return (
-                    <View style={{ marginTop: index != 0 ? 10 : 0 }}>
+                    <View key={index} style={{ marginTop: index != 0 ? 10 : 0 }}>
                       <MyText  >{labels?.dailyDynamiteLabels[index]}</MyText>
                       <TextInput
                         placeholder={index + 1 + ". "}
@@ -160,6 +161,7 @@ const ScheduleView = ({ schedule, index }) => {
                   hideRepliesCheckBox={true}
                   item={{ ...item }}
                   index={index}
+								  key={index}
                   showRepliesbtns={false}
                   hideCollpase={true}
                 />)
@@ -169,7 +171,7 @@ const ScheduleView = ({ schedule, index }) => {
           {schedule?.growth_tool_allowed_actions.map((item, index) => {
             if (item?.tool == "dynamite_dairy") {
               return (
-                <View>
+                <View key={index}>
                   {growthToolIntentions(item, index)}
                 </View>
               )
@@ -211,6 +213,7 @@ const ScheduleView = ({ schedule, index }) => {
                   hideRepliesCheckBox={true}
                   item={{ ...item }}
                   index={index}
+								  key={index}
                   showRepliesbtns={false}
                   hideCollpase={true}
                 />)

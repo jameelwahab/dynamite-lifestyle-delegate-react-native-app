@@ -111,7 +111,7 @@ const Scheduler = ({ navigation, route }) => {
 					onRefresh={onRefresh}
 				/>}
 				ListEmptyComponent={!loading && <EmptyView />}
-				keyExtractor={(el,index)=> el?._id || index.toString()}
+				keyExtractor={(_,index)=> index.toString()}
 				ListFooterComponent={<View style={{height:50}}/>}
 				showsVerticalScrollIndicator={false}
 				renderItem={({ item, index }) =>!loading && 
@@ -145,21 +145,17 @@ export const HeaderView = ({type="", embed_code="",video_url="", mission_id="",a
 						}
 				else if(audio_url){
 						return (
-								<>
-								
-								{(audio_url != "" && img_url!="") && <View style={{height:10}}/>}
-								{audio_url!="" && <AudioPlayer
+								 <AudioPlayer
 												url={audio_url}
 												mission={type=="mission"}
 												title={title}
 												desc={desc}  
-												/>}
-								</>
+												/>
 						) }
-		else if(img_url=""){
-				img_url && <ResponsiveImage2
+		else if(img_url!=""){
+				return (<ResponsiveImage2
 												uri={S3_URL + img_url}
-										/>
+								/>)
 		}
 }
 

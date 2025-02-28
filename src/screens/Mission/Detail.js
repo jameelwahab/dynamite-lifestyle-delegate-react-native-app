@@ -159,11 +159,19 @@ const TrackerList = ({ res, type }) => {
 }
 
 
-const Header = ({ res, show, showBadges, quest, daysOn="" }) => {
+const Header = ({ res, show, showBadges, quest='', daysOn="" }) => {
     
 	const startDate =  `${moment(res?.start_date).format(dateTimeFormat.date).split('-')[0]} ${months[Number(moment(res?.start_date).format(dateTimeFormat.date).split('-')[1])-1].short2}`
 	const endDate =  `${moment(res?.end_date).format(dateTimeFormat.date).split('-')[0]} ${months[Number(moment(res?.end_date).format(dateTimeFormat.date).split('-')[1])-1].short2}`
-
+		const [schedule,setSchedules] = useState(res)	
+		useEffect(()=> {
+				if(daysOn!=""){
+						setSchedules(res?.mission_schedules.find(el=> el._id==daysOn))
+				}
+		},[daysOn])
+		useEffect(()=>{
+						console.log(schedule?.image?.thumbnail_1)
+		},[schedule])
 	return (
 		<>
 			{
@@ -177,8 +185,15 @@ const Header = ({ res, show, showBadges, quest, daysOn="" }) => {
 				// <MyImage source={{ uri: S3_URL + res.image?.thumbnail_1 }}
 				// 	style={{ width: "100%", height: 250 }} />
 				HeaderView({
-					video_url: daysOn!="" ? res?.mission_schedules.find(el=> el._id==daysOn)?.video_url : res?.video_url,
-					img_url: daysOn!="" ? res?.mission_schedules.find(el=> el._id==daysOn)?.image?.thumbnail_1 : res.image?.thumbnail_1
+						type: quest,
+						embed_code: daysOn != "" ? schedule?.embed_code : res?.embed_code,
+						video_url: daysOn != "" ? schedule?.video_url : res?.video_url,
+						mission_id: daysOn != "" ? schedule?._id : res?._id,
+						audio_url:  daysOn != "" ? schedule?.audio_url : res?.audio_url,
+						img_url: daysOn != "" ? schedule?.image?.thumbnail_1 : res?.image?.thumbnail_1,
+						title: daysOn != "" ? schedule?.audio_title : res?.title,
+						desc:  daysOn != "" ? schedule?.audio_description : res?.audio_description ,
+
 				})
 			}
 			<View style={{ height: 10 }} />
