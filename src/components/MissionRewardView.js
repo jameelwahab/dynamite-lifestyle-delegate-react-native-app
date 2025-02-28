@@ -127,7 +127,7 @@ const MissionRewardView = ({ isQuest = false, questReplayAccessDays = "", dateSt
                 </Row>
                 <Flex flex={1} alignItems="flex-end"  >
                   <Row alignItems="center" justifyContent="flex-end">
-                    <MyText style={{ fontFamily: fonts.medium }} >{dateString}</MyText>
+                    <MyText color={colors.lightText2} style={{ fontFamily: fonts.medium }} >{dateString}</MyText>
                   </Row>
                 </Flex>
               </Row>

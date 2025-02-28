@@ -28,14 +28,16 @@ const LessonView = ({ title, style, heading, icon, iconTextColor = colors.white,
 	    }
 	    <Pressable onPress={handlePress}>
 		<View style={[__styles.container, style, !missionDetail && {backgroundColor: colors.secondary,} ]} >
-		    <View style={{ overflow: 'hidden' }}>
+		    <View style={{ overflow: 'hidden', position:"relative", }}>
 			{image &&
+			<View>
 			    <ResponsiveImage3
 				width={150}
 				source={{uri: S3_URL +image }}
 				defaultSize={{ width: 150, height: 85 }}
-				style={{ width: "100%" }} />}
-			{copyEnable &&
+				style={{ width: "100%" }} />
+
+{copyEnable &&
 			    <View style={{
 				alignItems: "flex-end", justifyContent: "flex-end",
 				position:"absolute",
@@ -55,6 +57,8 @@ const LessonView = ({ title, style, heading, icon, iconTextColor = colors.white,
 				<MyText fontSize={10} type="medium" color={colors.black} >{duration} Days</MyText>
 			    </View>
 			}
+				</View>}
+		
 		</View>
 		<View
 		    style={{

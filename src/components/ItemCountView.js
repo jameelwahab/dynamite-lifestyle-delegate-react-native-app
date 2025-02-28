@@ -9,7 +9,7 @@ const ItemCountView = ({ icon, text1 = "", text2 = "", img, noTint = false, back
     <View style={{ alignItems: "center" }}>
       <View style={{ flexDirection: "row", alignItems: 'center', backgroundColor, paddingHorizontal: ph, paddingVertical: 6, borderRadius: 900, marginBottom: mb }}>
         {!!icon && icon }
-	{img && <Image resizeMode="contain" source={img} style={{ height: 15, width: 15, marginRight: 10, }} />}
+	{img && <Image resizeMode="contain" source={img} style={{ height: 15, width: 15, marginRight: 7, }} />}
         <MyText type='M' color={text1Color} >{text1}</MyText>
       </View>
       {!!text2 &&
