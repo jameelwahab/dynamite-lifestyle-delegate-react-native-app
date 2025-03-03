@@ -49,10 +49,10 @@ const MemberList = ({ navigation, route }) => {
     navigation.navigate(routes?.missionReportScreen, {
       missionId: item?.mission_info?._id,
       memberId: item?.member?._id,
-      type: "report",
+      type: route.params.type,
     })
   }
-
+    console.log(route.params)
 
   const callAPi = () => {
     paging.canLoadMore = false;

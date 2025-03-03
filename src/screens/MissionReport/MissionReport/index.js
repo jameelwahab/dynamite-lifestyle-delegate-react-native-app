@@ -220,7 +220,7 @@ const MissionReport = ({ navigation, route }) => {
 
         {isArray(schedules) > 0 &&
           <View style={{ marginTop: 10 }}>
-            <MyText fontSize={18} type='bold' color={colors.primary} >Mission Report Detail Overview</MyText>
+            <MyText fontSize={18} type='bold' color={colors.primary} >{mission?.type==="quest" ? "Detail Overview" : "Mission Report Detail Overview"}</MyText>
           </View>
         }
 
@@ -231,7 +231,7 @@ const MissionReport = ({ navigation, route }) => {
   return (
     <RootView
       subTitle={mission ? mission?.title : ""}
-      title={isObject(user) ? user?.first_name + " " + user?.last_name + `${route.params.type == "report" ? 's Report' : ''}` : ""} >
+      title={isObject(user) ? user?.first_name + " " + user?.last_name + `'s Report` : ""} >
       {!loader &&
         <View style={{ flex: 1 }}>
           <FlatList
@@ -242,7 +242,7 @@ const MissionReport = ({ navigation, route }) => {
             keyExtractor={(item) => item?._id}
             renderItem={({ item, index }) => {
               return (
-                <QuestionsView schedule={item} isAllow={hasPermission} index={index} />
+                <QuestionsView schedule={item} isAllow={(route.params.type=="completed" && (schedules.length==1 || index==schedules.length-1)) || hasPermission} index={index} />
               )
             }}
           />
@@ -421,13 +421,8 @@ const QuestionsView = ({ schedule, isAllow = false, index }) => {
           </View>
           <View style={{ transform: [{ rotate: isCollapsed ? '0deg' : '180deg' }] }}>
             {isAllow ? icons.down() : icons.lock()}
-            {/* <Image source={ic_down} style={{
-            height: 15, width: 15,
-            tintColor: colors.lightText2
-          }} /> */}
           </View>
         </Pressable>
-        {/* <Collapsible collapsed={isCollapsed} > */}
         {!isCollapsed &&
           <View>
 
@@ -481,6 +476,7 @@ const QuestionsView = ({ schedule, isAllow = false, index }) => {
                   <MyInputs
                     noLable
                     noSpace
+		    editable={false}
                     multiline={true}
                     value={schedule?.general_note}
                   />
