@@ -547,7 +547,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
       let resp = await Promise.all(uploadImageArray);
 
 
-      resp.forEach(image => {
+      for (const image of resp) {
         if (image.code == 200) {
           uploadedImages.push(image.images_obj);
         } else {
@@ -555,7 +555,16 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
           setLoader(false);
           return;
         }
-      });
+      }
+      // resp.forEach(image => {
+      //   if (image.code == 200) {
+      //     uploadedImages.push(image.images_obj);
+      //   } else {
+      //     showToast({ body: image?.message, title: "Error" })
+      //     setLoader(false);
+      //     return;
+      //   }
+      // });
 
     }
 
@@ -1064,7 +1073,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                       </TouchableOpacity>}
 
 
-                    {!!!editId &&
+                    {!!!editId && isScheduledFeed &&
                       <View opacity={0.7}>
                         <TouchableOpacity
                           style={__style.modalDropBtns}>

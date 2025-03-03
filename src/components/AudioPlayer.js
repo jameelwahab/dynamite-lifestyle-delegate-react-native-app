@@ -12,8 +12,8 @@ import { textSize } from '../utilities/styles';
 import MyText from '../components/MyText';
 import LinearGradient from "react-native-linear-gradient"
 import { SimpleLoader } from './MyLoader';
-
-
+import FontAwesome6 from "react-native-vector-icons/FontAwesome6"
+import Fontisto from "react-native-vector-icons/Fontisto";
 
 
 const ic_audio = require("../assets/icons/audio.png")
@@ -138,7 +138,7 @@ const AudioPlayer = ({ stop = "", url, mission=false, title, desc }) => {
 						  style={{ marginHorizontal: 20, height: 50, width: 50, borderRadius: 25, backgroundColor: colors.black, alignItems: "center", justifyContent: "center" }}>
               {loading ?
 								<SimpleLoader />
-										: isPlaying ? icons.pause() : icons.play()}
+										: isPlaying ? <Fontisto name="pause" size={20} color={colors.white} /> : <FontAwesome6 name="play" size={20} color={colors.white} />}
 						</Pressable>
             <TouchableOpacity disabled={!isPlaying} onPress={() => TrackPlayer.seekTo(position + 10)}>
               <Image source={ic_forward} style={{ height: 25, resizeMode: "contain" }} />

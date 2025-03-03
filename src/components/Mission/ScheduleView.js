@@ -153,7 +153,7 @@ const ScheduleView = ({ schedule, index }) => {
 
           {(isArray(schedule?.schedule_questions) && schedule?.schedule_questions.findIndex(item=> item.show_on=="on_screen") > -1) &&
             <View style={[__styles.boxView, {marginTop:15}]}>
-              <MyText type='medium' color={colors.primary} fontSize={16} >{"Content Questions"}</MyText>
+              <MyText type='medium' color={colors.primary} fontSize={16} >{schedule?.content_settings?.onscreen_question_title || "Content Questions"}</MyText>
               {schedule.schedule_questions.map((item, index) => {
                 return item.show_on=="on_screen" && (<QuestionComponent
                   padding={0}

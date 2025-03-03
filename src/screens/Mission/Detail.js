@@ -49,17 +49,38 @@ const MissionDetail = ({ navigation, route }) => {
 	const [showChat, setShowChat] = useState(true)
   const [enableChat, setEnableChat] = useState(false)
   const [chatID, setChatID] = useState(route.params.id)
- useEffect(()=> {console.log({enableChat, showChat})},[enableChat, showChat])
+  const [title, setTitle] =useState(route.params.heading)
+
 	const tab_quest = [
 		{ title: <Dashboard name="view-dashboard-outline" size={20} color={tab== 0 ? colors.primary : colors.lightText} /> } ,
 		{ title: <Feather name="target" size={20} color={tab== 1 ? colors.primary : colors.lightText} /> },
-		{ title: <Feather name="users" size={20} color={tab== 2 ? colors.primary : colors.lightText} /> },
+		{ title: <Feather name="users" size={20} color={tab== 2 ? colors.primary : colors.lightText} /> ,
+	type:"community"},
 	]
 
 	const tab_mission = [
 		{ title: <Feather name="target" size={20} color={tab== 0 ? colors.primary : colors.lightText} /> },
-		{ title: <Feather name="users" size={20} color={tab== 1 ? colors.primary : colors.lightText} /> },
+		{ title: <Feather name="users" size={20} color={tab== 1 ? colors.primary : colors.lightText} /> ,
+		type:"community"},
 	]
+
+
+	useEffect(()=> {
+		if(route?.params?.curTab == "community"){
+			if(route?.params?.type == "quest"){
+				let index = tab_quest.findIndex(x => x?.type =="community");
+				if(index>-1){
+					setTab(index)
+				}
+			}else if(route?.params?.type == "mission"){
+				let index = tab_mission.findIndex(x => x?.type =="community");
+				if(index>-1){
+					setTab(index)
+				}
+			}
+		}
+	},[])
+
 	    return (
 		<View style={{ flex: 1 }}>
 			{(tab == 0 && route.params.type=="quest" && enableChat)  && <LiveChat
@@ -80,7 +101,7 @@ const MissionDetail = ({ navigation, route }) => {
 							{icons.backMajor(colors.primary, 26)}
 						</Pressable>
 						<View style={{ width: 5 }} />
-						<MyText type="bold" fontSize={textSize.title} color={colors.primary}> {route.params.heading || "The Source Code"} </MyText>
+						<MyText type="bold" fontSize={textSize.title} color={colors.primary}> {title} </MyText>
 					</View>
 					{(tab == 0 && route.params.type=="quest" && enableChat) ?
 						<Pressable onPress={() => setShowChat(true)}>
@@ -96,6 +117,7 @@ const MissionDetail = ({ navigation, route }) => {
 					changeTab={(e) => setTab(e)}
 				/>
 				{ ( (route.params.type == "quest" && tab < 2) || (route.params.type == "mission" && tab == 0) ) && <Overview
+				  setTitle={setTitle}
 				  setEnableChat={setEnableChat}
 				  setChatID={setChatID}
 					token={token}
@@ -214,7 +236,7 @@ const Header = ({ res, show, showBadges, quest='', daysOn="" }) => {
 	)
 }
 
-const Overview = ({ token, navigation, id, type, showBadges, setEnableChat, setChatID }) => {
+const Overview = ({ token, navigation, id, type, showBadges, setEnableChat, setChatID, setTitle }) => {
 	const [res, setResult] = useState([])
 	const [loading, setLoading] = useState(true)
 	const [refreshing, setRefreshing] = useState(false)
@@ -227,6 +249,7 @@ const Overview = ({ token, navigation, id, type, showBadges, setEnableChat, setC
 		})
 		if (res.code == 200) {
 			setResult(res.mission)
+		  setTitle(res.mission.title)
 			setLoading(false)
 			setRefreshing(false);
 		  setEnableChat(res?.mission?.is_chat_enabled)
