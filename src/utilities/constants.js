@@ -98,7 +98,8 @@ export const dateTimeFormat = {
   time: "hh:mm A",
   dateTime: "DD-MM-YYYY hh:mm A",
   dateTimeWithText: (text) => `DD-MM-YYYY [${text}] hh:mm A`,
-  conversion: "YYYY-MM-DD HH:mm:ss"
+  conversion: "YYYY-MM-DD HH:mm:ss",
+  conversion2: "YYYY-MM-DD hh:mm:ss"
 }
 
 export const TimeZones = [

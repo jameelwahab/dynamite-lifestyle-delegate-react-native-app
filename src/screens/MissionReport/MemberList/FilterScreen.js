@@ -86,12 +86,11 @@ const FilterScreen = ({ navigation, route }) => {
 			<View style={{ flex: 1 }}>
 				<ScrollView contentContainerStyle={{ paddingHorizontal: 10 }}>
 					<View style={{ height: 10 }} />
-					<View style={__style.top_view_con}>
-						<Pressable
-							style={{ flex: 0.8, }}
-							onPress={() => setCalendarModalVisiblity(true)}>
+					<Pressable onPress={() => setCalendarModalVisiblity(true)} style={__style.top_view_con}>
+						<View
+							style={{ flex: 0.8 }} >
 							<MyText>{select?.title || "Missions"}</MyText>
-						</Pressable>
+						</View>
 						<View style={{ flexDirection: 'row' }}>
 							{select?.title &&
 								<Pressable style={__style.icons_container} onPress={() => setSelected({ title: "", from: 0, to: 0 })}>
@@ -105,7 +104,7 @@ const FilterScreen = ({ navigation, route }) => {
 								<Icon name="caretdown" size={12} color={colors.primary} />
 							</Pressable>
 						</View>
-					</View>
+					</Pressable>
 					<View style={{ height: 25 }} />
 					{select?.title &&
 						<>

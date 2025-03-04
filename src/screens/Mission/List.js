@@ -47,8 +47,9 @@ const List = ({ navigation, route }) => {
 		}
 	}
 	const handleCopyMethod = (link,mission_id, type) => {
+			console.log(type)
 	    if(link){
-		copyText(link)
+		copyText(link, `${type =="quest" ? "Quest" : "Mission"} link copied successfully`)
 	    }
 	    else{
 		GET_MISSION_APP_LINK({token, navigation,mission_id, type }).then(res=> {

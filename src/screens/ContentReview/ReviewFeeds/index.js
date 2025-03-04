@@ -9,12 +9,13 @@ import OptionModal2 from '../../../components/OptionModal2'
 import MyRefreshControl from '../../../components/MyRefreshControl'
 import FooterLoader from '../../../components/FooterLoader'
 import { colors } from "../../../utilities/colors"
+import { textSize } from "../../../utilities/styles"
 import { dateTimeFormat } from "../../../utilities/constants"
 import { GET_REVIEW_FEEDS, APPROVE_REVIEW_FEEDS, DELETE_REVIEW_FEEDS } from '../../../DAL'
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../../redux/reducers/userSlice'
 import { useState, useEffect, useRef } from "react"
-import { Text, FlatList, View, TouchableOpacity } from "react-native"
+import { Text, FlatList, View, TouchableOpacity, SafeAreaView, Pressable } from "react-native"
 import moment from 'moment'
 import { MenuButton } from '../../../components/MyButton';
 import routes from '../../../navigation/routes';
@@ -29,6 +30,8 @@ const ReviewFeeds = ({ navigation, route }) => {
 	const [refreshing, setRefresh] = useState(false)
 	const [showModal, setShowModal] = useState(false)
 	const [showFooterLoader, setShowFooterLoader] = useState(false)
+  const [showAlert, setShowAlert] =useState(false)
+  const [selectContent, setSelectContent] = useState({id:"", key:""})
 	const [page, setPage] = useState(0)
 
 
@@ -69,13 +72,16 @@ const ReviewFeeds = ({ navigation, route }) => {
 
 
 
-	const handleSelect = (opt, id) => {
-		if (opt.key == "ap") {
-			APPROVE_REVIEW_FEEDS({ token, navigation, id }).then(() => setResult(result.filter(el => el._id !== id && el)))
-		} else if (opt.key == "del") {
-			DELETE_REVIEW_FEEDS({ token, navigation, id }).then(() => setResult(result.filter(el => el._id !== id && el)))
+		const handleSelect = (opt, id) => {
+				setShowAlert(true)
+				setSelectContent({id, key:opt})
 		}
-	}
+		const handleDelete = (id)=>{
+				return DELETE_REVIEW_FEEDS({ token, navigation, id }).then(() => setResult(result.filter(el => el._id !== id && el)))
+		}
+		const handleAgree= (id)=>{
+				return APPROVE_REVIEW_FEEDS({ token, navigation, id }).then(() => setResult(result.filter(el => el._id !== id && el)))
+		}
 
 	const removeFromList = (id) => {
 		setResult((list) => list.filter(el => el._id !== id))
@@ -142,6 +148,8 @@ const ReviewFeeds = ({ navigation, route }) => {
 				/>
 			</View>
 
+	    <CustomAlert isVisible={showAlert} content={selectContent} closeModal={()=> setShowAlert(false)}  handleDelete={handleDelete} handleAgree={handleAgree}/> 
+
 			<OptionModal2
 				ref={ref}
 				onSelected={handleSelect}
@@ -150,6 +158,36 @@ const ReviewFeeds = ({ navigation, route }) => {
 			<MyLoader enable={loading} />
 		</RootView>
 	)
+}
+
+const CustomAlert = ({isVisible, closeModal, content, handleDelete, handleAgree})=>{
+		return(
+	<Modal
+	    isVisible={isVisible}
+	    onBackdropPress={closeModal}
+	    onBackButtonPress={closeModal}
+	    useNativeDriverForBackdrop={true}
+	    animationInTiming={300}
+	    animationOutTiming={300}
+	    hideModalContentWhileAnimating={true}
+	    >
+	    <SafeAreaView style={{ backgroundColor: colors.secondaryVariant, borderRadius: 10, height: 105 }} >
+		<View style={{flex:1, padding:15}}>
+				<MyText fontSize={textSize.title} color={colors.primary} type="bold">{`Are you sure you wanna ${content?.key?.title?.toLowerCase()} this post?`}</MyText>
+						<View style={{height:15}}/>
+				<View style={{flexDirection:"row", justifyContent:"flex-end", alignItems:"center"}}>
+								<Pressable onPress={closeModal}>
+										<MyText type="semi" color={colors.primary}>CANCEL</MyText>
+								</Pressable>
+						<View style={{width:10}}/>
+								<Pressable onPress={()=> closeModal() || content.key.key === 'del' && handleDelete(content.id) || content.key.key=="ap" && handleAgree(content.id) }>
+										<MyText type="semi" color={colors.primary}>AGRESS</MyText>
+								</Pressable>
+				</View>
+		</View>
+	    </SafeAreaView>
+	</Modal>
+		)
 }
 
 const renderPosts = ({ feed, index, handleClick, onDetail }) => {
@@ -187,9 +225,9 @@ const renderPosts = ({ feed, index, handleClick, onDetail }) => {
 			<StatView title="Created For" value={getFeedType(feed)} />
 			<StatView
 				title="Created At"
-				value={moment(feed?.createdAt).format(dateTimeFormat.conversion)}
+				value={moment(feed?.createdAt).format(dateTimeFormat.conversion2)}
 			/>
-			<StatView title="Appear by" value={feed?.feed_appear_by} />
+			<StatView title="Appeared" value={feed?.feed_appear_by} />
 			<StatView title="Reason" value={feed?.review_info.reason} numberOfLinesValues={2} />
 			<View style={{ height: 10 }} />
 			<TouchableOpacity

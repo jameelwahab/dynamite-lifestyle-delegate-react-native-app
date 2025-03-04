@@ -37,7 +37,7 @@ const LessonView = ({ title, style, heading, icon, iconTextColor = colors.white,
 				defaultSize={{ width: 150, height: 85 }}
 				style={{ width: "100%" }} />
 
-{copyEnable &&
+		  {copyEnable &&
 			    <View style={{
 				alignItems: "flex-end", justifyContent: "flex-end",
 				position:"absolute",
@@ -78,7 +78,7 @@ const LessonView = ({ title, style, heading, icon, iconTextColor = colors.white,
 			</Text>
 		    }
 		<View style={{ marginVertical: 2 }}>
-		    <CollapseText numOfLines={!missionDetail && (dynamicNumberOfTitleLines > 1 ? 2 : 3) } disable={missionDetail} desc={desc} style={main.miniDesc} />
+		    <CollapseText numOfLines={!missionDetail ? (dynamicNumberOfTitleLines > 1 ? 2 : 3) : 100} disable={missionDetail} desc={desc} style={main.miniDesc} />
 		</View>
 	    </View>
 	    </View>

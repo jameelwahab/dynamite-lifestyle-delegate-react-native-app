@@ -29,7 +29,9 @@ const ReviewComments = ({navigation}) => {
     const [showFooterLoader,setShowFooterLoader] = useState(false)
     const [page, setPage] =useState(0)
     const [showComment, setShowComment] = useState(false)
-    const [content, setContent] = useState({title:"", desc:""})
+		const [content, setContent] = useState({title:"", desc:""})
+		const [selectContent, setSelectContent] = useState({id:"", key:""})
+		const [showAlert, setShowAlert] = useState(false)
 
     const getFeeds = async ({load=false, pageCount}) => {
 	setLoading(load)
@@ -63,9 +65,17 @@ const ReviewComments = ({navigation}) => {
     const closeModal = () => setShowModal(false)
     const handleClick = (id)=> ref.current.openModal?.(id);
     const handleSelect=(opt, id)=> {
-	if(opt.key=="ap")  APPROVE_COMMENT_REVIEW({token, navigation, id}).then((res)=> res.code==200 && setResult(result.filter(el=> el._id !== id && el))) 
-	else if(opt.key=="del") DELETE_COMMNET_REVIEW({token, navigation, id}).then((res)=> res.code==200 && setResult(result.filter(el=> el._id !== id && el))) 
+	// if(opt.key=="ap")  APPROVE_COMMENT_REVIEW({token, navigation, id}).then((res)=> res.code==200 && setResult(result.filter(el=> el._id !== id && el))) 
+	// else if(opt.key=="del") DELETE_COMMNET_REVIEW({token, navigation, id}).then((res)=> res.code==200 && setResult(result.filter(el=> el._id !== id && el))) 
+				setShowAlert(true)
+				setSelectContent({id, key:opt})
     }
+		const handleDelete= (id) => {
+				return DELETE_COMMNET_REVIEW({token, navigation, id}).then((res)=> res.code==200 && setResult(result.filter(el=> el._id !== id && el)))  
+		}
+		const handleAgree= (id) => {
+				return APPROVE_COMMENT_REVIEW({token, navigation, id}).then((res)=> res.code==200 && setResult(result.filter(el=> el._id !== id && el))) 
+		}
     const handleEndReach = () => {
 	if(!loading){
 	    setShowFooterLoader(true)
@@ -81,6 +91,7 @@ const ReviewComments = ({navigation}) => {
 		optionList={optionsList}
 		/>
 	    <CustomModal isVisible={showComment} content={content} closeModal={()=> setShowComment(false)} /> 
+	    <CustomAlert isVisible={showAlert} content={selectContent} closeModal={()=> setShowAlert(false)}  handleDelete={handleDelete} handleAgree={handleAgree}/> 
 	    <FlatList 
 		data={result}
 		showsVerticalScrollIndicator={false}
@@ -106,6 +117,36 @@ const ReviewComments = ({navigation}) => {
 	</RootView>
     )
 
+}
+
+const CustomAlert = ({isVisible, closeModal, content, handleDelete, handleAgree})=>{
+		return(
+	<Modal
+	    isVisible={isVisible}
+	    onBackdropPress={closeModal}
+	    onBackButtonPress={closeModal}
+	    useNativeDriverForBackdrop={true}
+	    animationInTiming={300}
+	    animationOutTiming={300}
+	    hideModalContentWhileAnimating={true}
+	    >
+	    <SafeAreaView style={{ backgroundColor: colors.secondaryVariant, borderRadius: 10, height: 105 }} >
+		<View style={{flex:1, padding:15}}>
+				<MyText fontSize={textSize.title} color={colors.primary} type="bold">{`Are you sure you wanna ${content?.key?.title?.toLowerCase()} this post?`}</MyText>
+						<View style={{height:15}}/>
+				<View style={{flexDirection:"row", justifyContent:"flex-end", alignItems:"center"}}>
+								<Pressable onPress={closeModal}>
+										<MyText type="semi" color={colors.primary}>CANCEL</MyText>
+								</Pressable>
+						<View style={{width:10}}/>
+								<Pressable onPress={()=> closeModal() || content.key.key === 'del' && handleDelete(content.id) || content.key.key=="ap" && handleAgree(content.id) }>
+										<MyText type="semi" color={colors.primary}>AGRESS</MyText>
+								</Pressable>
+				</View>
+		</View>
+	    </SafeAreaView>
+	</Modal>
+		)
 }
 
 const CustomModal = ({isVisible, closeModal, content}) => {
@@ -147,7 +188,7 @@ const RenderPosts = ({feed, index, handleClick, setShowComment, setContent}) => 
 	<View style={{backgroundColor:colors.secondary, padding:10, borderRadius:10}}>
 	    <View style={{flexDirection:"row", aligItems:"center", justifyContent:"space-between"}}>
 		<View style={{flexDirection:"row", alignItems:'center'}}>
-		<UserImage size={30} image={feed.user_info_action_for.profile_image}/>
+				<UserImage size={30} image={feed?.user_info_action_for?.profile_image}/>
 		<View style={{width:10}}/>
 		<MyText
 		    fontSize={14}
@@ -162,14 +203,14 @@ const RenderPosts = ({feed, index, handleClick, setShowComment, setContent}) => 
 		</TouchableOpacity>
 	    </View>
 	    <View style={{height:10}}/>
-	    <StatView title="Description" value={feed?.message}/>
+	    <StatView title="Description" numberOfLinesValues={2} value={feed?.message}/>
 	    <StatView title="Created For" value={feed?.feed_created_for === "general" ? "The Source Code": feed?.feed_created_for}/>
 	    <StatView
 		title="Created At"
 		value={moment(new Date(feed?.createdAt))
-		    .format(dateTimeFormat.conversion)}
+		    .format(dateTimeFormat.conversion2)}
 		/>
-	    <StatView title="Reason" value={feed?.review_info.reason}/>
+	    <StatView title="Reason" numberOfLinesValues={2} value={feed?.review_info.reason}/>
 	    <View style={{height:10}}/>
 	    <TouchableOpacity activeOpacity={0.5} style={{alignItems:"flex-end"}} onPress={ ()=> setShowComment() || setContent() }>
 		<MyText fontSize={12} underlined color={colors.primary}>View Detail</MyText>

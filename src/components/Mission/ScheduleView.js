@@ -77,7 +77,11 @@ const ScheduleView = ({ schedule, index }) => {
                 {arr_gratitude.map((item, index) => {
                   return (
                     <View style={{ marginTop: index != 0 ? 10 : 0 }} key={index}>
-                      <MyText   >{labels?.gratitudeLabels[index]}</MyText>
+											<View style={{flexDirection:"row"}}>
+												<MyText>{labels?.gratitudeLabels[index]}</MyText>
+														<View style={{width:3}}/>
+												<MyText color={colors.delete}>*</MyText>
+											</View>
                       <TextInput
                         placeholder={index + 1 + ". "}
 												placeholderTextColor="white"
@@ -115,7 +119,13 @@ const ScheduleView = ({ schedule, index }) => {
                 {arr.map((item, index) => {
                   return (
                     <View key={index} style={{ marginTop: index != 0 ? 10 : 0 }}>
-                      <MyText  >{labels?.dailyDynamiteLabels[index]}</MyText>
+
+												<View style={{flexDirection:"row"}}>
+														<MyText>{labels?.dailyDynamiteLabels[index]}</MyText>
+														<View style={{width:3}}/>
+												<MyText color={colors.delete}>*</MyText>
+											</View>
+
                       <TextInput
                         placeholder={index + 1 + ". "}
 												placeholderTextColor="white"
@@ -159,11 +169,12 @@ const ScheduleView = ({ schedule, index }) => {
                   padding={0}
                   noQuestionStatement={true}
                   hideRepliesCheckBox={true}
+								  disableCollapse={true}
                   item={{ ...item }}
                   index={index}
 								  key={index}
                   showRepliesbtns={false}
-                  hideCollpase={true}
+                  hideCollpase={false}
                 />)
               })}
             </View>}
@@ -185,6 +196,7 @@ const ScheduleView = ({ schedule, index }) => {
                 <MyInputs
 		  placeholder={labels.journal}
                   noLable
+								  editable={false}
                   noSpace
                   multiline={true}
                   value={schedule?.general_note}
@@ -211,6 +223,7 @@ const ScheduleView = ({ schedule, index }) => {
                   padding={0}
                   noQuestionStatement={true}
                   hideRepliesCheckBox={true}
+								  disableCollapse={true}
                   item={{ ...item }}
                   index={index}
 								  key={index}
