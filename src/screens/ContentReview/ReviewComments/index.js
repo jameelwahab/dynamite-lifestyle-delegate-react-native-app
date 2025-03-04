@@ -16,7 +16,7 @@ import {GET_COMMENT_REVIEW, APPROVE_COMMENT_REVIEW, DELETE_COMMNET_REVIEW} from 
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../../redux/reducers/userSlice'
 import { useState, useEffect, useRef } from "react"
-import {Text, FlatList, View, TouchableOpacity, SafeAreaView, Pressable} from "react-native"
+import {Text, FlatList, View, TouchableOpacity, SafeAreaView,ScrollView, Pressable} from "react-native"
 import { icons } from '../../../utilities/icons';
 import moment from 'moment'
 
@@ -130,9 +130,8 @@ const CustomAlert = ({isVisible, closeModal, content, handleDelete, handleAgree}
 	    animationOutTiming={300}
 	    hideModalContentWhileAnimating={true}
 	    >
-	    <SafeAreaView style={{ backgroundColor: colors.secondaryVariant, borderRadius: 10, height: 105 }} >
-		<View style={{flex:1, padding:15}}>
-				<MyText fontSize={textSize.title} color={colors.primary} type="bold">{`Are you sure you wanna ${content?.key?.title?.toLowerCase()} this post?`}</MyText>
+		<View style={{backgroundColor: colors.secondaryVariant,padding:15, borderRadius: 10,}}>
+				<MyText fontSize={textSize.title} color={colors.primary} type="bold">{`Are you sure you want to ${content?.key?.key === "del" ? "delete" :"approve"} this comment?`}</MyText>
 						<View style={{height:15}}/>
 				<View style={{flexDirection:"row", justifyContent:"flex-end", alignItems:"center"}}>
 								<Pressable onPress={closeModal}>
@@ -144,7 +143,6 @@ const CustomAlert = ({isVisible, closeModal, content, handleDelete, handleAgree}
 								</Pressable>
 				</View>
 		</View>
-	    </SafeAreaView>
 	</Modal>
 		)
 }
@@ -160,8 +158,10 @@ const CustomModal = ({isVisible, closeModal, content}) => {
 	    animationOutTiming={300}
 	    hideModalContentWhileAnimating={true}
 	    >
-	    <SafeAreaView style={{ backgroundColor: colors.secondaryVariant, borderRadius: 10, height: 300 }} >
-		<View style={{flex:1, padding:15}}>
+				<View style={{ padding:15, backgroundColor: colors.secondaryVariant, borderRadius:10,}}>
+		<ScrollView
+				showsVerticalScrollIndicator={false}
+				style={{maxHeight:700 }}>
 		    <View style={{flexDirection:"row", alignItems:"center", justifyContent:"space-between",paddingBottom:10, borderBottomWidth:1, borderBottomColor:colors.lightText}}>
 			<View />
 			<MyText fontSize={textSize.title} type="bold">Review Comment</MyText>
@@ -175,8 +175,8 @@ const CustomModal = ({isVisible, closeModal, content}) => {
 			<View style={{height:6}}/>
 			<MyText>{content.desc}</MyText>
 		    </View>
-		</View>
-	    </SafeAreaView>
+		</ScrollView>
+				</View>
 	</Modal>
     )
 }
@@ -203,14 +203,14 @@ const RenderPosts = ({feed, index, handleClick, setShowComment, setContent}) => 
 		</TouchableOpacity>
 	    </View>
 	    <View style={{height:10}}/>
-	    <StatView title="Description" numberOfLinesValues={2} value={feed?.message}/>
+	    <StatView title="Description" original numberOfLinesValues={2} value={feed?.message}/>
 	    <StatView title="Created For" value={feed?.feed_created_for === "general" ? "The Source Code": feed?.feed_created_for}/>
 	    <StatView
 		title="Created At"
 		value={moment(new Date(feed?.createdAt))
-		    .format(dateTimeFormat.conversion2)}
+		    .format(dateTimeFormat.dateTime)}
 		/>
-	    <StatView title="Reason" numberOfLinesValues={2} value={feed?.review_info.reason}/>
+	    <StatView title="Reason" numberOfLinesValues={2} original value={feed?.review_info.reason}/>
 	    <View style={{height:10}}/>
 	    <TouchableOpacity activeOpacity={0.5} style={{alignItems:"flex-end"}} onPress={ ()=> setShowComment() || setContent() }>
 		<MyText fontSize={12} underlined color={colors.primary}>View Detail</MyText>

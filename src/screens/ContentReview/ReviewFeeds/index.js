@@ -171,9 +171,8 @@ const CustomAlert = ({isVisible, closeModal, content, handleDelete, handleAgree}
 	    animationOutTiming={300}
 	    hideModalContentWhileAnimating={true}
 	    >
-	    <SafeAreaView style={{ backgroundColor: colors.secondaryVariant, borderRadius: 10, height: 105 }} >
-		<View style={{flex:1, padding:15}}>
-				<MyText fontSize={textSize.title} color={colors.primary} type="bold">{`Are you sure you wanna ${content?.key?.title?.toLowerCase()} this post?`}</MyText>
+		<View style={{ backgroundColor: colors.secondaryVariant, borderRadius: 10, padding:15 }}>
+				<MyText fontSize={textSize.title} color={colors.primary} type="bold">{`Are you sure you want to ${content?.key?.key === "del" ? "delete" :"approve"} this post?`}</MyText>
 						<View style={{height:15}}/>
 				<View style={{flexDirection:"row", justifyContent:"flex-end", alignItems:"center"}}>
 								<Pressable onPress={closeModal}>
@@ -185,7 +184,6 @@ const CustomAlert = ({isVisible, closeModal, content, handleDelete, handleAgree}
 								</Pressable>
 				</View>
 		</View>
-	    </SafeAreaView>
 	</Modal>
 		)
 }
@@ -213,7 +211,6 @@ const renderPosts = ({ feed, index, handleClick, onDetail }) => {
 					member={feed.action_info}
 					hideEmail
 				/>
-				
 				<MenuButton
 					marginHorizontal={0}
 					onPress={handleClick}
@@ -221,14 +218,13 @@ const renderPosts = ({ feed, index, handleClick, onDetail }) => {
 				/>
 			 </View>
 			<View style={{ height: 10 }} />
-			<StatView title="Description" value={feed?.description} numberOfLinesValues={2} />
+			<StatView title="Description" original={true}  value={feed?.description} numberOfLinesValues={2} />
 			<StatView title="Created For" value={getFeedType(feed)} />
 			<StatView
 				title="Created At"
-				value={moment(feed?.createdAt).format(dateTimeFormat.conversion2)}
+				value={moment(feed?.createdAt).format(dateTimeFormat.dateTime)}
 			/>
-			<StatView title="Appeared" value={feed?.feed_appear_by} />
-			<StatView title="Reason" value={feed?.review_info.reason} numberOfLinesValues={2} />
+			<StatView title="Reason" value={feed?.review_info.reason} original={true} numberOfLinesValues={2} />
 			<View style={{ height: 10 }} />
 			<TouchableOpacity
 				onPress={onDetail} style={{ alignSelf: "flex-end" }}>

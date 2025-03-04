@@ -136,6 +136,7 @@ return (
 					showBadges={tab == 1}
 					type={route.params.type}
 				  focuse={isFocused}
+				  tab={tab}
 				/>}
 				{ ( (route.params.type=="quest" && tab == 2) || (route.params.type == "mission" && tab==1) ) && <Community route={route} navigation={navigation} />}
 			</View>
@@ -192,7 +193,7 @@ const TrackerList = ({ res, type }) => {
 }
 
 
-const Header = ({ res, show, showBadges, quest='', daysOn="", focuse }) => {
+const Header = ({ res, show, showBadges, quest='', daysOn="", focuse, tab }) => {
 	const startDate =  `${moment(res?.start_date).format(dateTimeFormat.date).split('-')[0]} ${months[Number(moment(res?.start_date).format(dateTimeFormat.date).split('-')[1])-1].short2}`
 	const endDate =  `${moment(res?.end_date).format(dateTimeFormat.date).split('-')[0]} ${months[Number(moment(res?.end_date).format(dateTimeFormat.date).split('-')[1])-1].short2}`
 		const [schedule,setSchedules] = useState(res)	
@@ -208,7 +209,7 @@ const Header = ({ res, show, showBadges, quest='', daysOn="", focuse }) => {
 				HeaderView({
 						type: quest,
 						embed_code: daysOn != "" ? schedule?.embed_code : res?.embed_code,
-						video_url: daysOn != "" ? schedule?.video_url : res?.video_url,
+						video_url: (daysOn != "" && tab==0) ? schedule?.video_url : res?.video_url,
 						mission_id: daysOn != "" ? schedule?._id : res?._id,
 						audio_url:  daysOn != "" ? schedule?.audio_url : res?.audio_url,
 						img_url: daysOn != "" ? schedule?.image?.thumbnail_1 : res?.image?.thumbnail_1,
@@ -236,7 +237,7 @@ const Header = ({ res, show, showBadges, quest='', daysOn="", focuse }) => {
 	)
 }
 
-const Overview = ({ token, navigation, id, type, showBadges, setEnableChat, setChatID, setTitle, focuse }) => {
+const Overview = ({ token, navigation, id, type, showBadges, setEnableChat, setChatID, setTitle, focuse, tab }) => {
 	const [res, setResult] = useState([])
 	const [loading, setLoading] = useState(true)
 	const [refreshing, setRefreshing] = useState(false)
@@ -286,7 +287,7 @@ const Overview = ({ token, navigation, id, type, showBadges, setEnableChat, setC
 			ListEmptyComponent={!loading && <EmptyView />}
 			ListFooterComponent={<View style={{height:100}}/>}
 			ListHeaderComponent={
-				<Header focuse={focuse} res={res} show={type == "mission" } quest={type=="quest"} daysOn={daysOn} showBadges={showBadges || type=="mission"}/>
+				<Header focuse={focuse} res={res} tab={tab} show={type == "mission" } quest={type=="quest"} daysOn={daysOn} showBadges={showBadges || type=="mission"}/>
 			}
 			refreshControl={<MyRefreshControl
 				refreshing={refreshing}
