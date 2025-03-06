@@ -38,7 +38,6 @@ const MissionReport = ({ navigation, route }) => {
   const [badgesEarned, setBadgesEarned] = useState([])
   const [user, setUser] = useState(null)
 
-
   const prepareLineChartData = (dataset) => {
     if (!dataset || dataset.length === 0) {
       return { labels: [], datasets: [] };
@@ -170,7 +169,7 @@ const MissionReport = ({ navigation, route }) => {
           acheivedCoins={mission?.attracted_coins}
         />
 
-        {!hasPermission &&
+        {!hasPermission && isArray(schedules) &&
           <View style={{ flexDirection: "row", borderRadius: 10, overflow: 'hidden', marginVertical: 10, backgroundColor: colors.secondary }}>
             <View style={{ width: 4, height: "100%", backgroundColor: colors.primary }} />
             <MyText style={{ padding: 10, backgroundColor: colors.secondary }}>{alert}</MyText>
@@ -218,9 +217,9 @@ const MissionReport = ({ navigation, route }) => {
           </>}
 
 
-        {isArray(schedules) > 0 &&
+        {isArray(schedules) &&
           <View style={{ marginTop: 10 }}>
-            <MyText fontSize={18} type='bold' color={colors.primary} >{mission?.type==="quest" ? "Detail Overview" : "Mission Report Detail Overview"}</MyText>
+            <MyText fontSize={18} type='bold' color={colors.primary} >{mission?.type === "quest" ? "Detail Overview" : "Mission Report Detail Overview"}</MyText>
           </View>
         }
 
@@ -242,7 +241,9 @@ const MissionReport = ({ navigation, route }) => {
             keyExtractor={(item) => item?._id}
             renderItem={({ item, index }) => {
               return (
-                <QuestionsView schedule={item} isAllow={(route.params.type=="completed" && (schedules.length==1 || index==schedules.length-1)) || hasPermission} index={index} />
+                <QuestionsView schedule={item}
+                  isAllow={(mission?.mission_status == "completed" && (index == schedules.length - 1)) || hasPermission}
+                  isLast={(schedules.length - 1 == index)} />
               )
             }}
           />
@@ -255,8 +256,8 @@ const MissionReport = ({ navigation, route }) => {
 export default MissionReport
 
 
-const QuestionsView = ({ schedule, isAllow = false, index }) => {
-  const [isCollapsed, setIsCollapsed] = useState(true);
+const QuestionsView = ({ schedule, isAllow = false, isLast }) => {
+  const [isCollapsed, setIsCollapsed] = useState(isAllow && isLast ? false : true);
 
   const scheduleActions = () => {
     let arr = schedule.general_allowed_actions;
@@ -441,7 +442,7 @@ const QuestionsView = ({ schedule, isAllow = false, index }) => {
                     item={{ ...item, answer: answers }}
                     index={index}
                     showRepliesbtns={false}
-                    hideCollpase={true}
+                    hideCollapse={true}
                   />)
                 })}
               </View>}
@@ -476,7 +477,7 @@ const QuestionsView = ({ schedule, isAllow = false, index }) => {
                   <MyInputs
                     noLable
                     noSpace
-		    editable={false}
+                    editable={false}
                     multiline={true}
                     value={schedule?.general_note}
                   />
@@ -504,7 +505,7 @@ const QuestionsView = ({ schedule, isAllow = false, index }) => {
                     item={{ ...item, answer: answers }}
                     index={index}
                     showRepliesbtns={false}
-                    hideCollpase={true}
+                    hideCollapse={true}
                   />)
                 })}
               </View>}

@@ -8,180 +8,260 @@ import StatView from '../../../components/StatView'
 import OptionModal2 from '../../../components/OptionModal2'
 import MyRefreshControl from '../../../components/MyRefreshControl'
 import FooterLoader from '../../../components/FooterLoader'
-import {MyButton2} from '../../../components/MyButton'
-import {colors} from "../../../utilities/colors"
+import { MyButton2 } from '../../../components/MyButton'
+import { colors } from "../../../utilities/colors"
 import { dateTimeFormat } from "../../../utilities/constants"
 import { textSize } from "../../../utilities/styles"
-import {GET_COMMENT_REVIEW, APPROVE_COMMENT_REVIEW, DELETE_COMMNET_REVIEW} from '../../../DAL'
+import { GET_COMMENT_REVIEW, APPROVE_COMMENT_REVIEW, DELETE_COMMNET_REVIEW } from '../../../DAL'
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../../redux/reducers/userSlice'
 import { useState, useEffect, useRef } from "react"
-import {Text, FlatList, View, TouchableOpacity, SafeAreaView, Pressable} from "react-native"
+import { Text, FlatList, View, TouchableOpacity, SafeAreaView, ScrollView, Pressable } from "react-native"
 import { icons } from '../../../utilities/icons';
 import moment from 'moment'
+import { onChatScreen } from '../../../functions/onChatScreen';
+import { MenuButton } from '../../../components/MyButton';
+import MemberView from '../../../components/MemberView';
+import ConfirmationModal2 from '../../../components/ConfirmationModal2';
+import showToast from '../../../functions/showToast';
 
-const ReviewComments = ({navigation}) => {
-    const { token } = useSelector(selectUser);
-    const [result, setResult] = useState()
-    const [loading, setLoading] = useState(false)
-    const [refreshing, setRefresh] = useState(false)
-    const [showModal, setShowModal] = useState(false)
-    const [showFooterLoader,setShowFooterLoader] = useState(false)
-    const [page, setPage] =useState(0)
-    const [showComment, setShowComment] = useState(false)
-    const [content, setContent] = useState({title:"", desc:""})
+const ReviewComments = ({ navigation }) => {
+	const { user, token, access } = useSelector(selectUser);
+	const ref_confirmModal = useRef()
+	const paging = useRef({ page: 0, canLoadMore: false })?.current;
+	const [result, setResult] = useState()
+	const [loading, setLoading] = useState(false)
+	const [refreshing, setRefresh] = useState(false)
+	const [showModal, setShowModal] = useState(false)
+	const [showFooterLoader, setShowFooterLoader] = useState(false)
+	const [page, setPage] = useState(0)
+	const [showComment, setShowComment] = useState(false)
+	const [content, setContent] = useState({ title: "", desc: "" })
+	const [selectContent, setSelectContent] = useState({ id: "", key: "" })
+	const [showAlert, setShowAlert] = useState(false)
 
-    const getFeeds = async ({load=false, pageCount}) => {
-	setLoading(load)
-	const res = await GET_COMMENT_REVIEW({token, navigation, limit:10, page:pageCount})
-	if(res.code == 200){
-	    if(pageCount==0) setResult(res?.comments)
-	    else setResult([...result, ...res?.comments])
-	    setLoading(false)
-	    setRefresh(false)
-	    setShowFooterLoader(false)
+
+
+	const getFeeds = async () => {
+		const res = await GET_COMMENT_REVIEW({ token, navigation, limit: 20, page: paging?.page })
+		if (res.code == 200) {
+			setResult(paging?.page == 0 ? res?.comments : [...result, ...res?.comments])
+			let length = paging?.page == 0 ? res?.comments.length : (result.length + res?.comments.length);
+			if (length < res?.total_count) {
+				paging.page++;
+				paging.canLoadMore = true;
+			} else {
+				paging.canLoadMore = false;
+			}
+			setLoading(false)
+			setRefresh(false)
+			setShowFooterLoader(false)
+		}
+		else {
+			setResult([])
+			setPage(0)
+			setLoading(false)
+			setRefresh(false)
+		}
 	}
-	else{
-	    setResult([])
-	    setPage(0)
-	    setLoading(false)
-	    setRefresh(false)
+
+	useEffect(() => {
+		paging.canLoadMore = false;
+		paging.page = 0;
+		setLoading(true)
+		getFeeds()
+	}, [])
+
+
+	const onRefresh = () => {
+		paging.canLoadMore = false;
+		paging.page = 0;
+		setRefresh(true)
+		getFeeds()
 	}
-    }
+	const ref = useRef(null)
+	const closeModal = () => setShowModal(false)
+	const handleClick = (id) => ref.current.openModal?.(id);
 
-    useEffect(()=>{
-	setPage(0)
-	getFeeds({load:true,pageCount:0})
-    },[])
+	const handleSelect = (opt, item) => {
+		if (opt.key == "msg") {
+			onChatScreen(item?.user_info_action_for?.action_id, token, navigation, user?._id)
+		} else if (opt.key == "edit") {
 
-
-    const onRefresh = () => {
-	setRefresh(true)
-	getFeeds({load:false, pageCount:0})
-    }
-    const ref = useRef(null)
-    const closeModal = () => setShowModal(false)
-    const handleClick = (id)=> ref.current.openModal?.(id);
-    const handleSelect=(opt, id)=> {
-	if(opt.key=="ap")  APPROVE_COMMENT_REVIEW({token, navigation, id}).then((res)=> res.code==200 && setResult(result.filter(el=> el._id !== id && el))) 
-	else if(opt.key=="del") DELETE_COMMNET_REVIEW({token, navigation, id}).then((res)=> res.code==200 && setResult(result.filter(el=> el._id !== id && el))) 
-    }
-    const handleEndReach = () => {
-	if(!loading){
-	    setShowFooterLoader(true)
-	    setPage(page+1)
-	    getFeeds({load:false})
+		} else if (opt.key == "del") {
+			ref_confirmModal?.current?.openModal({
+				title: `Are you sure you want to delete this comment?`,
+				agreeFunc: () => handleDelete(item?._id)
+			})
+		} else if (opt.key == "ap") {
+			ref_confirmModal?.current?.openModal({
+				title: `Are you sure you want to approve this comment?`,
+				agreeFunc: () => handleAgree(item?._id)
+			})
+		}
 	}
-    } 
-    return (
-	<RootView hideBackBottomButton title="Review Comments">
-	    <OptionModal2
-		ref={ref}
-		onSelected={handleSelect}
-		optionList={optionsList}
-		/>
-	    <CustomModal isVisible={showComment} content={content} closeModal={()=> setShowComment(false)} /> 
-	    <FlatList 
-		data={result}
-		showsVerticalScrollIndicator={false}
-		ListEmptyComponent={!loading && <EmptyView />}
-		ItemSeparatorComponent={<View style={{height:12}}/>}
-		ListFooterComponent={!loading && <FooterLoader isVisible={showFooterLoader}/>}
-		onEndReached={handleEndReach}
-		refreshControl = {<MyRefreshControl 
-					refreshing={refreshing}
-					onRefresh={onRefresh}
-				/>}
-		keyExtractor={(_,index)=> index.toString()}
-		renderItem={({item,index})=> 
-		    <RenderPosts
-			feed={item}
-			index={index}
-			handleClick={()=>handleClick(item._id)}
-			setShowComment={()=>setShowComment(true)}
-			setContent={()=>setContent({title:item.message, desc:item.review_info.reason})}
+
+	const handleDelete = async (id) => {
+		setLoading(true);
+		let res = await DELETE_COMMNET_REVIEW({ token, navigation, id });
+		if (res.code == 200) {
+			showToast({ body: res?.message, type: "success" })
+			setLoading(false);
+			setResult(result.filter(el => el._id !== id && el))
+		} else {
+			setLoading(false);
+		}
+	}
+
+	const handleAgree = async (id) => {
+		setLoading(true);
+		let res = await APPROVE_COMMENT_REVIEW({ token, navigation, id });
+		if (res.code == 200) {
+			showToast({ body: res?.message, type: "success" })
+			setLoading(false);
+			setResult(result.filter(el => el._id !== id && el))
+		} else {
+			setLoading(false);
+		}
+	}
+
+	const handleEndReach = () => {
+		if (paging?.canLoadMore) {
+			paging.canLoadMore = false;
+			setShowFooterLoader(true)
+			getFeeds()
+		}
+	}
+
+	const filterOptions = () => {
+		// console.log(access,"access")
+		return optionsList.slice().filter(item => {
+			if (item.key == "del" || item.key == "edit") {
+				return access?.edit_delete_option_in_source_all_source_feeds
+			} else if (item.key == 'msg') {
+				return access?.is_chat_allowed
+			} else {
+				return true
+			}
+		})
+	}
+
+	return (
+		<RootView hideBackBottomButton title="Review Comments">
+			<CustomModal isVisible={showComment} content={content} closeModal={() => setShowComment(false)} />
+			<View style={{ flex: 1 }}>
+				<FlatList
+					data={result}
+					showsVerticalScrollIndicator={false}
+					ListEmptyComponent={!loading && <EmptyView />}
+					ItemSeparatorComponent={<View style={{ height: 12 }} />}
+					ListFooterComponent={!loading && <FooterLoader isVisible={showFooterLoader} />}
+					onEndReached={handleEndReach}
+					refreshControl={<MyRefreshControl
+						refreshing={refreshing}
+						onRefresh={onRefresh}
+					/>}
+					keyExtractor={(_, index) => index.toString()}
+					renderItem={({ item, index }) =>
+						<RenderPosts
+							feed={item}
+							index={index}
+							handleClick={() => handleClick(item)}
+							setShowComment={() => setShowComment(true)}
+							setContent={() => setContent({ title: item.message, desc: item.review_info.reason })}
+						/>
+					} />
+			</View>
+			<MyLoader enable={loading} />
+
+			<OptionModal2
+				ref={ref}
+				onSelected={handleSelect}
+				optionList={filterOptions()}
 			/>
-		}/>
-	    <MyLoader enable={loading}/>
-	</RootView>
-    )
+			<ConfirmationModal2
+				ref={ref_confirmModal}
+			/>
+		</RootView>
+	)
 
 }
 
-const CustomModal = ({isVisible, closeModal, content}) => {
-    return(
-	<Modal
-	    isVisible={isVisible}
-	    onBackdropPress={closeModal}
-	    onBackButtonPress={closeModal}
-	    useNativeDriverForBackdrop={true}
-	    animationInTiming={300}
-	    animationOutTiming={300}
-	    hideModalContentWhileAnimating={true}
-	    >
-	    <SafeAreaView style={{ backgroundColor: colors.secondaryVariant, borderRadius: 10, height: 300 }} >
-		<View style={{flex:1, padding:15}}>
-		    <View style={{flexDirection:"row", alignItems:"center", justifyContent:"space-between",paddingBottom:10, borderBottomWidth:1, borderBottomColor:colors.lightText}}>
-			<View />
-			<MyText fontSize={textSize.title} type="bold">Review Comment</MyText>
-			    <MyButton2 icon={()=> icons.crosss(colors.primary, 16)} onPress={closeModal}/>
-		    </View>
-		    <View style={{paddingVertical:10, borderBottomWidth:1, borderBottomColor:colors.lightText}}>
-			<MyText>{content.title}</MyText>
-		    </View>
-		    <View style={{paddingVertical:10}}>
-			<MyText style={textSize.title} type="bold" color={colors.primary}>Review Reason</MyText>
-			<View style={{height:6}}/>
-			<MyText>{content.desc}</MyText>
-		    </View>
-		</View>
-	    </SafeAreaView>
-	</Modal>
-    )
+
+
+const CustomModal = ({ isVisible, closeModal, content }) => {
+	return (
+		<Modal
+			isVisible={isVisible}
+			onBackdropPress={closeModal}
+			onBackButtonPress={closeModal}
+			useNativeDriverForBackdrop={true}
+			animationInTiming={300}
+			animationOutTiming={300}
+			animationIn={"zoomIn"}
+			animationOut={"zoomOut"}
+			hideModalContentWhileAnimating={true}
+		>
+			<View style={{ padding: 15, backgroundColor: colors.secondaryVariant, borderRadius: 10, }}>
+				<ScrollView
+					showsVerticalScrollIndicator={false}
+					style={{ maxHeight: 700 }}>
+					<View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingBottom: 10, borderBottomWidth: 1, borderBottomColor: colors.lightText }}>
+						<View />
+						<MyText fontSize={textSize.title} type="bold">Review Comment</MyText>
+						<MyButton2 icon={() => icons.crosss(colors.primary, 16)} onPress={closeModal} />
+					</View>
+					<View style={{ paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: colors.lightText }}>
+						<MyText>{content.title}</MyText>
+					</View>
+					<View style={{ paddingVertical: 10 }}>
+						<MyText style={textSize.title} type="bold" color={colors.primary}>Review Reason</MyText>
+						<View style={{ height: 6 }} />
+						<MyText>{content.desc}</MyText>
+					</View>
+				</ScrollView>
+			</View>
+		</Modal>
+	)
 }
 
-const RenderPosts = ({feed, index, handleClick, setShowComment, setContent}) => {
+const RenderPosts = ({ feed, index, handleClick, setShowComment, setContent }) => {
 
-    return (
-	<>
-	<View style={{backgroundColor:colors.secondary, padding:10, borderRadius:10}}>
-	    <View style={{flexDirection:"row", aligItems:"center", justifyContent:"space-between"}}>
-		<View style={{flexDirection:"row", alignItems:'center'}}>
-		<UserImage size={30} image={feed.user_info_action_for.profile_image}/>
-		<View style={{width:10}}/>
-		<MyText
-		    fontSize={14}
-		    type='bold'>{feed?.user_info_action_for?.name}</MyText>
-		</View>
-		<TouchableOpacity
-		    onPress={handleClick}
-		    activeOpacity={0.5} style={{backgroundColor:colors.border, width:24.5, height: 24.5,borderRadius:33, alignItems:"center", justifyContent:"center"}}>
-		    {[...Array(3)].map((el,index)=> 
-			<View key={index} style={{width:3, height:3, borderRadius:30, backgroundColor:colors.primary, marginTop:index== 0 ? 0 : 2.5}}/>
-		    )}
-		</TouchableOpacity>
-	    </View>
-	    <View style={{height:10}}/>
-	    <StatView title="Description" value={feed?.message}/>
-	    <StatView title="Created For" value={feed?.feed_created_for === "general" ? "The Source Code": feed?.feed_created_for}/>
-	    <StatView
-		title="Created At"
-		value={moment(new Date(feed?.createdAt))
-		    .format(dateTimeFormat.conversion)}
-		/>
-	    <StatView title="Reason" value={feed?.review_info.reason}/>
-	    <View style={{height:10}}/>
-	    <TouchableOpacity activeOpacity={0.5} style={{alignItems:"flex-end"}} onPress={ ()=> setShowComment() || setContent() }>
-		<MyText fontSize={12} underlined color={colors.primary}>View Detail</MyText>
-	    </TouchableOpacity>
-	</View>
-	</>
-    )
+	return (
+		<>
+			<View style={{ backgroundColor: colors.secondary, padding: 10, borderRadius: 10 }}>
+				<View style={{ flexDirection: "row", aligItems: "center", justifyContent: "space-between" }}>
+					<MemberView
+						member={feed?.user_info_action_for}
+						hideEmail
+					/>
+					<MenuButton
+						marginHorizontal={0}
+						onPress={handleClick}
+						size={20}
+					/>
+				</View>
+				<View style={{ height: 10 }} />
+				<StatView title="Description" original numberOfLinesValues={2} value={feed?.message} />
+				<StatView title="Created For" value={feed?.feed_created_for === "general" ? "The Source Code" : feed?.feed_created_for} />
+				<StatView
+					title="Created At"
+					value={moment(new Date(feed?.createdAt))
+						.format(dateTimeFormat.dateTime)}
+				/>
+				<StatView title="Reason" numberOfLinesValues={2} original value={feed?.review_info.reason} />
+				<View style={{ height: 10 }} />
+				<TouchableOpacity activeOpacity={0.5} style={{ alignItems: "flex-end" }} onPress={() => setShowComment() || setContent()}>
+					<MyText fontSize={12} underlined color={colors.primary}>View Detail</MyText>
+				</TouchableOpacity>
+			</View>
+		</>
+	)
 }
 
 const optionsList = [
 	{
-		title: "Approved",
+		title: "Approve",
 		key: "ap",
 		icon: () => icons.check_circle(colors.primary, 17),
 	},
@@ -190,6 +270,16 @@ const optionsList = [
 		key: "del",
 		icon: icons.trash,
 	},
+	// {
+	// 	title: "Edit",
+	// 	key: "edit",
+	// 	icon: icons.edit,
+	// },
+	{
+		title: "Message",
+		key: "msg",
+		icon: icons.share,
+	}
 
 ]
 export default ReviewComments

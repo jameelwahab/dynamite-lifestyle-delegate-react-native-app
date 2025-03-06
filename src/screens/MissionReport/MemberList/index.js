@@ -1,4 +1,4 @@
-import { View, FlatList, StyleSheet, Pressable, TouchableOpacity } from 'react-native'
+import { View, FlatList, StyleSheet, Pressable, TouchableOpacity, Keyboard } from 'react-native'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import RootView from '../../../components/RootView'
 import { useSelector } from 'react-redux'
@@ -52,7 +52,7 @@ const MemberList = ({ navigation, route }) => {
       type: route.params.type,
     })
   }
-    console.log(route.params)
+  console.log(route.params)
 
   const callAPi = () => {
     paging.canLoadMore = false;
@@ -78,6 +78,7 @@ const MemberList = ({ navigation, route }) => {
   }
 
   const onSearch = () => {
+    Keyboard.dismiss()
     paging.page = 0;
     paging.canLoadMore = false;
     setSearching(true)
@@ -154,7 +155,7 @@ const MemberList = ({ navigation, route }) => {
           {icons.forwardArrow()}
         </Row>
         {/* <StatView title={"Badge Level"} value={item?.mission_info?.membership_level_info?.badge_level_info?.title} /> */}
-        <StatView title={"Mission Title"} value={item?.mission_info?.title}  original />
+        <StatView title={"Mission Title"} value={item?.mission_info?.title} original />
         <StatView title={"Duration"} value={item?.mission_duration + " days"} />
         <StatView title={"Coins Earned"} value={item?.mission_attracted_coins} />
         <StatView title={"Achievable Coins"} value={item?.mission_reward_coins} />
@@ -223,6 +224,7 @@ const MemberList = ({ navigation, route }) => {
       {topView()}
       <View style={{ flex: 1 }}>
         <FlatList
+          keyboardShouldPersistTaps="handled"
           ListHeaderComponent={headerView()}
           stickyHeaderIndices={[0]}
           keyExtractor={(item) => item?._id}

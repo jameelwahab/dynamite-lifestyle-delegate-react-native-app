@@ -1,4 +1,5 @@
 import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, Pressable } from "react-native"
+import { useFocusEffect } from "@react-navigation/native"
 import RootView from "../../components/RootView"
 import MyLoader from "../../components/MyLoader"
 import EmptyView from '../../components/EmptyView'
@@ -85,6 +86,15 @@ const MissionDetail = ({ navigation, route }) => {
 		}
 	}, [])
 
+	const [isFocused, setIsFocused] = useState(false);
+
+	useFocusEffect(useCallback(() => {
+		setIsFocused(true);
+		return () => {
+			setIsFocused(false);
+		}
+	}, []))
+
 	return (
 		<View style={{ flex: 1 }}>
 			{(tab == 0 && route.params.type == "quest" && enableChat) && <LiveChat
@@ -129,6 +139,8 @@ const MissionDetail = ({ navigation, route }) => {
 					id={route.params.id}
 					showBadges={tab == 1}
 					type={route.params.type}
+					focuse={isFocused}
+					tab={tab}
 				/>}
 				{((route.params.type == "quest" && tab == 2) || (route.params.type == "mission" && tab == 1)) && <Community route={route} navigation={navigation} />}
 			</View>
@@ -185,45 +197,29 @@ const TrackerList = ({ res, type }) => {
 }
 
 
-const Header = ({ res, show, showBadges, quest = '', daysOn = "" }) => {
-
+const Header = ({ res, show, showBadges, quest = '', daysOn = "", focuse, tab }) => {
 	const startDate = `${moment(res?.start_date).format(dateTimeFormat.date).split('-')[0]} ${months[Number(moment(res?.start_date).format(dateTimeFormat.date).split('-')[1]) - 1].short2}`
 	const endDate = `${moment(res?.end_date).format(dateTimeFormat.date).split('-')[0]} ${months[Number(moment(res?.end_date).format(dateTimeFormat.date).split('-')[1]) - 1].short2}`
 	const [schedule, setSchedules] = useState(res)
-
-	
 	useEffect(() => {
 		if (daysOn != "") {
 			setSchedules(res?.mission_schedules.find(el => el._id == daysOn))
 		}
 	}, [daysOn])
 
-
-	useEffect(() => {
-		console.log(schedule?.image?.thumbnail_1)
-	}, [schedule])
-
 	return (
 		<>
 			{
-				// 	res.video_url != "" ?
-				// <>
-				// 	{res?.video_url?.includes("vimeo") ?
-				// 		<VimeoWithPip url={res?.video_url} focused={true} id={res?._id} /> :
-				// 		<WebPlayer width={utilities?.screenWidth() - 20} url={res?.video_url} />
-				// 	}
-				// </> :
-				// <MyImage source={{ uri: S3_URL + res.image?.thumbnail_1 }}
-				// 	style={{ width: "100%", height: 250 }} />
 				HeaderView({
 					type: quest,
 					embed_code: daysOn != "" ? schedule?.embed_code : res?.embed_code,
-					video_url: daysOn != "" ? schedule?.video_url : res?.video_url,
+					video_url: (daysOn != "" && tab == 0) ? schedule?.video_url : res?.video_url,
 					mission_id: daysOn != "" ? schedule?._id : res?._id,
 					audio_url: daysOn != "" ? schedule?.audio_url : res?.audio_url,
 					img_url: daysOn != "" ? schedule?.image?.thumbnail_1 : res?.image?.thumbnail_1,
 					title: daysOn != "" ? schedule?.audio_title : res?.title,
 					desc: daysOn != "" ? schedule?.audio_description : res?.audio_description,
+					focuse,
 
 				})
 			}
@@ -245,7 +241,7 @@ const Header = ({ res, show, showBadges, quest = '', daysOn = "" }) => {
 	)
 }
 
-const Overview = ({ token, navigation, id, type, showBadges, setEnableChat, setChatID, setTitle }) => {
+const Overview = ({ token, navigation, id, type, showBadges, setEnableChat, setChatID, setTitle, focuse, tab }) => {
 	const [res, setResult] = useState([])
 	const [loading, setLoading] = useState(true)
 	const [refreshing, setRefreshing] = useState(false)
@@ -295,7 +291,7 @@ const Overview = ({ token, navigation, id, type, showBadges, setEnableChat, setC
 			ListEmptyComponent={!loading && <EmptyView />}
 			ListFooterComponent={<View style={{ height: 100 }} />}
 			ListHeaderComponent={
-				<Header res={res} show={type == "mission"} quest={type == "quest"} daysOn={daysOn} showBadges={showBadges || type == "mission"} />
+				<Header focuse={focuse} res={res} tab={tab} show={type == "mission"} quest={type == "quest"} daysOn={daysOn} showBadges={showBadges || type == "mission"} />
 			}
 			refreshControl={<MyRefreshControl
 				refreshing={refreshing}

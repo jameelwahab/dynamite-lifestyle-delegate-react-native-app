@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, SectionList, StyleSheet,Dimensions } from "react-native"
+import { View, Text, TouchableOpacity, SectionList, StyleSheet, Dimensions } from "react-native"
 import LessonView from "../../components/LessonView.js"
 import TitleView from "../../components/TitleView"
 import MyText from "../../components/MyText"
@@ -10,7 +10,7 @@ import { colors } from "../../utilities/colors"
 import { fonts } from "../../utilities/fonts"
 import { textSize } from "../../utilities/styles"
 import copyText from "../../functions/copyText"
-import { GET_MISSION_LIST_ID,GET_MISSION_APP_LINK } from "../../DAL"
+import { GET_MISSION_LIST_ID, GET_MISSION_APP_LINK } from "../../DAL"
 import { selectUser } from '../../redux/reducers/userSlice'
 import { useSelector } from 'react-redux'
 import routes from "../../navigation/routes"
@@ -26,7 +26,6 @@ const List = ({ navigation, route }) => {
 	const [res, setResult] = useState([])
 	const [loading, setLoading] = useState(true)
 	const [refreshing, setRefreshing] = useState(false)
-
 
 	const getMissionList = async (loader) => {
 		setLoading(loader)
@@ -46,17 +45,18 @@ const List = ({ navigation, route }) => {
 			setRefreshing(false)
 		}
 	}
-	const handleCopyMethod = (link,mission_id, type) => {
-	    if(link){
-		copyText(link)
-	    }
-	    else{
-		GET_MISSION_APP_LINK({token, navigation,mission_id, type }).then(res=> {
-		    if(res.code==200){
-			copyText(res.url)
-		    }
-		})
-	    }
+	const handleCopyMethod = (link, mission_id, type) => {
+		if (link) {
+			copyText(link, `${type == "quest" ? "Quest" : "Mission"} link copied successfully`)
+		}
+		else {
+			GET_MISSION_APP_LINK({ token, navigation, mission_id, type }).
+			then(res => {
+				if (res.code == 200) {
+					copyText(res.url, `${type == "quest" ? "Quest" : "Mission"} link copied successfully`)
+				}
+			})
+		}
 	}
 
 	useEffect(() => {
@@ -99,7 +99,7 @@ const List = ({ navigation, route }) => {
 				<TitleView
 					title={res?.badge_level?.title}
 					titleIcon={route.params.icon}
-					customStyle={{borderBottomWidth:0.5, borderColor:colors.border, width: Dimensions.get('screen').width}}
+					customStyle={{ borderBottomWidth: 0.5, borderColor: colors.border, width: Dimensions.get('screen').width }}
 				/>
 			</View>
 			}
@@ -135,7 +135,7 @@ const List = ({ navigation, route }) => {
 								type: item.type
 							})}
 							copyEnable={true}
-							hanldeCopy={()=> handleCopyMethod(item.app_branch_url, item._id, item.type)}
+							hanldeCopy={() => handleCopyMethod(item.app_branch_url, item._id, item.type)}
 							heading={item?.title}
 							image={item?.image?.thumbnail_1}
 							desc={item?.short_description}

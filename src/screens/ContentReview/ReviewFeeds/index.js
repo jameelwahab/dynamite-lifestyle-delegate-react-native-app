@@ -3,58 +3,67 @@ import MyText from '../../../components/MyText'
 import Modal from 'react-native-modal';
 import MyLoader from '../../../components/MyLoader'
 import EmptyView from '../../../components/EmptyView'
-import UserImage from '../../../components/UserImage'
 import StatView from '../../../components/StatView'
 import OptionModal2 from '../../../components/OptionModal2'
 import MyRefreshControl from '../../../components/MyRefreshControl'
 import FooterLoader from '../../../components/FooterLoader'
 import { colors } from "../../../utilities/colors"
+import { textSize } from "../../../utilities/styles"
 import { dateTimeFormat } from "../../../utilities/constants"
 import { GET_REVIEW_FEEDS, APPROVE_REVIEW_FEEDS, DELETE_REVIEW_FEEDS } from '../../../DAL'
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../../redux/reducers/userSlice'
 import { useState, useEffect, useRef } from "react"
-import { Text, FlatList, View, TouchableOpacity } from "react-native"
+import { Text, FlatList, View, TouchableOpacity, SafeAreaView, Pressable } from "react-native"
 import moment from 'moment'
 import { MenuButton } from '../../../components/MyButton';
 import routes from '../../../navigation/routes';
 import MemberView from '../../../components/MemberView';
 import { icons } from '../../../utilities/icons';
+import { onChatScreen } from '../../../functions/onChatScreen';
+import ConfirmationModal2 from '../../../components/ConfirmationModal2';
+import showToast from '../../../functions/showToast';
 
 const ReviewFeeds = ({ navigation, route }) => {
 	const ref = useRef(null)
-	const { token, access } = useSelector(selectUser);
-	const [result, setResult] = useState()
+	const ref_confirmModal = useRef()
+	const paging = useRef({ page: 0, canLoadMore: false })?.current;
+	const { token, access, user } = useSelector(selectUser);
+	const [result, setResult] = useState([])
 	const [loading, setLoading] = useState(false)
 	const [refreshing, setRefresh] = useState(false)
 	const [showModal, setShowModal] = useState(false)
 	const [showFooterLoader, setShowFooterLoader] = useState(false)
-	const [page, setPage] = useState(0)
 
 
-	const getFeeds = async ({ load = false, pageCount }) => {
-		setLoading(load)
-		const res = await GET_REVIEW_FEEDS({ token, navigation, limit: 20, page: pageCount })
+	const getFeeds = async () => {
+		const res = await GET_REVIEW_FEEDS({ token, navigation, limit: 20, page: paging?.page })
 		if (res.code == 200) {
-			if (pageCount == 0 || result.length === 0) setResult(res?.feeds)
-			else setResult([...result, ...res?.feeds])
+			setResult(paging?.page == 0 ? res?.feeds : [...result, ...res?.feeds])
+			let length = paging?.page == 0 ? res?.feeds.length : (result.length + res?.feeds.length);
+			if (length < res?.total_count) {
+				paging.page++;
+				paging.canLoadMore = true;
+			} else {
+				paging.canLoadMore = false;
+			}
 			setLoading(false)
 			setRefresh(false)
 			setShowFooterLoader(false)
 		}
 		else {
-			setResult([])
-			setPage(0)
 			setLoading(false)
 			setRefresh(false)
 		}
 	}
 
 
-	
+
 	const onRefresh = () => {
+		paging.canLoadMore = false;
+		paging.page = 0;
 		setRefresh(true)
-		getFeeds({ load: false, pageCount: page + 1 })
+		getFeeds()
 	}
 
 
@@ -63,17 +72,50 @@ const ReviewFeeds = ({ navigation, route }) => {
 		setShowModal(false)
 	}
 
-	const handleClick = (id) => {
-		ref.current.openModal?.(id);
+	const handleClick = (item) => {
+		ref.current.openModal?.(item);
 	}
 
 
 
-	const handleSelect = (opt, id) => {
-		if (opt.key == "ap") {
-			APPROVE_REVIEW_FEEDS({ token, navigation, id }).then(() => setResult(result.filter(el => el._id !== id && el)))
+	const handleSelect = (opt, item) => {
+		if (opt.key == "msg") {
+			onChatScreen(item?.action_info?.action_id, token, navigation, user?._id)
+		} else if (opt.key == "edt") {
+			console.log("Hora")
+		} else if (opt.key == "ap") {
+			ref_confirmModal?.current?.openModal({
+				title: `Are you sure you want to approve this post?`,
+				agreeFunc: () => handleAgree(item?._id)
+			})
 		} else if (opt.key == "del") {
-			DELETE_REVIEW_FEEDS({ token, navigation, id }).then(() => setResult(result.filter(el => el._id !== id && el)))
+			ref_confirmModal?.current?.openModal({
+				title: `Are you sure you want to delete this post?`,
+				agreeFunc: () => handleDelete(item?._id)
+			})
+		}
+	}
+	const handleDelete = async (id) => {
+		setLoading(true)
+		let res = await DELETE_REVIEW_FEEDS({ token, navigation, id });
+		if (res.code == 200) {
+			showToast({ title: res?.message, type: "success" })
+			setLoading(false)
+			setResult(result.filter(el => el._id !== id && el))
+		} else {
+			setLoading(false)
+		}
+	}
+	const handleAgree = async (id) => {
+		setLoading(true)
+		let res = await APPROVE_REVIEW_FEEDS({ token, navigation, id });
+		if (res.code == 200) {
+			setLoading(false)
+			showToast({ title: res?.message, type: "success" })
+			setResult(result.filter(el => el._id !== id && el))
+		}
+		else {
+			setLoading(false)
 		}
 	}
 
@@ -92,26 +134,32 @@ const ReviewFeeds = ({ navigation, route }) => {
 	}
 
 	const handleEndReach = () => {
-		if (!loading) {
+		if (paging?.canLoadMore) {
 			setShowFooterLoader(true)
-			setPage(page + 1)
-			getFeeds({ load: false })
+			getFeeds()
 		}
 	}
 
 	const filterOptions = () => {
 		return optionsList.slice().filter(item => {
-			if (item.key == "del") {
+			if (item.key == "del" || item.key == "edit") {
 				return access?.edit_delete_option_in_source_all_source_feeds
-			} else {
+			}
+			if (item.key == 'msg') {
+				return access?.is_chat_allowed
+			}
+			else {
 				return true
 			}
+
 		})
 	}
 
 	useEffect(() => {
-		setPage(0)
-		getFeeds({ load: true, pageCount: 0 })
+		paging.canLoadMore = false;
+		paging.page = 0;
+		setLoading(true)
+		getFeeds()
 	}, [])
 
 
@@ -132,15 +180,20 @@ const ReviewFeeds = ({ navigation, route }) => {
 						refreshing={refreshing}
 						onRefresh={onRefresh}
 					/>}
-					keyExtractor={(_,index) => index.toString()}
+					keyExtractor={(item) => item?._id.toString()}
 					renderItem={({ item, index }) =>
 						renderPosts({
 							feed: item, index,
-							handleClick: () => handleClick(item._id),
+							handleClick: () => handleClick(item),
 							onDetail: () => onDetail(item),
 						})}
 				/>
 			</View>
+
+			<ConfirmationModal2
+				ref={ref_confirmModal}
+			/>
+
 
 			<OptionModal2
 				ref={ref}
@@ -151,6 +204,7 @@ const ReviewFeeds = ({ navigation, route }) => {
 		</RootView>
 	)
 }
+
 
 const renderPosts = ({ feed, index, handleClick, onDetail }) => {
 
@@ -175,22 +229,22 @@ const renderPosts = ({ feed, index, handleClick, onDetail }) => {
 					member={feed.action_info}
 					hideEmail
 				/>
-				
 				<MenuButton
 					marginHorizontal={0}
 					onPress={handleClick}
 					size={20}
 				/>
-			 </View>
+			</View>
 			<View style={{ height: 10 }} />
-			<StatView title="Description" value={feed?.description} numberOfLinesValues={2} />
+			<StatView title="Description" original={true} value={feed?.description} numberOfLinesValues={2} />
 			<StatView title="Created For" value={getFeedType(feed)} />
-			<StatView
-				title="Created At"
-				value={moment(feed?.createdAt).format(dateTimeFormat.conversion)}
-			/>
 			<StatView title="Appear by" value={feed?.feed_appear_by} />
-			<StatView title="Reason" value={feed?.review_info.reason} numberOfLinesValues={2} />
+			<StatView
+				original
+				title="Created At"
+				value={moment(feed?.createdAt).format(dateTimeFormat.dateTime)}
+			/>
+			<StatView title="Reason" value={feed?.review_info.reason} original={true} numberOfLinesValues={2} />
 			<View style={{ height: 10 }} />
 			<TouchableOpacity
 				onPress={onDetail} style={{ alignSelf: "flex-end" }}>
@@ -204,7 +258,7 @@ export default ReviewFeeds
 
 const optionsList = [
 	{
-		title: "Approved",
+		title: "Approve",
 		key: "ap",
 		icon: () => icons.check_circle(colors.primary, 17),
 	},
@@ -213,5 +267,15 @@ const optionsList = [
 		key: "del",
 		icon: icons.trash,
 	},
+	{
+		title: "Edit",
+		key: "edit",
+		icon: icons.edit,
+	},
+	{
+		title: "Message",
+		key: "msg",
+		icon: icons.share,
+	}
 
 ]

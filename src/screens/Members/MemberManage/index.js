@@ -85,10 +85,11 @@ const MemberManage = ({route, navigation}) => {
 			<View>
 			    <StatView 
 				title={"Title"}
+				original={true}
 				value={item.mission_info.title} 
 				/>
 			    <StatView 
-				title={"Mission Duration"}
+				title={!tab ? "Mission Duration" : "Quest Duration"}
 				value={item.mission_duration} 
 				/>
 			    <StatView 

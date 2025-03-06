@@ -73,12 +73,12 @@ const MissionLevel = ({ navigation }) => {
 		<RootView hideSubHeader hideBackBottomButton >
 			<View style={__styles.container}>
 				<FlatList
-				ListHeaderComponent={Header()}
+				  ListHeaderComponent={Header()}
 					showsVerticalScrollIndicator={false}
-
 					data={res.level_badges}
 					keyExtraction={item => item}
 					ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
+				  ListFooterComponent={()=> <View style={{ height: 20 }} />}
 					ListEmptyComponent={!loading && <EmptyView />}
 					refreshControl={<MyRefreshControl
 						refreshing={refreshing}

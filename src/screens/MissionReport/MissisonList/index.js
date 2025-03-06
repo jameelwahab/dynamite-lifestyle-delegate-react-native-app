@@ -134,6 +134,7 @@ const MissisonList = ({ navigation, route }) => {
       {/* {topView()} */}
       <View style={{ flex: 1 }}>
         <FlatList
+          keyboardShouldPersistTaps="handled"
           // ListHeaderComponent={headerView()}
           // stickyHeaderIndices={[0]}
           keyExtractor={(item) => item?._id}

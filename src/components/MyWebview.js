@@ -78,7 +78,7 @@ export class MyWebview extends Component {
 
 
   render() {
-    let { html, style, baseStyle } = this.props;
+    let { html, style, baseStyle, spanColor, } = this.props;
     html = "<div>" + html.replace(/padding:/g, "") + "</div>";
     return (
       <RenderHTML
@@ -110,15 +110,14 @@ export class MyWebview extends Component {
             margin: 0,
             // padding: 0,
           },
-          span: {
 
+          span: {
             fontFamily: !!this.props?.html.includes("<b>") ? undefined : fonts.light,
             margin: 0,
             // marginTop: 5,
-            lineHeight: 20,
+            lineHeight: 12,
             fontSize: 13,
             color: this.props?.invert ? colors.black : colors.lightText,
-
           },
           p: {
             margin: 0,
@@ -215,6 +214,18 @@ export class MyWebview extends Component {
           "mentioned-name": {
             color: colors.primary
           },
+            required: {
+              fontFamily: fonts.regular,
+              lineHeight: 20,
+              fontSize: 16,
+              color: colors.danger,
+            },
+            question: {
+              fontFamily: fonts.regular,
+              lineHeight: 20,
+              fontSize: 16,
+              color: colors.primary2,
+            }
           // "seeMoreBtn":{
           //   color:colors.primary
           // }

@@ -11,7 +11,7 @@ import openUrl from '../../../functions/openUrl'
 import { S3_URL } from '../../../utilities/constants'
 
 
-const QuestionComponent = ({ item, index, showRepliesbtns = false, onShowReplyPress, onRelpyBtnPress, hideRepliesCheckBox = false, hideCollapse = false, noQuestionStatement = false,padding=10 }) => {
+const QuestionComponent = ({ item, index, showRepliesbtns = false, onShowReplyPress, onRelpyBtnPress, hideRepliesCheckBox = false, hideCollapse = false, noQuestionStatement = false, padding = 10 }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const findCollapsed = (id) => {
     return !!isCollapsed.find(x => x == id)
@@ -96,7 +96,7 @@ const QuestionComponent = ({ item, index, showRepliesbtns = false, onShowReplyPr
             noSpace
           /> */}
           <View style={{ borderWidth: 1 / 2, borderRadius: 10, borderColor: colors.white, minHeight: 100, padding: 10 }}>
-            <MyText color={colors.white} style={{opacity:0.8}} >{item?.answer?.answer_statement || item?.question_placeholder}</MyText>
+            <MyText color={colors.lightText} style={{ opacity: 0.8 }} >{item?.answer?.answer_statement || item?.question_placeholder}</MyText>
           </View>
         </View>
       </View>
@@ -123,35 +123,65 @@ const QuestionComponent = ({ item, index, showRepliesbtns = false, onShowReplyPr
           />}
       </View>)
   }
+  const addStyle = (txt) => {
+    for (let i = 0; txt.length; i++) {
+      if (txt[i] == '<' && txt[i + 2] == ">") {
+        const style = ` "style="display: inline-block;" `;
+        return `${txt.slice(0, i + 2)}${style}${txt.slice(i + 2)}`
+      }
+    }
+  }
 
+  const addImport = (txt) => {
+    const str = `<span> *</span>`;
+    for (let i = 0; i < txt.length; i++) {
+      if (txt[i] === "<" && txt[i + 1] === "/") {
+        return addStyle(`${txt.slice(0, i)}${str}${txt.slice(i)}`)
+      }
+    }
+    return txt
+  }
   return (
-    <View style={{ backgroundColor: colors.secondary, padding:padding, marginTop: 10, borderRadius: 10 }}>
+    <View style={{ backgroundColor: colors.secondary, padding: padding, marginTop: 10, borderRadius: 10 }}>
+
       <Pressable
         disabled={hideCollapse}
-        onPress={() => setIsCollapsed(!isCollapsed)}
+        onPress={() => {
+          setIsCollapsed(!isCollapsed)
+        }}
         style={{ flexDirection: "row", alignItems: "center" }}>
         <View style={{ flex: 1 }}>
           {!noQuestionStatement &&
-          <MyText type='medium' >{"Question Statement"}</MyText>}
+            <MyText type='medium' >{"Question Statement"}</MyText>}
           <View style={{ marginTop: 5 }}>
             {!!item?.question_statement &&
-              <MyWebview
-                fullWidth
-                html={item?.question_statement}
-                style={{
-                  h1: {
-                    margin: 0,
-                    color: colors.primary
-                  },
-                  h2: {
-                    margin: 0,
-                    color: colors.primary
-                  },
-                }}
-              />}
+              <>
+                <MyWebview
+                  fullWidth
+                  html={item?.is_required ? addImport(item?.question_statement) : item?.question_statement}
+                  style={{
+                    h1: {
+                      margin: 0,
+                      color: colors.primary
+                    },
+                    h2: {
+                      margin: 0,
+                      color: colors.primary
+                    },
+                    span: {
+                      color: colors.delete,
+                      fontSize: 16,
+                      paddingTop: 10,
+                      transform: [{ translateY: 50 }]
+                    },
+
+                  }}
+                />
+              </>
+            }
           </View>
         </View>
-        {hideCollapse &&
+        {!hideCollapse &&
           <View>
             {isCollapsed ? icons.downwardArrow() : icons.upwardArrow()}
           </View>}

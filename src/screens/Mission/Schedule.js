@@ -1,4 +1,5 @@
 import RootView from "../../components/RootView"
+import React from "react"
 import MyText from "../../components/MyText"
 import MyWebview from "../../components/MyWebview"
 import MyRefreshControl from "../../components/MyRefreshControl"
@@ -23,8 +24,9 @@ import { icons } from '../../utilities/icons'
 import { useState } from "react"
 import { selectUser } from '../../redux/reducers/userSlice'
 import { useSelector } from 'react-redux'
-import { useEffect } from "react"
-import { View, FlatList, Image, StyleSheet, Text, Pressable } from "react-native"
+import { useEffect, useCallback } from "react"
+import { useFocusEffect } from "@react-navigation/native"
+import { View, FlatList, Image, StyleSheet, Text, Pressable, } from "react-native"
 import ItemCountView from "../../components/ItemCountView"
 
 const Schedule = (props) => {
@@ -40,7 +42,9 @@ const Scheduler = ({ navigation, route }) => {
 	const [res, setResult] = useState([])
 	const [refreshing, setRefreshing] = useState(false)
 	const [showChat, setShowChat] = useState(false)
-	const [enableChat, setEnableChat] = useState(false)
+  const [enableChat, setEnableChat] = useState(false)
+
+
 	const getResult = async (loader) => {
 		setLoading(loader)
 		const res = await GET_MISSION_SCHEDULE({
@@ -58,13 +62,25 @@ const Scheduler = ({ navigation, route }) => {
 			setRefreshing(false)
 		}
 	}
+
 	useEffect(() => {
 		getResult(true)
 	}, [])
+
 	const onRefresh = () => {
 		setRefreshing(true)
 		getResult(false)
 	}
+
+	const [isFocused, setIsFocused] = useState(false);
+
+	useFocusEffect(useCallback(() => {
+		setIsFocused(true);
+		return () => {
+			setIsFocused(false);
+		}
+	}, []))
+
 
 	return (
 		<View style={__styles.container}>
@@ -74,7 +90,7 @@ const Scheduler = ({ navigation, route }) => {
 					{icons.chat(colors.primary, 23)}
 				</Pressable>}
 			</View>
-			<View style={{ height: 15 }} />
+			<View style={{ height: 5 }} />
 			{enableChat &&
 				<LiveChat
 					user={user}
@@ -98,7 +114,9 @@ const Scheduler = ({ navigation, route }) => {
 							audio_url: res?.mission_schedule?.audio_url,
 							img_url: res?.mission_schedule?.image?.thumbnail_1,
 							title: res?.mission_schedule?.audio_title,
-							desc: res?.mission_schedule?.audio_description
+							desc: res?.mission_schedule?.audio_description,
+							focuse: isFocused
+
 						})}
 						<View style={{ height: 10 }} />
 						<Overview res={res} />
@@ -127,7 +145,8 @@ const Scheduler = ({ navigation, route }) => {
 	)
 }
 
-export const HeaderView = ({ type = "", embed_code = "", video_url = "", mission_id = "", audio_url = "", img_url = "", title = "", desc = "" }) => {
+export const HeaderView = ({ type = "", embed_code = "", video_url = "", mission_id = "", audio_url = "", img_url = "", title = "", desc = "", focuse = true }) => {
+
 	if (type == "quest" && embed_code != "") {
 		return (
 			<MyWebview
@@ -139,8 +158,7 @@ export const HeaderView = ({ type = "", embed_code = "", video_url = "", mission
 		return video_url?.includes("vimeo") ?
 			<VimeoWithPip
 				url={video_url}
-				focused={true}
-				id={mission_id}
+				focused={focuse} id={mission_id}
 			/> :
 			<WebPlayer width={utilities.screenWidth() - 20} url={video_url} />
 
