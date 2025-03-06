@@ -19,6 +19,7 @@ import RootView from '../../../components/RootView'
 import MyLoader from '../../../components/MyLoader'
 import MyText from '../../../components/MyText'
 import routes from "../../../navigation/routes"
+import OptionModalWithSearch from "../../../components/OptionModalWithSearch"
 
 const FilterScreen = ({ navigation, route }) => {
 	const [isCalendarModalVisible, setCalendarModalVisiblity] = useState(false)
@@ -52,48 +53,31 @@ const FilterScreen = ({ navigation, route }) => {
 	const handleSubmit = () => {
 		navigation.navigate(routes.missionMembers, { filter: { ...select, end_limit: duration.to } })
 	}
-
+	const filterTheList = (items, text) => {
+	    if (text.trim() == "") {
+		return items
+	    } else {
+		    return items.filter(x=> {
+			return filterTxtForSearch(x.title).includes(filterTxtForSearch(text)) &&  x
+		    })
+	    }
+	}
+	const filterTxtForSearch = (txt)=> txt.toLowerCase().split('').filter(e=> e.trim().length).join('')
 	const CalendarModal = () => {
 		return (
-			<Modal
-				isVisible={isCalendarModalVisible}
-				onBackdropPress={() => setCalendarModalVisiblity(false)}
-				onBackButtonPress={() => setCalendarModalVisiblity(false)}
-				useNativeDriverForBackdrop={true}
-				animationIn='slideInUp'
-				animationOut='slideOutDown'
-				animationInTiming={300}
-				animationOutTiming={300}
-				style={{ margin: 10 }}>
-				<SafeAreaView style={{ backgroundColor: colors.secondaryVariant, borderRadius: 10, }} >
-					<View style={{ margin: 10 }}>
-						<Pressable
-							onPress={() => {
-								setCalendarModalVisiblity(false)
-							}}
-							style={{ padding: 5, alignSelf: "flex-end" }}>
-							{icons.crosss(colors.primary)}
-						</Pressable>
-						<FlatList
-							data={list}
-							showsVerticalScrollIndicator={false}
-							style={{ height: 300 }}
-							keyExtractor={item => item?._id}
-							renderItem={({ item }) =>
-								<TouchableOpacity
-									onPress={() => {
-										setCalendarModalVisiblity(false)
-										setSelected({ _id: item?._id, title: item?.title, from: 1, to: item?.mission_duration })
-										setDuration({ from: 1, to: item?.mission_duration })
-									}}
-									style={__style.list_sub_container}>
-									<MyText>{item?.title}</MyText>
-								</TouchableOpacity>
-							}
-						/>
-					</View>
-				</SafeAreaView>
-			</Modal>
+		    <OptionModalWithSearch
+			    isVisible={isCalendarModalVisible}
+			    closeModal={()=>setCalendarModalVisiblity(false)}
+			    filterTheList={filterTheList}
+			    onSelected={(item)=>{
+-				setCalendarModalVisiblity(false)
+-				setSelected({ _id: item?._id, title: item?.title, from: 1, to: item?.mission_duration })
+-				setDuration({ from: 1, to: item?.mission_duration })
+			    }}
+			    optionList={list}
+			    
+			>
+		    </OptionModalWithSearch>
 		)
 	}
 	return (

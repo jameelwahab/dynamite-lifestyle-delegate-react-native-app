@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, SectionList, StyleSheet } from "react-native"
+import { View, Text, TouchableOpacity, SectionList, StyleSheet,Dimensions } from "react-native"
 import LessonView from "../../components/LessonView.js"
 import TitleView from "../../components/TitleView"
 import MyText from "../../components/MyText"
@@ -99,6 +99,7 @@ const List = ({ navigation, route }) => {
 				<TitleView
 					title={res?.badge_level?.title}
 					titleIcon={route.params.icon}
+					customStyle={{borderBottomWidth:0.5, borderColor:colors.border, width: Dimensions.get('screen').width}}
 				/>
 			</View>
 			}

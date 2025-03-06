@@ -49,10 +49,10 @@ const MemberList = ({ navigation, route }) => {
     navigation.navigate(routes?.missionReportScreen, {
       missionId: item?.mission_info?._id,
       memberId: item?.member?._id,
-      type: "report",
+      type: route.params.type,
     })
   }
-
+    console.log(route.params)
 
   const callAPi = () => {
     paging.canLoadMore = false;
@@ -92,9 +92,9 @@ const MemberList = ({ navigation, route }) => {
       type: memberTypeObj[access?.show_members_list_for_payment_request],
       mission_type: type,
       body: {
-        from_day: filter?.to,
+        to_day: filter?.to,
         mission_id: filter?._id,
-        to_day: filter?.from
+        from_day: filter?.from
       },
     })
     if (res.code == 200) {
@@ -157,7 +157,7 @@ const MemberList = ({ navigation, route }) => {
         <StatView title={"Mission Title"} value={item?.mission_info?.title}  original />
         <StatView title={"Duration"} value={item?.mission_duration + " days"} />
         <StatView title={"Coins Earned"} value={item?.mission_attracted_coins} />
-        <StatView title={"Acheivable Coins"} value={item?.mission_reward_coins} />
+        <StatView title={"Achievable Coins"} value={item?.mission_reward_coins} />
         <StatView title={"Start Date"} value={convertTimezone2(item?.mission_start_date, timezone).format(dateTimeFormat.date)} />
         {isCompleted &&
           <StatView title={"Completed Date"} value={convertTimezone2(item?.mission_completed_date, timezone).format(dateTimeFormat.date)} />}

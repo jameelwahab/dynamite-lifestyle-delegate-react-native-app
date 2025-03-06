@@ -21,7 +21,7 @@ import MyText from '../MyText';
 const ic_coin_s = require("../../assets/icons/coin.png");
 const ic_tropy = require("../../assets/icons/trophy.png");
 
-const MissionRewardView = ({ badges = [], showEarnedBadges = true, badgesEarned = [], duration = 0, totalCoins = 0, acheivedCoins = 0, }) => {
+const MissionRewardView = ({ badges = [], showEarnedBadges = true, badgesEarned = [], duration = 0, durationTitle, totalCoins = 0, acheivedCoins = 0, }) => {
   const ref_info = useRef();
 
   const badgesView = (badgeList) => {

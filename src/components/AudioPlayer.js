@@ -1,25 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import TrackPlayer, { useProgress, State, usePlaybackState, useActiveTrack } from 'react-native-track-player';
-import { Text, View, StyleSheet, TouchableOpacity, Image, } from 'react-native';
+import { Text, View, StyleSheet, TouchableOpacity, Image, Pressable } from 'react-native';
 import moment from 'moment';
 import { ActivityIndicator } from 'react-native';
-import Slider from '@react-native-community/slider';
+import SliderSimple from '@react-native-community/slider';
+import { Slider } from "@rneui/themed"
 import { colors } from '../utilities/colors';
 import { S3_URL } from '../utilities/constants';
 import { icons } from '../utilities/icons';
+import { textSize } from '../utilities/styles';
+import MyText from '../components/MyText';
+import LinearGradient from "react-native-linear-gradient"
 import { SimpleLoader } from './MyLoader';
+import FontAwesome6 from "react-native-vector-icons/FontAwesome6"
+import Fontisto from "react-native-vector-icons/Fontisto";
 
 
+const ic_audio = require("../assets/icons/audio.png")
+const ic_forward = require("../assets/icons/forward.png")
+const ic_backward = require("../assets/icons/backward.png")
 
 
-
-
-const AudioPlayer = ({ stop = "", url,  }) => {
+const AudioPlayer = ({ stop = "", url, mission=false, title, desc }) => {
   const [duration, setDuration] = useState(0);
   const [position, setPosition] = useState(0);
   const [loading, setLoading] = useState(false)
   const progress = useProgress();
   const [isPlaying, setPlaying] = useState(false);
+
 
   useEffect(() => {
     if (!!stop) {
@@ -99,6 +107,73 @@ const AudioPlayer = ({ stop = "", url,  }) => {
     setPlaying(false)
   }
 
+  if(mission){
+ return (
+      <View style={{borderRadius:10, overflow:"hidden"}}>
+        <LinearGradient
+          style={{ flex: 1, padding: 10 }}
+          colors={["#FFE9C4", colors.primary2]}
+          // locations={[0,0.6]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0.3, y: 1 }}>
+          <View style={{ flex: 1 }}>
+            {!!title &&
+              <View style={{ flexDirection: "row", alignItems: "center", marginTop: 5 }}>
+                <Image source={ic_audio} style={[{ tintColor: colors.black, marginRight: 5, height: 15, resizeMode: "contain" }]} />
+                <Text style={[textSize.title, { color: colors.black }]}>{title}</Text>
+              </View>}
+            {!!desc &&
+              <MyText numberOfLines={2} color={"#6f502c"} fontSize={textSize.description2}>{desc}</MyText>
+						}
+          </View>
+
+
+          <View style={{ flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", marginTop: 20 }}>
+            <TouchableOpacity disabled={!isPlaying} onPress={() => TrackPlayer.seekTo(position - 10)}>
+              <Image source={ic_backward} style={{ height: 25, resizeMode: "contain" }} />
+            </TouchableOpacity>
+            <Pressable
+              onPress={playPauseFunction}
+              disabled={loading}
+						  style={{ marginHorizontal: 20, height: 50, width: 50, borderRadius: 25, backgroundColor: colors.black, alignItems: "center", justifyContent: "center" }}>
+              {loading ?
+								<SimpleLoader />
+										: isPlaying ? <Fontisto name="pause" size={20} color={colors.white} /> : <FontAwesome6 name="play" size={20} color={colors.white} />}
+						</Pressable>
+            <TouchableOpacity disabled={!isPlaying} onPress={() => TrackPlayer.seekTo(position + 10)}>
+              <Image source={ic_forward} style={{ height: 25, resizeMode: "contain" }} />
+            </TouchableOpacity>
+          </View>
+
+          <View style={{ justifyContent: "flex-end", flex: 1 }}>
+            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", }}>
+              <MyText  color={colors.black} >{formatTime(position)}</MyText>
+              <MyText color={colors.black} >{formatTime(duration)}</MyText>
+            </View>
+            <View>
+              <Slider
+                thumbStyle={{ height: 18, width: 18, backgroundColor: "#9F723F" }}
+                value={position}
+                maximumTrackTintColor='#C6A26D'
+                minimumTrackTintColor='#C6A26D'
+                trackStyle={{ height: 7, borderRadius: 20 }}
+                animationType='timing'
+                minimumValue={0}
+                maximumValue={duration}
+                onSlidingComplete={val => {
+                  TrackPlayer.seekTo(val)
+                  TrackPlayer.play()
+                  setPlaying(true)
+                }}
+              />
+            </View>
+          </View>
+
+        </LinearGradient>
+
+      </View>
+    )
+	}
 
   return (
     <View style={{ backgroundColor: colors.secondaryVariant, paddingVertical: 3, borderRadius: 40, flexDirection: "row", alignItems: "center", paddingHorizontal: 12, }} >
@@ -111,7 +186,7 @@ const AudioPlayer = ({ stop = "", url,  }) => {
       </TouchableOpacity>
       <View style={styles.container}>
         <Text style={styles.position}>{formatTime(position)}</Text>
-        <Slider
+        <SliderSimple
           style={styles.slider}
           value={position}
 

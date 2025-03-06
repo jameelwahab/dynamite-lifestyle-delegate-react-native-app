@@ -7,7 +7,7 @@ import { fonts } from '../utilities/fonts'
 import MyText from "../components/MyText"
 import InfoModal from './InfoModal'
 import numFormatter from '../functions/numFormatter'
-import {colors} from '../utilities/colors'
+import { colors } from '../utilities/colors'
 import isArray from '../functions/isArray'
 import Divider from '../UIComponents/Divider'
 import { S3_URL } from '../utilities/constants'
@@ -20,7 +20,7 @@ const ic_coin_s = require("../assets/icons/coin1.png");
 const ic_calendar = require("../assets/icons/calendar.png");
 const ic_tropy = require("../assets/icons/trophy.png");
 
-const MissionRewardView = ({ isQuest = false, questReplayAccessDays = "", dateString = "", badges = [], showEarnedBadges = true, badgesEarned = [],showBadgesEarned=true, duration = 0, totalCoins = 0, acheivedCoins = 0, onReportPress }) => {
+const MissionRewardView = ({ isQuest = false, questReplayAccessDays = "", dateString = "", badges = [], showEarnedBadges = true, badgesEarned = [], showBadgesEarned = true, duration = 0, totalCoins = 0, acheivedCoins = 0, onReportPress }) => {
   const ref_info = useRef();
 
   const badgesView = (badgeList) => {
@@ -42,7 +42,7 @@ const MissionRewardView = ({ isQuest = false, questReplayAccessDays = "", dateSt
           <FlatList
             numColumns={4}
             scrollEnabled={false}
-	    keyExtraction={(_,index)=> index.toString()}
+            keyExtraction={(_, index) => index.toString()}
             data={list || []}
             renderItem={({ item, index }) => {
               return (
@@ -81,7 +81,7 @@ const MissionRewardView = ({ isQuest = false, questReplayAccessDays = "", dateSt
                   style={{ height: 20, width: 20, tintColor: colors.primary2 }}
                 />
               </Flex>
-              <MyText >{isQuest ? "Quest Duration" : "Mission Duration"}</MyText>
+              <MyText  style={{ fontFamily: fonts.medium, }} >{isQuest ? "Quest Duration" : "Mission Duration"}</MyText>
             </Row>
             <Flex flex={1} alignItems="flex-end"  >
               <Row alignItems="center" justifyContent="flex-end">
@@ -127,7 +127,7 @@ const MissionRewardView = ({ isQuest = false, questReplayAccessDays = "", dateSt
                 </Row>
                 <Flex flex={1} alignItems="flex-end"  >
                   <Row alignItems="center" justifyContent="flex-end">
-                    <MyText style={{ fontFamily: fonts.medium }} >{dateString}</MyText>
+                    <MyText color={colors.lightText2} style={{ fontFamily: fonts.medium }} >{dateString}</MyText>
                   </Row>
                 </Flex>
               </Row>
@@ -140,7 +140,7 @@ const MissionRewardView = ({ isQuest = false, questReplayAccessDays = "", dateSt
         (!!acheivedCoins || isArray(badges, 0) || !!totalCoins || showEarnedBadges) &&
         <View style={{ marginVertical: 10, marginTop: 15 }}>
           <Row justifyContent="space-between">
-            <MyText fontSize={16} color={colors.primary} style={{fontFamily: fonts.bold}}>{"Rewards & Badges"}</MyText>
+            <MyText fontSize={16} color={colors.primary} style={{ fontFamily: fonts.bold }}>{"Rewards & Badges"}</MyText>
             {!!onReportPress &&
               <Pressable onPress={onReportPress} >
                 <MyText style={{ textDecorationLine: "underline", fontStyle: "italic" }} >View Report</MyText>
@@ -161,31 +161,31 @@ const MissionRewardView = ({ isQuest = false, questReplayAccessDays = "", dateSt
                   </Row>
                   <Flex flex={1}  >
                     <Row alignItems="center" justifyContent="flex-end">
-			<>
-			    
-                      {badges.map((item, index) => {
-                        if (index == 0) {
-                          return (
-                            <Row alignItems="center" justifyContent="flex-end">
-			    {showBadgesEarned && 
-                              <MyText style={{ fontSize: 16, marginRight: 5, fontFamily: fonts.medium }} >{item?.no_of_badges} x</MyText>
-			    }
-                              <Flex alignItems="center"  >
-                                <MyImage
-                                  source={{ uri: S3_URL + item?.general_icon?.thumbnail_1 }}
-                                  style={{ height: 20, width: 20 }}
-                                />
-                              </Flex>
-                            </Row>
-                          )
-                        } else return null
-                      })}
-			</>
+                      <>
+
+                        {badges.map((item, index) => {
+                          if (index == 0) {
+                            return (
+                              <Row alignItems="center" justifyContent="flex-end">
+                                {/* {showBadgesEarned && */}
+                                  <MyText style={{ fontSize: 16, marginRight: 5, fontFamily: fonts.medium }} >{item?.no_of_badges} x</MyText>
+                                {/* } */}
+                                <Flex alignItems="center"  >
+                                  <MyImage
+                                    source={{ uri: S3_URL + item?.general_icon?.thumbnail_1 }}
+                                    style={{ height: 20, width: 20 }}
+                                  />
+                                </Flex>
+                              </Row>
+                            )
+                          } else return null
+                        })}
+                      </>
+
                       {badges.length > 1 &&
                         <Pressable
-                          style={{ marginLeft: 5 }}
-                          onPress={() => ref_info?.current?.openModal("", "", false, "", null, badgesView(badges))}
-                        >
+                          style={{ marginLeft: 10, flexDirection: "row" }}
+                          onPress={() => ref_info?.current?.openModal("", "", false,  badgesView(badges))}>
                           <MyText style={{ textDecorationLine: "underline", color: colors.primary2 }}>More</MyText>
                         </Pressable>
                       }
@@ -211,14 +211,14 @@ const MissionRewardView = ({ isQuest = false, questReplayAccessDays = "", dateSt
                   </Row>
                   <Flex flex={1}  >
                     <Row alignItems="center" justifyContent="flex-end">
-                      {isArray(badgesEarned)   ?
+                      {isArray(badgesEarned) ?
                         <>
                           {badgesEarned.map((item, index) => {
                             if (index == 0) {
                               return (
                                 <Row alignItems="center" justifyContent="flex-end">
                                   <MyText style={{ fontSize: 16, marginRight: 5, fontFamily: fonts.medium }} >{item?.no_of_badges} x</MyText>
-				  {/* 
+                                  {/* 
                                   <Flex alignItems="center"  >
                                     <CustomImage
                                       source={{ uri: Imagesdomain + item?.general_icon?.thumbnail_1 }}

@@ -76,7 +76,7 @@ const MyButton2 = ({
     <TouchableOpacity
       activeOpacity={0.3}
       onPress={onPress}>
-      <View style={{backgroundColor:color,paddingHorizontal:10, paddingVertical:5, borderRadius:30,}} >
+      <View style={{backgroundColor:color,paddingHorizontal:7, paddingVertical:7, borderRadius:30,}} >
         {icon?.()}
         {!!title && <MyText color={colors.primary}  fontSize={textSize.mini}>{title}</MyText>}
       </View>

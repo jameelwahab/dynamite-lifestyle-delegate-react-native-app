@@ -27,6 +27,7 @@ import ConfirmationModal from './ConfirmationModal';
 import Toast from 'react-native-toast-message';
 import EmptyView from './EmptyView';
 import FooterLoader from './FooterLoader';
+import moment from "moment"
 
 
 let page = 0;
@@ -680,7 +681,7 @@ const LiveChat = ({ isVisible, closeModal, type, token, navigation, videoId, tim
                 <MyText type='medium'>{item?.member?.first_name + " " + item?.member?.last_name + "  "}</MyText>
                 {pinned ? icons.pin(colors.white) : ""}
               </View>
-              <MyText fontSize={10} color={colors.lightGrey} type='medium' >{convertTimezone(item?.createdAt, timezone).format(dateTimeFormat.dateTime)}</MyText>
+              <MyText fontSize={10} color={colors.lightGrey} type='medium' >{moment(item?.createdAt).format(dateTimeFormat.dateTime)}</MyText>
             </View>
             {isLive ?
               <>

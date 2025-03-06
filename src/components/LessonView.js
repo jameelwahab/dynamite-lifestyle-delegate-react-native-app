@@ -7,81 +7,99 @@ import { useState } from "react";
 import MyImage from "./MyImage";
 import MyText from "./MyText";
 import ResponsiveImage3 from "./ResponsiveImage3";
-import { textSize } from "../utilities/styles"
+import { main, textSize } from "../utilities/styles"
+import CollapseText from "./CollapseText";
 
-const LessonView = ({ title, style, heading, icon, desc, txtlen = 50, hanldeCopy, copyEnable=false, image, handlePress, duration }) => {
+const LessonView = ({ title, style, heading, icon, iconTextColor = colors.white, missionDetail=false, desc, txtlen = 50, hanldeCopy, copyEnable = false, image, handlePress, duration,
+	numberOfTitleLines = 2
+}) => {
 	const [show, setShow] = useState()
+	const [dynamicNumberOfTitleLines, setDynamicNumberOfTitleLines] = useState(1)
 	return (
-		<>
-			{icon &&
-				<View style={__styles.icon_container}>
-					<Image source={{ uri: S3_URL + icon }} style={__styles.icon} />
-					<Text style={[__styles.icon_heading, { marginLeft: 10 }]}>{title}</Text>
-				</View>
+	    <>
+	    {icon &&
+		<View style={__styles.icon_container}>
+		    <MyImage source={{ uri: S3_URL + icon }} style={__styles.icon}
+			resizeMode="contain" />
+		    <View style={{ marginLeft: 10,flex:1 }} >
+			<Text style={[main.title,{textTransform:"uppercase"}]}>{title}</Text>
+		    </View>
+		</View>
+	    }
+	    <Pressable onPress={handlePress}>
+		<View style={[__styles.container, style, !missionDetail && {backgroundColor: colors.secondary,} ]} >
+		    <View style={{ overflow: 'hidden', position:"relative", }}>
+			{image &&
+			<View>
+			    <ResponsiveImage3
+				width={150}
+				source={{uri: S3_URL +image }}
+				defaultSize={{ width: 150, height: 85 }}
+				style={{ width: "100%" }} />
+
+{copyEnable &&
+			    <View style={{
+				alignItems: "flex-end", justifyContent: "flex-end",
+				position:"absolute",
+				left:3,
+				top:3 }}>
+				<TouchableOpacity
+				    style={{ backgroundColor: colors.secondarySelect+"88", padding: 5, borderRadius: 999 }}
+				    onPress={hanldeCopy}
+				    activeOpacity={0.5}
+				    >
+				    {icons.copy(colors.primary,15)}
+				</TouchableOpacity>
+			    </View>
 			}
-			<Pressable onPress={handlePress}>
-				<View style={[__styles.container, style]} >
-					<View style={{ overflow: 'hidden' }}>
-						{image &&
-							<Image
-								style={{ width:145, height:95 }}
-								source={{ uri: S3_URL + image }}
-							/>}
-						{duration &&
-							<View style={__styles.imgTag}>
-								<MyText fontSize={10} type="medium" color={colors.black} >{duration} Days</MyText>
-							</View>
-						}
-					</View>
-					<View style={__styles.sub_container}>
-						<MyText numberOfLines={2} style={__styles.heading}>{heading}</MyText>
-						<View>
-						    <Text numberOfLines={!show && 2} style={__styles.desc}>{desc}</Text>
-						    {copyEnable && <View style={{height:5}}/>}
-						    <View style={{flexDirection:'row', alignItems:'center',justifyContent:desc.length > txtlen ? "space-between" : "flex-end"}}>
-							{desc.length > txtlen &&
-							    <Text
-								onPress={() => setShow(!show)}
-								style={__styles.showText}>
-								{show ? "See Less" : "See More"}
-							    </Text>
-							}
-							{copyEnable &&
-								<TouchableOpacity
-								    style={{marginRight:5}}
-								    onPress={hanldeCopy}
-								    activeOpacity={0.5}
-									>
-								    {icons.copyOulined(15)}
-								</TouchableOpacity>}
-						    </View>
-						</View>
-					</View>
-				</View>
-			</Pressable>
-		</>
+			{duration &&
+			    <View style={__styles.imgTag}>
+				<MyText fontSize={10} type="medium" color={colors.black} >{duration} Days</MyText>
+			    </View>
+			}
+				</View>}
+		
+		</View>
+		<View
+		    style={{
+			width: '100%',
+		        paddingHorizontal: image ? 5 : 0,
+			 paddingVertical: 1,
+			flex: 1
+		    }}>
+		    {!!heading &&
+			<Text
+			    onTextLayout={({ nativeEvent: { lines } }) => {
+			    setDynamicNumberOfTitleLines(lines.length)
+			}}
+			numberOfLines={numberOfTitleLines}
+			style={[main.title]}>
+			    {heading}
+			</Text>
+		    }
+		<View style={{ marginVertical: 2 }}>
+		    <CollapseText numOfLines={!missionDetail && (dynamicNumberOfTitleLines > 1 ? 2 : 3) } disable={missionDetail} desc={desc} style={main.miniDesc} />
+		</View>
+	    </View>
+	    </View>
+	    </Pressable>
+	    </>
 	)
 }
 
 const __styles = StyleSheet.create({
 	container: {
-		backgroundColor: colors.secondary,
 		flexDirection: 'row',
 		borderRadius: 10,
 		overflow: "hidden"
 	},
 	icon_container: {
 		flexDirection: 'row',
-		marginBottom: 6,
+		marginBottom: 5,
 	},
 	icon: {
-		width: 20,
-		height: 20,
-	},
-	icon_heading: {
-		color: colors.primary,
-		fontFamily: fonts.medium,
-		fontSize: textSize.title,
+		width: 22,
+		height: 22,
 	},
 	img: {
 		width: 140,

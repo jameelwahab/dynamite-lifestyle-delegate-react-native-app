@@ -93,7 +93,7 @@ const MemberManage = ({route, navigation}) => {
 				/>
 			    <StatView 
 				title={"Status"}
-				value={item.mission_status=="in_progress" ? "In Progress" : ""} 
+				value={item.mission_status=="in_progress" ? "In Progress" : "Completed"} 
 				/>
 			</View>
 			<View style={{ alignItems: "flex-end" }}>

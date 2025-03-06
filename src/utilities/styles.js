@@ -39,7 +39,7 @@ export const main = StyleSheet.create({
     fontSize: 11,
     fontFamily: "Montserrat-Regular",
     lineHeight: 15,
-    color: colors.silver,
+    color: colors.lightText,
     includeFontPadding: false,
   },
 
@@ -47,12 +47,12 @@ export const main = StyleSheet.create({
     fontSize: 13,
     fontFamily: "Montserrat-Regular",
     lineHeight: 20,
-    color: colors.silver,
+    color: colors.lightText,
     includeFontPadding: false,
   },
   description2: {
     fontFamily: "Montserrat-Regular",
-    color: colors.silver,
+    color: colors.lightText,
     includeFontPadding: false,
     fontSize: 14,
     lineHeight: 20,

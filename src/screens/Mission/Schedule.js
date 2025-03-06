@@ -8,11 +8,12 @@ import EmptyView from "../../components/EmptyView"
 import MyCheckBox from "../../components/MyCheckBox"
 import AudioPlayer from "../../components/AudioPlayer"
 import ScheduleView from "../../components/Mission/ScheduleView"
-import ResponsiveImage from "../../components/ResponsiveImage"
+import ResponsiveImage2 from "../../components/ResponsiveImage2"
 import LiveChat from "../../components/LiveChat"
 import { S3_URL } from "../../utilities/constants"
 import VimeoWithPip from "../../components/VimeoWithPip"
 import WebPlayer from "../../components/WebPlayer"
+import MyLoader from "../../components/MyLoader"
 import extractTextFromHtml from "../../functions/extractTextFromHTML.js"
 import utilities from "../../utilities"
 import { colors } from "../../utilities/colors"
@@ -24,7 +25,8 @@ import { selectUser } from '../../redux/reducers/userSlice'
 import { useSelector } from 'react-redux'
 import { useEffect } from "react"
 import { View, FlatList, Image, StyleSheet, Text, Pressable } from "react-native"
-import MyLoader from "../../components/MyLoader"
+import ItemCountView from "../../components/ItemCountView"
+
 const Schedule = (props) => {
 	return (
 		<RootView hideSubHeader hideHeader>
@@ -38,6 +40,7 @@ const Scheduler = ({ navigation, route }) => {
 	const [res, setResult] = useState([])
 	const [refreshing, setRefreshing] = useState(false)
 	const [showChat, setShowChat] = useState(false)
+	const [enableChat, setEnableChat] = useState(false)
 	const getResult = async (loader) => {
 		setLoading(loader)
 		const res = await GET_MISSION_SCHEDULE({
@@ -47,6 +50,7 @@ const Scheduler = ({ navigation, route }) => {
 			setResult(res)
 			setLoading(false)
 			setRefreshing(false)
+			setEnableChat(res?.mission_schedule?.is_chat_enabled)
 		}
 		else {
 			setResult([])
@@ -62,45 +66,43 @@ const Scheduler = ({ navigation, route }) => {
 		getResult(false)
 	}
 
-	if (loading) return <MyLoader enable={loading} />
 	return (
 		<View style={__styles.container}>
-			<LiveChat
-				user={user}
-				flex={0.63}
-				isVisible={showChat}
-				closeModal={() => setShowChat(false)}
-				eventId={route.params.id}
-				token={token}
-				naivgation={navigation}
-			/>
+			<View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: 'center', height: 30, }}>
+				<TitleView title={res?.mission_schedule?.main_heading || route.params.heading || "The Source Code"} />
+				{(route.params.type == "quest" && enableChat) && <Pressable onPress={() => setShowChat(true)}>
+					{icons.chat(colors.primary, 23)}
+				</Pressable>}
+			</View>
+			<View style={{ height: 15 }} />
+			{enableChat &&
+				<LiveChat
+					user={user}
+					flex={0.63}
+					isVisible={showChat}
+					closeModal={() => setShowChat(false)}
+					eventId={route.params.id}
+					token={token}
+					naivgation={navigation}
+				/>
+			}
 			<FlatList
-				ListHeaderComponent={
+				style={{ paddingTop: 10 }}
+				ListHeaderComponent={!loading &&
 					<>
-						<View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: 'center' }}>
-							<View style={{ flex: 0.95 }}>
-								<TitleView title={res?.mission_schedule?.main_heading || "The Source Code"} />
-							</View>
-						{route.params.type == "quest" && <Pressable onPress={() => setShowChat(true)}>
-								{icons.chat(colors.primary, 23)}
-							</Pressable> }
-						</View>
-						<View style={{ height: 15 }} />
-						{res?.mission?.video_url != "" ?
-							(res?.mission?.video_url.includes("vimeo") ?
-								<VimeoWithPip
-									url={res?.mission?.video_url}
-									focused={true} id={res?.mission?._id}
-								/> :
-								<WebPlayer width={utilities.screenWidth() - 20} url={res?.mission?.video_url} />
-							) :
-							<ResponsiveImage
-								uri={S3_URL + res?.mission_schedule?.image?.thumbnail_1}
-							/>
-						}
-						{res?.mission_schedule?.audio_url != "" && <AudioPlayer url={res?.mission_schedule?.audio_url} />}
-						<View style={{ height: 15 }} />
+						{HeaderView({
+							type: route.params.type,
+							embed_code: res?.mission_schedule?.embed_code,
+							video_url: res?.mission_schedule?.video_url,
+							mission_id: res?.mission?._id,
+							audio_url: res?.mission_schedule?.audio_url,
+							img_url: res?.mission_schedule?.image?.thumbnail_1,
+							title: res?.mission_schedule?.audio_title,
+							desc: res?.mission_schedule?.audio_description
+						})}
+						<View style={{ height: 10 }} />
 						<Overview res={res} />
+						<View style={{ height: 5 }} />
 					</>
 				}
 				data={[res]}
@@ -109,8 +111,10 @@ const Scheduler = ({ navigation, route }) => {
 					onRefresh={onRefresh}
 				/>}
 				ListEmptyComponent={!loading && <EmptyView />}
+				keyExtractor={(_, index) => index.toString()}
+				ListFooterComponent={<View style={{ height: 50 }} />}
 				showsVerticalScrollIndicator={false}
-				renderItem={({ item, index }) =>
+				renderItem={({ item, index }) => !loading &&
 					<>
 						<ScheduleView
 							schedule={res?.mission_schedule}
@@ -118,66 +122,68 @@ const Scheduler = ({ navigation, route }) => {
 						/>
 					</>
 				} />
+			<MyLoader enable={loading} />
 		</View>
 	)
+}
+
+export const HeaderView = ({ type = "", embed_code = "", video_url = "", mission_id = "", audio_url = "", img_url = "", title = "", desc = "" }) => {
+	if (type == "quest" && embed_code != "") {
+		return (
+			<MyWebview
+				fullWidth
+				html={res?.mission_schedule?.embed_code || ""} />
+		)
+	}
+	else if (video_url != "") {
+		return video_url?.includes("vimeo") ?
+			<VimeoWithPip
+				url={video_url}
+				focused={true}
+				id={mission_id}
+			/> :
+			<WebPlayer width={utilities.screenWidth() - 20} url={video_url} />
+
+	}
+	else if (audio_url) {
+		return (
+			<AudioPlayer
+				url={audio_url}
+				mission={type == "mission"}
+				title={title}
+				desc={desc}
+			/>
+		)
+	}
+	else if (img_url != "") {
+		return (<ResponsiveImage2
+			uri={S3_URL + img_url}
+		/>)
+	}
 }
 
 const Overview = ({ res }) => {
 	return (
-		<View style={__styles.schedule_container}>
-			<MyText
-				fontSize={16}
-				color={colors.primary}
-				style={{ fontFamily: fonts.bold }}
-			>Schedule Overview
-			</MyText>
-			<View style={{ height: 5 }} />
+		<View>
 			<MyWebview
 				fullWidth
 				html={res?.mission_schedule?.detailed_description || ""} />
-			<View style={{ height: 10 }} />
+			<View style={{ height: 25 }} />
 			<View style={__styles.sched_img_container}>
-				<Badge
+				<ItemCountView
+					text1={`${res?.mission_schedule?.total_number_of_days} day`}
+					backgroundColor={colors.secondary}
+					text2={"Total Days"}
 					img={require("../../assets/icons/calendar.png")}
-					context={`${res?.mission_schedule?.total_number_of_days} day`}
 				/>
-				<Badge
+				<ItemCountView
+					text1={`${res?.mission_schedule?.reward_coins}`}
+					backgroundColor={colors.secondary}
+					text2={"Coins Rewards"}
 					img={require("../../assets/icons/coin.png")}
-					context={`${res?.mission_schedule?.reward_coins} Reward Coins`}
 				/>
 			</View>
 		</View>
-	)
-}
-
-const Badge = ({ img, context }) => {
-	return (
-		<View style={__styles.badge}>
-			<Image style={__styles.schedule_img} source={img} />
-			<View style={{ width: 5 }} />
-			<MyText>{context}</MyText>
-		</View>
-	)
-}
-
-const Options = ({ list }) => {
-	return (
-		<FlatList
-			data={list}
-			scrollEnabled={false}
-			showsVerticalScrollIndicator={false}
-			ItemSeparatorComponent={<View style={{ height: 5 }} />}
-			keyExtraction={(_, index) => index.toString()}
-			renderItem={({ item }) =>
-				<View style={__styles.radio_container}>
-					<MyCheckBox circle color={colors.border} />
-					<View style={{ width: 10 }} />
-					<MyText>
-						{item}
-					</MyText>
-				</View>
-			}
-		/>
 	)
 }
 
@@ -186,19 +192,13 @@ const __styles = StyleSheet.create({
 	container: {
 		flex: 1
 	},
-	schedule_container: {
-		padding: 15,
-		borderWidth: 1,
-		borderColor: colors.border,
-		borderRadius: 10
-	},
 	sched_img_container: {
 		flexDirection: "row",
 		justifyContent: "space-between"
 	},
 	schedule_img: {
-		width: 25,
-		height: 25,
+		width: 20,
+		height: 20,
 	},
 	badge: {
 		flexDirection: 'row',

@@ -31,6 +31,7 @@ const ScheduleView = ({ schedule, index }) => {
               if (x.action_type == "general") {
                 return (
                   <View
+										key={i}
                     style={__styles.box2}
                     pointerEvents={"none"}>
                     <MyCheckBox
@@ -64,10 +65,10 @@ const ScheduleView = ({ schedule, index }) => {
     let arr_gratitude = [{ option: "", }, { option: "", }, { option: "", }];
     return (
       <View>
-        <View style={__styles.cardView} >
+        <View style={[__styles.boxView, {marginTop:15}]}>
           <View style={{ flexDirection: "row" }}>
             <View style={{ flex: 1 }}>
-              <MyText type='medium' color={colors.primary} >{schedule?.content_settings?.gratitude_action_title || "Gratitude"}</MyText>
+              <MyText type='medium' fontSize={16} color={colors.primary} >{schedule?.content_settings?.gratitude_action_title || "Gratitude"}</MyText>
             </View>
           </View>
           <View style={{ paddingTop: 10 }}>
@@ -75,11 +76,11 @@ const ScheduleView = ({ schedule, index }) => {
               <>
                 {arr_gratitude.map((item, index) => {
                   return (
-                    <View style={{ marginTop: index != 0 ? 10 : 0 }}>
+                    <View style={{ marginTop: index != 0 ? 10 : 0 }} key={index}>
                       <MyText   >{labels?.gratitudeLabels[index]}</MyText>
                       <TextInput
                         placeholder={index + 1 + ". "}
-		      placeholderTextColor="white"
+												placeholderTextColor="white"
                         // multiline={true}
                         multiline={true}
                         value={item?.option}
@@ -95,17 +96,6 @@ const ScheduleView = ({ schedule, index }) => {
                         }}
                         editable={false}
                       />
-                      {/* <MyAutoGrowTextField
-                        labelNode={<View style={{ marginBottom: 5 }}>
-                          <Text style={{}} >{labels?.gratitudeLabels[index]}
-                          </Text>
-                        </View>
-                        }
-                        style={{ backgroundColor: colors.box2, minHeight: 40, maxHeight: undefined, padding: 10 }}
-                        placeholder={index + 1 + ". "}
-                        value={item?.option}
-                        editable={false}
-                      /> */}
                     </View>
                   )
                 })}
@@ -113,10 +103,10 @@ const ScheduleView = ({ schedule, index }) => {
           </View>
         </View>
 
-        <View style={__styles.cardView} >
+        <View style={[__styles.boxView, {marginTop:15}]} >
           <View style={{ flexDirection: "row" }}>
             <View style={{ flex: 1 }}>
-              <MyText type='medium' color={colors.primary}  >{schedule?.content_settings?.dynamite_dairy_action_title || "Intentions"}</MyText>
+              <MyText type='medium' color={colors.primary} fontSize={16}  >{schedule?.content_settings?.dynamite_dairy_action_title || "Intentions"}</MyText>
             </View>
           </View>
           <View style={{}}>
@@ -124,11 +114,11 @@ const ScheduleView = ({ schedule, index }) => {
               <View style={{ marginTop: 10, }} >
                 {arr.map((item, index) => {
                   return (
-                    <View style={{ marginTop: index != 0 ? 10 : 0 }}>
+                    <View key={index} style={{ marginTop: index != 0 ? 10 : 0 }}>
                       <MyText  >{labels?.dailyDynamiteLabels[index]}</MyText>
                       <TextInput
                         placeholder={index + 1 + ". "}
-			placeholderTextColor="white"
+												placeholderTextColor="white"
                         multiline={true}
                         value={item?.option}
                         style={{
@@ -154,16 +144,16 @@ const ScheduleView = ({ schedule, index }) => {
   }
 
   return (
-    <View style={__styles.boxView}>
+    <View>
       {/* <Collapsible collapsed={isCollapsed} > */}
         <View>
 
           {scheduleActions()}
 
 
-          {isArray(schedule?.schedule_questions) &&
-            <View style={{ marginTop: 10 }}>
-              <MyText type='medium' color={colors.primary} fontSize={16} >{"Content Questions"}</MyText>
+          {(isArray(schedule?.schedule_questions) && schedule?.schedule_questions.findIndex(item=> item.show_on=="on_screen") > -1) &&
+            <View style={[__styles.boxView, {marginTop:15}]}>
+              <MyText type='medium' color={colors.primary} fontSize={16} >{schedule?.content_settings?.onscreen_question_title || "Content Questions"}</MyText>
               {schedule.schedule_questions.map((item, index) => {
                 return item.show_on=="on_screen" && (<QuestionComponent
                   padding={0}
@@ -171,29 +161,17 @@ const ScheduleView = ({ schedule, index }) => {
                   hideRepliesCheckBox={true}
                   item={{ ...item }}
                   index={index}
+								  key={index}
                   showRepliesbtns={false}
                   hideCollpase={true}
                 />)
               })}
             </View>}
 
-          {/* {!!schedule?.questions?.questions && schedule?.questions?.questions.length > 0 &&
-            <View style={{ marginTop: 10 }}>
-              <Text style={main.titleGolden} >{schedule?.content_settings?.onscreen_question_title || "Content Questions"}</Text>
-              <MissionQuestions2
-                from="mission"
-                questions={schedule?.questions?.questions}
-                questionsReplies={schedule?.questions?.question_replies}
-                bgColor={colors.box2}
-                showAnswersOnly={true}
-                disable={true}
-              />
-            </View>} */}
-
           {schedule?.growth_tool_allowed_actions.map((item, index) => {
             if (item?.tool == "dynamite_dairy") {
               return (
-                <View>
+                <View key={index}>
                   {growthToolIntentions(item, index)}
                 </View>
               )
@@ -201,8 +179,8 @@ const ScheduleView = ({ schedule, index }) => {
           })}
 
           {schedule?.content_settings?.is_show_general_note &&
-            <View style={{ marginTop: 15 }} >
-              <MyText type='medium' color={colors.primary2} >{(schedule?.content_settings?.general_note_title || "Journal")}</MyText>
+            <View style={[__styles.boxView, {marginTop:15}]} >
+              <MyText type='medium' color={colors.primary2} fontSize={16} >{(schedule?.content_settings?.general_note_title || "Journal")}</MyText>
               <View style={{ marginTop: 5 }}>
                 <MyInputs
 		  placeholder={labels.journal}
@@ -222,8 +200,8 @@ const ScheduleView = ({ schedule, index }) => {
 
 
 
-          {isArray(schedule?.schedule_questions) &&
-            <View style={{ marginTop: 10 }}>
+          {(isArray(schedule?.schedule_questions) && schedule?.schedule_questions.findIndex(item=> item.show_on=="after_action") > -1) &&
+            <View style={[__styles.boxView, {marginTop:15}]}>
               <MyText 
 		type='medium'
 		color={colors.primary}
@@ -235,6 +213,7 @@ const ScheduleView = ({ schedule, index }) => {
                   hideRepliesCheckBox={true}
                   item={{ ...item }}
                   index={index}
+								  key={index}
                   showRepliesbtns={false}
                   hideCollpase={true}
                 />)
@@ -274,11 +253,6 @@ const __styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: 'center',
     marginRight: 5
-  },
-  cardView: {
-    marginTop: 15,
-    backgroundColor: colors.secondary,
-    borderRadius: 10,
   },
   box2: {
     backgroundColor: colors.secondaryVariant,
