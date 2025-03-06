@@ -38,7 +38,6 @@ const MissionReport = ({ navigation, route }) => {
   const [badgesEarned, setBadgesEarned] = useState([])
   const [user, setUser] = useState(null)
 
-
   const prepareLineChartData = (dataset) => {
     if (!dataset || dataset.length === 0) {
       return { labels: [], datasets: [] };
@@ -242,7 +241,7 @@ const MissionReport = ({ navigation, route }) => {
             keyExtractor={(item) => item?._id}
             renderItem={({ item, index }) => {
               return (
-                <QuestionsView schedule={item} isAllow={(route.params.type=="completed" && (schedules.length==1 || index==schedules.length-1)) || hasPermission} index={index} />
+                <QuestionsView schedule={item} isAllow={(route?.params?.type=="completed" && (schedules.length==1 || index==schedules.length-1)) || hasPermission} index={index} />
               )
             }}
           />

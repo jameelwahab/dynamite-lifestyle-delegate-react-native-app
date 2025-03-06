@@ -19,9 +19,12 @@ import { useState, useEffect, useRef } from "react"
 import {Text, FlatList, View, TouchableOpacity, SafeAreaView,ScrollView, Pressable} from "react-native"
 import { icons } from '../../../utilities/icons';
 import moment from 'moment'
+import { onChatScreen } from '../../../functions/onChatScreen';
+import { MenuButton } from '../../../components/MyButton';
+import MemberView from '../../../components/MemberView';
 
 const ReviewComments = ({navigation}) => {
-    const { token } = useSelector(selectUser);
+    const { user,token, access } = useSelector(selectUser);
     const [result, setResult] = useState()
     const [loading, setLoading] = useState(false)
     const [refreshing, setRefresh] = useState(false)
@@ -32,6 +35,8 @@ const ReviewComments = ({navigation}) => {
 		const [content, setContent] = useState({title:"", desc:""})
 		const [selectContent, setSelectContent] = useState({id:"", key:""})
 		const [showAlert, setShowAlert] = useState(false)
+
+		console.log(access,"access")
 
     const getFeeds = async ({load=false, pageCount}) => {
 	setLoading(load)
@@ -64,31 +69,52 @@ const ReviewComments = ({navigation}) => {
     const ref = useRef(null)
     const closeModal = () => setShowModal(false)
     const handleClick = (id)=> ref.current.openModal?.(id);
-    const handleSelect=(opt, id)=> {
-	// if(opt.key=="ap")  APPROVE_COMMENT_REVIEW({token, navigation, id}).then((res)=> res.code==200 && setResult(result.filter(el=> el._id !== id && el))) 
-	// else if(opt.key=="del") DELETE_COMMNET_REVIEW({token, navigation, id}).then((res)=> res.code==200 && setResult(result.filter(el=> el._id !== id && el))) 
+
+    const handleSelect=(opt, item)=> {
+				if(opt.key=="msg"){
+					onChatScreen(item?.user_info_action_for?.action_id,token,navigation,user?._id)
+				}
+				else if(opt.key=="edit")console.log("hello")
+				else{
 				setShowAlert(true)
-				setSelectContent({id, key:opt})
+				setSelectContent({id:item?.user_info_action_for?.action_id, key:opt})
+				}
     }
-		const handleDelete= (id) => {
-				return DELETE_COMMNET_REVIEW({token, navigation, id}).then((res)=> res.code==200 && setResult(result.filter(el=> el._id !== id && el)))  
-		}
-		const handleAgree= (id) => {
-				return APPROVE_COMMENT_REVIEW({token, navigation, id}).then((res)=> res.code==200 && setResult(result.filter(el=> el._id !== id && el))) 
-		}
+
+		const handleDelete= (id) => DELETE_COMMNET_REVIEW({token, navigation, id}).then((res)=> res.code==200 && setResult(result.filter(el=> el._id !== id && el)))  
+
+		const handleAgree= (id) => APPROVE_COMMENT_REVIEW({token, navigation, id}).then((res)=> res.code==200 && setResult(result.filter(el=> el._id !== id && el))) 
+		
     const handleEndReach = () => {
+
 	if(!loading){
 	    setShowFooterLoader(true)
 	    setPage(page+1)
 	    getFeeds({load:false})
 	}
     } 
+
+const filterOptions = () => {
+		return optionsList.slice().filter(item => {
+			if (item.key == "del" || item.key=="edit") {
+				return access?.edit_delete_option_in_source_all_source_feeds
+			}
+		  if(item.key=='msg'){
+						return access?.is_chat_allowed
+				}
+		else {
+				return true
+			}
+
+		})
+	}
+
     return (
 	<RootView hideBackBottomButton title="Review Comments">
 	    <OptionModal2
 		ref={ref}
 		onSelected={handleSelect}
-		optionList={optionsList}
+		optionList={filterOptions()}
 		/>
 	    <CustomModal isVisible={showComment} content={content} closeModal={()=> setShowComment(false)} /> 
 	    <CustomAlert isVisible={showAlert} content={selectContent} closeModal={()=> setShowAlert(false)}  handleDelete={handleDelete} handleAgree={handleAgree}/> 
@@ -108,7 +134,7 @@ const ReviewComments = ({navigation}) => {
 		    <RenderPosts
 			feed={item}
 			index={index}
-			handleClick={()=>handleClick(item._id)}
+			handleClick={()=>handleClick(item)}
 			setShowComment={()=>setShowComment(true)}
 			setContent={()=>setContent({title:item.message, desc:item.review_info.reason})}
 			/>
@@ -120,6 +146,7 @@ const ReviewComments = ({navigation}) => {
 }
 
 const CustomAlert = ({isVisible, closeModal, content, handleDelete, handleAgree})=>{
+
 		return(
 	<Modal
 	    isVisible={isVisible}
@@ -186,22 +213,18 @@ const RenderPosts = ({feed, index, handleClick, setShowComment, setContent}) => 
     return (
 	<>
 	<View style={{backgroundColor:colors.secondary, padding:10, borderRadius:10}}>
-	    <View style={{flexDirection:"row", aligItems:"center", justifyContent:"space-between"}}>
-		<View style={{flexDirection:"row", alignItems:'center'}}>
-				<UserImage size={30} image={feed?.user_info_action_for?.profile_image}/>
-		<View style={{width:10}}/>
-		<MyText
-		    fontSize={14}
-		    type='bold'>{feed?.user_info_action_for?.name}</MyText>
+
+		<View style={{ flexDirection: "row", aligItems: "center", justifyContent: "space-between" }}>
+				<MemberView
+					member={feed?.user_info_action_for}
+					hideEmail
+				/>
+				<MenuButton
+					marginHorizontal={0}
+					onPress={handleClick}
+					size={20}
+				/>
 		</View>
-		<TouchableOpacity
-		    onPress={handleClick}
-		    activeOpacity={0.5} style={{backgroundColor:colors.border, width:24.5, height: 24.5,borderRadius:33, alignItems:"center", justifyContent:"center"}}>
-		    {[...Array(3)].map((el,index)=> 
-			<View key={index} style={{width:3, height:3, borderRadius:30, backgroundColor:colors.primary, marginTop:index== 0 ? 0 : 2.5}}/>
-		    )}
-		</TouchableOpacity>
-	    </View>
 	    <View style={{height:10}}/>
 	    <StatView title="Description" original numberOfLinesValues={2} value={feed?.message}/>
 	    <StatView title="Created For" value={feed?.feed_created_for === "general" ? "The Source Code": feed?.feed_created_for}/>
@@ -221,16 +244,26 @@ const RenderPosts = ({feed, index, handleClick, setShowComment, setContent}) => 
 }
 
 const optionsList = [
-	{
-		title: "Approved",
-		key: "ap",
-		icon: () => icons.check_circle(colors.primary, 17),
-	},
-	{
-		title: "Delete",
-		key: "del",
-		icon: icons.trash,
-	},
+		{
+				title: "Approved",
+				key: "ap",
+				icon: () => icons.check_circle(colors.primary, 17),
+		},
+		{
+				title: "Delete",
+				key: "del",
+				icon: icons.trash,
+		},
+		{
+				title:"Edit",
+				key:"edit",
+				icon: icons.edit,
+		},
+		{
+				title:"Message",
+				key:"msg",
+				icon: icons.share,
+		}
 
 ]
 export default ReviewComments

@@ -3,7 +3,6 @@ import MyText from '../../../components/MyText'
 import Modal from 'react-native-modal';
 import MyLoader from '../../../components/MyLoader'
 import EmptyView from '../../../components/EmptyView'
-import UserImage from '../../../components/UserImage'
 import StatView from '../../../components/StatView'
 import OptionModal2 from '../../../components/OptionModal2'
 import MyRefreshControl from '../../../components/MyRefreshControl'
@@ -21,10 +20,11 @@ import { MenuButton } from '../../../components/MyButton';
 import routes from '../../../navigation/routes';
 import MemberView from '../../../components/MemberView';
 import { icons } from '../../../utilities/icons';
+import { onChatScreen } from '../../../functions/onChatScreen';
 
 const ReviewFeeds = ({ navigation, route }) => {
 	const ref = useRef(null)
-	const { token, access } = useSelector(selectUser);
+	const { token, access, user } = useSelector(selectUser);
 	const [result, setResult] = useState()
 	const [loading, setLoading] = useState(false)
 	const [refreshing, setRefresh] = useState(false)
@@ -33,7 +33,6 @@ const ReviewFeeds = ({ navigation, route }) => {
   const [showAlert, setShowAlert] =useState(false)
   const [selectContent, setSelectContent] = useState({id:"", key:""})
 	const [page, setPage] = useState(0)
-
 
 	const getFeeds = async ({ load = false, pageCount }) => {
 		setLoading(load)
@@ -66,15 +65,19 @@ const ReviewFeeds = ({ navigation, route }) => {
 		setShowModal(false)
 	}
 
-	const handleClick = (id) => {
-		ref.current.openModal?.(id);
+	const handleClick = (item) => {
+		ref.current.openModal?.(item);
 	}
 
 
 
-		const handleSelect = (opt, id) => {
-				setShowAlert(true)
-				setSelectContent({id, key:opt})
+		const handleSelect = (opt, item) => {
+				if(opt.key=="msg") onChatScreen(item?.action_info?.action_id,token,navigation,user?._id) 
+				if(opt.key=="edt") console.log("Hora")
+				else{
+						setShowAlert(true)
+						setSelectContent({id:item?.action_info?.action_id, key:opt})
+				}
 		}
 		const handleDelete = (id)=>{
 				return DELETE_REVIEW_FEEDS({ token, navigation, id }).then(() => setResult(result.filter(el => el._id !== id && el)))
@@ -107,11 +110,16 @@ const ReviewFeeds = ({ navigation, route }) => {
 
 	const filterOptions = () => {
 		return optionsList.slice().filter(item => {
-			if (item.key == "del") {
+			if (item.key == "del" || item.key=="edit") {
 				return access?.edit_delete_option_in_source_all_source_feeds
-			} else {
+			}
+		  if(item.key=='msg'){
+						return access?.is_chat_allowed
+				}
+		else {
 				return true
 			}
+
 		})
 	}
 
@@ -142,7 +150,7 @@ const ReviewFeeds = ({ navigation, route }) => {
 					renderItem={({ item, index }) =>
 						renderPosts({
 							feed: item, index,
-							handleClick: () => handleClick(item._id),
+							handleClick: () => handleClick(item),
 							onDetail: () => onDetail(item),
 						})}
 				/>
@@ -237,15 +245,25 @@ const renderPosts = ({ feed, index, handleClick, onDetail }) => {
 export default ReviewFeeds
 
 const optionsList = [
-	{
-		title: "Approved",
-		key: "ap",
-		icon: () => icons.check_circle(colors.primary, 17),
-	},
-	{
-		title: "Delete",
-		key: "del",
-		icon: icons.trash,
-	},
+		{
+				title: "Approved",
+				key: "ap",
+				icon: () => icons.check_circle(colors.primary, 17),
+		},
+		{
+				title: "Delete",
+				key: "del",
+				icon: icons.trash,
+		},
+		{
+				title:"Edit",
+				key:"edit",
+				icon: icons.edit,
+		},
+		{
+				title:"Message",
+				key:"msg",
+				icon: icons.share,
+		}
 
 ]
