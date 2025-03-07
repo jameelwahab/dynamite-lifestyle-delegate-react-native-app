@@ -177,7 +177,7 @@ const ScheduleView = ({ schedule, index }) => {
                 index={index}
                 key={index}
                 showRepliesbtns={false}
-                hideCollpase={false}
+                hideCollapse={true}
               />)
             })}
           </View>}

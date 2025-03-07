@@ -145,9 +145,10 @@ const QuestionComponent = ({ item, index, showRepliesbtns = false, onShowReplyPr
     <View style={{ backgroundColor: colors.secondary, padding: padding, marginTop: 10, borderRadius: 10 }}>
 
       <Pressable
-        disabled={hideCollapse}
         onPress={() => {
-          setIsCollapsed(!isCollapsed)
+						if(!hideCollapse){
+								setIsCollapsed(!isCollapsed)
+						}
         }}
         style={{ flexDirection: "row", alignItems: "center" }}>
         <View style={{ flex: 1 }}>

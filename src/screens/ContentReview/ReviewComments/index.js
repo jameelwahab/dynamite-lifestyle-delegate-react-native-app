@@ -147,7 +147,8 @@ const ReviewComments = ({ navigation }) => {
 	}
 
 	return (
-		<RootView hideBackBottomButton title="Review Comments">
+		<RootView hideBackBottomButton hideSubHeader>
+			<MyText style={{marginBottom:15}} fontSize={textSize.title} type="bold" color={colors.primary}> Review Comments </MyText>
 			<CustomModal isVisible={showComment} content={content} closeModal={() => setShowComment(false)} />
 			<View style={{ flex: 1 }}>
 				<FlatList
@@ -232,6 +233,7 @@ const RenderPosts = ({ feed, index, handleClick, setShowComment, setContent }) =
 			<View style={{ backgroundColor: colors.secondary, padding: 10, borderRadius: 10 }}>
 				<View style={{ flexDirection: "row", aligItems: "center", justifyContent: "space-between" }}>
 					<MemberView
+						borderColor={feed?.user_info_action_for?.badge_level_info?.color_code}
 						member={feed?.user_info_action_for}
 						hideEmail
 					/>

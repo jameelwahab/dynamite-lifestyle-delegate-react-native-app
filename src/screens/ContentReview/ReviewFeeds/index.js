@@ -166,8 +166,8 @@ const ReviewFeeds = ({ navigation, route }) => {
 
 
 	return (
-		<RootView hideBackBottomButton title="Review Posts">
-
+		<RootView hideBackBottomButton hideSubHeader>
+			<MyText style={{marginBottom:15}} fontSize={textSize.title} type="bold" color={colors.primary}> Review Posts </MyText>
 			<View style={{ flex: 1 }}>
 				<FlatList
 					data={result}
@@ -226,6 +226,7 @@ const renderPosts = ({ feed, index, handleClick, onDetail }) => {
 		<View style={{ backgroundColor: colors.secondary, padding: 10, borderRadius: 10 }} key={index}>
 			<View style={{ flexDirection: "row", aligItems: "center", justifyContent: "space-between" }}>
 				<MemberView
+				  borderColor={feed?.badge_level_info?.color_code}
 					member={feed.action_info}
 					hideEmail
 				/>
