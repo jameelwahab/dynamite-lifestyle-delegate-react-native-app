@@ -28,6 +28,7 @@ import ConfirmationModal from '../../components/ConfirmationModal'
 import showToast from '../../functions/showToast'
 
 const GenericQuetionListByModule = ({ module, moduleId }) => {
+  console.log("GenericQuetionListByModule")
   const navigation = useNavigation();
   const route = useRoute();
   const { token } = useSelector(selectUser)

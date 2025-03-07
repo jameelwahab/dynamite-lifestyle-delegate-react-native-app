@@ -24,7 +24,7 @@ import { icons } from '../../utilities/icons'
 import { useState } from "react"
 import { selectUser } from '../../redux/reducers/userSlice'
 import { useSelector } from 'react-redux'
-import { useEffect, useCallback} from "react"
+import { useEffect, useCallback } from "react"
 import { useFocusEffect } from "@react-navigation/native"
 import { View, FlatList, Image, StyleSheet, Text, Pressable, } from "react-native"
 import ItemCountView from "../../components/ItemCountView"
@@ -54,7 +54,7 @@ const Scheduler = ({ navigation, route }) => {
 			setResult(res)
 			setLoading(false)
 			setRefreshing(false)
-		  setEnableChat(res?.mission_schedule?.is_chat_enabled)
+			setEnableChat(res?.mission_schedule?.is_chat_enabled)
 		}
 		else {
 			setResult([])
@@ -67,55 +67,55 @@ const Scheduler = ({ navigation, route }) => {
 		getResult(true)
 	}, [])
 
-		const onRefresh = () => {
-				setRefreshing(true)
-				getResult(false)
+	const onRefresh = () => {
+		setRefreshing(true)
+		getResult(false)
+	}
+
+	const [isFocused, setIsFocused] = useState(false);
+
+	useFocusEffect(useCallback(() => {
+		setIsFocused(true);
+		return () => {
+			setIsFocused(false);
 		}
-
-		const [isFocused, setIsFocused] = useState(false);
-
-		useFocusEffect(useCallback(() => {
-				setIsFocused(true);
-				return () => {
-						setIsFocused(false);
-				}
-		}, []))
+	}, []))
 
 
 	return (
 		<View style={__styles.container}>
-				<View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: 'center', height:30, }}>
-								<TitleView title={res?.mission_schedule?.main_heading || route.params.heading || "The Source Code"} />
-						{(route.params.type == "quest" && enableChat) && <Pressable onPress={() => setShowChat(true)}>
-								{icons.chat(colors.primary, 23)}
-							</Pressable> }
-				</View>
-				<View style={{ height: 5 }} />
-				{enableChat && 
-						<LiveChat
-								user={user}
-								flex={0.63}
-								isVisible={showChat}
-								closeModal={() => setShowChat(false)}
-								eventId={route.params.id}
-								token={token}
-								naivgation={navigation}
-								/>
-				}
-				<FlatList
-				style={{paddingTop:10}}
-				ListHeaderComponent={!loading && 
+			<View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: 'center', height: 30, }}>
+				<TitleView title={res?.mission_schedule?.main_heading || route.params.heading || "The Source Code"} />
+				{(route.params.type == "quest" && enableChat) && <Pressable onPress={() => setShowChat(true)}>
+					{icons.chat(colors.primary, 23)}
+				</Pressable>}
+			</View>
+			<View style={{ height: 5 }} />
+			{enableChat &&
+				<LiveChat
+					user={user}
+					flex={0.63}
+					isVisible={showChat}
+					closeModal={() => setShowChat(false)}
+					eventId={route.params.id}
+					token={token}
+					naivgation={navigation}
+				/>
+			}
+			<FlatList
+				style={{ paddingTop: 10 }}
+				ListHeaderComponent={!loading &&
 					<>
 						{HeaderView({
-								type: route.params.type,
-								embed_code: res?.mission_schedule?.embed_code,
-								video_url: res?.mission_schedule?.video_url,
-								mission_id: res?.mission?._id,
-								audio_url: res?.mission_schedule?.audio_url,
-								img_url: res?.mission_schedule?.image?.thumbnail_1,
-								title: res?.mission_schedule?.audio_title,
-								desc: res?.mission_schedule?.audio_description,
-								focuse:isFocused
+							type: route.params.type,
+							embed_code: res?.mission_schedule?.embed_code,
+							video_url: res?.mission_schedule?.video_url,
+							mission_id: res?.mission?._id,
+							audio_url: res?.mission_schedule?.audio_url,
+							img_url: res?.mission_schedule?.image?.thumbnail_1,
+							title: res?.mission_schedule?.audio_title,
+							desc: res?.mission_schedule?.audio_description,
+							focuse: isFocused
 
 						})}
 						<View style={{ height: 10 }} />
@@ -129,10 +129,10 @@ const Scheduler = ({ navigation, route }) => {
 					onRefresh={onRefresh}
 				/>}
 				ListEmptyComponent={!loading && <EmptyView />}
-				keyExtractor={(_,index)=> index.toString()}
-				ListFooterComponent={<View style={{height:50}}/>}
+				keyExtractor={(_, index) => index.toString()}
+				ListFooterComponent={<View style={{ height: 50 }} />}
 				showsVerticalScrollIndicator={false}
-				renderItem={({ item, index }) =>!loading && 
+				renderItem={({ item, index }) => !loading &&
 					<>
 						<ScheduleView
 							schedule={res?.mission_schedule}
@@ -145,37 +145,39 @@ const Scheduler = ({ navigation, route }) => {
 	)
 }
 
-export const HeaderView = ({type="", embed_code="",video_url="", mission_id="",audio_url="", img_url="",title="",desc="", focuse=true}) => {
+export const HeaderView = ({ type = "", embed_code = "", video_url = "", mission_id = "", audio_url = "", img_url = "", title = "", desc = "", focuse = true }) => {
 
-				if(type == "quest" && embed_code != ""){
-						return (
-								<MyWebview
-										fullWidth
-										html={res?.mission_schedule?.embed_code|| ""} />
-						)}
-				else if (video_url != ""){
-							return video_url?.includes("vimeo") ?
-								<VimeoWithPip
-									url={video_url}
-									focused={focuse} id={mission_id}
-								/> :
-								<WebPlayer width={utilities.screenWidth() - 20} url={video_url} />
-							
-						}
-				else if(audio_url){
-						return (
-								 <AudioPlayer
-												url={audio_url}
-												mission={type=="mission"}
-												title={title}
-												desc={desc}  
-												/>
-						) }
-		else if(img_url!=""){
-				return (<ResponsiveImage2
-												uri={S3_URL + img_url}
-								/>)
-		}
+	if (type == "quest" && embed_code != "") {
+		return (
+			<MyWebview
+				fullWidth
+				html={res?.mission_schedule?.embed_code || ""} />
+		)
+	}
+	else if (video_url != "") {
+		return video_url?.includes("vimeo") ?
+			<VimeoWithPip
+				url={video_url}
+				focused={focuse} id={mission_id}
+			/> :
+			<WebPlayer width={utilities.screenWidth() - 20} url={video_url} />
+
+	}
+	else if (audio_url) {
+		return (
+			<AudioPlayer
+				url={audio_url}
+				mission={type == "mission"}
+				title={title}
+				desc={desc}
+			/>
+		)
+	}
+	else if (img_url != "") {
+		return (<ResponsiveImage2
+			uri={S3_URL + img_url}
+		/>)
+	}
 }
 
 const Overview = ({ res }) => {
@@ -187,17 +189,17 @@ const Overview = ({ res }) => {
 			<View style={{ height: 25 }} />
 			<View style={__styles.sched_img_container}>
 				<ItemCountView
-				    text1={`${res?.mission_schedule?.total_number_of_days} day`}
-				    backgroundColor={colors.secondary}
-				    text2={"Total Days"}
-				    img={require("../../assets/icons/calendar.png")}
-				    />
+					text1={`${res?.mission_schedule?.total_number_of_days} day`}
+					backgroundColor={colors.secondary}
+					text2={"Total Days"}
+					img={require("../../assets/icons/calendar.png")}
+				/>
 				<ItemCountView
-				    text1={`${res?.mission_schedule?.reward_coins}`}
-				    backgroundColor={colors.secondary}
-				    text2={"Coins Rewards"}
-				    img={require("../../assets/icons/coin.png")}
-				    />
+					text1={`${res?.mission_schedule?.reward_coins}`}
+					backgroundColor={colors.secondary}
+					text2={"Coins Rewards"}
+					img={require("../../assets/icons/coin.png")}
+				/>
 			</View>
 		</View>
 	)
