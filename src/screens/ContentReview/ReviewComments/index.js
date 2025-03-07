@@ -40,6 +40,7 @@ const ReviewComments = ({ navigation }) => {
 
 	const [searching, setSearching] = useState(false);
 	const [searchText, setSearchText] = useState("");
+  const [total, setTotal] = useState(0)
 
 
 
@@ -58,6 +59,7 @@ const ReviewComments = ({ navigation }) => {
 			setRefresh(false)
 			setSearching(false)
 			setShowFooterLoader(false)
+		  setTotal(res?.total_count);
 		}
 		else {
 			setShowFooterLoader(false)
@@ -169,7 +171,11 @@ const ReviewComments = ({ navigation }) => {
 
 
 	return (
-		<RootView hideBackBottomButton title='Review Comments'>
+		<RootView
+			hideBackBottomButton
+			title="Review Comments"
+			subTitle={`Showing ${result?.length} of ${total}`}
+		>
 			<CustomModal isVisible={showComment} content={content} closeModal={() => setShowComment(false)} />
 			<View style={{ flex: 1 }}>
 				<FlatList

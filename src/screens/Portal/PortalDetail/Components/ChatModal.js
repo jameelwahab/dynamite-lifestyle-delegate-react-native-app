@@ -670,6 +670,8 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
         <View style={[__style.commentView, { marginLeft: isChild ? "10%" : undefined }]}>
           <View style={__style.profileView}>
             <UserImage
+				     borderWidth={2}
+				      borderColor={item?.badge_info?.code_color}
               image={item?.member?.profile_image}
               name={item?.member?.first_name}
               backgroundTransparent={true}

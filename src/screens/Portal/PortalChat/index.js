@@ -123,7 +123,7 @@ const PortalChat = ({ navigation, route }) => {
   useEffect(() => {
     page = 0;
     cnanLoadMore = false;
-    setUsers([])
+    setUsers([]).
     setLoader(true)
     getDataFromServer()
   }, [tab])

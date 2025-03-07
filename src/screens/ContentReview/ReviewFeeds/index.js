@@ -40,10 +40,11 @@ const ReviewFeeds = ({ navigation, route }) => {
 	const [showFooterLoader, setShowFooterLoader] = useState(false)
 	const [searching, setSearching] = useState(false);
 	const [searchText, setSearchText] = useState("");
+	const [totle, setTotal] = useState(0)
 
 
 	const getFeeds = async () => {
-		const res = await GET_REVIEW_FEEDS({ token, navigation, limit: 20, page: paging?.page,search_text:searchText })
+		const res = await GET_REVIEW_FEEDS({ token, navigation, limit: 20, page: paging?.page, search_text: searchText })
 		if (res.code == 200) {
 			setResult(paging?.page == 0 ? res?.feeds : [...result, ...res?.feeds])
 			let length = paging?.page == 0 ? res?.feeds.length : (result.length + res?.feeds.length);
@@ -53,6 +54,7 @@ const ReviewFeeds = ({ navigation, route }) => {
 			} else {
 				paging.canLoadMore = false;
 			}
+			setTotal(res?.total_count)
 			setLoading(false)
 			setRefresh(false)
 			setSearching(false)
@@ -202,8 +204,10 @@ const ReviewFeeds = ({ navigation, route }) => {
 
 
 	return (
-		<RootView hideBackBottomButton >
-
+		<RootView
+			hideBackBottomButton
+			title="Review Posts"
+			subTitle={`Showing ${result?.length} of ${totle}`}>
 
 			<View style={{ flex: 1 }}>
 				<FlatList
@@ -304,7 +308,7 @@ const renderPosts = ({ feed, index, handleClick, onDetail }) => {
 			<View style={{ height: 10 }} />
 			<StatView title="Description" original={true} value={feed?.description} numberOfLinesValues={2} />
 			<StatView title="Created For" value={getFeedType(feed)} />
-			<StatView title="Appear by" value={feed?.feed_appear_by} />
+			<StatView title="Feed Type" value={feed?.feed_appear_by} />
 			<StatView
 				original
 				title="Created At"

@@ -703,7 +703,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       list: [],
       modalVisibility: true,
       loader: true,
-      type:"like"
+      type: "like"
     });
     likeVar = {
       ...likeVar,
@@ -718,7 +718,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       list: [],
       modalVisibility: true,
       loader: true,
-      type:"like"
+      type: "like"
     });
     likeVar = {
       page: 0,
@@ -1022,7 +1022,8 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
         }
 
         if (item.type == "message" && feed?.review_status == "approved") {
-          if (isChatAllowed && user?.is_super_delegate) {
+          console.log(isChatAllowed,"isChatAllowed")
+          if (isChatAllowed) {
             if (!isMine && feed.action_info?.action_by != "consultant_user") {
               newList.push(item);
             }
@@ -1118,7 +1119,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       }
 
       if (item.type == "message" && feed?.review_status == "approved") {
-        if (isChatAllowed && user?.is_super_delegate) {
+        if (isChatAllowed) {
           if (!isMine && feed.action_info?.action_by != "consultant_user") {
             newList.push(item);
           }
@@ -1165,7 +1166,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       list: [],
       modalVisibility: true,
       loader: true,
-      type:"report"
+      type: "report"
     });
     likeVar = {
       page: 0,

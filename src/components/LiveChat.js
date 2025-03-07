@@ -23,6 +23,7 @@ import { useSelector } from 'react-redux';
 import { selectSocket } from '../redux/reducers/socketSlice';
 import LikeModal from './LikeModal';
 import showToast from '../functions/showToast';
+import { onChatScreen } from '../functions/onChatScreen';
 import ConfirmationModal from './ConfirmationModal';
 import Toast from 'react-native-toast-message';
 import EmptyView from './EmptyView';
@@ -33,7 +34,7 @@ import moment from "moment"
 let page = 0;
 let canLoadMore = false;
 
-const LiveChat = ({ isVisible, closeModal, type, token, navigation, videoId, timezone, purchaseLink, linkImage, eventId, user, flex = 0.6 }) => {
+const LiveChat = ({ isVisible, closeModal, type, token, navigation, videoId, timezone, purchaseLink, linkImage, eventId, user, flex = 0.6, access}) => {
   const paging = useRef({ page: 0, canLoadMore: false })?.current;
   const { socket } = useSelector(selectSocket);
   const likeModalRef = useRef();
@@ -63,7 +64,6 @@ const LiveChat = ({ isVisible, closeModal, type, token, navigation, videoId, tim
   const [selectedCommentFor, setSelectedCommentFor] = useState("");
   const [showScroller, setShowScroller] = useState(false);
   const [footerLoader, setFooterLoader] = useState(false);
-
   useEffect(() => {
     return () => {
       onModalHide()
@@ -263,6 +263,9 @@ const LiveChat = ({ isVisible, closeModal, type, token, navigation, videoId, tim
         setConfirmationsModal({ isVisible: true, item: item, type: "note", title: "Are you sure you want to add the comment as personal note?" })
       }, 1000);
     }
+			else if (opt?.type=="message"){
+				onChatScreen(optionModal?.item?.member?._id, token, navigation, user?._id)
+			}
   }
 
   const onConfirmAgree = () => {
@@ -501,8 +504,10 @@ const LiveChat = ({ isVisible, closeModal, type, token, navigation, videoId, tim
     } else {
       nlist = list.slice().filter(x => x.type != "unpin")
     }
-
-    if (optionModal?.item?.action_by != "member") {
+		if(!access?.is_chat_allowed || (optionModal?.item?.member?._id == user?._id)){
+      nlist = nlist.slice().filter(x => x.type != "message")
+		}
+    if (optionModal?.item?.action_by == "consultant_user" || (optionModal?.item?.member?._id == user?._id)) {
       nlist = nlist.slice().filter(x => x.type != "note")
     }
 
@@ -639,9 +644,7 @@ const LiveChat = ({ isVisible, closeModal, type, token, navigation, videoId, tim
                 />
               </TouchableOpacity>
             }
-            {/* <View style={__style.sendMsgTextView}>
-            <MyText color={colors.lightGrey} >Write a comment...*</MyText>
-          </View> */}
+            
           </View>
 
           <TouchableOpacity
@@ -670,9 +673,10 @@ const LiveChat = ({ isVisible, closeModal, type, token, navigation, videoId, tim
         <View style={[__style.commentView, { marginLeft: isChild ? "10%" : undefined }]}>
           <View style={__style.profileView}>
             <UserImage
+						  borderWidth={2}
+						  borderColor={item?.badge_info?.color_code}
               image={item?.member?.profile_image}
               name={item?.member?.first_name}
-              backgroundTransparent={true}
               size={30}
             />
 
@@ -685,11 +689,10 @@ const LiveChat = ({ isVisible, closeModal, type, token, navigation, videoId, tim
             </View>
             {isLive ?
               <>
-                {item?.member?._id == user?._id &&
                   <MenuButton
                     size={20}
                     onPress={() => setOptionModal({ isVisible: true, item: item })}
-                  />}
+                  />
               </>
               :
               item?.like_count > 0 ?
@@ -1024,14 +1027,14 @@ const OptionList = [
   //   title: "Pin",
   //   type: "pin"
   // },
-  // {
-  //   icon: icons.pin,
-  //   title: "Unpin",
-  //   type: "unpin"
-  // },
-  // {
-  //   icon: icons.edit,
-  //   title: "Add as Note",
-  //   type: "note"
-  // },
+  {
+    icon: icons.share,
+    title: "Message",
+    type: "message"
+  },
+  {
+    icon: icons.edit,
+    title: "Add as Note",
+    type: "note"
+  },
 ]

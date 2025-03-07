@@ -66,6 +66,7 @@ const BroadcastDetail = ({ navigation, route }) => {
   const listview = ({ item, index }) => {
     return <View style={{ backgroundColor: colors.secondary, borderRadius: 10, padding: 10, marginTop: 10 }}>
       <MemberView
+			  borderColor={item?.membership_level_badge_info?.membership_level_badge_id?.color_code}
         member={item}
         size={35}
         titleSize={14}

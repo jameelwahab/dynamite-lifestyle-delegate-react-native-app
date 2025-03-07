@@ -27,7 +27,7 @@ export const onChatScreen = async (memberId, token, navigation, userId) => {
         firstName: member?.first_name,
         lastName: member?.last_name,
         lastSeen: !!member?.last_login_activity ? member?.last_login_activity : "",
-        profileImage: !!member?.member ? member?.member : "",
+        profileImage:  member?.profile_image?.thumbnail_1 ||  "",
         chatId: "",
         canGoBack: true,
         resetCountToZero: () => { },
