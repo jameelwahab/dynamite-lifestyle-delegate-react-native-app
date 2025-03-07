@@ -36,7 +36,6 @@ let mlpage = 0;
 let mlcanLoadMore = false;
 let isNewChat = false;
 const MessageList = ({ navigation, route }) => {
-  console.log(route?.params)
   const [member, setMember] = useState(route?.params);
   const insets = useSafeAreaInsets();
   const timezone = useSelector(selectTimeZone);

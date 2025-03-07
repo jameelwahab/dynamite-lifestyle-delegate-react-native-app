@@ -25,13 +25,13 @@ const MsgView = ({ item, index, user, timezone, onMsgLongPress, openImageZommer,
   return (
     <TouchableOpacity
       onLongPress={onMsgLongPress}
-      style={{ alignSelf: isOtherMember(item.receiver_id) ? "flex-start" : "flex-end", }}>
+      style={{ alignSelf: isOtherMember(item?.receiver_id) ? "flex-start" : "flex-end", }}>
       <View
 
         style={{
-          borderBottomRightRadius: isOtherMember(item.receiver_id) ? 10 : 0,
-          borderBottomLeftRadius: isOtherMember(item.receiver_id) ? 0 : 10,
-          backgroundColor: isOtherMember(item.receiver_id) ? colors.lightText2 : colors.secondaryVariant,
+          borderBottomRightRadius: isOtherMember(item?.receiver_id) ? 10 : 0,
+          borderBottomLeftRadius: isOtherMember(item?.receiver_id) ? 0 : 10,
+          backgroundColor: isOtherMember(item?.receiver_id) ? colors.lightText2 : colors.secondaryVariant,
           minWidth: utilities.screenWidth() * 0.4,
           maxWidth: utilities.screenWidth() * 0.8,
           padding: 5,
@@ -42,12 +42,12 @@ const MsgView = ({ item, index, user, timezone, onMsgLongPress, openImageZommer,
 
           {/*//?   Image View  */}
 
-          {item.message_type == 'image' && !!item.image &&
+          {item?.message_type == 'image' && !!item?.image &&
             <TouchableOpacity
               activeOpacity={0.5}
               pointerEvents='box-only'
               onLongPress={onMsgLongPress}
-              onPress={() => openImageZommer(item.image)}
+              onPress={() => openImageZommer(item?.image)}
               style={{ padding: 2 }}>
               <ResponsiveImage
                 uri={S3_URL + item?.image}
@@ -63,7 +63,7 @@ const MsgView = ({ item, index, user, timezone, onMsgLongPress, openImageZommer,
               currentPlaying={state.isPlaying}
               currentTrack={state.selected_audio}
               thisTrack={item._id}
-              onPress={() => playIconClick(item.audio_url, item._id, isOtherMember(item.receiver_id))}
+              onPress={() => playIconClick(item?.audio_url, item?._id, isOtherMember(item?.receiver_id))}
               stopPlayer={stopPlayer}
               totalDuration={item?.audio_duration}
               url={item?.audio_url}
@@ -76,25 +76,25 @@ const MsgView = ({ item, index, user, timezone, onMsgLongPress, openImageZommer,
           {!!item?.message && <View style={{ paddingHorizontal: 5 }}>
             {isHtml(item?.message) ?
               <MyWebview
-                style={isOtherMember(item.receiver_id) ? WebviewStyleOther : WebviewStyleMine}
+                style={isOtherMember(item?.receiver_id) ? WebviewStyleOther : WebviewStyleMine}
                 html={item?.message}
 
               /> :
 
               <Markdown
-                style={isOtherMember(item.receiver_id) ? markdownStyleOther : markdownStyleMine}
+                style={isOtherMember(item?.receiver_id) ? markdownStyleOther : markdownStyleMine}
                 onLinkPress={(url) => {
                   openUrl(url);
                   return false
                 }}>
-                {urlify(item.message)}
+                {urlify(item?.message)}
                 {/* <MyText>{item.message}</MyText> */}
               </Markdown>
             }
           </View>}
 
           <View style={{ marginTop: 5, alignSelf: "flex-end", flexDirection: "row", alignItems: "center" }}>
-            {!isOtherMember(item.receiver_id) &&
+            {!isOtherMember(item?.receiver_id) &&
               <View style={{ marginRight: 5 }}>
                 {!!item?.status == false || item?.status == "sent"
                   ? icons.sent(colors.white, 18) :
@@ -106,7 +106,7 @@ const MsgView = ({ item, index, user, timezone, onMsgLongPress, openImageZommer,
               </View>}
             <MyText
               fontSize={10}
-              color={isOtherMember(item.receiver_id) ? colors.black : undefined}>
+              color={isOtherMember(item?.receiver_id) ? colors.black : undefined}>
               {convertTimezone(item?.createdAt, timezone).format(dateTimeFormat.dateTime)}
             </MyText>
           </View>

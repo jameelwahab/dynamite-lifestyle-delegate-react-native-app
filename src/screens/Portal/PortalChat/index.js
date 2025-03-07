@@ -161,7 +161,6 @@ const PortalChat = ({ navigation, route }) => {
   }
 
   const renderUserList = ({ item, index }) => {
-			console.log("here is the item", item)
     return (
       <TouchableOpacity
         onPress={() => onChatScreen(item)}

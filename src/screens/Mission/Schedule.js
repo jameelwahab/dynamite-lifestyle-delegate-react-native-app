@@ -39,7 +39,7 @@ const Schedule = (props) => {
 }
 const Scheduler = ({ navigation, route }) => {
 	const [loading, setLoading] = useState(false)
-	const { token, user } = useSelector(selectUser);
+	const { token, user, access } = useSelector(selectUser);
 	const [res, setResult] = useState([])
 	const [refreshing, setRefreshing] = useState(false)
 	const [showChat, setShowChat] = useState(false)
@@ -112,7 +112,8 @@ const Scheduler = ({ navigation, route }) => {
 					closeModal={() => setShowChat(false)}
 					eventId={route.params.id}
 					token={token}
-					naivgation={navigation}
+					access={access}
+					navigation={navigation}
 				/>
 			}
 			<FlatList
