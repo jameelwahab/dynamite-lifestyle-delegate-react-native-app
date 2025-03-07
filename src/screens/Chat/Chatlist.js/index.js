@@ -446,7 +446,6 @@ const ChatList = ({ navigation }) => {
       member = item?.member[1];
       otherUser = item?.member[0];
     }
-
     return (
       <TouchableHighlight
         onPress={() => onChatScreen(member, item)}
@@ -454,6 +453,8 @@ const ChatList = ({ navigation }) => {
         <View style={__style.itemRootView}>
           <View>
             <UserImage
+						  borderWidth={2}
+						  borderColor={member?.badge_info?.color_code}
               image={member?.profile_image}
               name={member?.first_name}
             />

@@ -856,8 +856,8 @@ const MemberList = ({ navigation, route }) => {
             style={{ flexDirection: "row", flex: 1, alignItems: "center" }}>
             <View>
               <UserImage
-		borderWidth={1}
-		borderColor={colors.delete}
+								borderWidth={1}
+								borderColor={colors.delete}
                 image={item?.profile_image}
                 name={item?.first_name}
                 size={30} />

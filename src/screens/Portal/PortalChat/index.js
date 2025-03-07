@@ -123,7 +123,7 @@ const PortalChat = ({ navigation, route }) => {
   useEffect(() => {
     page = 0;
     cnanLoadMore = false;
-    setUsers([])
+    setUsers([]).
     setLoader(true)
     getDataFromServer()
   }, [tab])
@@ -161,6 +161,7 @@ const PortalChat = ({ navigation, route }) => {
   }
 
   const renderUserList = ({ item, index }) => {
+			console.log("here is the item", item)
     return (
       <TouchableOpacity
         onPress={() => onChatScreen(item)}

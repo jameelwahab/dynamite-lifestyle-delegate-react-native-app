@@ -45,13 +45,12 @@ const List = (props) => {
 
 
 const MissionDetail = ({ navigation, route }) => {
-	const { token, user } = useSelector(selectUser);
+	const { token, user, access } = useSelector(selectUser);
 	const [tab, setTab] = useState(0)
 	const [showChat, setShowChat] = useState(true)
 	const [enableChat, setEnableChat] = useState(false)
 	const [chatID, setChatID] = useState(route.params.id)
 	const [title, setTitle] = useState(route.params.heading)
-
 	const tab_quest = [
 		{ title: <Dashboard name="view-dashboard-outline" size={20} color={tab == 0 ? colors.primary : colors.lightText} /> },
 		{ title: <Feather name="target" size={20} color={tab == 1 ? colors.primary : colors.lightText} /> },
@@ -104,8 +103,9 @@ const MissionDetail = ({ navigation, route }) => {
 				eventId={chatID}
 				token={token}
 				user={user}
+		    access={access}
 				type={route.params.type}
-				naivgation={navigation}
+				navigation={navigation}
 			/>}
 			<View style={__styles.container}>
 				<View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: 'center' }}>
@@ -138,7 +138,6 @@ const MissionDetail = ({ navigation, route }) => {
 					navigation={navigation}
 					id={route.params.id}
 					showBadges={tab == 1}
-					type={route.params.type}
 					focuse={isFocused}
 					tab={tab}
 				/>}
@@ -168,9 +167,9 @@ const Tabs = ({ list, tab, style, changeTab }) => {
 }
 
 
-const TrackerList = ({ res, type }) => {
+const TrackerList = ({ res }) => {
 	const nav = useNavigation()
-	const handlePress = (item) => nav.navigate(routes.missionSchedule, { id: item._id, type: type, heading: item?.main_heading })
+	const handlePress = (item) => nav.navigate(routes.missionSchedule, { id: item._id, type: res?.type, heading: item?.main_heading })
 	return (
 		<FlatList
 			scrollEnabled={false}
@@ -186,7 +185,7 @@ const TrackerList = ({ res, type }) => {
 			renderItem={({ item }) =>
 				<LessonView
 					missionDetail={true}
-					txtlen={type == "quest" ? 30 : 55}
+					txtlen={res?.type == "quest" ? 30 : 55}
 					heading={item.main_heading}
 					desc={item.short_description}
 					handlePress={() => handlePress(item)}
@@ -197,7 +196,7 @@ const TrackerList = ({ res, type }) => {
 }
 
 
-const Header = ({ res, show, showBadges, quest = '', daysOn = "", focuse, tab }) => {
+const Header = ({ res, showBadges, daysOn = "", focuse, tab }) => {
 	const startDate = `${moment(res?.start_date).format(dateTimeFormat.date).split('-')[0]} ${months[Number(moment(res?.start_date).format(dateTimeFormat.date).split('-')[1]) - 1].short2}`
 	const endDate = `${moment(res?.end_date).format(dateTimeFormat.date).split('-')[0]} ${months[Number(moment(res?.end_date).format(dateTimeFormat.date).split('-')[1]) - 1].short2}`
 	const [schedule, setSchedules] = useState(res)
@@ -211,14 +210,14 @@ const Header = ({ res, show, showBadges, quest = '', daysOn = "", focuse, tab })
 		<>
 			{
 				HeaderView({
-					type: quest,
-					embed_code: daysOn != "" ? schedule?.embed_code : res?.embed_code,
+					type: res?.type,
+					embed_code: (daysOn != "" && tab == 0) ? schedule?.embed_code : res?.embed_code,
 					video_url: (daysOn != "" && tab == 0) ? schedule?.video_url : res?.video_url,
-					mission_id: daysOn != "" ? schedule?._id : res?._id,
-					audio_url: daysOn != "" ? schedule?.audio_url : res?.audio_url,
-					img_url: daysOn != "" ? schedule?.image?.thumbnail_1 : res?.image?.thumbnail_1,
-					title: daysOn != "" ? schedule?.audio_title : res?.title,
-					desc: daysOn != "" ? schedule?.audio_description : res?.audio_description,
+					mission_id: (daysOn != "" && tab == 0) ? schedule?._id : res?._id,
+					audio_url: (daysOn != "" && tab == 0) ? schedule?.audio_url : res?.audio_url,
+					img_url: (daysOn != "" && tab == 0) ? schedule?.image?.thumbnail_1 : res?.image?.thumbnail_1,
+					title: (daysOn != "" && tab == 0) ? schedule?.audio_title : res?.title,
+					desc: (daysOn != "" && tab == 0) ? schedule?.audio_description : res?.audio_description,
 					focuse,
 
 				})
@@ -231,17 +230,17 @@ const Header = ({ res, show, showBadges, quest = '', daysOn = "", focuse, tab })
 					badges={res?.badge_configration}
 					questReplayAccessDays={res.replay_days}
 					dateString={`${startDate} - ${endDate}`}
-					isQuest={quest}
+					isQuest={res?.type=="quest"}
 					showEarnedBadges={false}
 				// showBadgesEarned={false}
 				/>}
-			{show && !!res?.detailed_description &&
+			{res?.type==="mission" && !!res?.detailed_description &&
 				<MyWebview fullWidth html={res?.detailed_description?.toString()} />}
 		</>
 	)
 }
 
-const Overview = ({ token, navigation, id, type, showBadges, setEnableChat, setChatID, setTitle, focuse, tab }) => {
+const Overview = ({ token, navigation, id, showBadges, setEnableChat, setChatID, setTitle, focuse, tab }) => {
 	const [res, setResult] = useState([])
 	const [loading, setLoading] = useState(true)
 	const [refreshing, setRefreshing] = useState(false)
@@ -291,7 +290,12 @@ const Overview = ({ token, navigation, id, type, showBadges, setEnableChat, setC
 			ListEmptyComponent={!loading && <EmptyView />}
 			ListFooterComponent={<View style={{ height: 100 }} />}
 			ListHeaderComponent={
-				<Header focuse={focuse} res={res} tab={tab} show={type == "mission"} quest={type == "quest"} daysOn={daysOn} showBadges={showBadges || type == "mission"} />
+				<Header
+						focuse={focuse}
+						res={res}
+						tab={tab}
+						daysOn={daysOn}
+						showBadges={showBadges || res?.type === "mission"} />
 			}
 			refreshControl={<MyRefreshControl
 				refreshing={refreshing}
@@ -300,7 +304,7 @@ const Overview = ({ token, navigation, id, type, showBadges, setEnableChat, setC
 			ListHeaderComponentStyle={{ marginBottom: 20 }}
 			keyExtractor={(_, index) => index.toString()}
 			renderItem={({ _ }) =>
-				<TrackerList res={res} type={type} />
+				<TrackerList res={res} />
 			}
 		/>
 	)

@@ -654,6 +654,8 @@ const CommentModal = ({
         }]}>
           <View style={__style.profiletView}>
             <UserImage
+				      borderWidth={2}
+				      borderColor={item?.user_info_action_for?.badge_level_info?.code_color}
               image={item?.user_info_action_for?.profile_image}
               name={item?.user_info_action_for?.name}
               size={30}

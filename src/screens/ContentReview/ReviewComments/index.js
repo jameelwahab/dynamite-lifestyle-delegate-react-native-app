@@ -39,6 +39,7 @@ const ReviewComments = ({ navigation }) => {
 	const [content, setContent] = useState({ title: "", desc: "" })
 	const [selectContent, setSelectContent] = useState({ id: "", key: "" })
 	const [showAlert, setShowAlert] = useState(false)
+  const [total, setTotal] = useState(0)
 
 
 
@@ -53,9 +54,10 @@ const ReviewComments = ({ navigation }) => {
 			} else {
 				paging.canLoadMore = false;
 			}
-			setLoading(false)
-			setRefresh(false)
-			setShowFooterLoader(false)
+		  setTotal(res?.total_count);
+			setLoading(false);
+			setRefresh(false);
+			setShowFooterLoader(false);
 		}
 		else {
 			setResult([])
@@ -147,8 +149,11 @@ const ReviewComments = ({ navigation }) => {
 	}
 
 	return (
-		<RootView hideBackBottomButton hideSubHeader>
-			<MyText style={{marginBottom:15}} fontSize={textSize.title} type="bold" color={colors.primary}> Review Comments </MyText>
+		<RootView
+				hideBackBottomButton
+				title="Review Comments"
+				subTitle={`Showing ${result?.length} of ${total}`}
+			 >
 			<CustomModal isVisible={showComment} content={content} closeModal={() => setShowComment(false)} />
 			<View style={{ flex: 1 }}>
 				<FlatList

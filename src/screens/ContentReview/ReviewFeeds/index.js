@@ -33,7 +33,8 @@ const ReviewFeeds = ({ navigation, route }) => {
 	const [loading, setLoading] = useState(false)
 	const [refreshing, setRefresh] = useState(false)
 	const [showModal, setShowModal] = useState(false)
-	const [showFooterLoader, setShowFooterLoader] = useState(false)
+	const [showFooterLoader, setShowFooterLoader] = useState(false);
+	const [totle, setTotal] = useState(0)
 
 
 	const getFeeds = async () => {
@@ -47,6 +48,7 @@ const ReviewFeeds = ({ navigation, route }) => {
 			} else {
 				paging.canLoadMore = false;
 			}
+			setTotal(res?.total_count)
 			setLoading(false)
 			setRefresh(false)
 			setShowFooterLoader(false)
@@ -166,8 +168,9 @@ const ReviewFeeds = ({ navigation, route }) => {
 
 
 	return (
-		<RootView hideBackBottomButton hideSubHeader>
-			<MyText style={{marginBottom:15}} fontSize={textSize.title} type="bold" color={colors.primary}> Review Posts </MyText>
+		<RootView hideBackBottomButton title="Review Posts"
+		subTitle={`Showing ${result?.length} of ${totle}`}>
+
 			<View style={{ flex: 1 }}>
 				<FlatList
 					data={result}
@@ -239,7 +242,7 @@ const renderPosts = ({ feed, index, handleClick, onDetail }) => {
 			<View style={{ height: 10 }} />
 			<StatView title="Description" original={true} value={feed?.description} numberOfLinesValues={2} />
 			<StatView title="Created For" value={getFeedType(feed)} />
-			<StatView title="Appear by" value={feed?.feed_appear_by} />
+			<StatView title="Feed Type" value={feed?.feed_appear_by} />
 			<StatView
 				original
 				title="Created At"
