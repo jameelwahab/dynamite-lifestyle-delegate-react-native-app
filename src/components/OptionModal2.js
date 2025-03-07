@@ -12,6 +12,7 @@ import breakReference from '../functions/breakReference'
 const OptionModal2 = forwardRef(({
   onSelected,
   optionList,
+  filterTheList = null,
   titleKey = undefined,
   renderText,
   noIcon = false,
@@ -64,7 +65,7 @@ const OptionModal2 = forwardRef(({
           </View>
         }
         <FlatList
-          data={optionList}
+          data={typeof filterTheList == "function" ? filterTheList?.(selectedItem) : optionList}
           // keyExtractor={(item, index) => item?.key}
           // scrollEnabled={false}
           contentContainerStyle={{ paddingVertical: 10 }}

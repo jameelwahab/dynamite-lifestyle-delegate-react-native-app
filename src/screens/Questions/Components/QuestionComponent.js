@@ -123,31 +123,21 @@ const QuestionComponent = ({ item, index, showRepliesbtns = false, onShowReplyPr
           />}
       </View>)
   }
-  const addStyle = (txt) => {
-    for (let i = 0; txt.length; i++) {
-      if (txt[i] == '<' && txt[i + 2] == ">") {
-        const style = ` "style="display: inline-block;" `;
-        return `${txt.slice(0, i + 2)}${style}${txt.slice(i + 2)}`
-      }
-    }
-  }
 
-  const addImport = (txt) => {
-    const str = `<span> *</span>`;
-    for (let i = 0; i < txt.length; i++) {
-      if (txt[i] === "<" && txt[i + 1] === "/") {
-        return addStyle(`${txt.slice(0, i)}${str}${txt.slice(i)}`)
-      }
-    }
-    return txt
-  }
+
+
+  const appendTextInline = (htmlContent) => {
+    return htmlContent.replace('</p>', ` <span class="required" >*</span></p>`)
+  };
+
   return (
     <View style={{ backgroundColor: colors.secondary, padding: padding, marginTop: 10, borderRadius: 10 }}>
 
       <Pressable
-        disabled={hideCollapse}
         onPress={() => {
-          setIsCollapsed(!isCollapsed)
+          if (!hideCollapse) {
+            setIsCollapsed(!isCollapsed)
+          }
         }}
         style={{ flexDirection: "row", alignItems: "center" }}>
         <View style={{ flex: 1 }}>
@@ -158,24 +148,25 @@ const QuestionComponent = ({ item, index, showRepliesbtns = false, onShowReplyPr
               <>
                 <MyWebview
                   fullWidth
-                  html={item?.is_required ? addImport(item?.question_statement) : item?.question_statement}
-                  style={{
-                    h1: {
-                      margin: 0,
-                      color: colors.primary
-                    },
-                    h2: {
-                      margin: 0,
-                      color: colors.primary
-                    },
-                    span: {
-                      color: colors.delete,
-                      fontSize: 16,
-                      paddingTop: 10,
-                      transform: [{ translateY: 50 }]
-                    },
+                  // html={item?.question_statement}
+                  html={item?.is_required ? appendTextInline(item?.question_statement) : item?.question_statement}
+                // style={{
+                //   h1: {
+                //     margin: 0,
+                //     color: colors.primary
+                //   },
+                //   h2: {
+                //     margin: 0,
+                //     color: colors.primary
+                //   },
+                //   span: {
+                //     color: colors.delete,
+                //     fontSize: 16,
+                //     paddingTop: 10,
+                //     transform: [{ translateY: 50 }]
+                //   },
 
-                  }}
+                // }}
                 />
               </>
             }

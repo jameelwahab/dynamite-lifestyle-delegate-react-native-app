@@ -16,7 +16,7 @@ import { GET_COMMENT_REVIEW, APPROVE_COMMENT_REVIEW, DELETE_COMMNET_REVIEW } fro
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../../redux/reducers/userSlice'
 import { useState, useEffect, useRef } from "react"
-import { Text, FlatList, View, TouchableOpacity, SafeAreaView, ScrollView, Pressable } from "react-native"
+import { Text, FlatList, View, TouchableOpacity, SafeAreaView, ScrollView, Pressable, Keyboard } from "react-native"
 import { icons } from '../../../utilities/icons';
 import moment from 'moment'
 import { onChatScreen } from '../../../functions/onChatScreen';
@@ -24,6 +24,8 @@ import { MenuButton } from '../../../components/MyButton';
 import MemberView from '../../../components/MemberView';
 import ConfirmationModal2 from '../../../components/ConfirmationModal2';
 import showToast from '../../../functions/showToast';
+import AddPost from '../../Feed/FeedScreen/AddPost';
+import SearchView from '../../../components/SearchView';
 
 const ReviewComments = ({ navigation }) => {
 	const { user, token, access } = useSelector(selectUser);
@@ -32,18 +34,17 @@ const ReviewComments = ({ navigation }) => {
 	const [result, setResult] = useState()
 	const [loading, setLoading] = useState(false)
 	const [refreshing, setRefresh] = useState(false)
-	const [showModal, setShowModal] = useState(false)
 	const [showFooterLoader, setShowFooterLoader] = useState(false)
-	const [page, setPage] = useState(0)
 	const [showComment, setShowComment] = useState(false)
 	const [content, setContent] = useState({ title: "", desc: "" })
-	const [selectContent, setSelectContent] = useState({ id: "", key: "" })
-	const [showAlert, setShowAlert] = useState(false)
+
+	const [searching, setSearching] = useState(false);
+	const [searchText, setSearchText] = useState("");
 
 
 
 	const getFeeds = async () => {
-		const res = await GET_COMMENT_REVIEW({ token, navigation, limit: 20, page: paging?.page })
+		const res = await GET_COMMENT_REVIEW({ token, navigation, limit: 20, page: paging?.page, search_text: searchText })
 		if (res.code == 200) {
 			setResult(paging?.page == 0 ? res?.comments : [...result, ...res?.comments])
 			let length = paging?.page == 0 ? res?.comments.length : (result.length + res?.comments.length);
@@ -55,11 +56,12 @@ const ReviewComments = ({ navigation }) => {
 			}
 			setLoading(false)
 			setRefresh(false)
+			setSearching(false)
 			setShowFooterLoader(false)
 		}
 		else {
-			setResult([])
-			setPage(0)
+			setShowFooterLoader(false)
+			setSearching(false)
 			setLoading(false)
 			setRefresh(false)
 		}
@@ -80,14 +82,12 @@ const ReviewComments = ({ navigation }) => {
 		getFeeds()
 	}
 	const ref = useRef(null)
-	const closeModal = () => setShowModal(false)
+
 	const handleClick = (id) => ref.current.openModal?.(id);
 
 	const handleSelect = (opt, item) => {
 		if (opt.key == "msg") {
 			onChatScreen(item?.user_info_action_for?.action_id, token, navigation, user?._id)
-		} else if (opt.key == "edit") {
-
 		} else if (opt.key == "del") {
 			ref_confirmModal?.current?.openModal({
 				title: `Are you sure you want to delete this comment?`,
@@ -146,15 +146,40 @@ const ReviewComments = ({ navigation }) => {
 		})
 	}
 
+	const headerView = () => {
+		return (
+			<View style={{ backgroundColor: colors.darkSecondary }}>
+				<SearchView
+					search={searchText}
+					onChangeText={(text) => setSearchText(text)}
+					onSearchPress={onSearch}
+					loader={searching}
+				/>
+			</View>
+		)
+	}
+
+	const onSearch = () => {
+		Keyboard.dismiss()
+		paging.page = 0;
+		paging.canLoadMore = false;
+		setSearching(true)
+		getFeeds()
+	}
+
+
 	return (
-		<RootView hideBackBottomButton title="Review Comments">
+		<RootView hideBackBottomButton title='Review Comments'>
 			<CustomModal isVisible={showComment} content={content} closeModal={() => setShowComment(false)} />
 			<View style={{ flex: 1 }}>
 				<FlatList
 					data={result}
+					stickyHeaderHiddenOnScroll={true}
+					stickyHeaderIndices={[0]}
+					ListHeaderComponent={headerView()}
+					keyboardShouldPersistTaps="handled"
 					showsVerticalScrollIndicator={false}
 					ListEmptyComponent={!loading && <EmptyView />}
-					ItemSeparatorComponent={<View style={{ height: 12 }} />}
 					ListFooterComponent={!loading && <FooterLoader isVisible={showFooterLoader} />}
 					onEndReached={handleEndReach}
 					refreshControl={<MyRefreshControl
@@ -182,6 +207,8 @@ const ReviewComments = ({ navigation }) => {
 			<ConfirmationModal2
 				ref={ref_confirmModal}
 			/>
+
+
 		</RootView>
 	)
 
@@ -229,9 +256,10 @@ const RenderPosts = ({ feed, index, handleClick, setShowComment, setContent }) =
 
 	return (
 		<>
-			<View style={{ backgroundColor: colors.secondary, padding: 10, borderRadius: 10 }}>
+			<View style={{ marginTop: 10, backgroundColor: colors.secondary, padding: 10, borderRadius: 10 }}>
 				<View style={{ flexDirection: "row", aligItems: "center", justifyContent: "space-between" }}>
 					<MemberView
+						borderColor={feed?.user_info_action_for?.badge_level_info?.color_code}
 						member={feed?.user_info_action_for}
 						hideEmail
 					/>

@@ -106,6 +106,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
     modalVisibility: false,
     list: [],
     loader: false,
+    type: "like"
 
   });
 
@@ -154,7 +155,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
     }
   }
 
-  const getLikes = async (forCmments) => {
+  const getLikes = async (forCmments, forUserReports = false) => {
     let fd = new FormData();
     fd.append("feed", likeVar.id);
     fd.append("action_type", likeVar.actionType);
@@ -180,18 +181,22 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       setLikes((prev) => ({
         modalVisibility: true,
         list: [...prev.list, ...res?.feed_activity],
-        loader: false
+        loader: false,
+        type: forUserReports ? "report" : "like"
       }));
       setLikesFooterLoader(true);
     } else {
       setLikes({
         modalVisibility: true,
         list: [],
-        loader: false
+        loader: false,
+        type: likes?.type
       });
       setLikesFooterLoader(true);
     }
   }
+
+
 
   const getFeed = async () => {
     if (!!feedId) {
@@ -228,7 +233,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       eventId: eventId,
       feedTypeAction: feedType?.value,
       feedTypeActionId:
-        feedType?.value == "all" ? "all" :
+        (feedType?.value == "all" || feedType?.value == "reported") ? "all" :
           feedType?.value == "own" ? user?._id :
             feedType?.value == "other" ? feedTypeMember?._id :
               undefined
@@ -698,6 +703,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       list: [],
       modalVisibility: true,
       loader: true,
+      type:"like"
     });
     likeVar = {
       ...likeVar,
@@ -712,6 +718,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       list: [],
       modalVisibility: true,
       loader: true,
+      type:"like"
     });
     likeVar = {
       page: 0,
@@ -837,6 +844,10 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           title: `Are you sure you want to approve this post?`,
           type: selectedOpt?.type
         })
+      }, 500);
+    } else if (selectedOpt?.type == "reported_by") {
+      setTimeout(() => {
+        getUserWhoReportedFeed(item)
       }, 500);
     }
   }
@@ -970,7 +981,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           }
         }
 
-        if (item.type == "edit" ) {
+        if (item.type == "edit") {
           if (isMine) {
             if ((feed?.feed_type == "poll" && feed?.poll_info?.poll_status == "expired") || (feed?.feed_type == "survey" && feed?.survey_info?.survey_status == "expired")) { }
             else {
@@ -1019,6 +1030,9 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
         }
 
         if (item.type == "approve" && feed?.review_status == "pending") {
+          newList.push(item);
+        }
+        if (item.type == "reported_by" && feed?.is_reported) {
           newList.push(item);
         }
 
@@ -1114,6 +1128,10 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       if (item.type == "approve" && feed?.review_status == "pending") {
         newList.push(item);
       }
+
+      if (item.type == "reported_by" && feed?.is_reported) {
+        newList.push(item);
+      }
     })
     return newList.length
   }
@@ -1139,6 +1157,23 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
   const openSurveyDetail = (item) => {
     ref_surveyInfo?.current?.openModal(item)
 
+
+  }
+
+  const getUserWhoReportedFeed = async (feed) => {
+    setLikes({
+      list: [],
+      modalVisibility: true,
+      loader: true,
+      type:"report"
+    });
+    likeVar = {
+      page: 0,
+      canLoadMore: false,
+      id: feed?._id,
+      actionType: "feed_report",
+    }
+    getLikes(false, true)
 
   }
 
@@ -1243,7 +1278,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
                 changeTab={changeTab}
                 isScheduleFeedTabAllowed={isScheduleFeedTabAllowed} />}
           </>}
-        {console.log(access, "access")}
+
         <AddPost
           ref={addPostRef}
           tab={tab}
@@ -1263,6 +1298,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
             }
             return [...feeds];
           })}
+          hideOnlyAddPostView={feedType?.value == "reported"}
           hideAddView={!!feedId}
           isCosmos={isCosmos}
           isScheduledFeed={isScheduledFeed || schedulePost}
@@ -1391,13 +1427,15 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
 
 
       <LikeModal
+        type={likes?.type}
         isVisible={likes?.modalVisibility}
         timezone={timezone}
         closeModal={() =>
           setLikes({
             modalVisibility: false,
             list: [],
-            loader: false
+            loader: false,
+            type: "like"
           })}
         likes={likes?.list}
         user={user}
@@ -1482,6 +1520,11 @@ const feedOptionList = [{
   icon: icons.pin,
   title: "Unpin",
   type: "unpin"
+},
+{
+  icon: () => icons.warnOctagon(colors.primary, 17),
+  title: "Reported By",
+  type: "reported_by"
 },
 {
   icon: () => icons.send(colors.primary, 17),

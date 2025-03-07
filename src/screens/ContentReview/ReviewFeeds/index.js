@@ -14,7 +14,7 @@ import { GET_REVIEW_FEEDS, APPROVE_REVIEW_FEEDS, DELETE_REVIEW_FEEDS } from '../
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../../redux/reducers/userSlice'
 import { useState, useEffect, useRef } from "react"
-import { Text, FlatList, View, TouchableOpacity, SafeAreaView, Pressable } from "react-native"
+import { Text, FlatList, View, TouchableOpacity, SafeAreaView, Pressable, Keyboard } from "react-native"
 import moment from 'moment'
 import { MenuButton } from '../../../components/MyButton';
 import routes from '../../../navigation/routes';
@@ -23,21 +23,27 @@ import { icons } from '../../../utilities/icons';
 import { onChatScreen } from '../../../functions/onChatScreen';
 import ConfirmationModal2 from '../../../components/ConfirmationModal2';
 import showToast from '../../../functions/showToast';
+import AddPost from '../../Feed/FeedScreen/AddPost';
+import { selectTimeZone } from '../../../redux/reducers/timezoneSlice';
+import SearchView from '../../../components/SearchView';
 
 const ReviewFeeds = ({ navigation, route }) => {
 	const ref = useRef(null)
 	const ref_confirmModal = useRef()
+	const addPostRef = useRef()
+	const timezone = useSelector(selectTimeZone)
 	const paging = useRef({ page: 0, canLoadMore: false })?.current;
 	const { token, access, user } = useSelector(selectUser);
 	const [result, setResult] = useState([])
 	const [loading, setLoading] = useState(false)
 	const [refreshing, setRefresh] = useState(false)
-	const [showModal, setShowModal] = useState(false)
 	const [showFooterLoader, setShowFooterLoader] = useState(false)
+	const [searching, setSearching] = useState(false);
+	const [searchText, setSearchText] = useState("");
 
 
 	const getFeeds = async () => {
-		const res = await GET_REVIEW_FEEDS({ token, navigation, limit: 20, page: paging?.page })
+		const res = await GET_REVIEW_FEEDS({ token, navigation, limit: 20, page: paging?.page,search_text:searchText })
 		if (res.code == 200) {
 			setResult(paging?.page == 0 ? res?.feeds : [...result, ...res?.feeds])
 			let length = paging?.page == 0 ? res?.feeds.length : (result.length + res?.feeds.length);
@@ -49,9 +55,12 @@ const ReviewFeeds = ({ navigation, route }) => {
 			}
 			setLoading(false)
 			setRefresh(false)
+			setSearching(false)
 			setShowFooterLoader(false)
 		}
 		else {
+			setShowFooterLoader(false)
+			setSearching(false)
 			setLoading(false)
 			setRefresh(false)
 		}
@@ -68,9 +77,6 @@ const ReviewFeeds = ({ navigation, route }) => {
 
 
 
-	const closeModal = () => {
-		setShowModal(false)
-	}
 
 	const handleClick = (item) => {
 		ref.current.openModal?.(item);
@@ -81,8 +87,11 @@ const ReviewFeeds = ({ navigation, route }) => {
 	const handleSelect = (opt, item) => {
 		if (opt.key == "msg") {
 			onChatScreen(item?.action_info?.action_id, token, navigation, user?._id)
-		} else if (opt.key == "edt") {
-			console.log("Hora")
+		} else if (opt.key == "edit") {
+			setTimeout(() => {
+				// console.log(item, "item")
+				addPostRef?.current?.selectItemForEdit?.(item)
+			}, 500);
 		} else if (opt.key == "ap") {
 			ref_confirmModal?.current?.openModal({
 				title: `Are you sure you want to approve this post?`,
@@ -140,19 +149,31 @@ const ReviewFeeds = ({ navigation, route }) => {
 		}
 	}
 
-	const filterOptions = () => {
-		return optionsList.slice().filter(item => {
-			if (item.key == "del" || item.key == "edit") {
-				return access?.edit_delete_option_in_source_all_source_feeds
-			}
-			if (item.key == 'msg') {
-				return access?.is_chat_allowed
-			}
-			else {
-				return true
-			}
+	const filterOptions = (feed) => {
+		if (feed) {
+			return optionsList.slice().filter(item => {
+				if (item.key == "del" || item.key == "edit") {
+					if (feed?.feed_type == "poll" || feed?.feed_type == "survey") {
+						return false
+					} else {
+						return access?.edit_delete_option_in_source_all_source_feeds
+					}
+				} else if (item.key == 'msg') {
+					return access?.is_chat_allowed
+				} else {
+					return true
+				}
 
-		})
+			})
+		} else return []
+	}
+
+	const onSearch = () => {
+		Keyboard.dismiss()
+		paging.page = 0;
+		paging.canLoadMore = false;
+		setSearching(true)
+		getFeeds()
 	}
 
 	useEffect(() => {
@@ -164,16 +185,35 @@ const ReviewFeeds = ({ navigation, route }) => {
 
 
 
+	const headerView = () => {
+		return (
+			<View style={{ backgroundColor: colors.darkSecondary }}>
+				<SearchView
+					search={searchText}
+					onChangeText={(text) => setSearchText(text)}
+					onSearchPress={onSearch}
+					loader={searching}
+				/>
+			</View>
+		)
+	}
+
+
+
 
 	return (
-		<RootView hideBackBottomButton title="Review Posts">
+		<RootView hideBackBottomButton >
+
 
 			<View style={{ flex: 1 }}>
 				<FlatList
+					keyboardShouldPersistTaps="handled"
 					data={result}
 					showsVerticalScrollIndicator={false}
+					stickyHeaderHiddenOnScroll={true}
+					stickyHeaderIndices={[0]}
+					ListHeaderComponent={headerView()}
 					ListEmptyComponent={!loading && <EmptyView />}
-					ItemSeparatorComponent={<View style={{ height: 12 }} />}
 					ListFooterComponent={!loading && <FooterLoader isVisible={showFooterLoader} />}
 					onEndReached={handleEndReach}
 					refreshControl={<MyRefreshControl
@@ -198,9 +238,34 @@ const ReviewFeeds = ({ navigation, route }) => {
 			<OptionModal2
 				ref={ref}
 				onSelected={handleSelect}
-				optionList={filterOptions()}
+				filterTheList={filterOptions}
 			/>
+
 			<MyLoader enable={loading} />
+
+			<AddPost
+				ref={addPostRef}
+				user={user}
+				token={token}
+				navigation={navigation}
+				updateFeedItem={(newFeed) => setResult(feeds => {
+					let index = feeds.findIndex(feed => feed._id === newFeed?._id);
+					if (index !== -1) {
+						feeds.splice(index, 1, newFeed);
+					}
+					return [...feeds];
+				})}
+				hideAddView={true}
+				isCosmos={false}
+				isScheduledFeed={false}
+				timezone={timezone}
+				hideLevelView={true}
+				showEventOption={false}
+				selectLevelOptionOnAddPostForCosmos={false}
+				isPollAllowed={access?.enable_poll_feed}
+				isSurveyAllowed={access?.enable_survey_feed}
+				isFeedFilterAllowed={false}
+			/>
 		</RootView>
 	)
 }
@@ -223,9 +288,10 @@ const renderPosts = ({ feed, index, handleClick, onDetail }) => {
 
 	}
 	return (
-		<View style={{ backgroundColor: colors.secondary, padding: 10, borderRadius: 10 }} key={index}>
+		<View style={{ marginTop: 10, backgroundColor: colors.secondary, padding: 10, borderRadius: 10 }} key={index}>
 			<View style={{ flexDirection: "row", aligItems: "center", justifyContent: "space-between" }}>
 				<MemberView
+					borderColor={feed?.badge_level_info?.color_code}
 					member={feed.action_info}
 					hideEmail
 				/>

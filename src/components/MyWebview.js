@@ -218,7 +218,7 @@ export class MyWebview extends Component {
               fontFamily: fonts.regular,
               lineHeight: 20,
               fontSize: 16,
-              color: colors.danger,
+              color: colors.delete,
             },
             question: {
               fontFamily: fonts.regular,

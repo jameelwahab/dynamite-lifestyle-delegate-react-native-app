@@ -24,6 +24,7 @@ import { icons } from '../../utilities/icons'
 import { useState } from "react"
 import { selectUser } from '../../redux/reducers/userSlice'
 import { useSelector } from 'react-redux'
+import {textSize} from "../../utilities/styles"
 import { useEffect, useCallback } from "react"
 import { useFocusEffect } from "@react-navigation/native"
 import { View, FlatList, Image, StyleSheet, Text, Pressable, } from "react-native"
@@ -85,7 +86,19 @@ const Scheduler = ({ navigation, route }) => {
 	return (
 		<View style={__styles.container}>
 			<View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: 'center', height: 30, }}>
-				<TitleView title={res?.mission_schedule?.main_heading || route.params.heading || "The Source Code"} />
+				<View style={{ flexDirection: 'row', alignItems: "center" }}>
+						<Pressable
+							onPress={() => navigation.goBack()} >
+							{icons.backMajor(colors.primary, 26)}
+						</Pressable>
+						<View style={{ width: 10 }} />
+						<MyText
+								type="bold"
+								fontSize={textSize.title}
+								color={colors.primary}>
+								{res?.mission_schedule?.main_heading || route.params.heading || "The Source Code"} 
+						</MyText>
+					</View>
 				{(route.params.type == "quest" && enableChat) && <Pressable onPress={() => setShowChat(true)}>
 					{icons.chat(colors.primary, 23)}
 				</Pressable>}
@@ -151,7 +164,7 @@ export const HeaderView = ({ type = "", embed_code = "", video_url = "", mission
 		return (
 			<MyWebview
 				fullWidth
-				html={res?.mission_schedule?.embed_code || ""} />
+				html={embed_code || ""} />
 		)
 	}
 	else if (video_url != "") {
@@ -191,7 +204,7 @@ const Overview = ({ res }) => {
 				<ItemCountView
 					text1={`${res?.mission_schedule?.total_number_of_days} day`}
 					backgroundColor={colors.secondary}
-					text2={"Total Days"}
+					text2={"Schedule"}
 					img={require("../../assets/icons/calendar.png")}
 				/>
 				<ItemCountView
