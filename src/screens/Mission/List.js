@@ -97,14 +97,17 @@ const List = ({ navigation, route }) => {
 		else return null
 	}
 		const handlePress = (item) => ref.current.openModal?.(item)
-		const handleSelect = ()=> console.log("I hate my life") 
+		const handleSelect = (opt,item)=>  {
+				if(opt.key=="copy") handleCopyMethod(item?.app_branch_url, item?._id, item?.type)
+				if(opt.key="member") console.log("to be continue")
+		} 
 
 	return (
 		<RootView hideHeader>
 				<OptionModal2
 						ref={ref}
 						onSelected={handleSelect}
-						optionList={option_list}
+						optionList={optionList}
 						/>
 			{!loading && <View style={{ height: 40, justifyContent: "center" }}>
 				<TitleView
@@ -173,16 +176,15 @@ const __styles = StyleSheet.create({
 	}
 })
 
-
-const option_list = [
-		{
-				title:"Copy Link",
-				key:"copy",
-				icon: icons.copy()
+const optionList = [
+	{
+		title: "Copy Link",
+		key: "copy",
+		icon: () => icons.copy(colors.primary, 17),
+	},
+	{
+		title: "Member",
+		key: "member",
+		icon: icons.members2,
 		},
-		{
-				title:"Members",
-				key:"members",
-				icon: icons.copy()
-		},,
-]
+	]
