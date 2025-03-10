@@ -10,7 +10,6 @@ import MyInputs from "../MyInputs"
 import { Text } from "react-native-paper"
 import { main } from "../../utilities/styles"
 const ScheduleView = ({ schedule, index }) => {
-  console.log("is been called", schedule)
   const scheduleActions = () => {
     let arr = schedule?.general_allowed_actions;
     // let arr = [{
