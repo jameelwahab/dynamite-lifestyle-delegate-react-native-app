@@ -5,14 +5,17 @@ import MyText from "../../components/MyText"
 import MyRefreshControl from "../../components/MyRefreshControl"
 import MyLoader from "../../components/MyLoader"
 import MyWebview from "../../components/MyWebview"
+import OptionModal2 from '../../components/OptionModal2'
 import EmptyView from '../../components/EmptyView'
 import { colors } from "../../utilities/colors"
 import { fonts } from "../../utilities/fonts"
 import { textSize } from "../../utilities/styles"
+import { icons } from "../../utilities/icons"
 import copyText from "../../functions/copyText"
 import { GET_MISSION_LIST_ID, GET_MISSION_APP_LINK } from "../../DAL"
 import { selectUser } from '../../redux/reducers/userSlice'
 import { useSelector } from 'react-redux'
+import { useRef } from "react"
 import routes from "../../navigation/routes"
 import { useNavigation } from "@react-navigation/native"
 import { useEffect, useState } from "react"
@@ -26,6 +29,7 @@ const List = ({ navigation, route }) => {
 	const [res, setResult] = useState([])
 	const [loading, setLoading] = useState(true)
 	const [refreshing, setRefreshing] = useState(false)
+	const ref = useRef(null)
 
 	const getMissionList = async (loader) => {
 		setLoading(loader)
@@ -92,9 +96,16 @@ const List = ({ navigation, route }) => {
 		}
 		else return null
 	}
+		const handlePress = (item) => ref.current.openModal?.(item)
+		const handleSelect = ()=> console.log("I hate my life") 
 
 	return (
 		<RootView hideHeader>
+				<OptionModal2
+						ref={ref}
+						onSelected={handleSelect}
+						optionList={option_list}
+						/>
 			{!loading && <View style={{ height: 40, justifyContent: "center" }}>
 				<TitleView
 					title={res?.badge_level?.title}
@@ -133,8 +144,8 @@ const List = ({ navigation, route }) => {
 								heading: item.title,
 								type: item.type
 							})}
-							copyEnable={true}
-							hanldeCopy={() => handleCopyMethod(item.app_branch_url, item._id, item.type)}
+							showMenu={true}
+							handleClick={()=> handlePress(item)}
 							heading={item?.title}
 							image={item?.image?.thumbnail_1}
 							desc={item?.short_description}
@@ -162,3 +173,16 @@ const __styles = StyleSheet.create({
 	}
 })
 
+
+const option_list = [
+		{
+				title:"Copy Link",
+				key:"copy",
+				icon: icons.copy()
+		},
+		{
+				title:"Members",
+				key:"members",
+				icon: icons.copy()
+		},,
+]

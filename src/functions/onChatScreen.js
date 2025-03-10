@@ -2,7 +2,7 @@ import { IS_CHAT_EXIST } from "../DAL";
 import routes from "../navigation/routes";
 
 
-export const onChatScreen = async (memberId, token, navigation, userId) => {
+export const onChatScreen = async (memberId, token, navigation, userId, badge_color) => {
   let res = await IS_CHAT_EXIST({ token, navigation, memberId })
   if (res.code == 200) {
     if (res.is_chat_exist) {
@@ -15,6 +15,7 @@ export const onChatScreen = async (memberId, token, navigation, userId) => {
         lastSeen: "",
         profileImage: !!member?.profile_image ? member?.profile_image : "",
         chatId: res?.chat?._id,
+				badge_color,
         canGoBack: true,
         resetCountToZero: () => { },
         refresh: () => { },
@@ -28,6 +29,7 @@ export const onChatScreen = async (memberId, token, navigation, userId) => {
         lastName: member?.last_name,
         lastSeen: !!member?.last_login_activity ? member?.last_login_activity : "",
         profileImage:  member?.profile_image?.thumbnail_1 ||  "",
+				badge_color,
         chatId: "",
         canGoBack: true,
         resetCountToZero: () => { },

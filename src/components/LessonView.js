@@ -5,13 +5,13 @@ import { icons } from "../utilities/icons";
 import { S3_URL } from "../utilities/constants";
 import { useState } from "react";
 import MyImage from "./MyImage";
+import { MenuButton } from './MyButton';
 import MyText from "./MyText";
 import ResponsiveImage3 from "./ResponsiveImage3";
 import { main, textSize } from "../utilities/styles"
 import CollapseText from "./CollapseText";
 
-const LessonView = ({ title, style, heading, icon, iconTextColor = colors.white, missionDetail=false, desc, txtlen = 50, hanldeCopy, copyEnable = false, image, handlePress, duration,
-	numberOfTitleLines = 2
+const LessonView = ({ title, style, heading, icon, iconTextColor = colors.white, missionDetail=false, desc, txtlen = 50, handleClick, copyEnable = false, image, handlePress, duration, numberOfTitleLines = 2, showMenu=false, 
 }) => {
 	const [show, setShow] = useState()
 	const [dynamicNumberOfTitleLines, setDynamicNumberOfTitleLines] = useState(1)
@@ -36,30 +36,14 @@ const LessonView = ({ title, style, heading, icon, iconTextColor = colors.white,
 				source={{uri: S3_URL +image }}
 				defaultSize={{ width: 150, height: 85 }}
 				style={{ width: "100%" }} />
-
-		  {copyEnable &&
-			    <View style={{
-				alignItems: "flex-end", justifyContent: "flex-end",
-				position:"absolute",
-				left:3,
-				top:3 }}>
-				<TouchableOpacity
-				    style={{ backgroundColor: colors.secondarySelect+"88", padding: 5, borderRadius: 999 }}
-				    onPress={hanldeCopy}
-				    activeOpacity={0.5}
-				    >
-				    {icons.copy(colors.primary,15)}
-				</TouchableOpacity>
-			    </View>
-			}
 			{duration &&
 			    <View style={__styles.imgTag}>
 				<MyText fontSize={10} type="medium" color={colors.black} >{duration} Days</MyText>
 			    </View>
 			}
 				</View>}
-		
 		</View>
+
 		<View
 		    style={{
 			width: '100%',
@@ -67,16 +51,21 @@ const LessonView = ({ title, style, heading, icon, iconTextColor = colors.white,
 			 paddingVertical: 1,
 			flex: 1
 		    }}>
+			<View style={{flexDirection:"row", justifyContent:"space-between", paddingVertical: showMenu? 5: 0, paddingRight:5}}>
 		    {!!heading &&
-			<Text
-			    onTextLayout={({ nativeEvent: { lines } }) => {
-			    setDynamicNumberOfTitleLines(lines.length)
-			}}
-			numberOfLines={numberOfTitleLines}
-			style={[main.title]}>
-			    {heading}
-			</Text>
-		    }
+						<Text
+								onTextLayout={({ nativeEvent: { lines } }) => {
+								setDynamicNumberOfTitleLines(lines.length) }}
+								numberOfLines={numberOfTitleLines}
+								style={[main.title]}>
+								{heading}
+						</Text> }
+			{!!showMenu && <MenuButton
+					marginHorizontal={0}
+					onPress={handleClick}
+					size={20}
+				/>}
+		</View>
 		<View style={{ marginVertical: 2 }}>
 		    <CollapseText numOfLines={!missionDetail ? (dynamicNumberOfTitleLines > 1 ? 2 : 3) : 100} disable={missionDetail} desc={desc} style={main.miniDesc} />
 		</View>

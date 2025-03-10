@@ -87,7 +87,7 @@ const Scheduler = ({ navigation, route }) => {
 	return (
 		<View style={__styles.container}>
 			<View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: 'center', height: 30,marginTop:10 }}>
-				<View style={{ flexDirection: 'row', alignItems: "center" }}>
+				<View style={{ flexDirection: 'row', alignItems: "center",paddingVeritcal:10 }}>
 					<Pressable
 						onPress={() => navigation.goBack()} >
 						{icons.backMajor(colors.primary, 26)}
@@ -100,6 +100,7 @@ const Scheduler = ({ navigation, route }) => {
 						{res?.mission_schedule?.main_heading || route.params.heading || "The Source Code"}
 					</MyText>
 				</View>
+
 				{(route.params.type == "quest" && enableChat) && <Pressable onPress={() => setShowChat(true)}>
 					{icons.chat(colors.primary, 23)}
 				</Pressable>}

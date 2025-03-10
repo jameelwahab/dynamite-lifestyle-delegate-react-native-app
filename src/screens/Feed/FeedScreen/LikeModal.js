@@ -33,6 +33,8 @@ const LikeModal = ({
         <View style={__style.boxView}>
           <View>
             <UserImage
+				      borderWidth={2}
+						  borderColor={item?.user_info_action_by?.badge_level_info?.color_code}
               image={item?.user_info_action_by?.profile_image}
               name={item?.user_info_action_by?.name}
               size={35}
