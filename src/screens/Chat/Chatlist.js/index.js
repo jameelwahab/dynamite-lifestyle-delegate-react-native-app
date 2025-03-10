@@ -56,6 +56,7 @@ const ChatList = ({ navigation }) => {
       lastName: member?.last_name,
       lastSeen: member?._id?.last_login_activity,
       profileImage: member?.profile_image,
+		  badge_color: member?.badge_info?.color_code,
       chatId: item._id,
       resetCountToZero,
       refresh

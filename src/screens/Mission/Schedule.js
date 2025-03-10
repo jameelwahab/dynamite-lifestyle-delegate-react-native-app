@@ -86,7 +86,7 @@ const Scheduler = ({ navigation, route }) => {
 
 	return (
 		<View style={__styles.container}>
-			<View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: 'center', height: 30, }}>
+			<View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: 'center', height: 30,marginTop:10 }}>
 				<View style={{ flexDirection: 'row', alignItems: "center" }}>
 					<Pressable
 						onPress={() => navigation.goBack()} >

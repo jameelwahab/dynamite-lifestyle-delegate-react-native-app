@@ -170,6 +170,8 @@ const List = ({ navigation, route }) => {
         <View style={__styles.itemHead} >
           <UserImage
             size={35}
+				    borderWidth={2}
+				    borderColor={item?.membership_level_badge_info?.membership_level_badge_color_code}
             image={item?.profile_image}
             name={item?.first_name}
             backgroundTransparent
