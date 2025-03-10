@@ -51,11 +51,11 @@ const List = ({ navigation, route }) => {
 		}
 		else {
 			GET_MISSION_APP_LINK({ token, navigation, mission_id, type }).
-			then(res => {
-				if (res.code == 200) {
-					copyText(res.url, `${type == "quest" ? "Quest" : "Mission"} link copied successfully`)
-				}
-			})
+				then(res => {
+					if (res.code == 200) {
+						copyText(res.url, `${type == "quest" ? "Quest" : "Mission"} link copied successfully`)
+					}
+				})
 		}
 	}
 
@@ -94,15 +94,14 @@ const List = ({ navigation, route }) => {
 	}
 
 	return (
-		<RootView hideSubHeader hideHeader>
+		<RootView hideHeader>
 			{!loading && <View style={{ height: 40, justifyContent: "center" }}>
 				<TitleView
 					title={res?.badge_level?.title}
 					titleIcon={route.params.icon}
 					customStyle={{ borderBottomWidth: 0.5, borderColor: colors.border, width: Dimensions.get('screen').width }}
 				/>
-			</View>
-			}
+			</View>}
 			{loading ? <MyLoader enable={loading} /> :
 				<SectionList
 					style={__styles.container}

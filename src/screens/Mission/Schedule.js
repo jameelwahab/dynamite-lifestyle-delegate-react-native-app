@@ -29,6 +29,7 @@ import { useEffect, useCallback } from "react"
 import { useFocusEffect } from "@react-navigation/native"
 import { View, FlatList, Image, StyleSheet, Text, Pressable, } from "react-native"
 import ItemCountView from "../../components/ItemCountView"
+import Header from "../../components/Header"
 
 const Schedule = (props) => {
 	return (
@@ -42,7 +43,7 @@ const Scheduler = ({ navigation, route }) => {
 	const { token, user, access } = useSelector(selectUser);
 	const [res, setResult] = useState([])
 	const [refreshing, setRefreshing] = useState(false)
-	const [showChat, setShowChat] = useState(false)
+	const [showChat, setShowChat] = useState(true)
 	const [enableChat, setEnableChat] = useState(false)
 
 
