@@ -56,10 +56,11 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   setFeedTypeMember,
   isFeedFilterAllowed,
   isNoteMainFeed,
-  isMissionFeed
+  isMissionFeed,
+  hideOnlyAddPostView = false
 
 }, ref) => {
-  console.log(isNoteMainFeed, "isNoteMainFeed")
+
   const { height, width } = useWindowDimensions();
   const inset = useSafeAreaInsets();
   const ref_poll = useRef()
@@ -1581,7 +1582,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
             </Pressable>}
 
           {isFeedFilterAllowed &&
-            <View style={{ flexDirection: "row", marginTop: 10 }}>
+            <View style={{ flexDirection: "row", }}>
               <Pressable
                 onPress={() => setFeedTypeModalVisibility(true)}
                 style={[__style.lvlbtnView, { flex: 1, marginRight: 10 }]}>
@@ -1607,25 +1608,25 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                   {icons.down(colors.lightText2)}
                 </Pressable>}
             </View>}
+          {!hideOnlyAddPostView &&
+            <View style={__style.rootView}>
+              <View style={__style.inputRootView}>
 
-          <View style={__style.rootView}>
-            <View style={__style.inputRootView}>
+                <UserImage
+                  image={user?.image?.thumbnail_1}
+                  name={user?.first_name}
+                  size={40}
+                />
 
-              <UserImage
-                image={user?.image?.thumbnail_1}
-                name={user?.first_name}
-                size={40}
-              />
-
-              <TouchableOpacity
-                onPress={() => openModal("general")}
-                style={__style.inputView}>
-                <MyText type='medium' adjustsFontSizeToFit={true} fontSize={14} >
-                  {`What's on your mind${!!user?.first_name ? ", " + user?.first_name : ""}?`}
-                </MyText>
-              </TouchableOpacity>
-            </View>
-            {/* <View style={[__style.inputRootView, { marginTop: 10 }]}>
+                <TouchableOpacity
+                  onPress={() => openModal("general")}
+                  style={__style.inputView}>
+                  <MyText type='medium' adjustsFontSizeToFit={true} fontSize={14} >
+                    {`What's on your mind${!!user?.first_name ? ", " + user?.first_name : ""}?`}
+                  </MyText>
+                </TouchableOpacity>
+              </View>
+              {/* <View style={[__style.inputRootView, { marginTop: 10 }]}>
               <View style={__style.buttonsRow} >
 
                 <TouchableOpacity
@@ -1650,11 +1651,11 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
               </View>
             </View> */}
-            {/* <View style={__style.divider} /> */}
+              {/* <View style={__style.divider} /> */}
 
 
 
-          </View>
+            </View>}
 
 
           <LevelModal
@@ -1769,6 +1770,10 @@ const FeedTypeList = [
   {
     title: "Others Feeds",
     value: "other"
+  },
+  {
+    title: "Reported Feeds",
+    value: "reported"
   },
 
 ]

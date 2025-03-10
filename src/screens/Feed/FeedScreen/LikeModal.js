@@ -22,36 +22,44 @@ const LikeModal = ({
   loader,
   onEndReached,
   footerLoader,
-  onMessagePress
+  onMessagePress,
+  type = "like"
 }) => {
 
 
   const userLikeView = ({ item, index }) => {
     return (
-      <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 10, paddingVertical: 5, marginTop: 5 }}>
-        <View>
-          <UserImage
-            image={item?.user_info_action_by?.profile_image}
-            name={item?.user_info_action_by?.name}
-            size={35}
-          />
-          <View style={{ position: "absolute", bottom: 0, right: -5 }}>
-            {icons.heartFilled(colors.heart, 15)}
+      <View style={type == "report" ? __style.boxReportView : {}}>
+        <View style={__style.boxView}>
+          <View>
+            <UserImage
+              image={item?.user_info_action_by?.profile_image}
+              name={item?.user_info_action_by?.name}
+              size={35}
+            />
+            {type == "like" &&
+              <View style={{ position: "absolute", bottom: 0, right: -5 }}>
+                {icons.heartFilled(colors.heart, 15)}
+              </View>}
           </View>
-        </View>
-        <View style={{ marginLeft: 10, flex: 1, }}>
-          <View style={{}}>
-            <MyText fontSize={13} type='bold' >{item?.user_info_action_by?.name}</MyText>
-            <MyText style={{ marginTop: 3 }} fontSize={10} color={colors.lightText2} >{convertTimezone(item?.createdAt, timezone).format(dateTimeFormat.dateTimeWithText("at"))}</MyText>
-          </View>
+          <View style={{ marginLeft: 10, flex: 1, }}>
+            <View style={{}}>
+              <MyText fontSize={13} type='bold' >{item?.user_info_action_by?.name}</MyText>
+              <MyText style={{ marginTop: 3 }} fontSize={10} color={colors.lightText2} >{convertTimezone(item?.createdAt, timezone).format(dateTimeFormat.dateTimeWithText("at"))}</MyText>
+            </View>
 
+          </View>
+          {user?.is_chat_allow && item?.user_info_action_by?.action_by == 'member_user' &&
+            <TouchableOpacity
+              onPress={() => onMessagePress?.(item)}
+              style={{ padding: 10, }}>
+              {icons.message(colors.primary, 20)}
+            </TouchableOpacity>}
         </View>
-        {user?.is_chat_allow && item?.user_info_action_by?.action_by == 'member_user' &&
-          <TouchableOpacity
-            onPress={() => onMessagePress?.(item)}
-            style={{ padding: 10, }}>
-            {icons.message(colors.primary, 20)}
-          </TouchableOpacity>}
+        {!!item?.report_reason &&
+          <View style={{ marginLeft: 10, padding: 5 }}>
+            <MyText type='medium' >{item?.report_reason}</MyText>
+          </View>}
       </View>
     )
   }
@@ -73,9 +81,10 @@ const LikeModal = ({
           <View style={__style.rootView}>
             <View style={__style.headingView}>
               <View style={{ flexDirection: "row", alignItems: "center" }}>
-                {icons.heartFilled(colors.heart, 25)}
+
+                {type == "report" ? icons.warnOctagon(colors.primary, 18) : icons.heartFilled(colors.heart, 25)}
                 <View style={{ marginLeft: 5 }}>
-                  <MyText fontSize={18} type='medium' >Likes</MyText>
+                  <MyText fontSize={18} type='medium' >{type == "report" ? "Reported Users" : "Likes"}</MyText>
                 </View>
                 {/* <MyText color={colors.lightText} fontSize={12}>Select your country from list below</MyText> */}
               </View>
@@ -122,4 +131,16 @@ const __style = StyleSheet.create({
   headingView: {
     flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 15, borderBottomWidth: 1 / 3, borderBottomColor: colors.lightText
   },
+  boxReportView: {
+    borderWidth: 1 / 2,
+    borderColor: colors.primary2,
+    borderRadius: 10,
+    marginHorizontal: 5,
+    marginTop: 5
+  },
+  boxView: {
+
+    flexDirection: "row", alignItems: "center", paddingHorizontal: 10, paddingVertical: 5, marginTop: 5,
+
+  }
 })

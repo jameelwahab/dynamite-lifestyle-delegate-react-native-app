@@ -24,11 +24,12 @@ import { icons } from '../../utilities/icons'
 import { useState } from "react"
 import { selectUser } from '../../redux/reducers/userSlice'
 import { useSelector } from 'react-redux'
-import {textSize} from "../../utilities/styles"
+import { textSize } from "../../utilities/styles"
 import { useEffect, useCallback } from "react"
 import { useFocusEffect } from "@react-navigation/native"
 import { View, FlatList, Image, StyleSheet, Text, Pressable, } from "react-native"
 import ItemCountView from "../../components/ItemCountView"
+import Header from "../../components/Header"
 
 const Schedule = (props) => {
 	return (
@@ -43,7 +44,7 @@ const Scheduler = ({ navigation, route }) => {
 	const [res, setResult] = useState([])
 	const [refreshing, setRefreshing] = useState(false)
 	const [showChat, setShowChat] = useState(true)
-  const [enableChat, setEnableChat] = useState(false)
+	const [enableChat, setEnableChat] = useState(false)
 
 
 	const getResult = async (loader) => {
@@ -87,18 +88,18 @@ const Scheduler = ({ navigation, route }) => {
 		<View style={__styles.container}>
 			<View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: 'center', height: 30, }}>
 				<View style={{ flexDirection: 'row', alignItems: "center" }}>
-						<Pressable
-							onPress={() => navigation.goBack()} >
-							{icons.backMajor(colors.primary, 26)}
-						</Pressable>
-						<View style={{ width: 10 }} />
-						<MyText
-								type="bold"
-								fontSize={textSize.title}
-								color={colors.primary}>
-								{res?.mission_schedule?.main_heading || route.params.heading || "The Source Code"} 
-						</MyText>
-					</View>
+					<Pressable
+						onPress={() => navigation.goBack()} >
+						{icons.backMajor(colors.primary, 26)}
+					</Pressable>
+					<View style={{ width: 10 }} />
+					<MyText
+						type="bold"
+						fontSize={textSize.title}
+						color={colors.primary}>
+						{res?.mission_schedule?.main_heading || route.params.heading || "The Source Code"}
+					</MyText>
+				</View>
 				{(route.params.type == "quest" && enableChat) && <Pressable onPress={() => setShowChat(true)}>
 					{icons.chat(colors.primary, 23)}
 				</Pressable>}
@@ -161,23 +162,24 @@ const Scheduler = ({ navigation, route }) => {
 
 export const HeaderView = ({ type = "", embed_code = "", video_url = "", mission_id = "", audio_url = "", img_url = "", title = "", desc = "", focuse = true }) => {
 
-	if (type == "quest" && embed_code != "") {
+	if (type == "quest" && !!embed_code) {
 		return (
 			<MyWebview
-				fullWidth
+				width={utilities.screenWidth() - 20}
 				html={embed_code || ""} />
 		)
-	}
-	else if (video_url != "") {
+	} else if (!!video_url) {
 		return video_url?.includes("vimeo") ?
 			<VimeoWithPip
 				url={video_url}
 				focused={focuse} id={mission_id}
 			/> :
-			<WebPlayer width={utilities.screenWidth() - 20} url={video_url} />
+			<WebPlayer width={utilities.screenWidth() - 20} url={video_url}
 
-	}
-	else if (audio_url) {
+				height={230}
+			/>
+
+	} else if (!!audio_url) {
 		return (
 			<AudioPlayer
 				url={audio_url}
@@ -197,9 +199,10 @@ export const HeaderView = ({ type = "", embed_code = "", video_url = "", mission
 const Overview = ({ res }) => {
 	return (
 		<View>
-			<MyWebview
-				fullWidth
-				html={res?.mission_schedule?.detailed_description || ""} />
+			{!!res?.mission_schedule?.detailed_description &&
+				<MyWebview
+					fullWidth
+					html={res?.mission_schedule?.detailed_description || ""} />}
 			<View style={{ height: 25 }} />
 			<View style={__styles.sched_img_container}>
 				<ItemCountView

@@ -417,13 +417,14 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
           <View >
             {profileView()}
             {descriptionView()}
-            {item?.review_status == "pending" ?
-              inRevivewView() :
-              item?.is_publish &&
-              <>
-                {statsView()}
-                {actionView()}
-              </>}
+            {item?.is_reported ? null :
+              item?.review_status == "pending" ?
+                inRevivewView() :
+                item?.is_publish &&
+                <>
+                  {statsView()}
+                  {actionView()}
+                </>}
           </View>
         </View>
       </View>

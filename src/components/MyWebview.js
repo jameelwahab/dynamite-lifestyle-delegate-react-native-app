@@ -80,6 +80,10 @@ export class MyWebview extends Component {
   render() {
     let { html, style, baseStyle, spanColor, } = this.props;
     html = "<div>" + html.replace(/padding:/g, "") + "</div>";
+    html = "<div>" + html.replace(/height:100%/g, "") + "</div>";
+   
+    // html = "<div>" + html.replace(/position:/g, "") + "</div>";
+    console.log(html,"html")
     return (
       <RenderHTML
 
@@ -218,7 +222,7 @@ export class MyWebview extends Component {
               fontFamily: fonts.regular,
               lineHeight: 20,
               fontSize: 16,
-              color: colors.danger,
+              color: colors.delete,
             },
             question: {
               fontFamily: fonts.regular,

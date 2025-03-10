@@ -103,7 +103,7 @@ const MissionDetail = ({ navigation, route }) => {
 				eventId={chatID}
 				token={token}
 				user={user}
-		    access={access}
+				access={access}
 				type={route.params.type}
 				navigation={navigation}
 			/>}
@@ -230,12 +230,15 @@ const Header = ({ res, showBadges, daysOn = "", focuse, tab }) => {
 					badges={res?.badge_configration}
 					questReplayAccessDays={res.replay_days}
 					dateString={`${startDate} - ${endDate}`}
-					isQuest={res?.type=="quest"}
+					isQuest={res?.type == "quest"}
 					showEarnedBadges={false}
 				// showBadgesEarned={false}
 				/>}
-			{res?.type==="mission" && !!res?.detailed_description &&
-				<MyWebview fullWidth html={res?.detailed_description?.toString()} />}
+			{res?.type === "mission" && !!res?.detailed_description &&
+				<MyWebview
+					width={utilities.screenWidth() - 20}
+					html={res?.detailed_description?.toString()}
+				/>}
 		</>
 	)
 }
@@ -291,11 +294,11 @@ const Overview = ({ token, navigation, id, showBadges, setEnableChat, setChatID,
 			ListFooterComponent={<View style={{ height: 100 }} />}
 			ListHeaderComponent={
 				<Header
-						focuse={focuse}
-						res={res}
-						tab={tab}
-						daysOn={daysOn}
-						showBadges={showBadges || res?.type === "mission"} />
+					focuse={focuse}
+					res={res}
+					tab={tab}
+					daysOn={daysOn}
+					showBadges={showBadges || res?.type === "mission"} />
 			}
 			refreshControl={<MyRefreshControl
 				refreshing={refreshing}

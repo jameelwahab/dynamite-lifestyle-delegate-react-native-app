@@ -12,7 +12,7 @@ import ReplyModal from '../components/ReplyModal'
 
 
 const QuestionView = ({ hideRepliesCheckBox = false, disableReplies = false, list, loader, onShowReplyPress, member, refresh }) => {
-  console.log("QuestionView")
+
   const ref_replyModal = useRef();
 
   const [sIndex, setSIndex] = useState(-1);
