@@ -42,7 +42,7 @@ const Scheduler = ({ navigation, route }) => {
 	const { token, user, access } = useSelector(selectUser);
 	const [res, setResult] = useState([])
 	const [refreshing, setRefreshing] = useState(false)
-	const [showChat, setShowChat] = useState(false)
+	const [showChat, setShowChat] = useState(true)
   const [enableChat, setEnableChat] = useState(false)
 
 
