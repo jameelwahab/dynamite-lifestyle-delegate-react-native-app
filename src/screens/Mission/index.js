@@ -17,7 +17,6 @@ import MyWebview from "../../components/MyWebview"
 
 const MissionLevel = ({ navigation }) => {
 	const {settings} = useSelector(selectSettings);
-
 	const { token } = useSelector(selectUser);
 	const [res, setResult] = useState([])
 	const [loading, setLoading] = useState(false)
