@@ -530,12 +530,13 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
         continue
       };
 
+      console.log(comment,"comment")
       if (type === "message") {
         if (isMe) {
           continue
         } else if (!is_chat_allowed) {
           continue
-        } else if (comment?.action_by == "consultant_user") {
+        } else if (comment?.action_by == "consultant") {
           continue
         }
       };
