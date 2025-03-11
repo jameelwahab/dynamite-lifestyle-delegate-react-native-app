@@ -530,7 +530,6 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
         continue
       };
 
-      console.log(comment,"comment")
       if (type === "message") {
         if (isMe) {
           continue
