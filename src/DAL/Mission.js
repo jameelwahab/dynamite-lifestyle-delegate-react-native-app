@@ -38,3 +38,10 @@ export const GET_MISSION_APP_LINK = ({token , navigation, mission_id, type}) => 
     navigation,
     postData:{ type, mission_id }
 })
+export const GET_MISSION_MEMBER_LIST = ({token, navigation, mission_id, page=0, limit=50, body})=> invokeApi({
+		path:`api/mission/members_list/v2/${mission_id}?page=${page}&limit=${limit}`,
+		method:"POST",
+		token,
+		navigation,
+		postData: body
+}) 

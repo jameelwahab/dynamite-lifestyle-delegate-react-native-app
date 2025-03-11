@@ -76,6 +76,8 @@ const routes = {
   //? Mission Report
   missionLevel: "MISSION_LEVEL",
   missionList: "MISSION_LIST",
+  missionFilter: "MISSION_Filter",
+  missionMemberList: "MISSION_Member_List",
   missionDetail: "MISSION_DETAIL",
   missionSchedule: "MISSION_Schedule",
 

@@ -95,6 +95,7 @@ export const communityLevelWithAllArr = [
 
 export const dateTimeFormat = {
   date: "DD-MM-YYYY",
+  date2: "YYYY-MM-DD",
   time: "hh:mm A",
   dateTime: "DD-MM-YYYY hh:mm A",
   dateTimeWithText: (text) => `DD-MM-YYYY [${text}] hh:mm A`,

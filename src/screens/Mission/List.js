@@ -99,7 +99,7 @@ const List = ({ navigation, route }) => {
 		const handlePress = (item) => ref.current.openModal?.(item)
 		const handleSelect = (opt,item)=>  {
 				if(opt.key=="copy") handleCopyMethod(item?.app_branch_url, item?._id, item?.type)
-				if(opt.key="member") console.log("to be continue")
+				if(opt.key="member") nav.navigate(routes.missionMemberList, {item})
 		} 
 
 	return (
@@ -178,7 +178,7 @@ const __styles = StyleSheet.create({
 
 const optionList = [
 	{
-		title: "Copy Link",
+		title: "Copy App Link",
 		key: "copy",
 		icon: () => icons.copy(colors.primary, 17),
 	},
