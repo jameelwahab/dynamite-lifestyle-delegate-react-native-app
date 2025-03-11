@@ -159,7 +159,9 @@ const MemberProfile = ({ navigation, route }) => {
     return (
       <View style={{ flexDirection: "row", alignItems: "center", flex: 1, paddingRight: 15 }}>
         <View style={{ flex: 1 }}>
-          {!!member?.member && <MemberView member={member?.member} showPhoneNumber />}
+          {!!member?.member && <MemberView member={member?.member}  borderColor={member?.member?.membership_level_badge_info?.membership_level_badge_id?.color_code}  showPhoneNumber />}
+
+
         </View>
         {isWhatsappChatAllowed &&
           <Pressable

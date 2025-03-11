@@ -72,6 +72,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
   const isMissionFeed = feedFor == "mission";
 
   const { token, user, access, isChatAllowed } = useSelector(selectUser);
+  console.log(access, "access")
 
   const { socket } = useSelector(selectSocket);
   const timezone = useSelector(selectTimeZone);
@@ -953,7 +954,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       let isMine = feed?.action_info?.action_id == user?._id;
 
       options.forEach((item) => {
-        if (item.type == "pin" && feed?.review_status == "approved") {
+        if (item.type == "pin" && feed?.review_status == "approved" && !feed?.is_reported) {
           if (access?.feed_pin_unpin_option) {
             if (!feed?.is_feature) {
               if (isAllSourceFeed || isTheSourceFeed) {
@@ -967,7 +968,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           }
         }
 
-        if (item.type == "unpin" && feed?.review_status == "approved") {
+        if (item.type == "unpin" && feed?.review_status == "approved" && !feed?.is_reported) {
           if (access?.feed_pin_unpin_option) {
             if (feed?.is_feature) {
               if (isAllSourceFeed || isTheSourceFeed) {
@@ -1022,7 +1023,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
         }
 
         if (item.type == "message" && feed?.review_status == "approved") {
-          console.log(isChatAllowed,"isChatAllowed")
+          console.log(isChatAllowed, "isChatAllowed")
           if (isChatAllowed) {
             if (!isMine && feed.action_info?.action_by != "consultant_user") {
               newList.push(item);
@@ -1354,6 +1355,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       openPollDetail={openPollDetail}
       onStartQuestionnairPress={onStartQuestionnairPress}
       openSurveyDetail={openSurveyDetail}
+      onReportedPress={() => getUserWhoReportedFeed(item)}
     />, [feed, inView]);
 
   const viewConfigRef = React.useRef({ viewAreaCoveragePercentThreshold: 50 })
@@ -1420,10 +1422,12 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
         updateFeedItemsSpecificField={updateFeedItemsSpecificField}
         socketEmittersForAction={socketEmittersForAction}
         isCosmos={isCosmos}
+        hasEditDeleteAccess={isAllSourceFeed || isTheSourceFeed || isNoteMainFeed ? access?.edit_delete_option_in_source_all_source_feeds : false}
         isNoteMainFeed={isNoteMainFeed}
         eventId={eventId}
         feedCreatedFor={commentVar?.level}
         onCommentMessagePress={onCommentMessagePress}
+        isChatAllowed={isChatAllowed}
       />
 
 
@@ -1431,19 +1435,27 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
         type={likes?.type}
         isVisible={likes?.modalVisibility}
         timezone={timezone}
-        closeModal={() =>
-          setLikes({
+        closeModal={() => {
+          setLikes((prev) => ({
+            ...prev,
             modalVisibility: false,
             list: [],
             loader: false,
-            type: "like"
-          })}
+          }));
+          setTimeout(() => {
+            setLikes((prev) => ({
+              ...prev,
+              type: "like"
+            }));
+          }, 500);
+        }}
         likes={likes?.list}
         user={user}
         loader={likes?.loader}
         onEndReached={onLikesEndReached}
         footerLoader={likesFooterLoader}
         onMessagePress={onMessagePress}
+        isChatAllowed={isChatAllowed}
       />
 
       <OptionModal

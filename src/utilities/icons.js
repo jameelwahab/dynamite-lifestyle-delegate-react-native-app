@@ -140,6 +140,7 @@ export const icons = {
   attachment: (color = colors.primary, size = 17) => { return (<Entypo name="attachment" color={color} size={size} />) },
   category: (color = colors.white, size = 20) => { return (<MaterialIcons name="category" color={color} size={size} />) },
   members: (color = colors.white, size = 20) => { return (<FontAwesome5 name="user-friends" color={color} size={size} />) },
+  members2: (color = colors.primary, size = 17) => { return (<FontAwesome5 name="user-friends" color={color} size={size} />) },
   list_circle: (color = colors.white, size = 20) => { return (<Ionicons name="list-circle" color={color} size={size} />) },
   duplicate: (color = colors.white, size = 20) => { return (<Ionicons name="duplicate" color={color} size={size} />) },
   drag: (color = colors.white, size = 20) => { return (<MaterialIcons name="drag-indicator" color={color} size={size} />) },

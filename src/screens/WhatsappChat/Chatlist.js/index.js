@@ -51,6 +51,7 @@ const ChatList = ({ navigation }) => {
 
   const onChatScreen = (member, item) => {
     navigation.navigate(routes.whtasappChatMessageList, {
+		  badge_color: member?.badge_info?.color_code,
       memberId: member?._id,
       firstName: member?.first_name,
       lastName: member?.last_name,

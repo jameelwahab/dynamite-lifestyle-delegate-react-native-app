@@ -35,12 +35,12 @@ const UserView = ({ member, timezone }) => {
     }
   }
 
-
-
   return (
     <View style={__style.userRootView}>
       <View>
         <UserImage
+				  borderWidth={2}
+				   borderColor={member?.badge_color}
           image={member?.profileImage}
           name={member?.firstName}
           size={35}

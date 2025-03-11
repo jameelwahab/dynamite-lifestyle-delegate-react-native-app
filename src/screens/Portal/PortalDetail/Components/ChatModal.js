@@ -26,6 +26,9 @@ import showToast from '../../../../functions/showToast';
 import ConfirmationModal from '../../../../components/ConfirmationModal';
 import Toast from 'react-native-toast-message';
 import EmptyView from '../../../../components/EmptyView';
+import { selectUser } from '../../../../redux/reducers/userSlice';
+import { onChatScreen } from '../../../../functions/onChatScreen';
+import isArray from '../../../../functions/isArray';
 
 
 let page = 0;
@@ -33,6 +36,8 @@ let canLoadMore = false;
 
 const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone, purchaseLink, linkImage, eventId, user }) => {
   const { socket } = useSelector(selectSocket);
+  const { access } = useSelector(selectUser);
+
   const likeModalRef = useRef();
   const chatListRef = useRef();
   const inputRef = useRef();
@@ -268,6 +273,10 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
       setTimeout(() => {
         setConfirmationsModal({ isVisible: true, item: item, type: "note", title: "Are you sure you want to add the comment as personal note?" })
       }, 550);
+    } else if (opt?.type == "message") {
+      setTimeout(() => {
+        onChatScreen(item?.member?._id, token, navigation, user?._id)
+      }, 550);
     }
   }
 
@@ -490,27 +499,60 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
     }, 300);
   }
 
-  const filterOptions = (list) => {
-    let nlist = []
-    if (!!optionModal?.item?.parent_message) {
-      nlist = list.slice().filter(x => x.type != "pin" && x.type != "unpin")
 
-    } else if (!!optionModal?.item && optionModal?.item?.is_featured) {
-      nlist = list.slice().filter(x => x.type != "pin")
+  const filterOptions = (item = null) => {
+    const comment = item || optionModal?.item;
+    const isMe = comment?.member?._id === user?._id;
+    const { allow_edit_delete_in_live_chat, allow_pin_unpin_in_live_chat, is_chat_allowed } = access || {};
 
-    } else {
-      nlist = list.slice().filter(x => x.type != "unpin")
+    const filteredList = [];
+
+    for (const item of OptionList) {
+      const { type } = item;
+      if (type === "pin" || type === "unpin") {
+        if (!allow_pin_unpin_in_live_chat) {
+          continue
+        } else if (!!comment?.parent_message) {
+          continue
+        };
+      }
+
+
+      if (comment?.is_featured && type === "pin") {
+        continue
+      };
+
+      if (!comment?.is_featured && type === "unpin") {
+        continue
+      };
+
+      if (!allow_edit_delete_in_live_chat && !isMe && (type === "edit" || type === "delete")) {
+        continue
+      };
+
+      if (type === "message") {
+        if (isMe) {
+          continue
+        } else if (!is_chat_allowed) {
+          continue
+        }
+      };
+
+
+      if (type === "note") {
+        if (comment?.action_by !== "member") {
+          continue
+        }
+      };
+
+      filteredList.push(item);
+    }
+    if (!optionModal?.item && !item) {
+      return []
     }
 
-    if (optionModal?.item?.action_by != "member") {
-      nlist = nlist.slice().filter(x => x.type != "note")
-    }
-
-
-    return nlist
-
-  }
-
+    return filteredList;
+  };
 
 
   const onViewableItemsChanged = useCallback(({ viewableItems }) => {
@@ -664,14 +706,15 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
   }
 
   const commentView = (item, index, isChild, pinned = false) => {
+    let haveOptions = isArray(filterOptions(item));
     return (
       <View
         key={item?._id}>
         <View style={[__style.commentView, { marginLeft: isChild ? "10%" : undefined }]}>
           <View style={__style.profileView}>
             <UserImage
-				     borderWidth={2}
-				      borderColor={item?.badge_info?.code_color}
+              borderWidth={2}
+              borderColor={item?.badge_info?.color_code}
               image={item?.member?.profile_image}
               name={item?.member?.first_name}
               backgroundTransparent={true}
@@ -686,10 +729,13 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
               <MyText fontSize={10} color={colors.lightGrey} type='medium' >{convertTimezone(item?.createdAt, timezone).format(dateTimeFormat.dateTime)}</MyText>
             </View>
             {isLive ?
-              <MenuButton
-                size={20}
-                onPress={() => setOptionModal({ isVisible: true, item: item })}
-              /> :
+              haveOptions &&
+              <>
+                <MenuButton
+                  size={20}
+                  onPress={() => setOptionModal({ isVisible: true, item: item })}
+                />
+              </> :
               item?.like_count > 0 ?
                 <TouchableOpacity
                   onPress={() => likeModalRef?.current?.openLikeModal?.(item?._id, "event")}
@@ -802,7 +848,7 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
                 renderItem={({ item, index }) => commentView(item, index, false)}
                 inverted={isLive ? true : false}
                 ref={chatListRef}
-                // onViewableItemsChanged={onViewableItemsChanged}
+                onViewableItemsChanged={onViewableItemsChanged}
                 onEndReached={loadMore}
                 ListEmptyComponent={!loader && !isLive && <EmptyView />}
                 ListFooterComponent={<View style={{ height: 50 }}>
@@ -840,7 +886,7 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
             isVisible={optionModal?.isVisible}
             onSelected={onSelectedOption}
             closeModal={() => setOptionModal({ isVisible: false, item: null })}
-            optionList={filterOptions(OptionList)}
+            optionList={filterOptions()}
           />
 
           {InputModal()}
@@ -1017,6 +1063,11 @@ const OptionList = [
     icon: icons.trash,
     title: "Delete",
     type: "delete"
+  },
+  {
+    icon: () => icons.send(colors.primary, 17),
+    title: "Message",
+    type: "message"
   },
   {
     icon: icons.pin,

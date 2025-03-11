@@ -108,6 +108,7 @@ const MissionDetail = ({ navigation, route }) => {
 				navigation={navigation}
 			/>}
 			<View style={__styles.container}>
+
 				<View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: 'center' }}>
 					<View style={{ flexDirection: 'row', alignItems: "center" }}>
 						<Pressable

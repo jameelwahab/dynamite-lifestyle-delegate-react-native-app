@@ -89,7 +89,8 @@ const ReviewComments = ({ navigation }) => {
 
 	const handleSelect = (opt, item) => {
 		if (opt.key == "msg") {
-			onChatScreen(item?.user_info_action_for?.action_id, token, navigation, user?._id)
+			onChatScreen(item?.user_info_action_for?.action_id, token, navigation, user?._id,
+					item?.user_info_action_for?.badge_level_info?.color_code)
 		} else if (opt.key == "del") {
 			ref_confirmModal?.current?.openModal({
 				title: `Are you sure you want to delete this comment?`,
@@ -141,7 +142,7 @@ const ReviewComments = ({ navigation }) => {
 			if (item.key == "del" || item.key == "edit") {
 				return access?.edit_delete_option_in_source_all_source_feeds
 			} else if (item.key == 'msg') {
-				return access?.is_chat_allowed
+				return !access?.is_chat_allowed
 			} else {
 				return true
 			}

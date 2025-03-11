@@ -159,6 +159,7 @@ const notificationHandler = (remoteMessage, navigation, navbar) => {
                     lastName: "",
                     lastSeen: "",
                     profileImage: profile?.profile_image,
+                    badge_color: profile?.color_code,
                   }
                 }],
             }

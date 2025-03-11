@@ -9,7 +9,7 @@ import UserImage from './UserImage';
 import { S3_URL, dateTimeFormat } from '../utilities/constants';
 import { convertTimezone } from '../functions/convertTime';
 import FooterLoader from './FooterLoader';
-import {  GET_PORTAL_CHAT_MESSAGE_LIKES } from '../DAL';
+import { GET_PORTAL_CHAT_MESSAGE_LIKES } from '../DAL';
 import MyLoader from './MyLoader';
 import utilities from '../utilities';
 
@@ -79,6 +79,8 @@ const LikeModal = forwardRef(({ navigation, token, timezone }, ref) => {
           <UserImage
             image={item?.action_info?.profile_image}
             name={item?.action_info?.first_name}
+            borderWidth={2}
+            borderColor={item?.badge_info?.color_code}
             size={35}
           />
           <View style={{ position: "absolute", bottom: 0, right: -5 }}>
@@ -86,7 +88,7 @@ const LikeModal = forwardRef(({ navigation, token, timezone }, ref) => {
           </View>
         </View>
         <View style={{ marginLeft: 10 }}>
-          <MyText fontSize={13} type='bold' >{item?.action_info?.first_name +" "+item?.action_info?.last_name}</MyText>
+          <MyText fontSize={13} type='bold' >{item?.action_info?.first_name + " " + item?.action_info?.last_name}</MyText>
           <MyText style={{ marginTop: 3 }} fontSize={10} color={colors.lightText2} >{convertTimezone(item?.createdAt, timezone).format(dateTimeFormat.dateTimeWithText("at"))}</MyText>
         </View>
 

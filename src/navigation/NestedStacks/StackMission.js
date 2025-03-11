@@ -13,43 +13,45 @@ const MissionStack = createNativeStackNavigator()
 
 const StackMission = ({ route }) => {
 	return (
-		<MissionStack.Navigator
-			// initialRouteName={routes.missionSchedule}
-			screenOptions={{ headerShown: false }}
-		>
-			<MissionStack.Screen
-				initialParams={routes.params}
-				name={routes.missionLevel}
-				component={Mission}
-			/>
-			<MissionStack.Screen
-				initialParams={routes.params}
-				name={routes.missionList}
-				component={List}
-			/>
-			<MissionStack.Screen
-				initialParams={routes.params}
-				name={routes.missionDetail}
-				component={Detail}
-			/>
-			<MissionStack.Screen
-				initialParams={routes.params}
-				name={routes.missionSchedule}
-				component={Schedule}
-			/>
+		<View style={{ flex: 1, backgroundColor: colors.darkSecondary }}>
+			<MissionStack.Navigator
+				// initialRouteName={routes.missionSchedule}
+				screenOptions={{ headerShown: false }}
+			>
+				<MissionStack.Screen
+					initialParams={routes.params}
+					name={routes.missionLevel}
+					component={Mission}
+				/>
+				<MissionStack.Screen
+					initialParams={routes.params}
+					name={routes.missionList}
+					component={List}
+				/>
+				<MissionStack.Screen
+					initialParams={routes.params}
+					name={routes.missionDetail}
+					component={Detail}
+				/>
+				<MissionStack.Screen
+					initialParams={routes.params}
+					name={routes.missionSchedule}
+					component={Schedule}
+				/>
 
-			<MissionStack.Screen
-				name={routes.feedDetailScreen}
-				component={FeedDetail}
-			/>
+				<MissionStack.Screen
+					name={routes.feedDetailScreen}
+					component={FeedDetail}
+				/>
 
-			{/* ye extra screens hoti hain jo har jaga se call ki jaye */}
+				{/* ye extra screens hoti hain jo har jaga se call ki jaye */}
 
-			{defaultScreens.map((x, i) => (
-				<MissionStack.Screen key={x.name} name={x.name} component={x.component} />
-			))}
+				{defaultScreens.map((x, i) => (
+					<MissionStack.Screen key={x.name} name={x.name} component={x.component} />
+				))}
 
-		</MissionStack.Navigator>
+			</MissionStack.Navigator>
+		</View>
 	)
 }
 

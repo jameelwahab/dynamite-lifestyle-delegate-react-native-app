@@ -23,7 +23,8 @@ const LikeModal = ({
   onEndReached,
   footerLoader,
   onMessagePress,
-  type = "like"
+  type = "like",
+  isChatAllowed
 }) => {
 
 
@@ -33,6 +34,8 @@ const LikeModal = ({
         <View style={__style.boxView}>
           <View>
             <UserImage
+              borderWidth={2}
+              borderColor={item?.user_info_action_by?.badge_level_info?.color_code}
               image={item?.user_info_action_by?.profile_image}
               name={item?.user_info_action_by?.name}
               size={35}
@@ -49,14 +52,14 @@ const LikeModal = ({
             </View>
 
           </View>
-          {user?.is_chat_allow && item?.user_info_action_by?.action_by == 'member_user' &&
+          {isChatAllowed && item?.user_info_action_by?.action_by == 'member_user' &&
             <TouchableOpacity
               onPress={() => onMessagePress?.(item)}
               style={{ padding: 10, }}>
               {icons.message(colors.primary, 20)}
             </TouchableOpacity>}
         </View>
-        {!!item?.report_reason &&
+        {!!item?.report_reason && type == "report" &&
           <View style={{ marginLeft: 10, padding: 5 }}>
             <MyText type='medium' >{item?.report_reason}</MyText>
           </View>}

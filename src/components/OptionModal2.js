@@ -113,7 +113,7 @@ const RenderList = ({ item, index, isChild, titleKey, onSelected, renderText, no
         <View style={{
           paddingVertical: 12, flexDirection: "row", alignItems: "center", paddingLeft: 20, backgroundColor: 'red',
           backgroundColor: isChecked ? colors.secondarySelect : colors.transparent,
-          marginLeft: isChild ? 30 : 0
+          marginLeft: !!isChild ? 30 : 0
 
         }}>
           {!!item.icon && noIcon == false &&
