@@ -21,12 +21,14 @@ import PostWebView from '../../../components/PostWebView'
 import FeedText from '../../../components/FeedText'
 import numFormatter from '../../../functions/numFormatter'
 import { MyButton } from '../../../components/MyButton'
+import { main } from '../../../utilities/styles'
+import { Row } from '../../../UIComponents/FlexViews'
 
 export const FeedView = ({ item, index, user, token, isInView, timezone, settings,
   openComments, showLikes, openOptions, onLikebtnPress, isCosmos,
   sourceLevelIcons, isScheduledFeed, openScheduleTimeModal, onFeedDetail,
   isNoteMainFeed, filterTheOptions, onVotePress, pollSettings, openPollDetail,
-  onStartQuestionnairPress, openSurveyDetail
+  onStartQuestionnairPress, openSurveyDetail, onReportedPress
 }) => {
 
 
@@ -93,6 +95,8 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
             style={{ tintColor: colors.primary, height: 25, width: 25 }}
           />
         </TouchableOpacity>}
+
+
       {(!!item?.badge_level_info?.icon?.thumbnail_1 || isCosmos) &&
         <View >
           <MyImage
@@ -155,6 +159,9 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
           }
         </>
       }
+
+
+
       {item.feed_type == "image" && !!item?.feed_images && item?.feed_images.length > 0 && (
         <View style={{ marginTop: 10 }}>
           <ImagesForFeed id={item._id} list={item.feed_images} />
@@ -229,6 +236,14 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
             >{item?.event_info?.button_text}</MyText>
           </TouchableOpacity>
         </View>}
+
+      {item?.is_reported &&
+        <TouchableOpacity onPress={onReportedPress}>
+          <Row paddingHorizontal={5} style={__style.reportedView}>
+            {icons.warnOctagon(colors.delete, 20)}
+            <Text style={__style.reportedText} >This post has been reported by some users</Text>
+          </Row>
+        </TouchableOpacity>}
 
 
     </View>
@@ -417,14 +432,13 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
           <View >
             {profileView()}
             {descriptionView()}
-            {item?.is_reported ? null :
-              item?.review_status == "pending" ?
-                inRevivewView() :
-                item?.is_publish &&
-                <>
-                  {statsView()}
-                  {actionView()}
-                </>}
+            {item?.review_status == "pending" ?
+              inRevivewView() :
+              item?.is_publish &&
+              <>
+                {statsView()}
+                {actionView()}
+              </>}
           </View>
         </View>
       </View>
@@ -472,8 +486,23 @@ const __style = StyleSheet.create({
     backgroundColor: colors.secondary,
     borderRadius: 10,
   },
+  reportedView: {
+    borderLeftWidth: 3,
+    borderColor: colors.delete,
+    backgroundColor: colors.delete + "22",
+    borderRadius: 5,
+    paddingVertical: 7,
+    marginTop: 10
+  },
+  reportedText: {
+    marginLeft: 10,
+    ...main.description,
+    color: colors.white,
+    // fontStyle: "italic",
+    // textDecorationLine: "underline"
 
 
+  },
   animationView: {
     width: "100%",
     height: "100%",

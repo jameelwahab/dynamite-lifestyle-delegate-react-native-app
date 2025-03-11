@@ -26,6 +26,8 @@ import MemberView from '../../../components/MemberView';
 import FeedText from '../../../components/FeedText';
 import breakReference from '../../../functions/breakReference';
 import numFormatter from '../../../functions/numFormatter';
+import { onChatScreen } from '../../../functions/onChatScreen';
+import isArray from '../../../functions/isArray';
 
 
 let commentCursor = {
@@ -55,7 +57,9 @@ const CommentModal = ({
   isNoteMainFeed,
   eventId,
   feedCreatedFor,
-  onCommentMessagePress
+  onCommentMessagePress,
+  hasEditDeleteAccess,
+  isChatAllowed
 }) => {
   const cmtTextInputRef = useRef();
   const likeModalRef = useRef();
@@ -293,6 +297,13 @@ const CommentModal = ({
           isVisible: true,
           selectedItem: item
         })
+      }, 500);
+    } else if (action?.type == "message") {
+      setTimeout(() => {
+        closeModal?.()
+        setTimeout(() => {
+          onChatScreen(item?.user_info_action_for?.action_id, token, navigation, user?._id)
+        }, 200);
       }, 500);
     }
 
@@ -578,7 +589,7 @@ const CommentModal = ({
         obj['profile_image'] = mUser?.profile_image
       }
 
-    
+
       while (mentionList.length > 0) {
         mentionList.pop()
       }
@@ -589,6 +600,7 @@ const CommentModal = ({
       setCommentText("")
     }
   }
+
   const viewMoreReplies = async (parentComment) => {
     let loadedChildComments = parentComment.child_comment.length;
     let totalChildComments = parentComment?.child_comments_count;
@@ -618,7 +630,7 @@ const CommentModal = ({
             comment["child_comment"] = childCommnetPage == 0 ? [...res?.comment] : [...comment?.child_comment, ...res?.comment];
             // comment["child_comments_count"] = comment.child_comment.length + res.comment.length
           }
-        
+
         })
         return { ...obj }
       })
@@ -629,6 +641,42 @@ const CommentModal = ({
       delete childCommentLoader[parentComment?._id]
       setChildCommentLoader({ ...childCommentLoader })
     }
+  }
+
+  const getFilteredOptions = (item = null) => {
+    let comment = options?.selectedItem;
+    if (item) {
+      comment = item
+    }
+    let newList = [];
+
+    let isMine = user?._id == comment?.user_info_action_for?.action_id
+
+    commentsOptionList.forEach((item) => {
+      if (item?.type == "delete" || item?.type == "edit") {
+        if (isMine) {
+          newList.push(item)
+        }
+        else if (hasEditDeleteAccess) {
+          if (comment?.user_info_action_for?.action_by == "member_user") {
+            newList.push(item)
+          }
+        }
+      }
+
+      if (item?.type == "message") {
+        if (!isCosmos) {
+          if (!isMine) {
+            if (comment?.user_info_action_for?.action_by == "member_user") {
+              if (isChatAllowed) {
+                newList.push(item)
+              }
+            }
+          }
+        }
+      }
+    })
+    return newList;
   }
 
 
@@ -644,6 +692,7 @@ const CommentModal = ({
       childCommentCount = item?.child_comments_count
       childCommentArray = item?.child_comment
     }
+    let hasOptionsToShow = isArray(getFilteredOptions(item));
     return (
       <View key={item?._id}>
         <View style={[__style.commentView, {
@@ -653,8 +702,8 @@ const CommentModal = ({
         }]}>
           <View style={__style.profiletView}>
             <UserImage
-				      borderWidth={2}
-				      borderColor={item?.user_info_action_for?.badge_level_info?.color_code}
+              borderWidth={2}
+              borderColor={item?.user_info_action_for?.badge_level_info?.color_code}
               image={item?.user_info_action_for?.profile_image}
               name={item?.user_info_action_for?.name}
               size={30}
@@ -668,7 +717,7 @@ const CommentModal = ({
               </View>
             </View>
 
-            {((user?._id == item?.user_info_action_for?.action_id) || (!isCosmos && !isNoteMainFeed && user?.is_super_delegate)) &&
+            {hasOptionsToShow &&
               <TouchableOpacity
                 onPress={() => setOptions({ isVisible: true, selectedItem: item })}
                 style={__style.menuIconBtn}>
@@ -777,6 +826,8 @@ const CommentModal = ({
     setMentionList([])
     set_at_index(-1)
   }
+
+
 
   const commentModal = () => (
     <Modal
@@ -965,8 +1016,9 @@ const CommentModal = ({
         </View>
 
         {isVisible && <Toast />}
+{console.log(getFilteredOptions(),"getFilteredOptions")}
         <OptionModal
-          optionList={commentsOptionList}
+          optionList={getFilteredOptions()}
           isVisible={options.isVisible}
           closeModal={() => setOptions({ isVisible: false, selectedItem: null })}
           onSelected={onSelectOption}
@@ -980,6 +1032,7 @@ const CommentModal = ({
         />
 
         <LikeModalForComments
+        isChatAllowed={isChatAllowed}
           ref={likeModalRef}
           navigation={navigation}
           token={token}
@@ -1005,6 +1058,8 @@ const CommentModal = ({
     </Modal>
   )
 
+
+
   return (
     <View>
       {commentModal()}
@@ -1024,7 +1079,13 @@ const commentsOptionList = [{
   icon: icons.trash,
   title: "Delete",
   type: "delete"
-}]
+},
+{
+  icon: () => icons.send(colors.primary, 17),
+  title: "Message",
+  type: "message"
+}
+]
 
 const __style = StyleSheet.create({
   rootView: {

@@ -9,7 +9,7 @@ import UserImage from '../../../../components/UserImage';
 import { S3_URL, dateTimeFormat } from '../../../../utilities/constants';
 import { convertTimezone } from '../../../../functions/convertTime';
 import FooterLoader from '../../../../components/FooterLoader';
-import {  GET_PORTAL_CHAT_MESSAGE_LIKES } from '../../../../DAL';
+import { GET_PORTAL_CHAT_MESSAGE_LIKES } from '../../../../DAL';
 import MyLoader from '../../../../components/MyLoader';
 import utilities from '../../../../utilities';
 
@@ -77,6 +77,8 @@ const LikeModal = forwardRef(({ navigation, token, timezone }, ref) => {
       <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 10, paddingVertical: 5, marginTop: 5 }}>
         <View>
           <UserImage
+            borderWidth={2}
+            borderColor={item?.badge_info?.color_code}
             image={item?.action_info?.profile_image}
             name={item?.action_info?.first_name}
             size={35}
@@ -86,7 +88,7 @@ const LikeModal = forwardRef(({ navigation, token, timezone }, ref) => {
           </View>
         </View>
         <View style={{ marginLeft: 10 }}>
-          <MyText fontSize={13} type='bold' >{item?.action_info?.first_name +" "+item?.action_info?.last_name}</MyText>
+          <MyText fontSize={13} type='bold' >{item?.action_info?.first_name + " " + item?.action_info?.last_name}</MyText>
           <MyText style={{ marginTop: 3 }} fontSize={10} color={colors.lightText2} >{convertTimezone(item?.createdAt, timezone).format(dateTimeFormat.dateTimeWithText("at"))}</MyText>
         </View>
 

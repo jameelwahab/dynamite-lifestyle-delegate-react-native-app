@@ -96,7 +96,7 @@ const NotificationList = ({ navigation, route }) => {
     let { notification_type } = item;
     if (feedType.includes(notification_type)) {
       let navigator = "";
-      console.log(item,"item")
+      console.log(item, "item")
       if ((item?.tab_type == "the_cosmos" || item?.notification_type == "feed_mentioned") && !!navbar.find(x => x.value == "the_cosmos")) {
         navigator = routes.feedNavigator;
       } else if (item?.tab_type == "event") {
@@ -180,7 +180,7 @@ const NotificationList = ({ navigation, route }) => {
             }],
           })
         } else if (item?.tab_type == "mission") {
-          console.log(navigator,"navigator")
+          console.log(navigator, "navigator")
           navigation.reset({
             routes: [{
               name: navigator,
@@ -247,7 +247,7 @@ const NotificationList = ({ navigation, route }) => {
           }
         }],
       })
-    } else if (notification_type == "message" && !!navbar.find(x => x.value == "chat")) {
+    } else if (notification_type == "message") {
       navigation.reset({
         routes: [{
           name: routes.chatNavigator,
@@ -266,6 +266,7 @@ const NotificationList = ({ navigation, route }) => {
                   lastName: "",
                   lastSeen: "",
                   profileImage: item?.user_info_sender?.profile_image,
+                  badge_color: item?.user_info_sender?.color_code
                 }
               }],
           }

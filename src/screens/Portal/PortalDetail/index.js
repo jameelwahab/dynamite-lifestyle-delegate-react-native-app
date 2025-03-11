@@ -26,7 +26,7 @@ import AudioPlayerForList from '../../../components/AudioPlayerForList'
 const PortalDetail = (props) => {
   const { navigation, route } = props;
   const { eventId } = route?.params
-  const { token, user } = useSelector(selectUser);
+  const { token, user,isChatAllowed } = useSelector(selectUser);
   const timezone = useSelector(selectTimeZone);
   const [loader, setLoader] = useState(true);
   const [event, setEvent] = useState(null);
@@ -168,7 +168,7 @@ const PortalDetail = (props) => {
         <View style={{ flex: 1, justifyContent: "center" }}>
           <MyText fontSize={18} type='medium' color={colors.primary} >{event?.title}</MyText>
         </View>
-        {user?.is_chat_allow && !!event &&
+        {isChatAllowed && !!event &&
           <Pressable
             onPress={onEventsChatScreen}
             style={__style.chatBtn}>

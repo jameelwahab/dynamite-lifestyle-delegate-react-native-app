@@ -29,12 +29,13 @@ import Toast from 'react-native-toast-message';
 import EmptyView from './EmptyView';
 import FooterLoader from './FooterLoader';
 import moment from "moment"
+import isArray from '../functions/isArray';
 
 
 let page = 0;
 let canLoadMore = false;
 
-const LiveChat = ({ isVisible, closeModal, type, token, navigation, videoId, timezone, purchaseLink, linkImage, eventId, user, flex = 0.6, access}) => {
+const LiveChat = ({ isVisible, closeModal, type, token, navigation, videoId, timezone, purchaseLink, linkImage, eventId, user, flex = 0.6, access }) => {
   const paging = useRef({ page: 0, canLoadMore: false })?.current;
   const { socket } = useSelector(selectSocket);
   const likeModalRef = useRef();
@@ -263,9 +264,9 @@ const LiveChat = ({ isVisible, closeModal, type, token, navigation, videoId, tim
         setConfirmationsModal({ isVisible: true, item: item, type: "note", title: "Are you sure you want to add the comment as personal note?" })
       }, 1000);
     }
-			else if (opt?.type=="message"){
-				onChatScreen(optionModal?.item?.member?._id, token, navigation, user?._id)
-			}
+    else if (opt?.type == "message") {
+      onChatScreen(optionModal?.item?.member?._id, token, navigation, user?._id)
+    }
   }
 
   const onConfirmAgree = () => {
@@ -493,28 +494,81 @@ const LiveChat = ({ isVisible, closeModal, type, token, navigation, videoId, tim
     }, 300);
   }
 
-  const filterOptions = (list) => {
-    let nlist = []
-    if (!!optionModal?.item?.parent_message) {
-      nlist = list.slice().filter(x => x.type != "pin" && x.type != "unpin")
+  // const filterOptions = (list) => {
+  //   let nlist = []
+  //   if (!!optionModal?.item?.parent_message) {
+  //     nlist = list.slice().filter(x => x.type != "pin" && x.type != "unpin")
 
-    } else if (!!optionModal?.item && optionModal?.item?.is_featured) {
-      nlist = list.slice().filter(x => x.type != "pin")
+  //   } else if (!!optionModal?.item && optionModal?.item?.is_featured) {
+  //     nlist = list.slice().filter(x => x.type != "pin")
 
-    } else {
-      nlist = list.slice().filter(x => x.type != "unpin")
+  //   } else {
+  //     nlist = list.slice().filter(x => x.type != "unpin")
+  //   }
+  // 	if(!access?.is_chat_allowed || (optionModal?.item?.member?._id == user?._id)){
+  //     nlist = nlist.slice().filter(x => x.type != "message")
+  // 	}
+  //   if (optionModal?.item?.action_by == "consultant_user" || (optionModal?.item?.member?._id == user?._id)) {
+  //     nlist = nlist.slice().filter(x => x.type != "note")
+  //   }
+
+
+  //   return nlist
+
+  // }
+
+  const filterOptions = (item = null) => {
+    const comment = item || optionModal?.item;
+    const isMe = comment?.member?._id === user?._id;
+    const { allow_edit_delete_in_live_chat, allow_pin_unpin_in_live_chat, is_chat_allowed } = access || {};
+
+    const filteredList = [];
+
+    for (const item of OptionList) {
+      const { type } = item;
+      if (type === "pin" || type === "unpin") {
+        if (!allow_pin_unpin_in_live_chat) {
+          continue
+        } else if (!!comment?.parent_message) {
+          continue
+        };
+      }
+
+
+      if (comment?.is_featured && type === "pin") {
+        continue
+      };
+
+      if (!comment?.is_featured && type === "unpin") {
+        continue
+      };
+
+      if (!allow_edit_delete_in_live_chat && !isMe && (type === "edit" || type === "delete")) {
+        continue
+      };
+
+      if (type === "message") {
+        if (isMe) {
+          continue
+        } else if (!is_chat_allowed) {
+          continue
+        }
+      };
+
+      if (type === "note") {
+        if (comment?.action_by == "consultant_user") {
+          continue
+        }
+      };
+
+      filteredList.push(item);
     }
-		if(!access?.is_chat_allowed || (optionModal?.item?.member?._id == user?._id)){
-      nlist = nlist.slice().filter(x => x.type != "message")
-		}
-    if (optionModal?.item?.action_by == "consultant_user" || (optionModal?.item?.member?._id == user?._id)) {
-      nlist = nlist.slice().filter(x => x.type != "note")
+    if (!optionModal?.item && !item) {
+      return []
     }
+    return filteredList;
+  };
 
-
-    return nlist
-
-  }
 
 
 
@@ -644,7 +698,7 @@ const LiveChat = ({ isVisible, closeModal, type, token, navigation, videoId, tim
                 />
               </TouchableOpacity>
             }
-            
+
           </View>
 
           <TouchableOpacity
@@ -667,14 +721,15 @@ const LiveChat = ({ isVisible, closeModal, type, token, navigation, videoId, tim
   }
 
   const commentView = (item, index, isChild, pinned = false) => {
+    let haveOptions = isArray(filterOptions(item));
     return (
       <View
         key={item?._id}>
         <View style={[__style.commentView, { marginLeft: isChild ? "10%" : undefined }]}>
           <View style={__style.profileView}>
             <UserImage
-						  borderWidth={2}
-						  borderColor={item?.badge_info?.color_code}
+              borderWidth={2}
+              borderColor={item?.badge_info?.color_code}
               image={item?.member?.profile_image}
               name={item?.member?.first_name}
               size={30}
@@ -689,10 +744,11 @@ const LiveChat = ({ isVisible, closeModal, type, token, navigation, videoId, tim
             </View>
             {isLive ?
               <>
+                {haveOptions &&
                   <MenuButton
                     size={20}
                     onPress={() => setOptionModal({ isVisible: true, item: item })}
-                  />
+                  />}
               </>
               :
               item?.like_count > 0 ?
@@ -807,7 +863,7 @@ const LiveChat = ({ isVisible, closeModal, type, token, navigation, videoId, tim
                 renderItem={({ item, index }) => commentView(item, index, false)}
                 inverted={isLive ? true : false}
                 ref={chatListRef}
-                // onViewableItemsChanged={onViewableItemsChanged}
+                onViewableItemsChanged={onViewableItemsChanged}
                 onEndReached={loadMore}
                 ListEmptyComponent={!loader && !isLive && <EmptyView />}
                 ListFooterComponent={<FooterLoader isVisible={footerLoader} />}
@@ -843,7 +899,7 @@ const LiveChat = ({ isVisible, closeModal, type, token, navigation, videoId, tim
             isVisible={optionModal?.isVisible}
             onSelected={onSelectedOption}
             closeModal={() => setOptionModal({ isVisible: false, item: null })}
-            optionList={filterOptions(OptionList)}
+            optionList={filterOptions()}
           />
 
           {InputModal()}

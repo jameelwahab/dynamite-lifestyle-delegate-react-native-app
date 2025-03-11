@@ -18,7 +18,7 @@ let page = 0;
 let canLoadMore = false;
 let commentId = "";
 
-const LikeModalForComments = forwardRef(({ navigation, token, timezone, user, onMessagePress }, ref) => {
+const LikeModalForComments = forwardRef(({ navigation, token, timezone, user, onMessagePress, isChatAllowed }, ref) => {
   const [isVisible, setIsVisible] = useState(false);
   const [likes, setLikes] = useState([]);
   const [footerLoader, setFooterLoader] = useState(false);
@@ -79,6 +79,8 @@ const LikeModalForComments = forwardRef(({ navigation, token, timezone, user, on
       <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 10, paddingVertical: 5, marginTop: 5 }}>
         <View>
           <UserImage
+            borderWidth={2}
+            borderColor={item?.user_info_action_by?.badge_level_info?.color_code}
             image={item?.user_info_action_by?.profile_image}
             name={item?.user_info_action_by?.name}
             size={35}
@@ -91,7 +93,7 @@ const LikeModalForComments = forwardRef(({ navigation, token, timezone, user, on
           <MyText fontSize={13} type='bold' >{item?.user_info_action_by?.name}</MyText>
           <MyText style={{ marginTop: 3 }} fontSize={10} color={colors.lightText2} >{convertTimezone(item?.createdAt, timezone).format(dateTimeFormat.dateTimeWithText("at"))}</MyText>
         </View>
-        {user?.is_chat_allow && item?.user_info_action_by?.action_by == 'member_user' &&
+        {isChatAllowed && item?.user_info_action_by?.action_by == 'member_user' &&
           <TouchableOpacity
             onPress={() => {
               onMessagePress?.(item)
