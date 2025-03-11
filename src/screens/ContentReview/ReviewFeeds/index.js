@@ -161,7 +161,7 @@ const ReviewFeeds = ({ navigation, route }) => {
 						return access?.edit_delete_option_in_source_all_source_feeds
 					}
 				} else if (item.key == 'msg') {
-					return !access?.is_chat_allowed
+					return access?.is_chat_allowed
 				} else {
 					return true
 				}
