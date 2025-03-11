@@ -178,7 +178,7 @@ const __styles = StyleSheet.create({
 
 const optionList = [
 	{
-		title: "Copy Link",
+		title: "Copy App Link",
 		key: "copy",
 		icon: () => icons.copy(colors.primary, 17),
 	},

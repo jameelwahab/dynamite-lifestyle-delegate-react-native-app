@@ -37,7 +37,7 @@ const Filter = ({route, navigation}) => {
 				setFilter(route.params.filters)
 		},[route])
 		return (
-		<RootView title={"Members Filter"}>
+		<RootView title={"Filter"}>
 				<MyKeyboardAvoidingView
 						style={{ paddingHorizontal: 10 }}
 						showsVerticalScrollIndicator={false} >
@@ -143,6 +143,7 @@ const Filter = ({route, navigation}) => {
 								setShowStart(false)
 								setShowEnd(false)
 								setShowAttract(false)
+								nav.navigate(routes.missionMemberList, {filter:{}, item:route.params.item })
 						}}
           />
           <MyButton

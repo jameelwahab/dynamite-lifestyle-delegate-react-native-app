@@ -13,10 +13,13 @@ import EmptyView from "../../components/EmptyView"
 import { useState, useEffect, useRef } from "react"
 import routes from "../../navigation/routes"
 import {colors} from "../../utilities/colors"
+import {dateTimeFormat} from "../../utilities/constants"
 import { selectUser } from '../../redux/reducers/userSlice'
 import { useSelector } from 'react-redux'
 import {icons} from "../../utilities/icons"
 import breakReference from '../../functions/breakReference'
+import numFormatter from "../../functions/numFormatter"
+import moment from "moment"
 
 const MemberList = ({route, navigation}) => {
 		const [filters, setFilters] = useState(route.params.filter)
@@ -49,17 +52,21 @@ const MemberList = ({route, navigation}) => {
 						mission_id:route.params.item?._id,
 						body:filters,
 						page: pagination?.current?.page,
-						limit:50,
+						limit:20,
 				})
 				if(res.code==200){
-						if(pagination.current.page==0) setResult(res.users_list)
-						else setResult([ ...result, ...res.users_list])
+						setResult(pagination.current.page==0? res.users_list:[ ...result, ...res.users_list])
 						setTotal(res?.total_count)
-						if(res.load_more_url){
-								pagination.current.page++;
-								pagination.current.canLoadMore=true;
-						}
 						setLoader("")
+						let length = pagination?.current?.page == 0 ?
+								res?.users_list.length : (result.length + res?.users_list.length);
+						if (length < res?.total_count) {
+								pagination.current.page++;
+								pagination.current.canLoadMore = true;
+						} else {
+								pagination.current.canLoadMore = false;
+						}
+						
 				} else {
 						setResult([])
 						setLoader("")
@@ -100,7 +107,7 @@ const MemberList = ({route, navigation}) => {
 														{icons.back(colors.primary, 25)}
 										</TouchableOpacity>
 										<TitleView
-										title={route.params.item.type + " Members"}
+										title={"Members"}
 										hideBackBottomButton
 										subTitle={`Showing ${result?.length} of ${total}`}
 										/>
@@ -162,7 +169,7 @@ const MemberList = ({route, navigation}) => {
 								showsVerticalScrollIndicator={false}
 								ListFooterComponent={<FooterLoader isVisible={loaders?.pagination} />}
 								data={result}
-								keyExtractor={(_,index) => index.toString()}
+								keyExtractor={(item) => item?._id.toString()}
 								renderItem={memberListView}
 						/>
 						<MyLoader enable={loaders.overall} />
@@ -171,9 +178,10 @@ const MemberList = ({route, navigation}) => {
 }
 
 const memberListView = ({ item, index }) => {
+
   const statusView = (value) => {
     return (
-      <View style={{ backgroundColor: value ? colors.green + "33" : colors.delete + "33", paddingHorizontal: 10, paddingVertical: 2, alignSelf: "flex-start", borderRadius: 10 }}>
+      <View style={{ backgroundColor: value=="completed" ? colors.green + "33" : colors.delete + "33", paddingHorizontal: 10, paddingVertical: 2, alignSelf: "flex-start", borderRadius: 10 }}>
         <MyText type='medium' capitalize color={value=="completed" ? colors.green : colors.delete} >
           {value}
         </MyText>
@@ -190,12 +198,11 @@ const memberListView = ({ item, index }) => {
         </View>
           
         <View style={{ padding: 5 }}>
-          <StatView title={"Name"} value={item?.user_info?.first_name + " " + item?.user_info?.last_name} />
-          <StatView title={"Start Date"} value={item?.mission_start_date} />
-          <StatView title={"End Date"} value={item?.mission_end_date} />
-          <StatView title={"Coins Attracted"} value={item?.attracted_coins} />
-          <StatView title={"Target Coins"} value={item?.target_coins} />
-          <StatView title={"Status"} value={statusView(item?.mission_status)} />
+          <StatView title={"Start Date"} value={moment(item?.mission_start_date).format(dateTimeFormat.dateTime)} />
+          <StatView title={"End Date"} value={moment(item?.mission_end_date).format(dateTimeFormat.dateTime)} />
+          <StatView title={"Coins Attracted"} value={numFormatter(item?.attracted_coins,1)} />
+          <StatView title={"Target Coins"} value={numFormatter(item?.target_coins,1)} />
+          <StatView title={"Status"} value={statusView(item?.mission_status.replace(/_/gm," "))} />
         </View>
       </View>
     )
