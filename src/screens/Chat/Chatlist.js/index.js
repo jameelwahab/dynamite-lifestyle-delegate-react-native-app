@@ -26,7 +26,7 @@ import { fonts } from '../../../utilities/fonts'
 import { selectSocket } from '../../../redux/reducers/socketSlice'
 import { convertTimezone } from '../../../functions/convertTime'
 import { selectTimeZone } from '../../../redux/reducers/timezoneSlice'
-import MyInputs from '../../../components/MyInputs' 
+import MyInputs from '../../../components/MyInputs'
 
 
 let clpage = 0;
@@ -35,7 +35,7 @@ let firstTime = true;
 let isNewChat = false;
 
 const ChatList = ({ navigation }) => {
-  const { token, user } = useSelector(selectUser);
+  const { token, user, isChatAllowed } = useSelector(selectUser);
   const { socket } = useSelector(selectSocket);
   const timezone = useSelector(selectTimeZone);
   const [loader, setLoader] = useState(true);
@@ -56,7 +56,7 @@ const ChatList = ({ navigation }) => {
       lastName: member?.last_name,
       lastSeen: member?._id?.last_login_activity,
       profileImage: member?.profile_image,
-		  badge_color: member?.badge_info?.color_code,
+      badge_color: member?.badge_info?.color_code,
       chatId: item._id,
       resetCountToZero,
       refresh
@@ -69,7 +69,7 @@ const ChatList = ({ navigation }) => {
         event_id: eventId?._id,
         search_text: searchText,
         chat_type: tab
-      }, token, page:clpage
+      }, token, page: clpage
     })
     if (res.code == 200) {
       if ((chatList.length + res?.chat.length) < res?.total_chat_count) {
@@ -110,7 +110,7 @@ const ChatList = ({ navigation }) => {
     }
   }
 
-   useEffect(() => {
+  useEffect(() => {
     if (!firstTime) {
       clpage = 0;
       clcanLoadMore = false;
@@ -454,8 +454,8 @@ const ChatList = ({ navigation }) => {
         <View style={__style.itemRootView}>
           <View>
             <UserImage
-						  borderWidth={2}
-						  borderColor={member?.badge_info?.color_code}
+              borderWidth={2}
+              borderColor={member?.badge_info?.color_code}
               image={member?.profile_image}
               name={member?.first_name}
             />
@@ -487,13 +487,13 @@ const ChatList = ({ navigation }) => {
                       item.message_type == "video" ? icons.playCircle(colors.white, 18) : ""}
                 </View>
               }
-              <View style={{ flexDirection: "row", flex: 1,height:18 }}>
+              <View style={{ flexDirection: "row", flex: 1, height: 18 }}>
                 <MyText fontSize={12} type='light' numberOfLines={1} style={{ marginTop: 3, flex: 1 }}>
                   {!!item?.last_message ?
                     isHtml(item?.last_message) ?
                       decode(item.last_message.replace(/<[^>]+>/g, '').replace(/\*/g, "").replace(/[\])}[{(]/g, " ").slice(0, 70), { level: "html5" }) :
-                      <Markdown  style={markdownStyleOther}>
-                        {item?.last_message.replace(/\n/g,"").slice(0, 100)}
+                      <Markdown style={markdownStyleOther}>
+                        {item?.last_message.replace(/\n/g, "").slice(0, 100)}
                       </Markdown> :
                     item.message_type == "image" ? "Photo" :
                       item.message_type == 'audio' ? "Audio" :
@@ -541,7 +541,7 @@ const ChatList = ({ navigation }) => {
       </View>
 
       {portalModal()}
-      {user?.is_chat_allow &&
+      {isChatAllowed &&
         <FAB
           onPress={() => navigation.navigate(routes.startNewChat, {
             resetCountToZero,
