@@ -178,7 +178,8 @@ export {
     GET_MISSION_LIST_ID,
     GET_MISSION_DETAIL,
     GET_MISSION_INFO,
-    GET_MISSION_APP_LINK
+    GET_MISSION_APP_LINK,
+		GET_MISSION_MEMBER_LIST
 } from "./Mission"
 
 export {GET_LIVE_CHAT_LIST} from "./LiveChat"

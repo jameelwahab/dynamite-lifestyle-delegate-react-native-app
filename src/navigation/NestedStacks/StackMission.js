@@ -8,6 +8,7 @@ import Schedule from "../../screens/Mission/Schedule.js"
 import Detail from "../../screens/Mission/Detail.js"
 import Filter from "../../screens/Mission/Filter.js"
 import FeedDetail from "../../screens/Feed/Detail"
+import MemberList from "../../screens/Mission/MemberList" 
 import { defaultScreens } from "./defaultScreens"
 
 const MissionStack = createNativeStackNavigator()
@@ -32,6 +33,11 @@ const StackMission = ({ route }) => {
 				initialParams={routes.params}
 				name={routes.missionFilter}
 				component={Filter}
+			/>
+		  <MissionStack.Screen
+				initialParams={routes.params}
+				name={routes.missionMemberList}
+				component={MemberList}
 			/>
 			<MissionStack.Screen
 				initialParams={routes.params}
