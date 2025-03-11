@@ -535,6 +535,8 @@ const ChatModal = ({ isVisible, closeModal, token, navigation, videoId, timezone
           continue
         } else if (!is_chat_allowed) {
           continue
+        } else if (comment?.action_by == "consultant_user") {
+          continue
         }
       };
 

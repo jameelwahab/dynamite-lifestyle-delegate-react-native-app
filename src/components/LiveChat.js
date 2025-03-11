@@ -552,6 +552,8 @@ const LiveChat = ({ isVisible, closeModal, type, token, navigation, videoId, tim
           continue
         } else if (!is_chat_allowed) {
           continue
+        } else if (comment?.action_by == "consultant_user") {
+          continue
         }
       };
 
