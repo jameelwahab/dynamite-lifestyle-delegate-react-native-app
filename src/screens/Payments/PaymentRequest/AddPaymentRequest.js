@@ -118,8 +118,10 @@ const AddPaymentRequest = ({ navigation, route }) => {
         installments: !!data?.no_of_installment ? data?.no_of_installment : "",
         // installmentAmount: !!data?.installment_amount ? data?.installment_amount : "",
         planType: !!data?.interval_type ? planTypeList.find(x => x.key == data?.interval_type) : "",
-        noOfDays: !!data?.number_of_days ? data?.number_of_days : ""
+        noOfDays: !!data?.number_of_days ? data?.number_of_days : "",
+				load_status: !!data?.lead_status?.title ? data?.lead_status?.title : ""
       }
+				console.log("here is the obj",obj)
       setSelected(obj);
     }
   }
@@ -493,6 +495,16 @@ const AddPaymentRequest = ({ navigation, route }) => {
 
               <MyInputs
                 label='VAT Number'
+                value={selected?.vat}
+                onChangeText={(text) => setSelected({ vat: text })} />
+						  <MyInputs
+                label='Consider Purchasing User As*'
+                value={selected.lead_status?.title}
+
+                onChangeText={(text) => setSelected({ lead_status: {...lead_status, title:txt} })} />
+
+						  <MyInputs
+                label='Payment Mode'
                 value={selected?.vat}
                 onChangeText={(text) => setSelected({ vat: text })} />
             </View>
