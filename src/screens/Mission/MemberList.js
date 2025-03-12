@@ -9,7 +9,7 @@ import MyLoader from "../../components/MyLoader"
 import MemberView from '../../components/MemberView'
 import StatView from '../../components/StatView'
 import SearchView from "../../components/SearchView"
-import { StyleSheet, View, TouchableOpacity, FlatList, Keyboard } from "react-native"
+import { StyleSheet, View, TouchableOpacity, FlatList, Keyboard, Pressable} from "react-native"
 import { GET_MISSION_MEMBER_LIST } from "../../DAL"
 import EmptyView from "../../components/EmptyView"
 import { useState, useEffect, useRef } from "react"
@@ -195,16 +195,28 @@ const MemberList = ({ route, navigation }) => {
 
 
   const memberListView = ({ item, index }) => {
-	const statusView = (value) => {
-		return (
-			<View style={{ backgroundColor: value == "completed" ? colors.green + "33" : colors.delete + "33", paddingHorizontal: 10, paddingVertical: 2, alignSelf: "flex-start", borderRadius: 10 }}>
-				<MyText type='medium' capitalize color={value == "completed" ? colors.green : colors.delete} >
-					{value}
-				</MyText>
-			</View>)
-	}
+
+		const statusView = (value) => {
+				return (
+						<View style={{ backgroundColor: value == "completed" ? colors.green + "33" : colors.delete + "33", paddingHorizontal: 10, paddingVertical: 2, alignSelf: "flex-start", borderRadius: 10 }}>
+								<MyText type='medium' capitalize color={value == "completed" ? colors.green : colors.delete} >
+										{value}
+								</MyText>
+						</View>
+				) }
+
+  const onMissionList = () => {
+    navigation.navigate(routes.missionReportScreen, {
+      missionId: item?.mission_info?._id,
+      memberId: item?.user_info?._id,
+      type: route.params.item?.type,
+    })
+  }
+
 	return (
-		<View style={__styles.itemView}>
+		<Pressable
+			onPress={onMissionList}
+			style={__styles.itemView}>
 			<View style={{ flex: 1, flexDirection: 'row', alignItems: "center", justifyContent: "space-between" }}>
 				<MemberView
 					borderColor={item?.user_info?.membership_level_badge_info?.membership_level_badge_color_code}
@@ -213,6 +225,7 @@ const MemberList = ({ route, navigation }) => {
 				/>
 				<View style={{ flexDirection: 'row', alignItems: "center", justifyContent: "space-between" }}>
 					<MyImage source={{ uri: S3_URL + item?.user_info?.membership_level_badge_info?.membership_level_badge_icon?.thumbnail_1 }} style={__styles.icon} />
+						{icons.forwardArrow()}
 				</View>
 			</View>
 
@@ -224,7 +237,7 @@ const MemberList = ({ route, navigation }) => {
 				<StatView title={"Target Coins"} value={numFormatter(item?.target_coins, 1)} />
 				<StatView title={"Status"} value={statusView(item?.mission_status.replace(/_/gm, " "))} />
 			</View>
-		</View>
+		</Pressable>
 	)
 }
 
