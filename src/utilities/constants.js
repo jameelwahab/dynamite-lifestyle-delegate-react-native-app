@@ -12,7 +12,7 @@ if (isDev) {
   // appName = displayName;
 
   domain = "https://apidev.dynamitelifestyle.com/";
-  socketUrl = "https://apidev.dynamitelifestyle.com";
+socketUrl = "https://apidev.dynamitelifestyle.com";
   S3_URL = "https://dynamite-lifestyle-dev-app-bucket.s3.amazonaws.com/";
   appName = displayName;
   websiteBaseUrl = "https://sourcedev.dynamitelifestyle.com/"

@@ -16,7 +16,7 @@ import { selectSettings } from "../../redux/reducers/settingSlice"
 import MyWebview from "../../components/MyWebview"
 
 const MissionLevel = ({ navigation }) => {
-	const {settings} = useSelector(selectSettings);
+	const { settings } = useSelector(selectSettings);
 	const { token } = useSelector(selectUser);
 	const [res, setResult] = useState([])
 	const [loading, setLoading] = useState(false)
@@ -29,7 +29,7 @@ const MissionLevel = ({ navigation }) => {
 			setLoading(false)
 			setRefreshing(false)
 		}
-		else{
+		else {
 			setResult([])
 			setLoading(false)
 			setRefreshing(false)
@@ -56,15 +56,16 @@ const MissionLevel = ({ navigation }) => {
 	}
 
 
-	const Header = ()=>{
-		return(
+	const Header = () => {
+		console.log(settings,"settings")
+		return (
 			<>
-			{!!settings?.missions_description &&
-			<View style={{marginBottom:10}}>
-			<MyWebview
-			html={settings?.missions_description}
-			/>
-			</View>}
+				{!!settings?.missions_description &&
+					<View style={{ marginBottom: 10 }}>
+						<MyWebview
+							html={settings?.missions_description}
+						/>
+					</View>}
 			</>
 		)
 	}
@@ -72,12 +73,12 @@ const MissionLevel = ({ navigation }) => {
 		<RootView hideSubHeader hideBackBottomButton >
 			<View style={__styles.container}>
 				<FlatList
-				  ListHeaderComponent={Header()}
+					ListHeaderComponent={Header()}
 					showsVerticalScrollIndicator={false}
 					data={res.level_badges}
 					keyExtraction={item => item}
 					ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
-				  ListFooterComponent={()=> <View style={{ height: 20 }} />}
+					ListFooterComponent={() => <View style={{ height: 20 }} />}
 					ListEmptyComponent={!loading && <EmptyView />}
 					refreshControl={<MyRefreshControl
 						refreshing={refreshing}
