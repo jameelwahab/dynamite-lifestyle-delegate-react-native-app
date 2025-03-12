@@ -52,7 +52,6 @@ const MemberList = ({ navigation, route }) => {
       type: route.params.type,
     })
   }
-  console.log(route.params)
 
   const callAPi = () => {
     paging.canLoadMore = false;

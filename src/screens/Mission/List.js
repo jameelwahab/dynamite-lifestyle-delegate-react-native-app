@@ -99,15 +99,22 @@ const List = ({ navigation, route }) => {
 		const handlePress = (item) => ref.current.openModal?.(item)
 		const handleSelect = (opt,item)=>  {
 				if(opt.key=="copy") handleCopyMethod(item?.app_branch_url, item?._id, item?.type)
-				if(opt.key="member") nav.navigate(routes.missionMemberList, {item})
+				else if(opt.key="member") nav.navigate(routes.missionMemberList, {item})
 		} 
-
+		const filterList = (item)=>{
+				if(item?.type == "mission"){
+						return [optionList[0], optionList[2]]
+				} 
+				else if(item?.type == "quest"){
+						return [optionList[0], optionList[1]]
+				} 
+		}
 	return (
 		<RootView hideHeader>
 				<OptionModal2
 						ref={ref}
 						onSelected={handleSelect}
-						optionList={optionList}
+						filterTheList={filterList}
 						/>
 			{!loading && <View style={{ height: 40, justifyContent: "center" }}>
 				<TitleView
@@ -176,6 +183,7 @@ const __styles = StyleSheet.create({
 	}
 })
 
+
 const optionList = [
 	{
 		title: "Copy App Link",
@@ -183,8 +191,13 @@ const optionList = [
 		icon: () => icons.copy(colors.primary, 17),
 	},
 	{
-		title: "Member",
-		key: "member",
+		title: "Quest Members",
+		key: "quest",
+		icon: icons.members2,
+		},
+		{
+		title: "Mission Members",
+		key: "mission",
 		icon: icons.members2,
 		},
 	]
