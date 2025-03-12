@@ -154,7 +154,7 @@ const Filter = ({ route, navigation }) => {
 						<View style={{ flex: 1 }}>
 							<MyInputs
 								label='Coin From*'
-								value={!!filter?.coins_from  ? filter?.coins_from : 0}
+								value={!!filter?.coins_from  ? filter?.coins_from : "0"}
 								onChangeText={(text) => setFilter({ ...filter, coins_from: text })}
 								keyboardType='number-pad'
 							/>
@@ -162,7 +162,7 @@ const Filter = ({ route, navigation }) => {
 						<View style={{ flex: 1, marginLeft: 10 }}>
 							<MyInputs
 								label='Coin To*'
-								value={!!filter?.coins_to ? filter?.coins_to : 0}
+								value={!!filter?.coins_to ? filter?.coins_to : "0"}
 								onChangeText={(text) => setFilter({ ...filter, coins_to: text })}
 								keyboardType='number-pad'
 							/>
