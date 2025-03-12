@@ -30,7 +30,7 @@ const Filter = ({ route, navigation }) => {
 	const [status, setStatus] = useState({ title: statusList[0].title, key: statusList[0].key });
 
 	const [showStart, setShowStart] = useState(!!route.params.filters?.from_start_date)
-	const [showEnd, setShowEnd] = useState(!!route.params.filters?.to_start_date)
+	const [showEnd, setShowEnd] = useState(!!route.params.filters?.to_end_date)
 	const [showAttract, setShowAttract] = useState(!!route.params.filters?.coins_from)
 	const [badges, setBadges] = useState(!!route.params.filters?.badges ? route.params.filters?.badges : [])
 	const [filter, setFilter] = useState(route.params.filters)
@@ -106,7 +106,7 @@ const Filter = ({ route, navigation }) => {
 					value={showStart}
 					onPress={() => {
 						setShowStart(!showStart)
-						setFilter({ ...filter, from_start_date: null, from_end_date: null })
+						setFilter({ ...filter, from_start_date: null, to_start_date: null })
 					}}
 				/>
 				<Collapsible collapsed={!showStart}>
@@ -118,9 +118,9 @@ const Filter = ({ route, navigation }) => {
 					/>
 					<MyTouchableInput
 						label='End Date From'
-						value={filter?.from_end_date || ""}
+						value={filter?.to_start_date || ""}
 						icon={() => icons.calendar(colors.primary)}
-						onPress={() => ref_calendar?.current?.openModal(filter?.from_end_date, "from_end_date")}
+						onPress={() => ref_calendar?.current?.openModal(filter?.from_end_date, "to_start_date")}
 					/>
 				</Collapsible>
 
@@ -130,7 +130,7 @@ const Filter = ({ route, navigation }) => {
 							title="Search By End Date"
 							onPress={() => {
 								setShowEnd(!showEnd)
-								setFilter({ ...filter, to_start_date: null, to_end_date: null })
+								setFilter({ ...filter, from_end_date: null, to_end_date: null })
 							}}
 							value={showEnd}
 						/>
@@ -138,9 +138,9 @@ const Filter = ({ route, navigation }) => {
 						<Collapsible collapsed={!showEnd}>
 							<MyTouchableInput
 								label='Start Date From'
-								value={filter?.to_start_date || ""}
+								value={filter?.from_end_date || ""}
 								icon={() => icons.calendar(colors.primary)}
-								onPress={() => ref_calendar?.current?.openModal(filter?.to_start_date, "to_start_date")}
+								onPress={() => ref_calendar?.current?.openModal(filter?.to_start_date, "from_end_date")}
 							/>
 							<MyTouchableInput
 								label='End Date From'

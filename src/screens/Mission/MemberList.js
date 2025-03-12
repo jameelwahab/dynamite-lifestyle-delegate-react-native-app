@@ -165,14 +165,14 @@ const MemberList = ({ route, navigation }) => {
 							)}
 						</>
 					}
-					{filters?.from_start_date && filters.from_end_date &&
-						<MyChip title={`Start from ${filters?.from_start_date} to ${filters?.from_end_date}`}
-							onPress={() => setFilters({ ...filters, from_start_date: null, from_end_date: null })} />
+					{filters?.from_start_date && filters.to_start_date &&
+						<MyChip title={`Start from ${filters?.from_start_date} to ${filters?.to_start_date}`}
+							onPress={() => setFilters({ ...filters, from_start_date: null, to_start_date: null })} />
 					}
 
-					{filters?.to_start_date && filters.to_end_date &&
-						<MyChip title={`End Date from ${filters?.to_start_date} to ${filters?.to_end_date}`}
-							onPress={() => setFilters({ ...filters, to_start_date: null, to_end_date: null })} />
+					{filters?.from_end_date && filters.to_end_date &&
+						<MyChip title={`End Date from ${filters?.from_end_date} to ${filters?.to_end_date}`}
+							onPress={() => setFilters({ ...filters, from_end_date: null, to_end_date: null })} />
 					}
 
 					{filters?.coins_from && filters.coins_to &&
