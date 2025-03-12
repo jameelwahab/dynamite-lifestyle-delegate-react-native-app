@@ -33,25 +33,37 @@ const Filter = ({ route, navigation }) => {
 	const [showEnd, setShowEnd] = useState(!!route.params.filters?.to_start_date)
 	const [showAttract, setShowAttract] = useState(!!route.params.filters?.coins_from)
 	const [badges, setBadges] = useState(!!route.params.filters?.badges ? route.params.filters?.badges : [])
+	const [filter, setFilter] = useState(route.params.filters)
+  const [coins, setCoins] = useState({from:"0", to:"0"})
 
 	const optionStatus = () => ref.current.openModal()
 	const optionStatus2 = () => ref2.current.openModal()
-	const handleSelect = (item) => item.key != 'all' && setFilter({ ...filter, mission_status: item.key, status: item.title })
+	const handleSelect = (item) => item.key != 'all' ? setFilter({ ...filter, mission_status: item.key, status: item.title }) :setFilter({...filter, mission_status: null, status:null })
 
-	const handleSelect2 = (item) => setBadges(badges.length == 0 ? [item] : [...badges, item])
-	const [filter, setFilter] = useState(route.params.filters)
+	const handleSelect2 = (item) => {
+				if(badges.length != access.badge_levels.length) { 
+						setBadges(badges.length == 0 ? [item] : [...badges, item]) }
+	}
 	const toUpper = (txt) => txt[0].toUpperCase() + txt.slice(1, txt.length)
 
 	const filterList = () => {
-		return badges.length == 0 ? [...access?.badge_levels] : access?.badge_levels.filter(el =>
-			badges.findIndex(x => x._id == el._id) < 0 && el
-		)
+			if(badges.length==access.badge_levels.length){
+					return [{title:"No options"}]
+			}
+			else if(badges.length == 0){ [...access?.badge_levels] }  	
+			else {
+		  access?.badge_levels.filter(el =>
+			badges.findIndex(x => x._id == el._id) < 0 && el )
+
+			}
 	}
 	useEffect(() => {
-
 		setFilter(route.params.filters)
 	}, [route])
 
+	useEffect(() => {
+		console.log(filter.coins_from)
+	}, [filter])
 	const ListBadge = () => {
 		return (
 			<FlatList
@@ -154,16 +166,16 @@ const Filter = ({ route, navigation }) => {
 						<View style={{ flex: 1 }}>
 							<MyInputs
 								label='Coin From*'
-								value={!!filter?.coins_from  ? filter?.coins_from : "0"}
-								onChangeText={(text) => setFilter({ ...filter, coins_from: text })}
+								value={coins.from}
+								onChangeText={(text) => setCoins({...coins,from: text })}
 								keyboardType='number-pad'
 							/>
 						</View>
 						<View style={{ flex: 1, marginLeft: 10 }}>
 							<MyInputs
 								label='Coin To*'
-								value={!!filter?.coins_to ? filter?.coins_to : "0"}
-								onChangeText={(text) => setFilter({ ...filter, coins_to: text })}
+								value={coins.to}
+								onChangeText={(text) => setCoins({...coins,to: text })}
 								keyboardType='number-pad'
 							/>
 						</View>
@@ -202,6 +214,8 @@ const Filter = ({ route, navigation }) => {
 								...filter,
 								badge_levels: [...badges.map(el => el._id)],
 								badges,
+								coins_from: showAttract ? coins.from:null,
+								coins_to: showAttract ? coins.to :null
 							},
 							item: route.params.item
 						})}
