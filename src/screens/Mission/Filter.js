@@ -28,13 +28,12 @@ const Filter = ({ route, navigation }) => {
 	const { access } = useSelector(selectUser);
 
 	const [status, setStatus] = useState({ title: statusList[0].title, key: statusList[0].key });
-
 	const [showStart, setShowStart] = useState(!!route.params.filters?.from_start_date)
 	const [showEnd, setShowEnd] = useState(!!route.params.filters?.to_end_date)
 	const [showAttract, setShowAttract] = useState(!!route.params.filters?.coins_from)
 	const [badges, setBadges] = useState(!!route.params.filters?.badges ? route.params.filters?.badges : [])
 	const [filter, setFilter] = useState(route.params.filters)
-  const [coins, setCoins] = useState({from:"0", to:"0"})
+  const [coins, setCoins] = useState( {from: route.params.filters?.coins_from || "0", to:  route.params.filters?.coins_to ||"0"})
 
 	const optionStatus = () => ref.current.openModal()
 	const optionStatus2 = () => ref2.current.openModal()
