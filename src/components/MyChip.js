@@ -15,6 +15,7 @@ const MyChip = ({ title, onPress, isCapitalize = false }) => {
       </View>
       {!!onPress &&
         <TouchableOpacity
+        hitSlop={{top:5,left:5,bottom:5,right:5}}
           onPress={onPress}
           style={__styles.chipBtn}>
           {icons.crosss(colors.primary, 15)}
