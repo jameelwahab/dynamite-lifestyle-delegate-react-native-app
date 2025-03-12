@@ -38,32 +38,30 @@ const Filter = ({ route, navigation }) => {
 
 	const optionStatus = () => ref.current.openModal()
 	const optionStatus2 = () => ref2.current.openModal()
-	const handleSelect = (item) => item.key != 'all' ? setFilter({ ...filter, mission_status: item.key, status: item.title }) :setFilter({...filter, mission_status: null, status:null })
+
+	const handleSelect = (item) => item.key != 'all' ? setFilter({ ...filter, mission_status: item.key, status: item.title }) : setFilter({...filter, mission_status: null, status:null })
 
 	const handleSelect2 = (item) => {
 				if(badges.length != access.badge_levels.length) { 
 						setBadges(badges.length == 0 ? [item] : [...badges, item]) }
 	}
+
 	const toUpper = (txt) => txt[0].toUpperCase() + txt.slice(1, txt.length)
 
 	const filterList = () => {
 			if(badges.length==access.badge_levels.length){
 					return [{title:"No options"}]
 			}
-			else if(badges.length == 0){ [...access?.badge_levels] }  	
+			else if(badges.length == 0){ return [...access?.badge_levels] }  	
 			else {
-		  access?.badge_levels.filter(el =>
-			badges.findIndex(x => x._id == el._id) < 0 && el )
-
+						return access?.badge_levels.filter(el =>
+			badges.findIndex(x => x._id == el._id) < 0 && el )  
 			}
 	}
 	useEffect(() => {
 		setFilter(route.params.filters)
 	}, [route])
 
-	useEffect(() => {
-		console.log(filter.coins_from)
-	}, [filter])
 	const ListBadge = () => {
 		return (
 			<FlatList

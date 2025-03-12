@@ -58,7 +58,6 @@ const MemberList = ({ route, navigation }) => {
 			navigation,
 			mission_id: item?._id,
 			page: pagination?.current?.page,
-			limit: 20,
 			body: filters,
 
 		})
