@@ -377,21 +377,21 @@ export const ParentComponents = {
     },
   },
 
-  "ad108738-ebe0-428e-9810-55203ee509f7": {
+  "ba0458ac-6983-4155-b594-0101f3a8658f": {
     key: routes.missionNavigator,
     component: StackMission,
     params: {
       value: "missions",
-      key: "ad108738-ebe0-428e-9810-55203ee509f7",
+      key: "ba0458ac-6983-4155-b594-0101f3a8658f",
     }
   },
 
-  "52f27c5a-44ba-44ba-b0f0-b0b150ea031b": {
+  "695cbdcf-bc37-4375-ba15-dcd312ff189f": {
     key: null,
     component: null,
     params: {
       value: "",
-      key: "52f27c5a-44ba-44ba-b0f0-b0b150ea031b"
+      key: "695cbdcf-bc37-4375-ba15-dcd312ff189f"
     },
   },
 
