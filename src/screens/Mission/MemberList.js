@@ -232,6 +232,8 @@ const MemberList = ({ route, navigation }) => {
 				<StatView title={"Start Date"} value={moment(item?.mission_start_date).format(dateTimeFormat.dateTime.split(' ')[0])} />
 			{route?.params?.item?.type=="quest" && <StatView title={"End Date"} value={moment(item?.mission_end_date).format(dateTimeFormat.dateTime.split(' ')[0] )} />}
 			{route?.params?.item?.type=="mission" && <StatView title={"Completed Days"} value={item?.completed_mission_days} />}
+        <StatView title={"Accept Time Badge"} value={<MyImage source={{uri: S3_URL + item?.accept_time_badge_details?.icon?.thumbnail_1 }} style={{width:17, height:17}}/>} />
+        <StatView title={"Current Badge"} value={<MyImage source={{uri: S3_URL + item?.current_badge_level?.icon?.thumbnail_1 }} style={{width:17, height:17}}/>} />
 				<StatView title={"Coins Attracted"} value={numFormatter(item?.attracted_coins, 1)} />
 				<StatView title={"Target Coins"} value={numFormatter(item?.target_coins, 1)} />
 				<StatView title={"Status"} value={statusView(item?.mission_status.replace(/_/gm, " "))} />

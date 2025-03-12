@@ -52,7 +52,7 @@ const AddPaymentRequest = ({ navigation, route }) => {
     template: null, title: "", status: statusList[0], currency: currencyList[1], product: null,
     programme: null, requestType: { title: "Onetime", key: "onetime", }, totalAmount: "", vat: "", note: "",
     initialAmount: "", installments: "", installmentAmount: "", planType: null,
-    noOfDays: ""
+    noOfDays: "", leadStatus:null, purchasingUser:null
   })
 
   const [optionModal, setOptionModal] = useState({
@@ -119,9 +119,9 @@ const AddPaymentRequest = ({ navigation, route }) => {
         // installmentAmount: !!data?.installment_amount ? data?.installment_amount : "",
         planType: !!data?.interval_type ? planTypeList.find(x => x.key == data?.interval_type) : "",
         noOfDays: !!data?.number_of_days ? data?.number_of_days : "",
-				load_status: !!data?.lead_status?.title ? data?.lead_status?.title : ""
+				leadStatus: !!data?.lead_status?.title ? data?.lead_status?.title : null,
+				purchasingUser: !!data?.consider_purchasing_user ? data?.consider_purchasing_user : null,
       }
-				console.log("here is the obj",obj)
       setSelected(obj);
     }
   }
@@ -497,16 +497,23 @@ const AddPaymentRequest = ({ navigation, route }) => {
                 label='VAT Number'
                 value={selected?.vat}
                 onChangeText={(text) => setSelected({ vat: text })} />
+
+						  
+						{!!selected?.leadStatus &&
+						  <MyInputs
+                label='Lead Status'
+                value={selected?.leadStatus}
+                onChangeText={(text) => setSelected({ leadStatus: text })} />
+						}
+
+						{!!selected?.purchasingUser &&
 						  <MyInputs
                 label='Consider Purchasing User As*'
-                value={selected.lead_status?.title}
+								capitalizeSentence={true}
+                value={selected?.purchasingUser[0].toUpperCase() + selected?.purchasingUser.slice(1, selected?.purchasingUser.length) + " Source Member"}
+                onChangeText={(text) => setSelected({ purchasingUser: text })} />
+						}
 
-                onChangeText={(text) => setSelected({ lead_status: {...lead_status, title:txt} })} />
-
-						  <MyInputs
-                label='Payment Mode'
-                value={selected?.vat}
-                onChangeText={(text) => setSelected({ vat: text })} />
             </View>
 
             <MyInputs

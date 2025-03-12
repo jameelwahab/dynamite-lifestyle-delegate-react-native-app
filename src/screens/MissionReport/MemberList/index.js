@@ -156,6 +156,8 @@ const MemberList = ({ navigation, route }) => {
         {/* <StatView title={"Badge Level"} value={item?.mission_info?.membership_level_info?.badge_level_info?.title} /> */}
         <StatView title={"Mission Title"} value={item?.mission_info?.title} original />
         <StatView title={"Duration"} value={item?.mission_duration + " days"} />
+        <StatView title={"Accept Time Badge"} value={<MyImage source={{uri: S3_URL + item?.accept_time_badge_details?.icon?.thumbnail_1 }} style={{width:17, height:17}}/>} />
+        <StatView title={"Current Badge"} value={<MyImage source={{uri: S3_URL + item?.current_badge_level?.icon?.thumbnail_1 }} style={{width:17, height:17}}/>} />
         <StatView title={"Coins Earned"} value={item?.mission_attracted_coins} />
         <StatView title={"Achievable Coins"} value={item?.mission_reward_coins} />
         <StatView title={"Start Date"} value={convertTimezone2(item?.mission_start_date, timezone).format(dateTimeFormat.date)} />
