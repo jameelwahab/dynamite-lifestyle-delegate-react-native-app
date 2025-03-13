@@ -94,7 +94,7 @@ console.log(route.params.filters,"filters")
 				/>
 
 				<MyTouchableInput
-					label='Filter Member by Badge Type*'
+					label='Filter Member by Badge Level*'
 					value={filter?.filter_member_title || ""}
 					icon={() => icons.down()}
 					onPress={optionBadgeType}
@@ -242,7 +242,7 @@ console.log(route.params.filters,"filters")
 							},
 							item: route.params.item
 						})}
-						else showToast({body: "Please Select the Badge Type"})
+						else showToast({body: "Please Select the Filter Member by Badge Type", title: "Filter Badege Level Not Selected" })
 						} }
 					/>
 
