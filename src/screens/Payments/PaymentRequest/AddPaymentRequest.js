@@ -290,7 +290,6 @@ const AddPaymentRequest = ({ navigation, route }) => {
         <View style={__styles.topView}>
           <TitleView
             title={!!editItem ? "Edit Payment Request" : "Add Payment Request"}
-            hideBackBottomButton
 
           />
           <View style={__styles.topBtnsView}>
