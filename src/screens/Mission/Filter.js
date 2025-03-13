@@ -23,9 +23,9 @@ import MyCheckBox from "../../components/MyCheckBox"
 
 const Filter = ({ route, navigation }) => {
 	const nav = useNavigation()
-	const ref = useRef(null);
-	const ref2 = useRef(null);
-	const ref3 = useRef(null);
+	const ref_status = useRef(null);
+	const ref_badges = useRef(null);
+	const ref_badge_type = useRef(null);
 	const ref_calendar = useRef(null)
 	const { access } = useSelector(selectUser);
 
@@ -38,9 +38,9 @@ console.log(route.params.filters,"filters")
 	const [filter, setFilter] = useState(route.params.filters)
   const [coins, setCoins] = useState( {from: route.params.filters?.coins_from || "0", to:  route.params.filters?.coins_to ||"0"})
 
-	const optionStatus = () => ref.current.openModal()
-	const optionStatus2 = () => ref2.current.openModal()
-	const optionStatus3 = () => ref3.current.openModal()
+	const optionStatus = () => ref_status.current.openModal()
+	const optionBadges = () => ref_badges.current.openModal()
+	const optionBadgeType = () => ref_badge_type.current.openModal()
 
 	const handleSelect = (item) => item.key != 'all' ? setFilter({ ...filter, mission_status: item.key, status: item.title }) : setFilter({...filter, mission_status: null, status:null })
 
@@ -97,12 +97,12 @@ console.log(route.params.filters,"filters")
 					label='Filter Member by Badge Type*'
 					value={filter?.filter_member_title || ""}
 					icon={() => icons.down()}
-					onPress={optionStatus3}
+					onPress={optionBadgeType}
 				/>
 
 				<MyTouchableInput
 					label={filter?.badge_type == "accept_time" && filter?.filter_member_title || "Current User Badge level" }
-					iconOnPress={optionStatus2}
+					iconOnPress={optionBadges}
 					view={() =>
 						<View style={{ flexDirection: "row", flex: 1, alignItems: "center", flexWrap: "wrap", paddingVertical: 2 }}>
 							{!!badges && badges?.length != 0 && badges?.map((el, index) =>
@@ -197,19 +197,19 @@ console.log(route.params.filters,"filters")
 				</Collapsible>
 
 				<OptionModal2
-					ref={ref}
+					ref={ref_status}
 					onSelected={handleSelect}
 					optionList={statusList}
 				/>
 
 				<OptionModal2
-					ref={ref2}
+					ref={ref_badges}
 					onSelected={handleSelect2}
 					filterTheList={filterList}
 				/>
 
 				<OptionModal2
-					ref={ref3}
+					ref={ref_badge_type}
 					onSelected={handleSelect3}
 					optionList={filterMember}
 				/>
