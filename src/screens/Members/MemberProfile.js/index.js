@@ -176,12 +176,12 @@ const MemberProfile = ({ navigation, route }) => {
             {icons.message(colors.white, 18)}
           </Pressable>}
 
-        {/* {access?.allow_to_send_sms &&
+        {access?.allow_to_send_sms &&
           <Pressable
             onPress={() => onSmsModal(memberId, token, navigation, user?._id)}
             style={[__styles.topBtn, { backgroundColor: "#366FB1" }]}>
             {icons.sms(colors.white, 18)}
-          </Pressable>} */}
+          </Pressable>}
       </View>
     )
   }

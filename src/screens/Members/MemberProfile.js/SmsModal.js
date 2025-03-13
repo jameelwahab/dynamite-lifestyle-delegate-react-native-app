@@ -27,10 +27,11 @@ const SmsModal = forwardRef(({ }, ref) => {
       onBackdropPress={closeModal}
       onBackButtonPress={closeModal}
       useNativeDriverForBackdrop={true}
-      animationIn="slideInRight"
-      animationOut="slideOutRight"
+      animationIn="zoomIn"
+      animationOut="zoomOut"
       animationInTiming={300}
       animationOutTiming={300}
+      avoidKeyboard={true}
       style={{ margin: 10 }}>
       <RootView hideHeader >
 
