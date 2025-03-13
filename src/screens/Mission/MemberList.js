@@ -161,7 +161,7 @@ const MemberList = ({ route, navigation }) => {
 					{!!filters?.badge_levels && filters?.badge_levels.length!=0  &&
 						<>
 									{!!filters.badge_type &&
-										<MyChip title={filters?.badge_type.replace(/_/g, " ")}
+										<MyChip title={filters?.badge_type == "accept_time" && "Accept Time" || filters?.badge_type == "current" && "Current"}
 												onPress={() => setFilters({ ...filters, badge_levels:null, badge_type: null, badges:null, filter_member_title:null })} />
 									}
 							{filters?.badges?.map((el, index) =>
