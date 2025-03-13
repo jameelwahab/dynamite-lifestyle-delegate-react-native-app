@@ -2,6 +2,7 @@ import { View } from "react-native"
 import MyInputs from '../../components/MyInputs'
 import RootView from "../../components/RootView"
 import MyChip from "../../components/MyChip"
+import showToast from "../../functions/showToast"
 import MyKeyboardAvoidingView from '../../components/MyKeyboardAvoidingView'
 import MyTouchableInput from '../../components/MyTouchableInput'
 import OptionModal2 from '../../components/OptionModal2'
@@ -24,6 +25,7 @@ const Filter = ({ route, navigation }) => {
 	const nav = useNavigation()
 	const ref = useRef(null);
 	const ref2 = useRef(null);
+	const ref3 = useRef(null);
 	const ref_calendar = useRef(null)
 	const { access } = useSelector(selectUser);
 
@@ -38,6 +40,7 @@ const Filter = ({ route, navigation }) => {
 
 	const optionStatus = () => ref.current.openModal()
 	const optionStatus2 = () => ref2.current.openModal()
+	const optionStatus3 = () => ref3.current.openModal()
 
 	const handleSelect = (item) => item.key != 'all' ? setFilter({ ...filter, mission_status: item.key, status: item.title }) : setFilter({...filter, mission_status: null, status:null })
 
@@ -45,6 +48,8 @@ const Filter = ({ route, navigation }) => {
 				if(badges.length != access.badge_levels.length) { 
 						setBadges(badges.length == 0 ? [item] : [...badges, item]) }
 	}
+
+	const handleSelect3 = (item) =>  setFilter({ ...filter, badge_type: item.key, filter_member_title: item.title });
 
 	const toUpper = (txt) => txt[0].toUpperCase() + txt.slice(1, txt.length)
 
@@ -61,6 +66,10 @@ const Filter = ({ route, navigation }) => {
 	useEffect(() => {
 		setFilter(route.params.filters)
 	}, [route])
+
+	useEffect(() => {
+		console.log(filter)
+	}, [filter])
 
 	const ListBadge = () => {
 		return (
@@ -85,7 +94,14 @@ const Filter = ({ route, navigation }) => {
 				/>
 
 				<MyTouchableInput
-					label='Badge Level'
+					label='Filter Member by Badge Type*'
+					value={filter?.filter_member_title || ""}
+					icon={() => icons.down()}
+					onPress={optionStatus3}
+				/>
+
+				<MyTouchableInput
+					label={filter?.badge_type == "accept_time" && filter?.filter_member_title || "Current User Badge level" }
 					iconOnPress={optionStatus2}
 					view={() =>
 						<View style={{ flexDirection: "row", flex: 1, alignItems: "center", flexWrap: "wrap", paddingVertical: 2 }}>
@@ -192,6 +208,12 @@ const Filter = ({ route, navigation }) => {
 					filterTheList={filterList}
 				/>
 
+				<OptionModal2
+					ref={ref3}
+					onSelected={handleSelect3}
+					optionList={filterMember}
+				/>
+
 				<View style={{ flexDirection: "row", marginTop: 10 }}>
 					<MyClearButton
 						style={{ flex: 1, marginRight: 10 }}
@@ -207,16 +229,21 @@ const Filter = ({ route, navigation }) => {
 					<MyButton
 						style={{ flex: 1 }}
 						title='Submit'
-						onPress={() => nav.navigate(routes.missionMemberList, {
-							filter: {
-								...filter,
-								badge_levels: [...badges.map(el => el._id)],
-								badges,
-								coins_from: showAttract ? coins.from:null,
-								coins_to: showAttract ? coins.to :null
+						onPress={() => {
+
+								if(filter?.badge_type){
+								nav.navigate(routes.missionMemberList, {
+										filter: {
+												...filter,
+												badge_levels: [...badges.map(el => el._id)],
+												badges,
+												coins_from: showAttract ? coins.from:null,
+												coins_to: showAttract ? coins.to :null
 							},
 							item: route.params.item
 						})}
+						else showToast({body: "Please Select the Badge Type"})
+						} }
 					/>
 
 				</View>
@@ -249,6 +276,17 @@ const statusList = [
 		title: "In Progress",
 		key: "in_progress",
 	}
+]
+
+const filterMember = [
+		{
+				title:"Member's Current Badge Level",
+				key:"current",
+		},
+		{
+				title:"Acceptance Time User Badge Level",
+				key:"accept_time",
+		}
 ]
 
 export default Filter

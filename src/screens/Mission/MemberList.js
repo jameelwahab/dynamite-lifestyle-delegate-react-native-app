@@ -148,11 +148,16 @@ const MemberList = ({ route, navigation }) => {
 						<MyChip title={`${filters?.mission_status == "in_progress" && "In Pogress" || filters?.mission_status == "completed" && "Completed"}`}
 							onPress={() => setFilters({ ...filters, mission_status: null, status: null })} />
 					}
-					{!!filters?.badge_levels &&
+					{!!filters?.badge_levels && filters?.badge_levels.length!=0  &&
 						<>
+									{!!filters.badge_type &&
+										<MyChip title={filters?.badge_type.replace(/_/g, " ")}
+												onPress={() => setFilters({ ...filters, badge_levels:null, badge_type: null, badges:null, filter_member_title:null })} />
+									}
 							{filters?.badges?.map((el, index) =>
-								<View style={{ flexWrap: "wrap", position: "relative", zIndex: 10 }} key={index}>
-									<MyChip title={el.title}
+									<MyChip
+												title={el.title}
+												key={index}
 										onPress={() => {
 											setFilters({
 												...filters, badge_levels:
@@ -161,7 +166,6 @@ const MemberList = ({ route, navigation }) => {
 													[...filters.badges.filter(val => val._id != el._id)]
 												})
 										}} />
-								</View>
 							)}
 						</>
 					}
