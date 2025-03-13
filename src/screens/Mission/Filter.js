@@ -30,7 +30,6 @@ const Filter = ({ route, navigation }) => {
 	const { access } = useSelector(selectUser);
 
 	const [status, setStatus] = useState({ title: statusList[0].title, key: statusList[0].key });
-console.log(route.params.filters,"filters")
 	const [showStart, setShowStart] = useState(!!route.params.filters?.from_start_date)
 	const [showEnd, setShowEnd] = useState(!!route.params.filters?.to_end_date)
 	const [showAttract, setShowAttract] = useState(!!route.params.filters?.coins_from)
