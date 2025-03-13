@@ -240,7 +240,6 @@ const MemberList = ({ route, navigation }) => {
 					customImage={item?.user_info?.profile_image}
 				/>
 				<View style={{ flexDirection: 'row', alignItems: "center", justifyContent: "space-between" }}>
-					<MyImage source={{ uri: S3_URL + item?.user_info?.membership_level_badge_info?.membership_level_badge_icon?.thumbnail_1 }} style={__styles.icon} />
 						{icons.forwardArrow()}
 				</View>
 			</View>
