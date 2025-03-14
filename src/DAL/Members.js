@@ -276,21 +276,21 @@ export const UPDATE_CALL_FUNCTIONALITY = ({ token, navigation, body: {
   })
 }
 
-export const MEMBER_MISSION_QUEST = ({ token, navigation, member_id }) =>invokeApi({
-    path: `api/member/get/member_missions_and_quests`,
-    method: "POST",
-    token,
-    navigation,
-    postData:{ member_id }
-  })
+export const MEMBER_MISSION_QUEST = ({ token, navigation, member_id }) => invokeApi({
+  path: `api/member/get/member_missions_and_quests`,
+  method: "POST",
+  token,
+  navigation,
+  postData: { member_id }
+})
 
-export const MEMBER_SMS_SYSTEM = ({token, navigation, msg, to})=> invokeApi({
-		path: "api/consultant/send_sms_to_member",
-		method:"POST",
-		token,
-		navigation,
-		postData:{
-				body:msg,
-				to,
-		}
+export const MEMBER_SMS_SYSTEM = ({ token, navigation, msg, to }) => invokeApi({
+  path: "api/consultant/send_sms_to_member",
+  method: "POST",
+  token,
+  navigation,
+  postData: {
+    body: msg,
+    to,
+  }
 })
