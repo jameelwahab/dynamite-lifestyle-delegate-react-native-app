@@ -14,7 +14,7 @@ const downloadImage = async (url) => {
     let picName = url.split("/").pop();
     let options = {
       fileCache: true,
-      appendExt: picName = url.split(".").pop(),
+      appendExt: url.split(".").pop(),
       addAndroidDownloads: {
         useDownloadManager: true,
         notification: true,
@@ -22,10 +22,13 @@ const downloadImage = async (url) => {
         description: 'downloading_file'
       }
     };
+
+    console.log(options,"options")
     await config(options)
       .fetch('GET', url)
       .then(async res => {
         if (!!res.path()) {
+          console.log(res,"res")
           if (Platform.OS == "android") {
             await saveImage(res.path())
           } else {
