@@ -337,9 +337,9 @@ const MessageList = ({ navigation, route }) => {
       if (item.message_type == "image" && !!item?.image) {
         options = [...msgOptionList];
         if (!!item?.message == false) {
-          options = options.slice().filter(x => x.type != 'copy');
-        }
-      }
+          options = options.slice().filter(x => x.type != 'download' && x.type != "copy");
+        } 
+			}
       else if (item.message_type == "audio") {
         options = msgOptionList.slice().filter(x => x.type == 'delete' || x.type == 'note'  || x.type=="download");
       } else {
