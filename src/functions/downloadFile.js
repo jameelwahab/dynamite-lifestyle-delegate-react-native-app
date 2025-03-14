@@ -13,7 +13,7 @@ const downloadFile = async (url, path) => {
     ext = "." + ext[0];
     const config = ReactNativeBlobUtil.config;
     const fs = ReactNativeBlobUtil.fs;
-    let DownloadDir = fs.dirs.DownloadDir;
+    let DownloadDir = fs.dirs.CacheDir;
     let options = {
       fileCache: true,
       addAndroidDownloads: {
@@ -25,7 +25,24 @@ const downloadFile = async (url, path) => {
     }
 
     await config(options).fetch('GET', url).then(async (res) => {
-      showToast({ title: "Downloaded", body: "File downloaded", type: "success" });
+
+      try {
+
+
+        let info = await ReactNativeBlobUtil.fs.stat(res.path());
+        let result = await ReactNativeBlobUtil.MediaCollection.copyToMediaStore({
+          name: path + "." + ext, // name of the file
+          parentFolder: path + "." + ext,
+          mimeType: info.type
+        },
+          'Download', // Media Collection to store the file in ("Audio" | "Image" | "Video" | "Download")
+          res.path()// Path to the file being copied in the apps own storage
+        );
+        showToast({ title: "Downloaded", body: "File downloaded", type: "success" });
+      } catch (error) {
+        alert("error in dowload!")
+      }
+
     }).catch((errorMessage, statusCode) => {
 
       alert("error in dowload!")
