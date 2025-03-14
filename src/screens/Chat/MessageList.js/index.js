@@ -31,6 +31,7 @@ import copyText from '../../../functions/copyText';
 import TrackPlayer from 'react-native-track-player'
 import routes from '../../../navigation/routes';
 import showToast from '../../../functions/showToast';
+import downloadFile from '../../../functions/downloadFile';
 
 let mlpage = 0;
 let mlcanLoadMore = false;
@@ -246,7 +247,7 @@ const MessageList = ({ navigation, route }) => {
 
   //? /////// ACTIONS
 
-  const optionAction = (opt) => {
+  const optionAction = async (opt) => {
     console.log(opt, "msgAction")
     let item = opitonModal.item
     console.log(item, "msgAction")
@@ -271,7 +272,9 @@ const MessageList = ({ navigation, route }) => {
       api_addAdNote(item?._id);
     } else if (opt.type == 'unread') {
       unReadMessage(item?._id);
-    }
+    } else if(opt.type == "download"){
+				await downloadFile(S3_URL + item.audio_url, "Audio/" + item.audio_url.split('/')[1].split('.')[0],"Audio have saved successfully")
+		}
   }
 
   const closeConfirmation = () => {
@@ -321,6 +324,15 @@ const MessageList = ({ navigation, route }) => {
         icon: () => icons.unread(colors.primary),
         type: "unread"
       })
+
+		 if(item.message_type=="audio") {
+      options.push({
+        title: "Download",
+        icon: () => icons.download(),
+        type: "download"
+      })
+		}
+
     } else {
       if (item.message_type == "image" && !!item?.image) {
         options = [...msgOptionList];
@@ -329,7 +341,7 @@ const MessageList = ({ navigation, route }) => {
         }
       }
       else if (item.message_type == "audio") {
-        options = msgOptionList.slice().filter(x => x.type == 'delete' || x.type == 'note');
+        options = msgOptionList.slice().filter(x => x.type == 'delete' || x.type == 'note'  || x.type=="download");
       } else {
         options = msgOptionList.slice().filter(x => x.type != 'download');
 
@@ -512,6 +524,11 @@ const msgOptionList = [
     title: "Delete",
     type: "delete"
   },
+		{
+    icon: icons.download,
+    title: "Download",
+    type: "download"
+  }
 
 ]
 

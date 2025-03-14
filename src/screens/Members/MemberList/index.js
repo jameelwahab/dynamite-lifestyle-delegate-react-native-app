@@ -127,6 +127,7 @@ const MemberList = ({ navigation, route }) => {
       }  else if (opt?.key == "profile") {
       navigation.navigate(routes.memberProfile, {
         memberId: item?._id,
+				contactNumber: item?.contact_number
       })
     } else if (opt?.key == "update_call") {
       setTimeout(() => {

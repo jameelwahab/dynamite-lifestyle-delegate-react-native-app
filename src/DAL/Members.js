@@ -284,3 +284,13 @@ export const MEMBER_MISSION_QUEST = ({ token, navigation, member_id }) =>invokeA
     postData:{ member_id }
   })
 
+export const MEMBER_SMS_SYSTEM = ({token, navigation, msg, to})=> invokeApi({
+		path: "api/consultant/send_sms_to_member",
+		method:"POST",
+		token,
+		navigation,
+		postData:{
+				body:msg,
+				to,
+		}
+})

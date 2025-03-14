@@ -8,7 +8,9 @@ import MyRefreshControl from "../../components/MyRefreshControl"
 import MyLoader from "../../components/MyLoader"
 import MemberView from '../../components/MemberView'
 import StatView from '../../components/StatView'
+import ImgAndTxt from '../../components/ImgAndTxt'
 import SearchView from "../../components/SearchView"
+import StatusView from "../../components/StatusView"
 import { StyleSheet, View, TouchableOpacity, FlatList, Keyboard, Pressable} from "react-native"
 import { GET_MISSION_MEMBER_LIST } from "../../DAL"
 import EmptyView from "../../components/EmptyView"
@@ -144,15 +146,28 @@ const MemberList = ({ route, navigation }) => {
 		return (
 			<View style={__styles.topViewBg} >
 				<View style={__styles.filterChipsView} >
+						{
+						  (  (filters?.mission_status && filters.mission_status) ||
+								(!!filters?.badge_levels && filters?.badge_levels.length!=0) ||
+								(filters?.from_start_date && filters.to_start_date) ||
+								(filters?.from_end_date && filters.to_end_date) ||
+								(filters?.coins_from && filters.coins_to) ) &&
+								<MyText>Filter by: </MyText>
+						}
 					{filters?.mission_status && filters.mission_status &&
 						<MyChip title={`${filters?.mission_status == "in_progress" && "In Pogress" || filters?.mission_status == "completed" && "Completed"}`}
 							onPress={() => setFilters({ ...filters, mission_status: null, status: null })} />
 					}
-					{!!filters?.badge_levels &&
+					{!!filters?.badge_levels && filters?.badge_levels.length!=0  &&
 						<>
+									{!!filters.badge_type &&
+										<MyChip title={filters?.badge_type == "accept_time" && "Accept Time" || filters?.badge_type == "current" && "Current"}
+												onPress={() => setFilters({ ...filters, badge_levels:null, badge_type: null, badges:null, filter_member_title:null })} />
+									}
 							{filters?.badges?.map((el, index) =>
-								<View style={{ flexWrap: "wrap", position: "relative", zIndex: 10 }} key={index}>
-									<MyChip title={el.title}
+									<MyChip
+												title={el.title}
+												key={index}
 										onPress={() => {
 											setFilters({
 												...filters, badge_levels:
@@ -161,7 +176,6 @@ const MemberList = ({ route, navigation }) => {
 													[...filters.badges.filter(val => val._id != el._id)]
 												})
 										}} />
-								</View>
 							)}
 						</>
 					}
@@ -179,6 +193,18 @@ const MemberList = ({ route, navigation }) => {
 						<MyChip title={`Coins Attract from ${filters?.coins_from} to ${filters?.coins_to}`}
 							onPress={() => setFilters({ ...filters, coins_from: null, coins_to: null })} />
 					}
+				{
+						  (  (filters?.mission_status && filters.mission_status) ||
+								(!!filters?.badge_levels && filters?.badge_levels.length!=0) ||
+								(filters?.from_start_date && filters.to_start_date) ||
+								(filters?.from_end_date && filters.to_end_date) ||
+								(filters?.coins_from && filters.coins_to) ) &&
+								<TouchableOpacity
+												onPress={() => setFilters({})}
+										style={{ marginLeft: 5, marginTop: 5, marginRight: 10, borderWidth: 1, borderColor: colors.primary, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 5, backgroundColor: colors.primary + "33" }}>
+								<MyText color={colors.primary}>{"Clear Filter"}</MyText>
+            </TouchableOpacity>
+						}
 				</View>
 				{/* search engine */}
 				<View>
@@ -195,22 +221,13 @@ const MemberList = ({ route, navigation }) => {
 
   const memberListView = ({ item, index }) => {
 
-		const statusView = (value) => {
-				return (
-						<View style={{ backgroundColor: value == "completed" ? colors.green + "33" : colors.delete + "33", paddingHorizontal: 10, paddingVertical: 2, alignSelf: "flex-start", borderRadius: 10 }}>
-								<MyText type='medium' capitalize color={value == "completed" ? colors.green : colors.delete} >
-										{value}
-								</MyText>
-						</View>
-				) }
-
-  const onMissionList = () => {
-    navigation.navigate(routes.missionReportScreen, {
-      missionId: item?.mission_info?._id,
-      memberId: item?.user_info?._id,
-      type: route.params.item?.type,
-    })
-  }
+		  const onMissionList = () => {
+				navigation.navigate(routes.missionReportScreen, {
+				missionId: item?.mission_info?._id,
+				memberId: item?.user_info?._id,
+				type: route.params.item?.type,
+				} )
+		}
 
 	return (
 		<Pressable
@@ -223,7 +240,6 @@ const MemberList = ({ route, navigation }) => {
 					customImage={item?.user_info?.profile_image}
 				/>
 				<View style={{ flexDirection: 'row', alignItems: "center", justifyContent: "space-between" }}>
-					<MyImage source={{ uri: S3_URL + item?.user_info?.membership_level_badge_info?.membership_level_badge_icon?.thumbnail_1 }} style={__styles.icon} />
 						{icons.forwardArrow()}
 				</View>
 			</View>
@@ -232,9 +248,15 @@ const MemberList = ({ route, navigation }) => {
 				<StatView title={"Start Date"} value={moment(item?.mission_start_date).format(dateTimeFormat.dateTime.split(' ')[0])} />
 			{route?.params?.item?.type=="quest" && <StatView title={"End Date"} value={moment(item?.mission_end_date).format(dateTimeFormat.dateTime.split(' ')[0] )} />}
 			{route?.params?.item?.type=="mission" && <StatView title={"Completed Days"} value={item?.completed_mission_days} />}
+        <StatView title={"Accept Time Badge"} view={()=> <ImgAndTxt img={item?.accept_time_badge_details?.icon?.thumbnail_1} txt={item?.accept_time_badge_details?.title} />} />
+        <StatView title={"Current Badge"} view={()=> <ImgAndTxt img={item?.current_badge_level?.icon?.thumbnail_1} txt={item?.current_badge_level?.title} /> } />
 				<StatView title={"Coins Attracted"} value={numFormatter(item?.attracted_coins, 1)} />
 				<StatView title={"Target Coins"} value={numFormatter(item?.target_coins, 1)} />
-				<StatView title={"Status"} value={statusView(item?.mission_status.replace(/_/gm, " "))} />
+				<StatView title={"Status"} view={()=><StatusView
+						bgColor={item?.mission_status == "completed" ? colors.green + "33" : colors.delete + "33"}
+						txtColor={item?.mission_status == "completed" ? colors.green : colors.delete}
+						value={item?.mission_status.replace(/_/gm, " ")} />}
+				/>
 			</View>
 		</Pressable>
 	)
@@ -270,6 +292,7 @@ const __styles = StyleSheet.create({
 	filterChipsView: {
 		flexDirection: "row",
 		flexWrap: "wrap",
+		alignItems:"center",
 	},
 	topViewBg: {
 		backgroundColor: colors.darkSecondary,

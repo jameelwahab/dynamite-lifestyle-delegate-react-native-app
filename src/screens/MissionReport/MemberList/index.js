@@ -9,6 +9,7 @@ import MyLoader from '../../../components/MyLoader'
 import { colors } from '../../../utilities/colors'
 import MemberView from '../../../components/MemberView'
 import EmptyView from '../../../components/EmptyView'
+import MyText from '../../../components/MyText'
 import MyRefreshControl from '../../../components/MyRefreshControl'
 import routes from '../../../navigation/routes'
 import TitleView from '../../../components/TitleView'
@@ -22,6 +23,7 @@ import { selectTimeZone } from '../../../redux/reducers/timezoneSlice'
 import { dateTimeFormat, S3_URL } from '../../../utilities/constants'
 import MyChip from "../../../components/MyChip"
 import MyImage from '../../../components/MyImage'
+import ImgAndTxt from '../../../components/ImgAndTxt'
 import StatView from '../../../components/StatView'
 
 
@@ -145,17 +147,18 @@ const MemberList = ({ navigation, route }) => {
               borderColor={item?.member?.membership_level_badge_info?.membership_level_badge_color_code}
             />
           </Flex>
-
-          <MyImage
-            source={{ uri: S3_URL + item?.member?.membership_level_badge_info?.membership_level_badge_icon?.thumbnail_1 }}
-            style={{ height: 20, width: 20, marginHorizontal: 5 }}
-            resizeMode="contain"
-          />
           {icons.forwardArrow()}
         </Row>
         {/* <StatView title={"Badge Level"} value={item?.mission_info?.membership_level_info?.badge_level_info?.title} /> */}
         <StatView title={"Mission Title"} value={item?.mission_info?.title} original />
         <StatView title={"Duration"} value={item?.mission_duration + " days"} />
+
+        <StatView title={"Accept Time Badge"} view={()=> 
+						<ImgAndTxt img={item?.accept_time_badge_details?.icon?.thumbnail_1} txt={item?.accept_time_badge_details?.title}/>
+				}/> 
+
+        <StatView title={"Current Badge"} view={()=> <ImgAndTxt img={item?.current_badge_level?.icon?.thumbnail_1} txt={item?.current_badge_level?.title} />}/> 
+
         <StatView title={"Coins Earned"} value={item?.mission_attracted_coins} />
         <StatView title={"Achievable Coins"} value={item?.mission_reward_coins} />
         <StatView title={"Start Date"} value={convertTimezone2(item?.mission_start_date, timezone).format(dateTimeFormat.date)} />
