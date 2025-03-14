@@ -229,7 +229,7 @@ const Filter = ({ route, navigation }) => {
 						style={{ flex: 1 }}
 						title='Submit'
 						onPress={() => {
-								if( (!!filter.badge_type && badges.length ==0) || (badges.length!=0 && !!filter.badge_type==false)  ){
+								if( (!!filter?.badge_type && badges.length ==0) || (badges.length!=0 && !!filter?.badge_type==false)  ){
 										showToast({body: "Please Select the Filter Member by Badge Type", title: "Filter Badege Level Not Selected" })
 								} else{
 								nav.navigate(routes.missionMemberList, {
