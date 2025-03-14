@@ -52,7 +52,7 @@ const AddPaymentRequest = ({ navigation, route }) => {
     template: null, title: "", status: statusList[0], currency: currencyList[1], product: null,
     programme: null, requestType: { title: "Onetime", key: "onetime", }, totalAmount: "", vat: "", note: "",
     initialAmount: "", installments: "", installmentAmount: "", planType: null,
-    noOfDays: ""
+    noOfDays: "", leadStatus:null, purchasingUser:null
   })
 
   const [optionModal, setOptionModal] = useState({
@@ -118,7 +118,9 @@ const AddPaymentRequest = ({ navigation, route }) => {
         installments: !!data?.no_of_installment ? data?.no_of_installment : "",
         // installmentAmount: !!data?.installment_amount ? data?.installment_amount : "",
         planType: !!data?.interval_type ? planTypeList.find(x => x.key == data?.interval_type) : "",
-        noOfDays: !!data?.number_of_days ? data?.number_of_days : ""
+        noOfDays: !!data?.number_of_days ? data?.number_of_days : "",
+				leadStatus: !!data?.lead_status?.title ? data?.lead_status?.title : null,
+				purchasingUser: !!data?.consider_purchasing_user ? data?.consider_purchasing_user : null,
       }
       setSelected(obj);
     }
@@ -288,7 +290,6 @@ const AddPaymentRequest = ({ navigation, route }) => {
         <View style={__styles.topView}>
           <TitleView
             title={!!editItem ? "Edit Payment Request" : "Add Payment Request"}
-            hideBackBottomButton
 
           />
           <View style={__styles.topBtnsView}>
@@ -495,6 +496,23 @@ const AddPaymentRequest = ({ navigation, route }) => {
                 label='VAT Number'
                 value={selected?.vat}
                 onChangeText={(text) => setSelected({ vat: text })} />
+
+						  
+						{!!selected?.leadStatus &&
+						  <MyInputs
+                label='Lead Status'
+                value={selected?.leadStatus}
+                onChangeText={(text) => setSelected({ leadStatus: text })} />
+						}
+
+						{!!selected?.purchasingUser &&
+						  <MyInputs
+                label='Consider Purchasing User As*'
+								capitalizeSentence={true}
+                value={selected?.purchasingUser[0].toUpperCase() + selected?.purchasingUser.slice(1, selected?.purchasingUser.length) + " Source Member"}
+                onChangeText={(text) => setSelected({ purchasingUser: text })} />
+						}
+
             </View>
 
             <MyInputs

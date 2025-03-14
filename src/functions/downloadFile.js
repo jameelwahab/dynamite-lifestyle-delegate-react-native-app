@@ -2,7 +2,7 @@ import { View, Text } from 'react-native'
 import React from 'react'
 import ReactNativeBlobUtil from "react-native-blob-util"
 import showToast from './showToast';
-const downloadFile = async (url, path) => {
+const downloadFile = async (url, path, bodyTitle) => {
 
 
 
@@ -38,7 +38,7 @@ const downloadFile = async (url, path) => {
           'Download', // Media Collection to store the file in ("Audio" | "Image" | "Video" | "Download")
           res.path()// Path to the file being copied in the apps own storage
         );
-        showToast({ title: "Downloaded", body: "File downloaded", type: "success" });
+        showToast({ title: "Downloaded", body: bodyTitle || "File downloaded", type: "success" });
       } catch (error) {
         alert("error in dowload!")
       }
@@ -67,11 +67,11 @@ const downloadFile = async (url, path) => {
     await config(options).fetch('GET', url).then(async (res) => {
 
 
-      showToast({ title: "Downloaded", body: "Recources downloaded", type: "success" });
+      showToast({ title: "Downloaded", body: bodyTitle || "Recources downloaded", type: "success" });
 
     }).catch((errorMessage,) => {
 
-
+      alert("error in dowload!")
 
     });
 

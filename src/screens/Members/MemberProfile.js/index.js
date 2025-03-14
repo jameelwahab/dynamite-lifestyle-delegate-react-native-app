@@ -47,7 +47,6 @@ const MemberProfile = ({ navigation, route }) => {
     let res = await MEMBER_PROFILE({ token, navigation, memberId: memberId, startDate: sDATE, endDate: eDATE })
     if (res.code == 200) {
 
-
       //? make Calendar data
       let startDate = moment(selectedDate, "YYYY-MM-DD").startOf(ttype);
       let endDate = moment(selectedDate, "YYYY-MM-DD").endOf(ttype)
@@ -145,9 +144,9 @@ const MemberProfile = ({ navigation, route }) => {
     geMemberDataFromServer(date, ntype);
   }
 
-  const onSmsModal = ()=>{
-    console.log(ref_sms?.current,"ref")
-    ref_sms?.current?.openModal()
+  const onSmsModal = (token, navigation)=>{
+
+    ref_sms?.current?.openModal({ token, navigation, user: member?.member?.contact_number})
   }
 
   useEffect(() => {
@@ -176,12 +175,12 @@ const MemberProfile = ({ navigation, route }) => {
             {icons.message(colors.white, 18)}
           </Pressable>}
 
-        {/* {access?.allow_to_send_sms &&
+        {access?.allow_to_send_sms &&
           <Pressable
-            onPress={() => onSmsModal(memberId, token, navigation, user?._id)}
+            onPress={() => onSmsModal( token, navigation )}
             style={[__styles.topBtn, { backgroundColor: "#366FB1" }]}>
             {icons.sms(colors.white, 18)}
-          </Pressable>} */}
+          </Pressable>}
       </View>
     )
   }

@@ -10,11 +10,13 @@ import { MenuButton } from '../../../../components/MyButton'
 import MemberView from '../../../../components/MemberView'
 import moment from 'moment'
 import { dateTimeFormat } from '../../../../utilities/constants'
+import StatusView from "../../../../components/StatusView"
 
 
 
 
 const RequestView = ({ item, index, openOptionModal, onDetail }) => {
+		console.log("here is the lead status", item?.payment_template?.lead_status)
   return (
     <View style={__styles.itemRootView}>
       <View style={__styles.profileView}>
@@ -36,6 +38,14 @@ const RequestView = ({ item, index, openOptionModal, onDetail }) => {
         <StatView title={"Initial Amount"} value={prependCurency(item?.currency) + " " + item?.initial_amount} />
         <StatView title={"Installment Amount"} value={prependCurency(item?.currency) + " " + item?.installment_amount} />
         <StatView title={"Month"} value={item?.month} />
+        <StatView title={"Consider Purchasing User"} value={item?.consider_purchasing_user || "N/A"} />
+				<StatView
+						title={"Lead Status"}
+						view={()=> !!item?.payment_template?.lead_status ? <StatusView
+														bgColor={item?.payment_template?.lead_status?.background_color}
+														value={item?.payment_template?.lead_status?.title}
+												/> : 
+								<MyText fontSize={12} type='medium' >N/A</MyText> } />
         <StatView title={"First Paid"} view={() => <PaidView value={item?.is_first_paid} text={item?.payment_status == "cancelled" ? `Cancelled on ${moment(item?.cancel_date).format(dateTimeFormat.date)}` : item?.is_first_paid ? `PAID on ${moment(item?.subscription_date).format(dateTimeFormat.date)} ` : item?.payment_status == "processing" ? "PROCESSING" : "PENDING"} />} />
         <StatView title={"Status"} view={() => <PaidView value={item?.status} text={item?.status ? "ACTIVE" : "INACTIVE"} />} />
       </View>
