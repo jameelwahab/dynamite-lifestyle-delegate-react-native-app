@@ -21,12 +21,12 @@ const SmsModal = forwardRef(({ }, ref) => {
   }
   
   const sendSMS = async () => {
-			// setLoading(true)
-			// const res = await MEMBER_SMS_SYSTEM({token: data.token,navigation: data.nav, msg:val, to:"+"+data.to })
-			// if(res.code==200){
-			// 	setLoading(false)
-			// }else setLoading(false)
-			//
+			setLoading(true)
+			const res = await MEMBER_SMS_SYSTEM({token: data.token,navigation: data.nav, msg:val, to:"+"+data.to })
+			if(res.code==200){
+				setLoading(false)
+			}else setLoading(false)
+
 			setData({})
 			setVal("")
 			closeModal()
