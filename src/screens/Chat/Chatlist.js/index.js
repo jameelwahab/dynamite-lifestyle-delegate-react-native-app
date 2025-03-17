@@ -452,7 +452,7 @@ const ChatList = ({ navigation }) => {
         onPress={() => onChatScreen(member, item)}
         underlayColor={colors.secondary}>
         <View style={__style.itemRootView}>
-          <View>
+          <View style={{height:40}}>
             <UserImage
               borderWidth={2}
               borderColor={member?.badge_info?.color_code}
@@ -467,11 +467,11 @@ const ChatList = ({ navigation }) => {
           <View style={__style.seondViewRow}>
             <View style={__style.headerView}>
               <View style={{ flex: 1 }}>
-                <MyText fontSize={14} type='medium' >{member?.first_name + " " + member?.last_name}</MyText>
+                <MyText fontSize={14} type='medium'  >{member?.first_name + " " + member?.last_name}</MyText>
               </View>
               <MyText fontSize={10} color={colors.lightText} >{convertTimezone(item?.last_message_date_time, timezone).format(dateTimeFormat.dateTime)}</MyText>
             </View>
-            <View style={{ marginTop: 3, flexDirection: "row", alignItems: "center" }}>
+            <View style={__style.msg_view}>
 
               {item?.last_message_sender == user?._id &&
                 <View style={{ marginRight: 5 }}>
@@ -481,13 +481,13 @@ const ChatList = ({ navigation }) => {
                 </View>}
 
               {item.message_type != "general" &&
-                <View style={{ marginRight: 5 }}>
+                <View style={{ marginRight: 5,  }}>
                   {item.message_type == "image" ? icons.camera(colors.white, 12) :
                     item.message_type == "audio" ? icons.mic(colors.white, 15) :
                       item.message_type == "video" ? icons.playCircle(colors.white, 18) : ""}
                 </View>
               }
-              <View style={{ flexDirection: "row", flex: 1, height: 18 }}>
+              <View style={{ flexDirection: "row", flex: 1, height: 20 }}>
                 <MyText fontSize={12} type='light' numberOfLines={1} style={{ marginTop: 3, flex: 1 }}>
                   {!!item?.last_message ?
                     isHtml(item?.last_message) ?
@@ -588,7 +588,6 @@ const __style = StyleSheet.create({
     flexDirection: "row",
     paddingVertical: 20,
     paddingHorizontal: 10,
-
   },
   headerView: {
     flexDirection: "row",
@@ -601,8 +600,10 @@ const __style = StyleSheet.create({
     marginLeft: 13
 
   },
-  nameAndMsgView: {
-
+  msg_view: {
+		 marginTop:5,
+		 flexDirection: "row",
+		 alignItems: "center",
   },
   tabsView: {
     flexDirection: "row",
