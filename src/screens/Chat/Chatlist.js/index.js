@@ -27,6 +27,7 @@ import { selectSocket } from '../../../redux/reducers/socketSlice'
 import { convertTimezone } from '../../../functions/convertTime'
 import { selectTimeZone } from '../../../redux/reducers/timezoneSlice'
 import MyInputs from '../../../components/MyInputs'
+import convertMarkdownIntoSimpleText from '../../../functions/convertMarkdownIntoSimpleText'
 
 
 let clpage = 0;
@@ -480,24 +481,25 @@ const ChatList = ({ navigation }) => {
                     icons.seen(item?.last_message_status == "read" ? colors.primary : colors.white, 20)}
                 </View>}
 
-              {item.message_type != "general" &&
+              {item?.message_type != "general" &&
                 <View style={{ marginRight: 5,  }}>
                   {item.message_type == "image" ? icons.camera(colors.white, 12) :
                     item.message_type == "audio" ? icons.mic(colors.white, 15) :
                       item.message_type == "video" ? icons.playCircle(colors.white, 18) : ""}
                 </View>
               }
-              <View style={{ flexDirection: "row", flex: 1, height: 20 }}>
+              <View style={{ flexDirection: "row", flex: 1}}>
                 <MyText fontSize={12} type='light' numberOfLines={1} style={{ marginTop: 3, flex: 1 }}>
                   {!!item?.last_message ?
                     isHtml(item?.last_message) ?
-                      decode(item.last_message.replace(/<[^>]+>/g, '').replace(/\*/g, "").replace(/[\])}[{(]/g, " ").slice(0, 70), { level: "html5" }) :
-                      <Markdown style={markdownStyleOther}>
-                        {item?.last_message.replace(/\n/g, "").slice(0, 100)}
-                      </Markdown> :
-                    item.message_type == "image" ? "Photo" :
-                      item.message_type == 'audio' ? "Audio" :
-                        item.message_type == 'video' ? "Video" : ""}
+                      decode(item?.last_message.replace(/<[^>]+>/g, '').replace(/\*/g, "").replace(/[\])}[{(]/g, " ").slice(0, 70), { level: "html5" }) :
+                      convertMarkdownIntoSimpleText(item.last_message):
+                      // <Markdown style={markdownStyleOther}>
+                      //   {item?.last_message.replace(/\n/g, "").slice(0, 100)}
+                      // </Markdown> :
+                    item?.message_type == "image" ? "Photo" :
+                      item?.message_type == 'audio' ? "Audio" :
+                        item?.message_type == 'video' ? "Video" : ""}
 
                 </MyText>
                 {otherUser?.unread_message_count > 0 &&
@@ -601,7 +603,7 @@ const __style = StyleSheet.create({
 
   },
   msg_view: {
-		 marginTop:5,
+		 marginTop:3,
 		 flexDirection: "row",
 		 alignItems: "center",
   },
