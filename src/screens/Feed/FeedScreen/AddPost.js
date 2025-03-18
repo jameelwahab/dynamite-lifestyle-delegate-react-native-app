@@ -7,6 +7,7 @@ import MyText from '../../../components/MyText'
 import { icons } from '../../../utilities/icons'
 import { fonts } from '../../../utilities/fonts'
 import MyInputs from '../../../components/MyInputs'
+import OptionModal2 from '../../../components/OptionModal2'
 import { MyButton } from '../../../components/MyButton'
 import ImageUploadModal from '../../../components/ImageUploadModal'
 import utilities from '../../../utilities'
@@ -36,6 +37,7 @@ import PollView from './PollView'
 import { convertTimezoneToRegion } from '../../../functions/convertTime'
 import OptionModalWithSearch from '../../../components/OptionModalWithSearch'
 import SurveyView from './SurveyView'
+import { selectUser } from '../../../redux/reducers/userSlice'
 
 
 
@@ -61,10 +63,12 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
 }, ref) => {
 
+	const { access } = useSelector(selectUser);
   const { height, width } = useWindowDimensions();
   const inset = useSafeAreaInsets();
   const ref_poll = useRef()
   const ref_survey = useRef()
+  const ref_badges = useRef()
 
   const { socket } = useSelector(selectSocket);
   const lvlModalRef = useRef()
@@ -75,6 +79,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   const [memberModalVisibilty, setMemberModalVisibilty] = useState(false);
   const [feedTypeModalVisibility, setFeedTypeModalVisibility] = useState(false)
   const [memberList, setMemberList] = useState([])
+  const [badge, setBadge] =useState({title:"All", key:"all"})
   const [options, setOption] = useState({
     list: [],
     type: "",
@@ -115,8 +120,8 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   const [pollData, setPollData] = useState(null);
   const [surveyData, setSurveyData] = useState(null);
 
-  useEffect(() => {
 
+  useEffect(() => {
     let text = postText;
     if (text[cursor?.start] == "@" || text == "@") {
       // let _at_index = !!cursor?.start ? cursor?.start : 0;
@@ -375,7 +380,15 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
         visibility: true,
         type: Modalfor
       })
-    } else if (Modalfor == "createdFor") {
+    }
+			else if (Modalfor == "badges") {
+      setOption({
+					list: [{title:"All", key:"all"}, ...access?.badge_levels],
+        visibility: true,
+        type: Modalfor
+      })
+    }
+			else if (Modalfor == "createdFor") {
       let arr = [];
       if (isCosmos) {
         cosmosLevelList.forEach((x) => {
@@ -410,7 +423,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
       setPostCategory(opt.type)
     } else if (options?.type == "createdFor") {
       setPostCreatedFor(opt.type)
-    }
+    } else if(options?.type == "badges") setBadge(opt)
 
     closeOptionModal()
   }
@@ -590,6 +603,9 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
       }
     }
 
+		if(!isCosmos && !isNoteMainFeed && !editId){
+				fd.append("show_feed_to", badge.key)
+		}
 
     if (!!pollData) {
       if (postType == "poll") {
@@ -822,6 +838,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
       setTextColor(colors.white);
       setButtonAlignment("center");
     }
+
     return (
       <Modal
         isVisible={eventModalVisible}
@@ -1049,6 +1066,21 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                 {/* //* Dropdown btns */}
                 <View style={{ marginLeft: 10, flex: 1 }}>
                   <MyText fontSize={16} type="bold">{user?.first_name + " " + user?.last_name}</MyText>
+										{(!isCosmos && !isNoteMainFeed && !editId ) &&
+												<View style={{flexDirection:"row", alignItems:"center", marginTop:5}}>
+														<TouchableOpacity
+																style={__style.modalDropBtns}>
+																<MyText>{"Publish"}</MyText>
+														</TouchableOpacity>
+
+														<TouchableOpacity
+																onPress={()=> openOptionModal("badges")}
+																style={__style.modalDropBtns}>
+																<MyText style={{marginRight:5}}>{badge.title}</MyText>
+																{icons.downwardArrow(17, colors.white)}
+														</TouchableOpacity>
+												</View>
+										}
                   <View style={__style.modalActionButtonRow}>
 
                     {/* <TouchableOpacity
