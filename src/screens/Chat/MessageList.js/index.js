@@ -253,7 +253,6 @@ const MessageList = ({ navigation, route }) => {
     console.log(item, "msgAction")
     setOptionModal({ ...opitonModal, opt: opt.type, item: null, isVisible: false, })
 
-
     if (opt.type == 'delete') {
       setTimeout(() => {
         setConfirmation({ isVisible: true, title: "Are you sure you want to delete this message?", item, type: "delete_msg" });
@@ -401,9 +400,19 @@ const MessageList = ({ navigation, route }) => {
   }
 
 
+	const	borderLine = ()=>{
+				return (
+						<View style={{flexDirection:"row", alignItems:"center", justifyContent:"center", marginTop:10}}>
+						<View style={{flex:1, borderWidth:0.5, borderColor: colors.primary}}/>
+						<MyText align="center"  color={colors.primary} style={{paddingHorizontal:10}}>Unread Messages</MyText>
+						<View style={{flex:1, borderWidth:0.5, borderColor: colors.primary2}}/>
+						</View>
+				)
+		}
 
   const renderMessages = ({ item, index }) => {
     return (
+				<>
       <MsgView
         state={state}
         setState={setState}
@@ -416,6 +425,8 @@ const MessageList = ({ navigation, route }) => {
         playIconClick={playIconClick}
         stopPlayer={stopPlayer}
       />
+				{item.status == "delivered" && chat[index+1].status == "read" && borderLine()}
+				</>
     )
   }
 
