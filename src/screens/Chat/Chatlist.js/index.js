@@ -193,7 +193,6 @@ const ChatList = ({ navigation }) => {
   }
 
   const newMsgReceive = (data) => {
-    console.log(data, "sendMessageReceiver")
     if (data.code == 200) {
       setChatList((chatList) => {
         let index = chatList.findIndex(x => x?._id == data?.chat_obj?.chat?._id);
