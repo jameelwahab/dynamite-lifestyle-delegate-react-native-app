@@ -79,7 +79,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   const [isImageVisible, setImageModalVisibilty] = useState(false);
   const [memberModalVisibilty, setMemberModalVisibilty] = useState(false);
   const [feedTypeModalVisibility, setFeedTypeModalVisibility] = useState(false)
-  const [notifyUser, setUserNotifyUser]=useState(false);
+  const [notifyUser, setNotifyUser]=useState(false);
   const [memberList, setMemberList] = useState([])
   const [badge, setBadge] =useState({title:"All", key:"all"})
   const [options, setOption] = useState({
@@ -374,6 +374,9 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
       start: 0,
       end: 0
     };
+		setBadge({title:"All", key:"all"})
+		setNotifyUser(false)
+		setNotifyTxt({state:"", desc:""})
   }
 
   const openOptionModal = (Modalfor) => {
@@ -544,7 +547,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
       }
     }
-		if(!notifyTxt.state && !notifyTxt.desc && notifyUser) return showToast({title:"Notification was not provided", body:"Notify statement and Notify description should be not be empty"})
+		if((notifyTxt.state=="" || notifyTxt.desc =="") && notifyUser) return showToast({title:"Notification was not provided", body:"Notify statement and Notify description should be not be empty"})
 
     setLoader(true);
     let uploadedImages = [];
@@ -680,7 +683,6 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
         refresh?.()
         setPostModalVisibilty(false)
         setLoader(false);
-				setBadge({title:"All", key:"all"})
         if (!!res.action_response) {
           let socketData = {
             action: "feed_mentioned",
@@ -1287,7 +1289,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 										title="Notify User"
 										value={notifyUser}
 										onPress={() => {
-												setUserNotifyUser(!notifyUser)
+												setNotifyUser(!notifyUser)
 												}}
 										/>
 								</View>
