@@ -4,6 +4,7 @@ import UserImage from '../../../components/UserImage'
 import Modal from 'react-native-modal'
 import { colors } from '../../../utilities/colors'
 import MyText from '../../../components/MyText'
+import MyCheckBox from '../../../components/MyCheckBox'
 import { icons } from '../../../utilities/icons'
 import { fonts } from '../../../utilities/fonts'
 import MyInputs from '../../../components/MyInputs'
@@ -78,6 +79,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   const [isImageVisible, setImageModalVisibilty] = useState(false);
   const [memberModalVisibilty, setMemberModalVisibilty] = useState(false);
   const [feedTypeModalVisibility, setFeedTypeModalVisibility] = useState(false)
+  const [notifyUser, setUserNotifyUser]=useState(false);
   const [memberList, setMemberList] = useState([])
   const [badge, setBadge] =useState({title:"All", key:"all"})
   const [options, setOption] = useState({
@@ -119,6 +121,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   const [multipleLevelModalVisiblity, setMultipleLevelModalVisiblity] = useState(false);
   const [pollData, setPollData] = useState(null);
   const [surveyData, setSurveyData] = useState(null);
+  const [notifyTxt, setNotifyTxt] =useState({state:"", desc:""})
 
 
   useEffect(() => {
@@ -541,7 +544,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
       }
     }
-
+		if(!notifyTxt.state && !notifyTxt.desc && notifyUser) return showToast({title:"Notification was not provided", body:"Notify statement and Notify description should be not be empty"})
 
     setLoader(true);
     let uploadedImages = [];
@@ -604,8 +607,15 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     }
 
 		if(!isCosmos && !isNoteMainFeed && !editId){
-				fd.append("show_feed_to", badge.key)
+				console.log("badges here", badge)
+				fd.append("show_feed_to", badge.title.toLowerCase() != "all" ? badge._id : "all")
 		}
+		
+			if(notifyUser){
+					fd.append("notify_users", notifyUser);
+					fd.append("notification_statement", notifyTxt.state);
+					fd.append("notification_description", notifyTxt.desc);
+			}
 
     if (!!pollData) {
       if (postType == "poll") {
@@ -670,6 +680,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
         refresh?.()
         setPostModalVisibilty(false)
         setLoader(false);
+				setBadge({title:"All", key:"all"})
         if (!!res.action_response) {
           let socketData = {
             action: "feed_mentioned",
@@ -1011,7 +1022,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
       lastIndex = endIndex;
     });
 
-    if (lastIndex < str.length) {
+    if (lastIndex < str?.length) {
       parts.push(str.slice(lastIndex));
     }
 
@@ -1169,6 +1180,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                 }}
               /> : */}
               <>
+
                 <View style={{ paddingHorizontal: 10, }}>
 
 
@@ -1267,6 +1279,110 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                         </View>}
                     </View>
                   </View>}
+
+				{(!isCosmos && !isNoteMainFeed && !editId && access?.notify_users_on_create_post) &&
+						<View style={{ paddingHorizontal: 10, }}>
+								<View style={{marginLeft:10}}>
+										<MyCheckBox
+										title="Notify User"
+										value={notifyUser}
+										onPress={() => {
+												setUserNotifyUser(!notifyUser)
+												}}
+										/>
+								</View>
+
+								{notifyUser &&
+										<>
+										<TextInput
+                    style={[__style.modalInput, {
+                      color: colors.lightText2,
+                      fontFamily: fonts.regular,
+                      includeFontPadding: false,
+                      maxHeight: (!isCosmos && height < 800) ? 120 : 150,
+
+                    }]}
+                    multiline={true}
+                    autoCapitalize="sentences"
+                    autoComplete="off"
+                    textAlignVertical="top"
+                    autoCorrect={false}
+                    placeholder="Notify Statement*"
+                    placeholderTextColor={colors.lightText2}
+                    keyboardAppearance="dark"
+                    selectionColor={colors.selection}
+                    cursorColor={colors.white}
+                    ref={ref_input}
+                    onContentSizeChange={({ nativeEvent: { contentSize: { height } } }) => {
+                      if (inputHeight != height) {
+                        let boxHeight = (!isCosmos && height < 800) ? 120 : 150;
+                        if (height > boxHeight) {
+                          setInputHeight(boxHeight)
+                        } else {
+                          setInputHeight(height)
+                        }
+                      }
+                    }}
+                    // keyboardType='email-address'
+                    onChangeText={(text) => setNotifyTxt({...notifyTxt, state:text })}
+                    onSelectionChange={(e) => {
+                      cursor = e.nativeEvent.selection
+                    }}
+                  ><Text style={[{
+                    color: colors.text,
+                    fontFamily: fonts.regular,
+                    includeFontPadding: false
+                  }]} >
+                      {replaceAndHighlight(notifyTxt.state, mentionList)}
+                    </Text>
+                  </TextInput> 
+				
+
+								<TextInput
+                    style={[__style.modalInput, {
+                      color: colors.lightText2,
+                      fontFamily: fonts.regular,
+                      includeFontPadding: false,
+                      maxHeight: (!isCosmos && height < 800) ? 120 : 150,
+                    }]}
+                    multiline={true}
+                    autoCapitalize="sentences"
+                    autoComplete="off"
+                    textAlignVertical="top"
+                    autoCorrect={false}
+                    placeholder="Notify Description*"
+                    placeholderTextColor={colors.lightText2}
+                    keyboardAppearance="dark"
+                    selectionColor={colors.selection}
+                    cursorColor={colors.white}
+                    ref={ref_input}
+                    onContentSizeChange={({ nativeEvent: { contentSize: { height } } }) => {
+                      if (inputHeight != height) {
+                        let boxHeight = (!isCosmos && height < 800) ? 120 : 150;
+                        if (height > boxHeight) {
+                          setInputHeight(boxHeight)
+                        } else {
+                          setInputHeight(height)
+                        }
+                      }
+                    }}
+                    onChangeText={(txt) => setNotifyTxt({...notifyTxt, desc:txt})}
+                    onSelectionChange={(e) => {
+                      cursor = e.nativeEvent.selection
+                    }}
+                  ><Text style={[{
+                    color: colors.text,
+                    fontFamily: fonts.regular,
+                    includeFontPadding: false
+                  }]} >
+                      {replaceAndHighlight(notifyTxt.desc, mentionList)}
+                    </Text>
+                  </TextInput>
+										</> 
+								}
+
+                </View> }
+
               </>
               {/* } */}
 
