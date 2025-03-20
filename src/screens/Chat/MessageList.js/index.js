@@ -128,6 +128,11 @@ const MessageList = ({ navigation, route }) => {
     console.log(data, "sendMessageReceiverForSender")
     setChat((chat) => [data?.message_obj, ...chat])
     setMember((member) => { return { ...member, chatId: data?.chat_obj?._id, } })
+
+		setChat((chatList) => {
+        chatList.map((chat) => chat.status = "read");
+        return [...chatList]
+      })
   }
 
   const sendMessageReceiver = (data) => {
@@ -402,11 +407,11 @@ const MessageList = ({ navigation, route }) => {
   }
 
 
-	const	borderLine = ()=>{
+	const	borderLine = (index)=>{
 				return (
 						<View style={{flexDirection:"row", alignItems:"center", justifyContent:"center", marginTop:10}}>
 						<View style={{flex:1, borderWidth:0.5, borderColor: colors.primary}}/>
-						<MyText align="center"  color={colors.primary} style={{paddingHorizontal:10}}>Unread Messages</MyText>
+						<MyText align="center"  color={colors.primary} style={{paddingHorizontal:10}}>{index+1} Unread Messages</MyText>
 						<View style={{flex:1, borderWidth:0.5, borderColor: colors.primary2}}/>
 						</View>
 				)
@@ -427,7 +432,7 @@ const MessageList = ({ navigation, route }) => {
         playIconClick={playIconClick}
         stopPlayer={stopPlayer}
       />
-				{item.status == "delivered" && chat[index+1].status == "read" && borderLine()}
+				{item.status == "delivered" &&( (chat.length-1)==index || chat[index+1].status == "read") && borderLine(index)}
 				</>
     )
   }

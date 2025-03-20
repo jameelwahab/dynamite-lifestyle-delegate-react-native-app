@@ -183,10 +183,11 @@ const __header = StyleSheet.create({
   secondView: {
     height: 50,
     width: "100%",
-    // backgroundColor: colors.darkSecondary,
+    backgroundColor: colors.darkSecondary,
     // backgroundColor: "green",
     flexDirection: "row",
-    alignItems: "center"
+    alignItems: "center",
+			zIndex:1,
   },
   titleView: {
     flex: 1,
