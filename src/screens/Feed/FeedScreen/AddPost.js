@@ -747,7 +747,8 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
         community_levels: isNoteMainFeed ? undefined : isCosmos ? [postCeatedFor] : !!editId ? [postCeatedFor] : postCeatedForArray.map(x => x.type),
         event_id: isNoteMainFeed ? eventId : undefined,
         list_type: isCosmos ? "the_cosmos" : "the_source",
-        type: isEventFeed ? "event" : isProgramFeed ? "program" : undefined
+        type: isEventFeed ? "event" : isProgramFeed ? "program" : undefined,
+				allow_all_option_in_mention_feed: !isCosmos && !isNoteMainFeed ? access.allow_all_option_in_mention_feed : undefined,
       }
     });
     setMentionListLoading(false);
@@ -1273,7 +1274,9 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                                 size={30}
                                 titleSize={12}
                                 member={item}
-                                customImage={item?.image?.thumbnail_1}
+                                customImage={(item.first_name !="all" && item.last_name !="") ?
+																		item?.image?.thumbnail_1 : icons.people(colors.primary, 17)}
+
                                 hideEmail />
                             </TouchableOpacity>)}
                         </ScrollView>

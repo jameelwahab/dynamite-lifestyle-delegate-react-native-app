@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, FlatList, KeyboardAvoidingView, StatusBar, Platform, TextInput, Image, TouchableHighlight, Pressable, TouchableOpacity, SafeAreaView } from 'react-native'
-import React, { memo, useEffect, useState } from 'react'
+import React, { memo, useEffect, useRef, useState } from 'react'
 import RootView from '../../../components/RootView'
 import UserImage from '../../../components/UserImage';
 import MyText from '../../../components/MyText';
@@ -49,6 +49,7 @@ const MessageList = ({ navigation, route }) => {
   const [confirmation, setConfirmation] = useState({ isVisible: false, item: null, title: "", type: "" })
   const [isImageZoomerVisible, setImageZommerVisiblity] = useState("");
   const [edit, setEdit] = useState({ msg: "", image: "", id: "", })
+  const ref = useRef()
 
 
   useEffect(() => {
@@ -132,7 +133,8 @@ const MessageList = ({ navigation, route }) => {
   const sendMessageReceiver = (data) => {
     console.log(data, "sendMessageReceiver")
     setChat((chat) => [data?.message_obj, ...chat])
-  }
+		ref?.current.scrollToOffset({ animated: true, offset: 0 });
+	}
 
   const editMessageReceiverForSender = (data) => {
     console.log(data, "editMessageReceiverForSender")
@@ -440,6 +442,7 @@ const MessageList = ({ navigation, route }) => {
     }
   }
 
+
   return (
     <RootView
       titleView={() => <UserView member={member} timezone={timezone} />}
@@ -455,6 +458,7 @@ const MessageList = ({ navigation, route }) => {
           {/* Flatlist */}
           <View style={{ flex: 1, borderTopColor: colors.lightText2, borderTopWidth: 1 / 3, marginHorizontal: -10, paddingHorizontal: 10 }}>
             <FlatList
+						  ref={ref}
               showsVerticalScrollIndicator={false}
               onEndReachedThreshold={0}
               inverted={chat.length == 0 ? false : true}
