@@ -198,7 +198,7 @@ const ChatList = ({ navigation }) => {
         let index = chatList.findIndex(x => x?._id == data?.chat_obj?.chat?._id);
         if (index > -1) {
           let chatobj = { ...chatList[index] };
-				  let memberIndex = chatobj.member.findIndex(x => x._id?._id != user?._id);
+          let memberIndex = chatobj.member.findIndex(x => x._id?._id != user?._id);
           let newChatObj = data?.chat_obj?.chat;
           chatobj = {
             ...chatobj,
@@ -209,17 +209,17 @@ const ChatList = ({ navigation }) => {
             updatedAt: newChatObj.updatedAt,
             message_type: newChatObj.message_type,
             member: data?.chat_obj?.member,
-						border_color: chatobj?.member[memberIndex]?.badge_info?.color_code,
+            border_color: chatobj?.member[memberIndex]?.badge_info?.color_code,
             last_message_sender: data?.message_obj?.sender_id,
             last_message_status: data?.message_obj?.status,
           };
 
-						chatobj.member[memberIndex] = {
-								...chatobj.member[memberIndex],
-								badge_info:{
-										color_code: chatList[index]?.member[memberIndex]?.badge_info?.color_code
-								}
-						} 
+          chatobj.member[memberIndex] = {
+            ...chatobj.member[memberIndex],
+            badge_info: {
+              color_code: chatList[index]?.member[memberIndex]?.badge_info?.color_code
+            }
+          }
 
           chatList.splice(index, 1, chatobj);
         } else {
@@ -272,8 +272,10 @@ const ChatList = ({ navigation }) => {
   const deleteMessageReceiver = (data) => {
     console.log(data, "deleteMessageReceiver")
     if (data.code == 200) {
-				api_ChatList(true)
-		}
+      clpage = 0;
+      clcanLoadMore = false;
+      api_ChatList(true)
+    }
   }
 
 
@@ -441,7 +443,7 @@ const ChatList = ({ navigation }) => {
         onPress={() => onChatScreen(member, item)}
         underlayColor={colors.secondary}>
         <View style={__style.itemRootView}>
-          <View style={{height:40}}>
+          <View style={{ height: 40 }}>
             <UserImage
               borderWidth={2}
               borderColor={member?.badge_info?.color_code}
@@ -470,21 +472,21 @@ const ChatList = ({ navigation }) => {
                 </View>}
 
               {item?.message_type != "general" &&
-                <View style={{ marginRight: 5,  }}>
+                <View style={{ marginRight: 5, }}>
                   {item.message_type == "image" ? icons.camera(colors.white, 12) :
                     item.message_type == "audio" ? icons.mic(colors.white, 15) :
                       item.message_type == "video" ? icons.playCircle(colors.white, 18) : ""}
                 </View>
               }
-              <View style={{ flexDirection: "row", flex: 1}}>
+              <View style={{ flexDirection: "row", flex: 1 }}>
                 <MyText fontSize={12} type='light' numberOfLines={1} style={{ marginTop: 3, flex: 1 }}>
                   {!!item?.last_message ?
                     isHtml(item?.last_message) ?
                       decode(item?.last_message.replace(/<[^>]+>/g, '').replace(/\*/g, "").replace(/[\])}[{(]/g, " ").slice(0, 70), { level: "html5" }) :
-                      convertMarkdownIntoSimpleText(item.last_message):
-                      // <Markdown style={markdownStyleOther}>
-                      //   {item?.last_message.replace(/\n/g, "").slice(0, 100)}
-                      // </Markdown> :
+                      convertMarkdownIntoSimpleText(item.last_message) :
+                    // <Markdown style={markdownStyleOther}>
+                    //   {item?.last_message.replace(/\n/g, "").slice(0, 100)}
+                    // </Markdown> :
                     item?.message_type == "image" ? "Photo" :
                       item?.message_type == 'audio' ? "Audio" :
                         item?.message_type == 'video' ? "Video" : ""}
@@ -591,9 +593,9 @@ const __style = StyleSheet.create({
 
   },
   msg_view: {
-		 marginTop:3,
-		 flexDirection: "row",
-		 alignItems: "center",
+    marginTop: 3,
+    flexDirection: "row",
+    alignItems: "center",
   },
   tabsView: {
     flexDirection: "row",
