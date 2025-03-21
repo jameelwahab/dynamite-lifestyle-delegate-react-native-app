@@ -112,10 +112,10 @@ const NotificationList = ({ navigation, route }) => {
           navigator = routes.sourceFeedNavigator;
       }
 
+      console.log(navigator, "")
 
-
+      let params = { feedId: item?.feeds?._id };
       if (!!navigator) {
-        let params = { feedId: item?.feeds?._id };
         if (item?.tab_type == "event") {
           params["eventId"] = item?.module_id
           params["feedFor"] = "event"
@@ -210,22 +210,22 @@ const NotificationList = ({ navigation, route }) => {
               }
             }],
           })
+        } else {
+          navigation.reset({
+            routes: [{
+              name: navigator,
+              state: {
+                routes: [{
+                  name: routes.feedScreen,
+                },
+                {
+                  name: routes.feedDetailScreen,
+                  params: params
+                }],
+              }
+            }],
+          })
         }
-      } else {
-        navigation.reset({
-          routes: [{
-            name: navigator,
-            state: {
-              routes: [{
-                name: routes.feedScreen,
-              },
-              {
-                name: routes.feedDetailScreen,
-                params: params
-              }],
-            }
-          }],
-        })
       }
     }
 

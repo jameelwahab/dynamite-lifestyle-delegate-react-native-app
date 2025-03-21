@@ -34,7 +34,7 @@ const UserView = ({ member, timezone }) => {
       setOnlineStatus(false)
     }
   }
-
+		console.log("here is the member",member)
   return (
     <View style={__style.userRootView}>
       <View>

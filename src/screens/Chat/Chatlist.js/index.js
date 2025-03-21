@@ -193,13 +193,12 @@ const ChatList = ({ navigation }) => {
   }
 
   const newMsgReceive = (data) => {
-    console.log(data, "sendMessageReceiver")
     if (data.code == 200) {
       setChatList((chatList) => {
         let index = chatList.findIndex(x => x?._id == data?.chat_obj?.chat?._id);
-        console.log(index, "index")
         if (index > -1) {
           let chatobj = { ...chatList[index] };
+				  let memberIndex = chatobj.member.findIndex(x => x._id?._id != user?._id);
           let newChatObj = data?.chat_obj?.chat;
           chatobj = {
             ...chatobj,
@@ -210,10 +209,18 @@ const ChatList = ({ navigation }) => {
             updatedAt: newChatObj.updatedAt,
             message_type: newChatObj.message_type,
             member: data?.chat_obj?.member,
+						border_color: chatobj?.member[memberIndex]?.badge_info?.color_code,
             last_message_sender: data?.message_obj?.sender_id,
             last_message_status: data?.message_obj?.status,
           };
-          console.log(chatobj, "newchatobj")
+
+						chatobj.member[memberIndex] = {
+								...chatobj.member[memberIndex],
+								badge_info:{
+										color_code: chatList[index]?.member[memberIndex]?.badge_info?.color_code
+								}
+						} 
+
           chatList.splice(index, 1, chatobj);
         } else {
           let newChatObj = data?.chat_obj?.chat;
@@ -265,27 +272,8 @@ const ChatList = ({ navigation }) => {
   const deleteMessageReceiver = (data) => {
     console.log(data, "deleteMessageReceiver")
     if (data.code == 200) {
-      if (data.is_last_message) {
-        setChatList((chatList) => {
-          let index = chatList.findIndex(x => x?._id == data?.chat_id);
-          if (index > -1) {
-            let chatobj = { ...chatList[index] };
-            let newChatObj = data?.message_obj;
-            chatobj = {
-              ...chatobj,
-              image: newChatObj.image,
-              last_message: newChatObj.message,
-              last_message_date_time: newChatObj.message_date_time,
-              message_id: newChatObj._id,
-              updatedAt: newChatObj.updatedAt,
-              message_type: newChatObj.message_type,
-            }
-            chatList.splice(index, 1, chatobj);
-            return [...chatList]
-          }
-        })
-      }
-    }
+				api_ChatList(true)
+		}
   }
 
 
