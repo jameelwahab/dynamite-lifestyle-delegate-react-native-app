@@ -341,5 +341,14 @@ export const FEED_SURVEY_MEMBER_LIST = ({ token, navigation, body: {
   });
 }
 
-
+export const NOITFY_USERS = ({token, navigation, id,notify_state, notify_desc })=> invokeApi({
+		path:`api/feeds/send_feed_reminder/${id}`,
+		method:"POST",
+    token,
+    navigation,
+		postData:{
+				notification_statement: notify_state,
+				notification_description: notify_desc,
+		}
+})
 

@@ -1021,7 +1021,6 @@ const CommentModal = ({
         </View>
 
         {isVisible && <Toast />}
-{console.log(getFilteredOptions(),"getFilteredOptions")}
         <OptionModal
           optionList={getFilteredOptions()}
           isVisible={options.isVisible}
