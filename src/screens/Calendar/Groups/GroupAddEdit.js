@@ -31,6 +31,7 @@ const GroupAddEdit = ({ navigation, route }) => {
   const [eventsList, setEventsList] = useState([]);
   const [salePageList, setSalePageList] = useState([]);
   const [paymentPlanList, setPaymentPlanList] = useState([]);
+  const [missionList, setMissionList] = useState([]);
   const [optionModal, setOptionModal] = useState({
     isVisible: false,
     type: "",
@@ -45,6 +46,7 @@ const GroupAddEdit = ({ navigation, route }) => {
     program: !!group?.program ? group?.program.map(x => x?._id) : [],
     event: !!group?.event ? group?.event.map(x => x?._id) : [],
     sale_page: !!group?.sale_pages ? group?.sale_pages.map(x => x?._id) : [],
+		mission: !!group?.misson ? group?.mission.map(x => x?._id) : [],
     plans: !!group?.plans ? group?.plans.map(x => x?._id) : [],
     member: !!group?.member ? group?.member.map(x => x?._id) : [],
     exclude_members: !!group?.exclude_members ? group?.exclude_members.map(x => x?._id) : [],
@@ -93,7 +95,9 @@ const GroupAddEdit = ({ navigation, route }) => {
         setSalePageList(res?.data);
       } else if (type == "plan") {
         setPaymentPlanList(res?.data);
-      }
+      } else if(type=="mission"){
+					setMissionList(res?.data)
+			}
     }
   }
 
@@ -142,6 +146,7 @@ const GroupAddEdit = ({ navigation, route }) => {
         exclude_members: groupData.exclude_members.map(member => member?._id),
         badge_levels: groupData?.communityLevel,
         group_for_member: groupData?.memberType,
+				missions: groupData.map(el=> {{}}),
 
       };
       if (obj.group_by == "program") {
@@ -156,9 +161,8 @@ const GroupAddEdit = ({ navigation, route }) => {
       } else if (obj.group_by == "event") {
         obj["event"] = groupData.event.map(item => ({ event_slug: item?.event_slug }))
       } else if (obj.group_by == "sale_page") {
-        obj["sale_page"] = groupData.sale_page.map(item => ({ _id: item?._id }))
-        obj["plans"] = groupData.plans.map(item => ({ _id: item?._id }))
-      }
+        obj["missions"] = groupData.mission.map(item => ({ _id: item?._id }))
+      } 
 
       if (isEdit) {
         updateGroupToServer(obj)
@@ -263,11 +267,10 @@ const GroupAddEdit = ({ navigation, route }) => {
             </View>
           </View>
         </View>
-
-
+		
         <MyTouchableInput
           label='Group By *'
-          value={grpByTypeList[groupData?.groupBy]?.title}
+          value={grpByTypeList[groupData?.groupBy]?.title || grpByTypeList.mission_quest?.title || ""}
           onPress={() => setGrpModalVisible(true)}
         // iconOnPress={() => setOptionModal({ isVisible: true, type: groupData.groupBy })}
         // view={() => selectedView(groupData?.program, "program")}
@@ -318,7 +321,7 @@ const GroupAddEdit = ({ navigation, route }) => {
             iconOnPress={() => setOptionModal({ isVisible: true, type: groupData.groupBy })}
             view={() => selectedView(groupData?.program, "program")}
           /> : groupData.groupBy == "event" ?
-            <MyTouchableInput
+            <MyTouchableIntitltitleeput
               label='Event'
               view={() => selectedView(groupData?.event, "event")}
               iconOnPress={() => setOptionModal({ isVisible: true, type: groupData.groupBy })}
@@ -327,7 +330,12 @@ const GroupAddEdit = ({ navigation, route }) => {
                 label='Sale Pages'
                 view={() => selectedView(groupData?.sale_page, "sale_page", "sale_page_title")}
                 iconOnPress={() => setOptionModal({ isVisible: true, type: groupData.groupBy })}
-              /> : null}
+              /> : groupData.groupBy == "mission" ?
+								<MyTouchableInput
+                label='Mission \ Quest'
+                view={() => selectedView(groupData?.mission, "mission", "title")}
+                iconOnPress={() => setOptionModal({ isVisible: true, type: groupData.groupBy })}
+              />: null }
 
         {groupData.groupBy == "sale_page" && groupData?.sale_page.length > 0 &&
           <MyTouchableInput
@@ -373,6 +381,7 @@ const GroupAddEdit = ({ navigation, route }) => {
               optionModal?.type == "sale_page" ? salePageList :
                 optionModal?.type == "plans" ? paymentPlanList :
                   optionModal?.type == "member" || optionModal?.type == "exclude_members" ? memberList :
+                  optionModal?.type == "mission" ? missionList :
                     []
         }
         title={
@@ -380,14 +389,17 @@ const GroupAddEdit = ({ navigation, route }) => {
             optionModal?.type == "event" ? "Event" :
               optionModal?.type == "sale_page" ? "Sale Page" :
                 optionModal?.type == "plans" ? "Plan" :
-                  optionModal?.type == "member" || optionModal?.type == "exclude_members" ? "Member" : ""
+                  optionModal?.type == "member" || optionModal?.type == "exclude_members" ? "Member" :
+                  optionModal?.type == "mission" ? "Mission" :
+						""
         }
         renderText={({ item }) => (
           <MyText>
             {(optionModal?.type == "program" || optionModal?.type == "event") ? `${item?.title}` :
               optionModal?.type == "sale_page" ? `${item?.sale_page_title}` :
                 optionModal?.type == "plans" ? `${item?.plan_title}` :
-                  optionModal?.type == "member" || optionModal?.type == "exclude_members" ? `${item?.first_name} ${item?.last_name} (${item?.email})` : ""}
+                  optionModal?.type == "member" || optionModal?.type == "exclude_members" ? `${item?.first_name} ${item?.last_name} (${item?.email})` :
+                  optionModal?.type == "mission" ? item?.title : ""}
           </MyText>
         )}
       />
