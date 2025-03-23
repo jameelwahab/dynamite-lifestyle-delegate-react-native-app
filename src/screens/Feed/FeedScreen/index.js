@@ -962,7 +962,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       let isMine = feed?.action_info?.action_id == user?._id;
 
       options.forEach((item) => {
-        if (item.type == "pin" && feed?.review_status == "approved" && !feed?.is_reported) {
+        if (item.type == "pin" && feed?.review_status == "approved" && !feed?.is_reported && !isCosmos) {
           if (access?.feed_pin_unpin_option) {
             if (!feed?.is_feature) {
               if (isAllSourceFeed || isTheSourceFeed) {
@@ -976,7 +976,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           }
         }
 
-        if (item.type == "unpin" && feed?.review_status == "approved" && !feed?.is_reported) {
+        if (item.type == "unpin" && feed?.review_status == "approved" && !feed?.is_reported && !isCosmos) {
           if (access?.feed_pin_unpin_option) {
             if (feed?.is_feature) {
               if (isAllSourceFeed || isTheSourceFeed) {
@@ -1053,7 +1053,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           }
         }
 
-        
+		 
       })
 
       return newList
@@ -1066,8 +1066,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
     let isMine = feed?.action_info?.action_id == user?._id;
 
     feedOptionList.forEach((item) => {
-      console.log(feed?.review_status, "review_status")
-      if (item.type == "pin" && feed?.review_status == "approved") {
+      if (item.type == "pin" && feed?.review_status == "approved" && !isCosmos) {
         if (access?.feed_pin_unpin_option) {
           if (!feed?.is_feature) {
             if (isAllSourceFeed || isTheSourceFeed) {
@@ -1081,7 +1080,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
         }
       }
 
-      if (item.type == "unpin" && feed?.review_status == "approved") {
+      if (item.type == "unpin" && feed?.review_status == "approved" && !isCosmos) {
         if (access?.feed_pin_unpin_option) {
           if (feed?.is_feature) {
             if (isAllSourceFeed || isTheSourceFeed) {

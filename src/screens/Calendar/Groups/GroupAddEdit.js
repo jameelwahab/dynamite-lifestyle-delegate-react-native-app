@@ -479,6 +479,10 @@ const grpByTypeList = {
     title: "Sale Page",
     value: "sale_page"
   },
+		"mission_quest": {
+    title: "Missions \\ Quests",
+    value: "mission"
+  },
 }
 
 

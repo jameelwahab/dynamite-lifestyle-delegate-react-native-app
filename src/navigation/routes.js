@@ -340,6 +340,7 @@ const routes = {
   calendarGroupList: "CALENDAR_GROUP_LIST_SCREEN",
   calendarGroupAddEdit: "CALENDAR_GROUP_ADD_EDIT_SCREEN",
   calendarGroupDetail: "CALENDAR_GROUP_DETAIL_SCREEN",
+  calendarGroupFilter: "CALENDAR_GROUP_Filter_SCREEN",
 
   //? Calendar Events
   calendarEventsList: "CALENDAR_EVENTS_SCREEN",
