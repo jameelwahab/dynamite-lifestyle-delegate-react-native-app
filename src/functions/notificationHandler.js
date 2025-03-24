@@ -13,7 +13,7 @@ const notificationHandler = (remoteMessage, navigation, navbar) => {
       navigator = routes.portalNavigator;
     } else if (data?.tab_type == "program") {
       navigator = routes.trainingNavigator;
-    } else if (item?.tab_type == "mission") {
+    } else if (data?.tab_type == "mission") {
       navigator = routes.missionNavigator;
     } else {
       if (!!navbar.find(x => x.value == "all_source_feed"))
@@ -29,7 +29,7 @@ const notificationHandler = (remoteMessage, navigation, navbar) => {
       } else if (data?.tab_type == "program") {
         params["eventId"] = data?.event_id
         params["feedFor"] = "event"
-      } else if (item?.tab_type == "mission") {
+      } else if (data?.tab_type == "mission") {
         params["eventId"] = item?.module_id
         params["feedFor"] = "mission"
       }
@@ -37,6 +37,7 @@ const notificationHandler = (remoteMessage, navigation, navbar) => {
       if (data?.type == "addcomment" || data?.type == "addcommentreply" || data?.type == "commentlike" || data?.type == 'feed_comment_mentioned') {
         params["openCommentModal"] = true;
       }
+
       if (data?.tab_type == "event") {
         navigation.reset({
           routes: [{
@@ -83,7 +84,7 @@ const notificationHandler = (remoteMessage, navigation, navbar) => {
             }
           }],
         })
-      } else if (item?.tab_type == "mission") {
+      } else if (data?.tab_type == "mission") {
         navigation.reset({
           routes: [{
             name: navigator,
@@ -263,7 +264,22 @@ const notificationHandler = (remoteMessage, navigation, navbar) => {
         }
       }]
     })
+  } else if (data?.type == "commission_notification") {
+    // navigation.navigate(routes.commissionNavigator)
+    navigation.reset({
+      routes: [{
+        name: routes?.commissionNavigator,
+        state: {
+          routes: [
+            {
+              name: routes.commissionDetailScreen,
+            }],
+        }
+      }],
+    })
   }
+
+
   notifee.decrementBadgeCount();
 }
 

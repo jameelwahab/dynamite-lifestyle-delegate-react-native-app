@@ -246,14 +246,19 @@ export const GET_DELEGATES_LIST_FROM_SERVER_FOR_MENTION_V1 = ({ token, navigatio
   list_type = undefined,
   search_text = undefined,
   event_id = undefined,
-  type = undefined
+  type = undefined,
+allow_all_option_in_mention_feed=undefined,
 } }) => {
   return invokeApi({
     path: `api/feeds/delegate_or_member/list/v1`,
     method: "POST",
     postData: {
-      //  community_levels,
-       list_type, search_text, event_id, type },
+				list_type,
+				search_text,
+				event_id,
+				type,
+				allow_all_option_in_mention_feed
+		},
     token,
     navigation,
   })
@@ -336,5 +341,14 @@ export const FEED_SURVEY_MEMBER_LIST = ({ token, navigation, body: {
   });
 }
 
-
+export const NOITFY_USERS = ({token, navigation, id,notify_state, notify_desc })=> invokeApi({
+		path:`api/feeds/send_feed_reminder/${id}`,
+		method:"POST",
+    token,
+    navigation,
+		postData:{
+				notification_statement: notify_state,
+				notification_description: notify_desc,
+		}
+})
 

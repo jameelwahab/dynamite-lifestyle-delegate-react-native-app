@@ -28,6 +28,8 @@ import breakReference from '../../../functions/breakReference';
 import numFormatter from '../../../functions/numFormatter';
 import { onChatScreen } from '../../../functions/onChatScreen';
 import isArray from '../../../functions/isArray';
+import { useSelector } from 'react-redux'
+import { selectUser } from '../../../redux/reducers/userSlice'
 
 
 let commentCursor = {
@@ -61,6 +63,7 @@ const CommentModal = ({
   hasEditDeleteAccess,
   isChatAllowed
 }) => {
+	const { access } = useSelector(selectUser);
   const cmtTextInputRef = useRef();
   const likeModalRef = useRef();
   const [commentText, setCommentText] = useState("");
@@ -249,6 +252,7 @@ const CommentModal = ({
         community_levels: !isNoteMainFeed ? [feedCreatedFor] : undefined,
         event_id: isNoteMainFeed ? eventId : undefined,
         list_type: isCosmos ? "the_cosmos" : "the_source",
+				allow_all_option_in_mention_feed: !isCosmos && !isNoteMainFeed ? access.allow_all_option_in_mention_feed : undefined,
       }
     });
     setMentionListLoading(false);
@@ -893,7 +897,8 @@ const CommentModal = ({
                             size={30}
                             titleSize={12}
                             member={item}
-                            customImage={item?.image?.thumbnail_1}
+                            customImage={(item.first_name !="all" && item.last_name !="") ?
+																		item?.image?.thumbnail_1 : icons.people(colors.primary, 17)}
                             hideEmail />
                         </TouchableOpacity>)}
                     </ScrollView>
@@ -1016,7 +1021,6 @@ const CommentModal = ({
         </View>
 
         {isVisible && <Toast />}
-{console.log(getFilteredOptions(),"getFilteredOptions")}
         <OptionModal
           optionList={getFilteredOptions()}
           isVisible={options.isVisible}

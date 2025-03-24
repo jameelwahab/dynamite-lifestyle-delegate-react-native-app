@@ -4,9 +4,11 @@ import UserImage from '../../../components/UserImage'
 import Modal from 'react-native-modal'
 import { colors } from '../../../utilities/colors'
 import MyText from '../../../components/MyText'
+import MyCheckBox from '../../../components/MyCheckBox'
 import { icons } from '../../../utilities/icons'
 import { fonts } from '../../../utilities/fonts'
 import MyInputs from '../../../components/MyInputs'
+import OptionModal2 from '../../../components/OptionModal2'
 import { MyButton } from '../../../components/MyButton'
 import ImageUploadModal from '../../../components/ImageUploadModal'
 import utilities from '../../../utilities'
@@ -36,6 +38,7 @@ import PollView from './PollView'
 import { convertTimezoneToRegion } from '../../../functions/convertTime'
 import OptionModalWithSearch from '../../../components/OptionModalWithSearch'
 import SurveyView from './SurveyView'
+import { selectUser } from '../../../redux/reducers/userSlice'
 
 
 
@@ -61,10 +64,12 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
 }, ref) => {
 
+	const { access } = useSelector(selectUser);
   const { height, width } = useWindowDimensions();
   const inset = useSafeAreaInsets();
   const ref_poll = useRef()
   const ref_survey = useRef()
+  const ref_badges = useRef()
 
   const { socket } = useSelector(selectSocket);
   const lvlModalRef = useRef()
@@ -74,7 +79,9 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   const [isImageVisible, setImageModalVisibilty] = useState(false);
   const [memberModalVisibilty, setMemberModalVisibilty] = useState(false);
   const [feedTypeModalVisibility, setFeedTypeModalVisibility] = useState(false)
+  const [notifyUser, setNotifyUser]=useState(false);
   const [memberList, setMemberList] = useState([])
+  const [badge, setBadge] =useState({title:"All", key:"all"})
   const [options, setOption] = useState({
     list: [],
     type: "",
@@ -114,9 +121,10 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   const [multipleLevelModalVisiblity, setMultipleLevelModalVisiblity] = useState(false);
   const [pollData, setPollData] = useState(null);
   const [surveyData, setSurveyData] = useState(null);
+  const [notifyTxt, setNotifyTxt] =useState({state:"", desc:""})
+
 
   useEffect(() => {
-
     let text = postText;
     if (text[cursor?.start] == "@" || text == "@") {
       // let _at_index = !!cursor?.start ? cursor?.start : 0;
@@ -366,6 +374,9 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
       start: 0,
       end: 0
     };
+		setBadge({title:"All", key:"all"})
+		setNotifyUser(false)
+		setNotifyTxt({state:"", desc:""})
   }
 
   const openOptionModal = (Modalfor) => {
@@ -375,7 +386,15 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
         visibility: true,
         type: Modalfor
       })
-    } else if (Modalfor == "createdFor") {
+    }
+			else if (Modalfor == "badges") {
+      setOption({
+					list: [{title:"All", key:"all"}, ...access?.badge_levels],
+        visibility: true,
+        type: Modalfor
+      })
+    }
+			else if (Modalfor == "createdFor") {
       let arr = [];
       if (isCosmos) {
         cosmosLevelList.forEach((x) => {
@@ -410,7 +429,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
       setPostCategory(opt.type)
     } else if (options?.type == "createdFor") {
       setPostCreatedFor(opt.type)
-    }
+    } else if(options?.type == "badges") setBadge(opt)
 
     closeOptionModal()
   }
@@ -528,7 +547,9 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
       }
     }
-
+		if((notifyTxt.state=="" || notifyTxt.desc =="") && notifyUser){
+				return showToast({title:"info", body:"Notication statement and Notication description should be not be empty"})
+		} 
 
     setLoader(true);
     let uploadedImages = [];
@@ -590,6 +611,16 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
       }
     }
 
+		if(!isCosmos && !isNoteMainFeed && !editId){
+				console.log("badges here", badge)
+				fd.append("show_feed_to", badge.title.toLowerCase() != "all" ? badge._id : "all")
+		}
+		
+			if(notifyUser){
+					fd.append("notify_users", notifyUser);
+					fd.append("notification_statement", notifyTxt.state);
+					fd.append("notification_description", notifyTxt.desc);
+			}
 
     if (!!pollData) {
       if (postType == "poll") {
@@ -716,7 +747,8 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
         community_levels: isNoteMainFeed ? undefined : isCosmos ? [postCeatedFor] : !!editId ? [postCeatedFor] : postCeatedForArray.map(x => x.type),
         event_id: isNoteMainFeed ? eventId : undefined,
         list_type: isCosmos ? "the_cosmos" : "the_source",
-        type: isEventFeed ? "event" : isProgramFeed ? "program" : undefined
+        type: isEventFeed ? "event" : isProgramFeed ? "program" : undefined,
+				allow_all_option_in_mention_feed: !isCosmos && !isNoteMainFeed ? access.allow_all_option_in_mention_feed : undefined,
       }
     });
     setMentionListLoading(false);
@@ -822,6 +854,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
       setTextColor(colors.white);
       setButtonAlignment("center");
     }
+
     return (
       <Modal
         isVisible={eventModalVisible}
@@ -994,7 +1027,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
       lastIndex = endIndex;
     });
 
-    if (lastIndex < str.length) {
+    if (lastIndex < str?.length) {
       parts.push(str.slice(lastIndex));
     }
 
@@ -1049,6 +1082,21 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                 {/* //* Dropdown btns */}
                 <View style={{ marginLeft: 10, flex: 1 }}>
                   <MyText fontSize={16} type="bold">{user?.first_name + " " + user?.last_name}</MyText>
+										{(!isCosmos && !isNoteMainFeed && !editId ) &&
+												<View style={{flexDirection:"row", alignItems:"center", marginTop:5}}>
+														<TouchableOpacity
+																style={__style.modalDropBtns}>
+																<MyText>{"Publish"}</MyText>
+														</TouchableOpacity>
+
+														<TouchableOpacity
+																onPress={()=> openOptionModal("badges")}
+																style={__style.modalDropBtns}>
+																<MyText style={{marginRight:5}}>{badge.title}</MyText>
+																{icons.downwardArrow(17, colors.white)}
+														</TouchableOpacity>
+												</View>
+										}
                   <View style={__style.modalActionButtonRow}>
 
                     {/* <TouchableOpacity
@@ -1137,6 +1185,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                 }}
               /> : */}
               <>
+
                 <View style={{ paddingHorizontal: 10, }}>
 
 
@@ -1225,7 +1274,9 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                                 size={30}
                                 titleSize={12}
                                 member={item}
-                                customImage={item?.image?.thumbnail_1}
+                                customImage={(item.first_name !="all" && item.last_name !="") ?
+																		item?.image?.thumbnail_1 : icons.people(colors.primary, 17)}
+
                                 hideEmail />
                             </TouchableOpacity>)}
                         </ScrollView>
@@ -1235,6 +1286,8 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                         </View>}
                     </View>
                   </View>}
+
+
               </>
               {/* } */}
 
@@ -1418,6 +1471,112 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                 <View >
                   <SurveyView ref={ref_survey} data={surveyData} timezone={timezone} />
                 </View>}
+
+				{(!isCosmos && !isNoteMainFeed && !editId && access?.notify_users_on_create_post) &&
+						<View style={{ marginHorizontal: 10,marginTop:15}}>
+								<View >
+										<MyCheckBox
+										title="Notify Users ?"
+										value={notifyUser}
+										onPress={() => {
+												setNotifyUser(!notifyUser)
+												}}
+										/>
+								</View>
+
+								{notifyUser &&
+										<View style={{padding:15,borderRadius:10, backgroundColor:colors.secondaryVariant}}>
+										<TextInput
+                    style={[__style.modalInput, {
+                      color: colors.lightText2,
+                      fontFamily: fonts.regular,
+                      includeFontPadding: false,
+                      maxHeight: (!isCosmos && height < 800) ? 120 : 150,
+										  borderWidth:1,
+										  borderColor:colors.white +"50"
+                    }]}
+                    multiline={true}
+                    autoCapitalize="sentences"
+                    autoComplete="off"
+                    textAlignVertical="top"
+                    autoCorrect={false}
+                    placeholder="Notification Statement*"
+                    placeholderTextColor={colors.lightText2}
+                    keyboardAppearance="dark"
+                    selectionColor={colors.selection}
+                    cursorColor={colors.white}
+                    ref={ref_input}
+                    onContentSizeChange={({ nativeEvent: { contentSize: { height } } }) => {
+                      if (inputHeight != height) {
+                        let boxHeight = (!isCosmos && height < 800) ? 120 : 150;
+                        if (height > boxHeight) {
+                          setInputHeight(boxHeight)
+                        } else {
+                          setInputHeight(height)
+                        }
+                      }
+                    }}
+                    // keyboardType='email-address'
+                    onChangeText={(text) => setNotifyTxt({...notifyTxt, state:text })}
+                    onSelectionChange={(e) => {
+                      cursor = e.nativeEvent.selection
+                    }}
+                  ><Text style={[{
+                    color: colors.text,
+                    fontFamily: fonts.regular,
+                    includeFontPadding: false
+                  }]} >
+                      {replaceAndHighlight(notifyTxt.state, mentionList)}
+                    </Text>
+                  </TextInput> 
+				
+
+								<TextInput
+                    style={[__style.modalInput, {
+                      color: colors.lightText2,
+                      fontFamily: fonts.regular,
+                      includeFontPadding: false,
+                      maxHeight: (!isCosmos && height < 800) ? 120 : 150,
+										  borderWidth:1,
+										  borderColor:colors.white +"50"
+                    }]}
+                    multiline={true}
+                    autoCapitalize="sentences"
+                    autoComplete="off"
+                    textAlignVertical="top"
+                    autoCorrect={false}
+                    placeholder="Notification Description*"
+                    placeholderTextColor={colors.lightText2}
+                    keyboardAppearance="dark"
+                    selectionColor={colors.selection}
+                    cursorColor={colors.white}
+                    ref={ref_input}
+                    onContentSizeChange={({ nativeEvent: { contentSize: { height } } }) => {
+                      if (inputHeight != height) {
+                        let boxHeight = (!isCosmos && height < 800) ? 120 : 150;
+                        if (height > boxHeight) {
+                          setInputHeight(boxHeight)
+                        } else {
+                          setInputHeight(height)
+                        }
+                      }
+                    }}
+                    onChangeText={(txt) => setNotifyTxt({...notifyTxt, desc:txt})}
+                    onSelectionChange={(e) => {
+                      cursor = e.nativeEvent.selection
+                    }}
+                  ><Text style={[{
+                    color: colors.text,
+                    fontFamily: fonts.regular,
+                    includeFontPadding: false
+                  }]} >
+                      {replaceAndHighlight(notifyTxt.desc, mentionList)}
+                    </Text>
+                  </TextInput>
+										</View> 
+								}
+
+                </View> }
 
 
               {/* //*     post type action buttonns  */}

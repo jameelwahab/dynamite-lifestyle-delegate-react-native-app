@@ -7,6 +7,7 @@ import { GET_FEED_LIST, GET_COMMENT_LIST, GET_LIKE_LIST, GET_COMMENT_LIKES_LIST,
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../../redux/reducers/userSlice'
 import FeedView from './FeedView'
+import NotifyUser from "./NotifyUser"
 import { selectTimeZone } from '../../../redux/reducers/timezoneSlice'
 import { selectSettings } from '../../../redux/reducers/settingSlice'
 import CommentModal from './CommentModal'
@@ -60,6 +61,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
   const ref_pollInfo = useRef();
   const ref_surveyInfo = useRef()
   const ref_confirmModal = useRef();
+  const ref_notify_user = useRef();
   const { feedFor, feedId, eventId = "" } = route?.params;
   const isCosmos = feedFor == "the_cosmos";
   const isScheduledFeed = feedFor == "scheduled";
@@ -850,6 +852,10 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       setTimeout(() => {
         getUserWhoReportedFeed(item)
       }, 500);
+    } else if (selectedOpt?.type == "notify") {
+      setTimeout(() => {
+        ref_notify_user?.current.openModal(item?.action_info?.action_id)
+      }, 500);
     }
   }
 
@@ -891,7 +897,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           profileImage: !!member?.profile_image ? member?.profile_image : "",
           chatId: res?.chat?._id,
           canGoBack: true,
-          badge_color:member?.color_code,
+          badge_color: member?.color_code,
           resetCountToZero: () => { },
           refresh: () => { },
         })
@@ -906,7 +912,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           profileImage: !!member?.member ? member?.member : "",
           chatId: "",
           canGoBack: true,
-          badge_color:member?.color_code,
+          badge_color: member?.color_code,
           resetCountToZero: () => { },
           refresh: () => { },
         })
@@ -956,7 +962,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       let isMine = feed?.action_info?.action_id == user?._id;
 
       options.forEach((item) => {
-        if (item.type == "pin" && feed?.review_status == "approved" && !feed?.is_reported) {
+        if (item.type == "pin" && feed?.review_status == "approved" && !feed?.is_reported && !isCosmos) {
           if (access?.feed_pin_unpin_option) {
             if (!feed?.is_feature) {
               if (isAllSourceFeed || isTheSourceFeed) {
@@ -970,7 +976,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
           }
         }
 
-        if (item.type == "unpin" && feed?.review_status == "approved" && !feed?.is_reported) {
+        if (item.type == "unpin" && feed?.review_status == "approved" && !feed?.is_reported && !isCosmos) {
           if (access?.feed_pin_unpin_option) {
             if (feed?.is_feature) {
               if (isAllSourceFeed || isTheSourceFeed) {
@@ -1036,10 +1042,18 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
         if (item.type == "approve" && feed?.review_status == "pending") {
           newList.push(item);
         }
+
         if (item.type == "reported_by" && feed?.is_reported) {
           newList.push(item);
         }
 
+        if (item?.type == "notify" && access?.notify_users_on_create_post) {
+          if (isMine && ( isAllSourceFeed ||  isTheSourceFeed)) {
+            newList.push(item)
+          }
+        }
+
+		 
       })
 
       return newList
@@ -1052,8 +1066,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
     let isMine = feed?.action_info?.action_id == user?._id;
 
     feedOptionList.forEach((item) => {
-      console.log(feed?.review_status, "review_status")
-      if (item.type == "pin" && feed?.review_status == "approved") {
+      if (item.type == "pin" && feed?.review_status == "approved" && !isCosmos) {
         if (access?.feed_pin_unpin_option) {
           if (!feed?.is_feature) {
             if (isAllSourceFeed || isTheSourceFeed) {
@@ -1067,7 +1080,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
         }
       }
 
-      if (item.type == "unpin" && feed?.review_status == "approved") {
+      if (item.type == "unpin" && feed?.review_status == "approved" && !isCosmos) {
         if (access?.feed_pin_unpin_option) {
           if (feed?.is_feature) {
             if (isAllSourceFeed || isTheSourceFeed) {
@@ -1136,6 +1149,13 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       if (item.type == "reported_by" && feed?.is_reported) {
         newList.push(item);
       }
+
+      if (item?.type == "notify" && access?.notify_users_on_create_post) {
+        if (isMine && ( isAllSourceFeed ||  isTheSourceFeed)) {
+          newList.push(item)
+        }
+      }
+
     })
     return newList.length
   }
@@ -1507,6 +1527,12 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
         navigation={navigation}
       />
 
+      <NotifyUser
+        ref={ref_notify_user}
+        token={token}
+        navigation={navigation}
+      />
+
       <MyLoader enable={loader} />
     </View >
   )
@@ -1558,6 +1584,10 @@ const feedOptionList = [{
   title: "Approve",
   type: "approve"
 },
-
+{
+  icon: () => icons.notification(colors.primary, 17),
+  title: "Notify Users",
+  type: "notify"
+}
 
 ]

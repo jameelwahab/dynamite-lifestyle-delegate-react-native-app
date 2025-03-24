@@ -8,6 +8,7 @@ import { colors } from '../../utilities/colors'
 import GroupList from '../../screens/Calendar/Groups/GroupList'
 import GroupAddEdit from '../../screens/Calendar/Groups/GroupAddEdit'
 import GroupDetail from '../../screens/Calendar/Groups/GroupDetail'
+import GroupFilter from '../../screens/Calendar/Groups/GroupFilter'
 
 
 
@@ -20,6 +21,7 @@ const StackCalendarGroups = ({ route }) => {
         screenOptions={{ headerShown: false }}>
         <StackGroup.Screen initialParams={route.params} name={routes.calendarGroupList} component={GroupList} />
         <StackGroup.Screen  name={routes.calendarGroupAddEdit} component={GroupAddEdit} />
+        <StackGroup.Screen  name={routes.calendarGroupFilter} component={GroupFilter} />
         <StackGroup.Screen  name={routes.calendarGroupDetail} component={GroupDetail} />
         
         {/*//? Default Screens Start */}

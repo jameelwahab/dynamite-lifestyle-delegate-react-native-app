@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, FlatList, KeyboardAvoidingView, StatusBar, Platform, TextInput, Image, TouchableHighlight, Pressable, TouchableOpacity, SafeAreaView } from 'react-native'
-import React, { memo, useEffect, useState } from 'react'
+import React, { memo, useEffect, useRef, useState } from 'react'
 import RootView from '../../../components/RootView'
 import UserImage from '../../../components/UserImage';
 import MyText from '../../../components/MyText';
@@ -49,6 +49,7 @@ const MessageList = ({ navigation, route }) => {
   const [confirmation, setConfirmation] = useState({ isVisible: false, item: null, title: "", type: "" })
   const [isImageZoomerVisible, setImageZommerVisiblity] = useState("");
   const [edit, setEdit] = useState({ msg: "", image: "", id: "", })
+  const ref = useRef()
 
 
   useEffect(() => {
@@ -127,12 +128,18 @@ const MessageList = ({ navigation, route }) => {
     console.log(data, "sendMessageReceiverForSender")
     setChat((chat) => [data?.message_obj, ...chat])
     setMember((member) => { return { ...member, chatId: data?.chat_obj?._id, } })
+
+		setChat((chatList) => {
+        chatList.map((chat) => chat.status = "read");
+        return [...chatList]
+      })
   }
 
   const sendMessageReceiver = (data) => {
     console.log(data, "sendMessageReceiver")
     setChat((chat) => [data?.message_obj, ...chat])
-  }
+		ref?.current.scrollToOffset({ animated: true, offset: 0 });
+	}
 
   const editMessageReceiverForSender = (data) => {
     console.log(data, "editMessageReceiverForSender")
@@ -252,7 +259,6 @@ const MessageList = ({ navigation, route }) => {
     let item = opitonModal.item
     console.log(item, "msgAction")
     setOptionModal({ ...opitonModal, opt: opt.type, item: null, isVisible: false, })
-
 
     if (opt.type == 'delete') {
       setTimeout(() => {
@@ -401,9 +407,19 @@ const MessageList = ({ navigation, route }) => {
   }
 
 
+	const	borderLine = (index)=>{
+				return (
+						<View style={{flexDirection:"row", alignItems:"center", justifyContent:"center", marginTop:10}}>
+						<View style={{flex:1, borderWidth:0.5, borderColor: colors.primary}}/>
+						<MyText align="center"  color={colors.primary} style={{paddingHorizontal:10}}>{index+1} Unread Messages</MyText>
+						<View style={{flex:1, borderWidth:0.5, borderColor: colors.primary2}}/>
+						</View>
+				)
+		}
 
   const renderMessages = ({ item, index }) => {
     return (
+				<>
       <MsgView
         state={state}
         setState={setState}
@@ -416,6 +432,8 @@ const MessageList = ({ navigation, route }) => {
         playIconClick={playIconClick}
         stopPlayer={stopPlayer}
       />
+				{item.status == "delivered" &&( (chat.length-1)==index || chat[index+1].status == "read") && borderLine(index)}
+				</>
     )
   }
 
@@ -428,6 +446,7 @@ const MessageList = ({ navigation, route }) => {
       })
     }
   }
+
 
   return (
     <RootView
@@ -444,6 +463,7 @@ const MessageList = ({ navigation, route }) => {
           {/* Flatlist */}
           <View style={{ flex: 1, borderTopColor: colors.lightText2, borderTopWidth: 1 / 3, marginHorizontal: -10, paddingHorizontal: 10 }}>
             <FlatList
+						  ref={ref}
               showsVerticalScrollIndicator={false}
               onEndReachedThreshold={0}
               inverted={chat.length == 0 ? false : true}

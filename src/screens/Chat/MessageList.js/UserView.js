@@ -34,7 +34,6 @@ const UserView = ({ member, timezone }) => {
       setOnlineStatus(false)
     }
   }
-
   return (
     <View style={__style.userRootView}>
       <View>
@@ -67,7 +66,7 @@ const __style = StyleSheet.create({
   userRootView: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 5
+    marginBottom: 5,
   },
   userNameView: {
     flex: 1,
