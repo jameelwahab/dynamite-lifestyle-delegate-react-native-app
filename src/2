@@ -1,4 +1,4 @@
-import { View, Text, FlatList, StyleSheet, Pressable, TouchableOpacity, Keyboard } from 'react-native'
+import { View, Text, FlatList, StyleSheet, Pressable, TouchableOpacity } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import RootView from '../../../components/RootView'
 import MyText from '../../../components/MyText'
@@ -25,7 +25,7 @@ import SearchView from '../../../components/SearchView'
 
 const GroupList = ({ navigation, route }) => {
   const { key, parentKey } = route?.params
-  const { token, access } = useSelector(selectUser);
+  const { token } = useSelector(selectUser);
   const { navbar } = useSelector(selectNavbar);
   const [title] = useState(navbar?.find(x => x._id == parentKey)?.child_options?.find(y => y._id == key)?.title);
   const [list, setList] = useState([]);
@@ -35,7 +35,6 @@ const GroupList = ({ navigation, route }) => {
   const [options, setOptions] = useState({ isVisible: false, item: null });
   const [confirmation, setConfirmation] = useState({ isVisible: false, item: null })
   const [filter, setFilter] =useState(null);
-  const [searchText, setSearchText]=useState("")
 
 
   useEffect(() => {
@@ -93,25 +92,36 @@ const GroupList = ({ navigation, route }) => {
 
   //! APIs
 
-		const getCalendarGroupsLists = async (search) => {
+		const getCalendarGroupsLists = async () => {
 
-				let res = await GET_CALENDAR_GROUPS_LIST_FILTER({
-						token,
-						navigation,
-						search,
-						group_by: filter?.group?.key,
-						badge_levels: filter?.badges?.map(el=>el._id),
-						group_by_ids: filter?.list?.map(el=> el._id)
-				})
-
-				setLoader(false);
-				setRefreshing(false)
-				setSearching(false)
-
-				if(res.code==200){
-						setList(res?.groups)
+				if(
+								(!!filter?.group && filter?.group.title!="") ||
+								(!!filter?.badges && filter?.badges.length!=0)	|
+								(!!filter?.list && filter?.list.length!=0)
+				){
+						let res = await GET_CALENDAR_GROUPS_LIST_FILTER({
+								token,
+								navigation,
+								group_by: filter?.group?.key,
+								badge_levels: filter?.badges.map(el=>el._id),
+								group_by_ids: filter?.list?.map(el=> el._id)
+						})
+						setLoader(false);
+						setRefreshing(false)
+						if(res.code==200){
+								setList(res?.groups)
+						}
 				}
-}
+				else {
+						let res = await GET_CALENDAR_GROUPS_LIST({ navigation, token });
+						setLoader(false);
+						setRefreshing(false)
+						if (res.code == 200) {
+								setList(res?.group)
+						}
+				}
+
+		}
 
   const deleteGrpFromServer = async (grp) => {
     let res = await DELETE_CALENDAR_GROUP({ navigation, token, slug: grp?.group_slug });
@@ -123,11 +133,7 @@ const GroupList = ({ navigation, route }) => {
     }
   }
 
-  const onSearch =  ()=>{
-						Keyboard.dismiss()
-						setSearching(true)
-						getCalendarGroupsLists(searchText)
-				}
+  
 
 
   const statusView = (value) => {
@@ -196,7 +202,7 @@ const GroupList = ({ navigation, route }) => {
 								</Text>
 										<TouchableOpacity
 												onPress={()=> navigation.navigate(routes.calendarGroupFilter,
-																		{ token, filter, access }
+																		{ token, filter }
 																)}
 												style={__styles.filterButton}
 												hitSlop={{ bottom: 5, top: 5, left: 5, right: 5 }}>
@@ -206,6 +212,23 @@ const GroupList = ({ navigation, route }) => {
 				)
 		}
 
+		const SearchSection = ()=>{
+				const [searchText, setSearchText]=useState("")
+				const onSearch =  ()=>{
+						console.log("Napolian")
+				}
+
+				return (
+						<View style={{ backgroundColor: colors.darkSecondary }}>
+								<SearchView
+										search={searchText}
+										onChangeText={(text) => setSearchText(text)}
+										onSearchPress={onSearch}
+										loader={searching}
+								/>
+      </View>
+				)
+		}
 
 		const headerView = ()=>{
 				return  (
@@ -249,14 +272,7 @@ const GroupList = ({ navigation, route }) => {
             </TouchableOpacity>					
 						</View> }
 
-						<View style={{ backgroundColor: colors.darkSecondary }}>
-								<SearchView
-										search={searchText}
-										onChangeText={(text) => setSearchText(text)}
-										onSearchPress={onSearch}
-										loader={searching}
-								/>
-						</View>
+						<SearchSection />
 
 						</>
 				)

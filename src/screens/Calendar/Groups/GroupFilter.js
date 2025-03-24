@@ -15,15 +15,14 @@ import { useRef, useState, useEffect } from "react"
 const GroupFilter = ({navigation, route })=>{
 		const ref_group_by = useRef(null)
 		const ref_badge_level = useRef(null);
-		const {token, filter } = route.params
+		const {token, filter, access } = route.params
 		const [visiSearch, setVisiSearch] = useState(false)
-		const [groupBy, setGroupBy] = useState(false)
-		const [list, setList] = useState({ data:[], badges: [{title:"No Options", key:"no"}] });
+		const [groupBy, setGroupBy] = useState("")
+		const [list, setList] = useState({ data:[], badges: access?.badge_levels || [] });
 		const [loading, setLoading] =useState(false);
 		const [selectedGroup, setSelectedGroup]=useState()
 		const [badges, setBadges] = useState([])
 		const [groupList, setGroupList] = useState([])
-
 
 		const fetchList = async ()=>{
 				setLoading(true)
@@ -48,45 +47,79 @@ const GroupFilter = ({navigation, route })=>{
 
 		useEffect(()=>{
 				setTimeout(()=>{
-						if(!!filter?.badges && filter?.badges.length!=0) setBadges(filter?.badges)
-						if(!!filter?.group && filter?.group.key!="") setGroupBy(filter?.group)
-						if(!!filter?.list && filter?.list.length!=0) setGroupList(filter.list)
+						if(!!filter?.badges && filter?.badges.length!=0){
+								setBadges(filter?.badges)
+						} 
+						if(!!filter?.group && filter?.group.key!=""){
+								setGroupBy(filter?.group)
+						} 
+						if(!!filter?.list && filter?.list.length!=0){
+								setGroupList(filter.list)
+						} 
 				},400)	
 		},[route])
 
 		const handleBadgePress = (item)=> {
 				if(item.key=="no") return;
-				if(badges.length==0) setBadges([item])
-				else setBadges([...badges, item])
+				else if(badges.length==0){
+						setBadges([item])
+				} 
+				else {
+						setBadges([...badges, item])
+				}
 		}
 		const filterBadgeList=(list)=>{
 				
-				if(!!list && badges.length == list.length) return [{title:"No options", key:"no"}]
-				if(badges.length ==0) return list
-				else{
+				if(!!list && badges.length == list.length){
+						return [{title:"No options", key:"no"}]
+				} 
+				else if(badges.length ==0){
+						return list
+				} 
+				else {
 						return list.filter(el=> badges.findIndex(x=> x._id == el._id) < 0 && el  )
 				}
 					
 		}
 
 		const handleSalesListSelect = (item)=>{
-				if(salesList.length == 0 )return[item]
-				else setSalesList([...badges, item])
+				if(salesList.length == 0 ){
+						return[item]
+				}
+				else {
+						setSalesList([...badges, item])
+				} 
 		}
    const filterGroupList = ()=>{
-			 if(groupList.length == 0 ) return list.data;
+			 if(groupList.length == 0 ){
+			 return list.data
+			 } 
 			 else{
 					 return list.data.filter(el=> groupList.findIndex(x => x._id == el._id) < 0 && el )
 			 }
 	 }
-
+		const filterTheList = (list, text) => {
+				if (text.trim() == "") {
+						return list
+				} else {
+						return list.slice().filter(x => x[groupBy.key == "sale_page" ? "sale_page_title" : "title"].toLowerCase().includes(text.toLowerCase().trim()))
+				}
+		}
 		return (
 				<RootView title="Filter">
+
 						<MyTouchableInput
 								label='Group by'
 								value={groupBy?.title || ""}
 								icon={() => icons.down()}
 								onPress={()=> ref_group_by?.current?.openModal()}
+								clearbutton={groupList.length!=0}
+								onClearButtonPress={() => {
+										setGroupList([])
+										setGroupBy("")
+										setList({...badges, data:[]})
+
+								}}
 						/>
 
 						<Collapsible collapsed={list.data.length==0} >
@@ -142,7 +175,6 @@ const GroupFilter = ({navigation, route })=>{
 						style={{ flex: 1 }}
 						title='Submit'
 						onPress={() => {
-								if(groupBy?.key){
 										navigation.navigate(routes.calendarGroupList, {
 												filter:{
 														group: groupBy,
@@ -151,11 +183,7 @@ const GroupFilter = ({navigation, route })=>{
 												}									
 										})
 								}
-								else{
-										showToast({title:"info", body:"Please Select The Group Type"})
-								}
-
-						} }
+						} 
 					/>
 				</View>
 		
@@ -175,6 +203,7 @@ const GroupFilter = ({navigation, route })=>{
 				<OptionModalWithSearch 
 						isVisible={visiSearch}
 						closeModal={()=> setVisiSearch(false)}
+						filterTheList={filterTheList}
 						titleKey={groupBy.key == "sale_page" ? "sale_page_title" : "title"}
 						optionList={filterGroupList()}
 						onSelected={(item)=> {

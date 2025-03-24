@@ -146,8 +146,6 @@ const GroupAddEdit = ({ navigation, route }) => {
         exclude_members: groupData.exclude_members.map(member => member?._id),
         badge_levels: groupData?.communityLevel,
         group_for_member: groupData?.memberType,
-				missions: groupData.map(el=> {{}}),
-
       };
       if (obj.group_by == "program") {
         obj["program"] = groupData.program.map(item => {
@@ -160,9 +158,12 @@ const GroupAddEdit = ({ navigation, route }) => {
         })
       } else if (obj.group_by == "event") {
         obj["event"] = groupData.event.map(item => ({ event_slug: item?.event_slug }))
-      } else if (obj.group_by == "sale_page") {
-        obj["missions"] = groupData.mission.map(item => ({ _id: item?._id }))
-      } 
+			} else if (obj.group_by == "sale_page") {
+					obj["sale_page"] = groupData.sale_page.map(item => ({ _id: item?._id }))
+					obj["plans"] = groupData.plans.map(item => ({ _id: item?._id }))
+      } else if(obj.group_by == "mission"){
+				obj["missions"] = groupData.mission.map(item=> item)
+			}
 
       if (isEdit) {
         updateGroupToServer(obj)
@@ -227,6 +228,7 @@ const GroupAddEdit = ({ navigation, route }) => {
       <View pointerEvents="auto" style={__styles.chipsLisView}>
         {list.map((item, index) =>
           <MyChip
+						key={index}
             title={!!variable ? item[variable] : `${item?.first_name} ${item?.last_name} (${item?.email})`}
             onPress={() => removeItem(index, type)}
           />
