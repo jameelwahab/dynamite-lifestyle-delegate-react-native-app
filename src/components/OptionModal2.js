@@ -13,7 +13,6 @@ const OptionModal2 = forwardRef(({
   onSelected,
   optionList,
   filterTheList = null,
-  titleKey = undefined,
   renderText,
   noIcon = false,
   multiple = false,
@@ -22,14 +21,16 @@ const OptionModal2 = forwardRef(({
 }, ref) => {
   const [isVisible, setIsVisible] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [titleKey, setTitleKey] = useState("title")
 
   const closeModal = () => {
     setSelectedItem(null)
     setIsVisible(false)
   }
 
-  const openModal = (item = null) => {
+  const openModal = (item = null,titleKey="title") => {
     setSelectedItem(item)
+    setTitleKey(titleKey)
     setIsVisible(true)
   }
 
