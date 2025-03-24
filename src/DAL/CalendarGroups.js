@@ -45,7 +45,8 @@ export const GET_CALENDAR_ALL_MEMBER = ({ token, navigation, slug, page, searchT
 
 export const ADD_CALENDAR_GROUP = ({ token, navigation, body }) => {
   return invokeApi({
-    path: `api/group`,
+    // path: `api/group`,
+    path:`api/group/add_group_v1`,
     method: "POST",
     postData: body,
     token,

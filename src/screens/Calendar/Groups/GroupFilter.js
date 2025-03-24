@@ -12,6 +12,7 @@ import {MyButton, MyClearButton} from "../../../components/MyButton"
 import { icons } from "../../../utilities/icons"
 import { View, StyleSheet } from "react-native"
 import { useRef, useState, useEffect } from "react"
+import isArray from "../../../functions/isArray"
 const GroupFilter = ({navigation, route })=>{
 		const ref_group_by = useRef(null)
 		const ref_badge_level = useRef(null);

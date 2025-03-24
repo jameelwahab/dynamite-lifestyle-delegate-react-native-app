@@ -220,31 +220,36 @@ const GroupDetail = ({ navigation, route }) => {
     if (tabIndex == 0)
       return (
         <View style={__styles.listRootView}>
-          {group?.group_by == "sale_page" ?
+          {group?.group_by == "mission" ?
             <>
-              <StatView title={"Sale Page Title"} value={item?.sale_page_title} />
-              <StatView title={"Payment Plan"} value={!!data?.plans && data?.plans?.map(x => {
-                if (x?.sale_page == item?._id) {
-                  return `${x?.plan_title},`
-                }
-              })} />
+              <StatView title={"Title"} value={item?.title} />
+              <StatView title={"Duration"} value={item?.mission_duration + " days"} />
             </> :
-            <>
-              <View style={__styles.titleRow}>
-                <UserImage
-                  image={group?.group_by == "program" ? item?.program_images?.thumbnail_1 : item?.images?.thumbnail_1}
-                  name={item?.title}
-                  size={40}
-                />
-                <View style={{ flex: 1, marginLeft: 10 }}>
-                  <MyText >{item?.title}</MyText>
+            group?.group_by == "sale_page" ?
+              <>
+                <StatView title={"Sale Page Title"} value={item?.sale_page_title} />
+                <StatView title={"Payment Plan"} value={!!data?.plans && data?.plans?.map(x => {
+                  if (x?.sale_page == item?._id) {
+                    return `${x?.plan_title},`
+                  }
+                })} />
+              </> :
+              <>
+                <View style={__styles.titleRow}>
+                  <UserImage
+                    image={group?.group_by == "program" ? item?.program_images?.thumbnail_1 : item?.images?.thumbnail_1}
+                    name={item?.title}
+                    size={40}
+                  />
+                  <View style={{ flex: 1, marginLeft: 10 }}>
+                    <MyText >{item?.title}</MyText>
+                  </View>
                 </View>
-              </View>
-              <View>
-                {/* <MyText>{item?.short_description}</MyText> */}
-                <StatView title={"Description"} value={item?.short_description} />
-              </View>
-            </>}
+                <View>
+                  {/* <MyText>{item?.short_description}</MyText> */}
+                  <StatView title={"Description"} value={item?.short_description} />
+                </View>
+              </>}
         </View>)
     else {
       return (
@@ -293,7 +298,7 @@ const GroupDetail = ({ navigation, route }) => {
       return list
     } else {
       if (tabIndex == 0) {
-        if (type == "sale_page") {
+        if (type == "sale_page" || type == "mission") {
           return list.slice().filter(x => x.title.toLowerCase().includes(stext))
         } else {
           return list.slice().filter(x => x.sale_page_title.toLowerCase().includes(stext))
@@ -323,8 +328,9 @@ const GroupDetail = ({ navigation, route }) => {
             data={tabIndex == 0 && group?.group_by == "program" ? searchFromList(data?.group_programs, group?.group_by) :
               tabIndex == 0 && group?.group_by == "event" ? searchFromList(data?.group_events, group?.group_by) :
                 tabIndex == 0 && group?.group_by == "sale_page" ? searchFromList(data?.sale_pages, group?.group_by) :
-                  tabIndex == 1 ? searchFromList(data?.group_members) :
-                    (tabIndex == 2 || tabIndex == 3) ? allMembers : []
+                  tabIndex == 0 && group?.group_by == "mission" ? searchFromList(data?.group?.missions, group?.group_by) :
+                    tabIndex == 1 ? searchFromList(data?.group_members) :
+                      (tabIndex == 2 || tabIndex == 3) ? allMembers : []
             }
             renderItem={renderList}
             showsVerticalScrollIndicator={false}
@@ -385,6 +391,11 @@ const grptype = {
     tab: "SALE PAGES LIST",
     title: "Sale Pages",
     variable: "event"
+  },
+  "mission": {
+    tab: "MISSIONS LIST",
+    title: "Missions",
+    variable: "mission"
   },
 }
 

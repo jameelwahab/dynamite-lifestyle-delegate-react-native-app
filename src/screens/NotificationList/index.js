@@ -109,7 +109,7 @@ const NotificationList = ({ navigation, route }) => {
           navigator = routes.allSourcesFeedNavigator;
         else if (!!navbar.find(x => x.value == "the_source_feed"))
           navigator = routes.sourceFeedNavigator;
-      } 
+      }
 
 
       let params = { feedId: item?.feeds?._id };
@@ -376,9 +376,20 @@ const NotificationList = ({ navigation, route }) => {
           }
         }],
       })
-    } else if(notification_type=="commission_notification"){
-				navigation.navigate(routes.commissionNavigator)
-		}
+    } else if (notification_type == "commission_notification") {
+      // navigation.navigate(routes.commissionNavigator)
+      navigation.reset({
+        routes: [{
+          name: routes?.commissionNavigator,
+          state: {
+            routes: [
+              {
+                name: routes.commissionDetailScreen,
+              }],
+          }
+        }],
+      })
+    }
 
 
 

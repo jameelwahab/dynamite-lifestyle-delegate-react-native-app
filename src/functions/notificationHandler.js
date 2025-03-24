@@ -264,10 +264,20 @@ const notificationHandler = (remoteMessage, navigation, navbar) => {
         }
       }]
     })
+  } else if (data?.type == "commission_notification") {
+    // navigation.navigate(routes.commissionNavigator)
+    navigation.reset({
+      routes: [{
+        name: routes?.commissionNavigator,
+        state: {
+          routes: [
+            {
+              name: routes.commissionDetailScreen,
+            }],
+        }
+      }],
+    })
   }
-		else if(data?.type == "commission_notification"){
-				navigation.navigate(routes.commissionNavigator)
-		}
 
 
   notifee.decrementBadgeCount();
