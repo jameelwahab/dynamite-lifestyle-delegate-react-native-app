@@ -10,7 +10,7 @@ export const GET_CALENDAR_GROUPS_LIST = ({ token, navigation, group_by, badge_le
   })
 }
 
-export const GET_CALENDAR_GROUPS_LIST_FILTER = ({ token, navigation, body, badge_levels, group_by, group_by_ids }) => {
+export const GET_CALENDAR_GROUPS_LIST_FILTER = ({ token, navigation, body, badge_levels, search, group_by, group_by_ids }) => {
   return invokeApi({
     path: `api/group/group_filter?page=0&limit=50`,
     method: "POST",
@@ -19,6 +19,7 @@ export const GET_CALENDAR_GROUPS_LIST_FILTER = ({ token, navigation, body, badge
 		postData: {
 				group_by,
 				badge_levels,
+				search,
 				group_by_ids,
 		},
   })
@@ -44,7 +45,8 @@ export const GET_CALENDAR_ALL_MEMBER = ({ token, navigation, slug, page, searchT
 
 export const ADD_CALENDAR_GROUP = ({ token, navigation, body }) => {
   return invokeApi({
-    path: `api/group`,
+    // path: `api/group`,
+    path:`api/group/add_group_v1`,
     method: "POST",
     postData: body,
     token,
@@ -54,7 +56,7 @@ export const ADD_CALENDAR_GROUP = ({ token, navigation, body }) => {
 
 export const UPDATE_CALENDAR_GROUP = ({ token, navigation, slug, body }) => {
   return invokeApi({
-    path: `api/group/${slug}`,
+    path: `api/group/update_group_v1/${slug}`,
     method: "PUT",
     postData: body,
     token,

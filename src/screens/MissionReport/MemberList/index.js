@@ -144,7 +144,7 @@ const MemberList = ({ navigation, route }) => {
           <Flex flex={1}>
             <MemberView
               member={item?.member}
-              borderColor={item?.member?.membership_level_badge_info?.membership_level_badge_color_code}
+              borderColor={item?.current_badge_level?.color_code}
             />
           </Flex>
           {icons.forwardArrow()}

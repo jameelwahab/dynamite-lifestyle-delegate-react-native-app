@@ -1476,7 +1476,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 						<View style={{ marginHorizontal: 10,marginTop:15}}>
 								<View >
 										<MyCheckBox
-										title="Notify User ?"
+										title="Notify Users ?"
 										value={notifyUser}
 										onPress={() => {
 												setNotifyUser(!notifyUser)
