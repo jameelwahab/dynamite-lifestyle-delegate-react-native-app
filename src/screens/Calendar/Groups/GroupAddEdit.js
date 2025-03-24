@@ -46,7 +46,7 @@ const GroupAddEdit = ({ navigation, route }) => {
     program: !!group?.program ? group?.program.map(x => x?._id) : [],
     event: !!group?.event ? group?.event.map(x => x?._id) : [],
     sale_page: !!group?.sale_pages ? group?.sale_pages.map(x => x?._id) : [],
-		mission: !!group?.misson ? group?.mission.map(x => x?._id) : [],
+		mission: !!group?.missions ? group?.missions.map(x => x) : [],
     plans: !!group?.plans ? group?.plans.map(x => x?._id) : [],
     member: !!group?.member ? group?.member.map(x => x?._id) : [],
     exclude_members: !!group?.exclude_members ? group?.exclude_members.map(x => x?._id) : [],
@@ -162,7 +162,9 @@ const GroupAddEdit = ({ navigation, route }) => {
 					obj["sale_page"] = groupData.sale_page.map(item => ({ _id: item?._id }))
 					obj["plans"] = groupData.plans.map(item => ({ _id: item?._id }))
       } else if(obj.group_by == "mission"){
-				obj["missions"] = groupData.mission.map(item=> item)
+				obj["missions"] = groupData.mission.map(item=> ({_id:item?._id,
+          title:item?.title
+        }))
 			}
 
       if (isEdit) {

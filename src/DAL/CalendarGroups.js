@@ -55,7 +55,7 @@ export const ADD_CALENDAR_GROUP = ({ token, navigation, body }) => {
 
 export const UPDATE_CALENDAR_GROUP = ({ token, navigation, slug, body }) => {
   return invokeApi({
-    path: `api/group/${slug}`,
+    path: `api/group/update_group_v1/${slug}`,
     method: "PUT",
     postData: body,
     token,
