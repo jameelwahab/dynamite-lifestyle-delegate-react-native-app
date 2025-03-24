@@ -106,6 +106,8 @@ const GroupFilter = ({navigation, route })=>{
 						return list.slice().filter(x => x[groupBy.key == "sale_page" ? "sale_page_title" : "title"].toLowerCase().includes(text.toLowerCase().trim()))
 				}
 		}
+
+
 		return (
 				<RootView title="Filter">
 
@@ -119,7 +121,6 @@ const GroupFilter = ({navigation, route })=>{
 										setGroupList([])
 										setGroupBy("")
 										setList({...badges, data:[]})
-
 								}}
 						/>
 
@@ -140,7 +141,6 @@ const GroupFilter = ({navigation, route })=>{
 												</View>
 										) }
 										</View>
-
 										}
 										/>
 						</Collapsible>
@@ -197,12 +197,15 @@ const GroupFilter = ({navigation, route })=>{
 
 				<OptionModal2
 						ref={ref_badge_level}
+						multiple
 						optionList={filterBadgeList(list.badges)}
 						onSelected={(item)=>handleBadgePress(item)}
+						multipleLabel={"Select Badge Levels"}
 				/>	
 
 				<OptionModalWithSearch 
 						isVisible={visiSearch}
+						noIcon
 						closeModal={()=> setVisiSearch(false)}
 						filterTheList={filterTheList}
 						titleKey={groupBy.key == "sale_page" ? "sale_page_title" : "title"}

@@ -34,8 +34,8 @@ const GroupList = ({ navigation, route }) => {
   const [refreshing, setRefreshing] = useState(false);
   const [options, setOptions] = useState({ isVisible: false, item: null });
   const [confirmation, setConfirmation] = useState({ isVisible: false, item: null })
-  const [filter, setFilter] =useState(null);
-  const [searchText, setSearchText]=useState("")
+  const [filter, setFilter] = useState(null);
+  const [searchText, setSearchText] = useState("")
 
 
   useEffect(() => {
@@ -66,9 +66,9 @@ const GroupList = ({ navigation, route }) => {
       if (opt.key == "edit") {
         navigation.navigate(routes.calendarGroupAddEdit, { group: item, ammendList })
       } else if (opt.key == "delete") {
-					setTimeout(()=>{
-							setConfirmation({ isVisible: true, item: item })
-					},350)
+        setTimeout(() => {
+          setConfirmation({ isVisible: true, item: item })
+        }, 350)
       } else if (opt.key == "detail") {
         onGrpDetail(item)
       }
@@ -93,25 +93,25 @@ const GroupList = ({ navigation, route }) => {
 
   //! APIs
 
-		const getCalendarGroupsLists = async (search) => {
+  const getCalendarGroupsLists = async (search) => {
 
-				let res = await GET_CALENDAR_GROUPS_LIST_FILTER({
-						token,
-						navigation,
-						search,
-						group_by: filter?.group?.key,
-						badge_levels: filter?.badges?.map(el=>el._id),
-						group_by_ids: filter?.list?.map(el=> el._id)
-				})
+    let res = await GET_CALENDAR_GROUPS_LIST_FILTER({
+      token,
+      navigation,
+      search,
+      group_by: filter?.group?.key,
+      badge_levels: filter?.badges?.map(el => el._id),
+      group_by_ids: filter?.list?.map(el => el._id)
+    })
 
-				setLoader(false);
-				setRefreshing(false)
-				setSearching(false)
+    setLoader(false);
+    setRefreshing(false)
+    setSearching(false)
 
-				if(res.code==200){
-						setList(res?.groups)
-				}
-}
+    if (res.code == 200) {
+      setList(res?.groups)
+    }
+  }
 
   const deleteGrpFromServer = async (grp) => {
     let res = await DELETE_CALENDAR_GROUP({ navigation, token, slug: grp?.group_slug });
@@ -123,11 +123,11 @@ const GroupList = ({ navigation, route }) => {
     }
   }
 
-  const onSearch =  ()=>{
-						Keyboard.dismiss()
-						setSearching(true)
-						getCalendarGroupsLists(searchText)
-				}
+  const onSearch = () => {
+    Keyboard.dismiss()
+    setSearching(true)
+    getCalendarGroupsLists(searchText)
+  }
 
 
   const statusView = (value) => {
@@ -173,9 +173,9 @@ const GroupList = ({ navigation, route }) => {
               item?.group_by == "event" ? item?.event
                 : item?.group_by == "program" ? item?.program
                   : item?.group_by == "sale_page" ? item?.sale_pages :
-						item?.group_by == "mission" ? item?.missions : [],
+                    item?.group_by == "mission" ? item?.missions : [],
               item?.group_by == "sale_page" ? "sale_page_title" : "title")
-						} />
+            } />
 
           <StatView title={"Type"} value={item?.group_type} />
           <StatView title={"Group By"} value={groupBy[item?.group_by]} />
@@ -188,90 +188,93 @@ const GroupList = ({ navigation, route }) => {
   }
 
 
-		const titleView = ()=>{
-				return(
-						<View style={__styles.heading_container}>
-								<Text style={__styles.heading_font} >
-										Groups
-								</Text>
-										<TouchableOpacity
-												onPress={()=> navigation.navigate(routes.calendarGroupFilter,
-																		{ token, filter, access }
-																)}
-												style={__styles.filterButton}
-												hitSlop={{ bottom: 5, top: 5, left: 5, right: 5 }}>
-												{icons.filterCircle(colors.primary, 30)}
-										</TouchableOpacity>
-						</View>
-				)
-		}
+  const titleView = () => {
+    return (
+      <View style={__styles.heading_container}>
+        <Text style={__styles.heading_font} >
+          Groups
+        </Text>
+        <TouchableOpacity
+          onPress={() => navigation.navigate(routes.calendarGroupFilter,
+            { token, filter, access }
+          )}
+          style={__styles.filterButton}
+          hitSlop={{ bottom: 5, top: 5, left: 5, right: 5 }}>
+          {icons.filterCircle(colors.primary, 30)}
+        </TouchableOpacity>
+      </View>
+    )
+  }
 
 
-		const headerView = ()=>{
-				return  (
-						<>
-						{	(
-								(!!filter?.group && filter?.group.title!="") ||
-								isArray(filter?.badges) || 
-								isArray(filter?.list)
-						) && 
-								<View style={__styles.topHeaderView}>
-								<MyText>Filter By: </MyText>
-								{!!filter?.group &&
-										<MyChip title={filter?.group?.title}
-												onPress={()=>setFilter({...filter, group:null, list:null, badges:null })} 
-										/>
-								}
-						{filter?.list?.map((el, index) =>
-									<MyChip
-												title={filter?.group?.key == "sale_page" ? el.sale_page_title : el.title}
-												key={index}
-										onPress={() => {
-											setFilter({
-												...filter, list: filter.list.filter(x=> x._id!=el._id)
-												})
-										}} />
-							)}
-						{filter?.badges?.map((el, index) =>
-									<MyChip
-												title={el.title}
-												key={index}
-										onPress={() => {
-											setFilter({
-												...filter, badges: filter.badges.filter(x=> x._id!=el._id)
-												})
-										}} />
-							)}
-						<TouchableOpacity
-										onPress={() => setFilter({})}
-										style={__styles.clear_btn}>
-								<MyText color={colors.primary}>{"Clear Filter"}</MyText>
-            </TouchableOpacity>					
-						</View> }
+  const headerView = () => {
+    return (
+      <View>
+        {(
+          (!!filter?.group && filter?.group.title != "") ||
+          isArray(filter?.badges) ||
+          isArray(filter?.list)
+        ) &&
+          <View style={__styles.topHeaderView}>
+            <MyText>Filter By: </MyText>
+            {!!filter?.group &&
+              <MyChip title={filter?.group?.title}
+                onPress={() => setFilter({ ...filter, group: null, list: null, })}
+              />
+            }
+            {filter?.list?.map((el, index) =>
+              <MyChip
+                title={filter?.group?.key == "sale_page" ? el.sale_page_title : el.title}
+                key={index}
+                onPress={() => {
+                  setFilter({
+                    ...filter, list: filter.list.filter(x => x._id != el._id)
+                  })
+                }} />
+            )}
+            {filter?.badges?.map((el, index) =>
+              <MyChip
+                title={el.title}
+                key={index}
+                onPress={() => {
+                  setFilter({
+                    ...filter, badges: filter.badges.filter(x => x._id != el._id)
+                  })
+                }} />
+            )}
+            <TouchableOpacity
+              onPress={() => setFilter({})}
+              style={__styles.clear_btn}>
+              <MyText color={colors.primary}>{"Clear Filter"}</MyText>
+            </TouchableOpacity>
+          </View>}
 
-						<View style={{ backgroundColor: colors.darkSecondary }}>
-								<SearchView
-										search={searchText}
-										onChangeText={(text) => setSearchText(text)}
-										onSearchPress={onSearch}
-										loader={searching}
-								/>
-						</View>
+        <View style={{ backgroundColor: colors.darkSecondary }}>
+          <SearchView
+            search={searchText}
+            onChangeText={(text) => setSearchText(text)}
+            onSearchPress={onSearch}
+            loader={searching}
+          />
+        </View>
 
-						</>
-				)
-		}
+      </View>
+    )
+  }
 
 
   return (
     <RootView hideBackBottomButton titleView={titleView}>
       <View style={{ flex: 1 }}>
         <FlatList
+          keyboardShouldPersistTaps="handled"
           data={list}
           ListHeaderComponent={headerView()}
           renderItem={renderItem}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={!loader && <EmptyView data={"No Groups found"} />}
+          stickyHeaderIndices={[0]}
+          stickyHeaderHiddenOnScroll={true}
           refreshControl={<MyRefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
@@ -307,7 +310,7 @@ const groupBy = {
   event: "Event",
   program: "Programme",
   sale_page: "Sale Page",
-  mission:"Mission",
+  mission: "Mission",
 }
 
 const optionsList = [
