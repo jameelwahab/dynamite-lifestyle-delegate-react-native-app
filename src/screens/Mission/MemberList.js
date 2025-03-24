@@ -235,7 +235,7 @@ const MemberList = ({ route, navigation }) => {
 			style={__styles.itemView}>
 			<View style={{ flex: 1, flexDirection: 'row', alignItems: "center", justifyContent: "space-between" }}>
 				<MemberView
-					borderColor={item?.user_info?.membership_level_badge_info?.membership_level_badge_color_code}
+					borderColor={item?.current_badge_level?.color_code}
 					member={item?.user_info}
 					customImage={item?.user_info?.profile_image}
 				/>

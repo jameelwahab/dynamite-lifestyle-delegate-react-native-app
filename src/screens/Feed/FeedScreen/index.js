@@ -1586,7 +1586,7 @@ const feedOptionList = [{
 },
 {
   icon: () => icons.notification(colors.primary, 17),
-  title: "Notify User",
+  title: "Notify Users",
   type: "notify"
 }
 
