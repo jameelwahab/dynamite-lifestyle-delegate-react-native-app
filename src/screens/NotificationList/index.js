@@ -96,7 +96,6 @@ const NotificationList = ({ navigation, route }) => {
     let { notification_type } = item;
     if (feedType.includes(notification_type)) {
       let navigator = "";
-      console.log(item, "item")
       if ((item?.tab_type == "the_cosmos" || item?.notification_type == "feed_mentioned") && !!navbar.find(x => x.value == "the_cosmos")) {
         navigator = routes.feedNavigator;
       } else if (item?.tab_type == "event") {
@@ -110,9 +109,8 @@ const NotificationList = ({ navigation, route }) => {
           navigator = routes.allSourcesFeedNavigator;
         else if (!!navbar.find(x => x.value == "the_source_feed"))
           navigator = routes.sourceFeedNavigator;
-      }
+      } 
 
-      console.log(navigator, "")
 
       let params = { feedId: item?.feeds?._id };
       if (!!navigator) {
@@ -132,7 +130,6 @@ const NotificationList = ({ navigation, route }) => {
           params["openCommentModal"] = true;
         }
         if (item?.tab_type == "event") {
-          console.log(item?.tab_type, "isEvent")
           navigation.reset({
             routes: [{
               name: navigator,
@@ -379,7 +376,11 @@ const NotificationList = ({ navigation, route }) => {
           }
         }],
       })
-    }
+    } else if(notification_type=="commission_notification"){
+				navigation.navigate(routes.commissionNavigator)
+		}
+
+
 
   }
 
@@ -645,5 +646,7 @@ const __styles = StyleSheet.create({
 
 
 
-const feedType = ["commentlike", "addcomment", "feedlike", "gratitude", "addcommentreply", "feed_mentioned", "feed_comment_mentioned", "poll_answer", "survey_answer"];
+const feedType = ["commentlike", "addcomment", "feedlike", "gratitude", "addcommentreply", "feed_mentioned", "feed_comment_mentioned", "poll_answer", "survey_answer",];
+
 const SupportTicketType = ["support_ticket_internal_note", "send_support_ticket_reminder", "close_support_ticket", "support_ticket_comment", "add_support_ticket", "support_ticket"];
+
