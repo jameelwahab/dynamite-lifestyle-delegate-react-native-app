@@ -209,7 +209,7 @@ const GroupList = ({ navigation, route }) => {
 
 		const headerView = ()=>{
 				return  (
-						<>
+						<View>
 						{	(
 								(!!filter?.group && filter?.group.title!="") ||
 								isArray(filter?.badges) || 
@@ -219,7 +219,7 @@ const GroupList = ({ navigation, route }) => {
 								<MyText>Filter By: </MyText>
 								{!!filter?.group &&
 										<MyChip title={filter?.group?.title}
-												onPress={()=>setFilter({...filter, group:null, list:null, badges:null })} 
+												onPress={()=>setFilter({ ...filter, group: null, list: null, })} 
 										/>
 								}
 						{filter?.list?.map((el, index) =>
@@ -258,7 +258,7 @@ const GroupList = ({ navigation, route }) => {
 								/>
 						</View>
 
-						</>
+						</View>
 				)
 		}
 
@@ -272,6 +272,8 @@ const GroupList = ({ navigation, route }) => {
           renderItem={renderItem}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={!loader && <EmptyView data={"No Groups found"} />}
+				  stickyHeaderIndices={[0]}
+				  stickyHeaderHiddenOnScroll={true}
           refreshControl={<MyRefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
