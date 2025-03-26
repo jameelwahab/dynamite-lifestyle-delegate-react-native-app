@@ -82,6 +82,17 @@ const Updates = ({route,navigation}) => {
 		}, [])
 
    const titleView = () => {
+
+			 const handleMenuPress = () => {
+					 setTimeout(()=>{
+							 ref?.current?.openModal()
+					 },200)
+			 }
+
+			 const handleFilterPress = () => {
+					 navigation.navigate(routes.updatesFilter, {filters}) 
+			 }
+
     return (
       <View style={__styles.heading_container}>
         <Text style={__styles.heading_font} >
@@ -89,14 +100,14 @@ const Updates = ({route,navigation}) => {
         </Text>
 				<View style={{flexDirection:"row"}}>
         <TouchableOpacity
-          onPress={()=>ref?.current?.openModal()}
+          onPress={handleMenuPress}
           style={[__styles.filterButton, {marginRight:10}]}
           hitSlop={{ bottom: 5, top: 5, left: 5, right: 5 }}>
           {icons.menuCircle(colors.primary, 30)}
         </TouchableOpacity>
 
         <TouchableOpacity
-          onPress={() => navigation.navigate(routes.updatesFilter, {filters}) }
+          onPress={handleFilterPress}
           style={__styles.filterButton}
           hitSlop={{ bottom: 5, top: 5, left: 5, right: 5 }}>
           {icons.filterCircle(colors.primary, 30)}
@@ -161,6 +172,8 @@ const Updates = ({route,navigation}) => {
 								renderItem={({item})=> renderList(item)}
 								stickyHeaderIndices={[0]}
 								stickyHeaderHiddenOnScroll={true}
+								onViewableItemsChanged={onViewCallBack}
+								viewabilityConfig={viewConfigRef?.current}
 						/>	
 						<MyLoader enable={loading} />
 
@@ -174,8 +187,6 @@ const Updates = ({route,navigation}) => {
 		)
 }
 
-								// onViewableItemsChanged={onViewCallBack}
-								// viewabilityConfig={viewConfigRef?.current}
 
 const __styles = StyleSheet.create({
 		heading_container: {

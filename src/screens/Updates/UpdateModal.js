@@ -94,7 +94,7 @@ const __styles = StyleSheet.create({
 				paddingHorizontal: 15,
 				paddingVertical:20,
 				height: "94%",
-				width:"75%%",
+				width:"75%",
 				marginLeft:"auto",
 				marginTop:"auto",
 		},
