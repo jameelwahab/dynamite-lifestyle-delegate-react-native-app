@@ -58,6 +58,7 @@ import StackMission from "../NestedStacks/StackMission"
 import StackContentReview from "../NestedStacks/StackFeedReview"
 import StackFeedReview from "../NestedStacks/StackFeedReview";
 import StackCommentReview from "../NestedStacks/StackCommentReview";
+import StackUpdates from "../NestedStacks/StackUpdates";
 
 
 
@@ -342,6 +343,7 @@ export const ParentComponents = {
       key: "aadbd7a3-91c1-40dd-bf24-532fc288d265555"
     }
   },
+
   "79fe1cf4-6cd7-42d0-a855-3fcf5fec045a": {
     key: null,
     component: null,
@@ -403,6 +405,18 @@ export const ParentComponents = {
   //     key: "aadbd7a3-444444-40dd-bf24-7846756776677887"
   //   }
   // },
+
+
+// Update Tab
+  "39f49f30-5a18-4c38-9c91-ad8a89f7218b": {
+    key: routes.updates,
+    component: StackUpdates,
+    params: {
+      value: "updates",
+      key: "39f49f30-5a18-4c38-9c91-ad8a89f7218b"
+    }
+  }
+
 }
 
 export const ChildComponents = {

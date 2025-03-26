@@ -365,6 +365,11 @@ const routes = {
   //? Sales Team Transactions
   salesTeamTransactionsListingScreen: "SALES_TEAM_TRANSACTION_LISTING_SCREEN",
   salesTeamTransactionsAddEditScreen: "SALES_TEAM_TRANSACTION_ADD_EDIT_SCREEN",
+
+  // Updates
+  updates:"UPDATES",
+  updatesMain:"UPDATES_MAIN",
+  updatesFilter: "UPDATES_FILTER"
 }
 
 

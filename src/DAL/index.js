@@ -190,3 +190,6 @@ export {GET_LIVE_CHAT_LIST} from "./LiveChat"
 export {GET_REVIEW_FEEDS, DELETE_REVIEW_FEEDS, APPROVE_REVIEW_FEEDS} from "./ReviewFeeds"
 
 export { GET_COMMENT_REVIEW, DELETE_COMMNET_REVIEW, APPROVE_COMMENT_REVIEW} from "./commentReview.js"
+
+export { GET_UPDATES_LIST } from "./Updates"
+
