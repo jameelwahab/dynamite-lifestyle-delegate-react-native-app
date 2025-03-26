@@ -11,6 +11,7 @@ import MyKeyboardAvoidingView from '../../../components/MyKeyboardAvoidingView'
 import capitalize from '../../../functions/capitalize'
 import breakReference from '../../../functions/breakReference'
 import NotificationModal from '../../../components/ReminderModals/NotificationModal'
+import EmailModal from '../../../components/ReminderModals/EmailModal'
 import MessageModal from '../../../components/ReminderModals/MessageModal'
 import moment from 'moment'
 import { ADD_CALENDAR_EVENT, UPDATE_CALENDAR_EVENT, UPDATE_CALENDAR_EVENT_ITERATION, UPDATE_CALENDAR_EVENT_ITERATION_BY_MEMBER } from '../../../DAL'
@@ -33,6 +34,8 @@ const CalendarNotifications = ({ navigation, route }) => {
   const timezone = useSelector(selectTimeZone)
   const refNotificationModal = useRef()
   const ref_option = useRef();
+  const ref_email_modal = useRef()
+  const ref_sms_modal = useRef()
   const refMessageModal = useRef();
   const [notifications, setnotifications] = useState(!!savedNotifications ? savedNotifications : !!event?.notify_before ? event?.notify_before : [{ ...notifyObject }])
   const [loader, setLoader] = useState(false);
@@ -220,9 +223,29 @@ const CalendarNotifications = ({ navigation, route }) => {
   const notificationView = ({ item, index }) => {
     let pushNot = item?.notification_send_type.find(x => x.name == "push_notification_access")
     let messageNot = item?.notification_send_type.find(x => x.name == "message_notification_access")
+    let email = item?.notification_send_type.find(x => x.name == "email_notification_access")
+    let sms = item?.notification_send_type.find(x => x.name == "sms_notification_access")
     return (
       <View style={__styles.notificationView} key={"notifcation" + index} >
+
         <View style={{ flexDirection: "row", alignItems: "center" }}>
+
+          <View style={{ flex: 1, paddingVertical: 4 }} >
+            <MyCheckBox
+              value={!!email}
+              onPress={() => notifcationTypeHandler("email_notification_access", index)}
+              title={"Email"} />
+						</View>
+				  
+          {!!email &&
+            <View style={__styles.cardViewEditBtn}>
+              <TransparentButton
+                onPress={() => ref_email_modal?.current?.openModal(item?.notification_send_type.find(x => x.name == "email_notification_access")?.email_notification_info, index)}
+                icon={() => icons.editpencil()} />
+            </View>}
+        </View>
+
+				<View style={{ flexDirection: "row", alignItems: "center" }}>
           <View style={{ flex: 1, paddingVertical: 4 }} >
             <MyCheckBox
               value={!!pushNot}
@@ -230,6 +253,7 @@ const CalendarNotifications = ({ navigation, route }) => {
               title={"Notification"} />
 
           </View>
+				  
           {!!pushNot &&
             <View style={__styles.cardViewEditBtn}>
               <TransparentButton
@@ -237,6 +261,7 @@ const CalendarNotifications = ({ navigation, route }) => {
                 icon={() => icons.editpencil()} />
             </View>}
         </View>
+
 
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <View style={{ flex: 1, paddingVertical: 4 }} >
@@ -254,6 +279,21 @@ const CalendarNotifications = ({ navigation, route }) => {
             </View>}
         </View>
 
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+						<View style={{ flex: 1, paddingVertical: 4 }} >
+								<MyCheckBox
+										value={!!sms}
+										onPress={() => notifcationTypeHandler("sms_notification_access", index)}
+										title={"SMS"} isNormalText/>
+						</View>
+
+          {!!sms &&
+            <View style={__styles.cardViewEditBtn}>
+              <TransparentButton
+                onPress={() => ref_sms_modal?.current?.openModal(item?.notification_send_type.find(x => x.name == "sms_notification_access")?.sms_notification_info, index, "SMS")}
+                icon={() => icons.editpencil()} />
+            </View>}
+        </View>
 
 
         <View style={{ marginTop: 10 }}>
@@ -351,6 +391,21 @@ const CalendarNotifications = ({ navigation, route }) => {
         }}
       />
 
+		  <MessageModal
+        ref={ref_sms_modal}
+        onReminderSavePress={(data, index) => {
+          notifcatioDataTypeHandler(data, index, "sms_notification_access");
+        }}
+      />
+
+			<EmailModal
+				ref={ref_email_modal}
+        onReminderSavePress={(data, index) => {
+          notifcatioDataTypeHandler({...data, show_preview:true}, index, "email_notification_access");
+        }}
+			/>
+				
+
       <EventOptionModal
         ref={ref_option}
         title="Perform this action On?"
@@ -371,14 +426,22 @@ const notifyObject = {
 }
 
 const access = {
-  push_notification_access: {
-    label: "Notification",
-    name: "push_notification_access"
-  },
-  message_notification_access: {
-    label: "Message",
-    name: "message_notification_access"
-  }
+		push_notification_access: {
+				label: "Notification",
+				name: "push_notification_access"
+		},
+		message_notification_access: {
+				label: "Message",
+				name: "message_notification_access"
+		},
+		email_notification_access:{
+				label:"Email",
+				name:"email_notification_access",
+		},
+		sms_notification_access:{
+				label:"SMS",
+				name:"sms_notification_access",
+		}
 }
 
 

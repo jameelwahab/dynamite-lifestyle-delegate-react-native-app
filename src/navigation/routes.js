@@ -347,6 +347,7 @@ const routes = {
   calendarEventDetail: "CALENDAR_EVENT_DETAIL_SCREEN",
   calendarEventsAddEdit: "CALENDAR_EVENTS_ADD_EDIT_SCREEN",
   calendarEventsAddEditNotification: "CALENDAR_EVENTS_ADD_EDIT_NOTIFICATIONS",
+  calendarGroupEventDetail: "CALENDAR_GROUP_EVENT_DETAIL_SCREEN",
 
 
 

@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Image } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Image, Pressable } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { selectNavbar } from '../../../redux/reducers/navbarSlice';
@@ -466,8 +466,9 @@ const CalendarScreen = ({ navigation, route }) => {
   }
 
   const renderEventItem = ({ item, index }) => {
+			const handlePress= () => navigation.navigate(routes.calendarGroupEventDetail,{ item })
     return (
-      <View style={__styles.eventListView}>
+      <Pressable onPress={handlePress} style={__styles.eventListView}>
         <View style={{ flexDirection: "row", alignItems: "center", paddingVertical: 5 }}>
           <View style={{ flex: 1 }}>
             <MyText type='medium' >{item?.title}</MyText>
@@ -486,7 +487,7 @@ const CalendarScreen = ({ navigation, route }) => {
           <StatView title={"Members"} value={item?.member.length} />
           <StatView title={"Status"} view={() => statusView(item?.status, item?._id)} />
         </View>
-      </View>
+      </Pressable>
     )
   }
 

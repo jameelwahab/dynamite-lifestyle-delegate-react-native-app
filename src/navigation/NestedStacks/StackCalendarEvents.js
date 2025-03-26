@@ -9,6 +9,7 @@ import CalendarEvents from '../../screens/Calendar/CalendarEvents'
 import AddEditEvent from '../../screens/Calendar/AddEditEvent'
 import CalendarNotifications from '../../screens/Calendar/AddEditEvent/CalendarNotifications'
 import CalendarDetail from '../../screens/Calendar/CalendarDetail'
+import GroupEventDetails from '../../screens/Calendar/CalendarEvents/GroupEventDetails.js'
 
 
 
@@ -26,6 +27,7 @@ const StackCalendarEvents = ({ route }) => {
         <CalendarEventsStack.Screen initialParams={route.params} name={routes.calendarEventsAddEdit} component={AddEditEvent} />
         <CalendarEventsStack.Screen initialParams={route.params} name={routes.calendarEventsAddEditNotification} component={CalendarNotifications} />
         <CalendarEventsStack.Screen initialParams={route.params} name={routes.calendarEventDetail} component={CalendarDetail} />
+        <CalendarEventsStack.Screen initialParams={route.params} name={routes.calendarGroupEventDetail} component={GroupEventDetails} />
 
         {/*//? Default Screens Start */}
         {defaultScreens.map((x, i) => (

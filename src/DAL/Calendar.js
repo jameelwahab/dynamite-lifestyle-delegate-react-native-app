@@ -133,3 +133,29 @@ export const DESYNC_GOOGLE_CALENDAR_WITH_SERVER = ({ token, navigation, googleSe
     navigation,
   })
 }
+
+export const GET_CALENDAR_EVENT_DETAIL = ({ token, navigation, slug, type }) => {
+  return invokeApi({
+    path: `api/event/event_details/with_type/${slug}?page=0&limit=50&type=${type}&search_text=`,
+    method: "GET",
+    token,
+    navigation,
+  })
+}
+
+export const  CHALLENGE_EXCLUDE_MEMBER = ({ token, navigation, slug, type, members })=> {
+		return invokeApi({
+				path : "api/challenge/exclude/member",
+				method: "PUT",
+				token,
+				navigation,
+				postData:{
+						slug,
+						type,
+						members,
+				}
+		})
+}
+
+
+

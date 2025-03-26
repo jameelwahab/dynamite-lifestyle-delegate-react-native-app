@@ -20,6 +20,7 @@ const EmailModal = forwardRef(({ onReminderSavePress }, ref) => {
   const [cc, setCc] = useState("");
   const [message, setMessage] = useState("")
   const [body, setBody] = useState("")
+  const [index, setIndex] = useState(undefined)
   useImperativeHandle(ref, () => {
     return {
       openModal
@@ -38,7 +39,7 @@ const EmailModal = forwardRef(({ onReminderSavePress }, ref) => {
     }
     onReminderSavePress({
       email_notification_info: obj
-    });
+    },index);
     closeModal();
   }
 
@@ -46,7 +47,8 @@ const EmailModal = forwardRef(({ onReminderSavePress }, ref) => {
     setIsVisible(false);
   }
 
-  const openModal = (data) => {
+  const openModal = (data, dIndex=undefined) => {
+			setIndex(dIndex)
     setIsVisible(true);
     if (!!data) {
       setSubject(!!data?.email_subject ? data?.email_subject : "");
