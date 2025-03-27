@@ -50,7 +50,7 @@ const GroupAddEdit = ({ navigation, route }) => {
     status: isEdit && !!event?.status == false ? false : true,
     group: !!event?.group ? event?.group.map(x => x?._id) : [],
     member: !!route?.params?.member ? [route?.params?.member] : !!event?.member ? event?.member.map(x => x?._id) : [],
-    exclude_members: !!route?.params?.exclude_members ? [route?.params?.exclude_members] : !!event?.excluded_members ? event?.excluded_members.map(x => x) : [],
+    exclude_members: !!route?.params?.event.exclude_members ? [route?.params?.event.exclude_members] : !!event?.excluded_members ? event?.excluded_members.map(x => x) : [],
     startDate: !!event?.start_date_time ? convertTimezone2(event?.start_date_time, timezone) : moment(),
     startTime: !!event?.start_date_time ? convertTimezone2(event?.start_date_time, timezone).format("HH:mm") : moment().format("HH:mm"),
     endDate: !!event?.end_date_time ? convertTimezone2(event?.end_date_time, timezone) : moment(),

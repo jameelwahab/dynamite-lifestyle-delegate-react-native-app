@@ -108,7 +108,9 @@ const CalendarDetail = ({ navigation, route }) => {
   return (
     <RootView titleView={titleView}>
       <MyLoader enable={loader} />
-			<ScrollView>
+			<ScrollView 
+				showsVerticalScrollIndicator={false}
+			>
 				<View style={{paddingBottom:30}}>
       {!!data &&
         <View style={{ flex: 1 }}>

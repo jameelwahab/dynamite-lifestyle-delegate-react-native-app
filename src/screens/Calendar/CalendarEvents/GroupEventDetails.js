@@ -265,7 +265,7 @@ const GroupEventDetails = ({ navigation, route }) => {
 
       {tabIndex == 3 && Object.keys(checked).length > 0 &&
         <FAB
-          icon={() => icons.trashFilled(colors.black)}
+          icon={() => icons.members2(colors.black)}
           onPress={() => setShowConfirmModal(true)}
         />}
 
