@@ -107,8 +107,9 @@ const CalendarDetail = ({ navigation, route }) => {
 
   return (
     <RootView titleView={titleView}>
+      <MyLoader enable={loader} />
 			<ScrollView>
-				<>
+				<View style={{paddingBottom:30}}>
       {!!data &&
         <View style={{ flex: 1 }}>
           <View style={__styles.rootView}>
@@ -133,14 +134,13 @@ const CalendarDetail = ({ navigation, route }) => {
 
 
         </View>}
-      <MyLoader enable={loader} />
       <EventOptionModal
         ref={ref_eventModal}
         onAgree={forDelete}
         title={"Delete recurring event?"}
       />
 
-				</>
+				</View>
 			</ScrollView>
     </RootView>
   )

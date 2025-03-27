@@ -234,6 +234,11 @@ const __webViewStyle = StyleSheet.create({
 				fontFamily: fonts.regular,
 				marginTop:5
 		},
+		span:{
+				color: colors.white,
+				fontFamily: fonts.regular,
+				marginTop:5
+		},
 		h3:{
 				color: colors.primary,
 				fontSize:14,
@@ -248,6 +253,12 @@ const __webViewStyle = StyleSheet.create({
 		},
 		strong:{
 				color: colors.lightText2
+		},
+		font:{
+				color: colors.primary,
+				borderColor:'white',
+				borderWidth:1,
+				
 		}
 })
 

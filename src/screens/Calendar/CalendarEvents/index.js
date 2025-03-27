@@ -519,13 +519,14 @@ const CalendarScreen = ({ navigation, route }) => {
           data={type == "week" ? Object.keys(calendarEvents) : calendarEvents[curDate]?.list}
           renderItem={renderItem}
           keyExtractor={(item) => type == "week" ? item : item?._id}
+				  contentContainerStyle={{paddingBottom:30}}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={!loader && <EmptyView label={"No Events Found"} />}
         /> :
         <FlatList
           data={eventList}
           renderItem={renderEventItem}
-          // keyExtractor={(item) => item?._id}
+				  contentContainerStyle={{paddingBottom:30}}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={!loader && <EmptyView label={"No Events Found"} />}
         />}

@@ -59,55 +59,6 @@ const GroupEventDetails = ({ navigation, route }) => {
 
   const onSelected = (item) => {
     setDetailModal({ isVisible: false, list: [] });
-    setTimeout(() => {
-      if (group?.group_by == "program") {
-        navigation.reset({
-          routes: [{
-            name: routes.trainingNavigator,
-            state: {
-              routes: [{
-                name: routes.traininglist,
-              },
-              {
-                name: routes.trainingDetail,
-                params: { slug: item?._id?.program_slug }
-              }],
-            }
-          }],
-        })
-      } else {
-        navigation.reset({
-          routes: [{
-            name: routes.portalNavigator,
-            state: {
-              routes: [{
-                name: routes.portalListScreen,
-              },
-              {
-                name: routes.portalDetailScreen,
-                params: {
-                  eventId: item?._id?._id,
-                  feedFor: "event"
-                }
-              }],
-            }
-          }],
-        })
-      }
-
-      // navigation.reset({
-      //   index: 1,
-      //   routes: [
-      //     {
-      //       name: routes.traininglist,
-      //     },
-      //     {
-      //       name: routes.trainingDetail,
-      //       params: { slug: item?.program_slug }
-      //     }
-      //   ]
-      // })
-    }, 500);
   }
   const changeTab = (tab) => {
     setTabIndex(tab);
@@ -200,7 +151,7 @@ const GroupEventDetails = ({ navigation, route }) => {
         {nlist.map((x, i) => {
           if (i < 5)
             return (
-              <View key={x?._id?._id + tabIndex} >
+              <View key={i} >
                 <MyText  >{x?._id?.title},</MyText>
               </View>
             )
@@ -244,11 +195,11 @@ const GroupEventDetails = ({ navigation, route }) => {
               />}
           </View>
           <View>
-            {/* <StatView title={grptype[group?.group_by]?.title} view={() => eventView(item?.[grptype[group?.group_by]?.variable])} /> */}
-            {group?.group_by == "program" ?
-              <StatView title={"Programmes"} view={() => eventView(item?.program)} /> :
-              <StatView title={"Events"} view={() => eventView(item?.event)} />}
 
+					{ tabIndex==1 && 
+              <StatView title={"Programmes"} view={() => eventView(item?.program)} />
+					}
+ 
           </View>
         </View>
       )
@@ -330,7 +281,7 @@ const GroupEventDetails = ({ navigation, route }) => {
         closeModal={() => setDetailModal({ isVisible: false, list: [] })}
         optionList={detailModal.list}
         multiple
-        multipleLabel={grptype[group?.group_by]?.title}
+        multipleLabel={"Programmes"}
         onSelected={onSelected}
         renderText={({ item }) => <View>
           <MyText fontSize={16} >{item?._id?.title}</MyText>

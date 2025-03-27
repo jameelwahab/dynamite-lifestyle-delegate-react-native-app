@@ -172,7 +172,7 @@ const MessageModal = forwardRef(({ onReminderSavePress }, ref) => {
 
           </View>
 
-          <View style={{ flex: 1, marginTop: 20, paddingHorizontal: 10 }}>
+          <View style={{ flex: 1, marginTop: 20 }}>
             <KeyboardAwareScrollView
               enableResetScrollToCoords={false}
               showsVerticalScrollIndicator={false}>
@@ -243,7 +243,7 @@ const __styles = StyleSheet.create({
     paddingHorizontal: 10
   },
   rootInnerView: {
-    paddingHorizontal: 10,
+    paddingHorizontal: 15,
     flex: 1,
   },
   header: {
