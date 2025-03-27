@@ -14,6 +14,7 @@ const TitleView = ({
   titleView,
   hideBackBottomButton = false,
   customStyle,
+  original=false
 }) => {
   const navigation = useNavigation()
   return (
@@ -28,8 +29,7 @@ const TitleView = ({
       }
       {!!title ?
         <View style={__header.titleView}>
-          <Text style={__header.titleText}>{<Text style={__header.titleText}>{title}</Text>}
-          </Text>
+          <Text style={[__header.titleText, !original && { textTransform: "capitalize",}]}>{title}</Text>
           {!!subTitle && <Text style={__header.subTitle}>{subTitle}</Text>}
         </View> :
         <View style={{ flex: 1 }}>
@@ -62,7 +62,6 @@ const __header = StyleSheet.create({
     // fontFamily: fonts.semiBold,
     fontSize: 18,
     includeFontPadding: false,
-    textTransform: "capitalize",
     fontFamily: fonts.bold,
     includeFontPadding: false
   },

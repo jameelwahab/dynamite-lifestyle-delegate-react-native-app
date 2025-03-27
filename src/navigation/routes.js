@@ -347,6 +347,7 @@ const routes = {
   calendarEventDetail: "CALENDAR_EVENT_DETAIL_SCREEN",
   calendarEventsAddEdit: "CALENDAR_EVENTS_ADD_EDIT_SCREEN",
   calendarEventsAddEditNotification: "CALENDAR_EVENTS_ADD_EDIT_NOTIFICATIONS",
+  calendarGroupEventDetail: "CALENDAR_GROUP_EVENT_DETAIL_SCREEN",
 
 
 
@@ -365,6 +366,11 @@ const routes = {
   //? Sales Team Transactions
   salesTeamTransactionsListingScreen: "SALES_TEAM_TRANSACTION_LISTING_SCREEN",
   salesTeamTransactionsAddEditScreen: "SALES_TEAM_TRANSACTION_ADD_EDIT_SCREEN",
+
+  // Updates
+  updates:"UPDATES",
+  updatesMain:"UPDATES_MAIN",
+  updatesFilter: "UPDATES_FILTER"
 }
 
 

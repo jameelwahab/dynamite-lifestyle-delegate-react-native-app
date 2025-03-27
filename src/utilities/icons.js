@@ -155,5 +155,6 @@ export const icons = {
   people: (color = colors.white, size = 20) => { return (<Ionicons name="people" color={color} size={size} />) },
   warnOctagon: (color = colors.white, size = 20) => { return (<Feather name="alert-octagon" color={color} size={size} />) },
   unread: (color = colors.white, size = 20) => { return (<MaterialCommunityIcons name="message-badge-outline" color={color} size={size} />) },
+  menuCircle: (color = colors.white, size = 20) => { return (<Ionicons name="list-circle" color={color} size={size} />) },
   check_circle: (color = colors.primary, size = 17) => { return (<Octicons name="check-circle" color={color} size={size} />) },
 }

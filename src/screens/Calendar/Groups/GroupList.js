@@ -357,6 +357,7 @@ const __styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     alignItems: "center",
+		padding:10,
   },
   heading_container: {
     flexDirection: "row",
