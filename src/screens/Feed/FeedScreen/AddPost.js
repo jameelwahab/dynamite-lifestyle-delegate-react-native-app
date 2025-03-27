@@ -1486,96 +1486,20 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
 								{notifyUser &&
 										<View style={{padding:15,borderRadius:10, backgroundColor:colors.secondaryVariant}}>
-										<TextInput
-                    style={[__style.modalInput, {
-                      color: colors.lightText2,
-                      fontFamily: fonts.regular,
-                      includeFontPadding: false,
-                      maxHeight: (!isCosmos && height < 800) ? 120 : 150,
-										  borderWidth:1,
-										  borderColor:colors.white +"50"
-                    }]}
-                    multiline={true}
-                    autoCapitalize="sentences"
-                    autoComplete="off"
-                    textAlignVertical="top"
-                    autoCorrect={false}
-                    placeholder="Notification Statement*"
-                    placeholderTextColor={colors.lightText2}
-                    keyboardAppearance="dark"
-                    selectionColor={colors.selection}
-                    cursorColor={colors.white}
-                    ref={ref_input}
-                    onContentSizeChange={({ nativeEvent: { contentSize: { height } } }) => {
-                      if (inputHeight != height) {
-                        let boxHeight = (!isCosmos && height < 800) ? 120 : 150;
-                        if (height > boxHeight) {
-                          setInputHeight(boxHeight)
-                        } else {
-                          setInputHeight(height)
-                        }
-                      }
-                    }}
-                    // keyboardType='email-address'
-                    onChangeText={(text) => setNotifyTxt({...notifyTxt, state:text })}
-                    onSelectionChange={(e) => {
-                      cursor = e.nativeEvent.selection
-                    }}
-                  ><Text style={[{
-                    color: colors.text,
-                    fontFamily: fonts.regular,
-                    includeFontPadding: false
-                  }]} >
-                      {replaceAndHighlight(notifyTxt.state, mentionList)}
-                    </Text>
-                  </TextInput> 
-				
+										 <MyInputs
+												label='Notification Statement*'
+												value={notifyTxt.state}
+												onChangeText={(txt) => setNotifyTxt({...notifyTxt, state:txt})}
+												/>
+									
+										<MyInputs
+												label='Notification Description*'
+												value={notifyTxt?.desc}
+												onChangeText={(text) => setNotifyTxt({ ...notifyTxt, desc: text })}
+												multiline={true}
+												/>
 
-								<TextInput
-                    style={[__style.modalInput, {
-                      color: colors.lightText2,
-                      fontFamily: fonts.regular,
-                      includeFontPadding: false,
-                      maxHeight: (!isCosmos && height < 800) ? 120 : 150,
-										  borderWidth:1,
-										  borderColor:colors.white +"50"
-                    }]}
-                    multiline={true}
-                    autoCapitalize="sentences"
-                    autoComplete="off"
-                    textAlignVertical="top"
-                    autoCorrect={false}
-                    placeholder="Notification Description*"
-                    placeholderTextColor={colors.lightText2}
-                    keyboardAppearance="dark"
-                    selectionColor={colors.selection}
-                    cursorColor={colors.white}
-                    ref={ref_input}
-                    onContentSizeChange={({ nativeEvent: { contentSize: { height } } }) => {
-                      if (inputHeight != height) {
-                        let boxHeight = (!isCosmos && height < 800) ? 120 : 150;
-                        if (height > boxHeight) {
-                          setInputHeight(boxHeight)
-                        } else {
-                          setInputHeight(height)
-                        }
-                      }
-                    }}
-                    onChangeText={(txt) => setNotifyTxt({...notifyTxt, desc:txt})}
-                    onSelectionChange={(e) => {
-                      cursor = e.nativeEvent.selection
-                    }}
-                  ><Text style={[{
-                    color: colors.text,
-                    fontFamily: fonts.regular,
-                    includeFontPadding: false
-                  }]} >
-                      {replaceAndHighlight(notifyTxt.desc, mentionList)}
-                    </Text>
-                  </TextInput>
-										</View> 
-								}
-
+										</View>  }
                 </View> }
 
 
