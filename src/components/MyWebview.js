@@ -119,8 +119,7 @@ export class MyWebview extends Component {
           span: {
             fontFamily: !!this.props?.html.includes("<b>") ? undefined : fonts.light,
             margin: 0,
-            // marginTop: 5,
-            lineHeight: 12,
+            lineHeight: 20,
             fontSize: 13,
             color: this.props?.invert ? colors.black : colors.lightText,
           },

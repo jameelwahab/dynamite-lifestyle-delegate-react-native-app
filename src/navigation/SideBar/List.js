@@ -380,21 +380,21 @@ export const ParentComponents = {
     },
   },
 
-  "ad108738-ebe0-428e-9810-55203ee509f7": {
+  "ba0458ac-6983-4155-b594-0101f3a8658f": {
     key: routes.missionNavigator,
     component: StackMission,
     params: {
       value: "missions",
-      key: "ad108738-ebe0-428e-9810-55203ee509f7",
+      key: "ba0458ac-6983-4155-b594-0101f3a8658f",
     }
   },
 
-  "52f27c5a-44ba-44ba-b0f0-b0b150ea031b": {
+  "695cbdcf-bc37-4375-ba15-dcd312ff189f": {
     key: null,
     component: null,
     params: {
       value: "",
-      key: "52f27c5a-44ba-44ba-b0f0-b0b150ea031b"
+      key: "695cbdcf-bc37-4375-ba15-dcd312ff189f"
     },
   },
 
@@ -463,7 +463,7 @@ export const ChildComponents = {
     params: {
       type: "in_progress",
       key: "hhfhhfhfhf-31d9-4154-b3a9-81619gdhb4va",
-      parentKey: "5bd62bab-3f70-471a-ad80-d788cd481c39"
+      parentKey: "695cbdcf-bc37-4375-ba15-dcd312ff189f"
     }
   },
   "hhfhhfhfhf-31d9-41bb-b3c9-81619fd1b49c": {
@@ -473,7 +473,7 @@ export const ChildComponents = {
       type: "completed",
       parentValue: "members",
       key: "hhfhhfhfhf-31d9-41bb-b3c9-81619fd1b49c",
-      parentKey: "5bd62bab-3f70-471a-ad80-d788cd481c39"
+      parentKey: "695cbdcf-bc37-4375-ba15-dcd312ff189f"
     }
   },
   "5f063d7b-640b-4088-a821-0b77a08b18c7": {

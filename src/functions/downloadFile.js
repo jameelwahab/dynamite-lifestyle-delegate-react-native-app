@@ -13,7 +13,7 @@ const downloadFile = async (url, path, bodyTitle) => {
     ext = "." + ext[0];
     const config = ReactNativeBlobUtil.config;
     const fs = ReactNativeBlobUtil.fs;
-    let DownloadDir = fs.dirs.DownloadDir;
+    let DownloadDir = fs.dirs.CacheDir;
     let options = {
       fileCache: true,
       addAndroidDownloads: {
