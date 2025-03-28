@@ -41,31 +41,20 @@ const Affiliates = ({navigation, route}) =>{
 		},[])
 
 		const renderView = (item, index)=>{
-				const affiliateLink = `${item.url}?affliate_url_name=${user.affiliate_url_name}`
+				const affiliateLink = `${item.url}?affiliate_url_name=${user.affiliate_url_name}`
 				const copy= () => copyText(affiliateLink, "Url copied to clipboard")
+				const openLink = () => openUrl(affiliateLink)
 
-				const copyLinkView = ()=> {
+				const linkView = (icon,txt, handlePress)=> {
 						return (
 								<TouchableOpacity
-										onPress={copy}
-										style={{width:100,flexDirection:"row", alignItems:"center"}}>
-										{icons.copy()}
+										onPress={handlePress}
+										style={{alignSelf:"flex-start", flexDirection:"row", alignItems:"center"}}>
+										{icon}
 										<MyText
-												underlined
 												color={colors.primary}
 												style={{fontStyle:"italic", marginLeft:10}}
-												>Copy Url</MyText>
-								</TouchableOpacity>
-						) }
-
-				const openPreview = ()=> {
-						return (
-								<TouchableOpacity
-										onPress={()=>openUrl(affiliateLink)}
-										style={{width:100,flexDirection:"row", alignItems:"center"}}>
-										{icons.goto()}
-								<MyText 
-										 fontSize={13} style={{ fontStyle:"italic", marginLeft:10 }} color={colors.primary} type='medium' >{"Preview"}</MyText>
+												>{txt}</MyText>
 								</TouchableOpacity>
 						) }
 
@@ -83,11 +72,11 @@ const Affiliates = ({navigation, route}) =>{
 								<StatView 
 										title={"Copy Link"}
 										value={"Yoko so"}
-										view={copyLinkView}
+										view={()=>linkView(icons.copy(), "Copy Url", copy)}
 										/>
 								<StatView 
 										title={"URL"}
-										view={openPreview}
+										view={()=>linkView(icons.gotoFill(), "Preview", openLink)}
 										/>
 						</View>
 				)
