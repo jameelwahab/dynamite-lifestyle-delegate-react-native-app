@@ -41,7 +41,7 @@ const Affiliates = ({navigation, route}) =>{
 		},[])
 
 		const renderView = (item, index)=>{
-				const affiliateLink = `${item.url}?affiliate_url_name=${user.affiliate_url_name}`
+				const affiliateLink = `${item.url}?affliate_url_name=${user.affiliate_url_name}`
 				const copy= () => copyText(affiliateLink, "Url copied to clipboard")
 				const openLink = () => openUrl(affiliateLink)
 
