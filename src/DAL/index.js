@@ -195,3 +195,5 @@ export { GET_COMMENT_REVIEW, DELETE_COMMNET_REVIEW, APPROVE_COMMENT_REVIEW} from
 
 export { GET_UPDATES_LIST } from "./Updates"
 
+export {GET_AFFILAITE_LINK} from "./Affiliates"
+

@@ -370,7 +370,11 @@ const routes = {
   // Updates
   updates:"UPDATES",
   updatesMain:"UPDATES_MAIN",
-  updatesFilter: "UPDATES_FILTER"
+  updatesFilter: "UPDATES_FILTER",
+  
+  // affilaite links 
+  affiliate:"AFFILIATE_SCREEN",
+  affiliateLinks:"AFFILIATE_LINKS_SCREEN",
 }
 
 
