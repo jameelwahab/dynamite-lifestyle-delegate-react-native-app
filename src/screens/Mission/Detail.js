@@ -110,7 +110,7 @@ const MissionDetail = ({ navigation, route }) => {
 			<View style={__styles.container}>
 
 				<View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: 'center' }}>
-					<View style={{ flexDirection: 'row', alignItems: "center" }}>
+					<View style={{ flexDirection: 'row', alignItems: "center",flex:1 }}>
 						<Pressable
 							onPress={() => navigation.goBack()} >
 							{icons.backMajor(colors.primary, 26)}
