@@ -151,7 +151,7 @@ const MissionDetail = ({ navigation, route }) => {
 
 const Tabs = ({ list, tab, style, changeTab }) => {
 	return (
-		<View style={[{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }, style]}>
+		<View style={[{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", backgroundColor: colors.darkSecondary, zIndex:10}, style]}>
 			{list.map((el, index) =>
 				<TouchableOpacity
 					onPress={() => changeTab(index)}
@@ -168,7 +168,7 @@ const Tabs = ({ list, tab, style, changeTab }) => {
 }
 
 
-const TrackerList = ({ res }) => {
+const TrackerList = ({ res, loading }) => {
 	const nav = useNavigation()
 	const handlePress = (item) => nav.navigate(routes.missionSchedule, { id: item._id, type: res?.type, heading: item?.main_heading })
 	return (
@@ -180,6 +180,7 @@ const TrackerList = ({ res }) => {
 			ListHeaderComponent={
 				<MyText color={colors.primary} type="bold" fontSize={textSize.title}>{res?.content_settings?.schedule_heading}</MyText>
 			}
+			ListEmptyComponent={!loading && <EmptyView />}
 			ListHeaderComponentStyle={{ marginBottom: 15 }}
 			KeyExtractor={(_, index) => index.toString()}
 			ItemSeparatorComponent={<View style={{ height: 10 }} />}
@@ -308,7 +309,7 @@ const Overview = ({ token, navigation, id, showBadges, setEnableChat, setChatID,
 			ListHeaderComponentStyle={{ marginBottom: 20 }}
 			keyExtractor={(_, index) => index.toString()}
 			renderItem={({ _ }) =>
-				<TrackerList res={res} />
+				<TrackerList res={res} loading={loading} />
 			}
 		/>
 	)
