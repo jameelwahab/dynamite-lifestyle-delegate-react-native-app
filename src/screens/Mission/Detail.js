@@ -188,8 +188,8 @@ const TrackerList = ({ res, loading }) => {
 				<LessonView
 					missionDetail={true}
 					txtlen={res?.type == "quest" ? 30 : 55}
-					heading={item.main_heading}
-					desc={item.short_description}
+					heading={item?.main_heading}
+					desc={item?.short_description}
 					handlePress={() => handlePress(item)}
 				/>
 			}
@@ -199,8 +199,8 @@ const TrackerList = ({ res, loading }) => {
 
 
 const Header = ({ res, showBadges, daysOn = "", focuse, tab }) => {
-	const startDate = `${moment(res?.start_date).format(dateTimeFormat.date).split('-')[0]} ${months[Number(moment(res?.start_date).format(dateTimeFormat.date).split('-')[1]) - 1].short2}`
-	const endDate = `${moment(res?.end_date).format(dateTimeFormat.date).split('-')[0]} ${months[Number(moment(res?.end_date).format(dateTimeFormat.date).split('-')[1]) - 1].short2}`
+	const startDate = `${moment(res?.start_date).format(dateTimeFormat.date).split('-')[0]} ${months[Number(moment(res?.start_date).format(dateTimeFormat.date).split('-')[1]) - 1]?.short2}`
+	const endDate = `${moment(res?.end_date).format(dateTimeFormat.date).split('-')[0]} ${months[Number(moment(res?.end_date).format(dateTimeFormat.date).split('-')[1]) - 1]?.short2}`
 	const [schedule, setSchedules] = useState(res)
 	useEffect(() => {
 		if (daysOn != "") {
@@ -230,7 +230,7 @@ const Header = ({ res, showBadges, daysOn = "", focuse, tab }) => {
 					duration={res?.mission_duration}
 					totalCoins={res?.rewarded_coins}
 					badges={res?.badge_configration}
-					questReplayAccessDays={res.replay_days}
+					questReplayAccessDays={res?.replay_days}
 					dateString={`${startDate} - ${endDate}`}
 					isQuest={res?.type == "quest"}
 					showEarnedBadges={false}
@@ -257,8 +257,8 @@ const Overview = ({ token, navigation, id, showBadges, setEnableChat, setChatID,
 			token, navigation, id
 		})
 		if (res.code == 200) {
-			setResult(res.mission)
-			setTitle(res.mission.title)
+			setResult(res?.mission)
+			setTitle(res?.mission.title)
 			setLoading(false)
 			setRefreshing(false);
 			setEnableChat(res?.mission?.is_chat_enabled)
