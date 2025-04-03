@@ -116,7 +116,7 @@ const MissionDetail = ({ navigation, route }) => {
 							{icons.backMajor(colors.primary, 26)}
 						</Pressable>
 						<View style={{ width: 5 }} />
-						<MyText type="bold" fontSize={textSize.title} color={colors.primary}> {title} </MyText>
+						<MyText style={{flex:1}} type="bold" fontSize={textSize.title} color={colors.primary}> {title} </MyText>
 					</View>
 					{(tab == 0 && route.params.type == "quest" && enableChat) ?
 						<Pressable onPress={() => setShowChat(true)}>
@@ -200,6 +200,7 @@ const TrackerList = ({ res, loading }) => {
 
 const Header = ({ res, showBadges, daysOn = "", focuse, tab }) => {
 	const [schedule, setSchedules] = useState(res)
+
 	useEffect(() => {
 		if (daysOn != "") {
 			setSchedules(res?.mission_schedules.find(el => el._id == daysOn))
