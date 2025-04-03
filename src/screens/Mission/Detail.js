@@ -199,8 +199,6 @@ const TrackerList = ({ res, loading }) => {
 
 
 const Header = ({ res, showBadges, daysOn = "", focuse, tab }) => {
-	const startDate = `${moment(res?.start_date).format(dateTimeFormat.date).split('-')[0]} ${months[Number(moment(res?.start_date).format(dateTimeFormat.date).split('-')[1]) - 1]?.short2}`
-	const endDate = `${moment(res?.end_date).format(dateTimeFormat.date).split('-')[0]} ${months[Number(moment(res?.end_date).format(dateTimeFormat.date).split('-')[1]) - 1]?.short2}`
 	const [schedule, setSchedules] = useState(res)
 	useEffect(() => {
 		if (daysOn != "") {
@@ -231,7 +229,7 @@ const Header = ({ res, showBadges, daysOn = "", focuse, tab }) => {
 					totalCoins={res?.rewarded_coins}
 					badges={res?.badge_configration}
 					questReplayAccessDays={res?.replay_days}
-					dateString={`${startDate} - ${endDate}`}
+					dateString={`${moment(res?.start_date).format("DD MMM")} -${moment(res?.end_date).format("DD MMM")}`}
 					isQuest={res?.type == "quest"}
 					showEarnedBadges={false}
 				// showBadgesEarned={false}
