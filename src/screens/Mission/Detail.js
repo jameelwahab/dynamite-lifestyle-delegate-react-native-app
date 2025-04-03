@@ -116,7 +116,7 @@ const MissionDetail = ({ navigation, route }) => {
 							{icons.backMajor(colors.primary, 26)}
 						</Pressable>
 						<View style={{ width: 5 }} />
-						<MyText type="bold" fontSize={textSize.title} color={colors.primary}> {title} </MyText>
+						<MyText style={{flex:1}} type="bold" fontSize={textSize.title} color={colors.primary}> {title} </MyText>
 					</View>
 					{(tab == 0 && route.params.type == "quest" && enableChat) ?
 						<Pressable onPress={() => setShowChat(true)}>
@@ -199,9 +199,8 @@ const TrackerList = ({ res, loading }) => {
 
 
 const Header = ({ res, showBadges, daysOn = "", focuse, tab }) => {
-	const startDate = `${moment(res?.start_date).format(dateTimeFormat.date).split('-')[0]} ${months[Number(moment(res?.start_date).format(dateTimeFormat.date).split('-')[1]) - 1]?.short2}`
-	const endDate = `${moment(res?.end_date).format(dateTimeFormat.date).split('-')[0]} ${months[Number(moment(res?.end_date).format(dateTimeFormat.date).split('-')[1]) - 1]?.short2}`
 	const [schedule, setSchedules] = useState(res)
+
 	useEffect(() => {
 		if (daysOn != "") {
 			setSchedules(res?.mission_schedules.find(el => el._id == daysOn))
@@ -231,7 +230,7 @@ const Header = ({ res, showBadges, daysOn = "", focuse, tab }) => {
 					totalCoins={res?.rewarded_coins}
 					badges={res?.badge_configration}
 					questReplayAccessDays={res?.replay_days}
-					dateString={`${startDate} - ${endDate}`}
+					dateString={`${moment(res?.start_date).format("DD MMM")} - ${moment(res?.end_date).format("DD MMM")}`}
 					isQuest={res?.type == "quest"}
 					showEarnedBadges={false}
 				// showBadgesEarned={false}
