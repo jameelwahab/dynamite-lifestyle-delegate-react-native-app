@@ -47,6 +47,7 @@ const Scheduler = ({ navigation, route }) => {
 	const [enableChat, setEnableChat] = useState(false)
 
 
+		console.log("here is the type", route.params.type)
 	const getResult = async (loader) => {
 		setLoading(loader)
 		const res = await GET_MISSION_SCHEDULE({
@@ -106,7 +107,7 @@ const Scheduler = ({ navigation, route }) => {
 				</Pressable>}
 			</View>
 			<View style={{ height: 5 }} />
-			{enableChat &&
+			{(route.params.type == "quest" && enableChat) &&
 				<LiveChat
 					user={user}
 					flex={0.63}

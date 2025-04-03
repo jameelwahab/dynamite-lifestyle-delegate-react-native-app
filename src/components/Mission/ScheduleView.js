@@ -4,6 +4,7 @@ import { fonts } from "../../utilities/fonts"
 import { icons } from "../../utilities/icons"
 import isArray from "../../functions/isArray"
 import { View, TextInput, StyleSheet, Pressable } from "react-native";
+import MyCheckBox from "../../components/MyCheckBox"
 import QuestionComponent from "../../screens/Questions/Components/QuestionComponent"
 import MyText from "../MyText"
 import MyInputs from "../MyInputs"
