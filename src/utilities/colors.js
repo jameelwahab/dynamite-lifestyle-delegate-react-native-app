@@ -8,6 +8,7 @@ export const colors = {
   lightPrimary2: '#F6BD4B33',
   lightPrimary3: '#F6BD4B1F',
   beige: "#B19E5A",
+  keyword:"#cce231",
   secondary: "#1F2536",
   darkSecondary: "#131825",
   secondaryVariant: '#252d41',

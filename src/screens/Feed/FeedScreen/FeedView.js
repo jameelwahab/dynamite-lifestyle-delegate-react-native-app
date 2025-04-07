@@ -23,6 +23,7 @@ import numFormatter from '../../../functions/numFormatter'
 import { MyButton } from '../../../components/MyButton'
 import { main } from '../../../utilities/styles'
 import { Row } from '../../../UIComponents/FlexViews'
+import isArray from '../../../functions/isArray'
 
 export const FeedView = ({ item, index, user, token, isInView, timezone, settings,
   openComments, showLikes, openOptions, onLikebtnPress, isCosmos,
@@ -153,7 +154,7 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
             <PostWebView enableCollapse={true} html={item?.description} />
             // <CollapsibleText>{item?.description}</CollapsibleText>
             : !!item?.mentioned_users ?
-              <FeedText list={item?.mentioned_users} text={item?.description} /> :
+              <FeedText keywords={isArray(item?.feed_keywords)?item?.feed_keywords:[]} list={item?.mentioned_users} text={item?.description} /> :
               <CollapsibleText>{item?.description}</CollapsibleText>
             // <MyWebview html={item?.description} /> 
           }
