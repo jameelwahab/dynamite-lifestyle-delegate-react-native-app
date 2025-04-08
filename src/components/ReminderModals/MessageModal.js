@@ -47,7 +47,6 @@ const MessageModal = forwardRef(({ onReminderSavePress }, ref) => {
   }
 
   const openModal = (data,index=undefined, dHeading="") => {
-			console.log(index)
 			setIsVisible(true);
 			setHeading(dHeading)	
     setIndex(index)
