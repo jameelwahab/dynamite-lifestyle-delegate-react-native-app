@@ -212,7 +212,7 @@ const FeedKeywords = ({ navigation }) => {
 			hideChatIcon
 			hideProfile
 			hideNotificaitonIcon
-			title="Feed Keywords Settings">
+			title="Feed Keywords">
 			<Flex flex={1}>
 				<MyKeyboardAvoidingView noScrollView>
 					<Flex flex={1}>

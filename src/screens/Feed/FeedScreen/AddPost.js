@@ -141,7 +141,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
       set_at_index(_at_index)
       setIsMentionListVisible(true);
       getTheDelegateListFromServer(extractSubstring(text, _at_index))
-    } else if (text[cursor?.start] == "#" || text == "#") {
+    } else if (!isCosmos && (text[cursor?.start] == "#" || text == "#")) {
       // let _at_index = !!cursor?.start ? cursor?.start : 0;
       let _at_index = !!text[cursor?.start] ? cursor?.start : 0;
       set_at_index(_at_index)
@@ -178,7 +178,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   }, [isMentionListVisible])
 
   useEffect(() => {
-    if (isKeywordListVisible == false) {
+    if (!isCosmos && isKeywordListVisible == false) {
       getTheKeywordListFromServer("");
     }
   }, [isKeywordListVisible])
@@ -1078,7 +1078,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
       }
       parts.push(<Text style={user?.type == "keyword" ? __style.keywordHighlightedText : __style.mentionUserText} >{
         // user?.type == "keyword" ? "#" : "" +
-          str.substring(startIndex, endIndex)}</Text>);
+        str.substring(startIndex, endIndex)}</Text>);
       lastIndex = endIndex;
     });
 
@@ -1103,7 +1103,8 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
         animationOutTiming={500}
         style={{ margin: 0 }}>
         <SafeAreaView style={{ flex: 1 }} >
-          <View pointerEvents={loader ? "none" : "auto"} style={__style.modalRootView}>
+          <View pointerEvents={loader ? "none" : "auto"}
+            style={__style.modalRootView}>
 
             <View style={__style.headingView}>
               <View style={__style.modalclosebtn} />
@@ -1118,7 +1119,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
             </View>
             <View style={[__style.divider, { marginTop: -1 }]} />
             <KeyboardAwareScrollView
-              keyboardShouldPersistTaps="always"
+              keyboardShouldPersistTaps="handled"
               style={__style.postView}
               showsVerticalScrollIndicator={false}>
 
@@ -1289,6 +1290,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
                 {isMentionListVisible && (delegateList.length > 0 || isMentionListLoading) &&
                   <View
+
                     style={{
                       paddingHorizontal: 15,
                       marginTop: 10,
