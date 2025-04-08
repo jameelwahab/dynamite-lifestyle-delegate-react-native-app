@@ -137,7 +137,6 @@ const ReviewComments = ({ navigation }) => {
 	}
 
 	const filterOptions = () => {
-		// console.log(access,"access")
 		return optionsList.slice().filter(item => {
 			if (item.key == "del" || item.key == "edit") {
 				return access?.edit_delete_option_in_source_all_source_feeds

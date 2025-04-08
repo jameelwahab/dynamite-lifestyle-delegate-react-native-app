@@ -72,7 +72,7 @@ const EmailModal = forwardRef(({ onReminderSavePress }, ref) => {
     if (cc.length > 0) {
       return (
         <View style={{ flexDirection: "row", flexWrap: "wrap", paddingBottom: 5 }}>
-          {cc.map((x, i) => <MyChip title={x} onPress={() => removeCc(i)} />)}
+          {cc.map((x, i) => <MyChip title={x} key={i} onPress={() => removeCc(i)} />)}
         </View>
       )
     } else return null
@@ -89,6 +89,7 @@ const EmailModal = forwardRef(({ onReminderSavePress }, ref) => {
       animationInTiming={300}
       animationOutTiming={300}
       hideModalContentWhileAnimating={true}
+      avoidKeyboard={true}
       style={{ margin: 0, }}>
 
       <SafeAreaView style={__styles.rootView}>

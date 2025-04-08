@@ -2,18 +2,19 @@ import { Platform } from "react-native";
 
 export const colors = {
   primary: "#EDBF60",
-  golden:"#EDBF60",
+  golden: "#EDBF60",
   primary2: "#EDBF60",
   lightPrimary: '#F6BD4B99',
   lightPrimary2: '#F6BD4B33',
   lightPrimary3: '#F6BD4B1F',
   beige: "#B19E5A",
+  keyword: "#cce231",
   secondary: "#1F2536",
   darkSecondary: "#131825",
   secondaryVariant: '#252d41',
   secondarySelect: "#2f3851",
   border: "#43464A",
-  transparent:"#FFFFFF00",
+  transparent: "#FFFFFF00",
   selection: Platform.select({ android: "#3D4250", ios: "#FFFFFF" }),
   text: "#FFFFFF",
   white: "#FFFFFF",
@@ -26,9 +27,9 @@ export const colors = {
   heart: "#CA5040",
   transparent: "#FFFFFF00",
   grey: "#696969",
-  lightGrey:"#A2A1A1",
+  lightGrey: "#A2A1A1",
   online: "#337447",
-  green:"#4B9831",
+  green: "#4B9831",
   chip: "#343b4b",
-  link:"#316BF2"
+  link: "#316BF2"
 }

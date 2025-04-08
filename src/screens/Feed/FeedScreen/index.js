@@ -32,6 +32,7 @@ import SurveyModal from './SurveyModal'
 import SurveyDetailModal from './SurveyDetailModal'
 import ConfirmationModal2 from '../../../components/ConfirmationModal2'
 import { S3_URL } from '../../../utilities/constants'
+import isArray from '../../../functions/isArray'
 
 
 
@@ -45,6 +46,7 @@ let commentVar = {
   canLoadMore: false,
   id: "",
   level: "",
+  keywords: []
 }
 
 let likeVar = {
@@ -74,7 +76,6 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
   const isMissionFeed = feedFor == "mission";
 
   const { token, user, access, isChatAllowed } = useSelector(selectUser);
-  console.log(access, "access")
 
   const { socket } = useSelector(selectSocket);
   const timezone = useSelector(selectTimeZone);
@@ -342,7 +343,8 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       page: 0,
       canLoadMore: false,
       id: "",
-      level: ""
+      level: "",
+      keywords: []
     };
     likeVar = {
       page: 0,
@@ -689,7 +691,8 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       page: 0,
       canLoadMore: false,
       id: id,
-      level: !!curFeed ? curFeed?.created_for_level_or_type : ""
+      level: !!curFeed ? curFeed?.created_for_level_or_type : "",
+      keywords: isArray(curFeed?.feed_keywords) ? [...new Map(curFeed?.feed_keywords.map(item => [item.value, item])).values()] : [],
     };
     setComments({
       list: [],
@@ -1048,12 +1051,12 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
         }
 
         if (item?.type == "notify" && access?.notify_users_on_create_post) {
-          if (isMine && ( isAllSourceFeed ||  isTheSourceFeed)) {
+          if (isMine && (isAllSourceFeed || isTheSourceFeed)) {
             newList.push(item)
           }
         }
 
-		 
+
       })
 
       return newList
@@ -1151,7 +1154,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       }
 
       if (item?.type == "notify" && access?.notify_users_on_create_post) {
-        if (isMine && ( isAllSourceFeed ||  isTheSourceFeed)) {
+        if (isMine && (isAllSourceFeed || isTheSourceFeed)) {
           newList.push(item)
         }
       }
@@ -1440,6 +1443,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
         token={token}
         navigation={navigation}
         feedId={commentVar?.id}
+        keywords={commentVar?.keywords}
         setComments={setComments}
         updateFeedItemsSpecificField={updateFeedItemsSpecificField}
         socketEmittersForAction={socketEmittersForAction}

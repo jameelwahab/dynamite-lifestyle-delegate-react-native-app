@@ -27,11 +27,8 @@ const Updates = ({route,navigation}) => {
 		const [list, setList] = useState([])
 		const [titleList, setTitleList] = useState([])
 		const ref = useRef(null)
-		const ref_flatList = useRef(null)
 		const [refreshing , setRefreshing ] = useState(false)
 		const [loading, setLoading] =useState(false)
-		const [currIndex, setCurrIndex] = useState(0);
-		const viewConfigRef = useRef({ viewAreaCoveragePercentThreshold: 50 })
 
 		const getList = async ()=>{
 				const res = await GET_UPDATES_LIST({token, navigation, body:filters})
@@ -66,21 +63,12 @@ const Updates = ({route,navigation}) => {
 				}
 		},[route])
 
-		const handleSelect = (index) => {
-				setCurrIndex(index)
-				ref_flatList?.current.scrollToIndex({ animated: true, index: index })
-		}
+		
 
 		const onRefresh = () => {
 				setRefreshing(true)
 				getList()
 		}
-
-		const onViewCallBack = useCallback((viewableItems:any)=> {
-            viewableItems.changed.map(el=>{
-								if(el.isViewable) setCurrIndex(el.index)
-						})
-		}, [])
 
    const titleView = () => {
 
@@ -100,12 +88,6 @@ const Updates = ({route,navigation}) => {
 				{"Updates"} 
         </Text>
 				<View style={{flexDirection:"row"}}>
-        <TouchableOpacity
-          onPress={handleMenuPress}
-          style={[__styles.filterButton, {marginRight:10}]}
-          hitSlop={{ bottom: 5, top: 5, left: 5, right: 5 }}>
-          {icons.menuCircle(colors.primary, 30)}
-        </TouchableOpacity>
 
         <TouchableOpacity
           onPress={handleFilterPress}
@@ -141,12 +123,14 @@ const Updates = ({route,navigation}) => {
 				)
 		}
 
-		const renderList = (item)=>{
+		const renderList = (item, index)=>{
 				return (
-						<View style={{padding:15, borderRadius:10, backgroundColor: colors.secondary }}>
-								<View style={{flexDirection:"row", justifyContent:"space-between"}}>
+						<TouchableOpacity 
+								onPress={()=> navigation.navigate(routes.updatesDetail, { list, index } )}
+								style={{padding:15, borderRadius:10, backgroundColor: colors.secondary }}>
+								<View style={{flexDirection:"row", justifyContent:"space-between", alignItems:"center"}}>
 								<MyText
-										fontSize={20}
+										fontSize={16}
 										color={colors.primary}
 										type="bold"
 
@@ -155,18 +139,13 @@ const Updates = ({route,navigation}) => {
 										{moment(item?.date).format(dateTimeFormat.date)}
 								</MyText>
 								</View>
-								<MyWebView 
-										html={item?.fixed_issues_description}
-										style={__webViewStyle}
-								/>
-						</View>
+						</TouchableOpacity>
 				)
 		}
 
 		return (
 				<RootView hideBackBottomButton titleView={titleView}>
 						<FlatList 
-								ref={ref_flatList}
 								refreshControl={<MyRefreshControl
 										refreshing={refreshing}
 										onRefresh={onRefresh}
@@ -174,27 +153,18 @@ const Updates = ({route,navigation}) => {
 								data={list}
 								showsVerticalScrollIndicator={false}
 								ListHeaderComponent={headerView()}
+								ListHeaderComponentStyle={{marginTop:10}}
 								KeyExtractor={(item)=> item?._id}
-								ItemSeparatorComponent={<View style={{height:20}}/>}
-								renderItem={({item})=> renderList(item)}
+								ItemSeparatorComponent={<View style={{height:15}}/>}
+								renderItem={({item, index})=> renderList(item, index)}
 								stickyHeaderIndices={[0]}
 								ListEmptyComponent={!loading && <EmptyView />}
 								stickyHeaderHiddenOnScroll={true}
-								onViewableItemsChanged={onViewCallBack}
-								viewabilityConfig={viewConfigRef?.current}
 						/>	
 						<MyLoader enable={loading} />
-
-						<UpdatesModal
-								list={titleList}
-								currIndex={currIndex}
-								onChangeIndex={handleSelect}
-								ref={ref}
-								/>
 				</RootView>
 		)
 }
-
 
 const __styles = StyleSheet.create({
 		heading_container: {
@@ -235,39 +205,5 @@ const __styles = StyleSheet.create({
   },
 })
 
-const __webViewStyle = StyleSheet.create({
-  
-		div: {
-				color: colors.white,
-				fontFamily: fonts.regular,
-				marginTop:5
-		},
-		span:{
-				color: colors.white,
-				fontFamily: fonts.regular,
-				marginTop:5
-		},
-		h3:{
-				color: colors.primary,
-				fontSize:14,
-				margin: 0,
-				fontWeight: "500",
-		},
-		b:{
-				color: colors.primary,
-				fontSize:14,
-				margin: 0,
-				fontWeight: "500",
-		},
-		strong:{
-				color: colors.lightText2
-		},
-		font:{
-				color: colors.primary,
-				borderColor:'white',
-				borderWidth:1,
-				
-		}
-})
 
 export default Updates 

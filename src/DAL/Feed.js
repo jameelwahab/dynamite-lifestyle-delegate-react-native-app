@@ -4,7 +4,7 @@ export const GET_FEED_LIST =
   ({ token, navigation, level, type, page, eventId, feedTypeAction, feedTypeActionId }) => {
     return invokeApi({
       // path: `api/feeds/delegate_portal/feed_listing/v1?page=${page}&limit=10&list_type=${type}&level_or_type=${level}&event=${eventId}&feed_action_type=${feedTypeAction}&feed_action_by=${feedTypeActionId}`,
-         path: `api/feeds/delegate_portal/feed_listing/v2?page=${page}&limit=10&list_type=${type}&level_or_type=${level}&event=${eventId}&feed_action_type=${feedTypeAction}&feed_action_by=${feedTypeActionId}`,
+      path: `api/feeds/delegate_portal/feed_listing/v2?page=${page}&limit=10&list_type=${type}&level_or_type=${level}&event=${eventId}&feed_action_type=${feedTypeAction}&feed_action_by=${feedTypeActionId}`,
       method: "GET",
       token,
       navigation,
@@ -247,18 +247,27 @@ export const GET_DELEGATES_LIST_FROM_SERVER_FOR_MENTION_V1 = ({ token, navigatio
   search_text = undefined,
   event_id = undefined,
   type = undefined,
-allow_all_option_in_mention_feed=undefined,
+  allow_all_option_in_mention_feed = undefined,
 } }) => {
   return invokeApi({
     path: `api/feeds/delegate_or_member/list/v1`,
     method: "POST",
     postData: {
-				list_type,
-				search_text,
-				event_id,
-				type,
-				allow_all_option_in_mention_feed
-		},
+      list_type,
+      search_text,
+      event_id,
+      type,
+      allow_all_option_in_mention_feed
+    },
+    token,
+    navigation,
+  })
+}
+
+export const GET_KEYWORDS_ADDED_BY_USER = ({ token, navigation, search_text = undefined, }) => {
+  return invokeApi({
+    path: `api/feeds/kewords_by_delegate/list?search_text=${search_text}`,
+    method: "GET",
     token,
     navigation,
   })
@@ -341,14 +350,14 @@ export const FEED_SURVEY_MEMBER_LIST = ({ token, navigation, body: {
   });
 }
 
-export const NOITFY_USERS = ({token, navigation, id,notify_state, notify_desc })=> invokeApi({
-		path:`api/feeds/send_feed_reminder/${id}`,
-		method:"POST",
-    token,
-    navigation,
-		postData:{
-				notification_statement: notify_state,
-				notification_description: notify_desc,
-		}
+export const NOITFY_USERS = ({ token, navigation, id, notify_state, notify_desc }) => invokeApi({
+  path: `api/feeds/send_feed_reminder/${id}`,
+  method: "POST",
+  token,
+  navigation,
+  postData: {
+    notification_statement: notify_state,
+    notification_description: notify_desc,
+  }
 })
 
