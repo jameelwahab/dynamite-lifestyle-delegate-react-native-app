@@ -10,7 +10,7 @@ import { icons } from '../../utilities/icons'
 import { MyButton, TransparentButton } from '../../components/MyButton.js'
 import { StyleSheet, View, TouchableOpacity, FlatList } from "react-native"
 import breakReference from '../../functions/breakReference'
-import {useState,useEffect,useRef, useState} from "react"
+import {useState,useEffect,useRef} from "react"
 import NotificationModal from "../../components/ReminderModals/NotificationModal"
 import EmailModal from '../../components/ReminderModals/EmailModal'
 import MessageModal from '../../components/ReminderModals/MessageModal'
@@ -160,7 +160,14 @@ const FeedKeywords  = ({ navigation }) =>{
                 label='Feed Keywords'
                 value={cc[index]}
                 customView={()=>ccView(index)}
-                onChangeText={(text) => setCc(cc.map((el,ind)=> ind==index ? text : el)) }
+                onChangeText={(text) => {
+										if(cc.length == feedKeywordSetting.length){
+												setCc(cc.map((el,ind)=> ind==index ? text : el))
+										}
+										else{
+												setCc([...cc, text])
+										}
+								} }
                 rightIcon={cc[index] != "" ? () => icons.plus(colors.primary) : null}
                 rightIconOnPress={() => {
 								  setFeedKeywordSetting(feedKeywordSetting.map((el,ind)=> ind==index ?
