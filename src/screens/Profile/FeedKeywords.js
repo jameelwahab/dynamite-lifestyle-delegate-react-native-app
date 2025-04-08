@@ -217,14 +217,16 @@ const FeedKeywords = ({ navigation }) => {
 							data={feedKeywordSetting}
 							showsVerticalScrollIndicator={false}
 							ListFooterComponentStyle={{ marginTop: 10 }}
+						  ListFooterComponent={
+										isArray(feedKeywordSetting) &&
+										<MyButton title="Update" onPress={updateTheList} />
+							}
 							contentContainerStyle={{ paddingBottom: 50 }}
 							KeyExtractor={(_, index) => index.toString()}
 							renderItem={__keywordConfigurationView}
 						/>
 					</Flex>
 				</MyKeyboardAvoidingView>
-				{isArray(feedKeywordSetting) &&
-					<MyButton title="Update" onPress={updateTheList} />}
 			</Flex>
 
 			<NotificationModal
