@@ -1,6 +1,7 @@
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import RootView from '../../components/RootView'
 import MyCheckBox from "../../components/MyCheckBox"
+import isArray from "../../functions/isArray"
 import MyInputs from "../../components/MyInputs"
 import MyChip from "../../components/MyChip"
 import MyLoader from "../../components/MyLoader"
@@ -17,7 +18,6 @@ import MessageModal from '../../components/ReminderModals/MessageModal'
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../redux/reducers/userSlice'
 import showToast from '../../functions/showToast'
-import isArray from '../../functions/isArray'
 import { Flex, Row } from '../../UIComponents/FlexViews'
 import MyText from '../../components/MyText'
 import MyKeyboardAvoidingView from '../../components/MyKeyboardAvoidingView'
@@ -68,9 +68,6 @@ const FeedKeywords = ({ navigation }) => {
 					notifications: feedKeywordSetting[ind].notifications.map((e, i) => e.name == type ? { ...e, ...data } : e)
 
 				} : el))
-		}
-		else {
-			console.log("not present")
 		}
 	}
 

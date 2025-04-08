@@ -130,7 +130,7 @@ const Updates = ({route,navigation}) => {
 								style={{padding:15, borderRadius:10, backgroundColor: colors.secondary }}>
 								<View style={{flexDirection:"row", justifyContent:"space-between", alignItems:"center"}}>
 								<MyText
-										fontSize={20}
+										fontSize={16}
 										color={colors.primary}
 										type="bold"
 
