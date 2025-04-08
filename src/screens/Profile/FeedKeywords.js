@@ -1,6 +1,7 @@
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import RootView from '../../components/RootView'
 import MyCheckBox from "../../components/MyCheckBox"
+import isArray from "../../functions/isArray"
 import MyInputs from "../../components/MyInputs"
 import MyChip from "../../components/MyChip"
 import MyLoader from "../../components/MyLoader"
@@ -99,7 +100,9 @@ const FeedKeywords  = ({ navigation }) =>{
 				const result = await GET_FEED_KEYWORDS_SETTINGS({token, navigation})
 				setLoader(false)	
 				if(result.code == 200){
-						setFeedKeywordSetting(result?.feed_keyword_setting)
+						if(isArray(result?.feed_keyword_setting)){
+								setFeedKeywordSetting(result?.feed_keyword_setting)
+						}
 				}
 		}
 
