@@ -31,10 +31,10 @@ export const defaultScreens = [
     name: routes.reminderSettings,
     component: ReminderSettings
   },
-		{
-				name: routes.feedKeywords,
-				component: FeedKeywords
-		},
+  {
+    name: routes.feedKeywords,
+    component: FeedKeywords
+  },
   {
     name: routes.chatMessageList,
     component: MessageList
