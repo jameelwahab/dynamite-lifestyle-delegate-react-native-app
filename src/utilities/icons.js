@@ -99,6 +99,8 @@ export const icons = {
   back: (color = colors.white, size = 20) => { return (<MaterialIcons name="arrow-back" color={color} size={size} />) },
   nextArrow: (color = colors.white, size = 20) => { return (<MaterialIcons name="arrow-forward" color={color} size={size} />) },
   downArrow: (color = colors.white, size = 20) => { return (<AntDesign name="arrowdown" color={color} size={size} />) },
+  rightcircle: (color = colors.white, size = 20) => { return (<AntDesign name="rightcircle" color={color} size={size} />) },
+  leftcircle: (color = colors.white, size = 20) => { return (<AntDesign name="leftcircle" color={color} size={size} />) },
   info: (color = colors.white, size = 20) => { return (<FontAwesome6 name="info" color={color} size={size} />) },
   upward: (color = colors.white, size = 20) => { return (<Ionicons name="caret-up" color={color} size={size} />) },
   downward: (color = colors.white, size = 20) => { return (<Ionicons name="caret-down" color={color} size={size} />) },
