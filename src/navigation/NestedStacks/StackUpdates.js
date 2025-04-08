@@ -4,6 +4,7 @@ import { colors } from '../../utilities/colors'
 import { createNativeStackNavigator, } from '@react-navigation/native-stack'
 import { defaultScreens } from "./defaultScreens"
 import Updates from "../../screens/Updates"
+import UpdateDetail from "../../screens/Updates/UpdateDetail"
 import UpdatesFilter from "../../screens/Updates/UpdatesFilter"
 
 const UpdatesStack = createNativeStackNavigator();
@@ -17,6 +18,12 @@ const StackUpdates = ({ route }) => {
 								<UpdatesStack.Screen
 										name={routes.updatesMain}
 										component={Updates}
+										initialParams={routes.params}
+										/>
+
+								<UpdatesStack.Screen
+										name={routes.updatesDetail}
+										component={UpdateDetail}
 										initialParams={routes.params}
 										/>
 

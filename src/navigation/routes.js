@@ -371,6 +371,7 @@ const routes = {
   // Updates
   updates:"UPDATES",
   updatesMain:"UPDATES_MAIN",
+  updatesDetail:"UPDATES_DETAILS",
   updatesFilter: "UPDATES_FILTER",
   
   // affilaite links 

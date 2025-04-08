@@ -82,8 +82,6 @@ export class MyWebview extends Component {
     html = "<div>" + html.replace(/padding:/g, "") + "</div>";
     html = "<div>" + html.replace(/height:100%/g, "") + "</div>";
 
-		console.log(html)	
-   
     // html = "<div>" + html.replace(/position:/g, "") + "</div>";
     return (
       <RenderHTML
