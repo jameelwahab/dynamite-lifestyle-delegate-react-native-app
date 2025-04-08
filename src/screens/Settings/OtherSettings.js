@@ -63,6 +63,12 @@ const SettingsList = [{
 },
 {
   _id: "3",
+  name: "Feed Keywords Settings",
+  icon: icons.user,
+  route: routes.feedKeywords,
+},
+{
+  _id: "4",
   name: "Change Password",
   icon: icons.lock,
   route: routes.changePassword

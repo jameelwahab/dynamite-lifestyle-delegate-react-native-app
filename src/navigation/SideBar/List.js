@@ -59,6 +59,7 @@ import StackContentReview from "../NestedStacks/StackFeedReview"
 import StackFeedReview from "../NestedStacks/StackFeedReview";
 import StackCommentReview from "../NestedStacks/StackCommentReview";
 import StackUpdates from "../NestedStacks/StackUpdates";
+import StackAffiliate from "../NestedStacks/StackAffiliate";
 
 
 
@@ -415,7 +416,17 @@ export const ParentComponents = {
       value: "updates",
       key: "39f49f30-5a18-4c38-9c91-ad8a89f7218b"
     }
-  }
+  },
+
+// Update Tab
+  "c6148bbe-118f-492d-b1e7-bec092d7afec": {
+    key: routes.affiliate,
+    component: StackAffiliate,
+    params: {
+      value: "campaign_url",
+      key: "c6148bbe-118f-492d-b1e7-bec092d7afec"
+    }
+  },
 
 }
 

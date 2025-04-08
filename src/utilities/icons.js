@@ -126,6 +126,7 @@ export const icons = {
   video: (color = colors.primary, size = 17) => { return (<Ionicons name="videocam" color={color} size={size} />) },
   code: (color = colors.primary, size = 17) => { return (<Ionicons name="code-slash" color={color} size={size} />) },
   goto: (color = colors.primary, size = 17) => { return (<Ionicons name="open-outline" color={color} size={size} />) },
+  gotoFill: (color = colors.primary, size = 17) => { return (<Ionicons name="open" color={color} size={size} />) },
   message: (color = colors.primary, size = 17) => { return (<MaterialIcons name="message" color={color} size={size} />) },
   history: (color = colors.primary, size = 17) => { return (<FontAwesome5 name="history" color={color} size={size} />) },
   sms: (color = colors.primary, size = 17) => { return (<FontAwesome5 name="sms" color={color} size={size} />) },

@@ -2,6 +2,7 @@ import RootView from "../../components/RootView"
 import MyRefreshControl from '../../components/MyRefreshControl'
 import MyWebView from "../../components/MyWebview"
 import MyLoader from "../../components/MyLoader"
+import EmptyView from '../../components/EmptyView'
 import OptionModal2 from "../../components/OptionModal2"
 import MyChip from "../../components/MyChip"
 import { View, StyleSheet, TouchableOpacity, Text, FlatList } from "react-native"
@@ -143,11 +144,17 @@ const Updates = ({route,navigation}) => {
 		const renderList = (item)=>{
 				return (
 						<View style={{padding:15, borderRadius:10, backgroundColor: colors.secondary }}>
+								<View style={{flexDirection:"row", justifyContent:"space-between"}}>
 								<MyText
 										fontSize={20}
 										color={colors.primary}
 										type="bold"
+
 										>{item?.title}</MyText>
+								<MyText style={{opacity:0.5}} type="semi">
+										{moment(item?.date).format(dateTimeFormat.date)}
+								</MyText>
+								</View>
 								<MyWebView 
 										html={item?.fixed_issues_description}
 										style={__webViewStyle}
@@ -171,6 +178,7 @@ const Updates = ({route,navigation}) => {
 								ItemSeparatorComponent={<View style={{height:20}}/>}
 								renderItem={({item})=> renderList(item)}
 								stickyHeaderIndices={[0]}
+								ListEmptyComponent={!loading && <EmptyView />}
 								stickyHeaderHiddenOnScroll={true}
 								onViewableItemsChanged={onViewCallBack}
 								viewabilityConfig={viewConfigRef?.current}
