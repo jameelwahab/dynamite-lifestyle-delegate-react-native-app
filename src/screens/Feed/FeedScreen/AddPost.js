@@ -40,6 +40,7 @@ import OptionModalWithSearch from '../../../components/OptionModalWithSearch'
 import SurveyView from './SurveyView'
 import { selectUser } from '../../../redux/reducers/userSlice'
 import isArray from '../../../functions/isArray'
+import breakReference from '../../../functions/breakReference'
 
 
 
@@ -630,11 +631,11 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     fd.append("description", postText);
     fd.append("embed_code", postType == "embed_code" ? embededCode : "");
     fd.append("feed_images", postType == 'image' ? JSON.stringify(uploadedImages) : "[]");
-    fd.append("mentioned_users", JSON.stringify(mentionList.filter(user => user?.type == "mention").map((user) => {
+    fd.append("mentioned_users", JSON.stringify(breakReference(mentionList).filter(user => user?.type == "mention").map((user) => {
       delete user["type"]
       return user
     })));
-    fd.append("feed_keywords", JSON.stringify(mentionList.filter(user => user?.type == "keyword").map((user) => {
+    fd.append("feed_keywords", JSON.stringify(breakReference(mentionList).slice().filter(user => user?.type == "keyword").map((user) => {
       delete user["type"]
       return user
     })))

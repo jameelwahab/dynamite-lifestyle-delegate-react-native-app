@@ -438,13 +438,13 @@ const CommentModal = ({
     let fd = new FormData();
     fd.append("message", commentText);
     if (selectedKeyword) {
-      let obj = mentionList.find(x => x.type == "keyword");
+      let obj = breakReference(mentionList).find(x => x.type == "keyword");
       if (obj) {
         delete obj.type;
         fd.append("feed_keyword", JSON.stringify(obj));
       }
     }
-    fd.append("mentioned_users", JSON.stringify(mentionList.filter(x => x.type == "mention").map(x => {
+    fd.append("mentioned_users", JSON.stringify(breakReference(mentionList).filter(x => x.type == "mention").map(x => {
       delete x.type;
       return x
     })));
@@ -535,13 +535,13 @@ const CommentModal = ({
     formData.append("feed", feedId);
     formData.append("message", commentText);
     if (selectedKeyword) {
-      let obj = mentionList.find(x => x.type == "keyword");
+      let obj = breakReference(mentionList).find(x => x.type == "keyword");
       if (obj) {
         delete obj.type;
         formData.append("feed_keyword", JSON.stringify(obj));
       }
     }
-    formData.append("mentioned_users", JSON.stringify(mentionList.filter(x => x.type == "mention").map(x => {
+    formData.append("mentioned_users", JSON.stringify(breakReference(mentionList).filter(x => x.type == "mention").map(x => {
       delete x.type;
       return x
     })));
