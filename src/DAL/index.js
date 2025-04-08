@@ -197,3 +197,5 @@ export { GET_UPDATES_LIST } from "./Updates"
 
 export {GET_AFFILAITE_LINK} from "./Affiliates"
 
+export {GET_FEED_KEYWORDS_SETTINGS, UPDATE_FEED_KEYWORDS_SETTINGS} from "./FeedKeywords.js"
+

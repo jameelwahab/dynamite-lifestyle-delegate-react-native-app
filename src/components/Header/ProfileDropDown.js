@@ -102,7 +102,7 @@ const ProfileDropDown = ({ isVisible = false, closeModal = () => { }, user }) =>
             onPress={logoutBtn}
             style={__styles.btnView}>
             <MyText>
-								Dete Iku 
+              Logout
             </MyText>
           </TouchableOpacity>
         </View>
