@@ -74,6 +74,7 @@ const NotificationModal = forwardRef(({ onReminderSavePress }, ref) => {
       animationInTiming={300}
       animationOutTiming={300}
       hideModalContentWhileAnimating={true}
+      avoidKeyboard={true}
       style={{ margin: 0, }}>
 
       <SafeAreaView style={__styles.rootView}>

@@ -63,7 +63,7 @@ const SettingsList = [{
 },
 {
   _id: "3",
-  name: "Feed Keywords Settings",
+  name: "Feed Keywords",
   icon: icons.user,
   route: routes.feedKeywords,
 },

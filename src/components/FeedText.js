@@ -8,7 +8,7 @@ import openUrl from '../functions/openUrl';
 import { fonts } from '../utilities/fonts';
 
 
-const FeedText = ({ text, list }) => {
+const FeedText = ({ text, list, keywords }) => {
   const [isSeeMoreActive] = useState(text.length > 150)
   const [isSeeMoreEnable, setSeeMoreEnable] = useState(true);
 
@@ -39,7 +39,7 @@ const FeedText = ({ text, list }) => {
 
 
   const links = findLinks(nText);
-  const parts = convertToMentionabableText(nText, list, links);
+  const parts = convertToMentionabableText(nText, list, links, keywords);
 
 
   return (
@@ -52,8 +52,13 @@ const FeedText = ({ text, list }) => {
               style={{ color: colors.primary, textDecorationLine: "underline" }}>{part.text}</Text>
           );
         }
+
         return (
-          <Text key={index} style={{ color: part.highlight ? colors.primary : colors.white }}>
+          <Text key={index} style={{
+            color: part?.isKeyword ? colors?.keyword : part.highlight ? colors.primary : colors.white,
+            fontFamily: part?.isKeyword ? fonts.bold : fonts.regular,
+            textDecorationLine: part?.isKeyword ? "underline" : "none"
+          }}>
             {part.text}
           </Text>
         )
