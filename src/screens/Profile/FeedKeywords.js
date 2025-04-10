@@ -92,8 +92,7 @@ const FeedKeywords = ({ navigation }) => {
 		if (txt == "add") {
 			setFeedKeywordSetting([...feedKeywordSetting, { keywords: [], notifications: [] }])
 			setCc([...cc, ""])
-		}
-		else if (txt == "rm") {
+		} else if (txt == "rm") {
 			setFeedKeywordSetting(feedKeywordSetting.filter((_, ind) => ind != index))
 			setCc(cc.filter((_, ind) => ind != index))
 		}
@@ -105,6 +104,7 @@ const FeedKeywords = ({ navigation }) => {
 		if (result.code == 200) {
 			if (isArray(result?.feed_keyword_setting)) {
 				setFeedKeywordSetting(result?.feed_keyword_setting)
+				setCc(Array(result?.feed_keyword_setting.length).fill(""));
 			} else {
 				setFeedKeywordSetting([{ keywords: [], notifications: [] }])
 			}
@@ -163,8 +163,7 @@ const FeedKeywords = ({ navigation }) => {
 						onChangeText={(text) => {
 							if (cc.length == feedKeywordSetting.length) {
 								setCc(cc.map((el, ind) => ind == index ? text : el))
-							}
-							else {
+							} else {
 								setCc([...cc, text])
 							}
 						}}
