@@ -27,7 +27,7 @@ const FeedKeywords = ({ navigation }) => {
 	const ref_email_modal = useRef();
 	const ref_message_modal = useRef();
 	const ref_notification_modal = useRef();
-	const [cc, setCc] = useState([""])
+	const [cc, setCc] = useState([])
 	const [feedKeywordSetting, setFeedKeywordSetting] = useState([])
 	const [loader, setLoader] = useState(false);
 
@@ -91,7 +91,6 @@ const FeedKeywords = ({ navigation }) => {
 	const addAndRemo = (txt, index) => {
 		if (txt == "add") {
 			setFeedKeywordSetting([...feedKeywordSetting, { keywords: [], notifications: [] }])
-			setCc([...cc, ""])
 		}
 		else if (txt == "rm") {
 			setFeedKeywordSetting(feedKeywordSetting.filter((_, ind) => ind != index))
@@ -129,6 +128,7 @@ const FeedKeywords = ({ navigation }) => {
 			setLoader(false)
 		}
 	}
+		// useEffect(()=> console.log(cc), [cc])
 
 	const __keywordConfigurationView = ({ item, index }) => {
 		return (
@@ -158,21 +158,22 @@ const FeedKeywords = ({ navigation }) => {
 						// style={{ marginTop: -5 }}
 						// label='Feed Keywords'
 						noLable
-						value={cc[index]}
+						value={cc.find(x=> x.index == index)?.val}
 						customView={() => ccView(index)}
 						onChangeText={(text) => {
-							if (cc.length == feedKeywordSetting.length) {
-								setCc(cc.map((el, ind) => ind == index ? text : el))
+								console.log(cc.findIndex(x=> x.index == index) > -1, cc[index]?.val)
+							if (cc.findIndex(x=> x.index == index) > -1 ) {
+								setCc(cc.map(el => el.index == index ? {index, val:text} : el))
 							}
 							else {
-								setCc([...cc, text])
+								setCc([...cc, { val:text, index}])
 							}
 						}}
 						rightIcon={cc[index] != "" ? () => icons.plus(colors.primary) : null}
 						rightIconOnPress={() => {
-							setFeedKeywordSetting(feedKeywordSetting.map((el, ind) => ind == index ?
-								{ ...feedKeywordSetting[ind], keywords: [...feedKeywordSetting[ind].keywords, { value: cc[index] }] } : el))
-							setCc(cc.map((x, ind) => ind != index ? x : ""))
+							setFeedKeywordSetting(feedKeywordSetting.map(el => el.index == index ?
+								{ ...feedKeywordSetting[index], keywords: [...feedKeywordSetting[index].keywords, { value: el?.val }] } : el))
+							setCc(cc.filter(x => x.index != index))
 						}}
 					/>
 				</View>

@@ -33,8 +33,6 @@ const Affiliates = ({navigation, route}) =>{
 				}
 		}
 
-		console.log()
-
 		useEffect(()=>{
 				setLoading(true)
 				getList()

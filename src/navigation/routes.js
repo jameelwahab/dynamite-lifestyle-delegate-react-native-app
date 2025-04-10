@@ -377,6 +377,10 @@ const routes = {
   // affilaite links 
   affiliate:"AFFILIATE_SCREEN",
   affiliateLinks:"AFFILIATE_LINKS_SCREEN",
+  
+  templates:"TEMPLATES_SCREEN",
+  templatesMain:"TEMPLATES_MAIN_SCREEN",
+  templateAddEdit:"TEMPLATES_EDIT_ADD_SCREEN",
 }
 
 

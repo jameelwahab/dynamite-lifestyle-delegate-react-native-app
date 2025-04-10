@@ -199,3 +199,5 @@ export {GET_AFFILAITE_LINK} from "./Affiliates"
 
 export {GET_FEED_KEYWORDS_SETTINGS, UPDATE_FEED_KEYWORDS_SETTINGS} from "./FeedKeywords.js"
 
+export { GET_TEMPLATES_LIST } from "./Templates"
+
