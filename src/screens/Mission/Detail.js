@@ -230,7 +230,7 @@ const Header = ({ res, showBadges, daysOn = "", focuse, tab }) => {
 					totalCoins={res?.rewarded_coins}
 					badges={res?.badge_configration}
 					questReplayAccessDays={res?.replay_days}
-					dateString={`${moment(res?.start_date).format("DD MMM")} - ${moment(res?.end_date).format("DD MMM")}`}
+					dateString={`${moment(res?.start_date).format("DD MMM")} -${moment(res?.end_date).format("DD MMM")}`}
 					isQuest={res?.type == "quest"}
 					showEarnedBadges={false}
 				// showBadgesEarned={false}
