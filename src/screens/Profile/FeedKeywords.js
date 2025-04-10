@@ -91,8 +91,8 @@ const FeedKeywords = ({ navigation }) => {
 	const addAndRemo = (txt, index) => {
 		if (txt == "add") {
 			setFeedKeywordSetting([...feedKeywordSetting, { keywords: [], notifications: [] }])
-		}
-		else if (txt == "rm") {
+			setCc([...cc, ""])
+		} else if (txt == "rm") {
 			setFeedKeywordSetting(feedKeywordSetting.filter((_, ind) => ind != index))
 			setCc(cc.filter((_, ind) => ind != index))
 		}
@@ -104,6 +104,7 @@ const FeedKeywords = ({ navigation }) => {
 		if (result.code == 200) {
 			if (isArray(result?.feed_keyword_setting)) {
 				setFeedKeywordSetting(result?.feed_keyword_setting)
+				setCc(Array(result?.feed_keyword_setting.length).fill(""));
 			} else {
 				setFeedKeywordSetting([{ keywords: [], notifications: [] }])
 			}
@@ -158,15 +159,13 @@ const FeedKeywords = ({ navigation }) => {
 						// style={{ marginTop: -5 }}
 						// label='Feed Keywords'
 						noLable
-						value={cc.find(x=> x.index == index)?.val}
+						value={cc[index]}
 						customView={() => ccView(index)}
 						onChangeText={(text) => {
-								console.log(cc.findIndex(x=> x.index == index) > -1, cc[index]?.val)
-							if (cc.findIndex(x=> x.index == index) > -1 ) {
-								setCc(cc.map(el => el.index == index ? {index, val:text} : el))
-							}
-							else {
-								setCc([...cc, { val:text, index}])
+							if (cc.length == feedKeywordSetting.length) {
+								setCc(cc.map((el, ind) => ind == index ? text : el))
+							} else {
+								setCc([...cc, text])
 							}
 						}}
 						rightIcon={cc[index] != "" ? () => icons.plus(colors.primary) : null}
@@ -218,16 +217,14 @@ const FeedKeywords = ({ navigation }) => {
 							data={feedKeywordSetting}
 							showsVerticalScrollIndicator={false}
 							ListFooterComponentStyle={{ marginTop: 10 }}
-						  ListFooterComponent={
-										isArray(feedKeywordSetting) &&
-										<MyButton title="Update" onPress={updateTheList} />
-							}
 							contentContainerStyle={{ paddingBottom: 50 }}
 							KeyExtractor={(_, index) => index.toString()}
 							renderItem={__keywordConfigurationView}
 						/>
 					</Flex>
 				</MyKeyboardAvoidingView>
+				{isArray(feedKeywordSetting) &&
+					<MyButton title="Update" onPress={updateTheList} />}
 			</Flex>
 
 			<NotificationModal
