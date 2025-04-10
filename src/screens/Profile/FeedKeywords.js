@@ -170,9 +170,9 @@ const FeedKeywords = ({ navigation }) => {
 						}}
 						rightIcon={cc[index] != "" ? () => icons.plus(colors.primary) : null}
 						rightIconOnPress={() => {
-							setFeedKeywordSetting(feedKeywordSetting.map(el => el.index == index ?
-								{ ...feedKeywordSetting[index], keywords: [...feedKeywordSetting[index].keywords, { value: el?.val }] } : el))
-							setCc(cc.filter(x => x.index != index))
+							setFeedKeywordSetting(feedKeywordSetting.map((el, ind) => ind == index ?
+								{ ...feedKeywordSetting[ind], keywords: [...feedKeywordSetting[ind].keywords, { value: cc[index] }] } : el))
+							setCc(cc.map((x, ind) => ind != index ? x : ""))
 						}}
 					/>
 				</View>
