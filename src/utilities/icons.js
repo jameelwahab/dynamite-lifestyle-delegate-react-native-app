@@ -99,6 +99,8 @@ export const icons = {
   back: (color = colors.white, size = 20) => { return (<MaterialIcons name="arrow-back" color={color} size={size} />) },
   nextArrow: (color = colors.white, size = 20) => { return (<MaterialIcons name="arrow-forward" color={color} size={size} />) },
   downArrow: (color = colors.white, size = 20) => { return (<AntDesign name="arrowdown" color={color} size={size} />) },
+  rightcircle: (color = colors.white, size = 20) => { return (<AntDesign name="rightcircle" color={color} size={size} />) },
+  leftcircle: (color = colors.white, size = 20) => { return (<AntDesign name="leftcircle" color={color} size={size} />) },
   info: (color = colors.white, size = 20) => { return (<FontAwesome6 name="info" color={color} size={size} />) },
   upward: (color = colors.white, size = 20) => { return (<Ionicons name="caret-up" color={color} size={size} />) },
   downward: (color = colors.white, size = 20) => { return (<Ionicons name="caret-down" color={color} size={size} />) },
@@ -126,6 +128,7 @@ export const icons = {
   video: (color = colors.primary, size = 17) => { return (<Ionicons name="videocam" color={color} size={size} />) },
   code: (color = colors.primary, size = 17) => { return (<Ionicons name="code-slash" color={color} size={size} />) },
   goto: (color = colors.primary, size = 17) => { return (<Ionicons name="open-outline" color={color} size={size} />) },
+  gotoFill: (color = colors.primary, size = 17) => { return (<Ionicons name="open" color={color} size={size} />) },
   message: (color = colors.primary, size = 17) => { return (<MaterialIcons name="message" color={color} size={size} />) },
   history: (color = colors.primary, size = 17) => { return (<FontAwesome5 name="history" color={color} size={size} />) },
   sms: (color = colors.primary, size = 17) => { return (<FontAwesome5 name="sms" color={color} size={size} />) },
@@ -155,5 +158,6 @@ export const icons = {
   people: (color = colors.white, size = 20) => { return (<Ionicons name="people" color={color} size={size} />) },
   warnOctagon: (color = colors.white, size = 20) => { return (<Feather name="alert-octagon" color={color} size={size} />) },
   unread: (color = colors.white, size = 20) => { return (<MaterialCommunityIcons name="message-badge-outline" color={color} size={size} />) },
+  menuCircle: (color = colors.white, size = 20) => { return (<Ionicons name="list-circle" color={color} size={size} />) },
   check_circle: (color = colors.primary, size = 17) => { return (<Octicons name="check-circle" color={color} size={size} />) },
 }

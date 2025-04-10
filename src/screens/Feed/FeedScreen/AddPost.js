@@ -15,7 +15,7 @@ import utilities from '../../../utilities'
 import MyImage from '../../../components/MyImage'
 import OptionModal from '../../../components/OptionModal'
 import Toast from 'react-native-toast-message'
-import { CREATE_FEED, FEED_DETAIL, GET_DELEGATES_LIST_FROM_SERVER_FOR_MENTION_V1, UPDATE_FEED, UPLOAD_FEED_IMAGES } from '../../../DAL'
+import { CREATE_FEED, FEED_DETAIL, GET_DELEGATES_LIST_FROM_SERVER_FOR_MENTION_V1, GET_KEYWORDS_ADDED_BY_USER, UPDATE_FEED, UPLOAD_FEED_IMAGES } from '../../../DAL'
 import showToast from '../../../functions/showToast'
 import { S3_URL, communityLevelWithAllObj, dateTimeFormat } from '../../../utilities/constants'
 import LevelModal from './LevelModal'
@@ -39,6 +39,8 @@ import { convertTimezoneToRegion } from '../../../functions/convertTime'
 import OptionModalWithSearch from '../../../components/OptionModalWithSearch'
 import SurveyView from './SurveyView'
 import { selectUser } from '../../../redux/reducers/userSlice'
+import isArray from '../../../functions/isArray'
+import breakReference from '../../../functions/breakReference'
 
 
 
@@ -64,7 +66,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
 }, ref) => {
 
-	const { access } = useSelector(selectUser);
+  const { access } = useSelector(selectUser);
   const { height, width } = useWindowDimensions();
   const inset = useSafeAreaInsets();
   const ref_poll = useRef()
@@ -79,9 +81,9 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   const [isImageVisible, setImageModalVisibilty] = useState(false);
   const [memberModalVisibilty, setMemberModalVisibilty] = useState(false);
   const [feedTypeModalVisibility, setFeedTypeModalVisibility] = useState(false)
-  const [notifyUser, setNotifyUser]=useState(false);
+  const [notifyUser, setNotifyUser] = useState(false);
   const [memberList, setMemberList] = useState([])
-  const [badge, setBadge] =useState({title:"All", key:"all"})
+  const [badge, setBadge] = useState({ title: "All", key: "all" })
   const [options, setOption] = useState({
     list: [],
     type: "",
@@ -111,7 +113,13 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   const [isMentionListLoading, setMentionListLoading] = useState(false);
   const [mentionList, setMentionList] = useState([]);
   const [_at_index, set_at_index] = useState(-1);
-  const [inputHeight, setInputHeight] = useState(0)
+  const [inputHeight, setInputHeight] = useState(0);
+
+  const [keywordList, setKeywordList] = useState([]);
+  const [isKeywordListVisible, setIsKeywordListVisible] = useState(false);
+  const [isKeywordListLoading, setIsKeywordListLoading] = useState(false);
+  const [keywordAddedList, setKeywordAddedList] = useState([]);
+  const [keyword_at_index, setKeyword_at_index] = useState(-1);
 
   const [dateModalVisible, setDateModalVisible] = useState(false);
   const [timeModalVisibe, setTimeModalVisibe] = useState(false);
@@ -121,30 +129,46 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   const [multipleLevelModalVisiblity, setMultipleLevelModalVisiblity] = useState(false);
   const [pollData, setPollData] = useState(null);
   const [surveyData, setSurveyData] = useState(null);
-  const [notifyTxt, setNotifyTxt] =useState({state:"", desc:""})
+  const [notifyTxt, setNotifyTxt] = useState({ state: "", desc: "" })
 
 
   useEffect(() => {
     let text = postText;
+
+    //* For Mention
     if (text[cursor?.start] == "@" || text == "@") {
       // let _at_index = !!cursor?.start ? cursor?.start : 0;
       let _at_index = !!text[cursor?.start] ? cursor?.start : 0;
       set_at_index(_at_index)
       setIsMentionListVisible(true);
       getTheDelegateListFromServer(extractSubstring(text, _at_index))
+    } else if (!isCosmos && (text[cursor?.start] == "#" || text == "#")) {
+      // let _at_index = !!cursor?.start ? cursor?.start : 0;
+      let _at_index = !!text[cursor?.start] ? cursor?.start : 0;
+      set_at_index(_at_index)
+      setIsKeywordListVisible(true);
+      getTheKeywordListFromServer(extractSubstring(text, _at_index))
     }
 
     if ((text[_at_index] != "@") && isMentionListVisible == true) {
       setIsMentionListVisible(false);
       set_at_index(-1)
+    } else if ((text[_at_index] != "#") && isKeywordListVisible == true) {
+      setIsKeywordListVisible(false);
+      set_at_index(-1)
     }
+
     if (isMentionListVisible) {
       getTheDelegateListFromServer(extractSubstring(text))
+    } else if (isKeywordListVisible) {
+      getTheKeywordListFromServer(extractSubstring(text))
     }
 
     if (text.trim() == "" && mentionList.length > 0) {
       setMentionList([])
     }
+
+
 
   }, [postText])
 
@@ -153,6 +177,12 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
       getTheDelegateListFromServer("");
     }
   }, [isMentionListVisible])
+
+  useEffect(() => {
+    if (!isCosmos && isKeywordListVisible == false) {
+      getTheKeywordListFromServer("");
+    }
+  }, [isKeywordListVisible])
 
   useEffect(() => {
     if (memberModalVisibilty) {
@@ -172,24 +202,21 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     if (!!sIndex) {
       startIndex = sIndex
     } else {
+      // if (type == 0) {
       startIndex = _at_index + 1;
+      // } else if (type == 1) {
+      //   startIndex = keyword_at_index + 1;
+      // }
     }
     let endIndex = cursor?.start;
     string = str.substring(startIndex, (endIndex + 1));
-    if (string[0] == '@') {
+    // if (string[0] == '@') {
+    if (string[0] == '@' || string[0] == '#') {
       string = string.substring(1);
     }
     return string
   }
 
-  function getSubstringToSpaceEndIndex(str, startIndex) {
-    if (startIndex >= str.length) {
-      return '';
-    }
-    const endIndex = str.indexOf(' ', startIndex);
-
-    return endIndex
-  }
 
   function replaceSubstring(str, startIndex, endIndex, replacement) {
     if (startIndex > str.length - 1) {
@@ -204,13 +231,8 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
 
   const replaceString = (str, index, replacement) => {
-    // if (index > str.length - 1) {
-    //   return str;
-    // }
-    // let endINdex = getSubstringToSpaceEndIndex(str, _at_index);
     let endINdex = cursor.start
     return replaceSubstring(str + " ", index, endINdex, replacement)
-
   }
 
 
@@ -242,26 +264,6 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     }
     chnageTheIndexes(text, postText)
     setPostText(text)
-
-
-    // if ((text[cursor?.start] == "@" && (text[cursor?.start + 1] == " " || text[cursor?.start + 1] == undefined)) || text == "@") {
-    //   let _at_index = cursor?.start;
-    //   setIsMentionListVisible(true);
-    //   set_at_index(_at_index)
-    //   getTheDelegateListFromServer(extractSubstring(text))
-    // }
-    // if (!text.includes("@")) {
-    //   setIsMentionListVisible(false);
-    // }
-    // if (isMentionListVisible) {
-    //   if (text.substring(_at_index, cursor?.start).includes(" ")) {
-    //     setIsMentionListVisible(false);
-    //     setDelegateList([])
-    //   }
-    //   else {
-    //     getTheDelegateListFromServer(extractSubstring(text))
-    //   }
-    // }
   }
 
   useImperativeHandle(ref, () => {
@@ -284,7 +286,8 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     let arr = [...mentionList, {
       ...obj,
       offset: _at_index,
-      length: `${obj?.first_name} ${obj?.last_name}`.trim().length
+      length: `${obj?.first_name} ${obj?.last_name}`.trim().length,
+      type: "mention"
     }];
     arr.sort((a, b) => a.offset - b.offset);
 
@@ -293,6 +296,30 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     setIsMentionListVisible(false);
     setDelegateList([]);
     setPostText(replaceString(postText, _at_index, `${obj?.first_name} ${obj?.last_name}`.trim()));
+    set_at_index(-1)
+  }
+
+  const onPressOnKeyword = (obj) => {
+    let diff = extractSubstring(postText, _at_index).length;
+    mentionList.forEach((item) => {
+      if (_at_index < item.offset) {
+        item.offset = item.offset + (`${obj?.value}`.trim().length - diff)
+      }
+    })
+
+    let arr = [...mentionList, {
+      ...obj,
+      offset: _at_index,
+      length: `${obj?.value}`.trim().length,
+      type: "keyword"
+    }];
+    arr.sort((a, b) => a.offset - b.offset);
+
+    setMentionList(arr);
+
+    setIsKeywordListVisible(false);
+    setKeywordList([]);
+    setPostText(replaceString(postText, _at_index, `${obj?.value}`.trim()));
     set_at_index(-1)
   }
 
@@ -306,8 +333,12 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     setPostCreatedForArray([PostCretedForSourceFeed.find(x => x.type == item?.created_for_level_or_type)])
     setPostType(item?.feed_type);
     setPostText(item?.description.replace(/\r\n/g, "\n").replace(/\r/g, "\n"));
-    if (!!item?.mentioned_users) {
-      setMentionList(item?.mentioned_users.sort((a, b) => a.offset - b.offset));
+    if (isArray(item?.mentioned_users) || isArray(item?.feed_keywords)) {
+      let mUser = isArray(item?.mentioned_users) ? item?.mentioned_users.map((item) => ({ ...item, type: "mention" })) : [];
+      let keywords = isArray(item?.feed_keywords) ? item?.feed_keywords.map((item) => ({ ...item, type: "keyword" })) : [];
+      let newArr = [...mUser, ...keywords];
+      newArr.sort((a, b) => a.offset - b.offset);
+      setMentionList(newArr);
     }
     setImages([...item.feed_images]);
     setVideoLink(item?.video_url);
@@ -366,6 +397,8 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     setPublishTime("12:00 AM");
     setMentionList([]);
     setDelegateList([]);
+    setKeywordList([]);
+    setIsKeywordListVisible(false)
     setIsMentionListVisible(false);
     set_at_index(-1)
     setPollData(null)
@@ -374,9 +407,9 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
       start: 0,
       end: 0
     };
-		setBadge({title:"All", key:"all"})
-		setNotifyUser(false)
-		setNotifyTxt({state:"", desc:""})
+    setBadge({ title: "All", key: "all" })
+    setNotifyUser(false)
+    setNotifyTxt({ state: "", desc: "" })
   }
 
   const openOptionModal = (Modalfor) => {
@@ -387,14 +420,14 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
         type: Modalfor
       })
     }
-			else if (Modalfor == "badges") {
+    else if (Modalfor == "badges") {
       setOption({
-					list: [{title:"All", key:"all"}, ...access?.badge_levels],
+        list: [{ title: "All", key: "all" }, ...access?.badge_levels],
         visibility: true,
         type: Modalfor
       })
     }
-			else if (Modalfor == "createdFor") {
+    else if (Modalfor == "createdFor") {
       let arr = [];
       if (isCosmos) {
         cosmosLevelList.forEach((x) => {
@@ -429,7 +462,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
       setPostCategory(opt.type)
     } else if (options?.type == "createdFor") {
       setPostCreatedFor(opt.type)
-    } else if(options?.type == "badges") setBadge(opt)
+    } else if (options?.type == "badges") setBadge(opt)
 
     closeOptionModal()
   }
@@ -547,9 +580,9 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
       }
     }
-		if((notifyTxt.state=="" || notifyTxt.desc =="") && notifyUser){
-				return showToast({title:"info", body:"Notication statement and Notication description should be not be empty"})
-		} 
+    if ((notifyTxt.state == "" || notifyTxt.desc == "") && notifyUser) {
+      return showToast({ title: "info", body: "Notication statement and Notication description should be not be empty" })
+    }
 
     setLoader(true);
     let uploadedImages = [];
@@ -598,7 +631,14 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     fd.append("description", postText);
     fd.append("embed_code", postType == "embed_code" ? embededCode : "");
     fd.append("feed_images", postType == 'image' ? JSON.stringify(uploadedImages) : "[]");
-    fd.append("mentioned_users", JSON.stringify(mentionList));
+    fd.append("mentioned_users", JSON.stringify(breakReference(mentionList).filter(user => user?.type == "mention").map((user) => {
+      delete user["type"]
+      return user
+    })));
+    fd.append("feed_keywords", JSON.stringify(breakReference(mentionList).slice().filter(user => user?.type == "keyword").map((user) => {
+      delete user["type"]
+      return user
+    })))
     // if (!isCosmos && !!editId == false) {
     //   fd.append("created_for_level_or_type", JSON.stringify(postCeatedForArray.map(x => x.type)));
     // } else 
@@ -611,16 +651,16 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
       }
     }
 
-		if(!isCosmos && !isNoteMainFeed && !editId){
-				console.log("badges here", badge)
-				fd.append("show_feed_to", badge.title.toLowerCase() != "all" ? badge._id : "all")
-		}
-		
-			if(notifyUser){
-					fd.append("notify_users", notifyUser);
-					fd.append("notification_statement", notifyTxt.state);
-					fd.append("notification_description", notifyTxt.desc);
-			}
+    if (!isCosmos && !isNoteMainFeed && !editId) {
+      console.log("badges here", badge)
+      fd.append("show_feed_to", badge.title.toLowerCase() != "all" ? badge._id : "all")
+    }
+
+    if (notifyUser) {
+      fd.append("notify_users", notifyUser);
+      fd.append("notification_statement", notifyTxt.state);
+      fd.append("notification_description", notifyTxt.desc);
+    }
 
     if (!!pollData) {
       if (postType == "poll") {
@@ -748,7 +788,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
         event_id: isNoteMainFeed ? eventId : undefined,
         list_type: isCosmos ? "the_cosmos" : "the_source",
         type: isEventFeed ? "event" : isProgramFeed ? "program" : undefined,
-				allow_all_option_in_mention_feed: !isCosmos && !isNoteMainFeed ? access.allow_all_option_in_mention_feed : undefined,
+        allow_all_option_in_mention_feed: !isCosmos && !isNoteMainFeed ? access.allow_all_option_in_mention_feed : undefined,
       }
     });
     setMentionListLoading(false);
@@ -773,6 +813,20 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
     if (res.code == 200) {
       setMemberList(res?.users)
+    }
+  }
+
+  const getTheKeywordListFromServer = async (text) => {
+    setIsKeywordListLoading(true);
+    let res = await GET_KEYWORDS_ADDED_BY_USER({
+      navigation, token, search_text: text,
+    });
+    setIsKeywordListLoading(false);
+    if (res.code == 200) {
+      setKeywordList(res?.keywords)
+      // if (res?.keywords.length > 0) {
+      //   setIsKeywordListVisible(true)
+      // }
     }
   }
 
@@ -1023,14 +1077,15 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
       if (lastIndex < startIndex) {
         parts.push(str.slice(lastIndex, startIndex));
       }
-      parts.push(<Text style={__style.mentionUserText} >{str.substring(startIndex, endIndex)}</Text>);
+      parts.push(<Text style={user?.type == "keyword" ? __style.keywordHighlightedText : __style.mentionUserText} >{
+        // user?.type == "keyword" ? "#" : "" +
+        str.substring(startIndex, endIndex)}</Text>);
       lastIndex = endIndex;
     });
 
     if (lastIndex < str?.length) {
       parts.push(str.slice(lastIndex));
     }
-
     return parts
   }
 
@@ -1049,7 +1104,8 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
         animationOutTiming={500}
         style={{ margin: 0 }}>
         <SafeAreaView style={{ flex: 1 }} >
-          <View pointerEvents={loader ? "none" : "auto"} style={__style.modalRootView}>
+          <View pointerEvents={loader ? "none" : "auto"}
+            style={__style.modalRootView}>
 
             <View style={__style.headingView}>
               <View style={__style.modalclosebtn} />
@@ -1064,7 +1120,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
             </View>
             <View style={[__style.divider, { marginTop: -1 }]} />
             <KeyboardAwareScrollView
-              keyboardShouldPersistTaps="always"
+              keyboardShouldPersistTaps="handled"
               style={__style.postView}
               showsVerticalScrollIndicator={false}>
 
@@ -1082,21 +1138,21 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                 {/* //* Dropdown btns */}
                 <View style={{ marginLeft: 10, flex: 1 }}>
                   <MyText fontSize={16} type="bold">{user?.first_name + " " + user?.last_name}</MyText>
-										{(!isCosmos && !isNoteMainFeed && !editId ) &&
-												<View style={{flexDirection:"row", alignItems:"center", marginTop:5}}>
-														<TouchableOpacity
-																style={__style.modalDropBtns}>
-																<MyText>{"Publish"}</MyText>
-														</TouchableOpacity>
+                  {(!isCosmos && !isNoteMainFeed && !editId) &&
+                    <View style={{ flexDirection: "row", alignItems: "center", marginTop: 5 }}>
+                      <TouchableOpacity
+                        style={__style.modalDropBtns}>
+                        <MyText>{"Publish"}</MyText>
+                      </TouchableOpacity>
 
-														<TouchableOpacity
-																onPress={()=> openOptionModal("badges")}
-																style={__style.modalDropBtns}>
-																<MyText style={{marginRight:5}}>{badge.title}</MyText>
-																{icons.downwardArrow(17, colors.white)}
-														</TouchableOpacity>
-												</View>
-										}
+                      <TouchableOpacity
+                        onPress={() => openOptionModal("badges")}
+                        style={__style.modalDropBtns}>
+                        <MyText style={{ marginRight: 5 }}>{badge.title}</MyText>
+                        {icons.downwardArrow(17, colors.white)}
+                      </TouchableOpacity>
+                    </View>
+                  }
                   <View style={__style.modalActionButtonRow}>
 
                     {/* <TouchableOpacity
@@ -1227,7 +1283,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                     fontFamily: fonts.regular,
                     includeFontPadding: false
                   }]} >
-                      {replaceAndHighlight(postText, mentionList)}
+                      {replaceAndHighlight(postText)}
                     </Text>
                   </TextInput>
                 </View>
@@ -1235,6 +1291,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
                 {isMentionListVisible && (delegateList.length > 0 || isMentionListLoading) &&
                   <View
+
                     style={{
                       paddingHorizontal: 15,
                       marginTop: 10,
@@ -1274,13 +1331,69 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                                 size={30}
                                 titleSize={12}
                                 member={item}
-                                customImage={(item.first_name !="all" && item.last_name !="") ?
-																		item?.image?.thumbnail_1 : icons.people(colors.primary, 17)}
+                                customImage={(item.first_name != "all" && item.last_name != "") ?
+                                  item?.image?.thumbnail_1 : icons.people(colors.primary, 17)}
 
                                 hideEmail />
                             </TouchableOpacity>)}
                         </ScrollView>
                         : isMentionListLoading &&
+                        <View style={{ alignItems: "center", justifyContent: "center", height: 100 }}>
+                          <SimpleLoader size={50} />
+                        </View>}
+                    </View>
+                  </View>}
+
+
+                {isKeywordListVisible && (keywordList.length > 0 || isKeywordListLoading) &&
+                  <View
+                    style={{
+                      paddingHorizontal: 15,
+                      marginTop: 10,
+                      position: "absolute",
+                      zIndex: 3,
+                      alignItems: "center",
+                      top: isCosmos || isNoteMainFeed ?
+                        (inputHeight + 80) :
+                        height < 800 ?
+                          inputHeight == 120 ? (inputHeight + 90) :
+                            (inputHeight + 125) : (inputHeight + 130)
+                    }}>
+                    <View style={{
+                      width: utilities.screenWidth() - 40,
+                      backgroundColor: colors.darkSecondary,
+                      borderRadius: 5,
+                      maxHeight: height > 800 ? 190 : 140,
+                      shadowColor: "#FFF",
+                      shadowOffset: {
+                        width: 0,
+                        height: 1,
+                      },
+                      shadowOpacity: 0.20,
+                      shadowRadius: 1.41,
+                      elevation: 2,
+                    }}>
+                      {keywordList.length > 0 ?
+                        <ScrollView
+                          keyboardShouldPersistTaps="handled"
+                          contentContainerStyle={{ padding: 10 }}>
+                          {keywordList.map((item) =>
+                            <TouchableOpacity
+                              onPress={() => onPressOnKeyword(item)}
+                              style={{ paddingVertical: 10 }}>
+                              <MyText>{item?.value}</MyText>
+                              {/* <MemberView
+                                secondText={!isNoteMainFeed ? isCosmos ? makeCosmosLevel(item?.team_type) : ` ${!!item?.membership_level_badge_info?.membership_level_badge_title ? "(" + item?.membership_level_badge_info?.membership_level_badge_title + ")" : ""}` : ""}
+                                size={30}
+                                titleSize={12}
+                                member={item}
+                                customImage={(item.first_name != "all" && item.last_name != "") ?
+                                  item?.image?.thumbnail_1 : icons.people(colors.primary, 17)}
+
+                                hideEmail /> */}
+                            </TouchableOpacity>)}
+                        </ScrollView>
+                        : isKeywordListLoading &&
                         <View style={{ alignItems: "center", justifyContent: "center", height: 100 }}>
                           <SimpleLoader size={50} />
                         </View>}
@@ -1390,7 +1503,6 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                           <TouchableOpacity
                             onPress={() => {
                               setImages((images) => images.filter((x, i) => i != index))
-
                             }}
                             style={[__style.inputCrossBtn, { backgroundColor: colors.primary, right: 5, top: -8 }]}>
                             {icons.crosss(colors.black, 15)}
@@ -1472,111 +1584,35 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                   <SurveyView ref={ref_survey} data={surveyData} timezone={timezone} />
                 </View>}
 
-				{(!isCosmos && !isNoteMainFeed && !editId && access?.notify_users_on_create_post) &&
-						<View style={{ marginHorizontal: 10,marginTop:15}}>
-								<View >
-										<MyCheckBox
-										title="Notify Users ?"
-										value={notifyUser}
-										onPress={() => {
-												setNotifyUser(!notifyUser)
-												}}
-										/>
-								</View>
+              {(!isCosmos && !isNoteMainFeed && !editId && access?.notify_users_on_create_post) &&
+                <View style={{ marginHorizontal: 10, marginTop: 15 }}>
+                  <View >
+                    <MyCheckBox
+                      title="Notify Users ?"
+                      value={notifyUser}
+                      onPress={() => {
+                        setNotifyUser(!notifyUser)
+                      }}
+                    />
+                  </View>
 
-								{notifyUser &&
-										<View style={{padding:15,borderRadius:10, backgroundColor:colors.secondaryVariant}}>
-										<TextInput
-                    style={[__style.modalInput, {
-                      color: colors.lightText2,
-                      fontFamily: fonts.regular,
-                      includeFontPadding: false,
-                      maxHeight: (!isCosmos && height < 800) ? 120 : 150,
-										  borderWidth:1,
-										  borderColor:colors.white +"50"
-                    }]}
-                    multiline={true}
-                    autoCapitalize="sentences"
-                    autoComplete="off"
-                    textAlignVertical="top"
-                    autoCorrect={false}
-                    placeholder="Notification Statement*"
-                    placeholderTextColor={colors.lightText2}
-                    keyboardAppearance="dark"
-                    selectionColor={colors.selection}
-                    cursorColor={colors.white}
-                    ref={ref_input}
-                    onContentSizeChange={({ nativeEvent: { contentSize: { height } } }) => {
-                      if (inputHeight != height) {
-                        let boxHeight = (!isCosmos && height < 800) ? 120 : 150;
-                        if (height > boxHeight) {
-                          setInputHeight(boxHeight)
-                        } else {
-                          setInputHeight(height)
-                        }
-                      }
-                    }}
-                    // keyboardType='email-address'
-                    onChangeText={(text) => setNotifyTxt({...notifyTxt, state:text })}
-                    onSelectionChange={(e) => {
-                      cursor = e.nativeEvent.selection
-                    }}
-                  ><Text style={[{
-                    color: colors.text,
-                    fontFamily: fonts.regular,
-                    includeFontPadding: false
-                  }]} >
-                      {replaceAndHighlight(notifyTxt.state, mentionList)}
-                    </Text>
-                  </TextInput> 
-				
+                  {notifyUser &&
+                    <View style={{ padding: 15, borderRadius: 10, backgroundColor: colors.secondaryVariant }}>
+                      <MyInputs
+                        label='Notification Statement*'
+                        value={notifyTxt.state}
+                        onChangeText={(txt) => setNotifyTxt({ ...notifyTxt, state: txt })}
+                      />
 
-								<TextInput
-                    style={[__style.modalInput, {
-                      color: colors.lightText2,
-                      fontFamily: fonts.regular,
-                      includeFontPadding: false,
-                      maxHeight: (!isCosmos && height < 800) ? 120 : 150,
-										  borderWidth:1,
-										  borderColor:colors.white +"50"
-                    }]}
-                    multiline={true}
-                    autoCapitalize="sentences"
-                    autoComplete="off"
-                    textAlignVertical="top"
-                    autoCorrect={false}
-                    placeholder="Notification Description*"
-                    placeholderTextColor={colors.lightText2}
-                    keyboardAppearance="dark"
-                    selectionColor={colors.selection}
-                    cursorColor={colors.white}
-                    ref={ref_input}
-                    onContentSizeChange={({ nativeEvent: { contentSize: { height } } }) => {
-                      if (inputHeight != height) {
-                        let boxHeight = (!isCosmos && height < 800) ? 120 : 150;
-                        if (height > boxHeight) {
-                          setInputHeight(boxHeight)
-                        } else {
-                          setInputHeight(height)
-                        }
-                      }
-                    }}
-                    onChangeText={(txt) => setNotifyTxt({...notifyTxt, desc:txt})}
-                    onSelectionChange={(e) => {
-                      cursor = e.nativeEvent.selection
-                    }}
-                  ><Text style={[{
-                    color: colors.text,
-                    fontFamily: fonts.regular,
-                    includeFontPadding: false
-                  }]} >
-                      {replaceAndHighlight(notifyTxt.desc, mentionList)}
-                    </Text>
-                  </TextInput>
-										</View> 
-								}
+                      <MyInputs
+                        label='Notification Description*'
+                        value={notifyTxt?.desc}
+                        onChangeText={(text) => setNotifyTxt({ ...notifyTxt, desc: text })}
+                        multiline={true}
+                      />
 
-                </View> }
+                    </View>}
+                </View>}
 
 
               {/* //*     post type action buttonns  */}
@@ -1938,8 +1974,26 @@ const FeedTypeList = [
 ]
 
 const __style = StyleSheet.create({
-  lvlbtnView: { flexDirection: "row", borderWidth: 1, borderColor: colors.lightText, height: 45, borderRadius: 10, marginTop: 10, alignItems: "center", paddingHorizontal: 10, justifyContent: "space-between" },
-  levlBtnLabel: { backgroundColor: colors.darkSecondary, alignSelf: "flex-start", paddingHorizontal: 5, position: "absolute", top: -8, left: 5 },
+  lvlbtnView: {
+    flexDirection: "row",
+    borderWidth: 1,
+    borderColor: colors.lightText,
+    height: 45,
+    borderRadius: 10,
+    marginTop: 10,
+    alignItems: "center",
+    paddingHorizontal: 10,
+    justifyContent: "space-between"
+  },
+
+  levlBtnLabel: {
+    backgroundColor: colors.darkSecondary,
+    alignSelf: "flex-start",
+    paddingHorizontal: 5,
+    position: "absolute",
+    top: -8,
+    left: 5
+  },
 
   rootView: {
     backgroundColor: colors.secondary,
@@ -1951,6 +2005,11 @@ const __style = StyleSheet.create({
   mentionUserText: {
     backgroundColor: colors.lightPrimary3,
     color: colors.primary
+  },
+  keywordHighlightedText: {
+    // backgroundColor: colors.lightText,
+    color: colors.keyword,
+    textDecorationLine: "underline"
   },
   inputRootView: {
     flexDirection: "row",

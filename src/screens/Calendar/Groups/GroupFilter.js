@@ -107,6 +107,60 @@ const GroupFilter = ({navigation, route })=>{
 				}
 		}
 
+		const groupByCleanBtn = () => {
+				setGroupList([])
+				setGroupBy("")
+				setList({...badges, data:[]})
+		}
+		
+		const viewSection = ()=>{
+				return (
+						<View style={__styles.viewContainer}>
+						{groupList.map((el,index)=> 
+								<View style={{ flexWrap: "wrap", position: "relative", zIndex: 10 }} key={index}>
+										<MyChip title={groupBy.key=='sale_page'  ? el.sale_page_title : el.title}
+												index={index}
+												onPress={() => {
+														setGroupList(groupList.filter(ele=> ele._id != el._id))
+												}} />
+								</View>
+								) }
+						</View>
+
+				)
+		}
+
+		const badgeView = ()=>{
+				return (
+						<View style={__styles.viewContainer}>
+										{badges.map((el,index)=> 
+												<View style={{ flexWrap: "wrap", position: "relative", zIndex: 10 }} key={index}>
+														<MyChip title={el.title}
+														onPress={() => {
+																setBadges(badges.filter(ele => ele._id != el._id))
+														}} />
+												</View>
+										) }
+										</View>
+
+				)
+		}
+
+		const handleSubmit = () => {
+				navigation.navigate(routes.calendarGroupList, {
+						filter:{
+								group: groupBy,
+								badges,
+								list: groupList
+						}									
+				})
+		}
+
+		const onOptionSelected = (item)=>{
+				setVisiSearch(false)
+				if(groupList.length == 0 ) setGroupList([item])
+				else setGroupList([...groupList, item])
+		}
 
 		return (
 				<RootView title="Filter">
@@ -117,11 +171,7 @@ const GroupFilter = ({navigation, route })=>{
 								icon={() => icons.down()}
 								onPress={()=> ref_group_by?.current?.openModal()}
 								clearbutton={groupList.length!=0}
-								onClearButtonPress={() => {
-										setGroupList([])
-										setGroupBy("")
-										setList({...badges, data:[]})
-								}}
+								onClearButtonPress={groupByCleanBtn}
 						/>
 
 						<Collapsible collapsed={list.data.length==0} >
@@ -129,19 +179,7 @@ const GroupFilter = ({navigation, route })=>{
 										label={groupBy.title || ""}
 										value={""}
 										iconOnPress={() => setVisiSearch(true) }
-										view={()=> 
-												<View style={{ flexDirection: "row", flex: 1, alignItems: "center", flexWrap: "wrap", paddingVertical: 2 }}>
-										{groupList.map((el,index)=> 
-												<View style={{ flexWrap: "wrap", position: "relative", zIndex: 10 }} key={index}>
-														<MyChip title={groupBy.key=='sale_page'  ? el.sale_page_title : el.title}
-																index={index}
-																onPress={() => {
-																		setGroupList(groupList.filter(ele=> ele._id != el._id))
-														}} />
-												</View>
-										) }
-										</View>
-										}
+										view={viewSection}
 										/>
 						</Collapsible>
 
@@ -149,18 +187,7 @@ const GroupFilter = ({navigation, route })=>{
 								label='Badge Level'
 								value={""}
 								iconOnPress={() => ref_badge_level.current.openModal()}
-								view={()=> 
-										<View style={{ flexDirection: "row", flex: 1, alignItems: "center", flexWrap: "wrap", paddingVertical: 2 }}>
-										{badges.map((el,index)=> 
-												<View style={{ flexWrap: "wrap", position: "relative", zIndex: 10 }} key={index}>
-														<MyChip title={el.title}
-														onPress={() => {
-																setBadges(badges.filter(ele => ele._id != el._id))
-														}} />
-												</View>
-										) }
-										</View>
-								}
+								view={badgeView}
 
 						/>
 
@@ -175,16 +202,7 @@ const GroupFilter = ({navigation, route })=>{
 					<MyButton
 						style={{ flex: 1 }}
 						title='Submit'
-						onPress={() => {
-										navigation.navigate(routes.calendarGroupList, {
-												filter:{
-														group: groupBy,
-														badges,
-														list: groupList
-												}									
-										})
-								}
-						} 
+						onPress={handleSubmit} 
 					/>
 				</View>
 		
@@ -210,11 +228,7 @@ const GroupFilter = ({navigation, route })=>{
 						filterTheList={filterTheList}
 						titleKey={groupBy.key == "sale_page" ? "sale_page_title" : "title"}
 						optionList={filterGroupList()}
-						onSelected={(item)=> {
-								setVisiSearch(false)
-								if(groupList.length == 0 ) setGroupList([item])
-								else setGroupList([...groupList, item])
-						}}
+						onSelected={(item)=>onOptionSelected(item)}
 				/>
 				<MyLoader enable={loading} />
 				</RootView>
@@ -225,6 +239,12 @@ const __styles = StyleSheet.create({
 		btn_container:{
 				flexDirection: "row",
 				marginTop: 10 
+		},
+		viewContainer:{
+				flexDirection: "row",
+				flex: 1, alignItems: "center",
+				flexWrap: "wrap",
+				paddingVertical: 2,
 		}
 })
 

@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import RootView from '../../../components/RootView'
 import MyText from '../../../components/MyText'
@@ -107,6 +107,11 @@ const CalendarDetail = ({ navigation, route }) => {
 
   return (
     <RootView titleView={titleView}>
+      <MyLoader enable={loader} />
+			<ScrollView 
+				showsVerticalScrollIndicator={false}
+			>
+				<View style={{paddingBottom:30}}>
       {!!data &&
         <View style={{ flex: 1 }}>
           <View style={__styles.rootView}>
@@ -131,12 +136,14 @@ const CalendarDetail = ({ navigation, route }) => {
 
 
         </View>}
-      <MyLoader enable={loader} />
       <EventOptionModal
         ref={ref_eventModal}
         onAgree={forDelete}
         title={"Delete recurring event?"}
       />
+
+				</View>
+			</ScrollView>
     </RootView>
   )
 }

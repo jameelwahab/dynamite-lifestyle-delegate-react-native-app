@@ -19,6 +19,7 @@ const MessageModal = forwardRef(({ onReminderSavePress }, ref) => {
   const [msg, setMsg] = useState("")
   const [index, setIndex] = useState(undefined)
   const [linkModal, setLinkModal] = useState({ isVisible: false, link: "", title: "" });
+  const [heading, setHeading] = useState("")
   useImperativeHandle(ref, () => {
     return {
       openModal
@@ -45,8 +46,9 @@ const MessageModal = forwardRef(({ onReminderSavePress }, ref) => {
     setMsg("")
   }
 
-  const openModal = (data,index=undefined) => {
-    setIsVisible(true);
+  const openModal = (data,index=undefined, dHeading="") => {
+			setIsVisible(true);
+			setHeading(dHeading)	
     setIndex(index)
     if (!!data) {
       setMsg(!!data?.message ? data?.message : "")
@@ -156,8 +158,9 @@ const MessageModal = forwardRef(({ onReminderSavePress }, ref) => {
           <View style={__styles.header}>
 
             <TitleView
-              title={"Message Notification Settings"}
+              title={(heading || "Message") + " Notification Settings"}
               hideBackBottomButton
+						  original={heading!=""}
             />
             <TouchableOpacity
               onPress={closeModal}
@@ -169,7 +172,7 @@ const MessageModal = forwardRef(({ onReminderSavePress }, ref) => {
 
           </View>
 
-          <View style={{ flex: 1, marginTop: 20, paddingHorizontal: 10 }}>
+          <View style={{ flex: 1, marginTop: 20 }}>
             <KeyboardAwareScrollView
               enableResetScrollToCoords={false}
               showsVerticalScrollIndicator={false}>
@@ -240,7 +243,7 @@ const __styles = StyleSheet.create({
     paddingHorizontal: 10
   },
   rootInnerView: {
-    paddingHorizontal: 10,
+    paddingHorizontal: 15,
     flex: 1,
   },
   header: {

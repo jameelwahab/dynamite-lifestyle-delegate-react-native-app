@@ -86,18 +86,20 @@ const Scheduler = ({ navigation, route }) => {
 
 	return (
 		<View style={__styles.container}>
-			<View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: 'center', height: 30,marginTop:10 }}>
-				<View style={{ flexDirection: 'row', alignItems: "center",paddingVeritcal:10 }}>
+			<View style={__styles.heading_container}>
+				<View style={{ flexDirection: 'row', alignItems: "center",paddingVeritcal:10, flex:1}}>
+
 					<Pressable
 						onPress={() => navigation.goBack()} >
 						{icons.backMajor(colors.primary, 26)}
 					</Pressable>
-					<View style={{ width: 10 }} />
+					<View style={{ width: 10, }} />
 					<MyText
 						type="bold"
+						style={{flex:0.95}}
 						fontSize={textSize.title}
 						color={colors.primary}>
-						{res?.mission_schedule?.main_heading || route.params.heading || "The Source Code"}
+						{res?.mission_schedule?.main_heading || route?.params?.heading || "The Source Code"}
 					</MyText>
 				</View>
 
@@ -245,6 +247,14 @@ const __styles = StyleSheet.create({
 		borderRadius: 30,
 		opacity: 0.8
 	},
+		heading_container:{
+				flexDirection: "row",
+				justifyContent: "space-between",
+				alignItems: 'center',
+				marginTop:10,
+				backgroundColor: colors.darkSecondary, 
+				zIndex:10 
+		},
 })
 
 

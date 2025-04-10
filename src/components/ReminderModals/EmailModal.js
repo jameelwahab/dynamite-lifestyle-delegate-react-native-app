@@ -20,6 +20,7 @@ const EmailModal = forwardRef(({ onReminderSavePress }, ref) => {
   const [cc, setCc] = useState("");
   const [message, setMessage] = useState("")
   const [body, setBody] = useState("")
+  const [index, setIndex] = useState(undefined)
   useImperativeHandle(ref, () => {
     return {
       openModal
@@ -38,7 +39,7 @@ const EmailModal = forwardRef(({ onReminderSavePress }, ref) => {
     }
     onReminderSavePress({
       email_notification_info: obj
-    });
+    },index);
     closeModal();
   }
 
@@ -46,7 +47,8 @@ const EmailModal = forwardRef(({ onReminderSavePress }, ref) => {
     setIsVisible(false);
   }
 
-  const openModal = (data) => {
+  const openModal = (data, dIndex=undefined) => {
+			setIndex(dIndex)
     setIsVisible(true);
     if (!!data) {
       setSubject(!!data?.email_subject ? data?.email_subject : "");
@@ -70,7 +72,7 @@ const EmailModal = forwardRef(({ onReminderSavePress }, ref) => {
     if (cc.length > 0) {
       return (
         <View style={{ flexDirection: "row", flexWrap: "wrap", paddingBottom: 5 }}>
-          {cc.map((x, i) => <MyChip title={x} onPress={() => removeCc(i)} />)}
+          {cc.map((x, i) => <MyChip title={x} key={i} onPress={() => removeCc(i)} />)}
         </View>
       )
     } else return null
@@ -87,6 +89,7 @@ const EmailModal = forwardRef(({ onReminderSavePress }, ref) => {
       animationInTiming={300}
       animationOutTiming={300}
       hideModalContentWhileAnimating={true}
+      avoidKeyboard={true}
       style={{ margin: 0, }}>
 
       <SafeAreaView style={__styles.rootView}>
@@ -107,7 +110,7 @@ const EmailModal = forwardRef(({ onReminderSavePress }, ref) => {
 
           </View>
 
-          <View style={{ flex: 1, marginTop: 20, paddingHorizontal: 10 }}>
+          <View style={{ flex: 1, marginTop: 20}}>
             <KeyboardAwareScrollView
               enableResetScrollToCoords={false}
               showsVerticalScrollIndicator={false}>
@@ -169,10 +172,9 @@ const __styles = StyleSheet.create({
   rootView: {
     flex: 1,
     backgroundColor: colors.secondaryVariant,
-    paddingHorizontal: 10
   },
   rootInnerView: {
-    paddingHorizontal: 10,
+    paddingHorizontal: 15,
     flex: 1,
   },
   header: {

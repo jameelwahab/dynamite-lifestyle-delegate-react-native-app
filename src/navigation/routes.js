@@ -116,6 +116,7 @@ const routes = {
   editProfile: "EDIT_PROFILE_SCREEN",
   changePassword: "CHANGE_PASSWORD_SCREEN",
   reminderSettings: "REMINDER_SETTINGS_SCREEN",
+  feedKeywords: "FEED_KEYWORDS_SETTINGS_SCREEN",
   zoomSettings: "ZOOM_SETTINGS_SCREEN",
   changeAffiliateIdScreen: "CHANGE_AFFILIATE_ID_SCREEN",
 
@@ -347,6 +348,7 @@ const routes = {
   calendarEventDetail: "CALENDAR_EVENT_DETAIL_SCREEN",
   calendarEventsAddEdit: "CALENDAR_EVENTS_ADD_EDIT_SCREEN",
   calendarEventsAddEditNotification: "CALENDAR_EVENTS_ADD_EDIT_NOTIFICATIONS",
+  calendarGroupEventDetail: "CALENDAR_GROUP_EVENT_DETAIL_SCREEN",
 
 
 
@@ -365,6 +367,16 @@ const routes = {
   //? Sales Team Transactions
   salesTeamTransactionsListingScreen: "SALES_TEAM_TRANSACTION_LISTING_SCREEN",
   salesTeamTransactionsAddEditScreen: "SALES_TEAM_TRANSACTION_ADD_EDIT_SCREEN",
+
+  // Updates
+  updates:"UPDATES",
+  updatesMain:"UPDATES_MAIN",
+  updatesDetail:"UPDATES_DETAILS",
+  updatesFilter: "UPDATES_FILTER",
+  
+  // affilaite links 
+  affiliate:"AFFILIATE_SCREEN",
+  affiliateLinks:"AFFILIATE_LINKS_SCREEN",
 }
 
 

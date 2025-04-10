@@ -30,6 +30,7 @@ import { onChatScreen } from '../../../functions/onChatScreen';
 import isArray from '../../../functions/isArray';
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../../redux/reducers/userSlice'
+import isObject from '../../../functions/isObject';
 
 
 let commentCursor = {
@@ -61,9 +62,10 @@ const CommentModal = ({
   feedCreatedFor,
   onCommentMessagePress,
   hasEditDeleteAccess,
-  isChatAllowed
+  isChatAllowed,
+  keywords
 }) => {
-	const { access } = useSelector(selectUser);
+  const { access } = useSelector(selectUser);
   const cmtTextInputRef = useRef();
   const likeModalRef = useRef();
   const [commentText, setCommentText] = useState("");
@@ -90,6 +92,9 @@ const CommentModal = ({
   const [mentionList, setMentionList] = useState([]);
   const [_at_index, set_at_index] = useState(-1);
   const [childCommentLoader, setChildCommentLoader] = useState({});
+
+
+  const [selectedKeyword, setSelectedKeyword] = useState(null)
 
   const onMessagePress = (item) => {
     onCommentMessagePress?.(item)
@@ -176,6 +181,9 @@ const CommentModal = ({
       let list = [...mentionList]
       let index = list.findIndex(x => cursorPosition > x?.offset && cursorPosition < (x?.offset + x?.length));
       if (index > -1) {
+        if (list[index]?.type == "keyword") {
+          setSelectedKeyword(null)
+        }
         list.splice(index, 1)
       }
       list.forEach((item, index) => {
@@ -198,19 +206,24 @@ const CommentModal = ({
 
   }
 
-  const onPressOnMentions = (obj) => {
+  const onPressOnMentions = (obj, type = "mention") => {
     let index = _at_index < 0 ? 0 : _at_index;
+    if (type == "keyword") {
+      index = commentCursor?.start > -1 ? commentCursor?.start : 0
+    }
+    let mentionStr = type == "keyword" ? obj?.value : type == "mention" ? `${obj?.first_name} ${obj?.last_name}` : "";
     let diff = extractSubstring(commentText, index).length;
     mentionList.forEach((item) => {
       if (index < item.offset) {
-        item.offset = item.offset + (`${obj?.first_name} ${obj?.last_name}`.trim().length - diff)
+        item.offset = item.offset + (mentionStr.trim().length - diff)
       }
     })
 
     let arr = [...mentionList, {
       ...obj,
       offset: index,
-      length: `${obj?.first_name} ${obj?.last_name}`.trim().length
+      length: mentionStr.trim().length,
+      type: type
     }];
     arr.sort((a, b) => a.offset - b.offset);
 
@@ -218,7 +231,10 @@ const CommentModal = ({
 
     setIsMentionListVisible(false);
     setDelegateList([]);
-    setCommentText(replaceString(commentText, index, `${obj?.first_name} ${obj?.last_name}`.trim()));
+    if (type == "keyword") {
+      setSelectedKeyword(obj)
+    }
+    setCommentText(replaceString(commentText, index, mentionStr.trim()));
     set_at_index(-1)
   }
 
@@ -233,7 +249,7 @@ const CommentModal = ({
       if (lastIndex < startIndex) {
         parts.push(str.slice(lastIndex, startIndex));
       }
-      parts.push(<Text style={__style.mentionUserText} >{str.substring(startIndex, endIndex)}</Text>);
+      parts.push(<Text style={user?.type == "keyword" ? __style.highlightKeyword : __style.mentionUserText} >{str.substring(startIndex, endIndex)}</Text>);
       lastIndex = endIndex;
     });
 
@@ -252,7 +268,7 @@ const CommentModal = ({
         community_levels: !isNoteMainFeed ? [feedCreatedFor] : undefined,
         event_id: isNoteMainFeed ? eventId : undefined,
         list_type: isCosmos ? "the_cosmos" : "the_source",
-				allow_all_option_in_mention_feed: !isCosmos && !isNoteMainFeed ? access.allow_all_option_in_mention_feed : undefined,
+        allow_all_option_in_mention_feed: !isCosmos && !isNoteMainFeed ? access.allow_all_option_in_mention_feed : undefined,
       }
     });
     setMentionListLoading(false);
@@ -288,7 +304,18 @@ const CommentModal = ({
       if (item?.image?.thumbnail_1) {
         setCommentImage(item?.image?.thumbnail_1)
       }
-      setMentionList(!!item?.mentioned_users ? breakReference(item?.mentioned_users) : [])
+      if (isArray(item?.mentioned_users) || isObject(item?.feed_keyword)) {
+
+        let arrMention = isArray(item?.mentioned_users) ? breakReference(item?.mentioned_users).map(x => ({ ...x, type: "mention" })) : [];
+        let arrKeyword = isObject(item?.feed_keyword) ? [{ ...item?.feed_keyword, type: "keyword" }] : [];
+        let newArr = [...arrMention, ...arrKeyword];
+        newArr.sort((a, b) => a.offset - b.offset)
+        setMentionList(newArr);
+        if (isObject(item?.feed_keyword)) {
+          setSelectedKeyword(item?.feed_keyword)
+        }
+      }
+      // setMentionList(!!item?.mentioned_users ? breakReference(item?.mentioned_users) : [])
       setSelectedCommentFor("edit")
       setCommentText(item?.message + " ");
       setTimeout(() => {
@@ -410,7 +437,17 @@ const CommentModal = ({
     setLoader(true);
     let fd = new FormData();
     fd.append("message", commentText);
-    fd.append("mentioned_users", JSON.stringify(mentionList));
+    if (selectedKeyword) {
+      let obj = breakReference(mentionList).find(x => x.type == "keyword");
+      if (obj) {
+        delete obj.type;
+        fd.append("feed_keyword", JSON.stringify(obj));
+      }
+    }
+    fd.append("mentioned_users", JSON.stringify(breakReference(mentionList).filter(x => x.type == "mention").map(x => {
+      delete x.type;
+      return x
+    })));
     if (!!commentImage && !!commentImage?.uri) {
       fd.append("image", commentImage);
     } else if (!!selectedComment?.image?.thumbnail_1 && !!commentImage == false) {
@@ -442,6 +479,7 @@ const CommentModal = ({
       setMentionListLoading(false);
       setIsMentionListVisible(false)
       setMentionList([])
+      setSelectedKeyword(null)
       commentCursor = {
         start: 0,
         end: 0
@@ -496,7 +534,17 @@ const CommentModal = ({
     let formData = new FormData();
     formData.append("feed", feedId);
     formData.append("message", commentText);
-    formData.append("mentioned_users", JSON.stringify(mentionList));
+    if (selectedKeyword) {
+      let obj = breakReference(mentionList).find(x => x.type == "keyword");
+      if (obj) {
+        delete obj.type;
+        formData.append("feed_keyword", JSON.stringify(obj));
+      }
+    }
+    formData.append("mentioned_users", JSON.stringify(breakReference(mentionList).filter(x => x.type == "mention").map(x => {
+      delete x.type;
+      return x
+    })));
     if (!!selectedComment) {
       formData.append("parent_comment", selectedComment?._id);
       action = "add_comment_reply"
@@ -539,6 +587,7 @@ const CommentModal = ({
       setMentionListLoading(false);
       setIsMentionListVisible(false)
       setMentionList([])
+      setSelectedKeyword(null)
       commentCursor = {
         start: 0,
         end: 0
@@ -733,7 +782,9 @@ const CommentModal = ({
           </View>
           {!!item?.message &&
             <View style={{ marginTop: 5 }}>
-              <FeedText list={!!item?.mentioned_users ? breakReference(item?.mentioned_users) : []} text={item?.message} />
+              <FeedText
+                keywords={isObject(item?.feed_keyword) ? [item?.feed_keyword] : []}
+                list={!!item?.mentioned_users ? breakReference(item?.mentioned_users) : []} text={item?.message} />
             </View>
           }
 
@@ -829,9 +880,20 @@ const CommentModal = ({
     setMentionListLoading(false);
     setMentionList([])
     set_at_index(-1)
+    setSelectedKeyword(null)
   }
 
 
+
+  const __renderKeywordReply = ({ item, index }) => {
+    return (
+      <TouchableOpacity
+        onPress={() => onPressOnMentions(item, "keyword")}
+        style={__style.commentReply} >
+        <MyText  >{item?.value}</MyText>
+      </TouchableOpacity>
+    )
+  }
 
   const commentModal = () => (
     <Modal
@@ -897,8 +959,8 @@ const CommentModal = ({
                             size={30}
                             titleSize={12}
                             member={item}
-                            customImage={(item.first_name !="all" && item.last_name !="") ?
-																		item?.image?.thumbnail_1 : icons.people(colors.primary, 17)}
+                            customImage={(item.first_name != "all" && item.last_name != "") ?
+                              item?.image?.thumbnail_1 : icons.people(colors.primary, 17)}
                             hideEmail />
                         </TouchableOpacity>)}
                     </ScrollView>
@@ -961,7 +1023,19 @@ const CommentModal = ({
 
 
               </View>
+              {console.log(selectedComment, "selectedComment")}
 
+              {isArray(keywords) && !selectedKeyword && selectedComment?.user_info_action_for?.action_by == "member_user" && selectedCommentFor == "edit" &&
+                <View style={{}}>
+                  <FlatList
+                    keyboardShouldPersistTaps="handled"
+                    contentContainerStyle={{ paddingHorizontal: 10 }}
+                    horizontal={true}
+                    data={keywords}
+                    showsVerticalScrollIndicator={false}
+                    renderItem={__renderKeywordReply}
+                  />
+                </View>}
 
               <View style={__style.inputRootView}>
 
@@ -1036,7 +1110,7 @@ const CommentModal = ({
         />
 
         <LikeModalForComments
-        isChatAllowed={isChatAllowed}
+          isChatAllowed={isChatAllowed}
           ref={likeModalRef}
           navigation={navigation}
           token={token}
@@ -1100,6 +1174,14 @@ const __style = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     backgroundColor: colors.secondaryVariant,
+  },
+  commentReply: {
+    backgroundColor: colors.secondary,
+    marginRight: 5,
+    marginTop: 15,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 10
   },
   headingView: {
     flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 15, borderBottomWidth: 1 / 3, borderBottomColor: colors.lightText
@@ -1215,5 +1297,10 @@ const __style = StyleSheet.create({
   mentionUserText: {
     backgroundColor: colors.lightPrimary3,
     color: colors.primary
-  }
+  },
+  highlightKeyword: {
+    color: colors.keyword,
+    textDecorationLine: "underline",
+    fontFamily: fonts.bold
+  },
 })

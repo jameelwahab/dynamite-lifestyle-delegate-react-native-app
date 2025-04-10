@@ -222,8 +222,8 @@ const MemberDetail = ({ navigation, route }) => {
             style={{ flexDirection: "row", flex: 1, alignItems: "center" }}>
             <View>
               <UserImage
-		borderWidth={1}
-		borderColor={colors.delete}
+								borderWidth={2}
+								borderColor={member.membership_level_badge_info?.membership_level_badge_color_code}
                 image={member?.profile_image}
                 name={member?.first_name}
                 size={30} />

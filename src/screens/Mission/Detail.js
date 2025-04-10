@@ -110,13 +110,13 @@ const MissionDetail = ({ navigation, route }) => {
 			<View style={__styles.container}>
 
 				<View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: 'center' }}>
-					<View style={{ flexDirection: 'row', alignItems: "center" }}>
+					<View style={{ flexDirection: 'row', alignItems: "center",flex:1 }}>
 						<Pressable
 							onPress={() => navigation.goBack()} >
 							{icons.backMajor(colors.primary, 26)}
 						</Pressable>
 						<View style={{ width: 5 }} />
-						<MyText type="bold" fontSize={textSize.title} color={colors.primary}> {title} </MyText>
+						<MyText style={{flex:1}} type="bold" fontSize={textSize.title} color={colors.primary}> {title} </MyText>
 					</View>
 					{(tab == 0 && route.params.type == "quest" && enableChat) ?
 						<Pressable onPress={() => setShowChat(true)}>
@@ -151,7 +151,7 @@ const MissionDetail = ({ navigation, route }) => {
 
 const Tabs = ({ list, tab, style, changeTab }) => {
 	return (
-		<View style={[{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }, style]}>
+		<View style={[{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", backgroundColor: colors.darkSecondary, zIndex:10}, style]}>
 			{list.map((el, index) =>
 				<TouchableOpacity
 					onPress={() => changeTab(index)}
@@ -168,7 +168,7 @@ const Tabs = ({ list, tab, style, changeTab }) => {
 }
 
 
-const TrackerList = ({ res }) => {
+const TrackerList = ({ res, loading }) => {
 	const nav = useNavigation()
 	const handlePress = (item) => nav.navigate(routes.missionSchedule, { id: item._id, type: res?.type, heading: item?.main_heading })
 	return (
@@ -180,6 +180,7 @@ const TrackerList = ({ res }) => {
 			ListHeaderComponent={
 				<MyText color={colors.primary} type="bold" fontSize={textSize.title}>{res?.content_settings?.schedule_heading}</MyText>
 			}
+			ListEmptyComponent={!loading && <EmptyView />}
 			ListHeaderComponentStyle={{ marginBottom: 15 }}
 			KeyExtractor={(_, index) => index.toString()}
 			ItemSeparatorComponent={<View style={{ height: 10 }} />}
@@ -187,8 +188,8 @@ const TrackerList = ({ res }) => {
 				<LessonView
 					missionDetail={true}
 					txtlen={res?.type == "quest" ? 30 : 55}
-					heading={item.main_heading}
-					desc={item.short_description}
+					heading={item?.main_heading}
+					desc={item?.short_description}
 					handlePress={() => handlePress(item)}
 				/>
 			}
@@ -198,9 +199,8 @@ const TrackerList = ({ res }) => {
 
 
 const Header = ({ res, showBadges, daysOn = "", focuse, tab }) => {
-	const startDate = `${moment(res?.start_date).format(dateTimeFormat.date).split('-')[0]} ${months[Number(moment(res?.start_date).format(dateTimeFormat.date).split('-')[1]) - 1].short2}`
-	const endDate = `${moment(res?.end_date).format(dateTimeFormat.date).split('-')[0]} ${months[Number(moment(res?.end_date).format(dateTimeFormat.date).split('-')[1]) - 1].short2}`
 	const [schedule, setSchedules] = useState(res)
+
 	useEffect(() => {
 		if (daysOn != "") {
 			setSchedules(res?.mission_schedules.find(el => el._id == daysOn))
@@ -229,8 +229,8 @@ const Header = ({ res, showBadges, daysOn = "", focuse, tab }) => {
 					duration={res?.mission_duration}
 					totalCoins={res?.rewarded_coins}
 					badges={res?.badge_configration}
-					questReplayAccessDays={res.replay_days}
-					dateString={`${startDate} - ${endDate}`}
+					questReplayAccessDays={res?.replay_days}
+					dateString={`${moment(res?.start_date).format("DD MMM")} - ${moment(res?.end_date).format("DD MMM")}`}
 					isQuest={res?.type == "quest"}
 					showEarnedBadges={false}
 				// showBadgesEarned={false}
@@ -256,8 +256,8 @@ const Overview = ({ token, navigation, id, showBadges, setEnableChat, setChatID,
 			token, navigation, id
 		})
 		if (res.code == 200) {
-			setResult(res.mission)
-			setTitle(res.mission.title)
+			setResult(res?.mission)
+			setTitle(res?.mission.title)
 			setLoading(false)
 			setRefreshing(false);
 			setEnableChat(res?.mission?.is_chat_enabled)
@@ -308,7 +308,7 @@ const Overview = ({ token, navigation, id, showBadges, setEnableChat, setChatID,
 			ListHeaderComponentStyle={{ marginBottom: 20 }}
 			keyExtractor={(_, index) => index.toString()}
 			renderItem={({ _ }) =>
-				<TrackerList res={res} />
+				<TrackerList res={res} loading={loading} />
 			}
 		/>
 	)

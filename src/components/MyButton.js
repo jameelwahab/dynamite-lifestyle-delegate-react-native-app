@@ -3,7 +3,7 @@ import React from 'react'
 import { colors } from '../utilities/colors'
 import { fonts } from '../utilities/fonts'
 import { icons } from '../utilities/icons'
-import  MyText from './MyText'
+import MyText from './MyText'
 import { textSize } from '../utilities/styles'
 
 
@@ -76,9 +76,9 @@ const MyButton2 = ({
     <TouchableOpacity
       activeOpacity={0.3}
       onPress={onPress}>
-      <View style={{backgroundColor:color,paddingHorizontal:7, paddingVertical:7, borderRadius:30,}} >
+      <View style={{ backgroundColor: color, paddingHorizontal: 7, paddingVertical: 7, borderRadius: 30, }} >
         {icon?.()}
-        {!!title && <MyText color={colors.primary}  fontSize={textSize.mini}>{title}</MyText>}
+        {!!title && <MyText color={colors.primary} fontSize={textSize.mini}>{title}</MyText>}
       </View>
     </TouchableOpacity>
   )
@@ -89,10 +89,12 @@ const TransparentButton = ({
   icon = () => { },
   onPress = () => { },
   style = {},
-  underlayColor = colors.lightPrimary2
+  underlayColor = colors.lightPrimary2,
+  disabled = false
 }) => {
   return (
     <TouchableHighlight
+      disabled={disabled}
       style={{ borderRadius: 10, }}
       underlayColor={underlayColor}
       onPress={onPress}>

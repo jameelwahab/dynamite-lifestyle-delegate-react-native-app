@@ -102,7 +102,7 @@ const NotifyUser = forwardRef(({ navigation, token }, ref) => {
 			<View style={__styles.modalRootView}>
 				<Row>
 					<Flex flex={1}>
-						<MyText fontSize={20} type="bold">Notify User</MyText>
+						<MyText fontSize={20} type="bold">Notify Users</MyText>
 					</Flex>
 					<Pressable
 						style={{ backgroundColor: colors.secondary,height:25,width:25,  borderRadius: 25/2,alignItems:"center",justifyContent:"center" }}
