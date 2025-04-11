@@ -7,6 +7,7 @@ import React, { forwardRef, useImperativeHandle, useState, useEffect } from 'rea
 import { colors } from "../../utilities/colors"
 import { icons } from "../../utilities/icons"
 import MyText from "../../components/MyText"
+import isArray from "../../functions/isArray"
 import Collapsible from 'react-native-collapsible'
 
 const TemplateModal = forwardRef(({
@@ -16,7 +17,8 @@ const TemplateModal = forwardRef(({
 }, ref)=> {
 		const [isVisible, setIsVisible] = useState(false);
 		const [collapse, setCollapse] =useState([])
-		const [item, setItem] = useState({})
+		const [item, setItem] = useState(false)
+		const [tempIndex, setTempIndex] = useState(null)
 
 		const closeModal = ()=>{
 				setIsVisible(false);
@@ -24,24 +26,163 @@ const TemplateModal = forwardRef(({
 				setItem({})
 		}
 
-		const openModal = (data)=> {
+		const openModal = (data,i)=> {
 				setIsVisible(true)
 				setItem(data)
+				setTempIndex(i)
 		}
 
 		useImperativeHandle(ref, () => {
 				return {
-				openModal
+						openModal
 				}
 		}, [])
+
+  function hasAccessToOPtion(data, label) {
+			return data?.findIndex(x=> x.label == label && x.is_access) > -1;
+  }
+
+		const menuList = ()=> {
+				if(item == false) return;
+				const MENU_LIST = [];
+				if(user.team_type !== "sub_team"){
+						MENU_LIST.push({
+								title: "Edit Template Setting",
+								key:"edit_template_setting",
+								icon: icons.edit,
+						})
+						if(hasAccessToOPtion(item.page_options_access, "update_page_content"))
+						{
+								MENU_LIST.push({
+										title:"Update Content",
+										key:"update_content",
+										icon: icons.edit,
+								});
+						}
+				}
+
+				MENU_LIST.push({
+						title:"Copy main URL",
+						key:"copy_main_url",
+						icon:icons.copy
+				})
+
+				if (item.type_of_page == "book_a_call_page") {
+						MENU_LIST.splice(5, 0, {
+								title: "Copy Appointment URL",
+								key:"copy_appointment_url",
+								icon: icons.copy,
+						});
+				}
+
+				if (user.team_type !== "sub_team") {
+						if (item.type_of_page == "book_a_call_page") {
+								MENU_LIST.splice(6, 0, {
+										title: "Question Answers",
+										key:"question_answers",
+										icon: icons.eye,
+								});
+						}
+				}
+				if (hasAccessToOPtion(item.page_options_access, "thanks_page")) {
+						if(!!item.thanks_page){
+						let child_menu_options = [
+								{
+										title: "Edit Page Setting",
+										icon: icons.edit,
+								},
+								{
+										title: "Update Page Content",
+										icon: icons.edit,
+								},
+						];
+
+								MENU_LIST.push({
+										title:"Thanks Page",
+										key:"thanks_page",
+										icon:icons.edit,
+										isCollapse:true,
+										list: child_menu_options, 
+								})
+						}
+				}
+
+				if(hasAccessToOPtion(item.page_options_access, "payment_page")){
+						if(item.payment_page){
+								let child_menu_options = [
+										{
+												title: "Edit Page Setting",
+												icon: icons.edit,
+										},
+										{
+												title: "Update Page Content",
+												icon: icons.edit,
+										},
+								];
+
+								MENU_LIST.push({
+										title:"Payment Page",
+										icon: icons.edit,
+										isCollapse:true,
+										list: child_menu_options
+								})
+						}
+				}
+
+				if(!item.is_template_data_imported){
+						MENU_LIST.push({
+								title:"Import Template Datala",
+								key:"import_template_datala",
+								icon: icons.edit,
+						});
+				}
+				if(item.plan_count > 0)
+				{
+						MENU_LIST.push({
+								title:"Set Commission",
+								key:"set_commission",
+								icon: icons.edit,
+						})
+				}
+				item?.module_info?.map((module) => {
+						if (module.is_access) {
+								MENU_LIST.push({
+										title: module.module_label_text,
+										key: module.module_actual_name,
+										icon: icons.edit,
+						});
+						}
+				});
+
+				MENU_LIST.push({
+						title: "Delete",
+						key:"delete",
+						icon: icons.trash,
+				});
+
+				const res = item?.page_options_access?.find(x=> x?.is_access && x.label=="social_sharing_setting")
+				
+				if(!!res)
+				{
+						MENU_LIST.splice(2,0, {
+								title: res.name,
+								key: res.label,
+								icon: icons.edit
+						})
+				}
+
+				return MENU_LIST;
+
+		}
 
 		const renderList = (item,index) => {
 				const isCollap =  item?.isCollapse
 				const isCollapse =  collapse.findIndex(x=> x.index == index) > -1;
+
 				const handlePress = () => {
 						if(!isCollap){
 								closeModal()
-								onSelect(item)
+								onSelect(item,tempIndex)
 						}
 						else{
 								if(collapse.findIndex(x=> x.index == index) > -1){
@@ -53,57 +194,6 @@ const TemplateModal = forwardRef(({
 						}
 				}
 
-		const menuList = ()=> {
-				const MENU_LIST = [];
-				if(user.team_type !== "sub_team"){
-						MENU_LIST.push({
-								title: "Edit Template Setting",
-								key:"edit_template_setting",
-								icon: icons.editpencil,
-						})
-						if(hasAccessToOPtion(item.page_options_access, "update_page_content"))
-						{
-								MENU_LIST.push({
-										title:"Update Content",
-										key:"update_content",
-										icon: icons.editpencil,
-								});
-						}
-				}
-
-				MENU_LIST.push({
-						title:"Copy main URL",
-						key:"copy_main_url",
-						icon:icons.eye
-				})
-
-				if (item.type_of_page == "book_a_call_page") {
-						MENU_OPTIONS.splice(5, 0, {
-								title: "Copy Appointment URL",
-								key:"copy_appointment_url",
-								icon: icons.eye,
-						});
-				}
-
-				if (userInfo.team_type !== "sub_team") {
-						if (value.type_of_page == "book_a_call_page") {
-								MENU_OPTIONS.splice(6, 0, {
-										label: "Question Answers",
-										icon: icons.eye,
-								});
-						}
-				}
-
-      if (hasAccessToOPtion(item.page_options_access, "thanks_page")) {
-					if(!!value.thank_page){
-							MENU_LIST.push({
-									title:""
-							})
-					}
-			}
-
-		}
-
 				return (
 						<>
 						<TouchableHighlight
@@ -112,13 +202,18 @@ const TemplateModal = forwardRef(({
 								style={[__styles.item_container, (isCollapse && isCollap) && {backgroundColor:colors.secondary} ]}
 								>
 								<View style={__styles.collapse_container}>
+										<View style={{flexDirection:"row", alignItems:"center"}}>
+										{item.icon()}
+										<View style={{width:10}}/>
 										<MyText 
 												fontSize={16} 
 												>{item.title}
 										</MyText>
+										</View>
 												{isCollap && 
 														(!isCollapse ? icons.downward(colors.primary):
-																icons.upward(colors.primary))}
+																icons.upward(colors.primary))
+												}
 								</View>
 						</TouchableHighlight>
 						<Collapsible collapsed={!isCollapse}>
@@ -131,12 +226,18 @@ const TemplateModal = forwardRef(({
 												style={{
 														paddingVertical: 12,
 														marginTop:5,
-														paddingLeft:30
+														paddingLeft:50,
+														flexDirection:"row",
+														alignItems:"center"
 												}}>
+										<>
+										{el.icon()}
+										<View style={{width:10}}/>
 										<MyText 
 												fontSize={16} 
 												>{el.title}
 										</MyText>
+										</>
 								</TouchableHighlight>)}
 						 </Collapsible>
 						</>
@@ -165,7 +266,7 @@ const TemplateModal = forwardRef(({
             </Pressable>
 						</View>
 						<FlatList 
-								data={list}
+								data={menuList()}
 								style={{ marginTop:10 }}
 								ItemSeparatorComponent={<View style={{height:5}}/>}
 								showsVerticalScrollIndicator={false}

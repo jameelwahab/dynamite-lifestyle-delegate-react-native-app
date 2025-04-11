@@ -1,6 +1,7 @@
 import RootView from "../../components/RootView"
 import MyLoader from "../../components/MyLoader";
 import MyText from "../../components/MyText";
+import routes from "../../navigation/routes"
 import SearchView from '../../components/SearchView';
 import MyRefreshControl from '../../components/MyRefreshControl'
 import StatView from "../../components/StatView"
@@ -8,14 +9,20 @@ import TemplateModal from "./TemplateModal"
 import { MenuButton } from '../../components/MyButton';
 import FAB from '../../components/FAB'
 import { colors } from "../../utilities/colors";
+import { websiteBaseUrl } from "../../utilities/constants";
 import { icons } from "../../utilities/icons";
 import copyText from "../../functions/copyText"
 import openUrl from "../../functions/openUrl"
+import showToast from "../../functions/showToast"
+import ConfirmationModal2 from '../../components/ConfirmationModal2';
 import { useEffect, useState, useRef } from "react"
-import { View, FlatList, Keyboard, StyleSheet, TouchableOpacity } from "react-native";
-import { GET_TEMPLATES_LIST } from "../../DAL";
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../redux/reducers/userSlice'
+import { View, FlatList, Keyboard, StyleSheet, TouchableOpacity } from "react-native";
+import { GET_TEMPLATES_LIST,
+		IMPORT_TEMPLATES_DATA,
+		DELETE_TEMPLATE
+} from "../../DAL";
 
 const Templates = ({ navigation,route }) => {
 		const [loader, setLoader] = useState(false);
@@ -25,6 +32,7 @@ const Templates = ({ navigation,route }) => {
 		const [searching, setSearching] = useState(false);
 		const [refreshing, setRefresh] = useState(false);
 		const ref = useRef(null);
+		const ref_confirmModal = useRef();
 
 		const getTemplateList = async () =>{
 				const result = await GET_TEMPLATES_LIST({token, navigation})
@@ -38,14 +46,35 @@ const Templates = ({ navigation,route }) => {
 				}
 		} 
 
+		const importData = async (sale_page_id) => {
+				setLoader(true)
+				const result = await IMPORT_TEMPLATES_DATA({token, navigation, sale_page_id })
+				if(result.code == 200){
+						getTemplateList()
+				}
+		}
+
+		const deleteTemplate = async (slug)=> {
+				setLoader(true)
+				const result = await DELETE_TEMPLATE({token, navigation, slug})
+				if(result.code == 200)
+				{
+						showToast({title:"Sale Page deleted successfully", type:"success"})
+						getTemplateList()
+				}
+				else{
+						setLoader(false)
+				}
+		}
+
+
 		useEffect(()=>{
 				setLoader(true)
 				getTemplateList()
-		},[])
+		},[route])
 
 		const onSearch = ()=> {
 				Keyboard.dismiss()
-				console.log("Watashi wa Revel")
 		}
 		
 		const onRefresh = () => {
@@ -54,9 +83,50 @@ const Templates = ({ navigation,route }) => {
 		}
 
 		const onAddTemplate = () => {
-				console.log("In a construction")
+				navigation.navigate(routes.templateAddEdit, {type:"add"});
 		}
 
+		const handleModulePress = ({key}, index) => {
+				if(key=="edit_template_setting"){
+						navigation.navigate(routes.templateAddEdit, 
+								{type:"edit", item:list[index] }
+						);
+				}
+				else if (key == "delete")
+				{
+						setTimeout(()=>{
+								ref_confirmModal?.current?.openModal({
+										title:"Are you sure you want to delete this page?",
+										agreeFunc: () => deleteTemplate(list[index].sale_page_title_slug),
+								})
+						}, 500)
+				}
+				else if(key == "copy_main_url")
+				{
+						const url  =  user.team_tyoe == "sub_team" 
+								? websiteBaseUrl + list[index].sale_page_title_slug + "/"
+										+ user.affiliate_url_name 
+								: websiteBaseUrl + list[index].sale_page_title_slug;
+						copyText(url, "Url copied to clipboard")
+				}
+				else if(key == "copy_appointment_url") {
+						const url  =  user.team_tyoe == "sub_team" 
+								? websiteBaseUrl + list[index].sale_page_title_slug + "/appointment/"
+										+ user.affiliate_url_name 
+								: websiteBaseUrl + list[index].sale_page_title_slug + "/appointment";
+						copyText(url, "Url copied to clipboard")
+				}
+				else if(key == "social_sharing_setting") {
+						navigation.navigate(routes.templateSocialSetting,
+								{ item: list[index] } )
+				}
+				else if(key=="question_answers"){
+						navigation.navigate(routes.templateQuestionAnswers, 
+								{ item:list[index] })
+				} else if(key == "payment_plans"){
+						navigation.navigate(routes.templatePaymentPlans, {item:list[index]} )
+				}
+		}
 
 		const headerComponent = () => {
 				return (
@@ -85,10 +155,36 @@ const Templates = ({ navigation,route }) => {
 						) }
 
 		const renderList = (item,index) => {
-				const copy= () => copyText("Ano ningen", "Url copied to clipboard")
-				const openLink = () => openUrl("Ano ningen")
-				const handleClick = () => ref.current.openModal();
 
+				const url  =  user.team_tyoe == "sub_team" 
+												? websiteBaseUrl + item.sale_page_title_slug + (item?.type_of_page != "sale_page" ? "/appointment" : "") + "/" + user.affiliate_url_name 
+												: websiteBaseUrl + item.sale_page_title_slug + (item?.type_of_page != "sale_page" ? "/appointment" : "");
+
+				const copy= () => copyText(url, "Url copied to clipboard")
+				const openLink = () => openUrl(url)
+				const handleClick = () => ref.current.openModal(item,index);
+
+
+				const importView = ()=> {
+						const handleImportPress =()=> ref_confirmModal?.current?.openModal({
+								title:"Are you sure you want to import template data?",
+								subtitle:"Importing template data will update page content and copy other modules data.",
+								agreeFunc: ()=> importData(item?._id)
+
+						})
+						return (
+						<TouchableOpacity
+								onPress={handleImportPress}
+								style={{borderColor:colors.primary, borderWidth:1,width:200, paddingVertical:10, borderRadius:10}}
+								>
+								<MyText
+										align={"center"}
+										color={colors.primary}
+										>Import Template Data</MyText>
+						</TouchableOpacity>
+						)
+				}
+ 
 				return(
 						<View style={__styles.card_container}>
 								<View style={__styles.card_heading}>
@@ -101,18 +197,25 @@ const Templates = ({ navigation,route }) => {
 								</View>
 								<StatView 
 										title={"Title"}
-										value={item?.meta_title}
+										value={item?.sale_page_title}
 										/>
+						{item.is_template_data_imported && <> 
 								<StatView 
-										title={"Copy Link"}
-										value={"Yoko so"}
-										view={()=>linkView(icons.copy(), "Copy Url", copy)}
-										/>
+										title={"Main URL"}
+										view={()=>linkView(icons.copy(), item?.type_of_page != "sale_page" ? "Copy Appointment URL" : "Copy Main URL" , copy)}
+										/> 
 								<StatView 
 										title={"URL"}
 										view={()=>linkView(icons.gotoFill(), "Preview", openLink)}
 										/>
-
+								</>
+						}
+				{!item.is_template_data_imported && 
+								<StatView 
+										title={"URL"}
+										view={importView}
+										/>
+				}
 						</View>
 				)
 		}
@@ -151,70 +254,16 @@ const Templates = ({ navigation,route }) => {
 						<FAB icon={()=>icons.plus(colors.black)} onPress={onAddTemplate} />
 						<TemplateModal 
 								ref={ref}
-								onSelect={(data)=>console.log(data)}
-								list={modalList}
+								onSelect={(data,index)=>handleModulePress(data,index)}
 								user={user}
 								/>
+						<ConfirmationModal2
+								ref={ref_confirmModal}
+						/>
 						<MyLoader enable={loader} />
 				</RootView>
 		)
 }
-
-const collapseList = [
-		{title:"Edit Page Setting", value:"edit_page_setting"},
-		{title:"Update Page Content", value:"update_page_content"}
-]
-
-const modalList = [
-		{
-				title: "Edit Template Setting",
-				key:"edit_template",
-		},
-		{
-				title:"Copy main URL",
-				key:"copy_main_url",
-		},
-		{
-				title: "Social Sharing Setting",
-				key:"social_sharing_setting",
-		},
-		{
-				title:"Thanks Page",
-				key:"thanks_page",
-				isCollapse: true,
-				list: collapseList,
-		},
-		{
-				title:"Payment Page",
-				key: "payment_page",
-				isCollapse: true,
-				list: collapseList,
-		},
-		{
-				title: "Set Commission",
-				key: "set_commission",
-		},
-		{
-				title:"Payment Plans",
-				key:"payment_plans",
-		},
-		{
-				title:"Strategy",
-				key:"strategy",
-		},
-		{
-				title: "Testimonial",
-				key: "testimonial"
-		},
-		{
-				title:"Venues",
-				key:"venues",
-		},
-		{
-				title: "Delete",
-				key:"delete",
-		}
-]
 
 
 

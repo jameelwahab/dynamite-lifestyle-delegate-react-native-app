@@ -381,6 +381,10 @@ const routes = {
   templates:"TEMPLATES_SCREEN",
   templatesMain:"TEMPLATES_MAIN_SCREEN",
   templateAddEdit:"TEMPLATES_EDIT_ADD_SCREEN",
+  templateSocialSetting:"TEMPLATES_SOCIAL_SETTING_SCREEN",
+  templateQuestionAnswers:"TEMPLATE_QUESTION_ANSWERS_SCREEN",
+  templateAnswersDetails: "TEMPLATE_ANSWERS_DETAILS",
+  templatePaymentPlans:"TEMPLATE_PAYMENT_PLANS"
 }
 
 
