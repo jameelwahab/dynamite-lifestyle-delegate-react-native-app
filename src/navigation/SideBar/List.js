@@ -431,15 +431,16 @@ export const ParentComponents = {
 
 		
 // Templates Tab
-  "0a3fc4be-fac3-46f2-a887-ae1e08f9d351": {
-    key: routes.templates,
-    component: StackTemplates,
-    params: {
-      value: "templates",
-		  title:"Templates",
-      key: "0a3fc4be-fac3-46f2-a887-ae1e08f9d351"
-    }
-  },
+//   "0a3fc4be-fac3-46f2-a887-ae1e08f9d351": {
+//     key: routes.templates,
+//     component: StackTemplates,
+//     params: {
+//       value: "templates",
+// 		  title:"Templates",
+//       key: "0a3fc4be-fac3-46f2-a887-ae1e08f9d351"
+//     }
+//   },
+//
 
 }
 

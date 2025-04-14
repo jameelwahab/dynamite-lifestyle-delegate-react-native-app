@@ -3,6 +3,7 @@ import MyLoader from "../../components/MyLoader";
 import MyText from "../../components/MyText";
 import routes from "../../navigation/routes"
 import SearchView from '../../components/SearchView';
+import EmptyView from '../../components/EmptyView'
 import MyRefreshControl from '../../components/MyRefreshControl'
 import StatView from "../../components/StatView"
 import TemplateModal from "./TemplateModal"
@@ -238,9 +239,9 @@ const Templates = ({ navigation,route }) => {
 								data={list}
 								keyboardShouldPersistTaps="handled"
 								ListHeaderComponent={headerComponent}
-								ListHeaderComponentStyle={{marginBottom:15}}
 								ItemSeparatorComponent={<View style={{height:15}}/>}
 								showsVerticalScrollIndicator={false}
+								ListEmptyComponent={!loader && <EmptyView />}
 								stickyHeaderHiddenOnScroll={true}
 								stickyHeaderIndices={[0]}
 								refreshControl={<MyRefreshControl

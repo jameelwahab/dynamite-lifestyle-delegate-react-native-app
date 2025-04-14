@@ -9,6 +9,7 @@ import TemplateSocialSetting from "../../screens/Templates/TemplateSocialSetting
 import TemplateQuestionAnswer from "../../screens/Templates/TemplateQuestionAnswers"
 import TemplateAnswerDetail from "../../screens/Templates/TemplateAnswerDetail"
 import TemplatePaymentPlan from "../../screens/Templates/TemplatePaymentPlan"
+import TemplateManageAccess from "../../screens/Templates/TemplateManageAccess"
 
 
 const TemplatesStack  = createNativeStackNavigator();
@@ -48,6 +49,12 @@ const StackTemplates = ({ route }) => {
 								 		component={TemplatePaymentPlan}
 								 		initialParams={route.params}
 								 		/>
+								<TemplatesStack.Screen
+										name={routes.templatePaymentManagePlan}
+								 		component={TemplateManageAccess}
+								 		initialParams={route.params}
+								 		/>
+
 
 								{defaultScreens.map((x, i) => (
 										<TemplatesStack.Screen key={x.name} name={x.name} component={x.component} />

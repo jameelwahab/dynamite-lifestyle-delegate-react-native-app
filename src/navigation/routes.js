@@ -384,7 +384,8 @@ const routes = {
   templateSocialSetting:"TEMPLATES_SOCIAL_SETTING_SCREEN",
   templateQuestionAnswers:"TEMPLATE_QUESTION_ANSWERS_SCREEN",
   templateAnswersDetails: "TEMPLATE_ANSWERS_DETAILS",
-  templatePaymentPlans:"TEMPLATE_PAYMENT_PLANS"
+  templatePaymentPlans:"TEMPLATE_PAYMENT_PLANS",
+  templatePaymentManagePlan:"TEMPLATE_PAYMENT_PLAN_MANAGE_ACCESS"
 }
 
 

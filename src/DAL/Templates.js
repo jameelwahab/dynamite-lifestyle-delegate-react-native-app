@@ -65,3 +65,9 @@ export const GET_PAYMENT_LIST = ({ token, navigation, id })=>
 				token, navigation
 		})
 
+export const GET_TEMPLATE_PAYMENT_MANAGE_LIST = ({ token, navigation, id})=>
+		invokeApi({
+				path:`api/payment_plan/list_portals_for_plan_by_delegate/${id}`,
+				token, navigation,
+		})
+
