@@ -1,4 +1,4 @@
-import { View, Text, TextInput, StyleSheet, TouchableHighlight, Image, Platform } from 'react-native'
+import { View, Text, TextInput, StyleSheet, Pressable, TouchableHighlight, Image, Platform } from 'react-native'
 import React, { useState } from 'react'
 import { fonts } from '../utilities/fonts'
 import { colors } from '../utilities/colors'
@@ -21,6 +21,7 @@ const MyInputs = ({
   leftIcon = null,
   rightIcon = null,
   rightIconOnPress = () => { },
+  disableRightIconHighlight=false,
   noSpace = false,
   editable = true,
   isSearch = false,
@@ -74,12 +75,22 @@ const MyInputs = ({
             {/* <Image style={__MyInputStyles.eyeIcon} source={showPassword ? openEye : closeEye} /> */}
           </TouchableHighlight> :
           rightIcon &&
+						<>
+						{ disableRightIconHighlight ?  
+          <Pressable
+            onPress={rightIconOnPress}
+            style={[__MyInputStyles.rightButton, { marginRight: 0 }]}>
+            {rightIcon()}
+          </Pressable>
+								:
           <TouchableHighlight
             onPress={rightIconOnPress}
             style={[__MyInputStyles.rightButton, { marginRight: 0 }]}>
             {rightIcon()}
           </TouchableHighlight>
         }
+				</>
+				}
       </View>
       {limited && <MyText
         color={colors.lightText + "AA"}

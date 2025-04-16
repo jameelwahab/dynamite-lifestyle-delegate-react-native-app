@@ -134,7 +134,7 @@ const GroupFilter = ({navigation, route })=>{
 				return (
 						<View style={__styles.viewContainer}>
 										{badges.map((el,index)=> 
-												<View style={{ flexWrap: "wrap", position: "relative", zIndex: 10 }} key={index}>
+												<View style={__styles.viewCards} key={index}>
 														<MyChip title={el.title}
 														onPress={() => {
 																setBadges(badges.filter(ele => ele._id != el._id))
@@ -245,6 +245,11 @@ const __styles = StyleSheet.create({
 				flex: 1, alignItems: "center",
 				flexWrap: "wrap",
 				paddingVertical: 2,
+		},
+		viewCards:{
+				flexWrap: "wrap",
+				position: "relative",
+				zIndex: 10 
 		}
 })
 
