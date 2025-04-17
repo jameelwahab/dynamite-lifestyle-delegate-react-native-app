@@ -18,7 +18,7 @@ import OptionModal from '../../../components/OptionModal';
 import ConfirmationModal from '../../../components/ConfirmationModal';
 import LeadModal from './LeadModal';
 
-const LeadHistoryModal = forwardRef(({ token, navigation, memberId }, ref) => {
+const LeadHistoryModal = forwardRef(({ token, navigation, memberId, expiryDate }, ref) => {
   const leadModalRef2 = useRef();
   const [isVisible, setIsVisible] = useState(false);
   const [loader, setLoader] = useState(false);
@@ -190,6 +190,7 @@ const LeadHistoryModal = forwardRef(({ token, navigation, memberId }, ref) => {
               setSelectedLeadStatusForEdit
             }}
             memberId={memberId}
+				expiryDate={expiryDate}
             oldLead={selectedLeadStatusForEdit}
             edit={true}
           />

@@ -345,7 +345,7 @@ const MemberList = ({ navigation, route }) => {
   }
 
 
-  const updateLeadStatus = (leadStatus, icome, date) => {
+  const updateLeadStatus = (leadStatus, icome, date, expiry) => {
     let lead = {
       background_color: leadStatus?.background_color,
       text_color: leadStatus?.text_color,
@@ -353,9 +353,14 @@ const MemberList = ({ navigation, route }) => {
       _id: leadStatus?._id
 
     }
+			if(leadStatus?.is_lead_status_locked){
+					lead = {...lead, is_lead_status_locked:leadStatus?.is_lead_status_locked}
+			}
+
     let obj = {
       ...member,
       lead_status: lead,
+		  lead_status_expiry:expiry,
       lead_status_history: [{
         income_value: icome,
         changed_date_time: date,
@@ -862,7 +867,10 @@ const MemberList = ({ navigation, route }) => {
                 image={item?.profile_image}
                 name={item?.first_name}
                 size={30} />
+
               <View style={[{ backgroundColor: item?.is_online ? colors.online : colors.primary2, }, __styles.memberStatusView]} />
+
+              <View style={[{ backgroundColor: item?.is_membership_active ? colors.active: colors.expire, }, __styles.memberActiveView]} />
             </View>
 
             <View style={__styles.memberProfileNameView}>
@@ -1019,11 +1027,13 @@ const MemberList = ({ navigation, route }) => {
         updateLeadStatus={updateLeadStatus}
         memberId={member?._id}
         oldLead={member?.lead_status}
+				expiryDate={member?.lead_status_expiry}
       />
 
       <LeadHistoryModal
         ref={hitoryModalRef}
         memberId={member?._id}
+				expiryDate={member?.lead_status_expiry}
         navigation={navigation}
         token={token}
       />
@@ -1071,7 +1081,8 @@ const filteroObj = {
 const __styles = StyleSheet.create({
   memberRootView: { backgroundColor: colors.secondary, marginTop: 10, borderRadius: 10, padding: 10 },
   memberProfileView: { flexDirection: "row", alignItems: "center" },
-  memberStatusView: { position: "absolute", bottom: 0, right: 0, height: 10, width: 10, borderRadius: 10 / 2, },
+  memberStatusView: { position: "absolute", bottom: 0, right: 0, height: 9, width: 9, borderRadius: 10 / 2,borderWidth:1, borderColor:colors.white },
+  memberActiveView: { position: "absolute", top: 0, right: 0, height: 10, width: 10, borderRadius: 10 / 2, },
   memberProfileNameView: { flex: 1, marginLeft: 10 },
   headerBtn: {
     height: 28,

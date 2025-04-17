@@ -18,8 +18,9 @@ import ConfirmationModal from '../../../components/ConfirmationModal';
 import { useSelector } from 'react-redux';
 import { selectUser } from '../../../redux/reducers/userSlice';
 
-const LeadModal = forwardRef(({ token, navigation, updateLeadStatus, memberId, oldLead, edit = false }, ref) => {
+const LeadModal = forwardRef(({ token, navigation, updateLeadStatus, expiryDate, memberId, oldLead, edit = false }, ref) => {
   const calendarModalRef = useRef();
+  const ref_expiry_modal = useRef();
   const [isVisible, setIsVisible] = useState(false);
   const [loader, setLoader] = useState(false)
   const [rootLoader, setRootLoader] = useState(false);
@@ -28,24 +29,25 @@ const LeadModal = forwardRef(({ token, navigation, updateLeadStatus, memberId, o
   const [selectedLead, setSelectedLead] = useState(null);
   const [icome, setIcome] = useState("0");
   const [date, setDate] = useState(moment());
+  const [expiry, setExpiry] = useState(moment());
   const [isConfirmationVisible, setIsConfirmationVisible] = useState(false);
 
-
-
   useEffect(() => {
-
     if (isVisible) {
       if (edit) {
-
-        setSelectedLead(!!oldLead ? oldLead?.lead_status : null)
-
         setIcome(!!oldLead?.income_value ? oldLead?.income_value.toString() : "0")
         setTimeout(() => {
           setDate(moment(oldLead?.changed_date_time))
+					if(expiryDate){
+							setExpiry(expiryDate)
+					}
         }, 200);
       } else {
         setSelectedLead(!!oldLead ? oldLead : null)
-      }
+					if(expiryDate){
+							setExpiry(expiryDate)
+					}
+			}
     }
   }, [isVisible])
 
@@ -111,7 +113,8 @@ const LeadModal = forwardRef(({ token, navigation, updateLeadStatus, memberId, o
         income_value: Number(icome),
         lead_status: selectedLead?._id,
         member_id: memberId,
-        id: oldLead?._id
+        id: oldLead?._id,
+				lead_status_expiry: selectedLead?.is_lead_status_locked ? moment(expiry).format('YYYY-MM-DD') : undefined
       }
     });
 
@@ -135,14 +138,15 @@ const LeadModal = forwardRef(({ token, navigation, updateLeadStatus, memberId, o
         income_value: Number(icome),
         lead_status: selectedLead?._id,
         member_id: memberId,
-
+				lead_status_expiry: selectedLead?.is_lead_status_locked ? moment(expiry).format('YYYY-MM-DD') : undefined
       }
     });
 
     if (res.code == 200) {
       setRootLoader(false);
       setIsVisible(false)
-      updateLeadStatus(selectedLead, icome, date);
+      updateLeadStatus(selectedLead, icome, date, expiry);
+				console.log("upadted",selectedLead)
       setIcome("0");
       setDate(moment())
       setSelectedLead(null)
@@ -199,6 +203,9 @@ const LeadModal = forwardRef(({ token, navigation, updateLeadStatus, memberId, o
                       onPress={() => {
                         setSelectedLead(item)
                         setLeadModaVisible(false)
+													if(item?.is_lead_status_locked){
+															setExpiry(moment().add(item?.lead_status_no_of_days, "days"))
+													}
                       }}
                       underlayColor={colors.darkSecondary}>
                       <View
@@ -275,6 +282,13 @@ const LeadModal = forwardRef(({ token, navigation, updateLeadStatus, memberId, o
                 icon={() => icons.calendar(colors.primary, 20)}
                 onPress={() => calendarModalRef?.current?.openModal(date)}
               />
+		
+						{selectedLead?.is_lead_status_locked && <MyTouchableInput
+                label='Expiry Date*'
+                value={moment(expiry).format(dateTimeFormat.date)}
+                icon={() => icons.calendar(colors.primary, 20)}
+                onPress={() => ref_expiry_modal?.current?.openModal(expiry)}
+              />}
 
               <MyButton invert title='Update' onPress={onUpdateBtnPress} />
             </ScrollView>
@@ -283,6 +297,9 @@ const LeadModal = forwardRef(({ token, navigation, updateLeadStatus, memberId, o
 
         <CalendarModal ref={calendarModalRef}
           onDateSelected={(selectedDate) => setDate(selectedDate)} />
+
+        <CalendarModal ref={ref_expiry_modal}
+          onDateSelected={(selectedDate) => setExpiry(selectedDate)} />
         <ConfirmationModal
           isVisible={isConfirmationVisible}
           title={"Are you sure you want to update lead status?"}
