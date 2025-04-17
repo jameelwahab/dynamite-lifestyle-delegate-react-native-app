@@ -77,7 +77,7 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
           name={item?.action_info?.name}
           backgroundTransparent={true}
           borderWidth={isCosmos ? 1 / 4 : 2}
-          borderColor={!isCosmos ? item?.badge_level_info?.color_code : undefined}
+          borderColor={!isCosmos ? !!item?.badge_level_info ? item?.badge_level_info?.color_code : item?.feed_badge_levels[0]?.color_code : undefined}
           size={35}
         />
         <View style={__style.profileNameView}>
@@ -98,7 +98,7 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
         </TouchableOpacity>}
 
 
-      {(!!item?.badge_level_info?.icon?.thumbnail_1 || isCosmos) &&
+      {(!!item?.badge_level_info?.icon?.thumbnail_1 || isCosmos || !!item?.feed_badge_levels[0]?.icon?.thumbnail_1) &&
         <View >
           <MyImage
             indicatorProps={{ color: colors.secondaryVariant }}
@@ -115,11 +115,13 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
                   //   //     item?.created_for_level_or_type == "inner_circle" ?
                   //   //       S3_URL + settings?.inner_circle_feed_icon :
                   S3_URL + settings?.[`${item?.created_for_level_or_type}_feed_icon`] :
-                  S3_URL + item?.badge_level_info?.icon?.thumbnail_1
+                  S3_URL + (!!item?.badge_level_info ? item?.badge_level_info?.icon?.thumbnail_1 : item?.feed_badge_levels[0]?.icon?.thumbnail_1)
             }}
             style={__style.feedTypeIcon}
           />
         </View>}
+
+
 
       {(((isCosmos || isScheduledFeed) && user?._id == item?.action_info?.action_id) ||
         (!isCosmos && !isScheduledFeed)) && filterTheOptions(item) > 0 &&

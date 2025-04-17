@@ -188,7 +188,6 @@ const GroupFilter = ({navigation, route })=>{
 								value={""}
 								iconOnPress={() => ref_badge_level.current.openModal()}
 								view={badgeView}
-
 						/>
 
 				<View style={__styles.btn_container}>
