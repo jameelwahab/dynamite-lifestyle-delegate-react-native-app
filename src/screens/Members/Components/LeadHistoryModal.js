@@ -75,7 +75,7 @@ const LeadHistoryModal = forwardRef(({ token, navigation, memberId, expiryDate }
       setTimeout(() => {
         setSelectedLeadStatusForEdit(item)
         leadModalRef2.current?.openModal()
-      }, 400);
+      }, 500);
     }
   }
 
@@ -190,7 +190,6 @@ const LeadHistoryModal = forwardRef(({ token, navigation, memberId, expiryDate }
               setSelectedLeadStatusForEdit
             }}
             memberId={memberId}
-				expiryDate={expiryDate}
             oldLead={selectedLeadStatusForEdit}
             edit={true}
           />

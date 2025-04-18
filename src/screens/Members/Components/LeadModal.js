@@ -34,7 +34,9 @@ const LeadModal = forwardRef(({ token, navigation, updateLeadStatus, expiryDate,
 
   useEffect(() => {
     if (isVisible) {
+				console.log("is visisble", isVisible)
       if (edit) {
+				 setSelectedLead(oldLead?.lead_status)
         setIcome(!!oldLead?.income_value ? oldLead?.income_value.toString() : "0")
         setTimeout(() => {
           setDate(moment(oldLead?.changed_date_time))
@@ -163,11 +165,11 @@ const LeadModal = forwardRef(({ token, navigation, updateLeadStatus, expiryDate,
         onBackButtonPress={() => setLeadModaVisible(false)}
         onBackdropPress={() => setLeadModaVisible(false)}
         useNativeDriverForBackdrop={true}
-        style={{ margin: 0 }}
+        style={{ margin: 0, }}
         animationInTiming={300}
         animationOutTiming={300}
       >
-        <SafeAreaView style={{ borderTopLeftRadius: 10, borderTopRightRadius: 10, flex: 0.8, marginTop: "auto", backgroundColor: colors.secondary }}>
+        <SafeAreaView style={{ borderTopLeftRadius: 10, borderTopRightRadius: 10, flex: 0.8, marginTop: "auto", backgroundColor: colors.secondary, }}>
 
           <View style={ModalStyle.container}>
 

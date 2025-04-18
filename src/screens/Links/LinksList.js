@@ -302,6 +302,11 @@ const tabs = [
     index: 1,
     title: "BOOKING PAGES",
   },
+  {
+    id: "clickfunnel_page",
+    index: 2,
+    title: "Funnels",
+  },
 
 ]
 
