@@ -72,3 +72,12 @@ export const UPDATE_LINKS_SALES_TEAM_ACCESS = ({ token, navigation, salePageId, 
     navigation: navigation,
   })
 }
+
+export const GET_LINKS_FUNNNELS = ({ token, navigation, salePageId }) => {
+  return invokeApi({
+    path: `api/sale_page/sync/click_funnels`,
+    method: "GET",
+    token: token,
+    navigation: navigation,
+  })
+}

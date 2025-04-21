@@ -29,6 +29,8 @@ export const colors = {
   grey: "#696969",
   lightGrey: "#A2A1A1",
   online: "#337447",
+  expire:"#dc3545",
+  active:"#28a745",
   green: "#4B9831",
   chip: "#343b4b",
   link: "#316BF2"

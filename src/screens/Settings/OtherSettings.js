@@ -49,28 +49,35 @@ const __styles = StyleSheet.create({
 })
 
 
-const SettingsList = [{
-  _id: "1",
-  name: "Zoom Settings",
-  icon: icons.user,
-  route: routes.zoomSettings
-},
-{
-  _id: "2",
-  name: "Welcome Reminder Settings",
-  icon: icons.user,
-  route: routes.reminderSettings
-},
-{
-  _id: "3",
-  name: "Feed Keywords",
-  icon: icons.user,
-  route: routes.feedKeywords,
-},
-{
-  _id: "4",
-  name: "Change Password",
-  icon: icons.lock,
-  route: routes.changePassword
-},
+const SettingsList = [
+		{
+				_id: "1",
+				name: "Zoom Settings",
+				icon: icons.user,
+				route: routes.zoomSettings
+		},
+		{
+				_id: "2",
+				name: "Welcome Reminder Settings",
+				icon: icons.user,
+				route: routes.reminderSettings
+		},
+		{
+				_id: "3",
+				name: "Feed Keywords",
+				icon: icons.user,
+				route: routes.feedKeywords,
+		},
+		// {
+		// 		_id: "4",
+		// 		name: "Send Notifications",
+		// 		icon: ()=>icons.notification(colors.primary),
+		// 		route: routes.sendNotifications,
+		// },
+		{
+				_id: "5",
+				name: "Change Password",
+				icon: icons.lock,
+				route: routes.changePassword
+		},
 ]

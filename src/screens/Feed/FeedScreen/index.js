@@ -75,7 +75,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
   const isProgramFeed = feedFor == "program";
   const isMissionFeed = feedFor == "mission";
 
-  const { token, user, access, isChatAllowed } = useSelector(selectUser);
+  const { token, user, access, isChatAllowed, feedSettings } = useSelector(selectUser);
 
   const { socket } = useSelector(selectSocket);
   const timezone = useSelector(selectTimeZone);
@@ -693,12 +693,13 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       id: id,
       level: !!curFeed ? curFeed?.created_for_level_or_type : "",
       keywords: isArray(curFeed?.feed_keywords) ? [...new Map(curFeed?.feed_keywords.map(item => [item.value, item])).values()] : [],
+		  feed_badge_levels: curFeed?.feed_badge_levels,
     };
     setComments({
       list: [],
       modalVisibility: true,
       loader: true,
-      focus: focus
+      focus: focus,
     });
 
     getComments();
@@ -1361,6 +1362,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       isInView={inView == item?._id}
       item={item}
       index={index}
+		  feedSettings={feedSettings}
       timezone={timezone}
       user={user}
       token={token}
@@ -1451,7 +1453,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
         hasEditDeleteAccess={isAllSourceFeed || isTheSourceFeed || isNoteMainFeed ? access?.edit_delete_option_in_source_all_source_feeds : false}
         isNoteMainFeed={isNoteMainFeed}
         eventId={eventId}
-        feedCreatedFor={commentVar?.level}
+        feedCreatedFor={commentVar?.feed_badge_levels}
         onCommentMessagePress={onCommentMessagePress}
         isChatAllowed={isChatAllowed}
       />

@@ -1,4 +1,3 @@
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import RootView from '../../components/RootView'
 import MyCheckBox from "../../components/MyCheckBox"
 import isArray from "../../functions/isArray"

@@ -30,7 +30,7 @@ const notificationHandler = (remoteMessage, navigation, navbar) => {
         params["eventId"] = data?.event_id
         params["feedFor"] = "event"
       } else if (data?.tab_type == "mission") {
-        params["eventId"] = item?.module_id
+        params["eventId"] = data?.module_id
         params["feedFor"] = "mission"
       }
 
@@ -85,6 +85,7 @@ const notificationHandler = (remoteMessage, navigation, navbar) => {
           }],
         })
       } else if (data?.tab_type == "mission") {
+					const val  =JSON.parse(data?.module_info)
         navigation.reset({
           routes: [{
             name: navigator,
@@ -96,14 +97,14 @@ const notificationHandler = (remoteMessage, navigation, navbar) => {
                 {
                   name: routes.missionList,
                   params: {
-                    id: item?.module_info?.level_id,
+                    id: val?.level_id,
                   }
                 },
                 {
                   name: routes.missionDetail,
                   params: {
-                    id: item?.module_info?.mission_id,
-                    type: item?.module_info?.type,
+                    id: val?.mission_id,
+                    type: val?.type,
                     curTab: "community"
                   }
                 },

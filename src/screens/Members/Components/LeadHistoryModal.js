@@ -18,7 +18,7 @@ import OptionModal from '../../../components/OptionModal';
 import ConfirmationModal from '../../../components/ConfirmationModal';
 import LeadModal from './LeadModal';
 
-const LeadHistoryModal = forwardRef(({ token, navigation, memberId }, ref) => {
+const LeadHistoryModal = forwardRef(({ token, navigation, memberId, expiryDate }, ref) => {
   const leadModalRef2 = useRef();
   const [isVisible, setIsVisible] = useState(false);
   const [loader, setLoader] = useState(false);
@@ -75,7 +75,7 @@ const LeadHistoryModal = forwardRef(({ token, navigation, memberId }, ref) => {
       setTimeout(() => {
         setSelectedLeadStatusForEdit(item)
         leadModalRef2.current?.openModal()
-      }, 400);
+      }, 500);
     }
   }
 
@@ -130,6 +130,7 @@ const LeadHistoryModal = forwardRef(({ token, navigation, memberId }, ref) => {
           <StatView title={"Income Value"} value={"£ " + item?.income_value} />
           <StatView title={"Action Info"} value={!!item?.action_info?.name ? `${item?.action_info?.name}\n(${item?.action_info?.action_user_type.replace("_", " ")})` : "N/A"} />
           <StatView title={"Date"} value={moment(item?.changed_date_time).format(dateTimeFormat.date)} />
+					{item?.lead_status?.is_lead_status_locked && <StatView title={"Expiry Date"} value={moment(item?.lead_status_expiry).format(dateTimeFormat.date)} /> }
         </View>
       )
     }

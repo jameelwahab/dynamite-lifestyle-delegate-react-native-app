@@ -210,3 +210,7 @@ export { GET_TEMPLATES_LIST,
 		GET_TEMPLATE_PAYMENT_MANAGE_LIST,
 } from "./Templates"
 
+export {
+		GET_GROUP_LIST
+} from "./SendNotifications.js"
+

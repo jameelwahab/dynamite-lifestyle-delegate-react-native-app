@@ -99,12 +99,12 @@ export const LEAD_STATUS_LIST = ({ token, navigation, }) => {
 
 
 export const CHANGE_LEAD_STATUS = ({ token, navigation, body: {
-  changed_date_time, income_value, lead_status, member_id
+  changed_date_time, income_value, lead_status, member_id, lead_status_expiry=undefined
 } }) => {
   return invokeApi({
     path: `api/lead_status/change/for_member`,
     postData: {
-      changed_date_time, income_value, lead_status, member_id
+      changed_date_time, income_value, lead_status, member_id, lead_status_expiry
     },
     method: "PUT",
     token,
@@ -113,12 +113,12 @@ export const CHANGE_LEAD_STATUS = ({ token, navigation, body: {
 }
 
 export const EDIT_LEAD_STATUS = ({ token, navigation, body: {
-  id, changed_date_time, income_value, lead_status, member_id
+  id, changed_date_time, income_value, lead_status, member_id,lead_status_expiry=undefined
 } }) => {
   return invokeApi({
     path: `api/lead_status/edit_lead_status/for_member`,
     postData: {
-      id, changed_date_time, income_value, lead_status, member_id
+      id, changed_date_time, income_value, lead_status, member_id, lead_status_expiry
     },
     method: "POST",
     token,
