@@ -1026,14 +1026,12 @@ const MemberList = ({ navigation, route }) => {
         token={token}
         updateLeadStatus={updateLeadStatus}
         memberId={member?._id}
-        oldLead={member?.lead_status}
-				expiryDate={member?.lead_status_expiry}
+        oldLead={member}
       />
 
       <LeadHistoryModal
         ref={hitoryModalRef}
         memberId={member?._id}
-				expiryDate={member?.lead_status_expiry}
         navigation={navigation}
         token={token}
       />

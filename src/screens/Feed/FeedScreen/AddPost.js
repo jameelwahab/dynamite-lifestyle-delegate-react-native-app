@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, TextInput, Pressable, ScrollView, useWindowDimensions, Image } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, TextInput, Pressable, Platform, ScrollView, useWindowDimensions, Image } from 'react-native'
 import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import UserImage from '../../../components/UserImage'
 import Modal from 'react-native-modal'
@@ -130,6 +130,8 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   const [pollData, setPollData] = useState(null);
   const [surveyData, setSurveyData] = useState(null);
   const [notifyTxt, setNotifyTxt] = useState({ state: "", desc: "" })
+		const [badgeFor, setBadgeFor] = useState( access?.multiple_levels_in_source_all_source_scadule_feeds ? 
+				{title:"All", key:"all"} : { title:"Specific", key:"specific"} )
 
 
   useEffect(() => {
@@ -326,6 +328,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   const selectItemForEdit = (item) => {
 			if(isArray(item?.feed_badge_levels)){
 					setBadge(item?.feed_badge_levels)
+					setBadgeFor({title:"Specific", key:"specific"})
 			}
 
 			if(!isCosmos && !isNoteMainFeed){
@@ -421,6 +424,8 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     };
     setBadge([access.badge_levels[0]])
 		setShowBadges({isVisible:false, list:access.badge_levels })
+		setBadgeFor( access?.multiple_levels_in_source_all_source_scadule_feeds ? 
+				{title:"All", key:"all"} : { title:"Specific", key:"specific"} )
     setNotifyUser(false)
     setNotifyTxt({ state: "", desc: "" })
 
@@ -454,7 +459,14 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
         visibility: true,
         type: Modalfor
       })
-    }
+    } else if(Modalfor = "badgeFor"){
+      setOption({
+					list:[{title:"All", key:"all"}, 
+							{ title:"Specific", key:"specific"}], 
+        visibility: true,
+        type: Modalfor
+      })
+		}
     else if (Modalfor == "createdFor") {
       let arr = [];
       if (isCosmos) {
@@ -490,7 +502,8 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
       setPostCategory(opt.type)
     } else if (options?.type == "createdFor") {
       setPostCreatedFor(opt.type)
-    } else if (options?.type == "badges"){
+    } else if (options?.type == "badgeFor"){
+				setBadgeFor(opt)
 		}
 
     closeOptionModal()
@@ -523,11 +536,13 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 						if(badges.findIndex(x=> x._id == opt._id) > -1){
 								setBadge(badges.filter(el=> el._id != opt._id))
 						}
+
 						else{
 								setBadge([...badges, opt])
 						}
 				}else{
 						setBadge([opt])
+						setShowBadges({...showBadges, isVisible:false})
 				}
 		}
 		
@@ -698,17 +713,24 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
     }
 
     if (!isCosmos && !isNoteMainFeed) {
-      fd.append("feed_badge_level_ids", JSON.stringify(badges.map(x=> x?._id)) )
+				if(badges.length == 0 && badgeFor.key != "all") {
+						showToast({ body: "Please Specify a badge level", title: "Alert", type: "info" })
+						setLoader(false);
+						return;
+				}
+				if(badgeFor.key == "all"){
+						fd.append("show_feed_to", badgeFor.key)
+				} else {
+						fd.append("show_feed_to", badgeFor.key)
+						fd.append("feed_badge_level_ids", JSON.stringify(badges.map(x=> x?._id)) )
+				}
     }
 
     if (notifyUser) {
-				fd.append("notify_users", true);
       fd.append("notify_users", notifyUser);
       fd.append("notification_statement", notifyTxt.state);
       fd.append("notification_description", notifyTxt.desc);
-    } else{
-				fd.append("notify_users", false)
-		}
+    } 
 
     if (!!pollData) {
       if (postType == "poll") {
@@ -1186,24 +1208,28 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                 {/* //* Dropdown btns */}
                 <View style={{ marginLeft: 10, flex: 1 }}>
                   <MyText fontSize={16} type="bold">{user?.first_name + " " + user?.last_name}</MyText>
-                    <View style={{ flexDirection: "row", alignItems: "center", marginTop: 5 }}>
-											{(!isCosmos && !isNoteMainFeed && !editId) &&
-                      <TouchableOpacity
-                        style={__style.modalDropBtns}>
-                        <MyText>{"Publish"}</MyText>
-                      </TouchableOpacity> }
-
 											{(!isCosmos && !isNoteMainFeed) &&
-															<View style={{maxWidth:300}}>
-												<TouchableOpacity
+                    <View style={{ flexDirection: "row", alignItems: "center", marginTop: 5 }}>
+													{ access?.multiple_levels_in_source_all_source_scadule_feeds &&  
+															<TouchableOpacity
+																onPress={()=> openOptionModal("badgeFor") }
+																style={__style.modalDropBtns}>
+																		<MyText>{badgeFor.title}</MyText>
+																</TouchableOpacity>
+													}
+												{	badgeFor.key != "all" &&
+										    <TouchableOpacity
 														onPress={() => setShowBadges({ ...showBadges, isVisible:true })}
 														style={__style.modalDropBtns}>
-														<MyText style={{ marginRight: 5 }}>{badges.map((el,i)=> i==0 ? el.title : `, ${el.title}`)}</MyText>
+														<MyText 
+																style={{ marginRight: 5, maxWidth:Platform.OS=="android" ? 170 : 270 }}>
+																{badges.map((el,i)=> i==0 ? el.title : `, ${el.title}`)}
+														</MyText>
 														{icons.downwardArrow(17, colors.white)}
-                      </TouchableOpacity>
-															</View>
+												</TouchableOpacity>
 											}
                     </View>
+											}
                   <View style={__style.modalActionButtonRow}>
 
                     {/* <TouchableOpacity
@@ -2032,6 +2058,7 @@ const FeedTypeList = [
   },
 
 ]
+
 
 const __style = StyleSheet.create({
   lvlbtnView: {

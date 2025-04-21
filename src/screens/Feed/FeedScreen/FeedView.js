@@ -1,12 +1,15 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity, Pressable } from 'react-native'
-import React, { memo, useEffect, useState } from 'react'
+import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, Pressable} from 'react-native'
+import React, { memo, useEffect, useState, useRef } from 'react'
 import UserImage from '../../../components/UserImage'
 import MyText from '../../../components/MyText'
+import InfoModal from '../../../components/InfoModal';
 import { convertTimezone, convertTimezone2 } from '../../../functions/convertTime'
 import { colors } from '../../../utilities/colors'
+import { fonts } from '../../../utilities/fonts';
 import { S3_URL, isDev } from '../../../utilities/constants'
 import ImagesForFeed from './ImagesForFeed'
 import { icons } from '../../../utilities/icons'
+import breakReference from '../../../functions/breakReference';
 import MyWebview from '../../../components/MyWebview'
 import MyImage2 from '../../../components/MyImage2'
 import MyImage from '../../../components/MyImage'
@@ -19,11 +22,14 @@ import DropShadow from "react-native-drop-shadow";
 import { isHtml } from '../../../functions/regex'
 import PostWebView from '../../../components/PostWebView'
 import FeedText from '../../../components/FeedText'
+import Divider from '../../../UIComponents/Divider';
 import numFormatter from '../../../functions/numFormatter'
 import { MyButton } from '../../../components/MyButton'
 import { main } from '../../../utilities/styles'
-import { Row } from '../../../UIComponents/FlexViews'
+import { Row, Flex } from '../../../UIComponents/FlexViews'
 import isArray from '../../../functions/isArray'
+
+const ic_tropy = require("../../../assets/icons/trophy.png");
 
 export const FeedView = ({ item, index, user, token, isInView, timezone, settings,
   openComments, showLikes, openOptions, onLikebtnPress, isCosmos,
@@ -34,6 +40,7 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
 
 
   const [animationState, setAnimationState] = useState(0)
+  const ref_info = useRef();
 
   useEffect(() => {
     if (index == 1)
@@ -67,6 +74,35 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
       </>
     )
   }
+const badgesView = (badgeList) => {
+    return (
+      <View>
+          <Text style={[main.heading, { fontFamily: fonts.medium, }]}>{"Badges"}</Text>
+        <Divider mt={10} />
+        <View style={{ marginTop: 10 }}>
+          <FlatList
+						horizontal
+            scrollEnabled={false}
+            data={badgeList || []}
+            renderItem={({ item, index }) => {
+              return (
+										<View style={{marginRight:20 }}>
+                    <Row alignItems="center">
+                      {/* <Text style={[main.regular, { marginRight: 5, textAlign: "center" }]} >{item?.no_of_badges} x</Text> */}
+                      <MyImage
+                        source={{ uri: S3_URL + item?.icon?.thumbnail_1 }}
+                        style={{ height: 20, width: 20 }}
+                      />
+                    </Row>
+									</View>
+              )
+
+            }}
+          />
+        </View>
+      </View>
+    )
+  }
 
   const profileView = () => (
     <View style={__style.profileView}>
@@ -97,8 +133,26 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
           />
         </TouchableOpacity>}
 
+      <InfoModal ref={ref_info} />
 
-      {(!!item?.badge_level_info?.icon?.thumbnail_1 || isCosmos || !!item?.feed_badge_levels[0]?.icon?.thumbnail_1) &&
+			{item?.feed_badge_levels?.length != 0 &&
+							<Pressable 
+								onPress={() => {
+										if(item?.feed_badge_levels?.length > 1){
+												ref_info?.current?.openModal("", "", false, badgesView(item?.feed_badge_levels))
+										}
+								}}
+								style={{flexDirection:'row', alignItems:"center"}}>
+								<MyImage
+										source={{ uri: S3_URL + item?.feed_badge_levels[0]?.icon?.thumbnail_1 }}
+										style={{ height: 20, width: 20, marginRight:5 }}
+								/>
+						{item?.feed_badge_levels?.length > 1 &&
+							<Text style={[main.description, { textDecorationLine: "underline", color: colors.primary2 }]} >{item?.feed_badge_levels?.length-1}+ </Text>
+						 }
+							</Pressable>
+        }
+      {(!!item?.badge_level_info?.icon?.thumbnail_1 || isCosmos) &&
         <View >
           <MyImage
             indicatorProps={{ color: colors.secondaryVariant }}
@@ -115,7 +169,7 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
                   //   //     item?.created_for_level_or_type == "inner_circle" ?
                   //   //       S3_URL + settings?.inner_circle_feed_icon :
                   S3_URL + settings?.[`${item?.created_for_level_or_type}_feed_icon`] :
-                  S3_URL + (!!item?.badge_level_info ? item?.badge_level_info?.icon?.thumbnail_1 : item?.feed_badge_levels[0]?.icon?.thumbnail_1)
+                  S3_URL + item?.badge_level_info?.icon?.thumbnail_1
             }}
             style={__style.feedTypeIcon}
           />

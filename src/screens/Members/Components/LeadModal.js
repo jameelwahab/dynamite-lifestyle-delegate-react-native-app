@@ -34,21 +34,19 @@ const LeadModal = forwardRef(({ token, navigation, updateLeadStatus, expiryDate,
 
   useEffect(() => {
     if (isVisible) {
-				console.log("is visisble", isVisible)
       if (edit) {
 				 setSelectedLead(oldLead?.lead_status)
         setIcome(!!oldLead?.income_value ? oldLead?.income_value.toString() : "0")
         setTimeout(() => {
           setDate(moment(oldLead?.changed_date_time))
-					if(expiryDate){
-							setExpiry(expiryDate)
-					}
+						if(oldLead?.lead_status?.is_lead_status_locked){
+								setExpiry(oldLead?.lead_status_expiry)
+						}
         }, 200);
       } else {
-        setSelectedLead(!!oldLead ? oldLead : null)
-					if(expiryDate){
-							setExpiry(expiryDate)
-					}
+					setDate(oldLead?.lead_status_history[0]?.changed_date_time)
+				  setExpiry(oldLead?.lead_status_expiry)
+        setSelectedLead(!!oldLead?.lead_status ? oldLead.lead_status : null)
 			}
     }
   }, [isVisible])

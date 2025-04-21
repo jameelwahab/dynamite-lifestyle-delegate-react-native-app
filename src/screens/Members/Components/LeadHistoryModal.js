@@ -130,6 +130,7 @@ const LeadHistoryModal = forwardRef(({ token, navigation, memberId, expiryDate }
           <StatView title={"Income Value"} value={"£ " + item?.income_value} />
           <StatView title={"Action Info"} value={!!item?.action_info?.name ? `${item?.action_info?.name}\n(${item?.action_info?.action_user_type.replace("_", " ")})` : "N/A"} />
           <StatView title={"Date"} value={moment(item?.changed_date_time).format(dateTimeFormat.date)} />
+					{item?.lead_status?.is_lead_status_locked && <StatView title={"Expiry Date"} value={moment(item?.lead_status_expiry).format(dateTimeFormat.date)} /> }
         </View>
       )
     }
