@@ -62,7 +62,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   isFeedFilterAllowed,
   isNoteMainFeed,
   isMissionFeed,
-  hideOnlyAddPostView = false
+  hideOnlyAddPostView = false,
 
 }, ref) => {
 
@@ -128,6 +128,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   const [eventModalVisible, setEventModalVisible] = useState(false)
   const [multipleLevelModalVisiblity, setMultipleLevelModalVisiblity] = useState(false);
   const [pollData, setPollData] = useState(null);
+  const [actionBy, setActionBy] = useState("");
   const [surveyData, setSurveyData] = useState(null);
   const [notifyTxt, setNotifyTxt] = useState({ state: "", desc: "" })
 		const [badgeFor, setBadgeFor] = useState( access?.multiple_levels_in_source_all_source_scadule_feeds ? 
@@ -136,7 +137,6 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
   useEffect(() => {
     let text = postText;
-
     //* For Mention
     if (text[cursor?.start] == "@" || text == "@") {
       // let _at_index = !!cursor?.start ? cursor?.start : 0;
@@ -326,6 +326,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   }
 
   const selectItemForEdit = (item) => {
+			setActionBy(item?.action_info?.action_by)
 			if(isArray(item?.feed_badge_levels)){
 					setBadge(item?.feed_badge_levels)
 					setBadgeFor({title:"Specific", key:"specific"})
@@ -428,6 +429,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 				{title:"All", key:"all"} : { title:"Specific", key:"specific"} )
     setNotifyUser(false)
     setNotifyTxt({ state: "", desc: "" })
+		setActionBy("")
 
   }
 
@@ -1208,7 +1210,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                 {/* //* Dropdown btns */}
                 <View style={{ marginLeft: 10, flex: 1 }}>
                   <MyText fontSize={16} type="bold">{user?.first_name + " " + user?.last_name}</MyText>
-											{(!isCosmos && !isNoteMainFeed) &&
+											{(!isCosmos && !isNoteMainFeed && actionBy=="consultant_user") &&
                     <View style={{ flexDirection: "row", alignItems: "center", marginTop: 5 }}>
 													{ access?.multiple_levels_in_source_all_source_scadule_feeds &&  
 															<TouchableOpacity
