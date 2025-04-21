@@ -31,7 +31,7 @@ import isArray from '../../../functions/isArray'
 
 const ic_tropy = require("../../../assets/icons/trophy.png");
 
-export const FeedView = ({ item, index, user, token, isInView, timezone, settings,
+export const FeedView = ({ item, index, user, token, feedSettings, isInView, timezone, settings,
   openComments, showLikes, openOptions, onLikebtnPress, isCosmos,
   sourceLevelIcons, isScheduledFeed, openScheduleTimeModal, onFeedDetail,
   isNoteMainFeed, filterTheOptions, onVotePress, pollSettings, openPollDetail,
@@ -88,7 +88,6 @@ const badgesView = (badgeList) => {
               return (
 										<View style={{marginRight:20 }}>
                     <Row alignItems="center">
-                      {/* <Text style={[main.regular, { marginRight: 5, textAlign: "center" }]} >{item?.no_of_badges} x</Text> */}
                       <MyImage
                         source={{ uri: S3_URL + item?.icon?.thumbnail_1 }}
                         style={{ height: 20, width: 20 }}
@@ -113,7 +112,8 @@ const badgesView = (badgeList) => {
           name={item?.action_info?.name}
           backgroundTransparent={true}
           borderWidth={isCosmos ? 1 / 4 : 2}
-          borderColor={!isCosmos ? !!item?.badge_level_info ? item?.badge_level_info?.color_code : item?.feed_badge_levels[0]?.color_code : undefined}
+          borderColor={!isCosmos ? 
+							!!item?.show_feed_to ? (item?.show_feed_to == "all" && item?.action_info?.action_by=="consultant_user") ? feedSettings?.color_code_for_all_level : !!item?.badge_level_info ? item?.badge_level_info?.color_code : item?.feed_badge_levels[0]?.color_code : undefined : undefined}
           size={35}
         />
         <View style={__style.profileNameView}>
@@ -135,7 +135,9 @@ const badgesView = (badgeList) => {
 
       <InfoModal ref={ref_info} />
 
-			{item?.feed_badge_levels?.length != 0 &&
+			{(!!item?.show_feed_to && item?.show_feed_to=="specific" && item?.action_info?.action_by=="consultant_user") &&
+					<>
+					{isArray(item?.feed_badge_levels) &&
 							<Pressable 
 								onPress={() => {
 										if(item?.feed_badge_levels?.length > 1){
@@ -150,8 +152,15 @@ const badgesView = (badgeList) => {
 						{item?.feed_badge_levels?.length > 1 &&
 							<Text style={[main.description, { textDecorationLine: "underline", color: colors.primary2 }]} >{item?.feed_badge_levels?.length-1}+ </Text>
 						 }
-							</Pressable>
+							</Pressable>} 
+					</>
         }
+
+			{(!!item?.show_feed_to && item?.show_feed_to=="all" && item?.action_info?.action_by=="consultant_user") && <MyImage
+										source={{ uri: S3_URL + feedSettings?.icon_for_all_level }}
+										style={{ height: 20, width: 20, marginRight:5 }}
+								/>}
+
       {(!!item?.badge_level_info?.icon?.thumbnail_1 || isCosmos) &&
         <View >
           <MyImage
@@ -189,7 +198,6 @@ const badgesView = (badgeList) => {
   )
 
   const inRevivewView = () => {
-    console.log(item, "feed")
     return (
       <View style={__style.review}>
         <MyText color={colors.primary} fontSize={16} type='medium' >Reivew Reason</MyText>

@@ -75,7 +75,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
   const isProgramFeed = feedFor == "program";
   const isMissionFeed = feedFor == "mission";
 
-  const { token, user, access, isChatAllowed } = useSelector(selectUser);
+  const { token, user, access, isChatAllowed, feedSettings } = useSelector(selectUser);
 
   const { socket } = useSelector(selectSocket);
   const timezone = useSelector(selectTimeZone);
@@ -687,7 +687,6 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
 
   const openComments = (id, focus) => {
     let curFeed = feed.find(fed => fed._id == id);
-			console.log("here is the current feed",curFeed);
     commentVar = {
       page: 0,
       canLoadMore: false,
@@ -1363,6 +1362,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       isInView={inView == item?._id}
       item={item}
       index={index}
+		  feedSettings={feedSettings}
       timezone={timezone}
       user={user}
       token={token}
