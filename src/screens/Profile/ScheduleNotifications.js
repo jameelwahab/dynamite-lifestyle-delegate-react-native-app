@@ -18,7 +18,7 @@ import { FlatList, View, StyleSheet, TouchableOpacity } from "react-native"
 import { useRef, useState, useEffect } from "react"
 import MyKeyboardAvoidingView from "../../components/MyKeyboardAvoidingView"
 
-const SendNotifications = ({ navigation }) => {
+const ScheduleNotifications = ({ navigation }) => {
 		const { token } = useSelector(selectUser);
 		const [modalSelect, setModalSelect] = useState({isVisible:false, index:undefined})
 		const ref_email_modal = useRef();
@@ -93,8 +93,6 @@ const SendNotifications = ({ navigation }) => {
 				getList()
 		},[])
 
-		useEffect(()=>{ console.log(list) },[list])
-
 		const groupChips = (index) => {
 				
 				return(
@@ -145,39 +143,31 @@ const SendNotifications = ({ navigation }) => {
 						</Row>
 
 						<View>
-								
-				<MyTouchableInput
-						label='Select Groups*'
-						view={()=>groupChips(index)}
-						icon={() => icons.down()}
-						iconOnPress={()=> setModalSelect({isVisible:true, index})}
-				/>
+
+								<MyTouchableInput
+										label='Membership level*'
+										view={()=>groupChips(index)}
+										icon={() => icons.down()}
+										iconOnPress={()=> setModalSelect({isVisible:true, index})}
+								/>
+
+								<MyTouchableInput
+										label='Action Type*'
+										view={()=>groupChips(index)}
+										icon={() => icons.down()}
+										iconOnPress={()=> setModalSelect({isVisible:true, index})}
+								/>
+
+								<MyTouchableInput
+										label='Date type'
+										view={()=>groupChips(index)}
+										icon={() => icons.down()}
+										iconOnPress={()=> setModalSelect({isVisible:true, index})}
+								/>
+						
 						</View>
 
-						{notify.map((el,i)=>{
-								let isPresent = isNotifyPresent(el,i);
-								console.log("is Present",isPresent)
-								return (
-										<View
-												style={__styles.notifyContainer}
-												key={i}>
-												<MyCheckBox 
-														pb={0}
-														value={isPresent}
-														onPress={() => notifcationTypeHandler(el, index)}
-														title={el.label}
-												/>
-												<TransparentButton
-														disabled={!isPresent}
-														onPress={() => handleNotifyEdit(el, index)}
-														icon={() => icons.editpencil(isPresent ? colors.primary : colors.transparent)} 	
-														/>
-												
-										</View>
-								)
-						})}
-
-						</View>
+				</View>
 				)
 		} 
 
@@ -186,7 +176,7 @@ const SendNotifications = ({ navigation }) => {
 						hideChatIcon
 						hideProfile
 						hideNotificaitonIcon
-				title="Send Notifications Settings">
+				title="Schedule Notifications Settings">
 			<Flex flex={1}>
 				<MyKeyboardAvoidingView noScrollView>
 					<Flex flex={1}>
@@ -212,25 +202,11 @@ const SendNotifications = ({ navigation }) => {
 						optionList={filteredGroupList(modalSelect.index)}
 						filterTheList={filterTheList}
 				/>
+
 				</RootView>
 		)
 }
 
-const notify = [
-	{
-		label: "Notification",
-		name: "push_notification_access"
-	},
-	{
-		label: "Message",
-		name: "message_notification_access"
-	},
-	{
-		label: "Email",
-		name: "email_notification_access",
-	},
-
-]
 
 const __styles = StyleSheet.create({
 		notificationView: {
@@ -262,4 +238,4 @@ const __styles = StyleSheet.create({
 		}
 })
 
-export default SendNotifications
+export default ScheduleNotifications

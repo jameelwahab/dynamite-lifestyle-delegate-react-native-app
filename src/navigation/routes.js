@@ -117,7 +117,7 @@ const routes = {
   changePassword: "CHANGE_PASSWORD_SCREEN",
   reminderSettings: "REMINDER_SETTINGS_SCREEN",
   feedKeywords: "FEED_KEYWORDS_SETTINGS_SCREEN",
-  sendNotifications: "SEND_NOITIFICATION_SETTINGS_SCREEN",
+  scheduleNotifications: "SCHEDULE_NOTIFIICAtIONS_SETTINGS_SCREEN",
   zoomSettings: "ZOOM_SETTINGS_SCREEN",
   changeAffiliateIdScreen: "CHANGE_AFFILIATE_ID_SCREEN",
 
