@@ -68,12 +68,12 @@ const SettingsList = [
 				icon: icons.user,
 				route: routes.feedKeywords,
 		},
-		// {
-		// 		_id: "4",
-		// 		name: "Send Notifications",
-		// 		icon: ()=>icons.notification(colors.primary),
-		// 		route: routes.sendNotifications,
-		// },
+		{
+				_id: "4",
+				name: "Send Notifications",
+				icon: ()=>icons.notification(colors.primary),
+				route: routes.sendNotifications,
+		},
 		{
 				_id: "5",
 				name: "Change Password",

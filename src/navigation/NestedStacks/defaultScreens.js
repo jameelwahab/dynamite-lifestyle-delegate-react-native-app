@@ -36,10 +36,10 @@ export const defaultScreens = [
     name: routes.feedKeywords,
     component: FeedKeywords
   },
-  // {
-  //   name: routes.sendNotifications,
-  //   component: SendNotifications
-  // },
+  {
+    name: routes.sendNotifications,
+    component: SendNotifications
+  },
   {
     name: routes.chatMessageList,
     component: MessageList

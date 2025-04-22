@@ -17,7 +17,7 @@ const MemberView = ({ member, borderColor = null, showPhoneNumber = false, margi
             <MyText type='bold' capitalize fontSize={titleSize} >{`${secondText}`}</MyText>}
         </View>
         {!!subText && <MyText type='medium' color={colors.lightText2} fontSize={10} >{subText}</MyText>}
-        {!hideEmail && <MyText type='medium' color={colors.lightText2} fontSize={10} >{`${member?.email}`}</MyText>}
+        {!hideEmail && <MyText type='medium' color={colors.lightText2} fontSize={10} >{`${member?.email || ""}`}</MyText>}
         {showPhoneNumber && !!member?.contact_number &&
           <MyText type='medium' color={colors.lightText2} fontSize={10} >{member?.contact_number}</MyText>}
       </View>

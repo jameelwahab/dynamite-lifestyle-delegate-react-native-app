@@ -246,11 +246,11 @@ const List = ({ navigation, route }) => {
 
         <View style={{ padding: 15, backgroundColor: colors.secondaryVariant, borderRadius: 20 }}>
 
-          <View style={{ paddingRight: 10, flexDirection: "row", }}>
+          <View style={{ paddingRight: 15, flexDirection: "row", }}>
             <View style={{ flex: 1 }}>
               <MyText numberOfLines={2} fontSize={16} type='medium' style={{ flex: 1 }} >{item?.subject}</MyText>
             </View>
-            <MyText fontSize={10} >
+            <MyText fontSize={10} style={{marginRight:5}} >
               {convertTimezone(item.support_ticket_date, timezone).fromNow()}
             </MyText>
             <View style={{ marginRight: -20, marginTop: -4 }}>
@@ -272,6 +272,16 @@ const List = ({ navigation, route }) => {
             </View>
           </View>
 
+				{/*(getStatusOfTicket(item).title=="solved" && !!item?.last_action_info) &&
+          <View style={{ flexDirection: "row", marginTop: 10, borderBottomWidth: 1 / 3, borderBottomColor: colors.lightText, paddingBottom: 5 }}>
+            <View style={{ flex: 0.7 }}>
+              <MyText color={colors.lightText2}>Name :</MyText>
+            </View>
+            <View style={{ flex: 1 }}>
+              <MyText type='medium'>{item?.last_action_info?.name}</MyText>
+            </View>
+          </View>*/
+				}
           <View style={{ flexDirection: "row", marginTop: 10, borderBottomWidth: 1 / 3, borderBottomColor: colors.lightText, paddingBottom: 5 }}>
             <View style={{ flex: 0.7 }}>
               <MyText color={colors.lightText2}>Department :</MyText>

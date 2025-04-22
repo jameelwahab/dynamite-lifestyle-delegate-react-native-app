@@ -68,7 +68,6 @@ const SendNotifications = ({ navigation }) => {
 
 		}
 		const isNotifyPresent = (el,indexNotify) => {
-				console.log("here is the presence",el.name,list[indexNotify]?.notifications)
 				return list[indexNotify]?.notifications?.findIndex(x => x.name == el.name) > -1;
 		}
 

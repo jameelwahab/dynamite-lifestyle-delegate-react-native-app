@@ -28,8 +28,9 @@ import MemberView from '../../../components/MemberView';
 import TitleView from '../../../components/TitleView';
 
 let autoMessages = [];
-const Detail = ({ navigation, route }) => {
-  const { route: listRoute1, refreshList, tab, isMine } = route?.params;
+  const Detail = ({ navigation, route }) => {
+  const { route: listRoute1, refreshList, tab, isMine,} = route?.params;
+  let isClose = route?.params?.route == "solved"
   const { token, user } = useSelector(selectUser);
   const timezone = useSelector(selectTimeZone);
   const [listRoute, setlistRoute] = useState(listRoute1)
@@ -220,6 +221,7 @@ const Detail = ({ navigation, route }) => {
           moveToMarkResolve={openMarkResolveModal}
           ticket={ticket}
           listRoute={listRoute}
+				  isClose={isClose}
           user={user} />
 
       case 'comments':
@@ -313,7 +315,11 @@ const Detail = ({ navigation, route }) => {
             return (
               <MemberView member={ticket?.member} />
             )
-          } else {
+          } /*else if(!!ticket?.last_action_info && ticket?.last_action_info?.name){
+						return (
+              <MemberView member={ticket?.last_action_info} />
+            )
+					} */else {
             return <TitleView hideBackBottomButton title={"Contact Support"} />
           }
         }
