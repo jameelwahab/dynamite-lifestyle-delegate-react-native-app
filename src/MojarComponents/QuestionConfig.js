@@ -13,11 +13,12 @@ import MyInputs from '../components/MyInputs';
 import { MyButton } from '../components/MyButton';
 import { KeyboardAwareFlatList } from 'react-native-keyboard-aware-scroll-view';
 import openUrl from '../functions/openUrl';
-import { S3_URL } from '../utilities/constants';
 import ImageUploadModal from '../components/ImageUploadModal';
 import showToast from '../functions/showToast';
 import EmptyView from '../components/EmptyView';
 import utilities from '../utilities';
+import { useSelector } from 'react-redux'
+import { selectUser } from '../redux/reducers/userSlice'
 
 const QuestionConfig = ({
   token, navigation,
@@ -30,6 +31,9 @@ const QuestionConfig = ({
   const [collapsed, setCollapsed] = useState({});
   const [answers, setAnswers] = useState([])
   const [filerPicker, setFilerPicker] = useState({ isVisible: false, item: null });
+  const { S3_URL } = useSelector(selectUser)
+
+
   useEffect(() => {
     getQuestions()
   }, [])

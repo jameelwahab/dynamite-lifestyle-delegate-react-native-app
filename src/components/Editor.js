@@ -23,7 +23,6 @@ import { useNavigation } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
 import { selectUser } from '../redux/reducers/userSlice';
 import { UPLOAD_FILE_TO_S3 } from '../DAL';
-import { S3_URL } from '../utilities/constants';
 
 const ic_A = require('../assets/icons/A-alphabet.png');
 const ic_bucket = require('../assets/icons/paint.png');
@@ -37,7 +36,7 @@ const Editor = ({
   placeholder = 'Type a message...'
 }) => {
   const navigation = useNavigation();
-  const { token } = useSelector(selectUser);
+  const { token, S3_URL } = useSelector(selectUser);
   const RichText = useRef();
   const scrollViewRef = useRef();
   const [link, setLink] = useState({ value: "", showDialog: false, title: "" })

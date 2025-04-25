@@ -31,7 +31,6 @@ import PollDetailModal from './PollDetailModal'
 import SurveyModal from './SurveyModal'
 import SurveyDetailModal from './SurveyDetailModal'
 import ConfirmationModal2 from '../../../components/ConfirmationModal2'
-import { S3_URL } from '../../../utilities/constants'
 import isArray from '../../../functions/isArray'
 
 
@@ -75,7 +74,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
   const isProgramFeed = feedFor == "program";
   const isMissionFeed = feedFor == "mission";
 
-  const { token, user, access, isChatAllowed, feedSettings } = useSelector(selectUser);
+  const { token, user, access, isChatAllowed, feedSettings, S3_URL } = useSelector(selectUser);
 
   const { socket } = useSelector(selectSocket);
   const timezone = useSelector(selectTimeZone);
@@ -858,7 +857,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
       }, 500);
     } else if (selectedOpt?.type == "notify") {
       setTimeout(() => {
-        ref_notify_user?.current.openModal(item?.action_info?.action_id)
+        ref_notify_user?.current.openModal(item?._id)
       }, 500);
     }
   }

@@ -20,7 +20,7 @@ import FooterLoader from '../../../components/FooterLoader'
 import { Flex, Row } from '../../../UIComponents/FlexViews'
 import { convertTimezone2 } from '../../../functions/convertTime'
 import { selectTimeZone } from '../../../redux/reducers/timezoneSlice'
-import { dateTimeFormat, S3_URL } from '../../../utilities/constants'
+import { dateTimeFormat } from '../../../utilities/constants'
 import MyChip from "../../../components/MyChip"
 import MyImage from '../../../components/MyImage'
 import ImgAndTxt from '../../../components/ImgAndTxt'

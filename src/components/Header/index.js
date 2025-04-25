@@ -10,7 +10,6 @@ import Octicons from 'react-native-vector-icons/Octicons';
 import { icons } from '../../utilities/icons'
 import ProfileDropDown from './ProfileDropDown'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { S3_URL } from '../../utilities/constants'
 import MyImage from '../MyImage'
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../redux/reducers/userSlice'
@@ -33,7 +32,7 @@ const Header = ({
   hideUpperHeader = false,
   subTitle = ""
 }) => {
-  const { user, token, isChatAllowed, unreadCount } = useSelector(selectUser)
+  const { user, token, isChatAllowed, unreadCount, S3_URL } = useSelector(selectUser)
   
   const navigation = useNavigation()
   const [isUserModalVisible, setIsUserModalVisible] = useState(false)

@@ -10,7 +10,7 @@ import { CHANGE_DEPARTMENT_OF_TICKET, MARK_RESOLVE_TICKET, MOVE_TICKET, SUPPORT_
 import MyLoader, { SimpleLoader } from '../../../components/MyLoader';
 import { useSelector } from 'react-redux';
 import { selectUser } from '../../../redux/reducers/userSlice';
-import { dateTimeFormat, S3_URL } from '../../../utilities/constants';
+import { dateTimeFormat } from '../../../utilities/constants';
 import moment from 'moment';
 import EmptyView from '../../../components/EmptyView';
 import MyImage from '../../../components/MyImage';

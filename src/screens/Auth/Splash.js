@@ -59,7 +59,7 @@ const Splash = ({ navigation }) => {
     let res = await INIT_WITHOUT_TOKEN();
     if (res.code == 200) {
       dispatch(setSettings(res?.consultant_setting));
-		  dispatch(setS3Url(res?.bucket_url));
+		  dispatch(setS3Url( res?.bucket_url +"/" ));
       moveTo(routes.login)
     } else {
       Alert.alert("Something went wrong",

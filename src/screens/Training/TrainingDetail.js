@@ -10,7 +10,6 @@ import MyLoader from '../../components/MyLoader'
 import utilities from '../../utilities'
 import AudioPlayer from '../../components/AudioPlayer'
 import ResponsiveImage2 from '../../components/ResponsiveImage2'
-import { S3_URL } from '../../utilities/constants'
 import MyWebview from '../../components/MyWebview'
 import Tabs from '../../components/Tabs'
 import { colors } from '../../utilities/colors'
@@ -25,9 +24,8 @@ import FeedScreen from '../Feed/FeedScreen'
 
 const TrainingDetail = (props) => {
   const { navigation, route } = props;
-  console.log(route, "route")
   let { slug } = route?.params;
-  let { token, user } = useSelector(selectUser);
+  let { token, user, S3_URL } = useSelector(selectUser);
   const isFirtTime = useRef(true);
   const [loader, setLoader] = useState(true);
   const [program, setProgram] = useState(null);

@@ -2,11 +2,12 @@ import { View, Text, StyleSheet, TouchableOpacity, Pressable } from 'react-nativ
 import React, { useState } from 'react'
 import MyText from './MyText'
 import { colors } from '../utilities/colors'
-import { S3_URL } from '../utilities/constants'
 import { icons } from '../utilities/icons'
 import DocumentPicker from 'react-native-document-picker'
 import showToast from '../functions/showToast'
 import AudioPlayer from './AudioPlayer'
+import { useSelector } from 'react-redux'
+import { selectUser } from '../redux/reducers/userSlice'
 
 
 const UploadAudio = ({
@@ -18,6 +19,7 @@ const UploadAudio = ({
   hideRemoveButton = false,
 }) => {
 
+		const { S3_URL } = useSelector(selectUser)
 
   const onUplaodPress = async () => {
     try {

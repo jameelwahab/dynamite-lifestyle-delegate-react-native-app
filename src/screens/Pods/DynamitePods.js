@@ -12,13 +12,12 @@ import utilities from '../../utilities'
 import MyWebview from '../../components/MyWebview'
 import EmptyView from '../../components/EmptyView'
 import { colors } from '../../utilities/colors'
-import { S3_URL } from '../../utilities/constants'
 import SearchView from '../../components/SearchView'
 import routes from '../../navigation/routes'
 
 const DynamitePods = ({ navigation, route }) => {
   const { key } = route?.params
-  const { token } = useSelector(selectUser);
+  const { token, S3_URL } = useSelector(selectUser);
   const { navbar } = useSelector(selectNavbar);
   const [title] = useState(navbar?.find(x => x._id == key)?.title);
   const [list, setList] = useState([]);

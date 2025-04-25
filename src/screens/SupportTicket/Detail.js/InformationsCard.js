@@ -6,16 +6,18 @@ import { colors } from '../../../utilities/colors'
 import moment from 'moment'
 import UserImage from '../../../components/UserImage'
 import MyImage from '../../../components/MyImage'
-import { S3_URL } from '../../../utilities/constants'
 import { MyButton, TransparentButton } from '../../../components/MyButton'
 import ImageZoomer from '../../../components/ImageZoomer'
 import getFileIconByType from '../../../functions/getFileIconByType'
 import { Image } from 'react-native'
 import { openUrl } from '@ronradtke/react-native-markdown-display'
+import { useSelector } from 'react-redux'
+import { selectUser } from '../../../redux/reducers/userSlice'
 
 const InformationsCard = ({ ticket, user, moveToMarkResolve, listRoute, isClose }) => {
 
   const [modalListImages, setModalListImages] = useState({ index: -1, list: [] });
+  const { S3_URL } = useSelector(selectUser)
 
   if (!!ticket) {
     return (

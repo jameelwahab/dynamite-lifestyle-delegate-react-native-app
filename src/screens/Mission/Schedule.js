@@ -11,7 +11,6 @@ import AudioPlayer from "../../components/AudioPlayer"
 import ScheduleView from "../../components/Mission/ScheduleView"
 import ResponsiveImage2 from "../../components/ResponsiveImage2"
 import LiveChat from "../../components/LiveChat"
-import { S3_URL } from "../../utilities/constants"
 import VimeoWithPip from "../../components/VimeoWithPip"
 import WebPlayer from "../../components/WebPlayer"
 import MyLoader from "../../components/MyLoader"
@@ -40,7 +39,7 @@ const Schedule = (props) => {
 }
 const Scheduler = ({ navigation, route }) => {
 	const [loading, setLoading] = useState(false)
-	const { token, user, access } = useSelector(selectUser);
+	const { token, user, access, S3_URL } = useSelector(selectUser);
 	const [res, setResult] = useState([])
 	const [refreshing, setRefreshing] = useState(false)
 	const [showChat, setShowChat] = useState(true)

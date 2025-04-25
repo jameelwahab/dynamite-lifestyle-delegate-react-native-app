@@ -19,7 +19,7 @@ import EmptyView from "../../components/EmptyView"
 import { useState, useEffect, useRef } from "react"
 import routes from "../../navigation/routes"
 import { colors } from "../../utilities/colors"
-import { dateTimeFormat, S3_URL } from "../../utilities/constants"
+import { dateTimeFormat } from "../../utilities/constants"
 import { selectUser } from '../../redux/reducers/userSlice'
 import { useSelector } from 'react-redux'
 import { icons } from "../../utilities/icons"

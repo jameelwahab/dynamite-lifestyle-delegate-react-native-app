@@ -8,11 +8,14 @@ import Collapsible from 'react-native-collapsible'
 import { icons } from '../../../utilities/icons'
 import { MyButton } from '../../../components/MyButton'
 import openUrl from '../../../functions/openUrl'
-import { S3_URL } from '../../../utilities/constants'
+import { useSelector } from 'react-redux'
+import { selectUser } from '../../../redux/reducers/userSlice'
 
 
 const QuestionComponent = ({ item, index, showRepliesbtns = false, onShowReplyPress, onRelpyBtnPress, hideRepliesCheckBox = false, hideCollapse = false, noQuestionStatement = false, padding = 10 }) => {
+
   const [isCollapsed, setIsCollapsed] = useState(false);
+		const { S3_URL } = useSelector(selectUser)
   const findCollapsed = (id) => {
     return !!isCollapsed.find(x => x == id)
   }

@@ -5,9 +5,10 @@ import moment from 'moment';
 import { ActivityIndicator } from 'react-native';
 import Slider from '@react-native-community/slider';
 import { colors } from '../utilities/colors';
-import { S3_URL } from '../utilities/constants';
 import { icons } from '../utilities/icons';
 import { SimpleLoader } from './MyLoader';
+import { useSelector } from 'react-redux'
+import { selectUser } from '../redux/reducers/userSlice'
 
 
 
@@ -23,6 +24,7 @@ const AudioPlayerForList = ({ stop = "", url, id, loop = false, onLoopComplete, 
   const active = useActiveTrack();
   const isCurrent = !!active ? active?.id == id : false;
   const [repeatMode, setRepeatMode] = useState(loop);
+		const { S3_URL } = useSelector(selectUser)
 
 
   useEffect(() => {

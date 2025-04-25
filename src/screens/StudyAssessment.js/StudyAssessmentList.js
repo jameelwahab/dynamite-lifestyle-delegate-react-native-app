@@ -10,7 +10,6 @@ import MyLoader from '../../components/MyLoader'
 import { STUDY_ASSESSSMENT_QUESTIONS_LIST } from '../../DAL/Certification'
 import { colors } from '../../utilities/colors'
 import ResponsiveImage2 from '../../components/ResponsiveImage2'
-import { S3_URL } from '../../utilities/constants'
 import routes from '../../navigation/routes'
 import { selectSettings } from '../../redux/reducers/settingSlice'
 import MyWebview from '../../components/MyWebview'
@@ -20,7 +19,7 @@ const StudyAssessmentList = ({ navigation, route }) => {
   const { key, parentKey, type } = route?.params
   const { navbar } = useSelector(selectNavbar);
   const { settings } = useSelector(selectSettings);
-  const { token } = useSelector(selectUser);
+  const { token, S3_URL } = useSelector(selectUser);
   const [loader, setLoader] = useState(true);
   const [list, setList] = useState([]);
   const [title] = useState(navbar?.find(x => x._id == parentKey)?.child_options?.find(y => y._id == key)?.title);

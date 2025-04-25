@@ -2,11 +2,15 @@ import { View, Text, Image } from 'react-native'
 import React from 'react'
 import MyText from '../../../components/MyText'
 import { colors } from '../../../utilities/colors'
-import { S3_URL } from '../../../utilities/constants'
+import { useSelector } from 'react-redux'
+import { selectUser } from '../../../redux/reducers/userSlice'
 
 
 
 const StatView = ({ title, value, view = null, uppercase = false, icon_img, noFontTransform = false }) => {
+
+  const { S3_URL } = useSelector(selectUser)
+
   return (
     <View style={{ flexDirection: "row", alignItems: "center", borderBottomWidth: 1 / 3, borderBottomColor: colors.lightText, paddingBottom: 10, marginTop: 10, }}>
       <View style={{ flex: 0.7 }}>
