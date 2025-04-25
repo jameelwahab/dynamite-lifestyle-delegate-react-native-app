@@ -9,6 +9,7 @@ import utilities from '../../utilities'
 import { colors } from '../../utilities/colors'
 import { INIT_WITHOUT_TOKEN, } from '../../DAL'
 import { setSettings } from '../../redux/reducers/settingSlice'
+import { setS3Url } from '../../redux/reducers/userSlice';
 import routes from '../../navigation/routes'
 import notifee from '@notifee/react-native';
 import InitWithAuth from '../../functions/InitWithAuth'
@@ -58,6 +59,7 @@ const Splash = ({ navigation }) => {
     let res = await INIT_WITHOUT_TOKEN();
     if (res.code == 200) {
       dispatch(setSettings(res?.consultant_setting));
+		  dispatch(setS3Url(res?.bucket_url));
       moveTo(routes.login)
     } else {
       Alert.alert("Something went wrong",

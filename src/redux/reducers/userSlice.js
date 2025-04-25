@@ -12,7 +12,8 @@ const initialState = {
   googleClientIdForAndriod: "",
   googleClientIdForWeb: "",
   access: null,
-  feedSettings:null,
+  feedSettings: null,
+  S3_URL: "",
 };
 const userSlice = createSlice({
   name: "user",
@@ -36,7 +37,8 @@ const userSlice = createSlice({
       state.isSyncWithGoogleAllowed = action.payload.isSyncWithGoogleAllowed;
       state.googleSyncedData = action.payload.googleSyncedData;
       state.access = action.payload.access;
-		  state.feedSettings = action.payload.feedSettings;
+      state.feedSettings = action.payload.feedSettings;
+      state.S3_URL = action.payload.S3_URL;
     },
     clearUserAndToken: (state) => {
       state = {
@@ -52,6 +54,9 @@ const userSlice = createSlice({
     },
     removeGoogleSyncedData: (state,) => {
       state.googleSyncedData = null;
+    },
+    setS3Url: (state) => {
+      state.S3_URL = action.payload;
     }
   }
 })

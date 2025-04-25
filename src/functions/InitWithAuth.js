@@ -46,6 +46,7 @@ const InitWithAuth = async (token, navigation, setLoader, dispatch) => {
       googleClientIdWeb: res?.site_setting?.client_id,
       access: res?.access_object,
 		  feedSettings: res?.delegate_feed_settings,
+      S3_URL : res?.bucket_url,
     }));
     dispatch(setNavbar(res?.nav_items));
     dispatch(setTimeZone({ user: res?.consultant?.time_zone, admin: res?.time_zone }))
