@@ -10,7 +10,6 @@ import moment from 'moment'
 import MyWebview from '../../../components/MyWebview'
 import downloadImage from '../../../functions/downloadImage'
 import MyImage from '../../../components/MyImage'
-import { S3_URL } from '../../../utilities/constants'
 import Editor from '../../../components/Editor'
 import { useNavigation } from '@react-navigation/native'
 import routes from '../../../navigation/routes'
@@ -27,8 +26,9 @@ import getFileIconByType from '../../../functions/getFileIconByType'
 import downloadFile from '../../../functions/downloadFile'
 import { openUrl } from '@ronradtke/react-native-markdown-display'
 import { SimpleLoader } from '../../../components/MyLoader'
+
 const Comments = ({ commentsList, ticket, user, autoMessages, addMessage, listRoute, timezone, isMine }) => {
-  const { token } = useSelector(selectUser)
+  const { token, S3_URL } = useSelector(selectUser)
   const navigation = useNavigation()
   const [modalImage, setModalImage] = useState("")
   const [comments, setComments] = useState(commentsList)

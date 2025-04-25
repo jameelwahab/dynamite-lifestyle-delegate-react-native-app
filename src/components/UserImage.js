@@ -2,10 +2,14 @@ import { View, Text } from 'react-native'
 import React from 'react'
 import MyImage from './MyImage'
 import MyText from './MyText'
-import { S3_URL } from '../utilities/constants'
 import { colors } from '../utilities/colors'
+import { useSelector } from 'react-redux'
+import { selectUser } from '../redux/reducers/userSlice'
 
 const UserImage = ({ image, name, size = 40, backgroundTransparent = false, noS3 = false, borderWidth = 1 / 4, borderColor = colors.primary }) => {
+
+		const { S3_URL } = useSelector(selectUser)
+
   return (
     <View style={{ height: size, width: size, borderRadius: size / 2, overflow: "hidden", borderWidth: borderWidth, borderColor: borderColor, alignItems: "center", justifyContent: "center", backgroundColor: backgroundTransparent ? "#00000000" : colors.grey }}>
       {!!image ?

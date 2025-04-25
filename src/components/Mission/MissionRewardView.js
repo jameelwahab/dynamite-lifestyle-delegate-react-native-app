@@ -3,7 +3,6 @@ import React, { useRef } from 'react'
 import BoxView from '../../UIComponents/BoxView';
 import { Flex, Row } from '../../UIComponents/FlexViews';
 import MyImage from '../MyImage';
-import { S3_URL } from '../../utilities/constants';
 import Divider from '../../UIComponents/Divider';
 import InfoModal from '../InfoModal';
 import breakReference from '../../functions/breakReference';
@@ -13,6 +12,8 @@ import numFormatter from '../../functions/numFormatter';
 import { icons } from '../../utilities/icons';
 import { fonts } from '../../utilities/fonts';
 import MyText from '../MyText';
+import { useSelector } from 'react-redux'
+import { selectUser } from '../../redux/reducers/userSlice'
 
 
 
@@ -22,7 +23,9 @@ const ic_coin_s = require("../../assets/icons/coin.png");
 const ic_tropy = require("../../assets/icons/trophy.png");
 
 const MissionRewardView = ({ badges = [], showEarnedBadges = true, badgesEarned = [], duration = 0, durationTitle, totalCoins = 0, acheivedCoins = 0, }) => {
+
   const ref_info = useRef();
+  const { S3_URL } = useSelector(selectUser)
 
   const badgesView = (badgeList) => {
     let list = breakReference(badgeList);

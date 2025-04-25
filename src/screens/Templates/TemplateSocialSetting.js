@@ -7,7 +7,6 @@ import showToast from "../../functions/showToast"
 import { MyButton } from "../../components/MyButton"
 import { icons } from "../../utilities/icons"
 import utilities from "../../utilities"
-import { S3_URL } from "../../utilities/constants"
 import routes from "../../navigation/routes"
 import { UPDATE_SOCIAL_SETTING, UPLOAD_FILE_TO_S3 } from "../../DAL"
 import ImageUploadModal from '../../components/ImageUploadModal'
@@ -19,7 +18,7 @@ import { StyleSheet, View, Pressable, TouchableOpacity } from "react-native"
 
 const TemplateSocialSetting = ({navigation, route}) => {
 		const {item}  = route.params
-		const { token } = useSelector(selectUser);
+		const { token, S3_URL } = useSelector(selectUser);
 		const [social, setSocial] = useState(!!item.social_sharing && item?.social_sharing!={} ? {...item?.social_sharing} : undefined)
 		const [image, setImage]  = useState(undefined)
 		const [loader, setLoader] = useState(false)

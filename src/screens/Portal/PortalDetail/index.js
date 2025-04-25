@@ -6,7 +6,6 @@ import { useSelector } from 'react-redux'
 import { selectUser } from '../../../redux/reducers/userSlice'
 import { GET_PORTAL_DETAIL, GET_PORTAL_LIST } from '../../../DAL'
 import MyLoader from '../../../components/MyLoader'
-import { S3_URL } from '../../../utilities/constants'
 import ResponsiveImage2 from '../../../components/ResponsiveImage2'
 import MyWebview from '../../../components/MyWebview'
 import utilities from '../../../utilities'
@@ -26,7 +25,7 @@ import AudioPlayerForList from '../../../components/AudioPlayerForList'
 const PortalDetail = (props) => {
   const { navigation, route } = props;
   const { eventId } = route?.params
-  const { token, user,isChatAllowed } = useSelector(selectUser);
+  const { token, user, isChatAllowed, S3_URL } = useSelector(selectUser);
   const timezone = useSelector(selectTimeZone);
   const [loader, setLoader] = useState(true);
   const [event, setEvent] = useState(null);

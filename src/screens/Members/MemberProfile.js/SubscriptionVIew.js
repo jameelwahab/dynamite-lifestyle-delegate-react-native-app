@@ -2,14 +2,17 @@ import { View, Text, TouchableOpacity } from 'react-native'
 import React from 'react'
 import { colors } from '../../../utilities/colors'
 import MyText from '../../../components/MyText'
-import { S3_URL } from '../../../utilities/constants'
 import { __styles } from './style'
 import { MenuButton } from '../../../components/MyButton'
 import StatView from '../Components/StatView'
 import openUrl from '../../../functions/openUrl'
 import EmptyView from '../../../components/EmptyView'
+import { useSelector } from 'react-redux'
+import { selectUser } from '../../../redux/reducers/userSlice'
 
 const SubscriptionVIew = ({ list }) => {
+
+  const { S3_URL } = useSelector(selectUser)
 
   const pdfLinkView = (link) => {
     if (!!link) {

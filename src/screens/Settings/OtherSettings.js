@@ -70,9 +70,9 @@ const SettingsList = [
 		},
 		// {
 		// 		_id: "4",
-		// 		name: "Send Notifications",
+		// 		name: "Schedule Notifications",
 		// 		icon: ()=>icons.notification(colors.primary),
-		// 		route: routes.sendNotifications,
+		// 		route: routes.scheduleNotifications,
 		// },
 		{
 				_id: "5",

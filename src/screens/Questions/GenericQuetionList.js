@@ -16,12 +16,11 @@ import Collapsible from 'react-native-collapsible'
 import { icons } from '../../utilities/icons'
 import { MyButton } from '../../components/MyButton'
 import openUrl from '../../functions/openUrl'
-import { S3_URL } from '../../utilities/constants'
 import MemberView from '../../components/MemberView'
 import QuestionComponent from './Components/QuestionComponent'
 
 const GenericQuetionList = ({ navigation, route }) => {
-  const { token } = useSelector(selectUser)
+  const { token, S3_URL } = useSelector(selectUser)
   const { created_for, id: createdForId, memberId } = route?.params
   const [loader, setLoader] = useState(false);
   const [list, setList] = useState([])

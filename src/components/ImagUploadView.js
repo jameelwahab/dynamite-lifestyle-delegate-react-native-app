@@ -3,12 +3,16 @@ import React from 'react'
 import MyText from './MyText'
 import { colors } from '../utilities/colors'
 import MyImage from './MyImage'
-import { S3_URL } from '../utilities/constants'
 import { icons, plus } from '../utilities/icons'
+import { useSelector } from 'react-redux'
+import { selectUser } from '../redux/reducers/userSlice'
 
 
 
 const ImagUploadView = ({ alreadyUploaded, selected, label, onPress, viewStyle }) => {
+
+  const { S3_URL } = useSelector(selectUser)
+
   return (
     <View>
       <MyText isLabel>{label}</MyText>

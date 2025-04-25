@@ -1,22 +1,23 @@
 import { View, Text, TouchableOpacity, Pressable, ScrollView, StyleSheet } from 'react-native'
-import React, { useState } from 'react'
+import React, { useState,useEffect } from 'react'
 import MyText from '../../../components/MyText'
 import { icons } from '../../../utilities/icons'
 import { colors } from '../../../utilities/colors'
 import moment from 'moment'
 import UserImage from '../../../components/UserImage'
 import MyImage from '../../../components/MyImage'
-import { S3_URL } from '../../../utilities/constants'
 import { MyButton, TransparentButton } from '../../../components/MyButton'
 import ImageZoomer from '../../../components/ImageZoomer'
 import getFileIconByType from '../../../functions/getFileIconByType'
 import { Image } from 'react-native'
 import { openUrl } from '@ronradtke/react-native-markdown-display'
+import { useSelector } from 'react-redux'
+import { selectUser } from '../../../redux/reducers/userSlice'
 
-const InformationsCard = ({ ticket, user, moveToMarkResolve, listRoute }) => {
+const InformationsCard = ({ ticket, user, moveToMarkResolve, listRoute, isClose }) => {
 
   const [modalListImages, setModalListImages] = useState({ index: -1, list: [] });
-
+  const { S3_URL } = useSelector(selectUser)
 
   if (!!ticket) {
     return (
@@ -39,8 +40,11 @@ const InformationsCard = ({ ticket, user, moveToMarkResolve, listRoute }) => {
 
             <View style={{ marginBottom: 10, padding: 10 }}>
 
-
-
+              {/*isClose &&
+                <MyText type='medium' fontSize={22} color={colors.primary} style={{marginBottom:5}}>
+                  ID: {ticket?.reference_number}
+                </MyText>*/}
+				
               {!!ticket?.subject &&
                 <MyText type='medium' fontSize={22} color={colors.primary}>
                   {ticket?.subject}
@@ -87,7 +91,7 @@ const InformationsCard = ({ ticket, user, moveToMarkResolve, listRoute }) => {
                   <View style={{ marginTop: 20 }}>
                     <MyText color={colors.primary} type='medium'  >Attachments</MyText>
                     <View style={{ flexDirection: "row", flexWrap: "wrap", height: 100, marginTop: 5 }}>
-                      <ScrollView horizontal >
+                      <ScrollView horizontal showsHorizontalScrollIndicator={false} >
                         {ticket?.ticket_images.map((x, i) => {
                           let fileIcon = getFileIconByType(x.thumbnail_1);
                           return (

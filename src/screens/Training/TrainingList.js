@@ -10,7 +10,6 @@ import { FlatList } from 'react-native-gesture-handler'
 import ResponsiveImage2 from '../../components/ResponsiveImage2'
 import MyWebview from '../../components/MyWebview'
 import EmptyView from '../../components/EmptyView'
-import { S3_URL } from '../../utilities/constants'
 import MyLoader from '../../components/MyLoader'
 import { colors } from '../../utilities/colors'
 import utilities from '../../utilities'
@@ -25,7 +24,7 @@ const TrainingList = ({ navigation, route }) => {
   const { key } = route?.params;
   const pagination = useRef({ page: 0, canLoadMore: false })
   const { navbar } = useSelector(selectNavbar);
-  const { token } = useSelector(selectUser);
+  const { token, S3_URL } = useSelector(selectUser);
   const [title] = useState(navbar?.find(x => x._id == key)?.title);
   const [loader,] = useState(true);
   const [list, setList] = useState([]);
