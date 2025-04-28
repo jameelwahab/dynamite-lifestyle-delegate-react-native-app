@@ -115,6 +115,9 @@ const _90daysTracker = ({ navigation, route }) => {
         for (let x of arr) {
           let bDate = moment(x.date);
           let diff = moment(bDate).diff(startDate, "days") + 1;
+          if(diff<0){
+            diff = 0
+          }
           if (bDate.isSameOrAfter(startDate, "date") && bDate.isSameOrBefore(moment(startDate).add({ days: 90 }))) {
             let iDate = bDate.format("DD.MM.YYYY")
             iAmount += x.earning;
@@ -136,7 +139,7 @@ const _90daysTracker = ({ navigation, route }) => {
             iAmount += x.earning;
             if (filteredData[iDate]) {
               filteredData[iDate].earning += x.earning;
-              filteredData[iDate].tillAmount += x.tillAmount
+              filteredData[iDate].tillAmount += iAmount
             } else {
               filteredData[iDate] = {
                 date: iDate,
@@ -151,8 +154,8 @@ const _90daysTracker = ({ navigation, route }) => {
         }
 
         filteredData = Object.values(filteredData)
-
-
+						
+						console.log(filteredData,"filteredData")
 
         chartData = {
           labels: filteredData.length <= 0 ? [0] : filteredData.map(x => numFormatter(x?.day)),
@@ -187,7 +190,6 @@ const _90daysTracker = ({ navigation, route }) => {
         chartBlockWidth = utilities.screenWidth();
         diff = 1;
       }
-
       setChartData(chartData);
       setChartWidth(chartBlockWidth);
       setLatestDay(diff);
@@ -227,7 +229,7 @@ const _90daysTracker = ({ navigation, route }) => {
   const header = (
     <View>
       <View style={[__styles.earningView]}>
-        {!!chartData &&
+        {!!chartData && 
           <ScrollView showsHorizontalScrollIndicator={false} horizontal={true} >
             <LineChart
               data={chartData}
