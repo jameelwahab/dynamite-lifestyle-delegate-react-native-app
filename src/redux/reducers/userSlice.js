@@ -56,7 +56,7 @@ const userSlice = createSlice({
       state.googleSyncedData = null;
     },
     setS3Url: (state) => {
-      state.S3_URL = action.payload;
+      state.S3_URL = state;
     }
   }
 })
@@ -65,7 +65,7 @@ export const { setConsultant,
   clearUserAndToken, setUnReadCount,
   setGoogleSyncedData, removeGoogleSyncedData,
   googleClientIdForIOS, googleClientIdForAndriod,
-  googleClientIdForWeb, access, feedSettings
+  googleClientIdForWeb, access, feedSettings, setS3Url
 } = userSlice.actions;
 export const selectUser = (state) => state.user;
 export default userSlice.reducer;
