@@ -251,9 +251,9 @@ const TicketsList = ({ navigation, route }) => {
 		}
 		function makeCsv () {
 				let file = "";
-				let header = `First Name, Last Name, Email, Subject, Department, Create Date, ${type == "support_ticket" ? " Issue Fix Date," : "" } ${((type=="support_ticket" && index==1) || (type=="internal_ticket" && index == 3)) ? "Ressolve Date," : ""} Status, Description,\n`;
+				let header = `First Name, Last Name, Email, Subject, Department, Create Date, ${type == "support_ticket" ? " Issue Fix Date," : "" } Response Date, ${((type=="support_ticket" && index==1) || (type=="internal_ticket" && index == 3)) ? "Ressolve Date," : ""} Status, Description\n`;
 				list.forEach((x, i)=> {
-						file += `${x?.member?.first_name}, ${x?.member?.last_name}, ${x?.member?.email}, ${x.subject}, ${x?.department?.title}, ${DateFormatorForCsv(x?.createdAt)}, ${type=="support_ticket"? DateFormatorForCsv(x?.issue_fix_date) + "," : ""} ${((type=="support_ticket" && index==1) || (type=="internal_ticket" && index == 3)) ? (DateFormatorForCsv(x?.resolve_date) + ",") : ""} ${tabs[type][index].key}, "${x?.description.replaceAll("\n", " ")}"\n`;
+						file += `${x?.member?.first_name}, ${x?.member?.last_name}, ${x?.member?.email}, ${x.subject}, ${x?.department?.title}, ${DateFormatorForCsv(x?.createdAt)}, ${type=="support_ticket"? DateFormatorForCsv(x?.issue_fix_date) + "," : ""} ${!!x?.last_action_date ? DateFormatorForCsv(x?.last_action_date) : "N/a"}, ${((type=="support_ticket" && index==1) || (type=="internal_ticket" && index == 3)) ? (DateFormatorForCsv(x?.resolve_date) + ",") : ""} ${tabs[type][index].key}, "${x?.description.replaceAll("\n", " ")}"\n`;
 				})
 				file = header + file;
 				const pathToWrite = 
