@@ -19,7 +19,6 @@ import EmptyView from '../../../components/EmptyView';
 import OptionModal from '../../../components/OptionModal';
 import ImageUploadModal from '../../../components/ImageUploadModal';
 import MyImage2 from '../../../components/MyImage2';
-import { S3_URL } from '../../../utilities/constants';
 import MyImage from '../../../components/MyImage';
 import MsgView from './MsgView';
 import ImageZoomer from '../../../components/ImageZoomer';
@@ -44,7 +43,7 @@ const MessageList = ({ navigation, route }) => {
   const insets = useSafeAreaInsets();
   const timezone = useSelector(selectTimeZone);
   const { socket } = useSelector(selectSocket);
-  const { token, user } = useSelector(selectUser);
+  const { token, user, S3_URL } = useSelector(selectUser);
   const [chat, setChat] = useState([]);
   const [loader, setLoader] = useState(false);
   const [footLoader, setFooterLoader] = useState(false);

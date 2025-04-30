@@ -60,6 +60,7 @@ import StackFeedReview from "../NestedStacks/StackFeedReview";
 import StackCommentReview from "../NestedStacks/StackCommentReview";
 import StackUpdates from "../NestedStacks/StackUpdates";
 import StackAffiliate from "../NestedStacks/StackAffiliate";
+import StackTemplates from "../NestedStacks/StackTemplates";
 
 
 
@@ -418,7 +419,7 @@ export const ParentComponents = {
     }
   },
 
-// Update Tab
+// Affilates Tab
   "c6148bbe-118f-492d-b1e7-bec092d7afec": {
     key: routes.affiliate,
     component: StackAffiliate,
@@ -427,6 +428,18 @@ export const ParentComponents = {
       key: "c6148bbe-118f-492d-b1e7-bec092d7afec"
     }
   },
+
+		
+// Templates Tab
+  // "0a3fc4be-fac3-46f2-a887-ae1e08f9d351": {
+  //   key: routes.templates,
+  //   component: StackTemplates,
+  //   params: {
+  //     value: "templates",
+		//   title:"Templates",
+  //     key: "0a3fc4be-fac3-46f2-a887-ae1e08f9d351"
+  //   }
+  // },
 
 }
 

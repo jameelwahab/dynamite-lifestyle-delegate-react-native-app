@@ -16,7 +16,6 @@ import StatusView from "../../../../components/StatusView"
 
 
 const RequestView = ({ item, index, openOptionModal, onDetail }) => {
-		console.log("here is the lead status", item?.payment_template?.lead_status)
   return (
     <View style={__styles.itemRootView}>
       <View style={__styles.profileView}>
@@ -38,6 +37,9 @@ const RequestView = ({ item, index, openOptionModal, onDetail }) => {
         <StatView title={"Initial Amount"} value={prependCurency(item?.currency) + " " + item?.initial_amount} />
         <StatView title={"Installment Amount"} value={prependCurency(item?.currency) + " " + item?.installment_amount} />
         <StatView title={"Month"} value={item?.month} />
+			{!!item?.sale_page  &&
+        <StatView title={"Sale Page"} value={item?.sale_page?.sale_page_title} />
+			}
         <StatView title={"Consider Purchasing User"} value={item?.consider_purchasing_user || "N/A"} />
 				<StatView
 						title={"Lead Status"}

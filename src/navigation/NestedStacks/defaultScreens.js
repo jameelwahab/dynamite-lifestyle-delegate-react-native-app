@@ -2,6 +2,7 @@ import MessageList from "../../screens/Chat/MessageList.js";
 import NotificationList from "../../screens/NotificationList";
 import ChangePassword from "../../screens/Profile/ChangePassword";
 import FeedKeywords from "../../screens/Profile/FeedKeywords";
+import ScheduleNotifications from "../../screens/Profile/ScheduleNotifications";
 import EditProfile from "../../screens/Profile/EditProfile";
 import ChangeAffiliateId from "../../screens/Settings/ChangeAffiliateId.js";
 import OtherSettings from "../../screens/Settings/OtherSettings";
@@ -35,6 +36,10 @@ export const defaultScreens = [
     name: routes.feedKeywords,
     component: FeedKeywords
   },
+  // {
+  //   name: routes.scheduleNotifications,
+  //   component: ScheduleNotifications
+  // },
   {
     name: routes.chatMessageList,
     component: MessageList

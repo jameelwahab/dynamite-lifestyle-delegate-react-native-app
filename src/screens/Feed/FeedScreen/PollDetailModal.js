@@ -8,11 +8,12 @@ import { convertTimezone2 } from '../../../functions/convertTime';
 import numFormatter from '../../../functions/numFormatter';
 import invokeApi from '../../../functions/invokeAPI';
 import MyImage from '../../../components/MyImage';
-import { S3_URL } from '../../../utilities/constants';
 import EmptyView from '../../../components/EmptyView';
 import MemberView from '../../../components/MemberView';
 import { icons } from '../../../utilities/icons';
 import { FEED_POLL_ACTIONS, FEED_POLL_DETAIL, FEED_POLLED_MEMBER_LIST } from '../../../DAL';
+import { useSelector } from 'react-redux'
+import { selectUser } from '../../../redux/reducers/userSlice'
 
 
 
@@ -29,6 +30,7 @@ const PollDetailModal = forwardRef(({ token, navigation, timezone, member, }, re
   const [memberList, setMemberList] = useState([]);
   const [listLoader, setListLoader] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const { S3_URL } = useSelector(selectUser)
 
   useImperativeHandle(ref, () => {
     return {

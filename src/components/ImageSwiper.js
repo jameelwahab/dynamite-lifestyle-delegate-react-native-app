@@ -1,13 +1,15 @@
 import { View, Text, FlatList, Pressable, Dimensions } from 'react-native'
 import React, { useRef, useState } from 'react'
 import MyImage from './MyImage'
-import { S3_URL } from '../utilities/constants'
 import SwiperFlatList from 'react-native-swiper-flatlist'
 import { colors } from '../utilities/colors'
 import ImageZoomer from './ImageZoomer'
+import { useSelector } from 'react-redux'
+import { selectUser } from '../redux/reducers/userSlice'
 
 const ImageSwiper = ({ list = [] }) => {
   const [selectedIndex, setIndex] = useState(0);
+  const { S3_URL } = useSelector(selectUser)
   const [imageForZoom, setImageForZoom] = useState("");
   const swiperRef = useRef();
 

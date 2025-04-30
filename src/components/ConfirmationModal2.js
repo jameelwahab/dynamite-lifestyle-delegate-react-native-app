@@ -66,7 +66,11 @@ const ConfirmationModal2 = forwardRef(({ }, ref) => {
               {title}
             </MyText>
             {!!subtitle &&
-              <MyText fontSize={18} type='medium' color={colors.primary}>
+              <MyText 
+								style={{marginTop:5}}
+								fontSize={16}
+								color={colors.white}
+								>
                 {subtitle}
               </MyText>}
           </View>

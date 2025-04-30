@@ -2,17 +2,20 @@ import { View, Text, Dimensions, Pressable } from 'react-native'
 import React, { createRef, useState } from 'react'
 import ImageZoomer from '../../../components/ImageZoomer'
 import ResponsiveImage2 from '../../../components/ResponsiveImage2'
-import { S3_URL } from '../../../utilities/constants'
 import SwiperFlatList from 'react-native-swiper-flatlist'
 import utilities from '../../../utilities'
 import MyImage from '../../../components/MyImage'
 import { fonts } from '../../../utilities/fonts'
 import MyText from '../../../components/MyText'
+import { useSelector } from 'react-redux'
+import { selectUser } from '../../../redux/reducers/userSlice'
 
 
 const ImagesForFeed = ({ index, list, swiper }) => {
+
   const swiperRef = createRef();
   const listRef = createRef();
+  const { S3_URL } = useSelector(selectUser)
 
   const [state, updateState] = useState({
     modalImages: [],

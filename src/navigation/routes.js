@@ -117,6 +117,7 @@ const routes = {
   changePassword: "CHANGE_PASSWORD_SCREEN",
   reminderSettings: "REMINDER_SETTINGS_SCREEN",
   feedKeywords: "FEED_KEYWORDS_SETTINGS_SCREEN",
+  scheduleNotifications: "SCHEDULE_NOTIFIICAtIONS_SETTINGS_SCREEN",
   zoomSettings: "ZOOM_SETTINGS_SCREEN",
   changeAffiliateIdScreen: "CHANGE_AFFILIATE_ID_SCREEN",
 
@@ -377,6 +378,18 @@ const routes = {
   // affilaite links 
   affiliate:"AFFILIATE_SCREEN",
   affiliateLinks:"AFFILIATE_LINKS_SCREEN",
+  
+  templates:"TEMPLATES_SCREEN",
+  templatesMain:"TEMPLATES_MAIN_SCREEN",
+  templateAddEdit:"TEMPLATES_EDIT_ADD_SCREEN",
+  templateSocialSetting:"TEMPLATES_SOCIAL_SETTING_SCREEN",
+  templateQuestionAnswers:"TEMPLATE_QUESTION_ANSWERS_SCREEN",
+  templateAnswersDetails: "TEMPLATE_ANSWERS_DETAILS",
+  templatePaymentPlans:"TEMPLATE_PAYMENT_PLANS",
+  templatePaymentManagePlan:"TEMPLATE_PAYMENT_PLAN_MANAGE_ACCESS"
+
+
+
 }
 
 

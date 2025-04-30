@@ -1,14 +1,18 @@
 import { View, Text, Image, StyleSheet } from "react-native"
 import { colors } from "../utilities/colors"
 import numFormatter from "../functions/numFormatter"
-import { S3_URL } from "../utilities/constants"
 import MyText from "./MyText"
 import MemberView from "./MemberView"
 import { icons } from "../utilities/icons"
+import { useSelector } from 'react-redux'
+import { selectUser } from '../redux/reducers/userSlice'
+
 const Contributor = ({ num, name, img, points, user, showBadge=true, secondaryText }) => {
 	const first = require("../assets/icons/1.png")
 	const second = require("../assets/icons/2.png")
 	const third = require("../assets/icons/3.png")
+
+		const { S3_URL }  = useSelector(selectUser)
 
 
 	return (

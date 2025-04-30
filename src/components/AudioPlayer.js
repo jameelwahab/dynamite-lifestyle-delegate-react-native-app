@@ -6,7 +6,6 @@ import { ActivityIndicator } from 'react-native';
 import SliderSimple from '@react-native-community/slider';
 import { Slider } from "@rneui/themed"
 import { colors } from '../utilities/colors';
-import { S3_URL } from '../utilities/constants';
 import { icons } from '../utilities/icons';
 import { textSize } from '../utilities/styles';
 import MyText from '../components/MyText';
@@ -14,6 +13,8 @@ import LinearGradient from "react-native-linear-gradient"
 import { SimpleLoader } from './MyLoader';
 import FontAwesome6 from "react-native-vector-icons/FontAwesome6"
 import Fontisto from "react-native-vector-icons/Fontisto";
+import { useSelector } from 'react-redux'
+import { selectUser } from '../redux/reducers/userSlice'
 
 
 const ic_audio = require("../assets/icons/audio.png")
@@ -27,6 +28,7 @@ const AudioPlayer = ({ stop = "", url, mission=false, title, desc }) => {
   const [loading, setLoading] = useState(false)
   const progress = useProgress();
   const [isPlaying, setPlaying] = useState(false);
+  const { S3_URL } = useSelector(selectUser)
 
 
   useEffect(() => {

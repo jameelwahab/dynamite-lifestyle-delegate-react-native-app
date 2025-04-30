@@ -7,7 +7,6 @@ import { selectUser } from '../../redux/reducers/userSlice'
 import MyLoader from '../../components/MyLoader'
 import { POD_DELEGATE_DETAIL } from '../../DAL'
 import ResponsiveImage2 from '../../components/ResponsiveImage2'
-import { S3_URL } from '../../utilities/constants'
 import MyWebview from '../../components/MyWebview'
 import { MyButton } from '../../components/MyButton'
 import openUrl from '../../functions/openUrl'
@@ -18,7 +17,7 @@ import { colors } from '../../utilities/colors'
 
 const DynamitePodDetail = ({ navigation, route }) => {
   const { slug } = route?.params
-  const { token } = useSelector(selectUser);
+  const { token, S3_URL } = useSelector(selectUser);
   const [pod, setPod] = useState(null)
   const [loader, setLoader] = useState(true);
 

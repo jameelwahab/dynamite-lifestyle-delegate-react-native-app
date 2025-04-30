@@ -8,7 +8,6 @@ import { icons } from '../../../utilities/icons';
 import ImageUploadModal from '../../../components/ImageUploadModal';
 import ImageZoomer from '../../../components/ImageZoomer';
 import MyImage from '../../../components/MyImage';
-import { S3_URL } from '../../../utilities/constants';
 import MyText from '../../../components/MyText';
 import { MyButton } from '../../../components/MyButton';
 import Modal from 'react-native-modal';
@@ -27,7 +26,7 @@ import FileViewer from "react-native-file-viewer";
 
 const oneFourthOfScreen = (utilities.windowWidth() - 40) / 4;
 const AddTicket = ({ navigation, route }) => {
-  const { token } = useSelector(selectUser);
+  const { token, S3_URL } = useSelector(selectUser);
   const { ticket: oldTicket } = route.params;
   const [loader, setLoader] = useState(false);
   const [images, setImages] = useState([{ type: "button" }]);

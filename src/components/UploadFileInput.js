@@ -3,12 +3,13 @@ import React, { useState } from 'react'
 import MyText from './MyText'
 import { colors } from '../utilities/colors'
 import MyImage from './MyImage'
-import { S3_URL } from '../utilities/constants'
 import { icons } from '../utilities/icons'
 import ImageUploadModal from './ImageUploadModal'
 import ImageZoomer from './ImageZoomer'
 import EmptyView from './EmptyView'
 import MyCheckBox from './MyCheckBox'
+import { useSelector } from 'react-redux'
+import { selectUser } from '../redux/reducers/userSlice'
 
 const UploadFileInput = ({
   label = "",
@@ -27,8 +28,10 @@ const UploadFileInput = ({
   multiple = false
 
 }) => {
+
   const [isImagePickerVisible, setIsImagePickerVisible] = useState(false);
   const [imageForZoom, setImageForZoom] = useState("")
+  const { S3_URL } = useSelector(selectUser)
 
   return (
 

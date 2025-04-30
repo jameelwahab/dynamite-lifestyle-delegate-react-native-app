@@ -16,7 +16,6 @@ import { selectUser } from '../../../redux/reducers/userSlice';
 import { ADD_TICKET_COMMENT, EDIT_TICKET_COMMENT, UPLOAD_TICKET_IMAGE } from '../../../DAL';
 import showToast from '../../../functions/showToast';
 import MyLoader from '../../../components/MyLoader';
-import { S3_URL } from '../../../utilities/constants';
 import MyImage from '../../../components/MyImage';
 import ImageZoomer from '../../../components/ImageZoomer';
 import getFileIconByType from '../../../functions/getFileIconByType';
@@ -28,7 +27,7 @@ const oneFourthOfScreen = (utilities.windowWidth() - 20) / 4;
 
 const TicketReply = ({ navigation, route }) => {
   const { isMine } = route?.params;
-  const { token } = useSelector(selectUser)
+  const { token, S3_URL } = useSelector(selectUser)
   const { msg } = route?.params;
   const [content, setContent] = useState(!!msg ? msg?.message : "");
   const [images, setImages] = useState([{ type: "button" }]);

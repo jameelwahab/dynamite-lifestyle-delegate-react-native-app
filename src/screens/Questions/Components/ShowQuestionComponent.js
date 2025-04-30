@@ -16,11 +16,11 @@ import Collapsible from 'react-native-collapsible'
 import { icons } from '../../../utilities/icons'
 import { MyButton } from '../../../components/MyButton'
 import openUrl from '../../../functions/openUrl'
-import { S3_URL } from '../../../utilities/constants'
 
 
 const ShowQuestionComponent = ({ item, index, onAddEditQuestion ,onDeleteQuestion}) => {
   const [isCollapsed, setIsCollapsed] = useState(index != 0);
+		const { S3_URL } = useSelector(selectUser)
 
   const findCollapsed = (id) => {
     return !!isCollapsed.find(x => x == id)

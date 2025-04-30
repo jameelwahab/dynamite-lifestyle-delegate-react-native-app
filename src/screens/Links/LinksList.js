@@ -133,11 +133,16 @@ const LinksList = ({ navigation, route }) => {
     if (type == "appointment") {
       link = websiteBaseUrl + item?.sale_page_title_slug + "/appointment";
       msg = "Appointment URL copied to clipboard"
-    } else if (type == "main") {
-      link = websiteBaseUrl + item?.sale_page_title_slug
-      msg = "Preview URL copied to clipboard"
-    }
-    copyText(link, msg)
+		} else if (type == "main") {
+						msg = "Preview URL copied to clipboard"
+				if(item?.type_of_page == "clickfunnel_page") {
+						link = item?.page_alias_url
+				}
+				else {
+						link = websiteBaseUrl + item?.sale_page_title_slug
+				}
+		}
+			copyText(link, msg)
   }
 
   const linkActon = (item, action) => {
@@ -149,7 +154,10 @@ const LinksList = ({ navigation, route }) => {
     } else if (item?.type_of_page == "sale_page") {
       link = websiteBaseUrl + item?.sale_page_title_slug + "/" + affiliate;
       msg = "Preview URL copied to clipboard"
-    }
+    } else if(item?.type_of_page == "clickfunnel_page") {
+				link = item?.page_alias_url;
+				msg = "Preview URL copied to clipboard"
+		}
 
     if (action == "copy") {
       copyText(link, msg)
@@ -163,7 +171,9 @@ const LinksList = ({ navigation, route }) => {
     let newList = []
     if (item?.type_of_page == "sale_page") {
       newList = list.slice().filter(x => x.type != "appointment")
-    } else {
+    } else if(item?.type_of_page == "clickfunnel_page"){
+				newList = list.slice().filter(x => x.type != "appointment")
+		} else {
       newList = [...list]
     }
 
@@ -184,7 +194,8 @@ const LinksList = ({ navigation, route }) => {
       style={__styles.copybtn} >
       <MyText color={colors.white} fontSize={12} type='medium'>
         {item?.type_of_page == "sale_page" ? "Copy Main URL " :
-          item?.type_of_page == "book_a_call_page" ? "Copy Appointment URL " : ""}
+          item?.type_of_page == "book_a_call_page" ? "Copy Appointment URL " : 
+          item?.type_of_page == "clickfunnel_page" ? "Copy Main URL  " :  ""}
       </MyText>
       {icons.copy(colors.primary, 15)}
     </TouchableOpacity>
@@ -192,7 +203,10 @@ const LinksList = ({ navigation, route }) => {
 
   const preview = (item) => (
     <TouchableOpacity
-      onPress={() => openUrl(websiteBaseUrl + item?.sale_page_title_slug + "/" + affiliate)}
+      onPress={() => openUrl(item?.type_of_page == "clickfunnel_page" ?
+					item?.page_alias_url :
+					(websiteBaseUrl + item?.sale_page_title_slug + "/" + affiliate)) 
+			}
       style={__styles.previewBtn} >
       <MyText color={colors.primary} >
         {"Preview "}
@@ -301,6 +315,11 @@ const tabs = [
     id: "book_a_call_page",
     index: 1,
     title: "BOOKING PAGES",
+  },
+  {
+    id: "clickfunnel_page",
+    index: 2,
+    title: "FUNNELS",
   },
 
 ]

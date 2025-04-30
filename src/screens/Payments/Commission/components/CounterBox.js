@@ -10,7 +10,9 @@ import { icons } from '../../../../utilities/icons'
 const CounterBox = ({
   color,
   count,
-  subTitle
+  subTitle,
+		icon=null,
+		normal=false,
 }) => {
   return (
     <View style={__style.box}>
@@ -20,10 +22,10 @@ const CounterBox = ({
         colors={[color + "55", color]}
         style={__style.gradientBox}
       >
-        {icons.pound(colors.primary)}
+        {icon ||icons.pound(colors.primary)}
       </LinearGradient>
 
-      <MyText style={{ marginTop: 10, textAlign: "center" }} fontSize={16} type='medium' >{"£ " + numFormatter(count, 2)}</MyText>
+      <MyText style={{ marginTop: 10, textAlign: "center" }} fontSize={16} type='medium' >{(normal ? "" :"£ ")  + numFormatter(count, 2)}</MyText>
       <MyText adjustsFontSizeToFit={true} fontSize={10} style={{ marginTop: 2, textAlign: "center",paddingHorizontal:3 }}>{subTitle}</MyText>
 
     </View>

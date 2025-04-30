@@ -10,8 +10,9 @@ import numFormatter from '../functions/numFormatter'
 import { colors } from '../utilities/colors'
 import isArray from '../functions/isArray'
 import Divider from '../UIComponents/Divider'
-import { S3_URL } from '../utilities/constants'
 import breakReference from '../functions/breakReference'
+import { useSelector } from 'react-redux'
+import { selectUser } from '../redux/reducers/userSlice'
 
 
 
@@ -21,7 +22,9 @@ const ic_calendar = require("../assets/icons/calendar.png");
 const ic_tropy = require("../assets/icons/trophy.png");
 
 const MissionRewardView = ({ isQuest = false, questReplayAccessDays = "", dateString = "", badges = [], showEarnedBadges = true, badgesEarned = [], showBadgesEarned = true, duration = 0, totalCoins = 0, acheivedCoins = 0, onReportPress }) => {
+
   const ref_info = useRef();
+  const { S3_URL } = useSelector(selectUser)
 
   const badgesView = (badgeList) => {
     let list = breakReference(badgeList);

@@ -1,12 +1,16 @@
 import { View, Text, StyleSheet } from 'react-native'
 import React from 'react'
 import ResponsiveImage2 from '../../../components/ResponsiveImage2'
-import { S3_URL } from '../../../utilities/constants'
 import utilities from '../../../utilities'
 import MyImage from '../../../components/MyImage'
 import { colors } from '../../../utilities/colors'
+import { useSelector } from 'react-redux'
+import { selectUser } from '../../../redux/reducers/userSlice'
 
 const HeaderBanner = ({ image, user ,}) => {
+
+		const { S3_URL } = useSelector(selectUser)
+
   return (
     <View style={{ margin: 10,minHeight:100 }}>
       <View style={__styles.imageView}>

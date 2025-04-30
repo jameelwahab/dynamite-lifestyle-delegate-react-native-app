@@ -5,14 +5,16 @@ import MyWebview from '../../../components/MyWebview'
 import utilities from '../../../utilities'
 import { colors } from '../../../utilities/colors'
 import ResponsiveImage from '../../../components/ResponsiveImage'
-import { S3_URL } from '../../../utilities/constants'
 import { MyButton } from '../../../components/MyButton'
 import ResponsiveImage2 from '../../../components/ResponsiveImage2'
 import openUrl from '../../../functions/openUrl'
+import { useSelector } from 'react-redux'
+import { selectUser } from '../../../redux/reducers/userSlice'
 
 const FeedEvents = ({ upcomingEvents, currentEvent, noticeboard, isEventFeed }) => {
 
 
+  const { S3_URL } = useSelector(selectUser)
 
   const eventView = (item, index) => {
     return (

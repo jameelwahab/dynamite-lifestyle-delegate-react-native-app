@@ -4,7 +4,6 @@ import RootView from '../../../components/RootView';
 import MyText from '../../../components/MyText';
 import MyWebview from '../../../components/MyWebview';
 import ResponsiveImage2 from '../../../components/ResponsiveImage2';
-import { S3_URL } from '../../../utilities/constants';
 import utilities from '../../../utilities';
 import { colors } from '../../../utilities/colors';
 import { MyButton } from '../../../components/MyButton';
@@ -15,7 +14,7 @@ import { selectTimeZone } from '../../../redux/reducers/timezoneSlice';
 
 const PortalEventsVideo = ({ navigation, route }) => {
   const { video } = route?.params;
-  const { token, user } = useSelector(selectUser);
+  const { token, user, S3_URL } = useSelector(selectUser);
   const timezone = useSelector(selectTimeZone);
   const [event,] = useState(video)
   const [isChatEnable, setIsChatEnable] = useState(false)

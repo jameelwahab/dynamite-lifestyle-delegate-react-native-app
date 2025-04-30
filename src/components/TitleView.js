@@ -1,10 +1,11 @@
 import { View, Image, Text, StyleSheet, Pressable } from 'react-native'
 import React from 'react'
 import { icons } from '../utilities/icons'
-import { S3_URL } from "../utilities/constants"
 import { colors } from '../utilities/colors'
 import { useNavigation } from '@react-navigation/native'
 import { fonts } from '../utilities/fonts'
+import { useSelector } from 'react-redux'
+import { selectUser } from '../redux/reducers/userSlice'
 
 const TitleView = ({
   onBackButtonPress,
@@ -16,7 +17,10 @@ const TitleView = ({
   customStyle,
   original=false
 }) => {
+
   const navigation = useNavigation()
+		const { S3_URL } = useSelector(selectUser)
+
   return (
     <View style={[__header.secondView, customStyle]}>
       {!hideBackBottomButton &&

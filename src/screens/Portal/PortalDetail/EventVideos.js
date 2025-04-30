@@ -3,15 +3,18 @@ import React from 'react'
 import { MyButton } from '../../../components/MyButton'
 import ResponsiveImage2 from '../../../components/ResponsiveImage2'
 import MyWebview from '../../../components/MyWebview'
-import { S3_URL } from '../../../utilities/constants'
 import utilities from '../../../utilities'
 import { colors } from '../../../utilities/colors'
 import MyText from '../../../components/MyText'
 import routes from '../../../navigation/routes'
 import EmptyView from '../../../components/EmptyView'
 import AudioPlayerForList from '../../../components/AudioPlayerForList'
+import { useSelector } from 'react-redux'
+import { selectUser } from '../../../redux/reducers/userSlice'
+
 const EventVideos = ({ selectedEvent: event, navigation }) => {
 
+  const { S3_URL } = useSelector(selectUser)
 
   const onVideoDetailScreen = (video) => {
     navigation.navigate(routes?.portalEventVidoScreen, {
