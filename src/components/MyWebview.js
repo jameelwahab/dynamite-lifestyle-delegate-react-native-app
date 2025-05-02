@@ -18,9 +18,10 @@ import { selectUser } from "../redux/reducers/userSlice";
 const MyWebview = ({
   html: rawHtml, style, baseStyle, spanColor, fullWidth, width, invert 
 }) => {
+  console.log(rawHtml,"rawHtml")
   const { S3_URL } = useSelector(selectUser)
   // Preprocess HTML
-  const html = useMemo(() => {
+  const htmlModified = useMemo(() => {
     let processed = "<div>" + rawHtml.replace(/padding:/g, "") + "</div>";
     processed = "<div>" + processed.replace(/height:100%/g, "") + "</div>";
 
@@ -64,7 +65,7 @@ const MyWebview = ({
     <RenderHTML
       WebView={WebView}
       contentWidth={contentWidth}
-      source={{ html, baseUrl: '' }}
+      source={{ html:htmlModified, baseUrl: '' }}
       customHTMLElementModels={customHTMLElementModels}
       renderers={renderers}
       enableExperimentalMarginCollapsing={true}
@@ -75,19 +76,19 @@ const MyWebview = ({
         a: {
           color: colors.primary,
           textDecorationColor: colors.primary,
-          fontFamily: rawHtml.includes('<b>') ? undefined : fonts.regular,
+          fontFamily: htmlModified.includes('<b>') ? undefined : fonts.regular,
           fontSize: 16,
           margin: 0,
         },
         div: {
           color: invert ? colors.black : colors.white,
-          fontFamily: rawHtml.includes('<b>') ? undefined : fonts.regular,
+          fontFamily: htmlModified.includes('<b>') ? undefined : fonts.regular,
           margin: 0,
         },
         span: {
-          fontFamily: rawHtml.includes('<b>') ? undefined : fonts.light,
+          fontFamily: htmlModified.includes('<b>') ? undefined : fonts.light,
           margin: 0,
-          lineHeight: 12,
+          lineHeight: 20,
           fontSize: 13,
           color: invert ? colors.black : colors.lightText,
         },
