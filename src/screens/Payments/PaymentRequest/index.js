@@ -199,11 +199,11 @@ const PaymentRequest = ({ navigation, route }) => {
   const callAPI = (refresh = false) => {
     page = 0;
     canLoadMore = false;
-    setTotal(0)
-    setList([])
     if (refresh) {
       setRefreshing(true);
     } else {
+      setTotal(0)
+      setList([])
       setLoader(true);
     }
     api_payment_request_list(true)
@@ -350,6 +350,12 @@ const PaymentRequest = ({ navigation, route }) => {
           // ListHeaderComponent={topView()}
           // stickyHeaderIndices={[0]}
           // stickyHeaderHiddenOnScroll={true}
+          refreshControl={
+            <MyRefreshControl
+              refreshing={refreshing}
+              onRefresh={() => callAPI(true)}
+            />
+          }
           renderItem={itemView}
           onEndReached={loadMore}
           ListEmptyComponent={!loader && !refreshing && <EmptyView label={'No Payment Requests Found'} />}
@@ -359,7 +365,7 @@ const PaymentRequest = ({ navigation, route }) => {
           windowSize={5}
         />
       </View>
-      <FAB icon={icons.plus} onPress={onAddPaymentRequest} />
+      <FAB icon={()=>icons.plus(colors.black)} onPress={onAddPaymentRequest} />
       <MyLoader enable={loader} />
 
       <OptionModal
