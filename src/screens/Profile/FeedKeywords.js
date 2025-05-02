@@ -1,4 +1,3 @@
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import RootView from '../../components/RootView'
 import MyCheckBox from "../../components/MyCheckBox"
 import isArray from "../../functions/isArray"
@@ -27,7 +26,7 @@ const FeedKeywords = ({ navigation }) => {
 	const ref_email_modal = useRef();
 	const ref_message_modal = useRef();
 	const ref_notification_modal = useRef();
-	const [cc, setCc] = useState([""])
+	const [cc, setCc] = useState([])
 	const [feedKeywordSetting, setFeedKeywordSetting] = useState([])
 	const [loader, setLoader] = useState(false);
 
@@ -129,6 +128,7 @@ const FeedKeywords = ({ navigation }) => {
 			setLoader(false)
 		}
 	}
+		// useEffect(()=> console.log(cc), [cc])
 
 	const __keywordConfigurationView = ({ item, index }) => {
 		return (

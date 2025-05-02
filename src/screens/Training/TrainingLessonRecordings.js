@@ -10,7 +10,6 @@ import ResponsiveImage2 from '../../components/ResponsiveImage2'
 import WebPlayer from '../../components/WebPlayer'
 import AudioPlayer from '../../components/AudioPlayer'
 import MyWebview from '../../components/MyWebview'
-import { S3_URL } from '../../utilities/constants'
 import utilities from '../../utilities'
 import { colors } from '../../utilities/colors'
 import { icons } from '../../utilities/icons'
@@ -18,7 +17,7 @@ import VimeoWithPip from '../../components/VimeoWithPip'
 
 const TrainingLessonRecordings = ({ navigation, route }) => {
   let { slug } = route?.params;
-  let { token, user } = useSelector(selectUser);
+  let { token, user, S3_URL } = useSelector(selectUser);
   const [loader, setLoader] = useState(true);
   const [recording, setRecording] = useState(null)
   const [prevRecording, setPrevRecording] = useState(null);

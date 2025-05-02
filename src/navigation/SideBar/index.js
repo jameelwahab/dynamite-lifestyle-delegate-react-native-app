@@ -8,7 +8,6 @@ import { ChildComponents, ParentComponents, } from './List';
 import Collapsible from 'react-native-collapsible';
 import { selectNavbar } from '../../redux/reducers/navbarSlice';
 import { useDispatch, useSelector } from 'react-redux';
-import { S3_URL } from '../../utilities/constants';
 import { selectSettings } from '../../redux/reducers/settingSlice';
 import MyImage2 from '../../components/MyImage2';
 import ResponsiveImage2 from '../../components/ResponsiveImage2';
@@ -37,7 +36,7 @@ const index = (props) => {
   const dispatch = useDispatch()
   const isDrawerOpen = useDrawerStatus() == "open";
   const { navbar } = useSelector(selectNavbar);
-  const { token, user } = useSelector(selectUser);
+  const { token, user, S3_URL } = useSelector(selectUser);
   const { settings } = useSelector(selectSettings);
   const { socket } = useSelector(selectSocket);
   const [isCollapsed, setCollapsed] = useState([]);

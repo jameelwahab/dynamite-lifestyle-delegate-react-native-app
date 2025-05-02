@@ -12,7 +12,6 @@ import WebPlayer from '../../components/WebPlayer'
 import Tabs from '../../components/Tabs'
 import routes from '../../navigation/routes'
 import { GET_TRAINING_DETAIL, GET_TRAINING_LESSONS_DETAIL } from '../../DAL'
-import { S3_URL } from '../../utilities/constants'
 import { colors } from '../../utilities/colors'
 import utilities from '../../utilities'
 import ResponsiveImage from '../../components/ResponsiveImage'
@@ -25,7 +24,7 @@ import EmptyView from '../../components/EmptyView'
 
 const TrainingLessonDetail = ({ navigation, route }) => {
   let { slug } = route?.params;
-  let { token, user } = useSelector(selectUser);
+  let { token, user, S3_URL } = useSelector(selectUser);
   const [selecedSlug, setSlug] = useState(slug)
   const [loader, setLoader] = useState(true);
   const [data, setData] = useState(null);

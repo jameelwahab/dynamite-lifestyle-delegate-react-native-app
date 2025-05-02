@@ -113,7 +113,7 @@ export const CREATE_FEED = ({ token, navigation, formData }) => {
   return invokeApi({
     // path: `api/feeds/delegate_portal/create`,
     // path: "api/feeds/delegate_portal/create_with_poll",
-    path: "api/feeds/delegate_portal/create_with_poll/v3",
+    path: "api/feeds/delegate_portal/create_with_poll/v4",
     headers: { 'Content-Type': 'multipart/form-data' },
     method: "POST",
     postData: formData,
@@ -136,7 +136,7 @@ export const UPDATE_FEED = ({ token, navigation, formData, feedId }) => {
   return invokeApi({
     // path: `api/feeds/update_feed_by_delegate/${feedId}`,
     // path: `api/feeds/update_feed_by_delegate_with_poll/${feedId}`,
-    path: `api/feeds/update_feed_by_delegate_with_poll/v2/${feedId}`,
+    path: `api/feeds/update_feed_by_delegate_with_poll/v3/${feedId}`,
     headers: { 'Content-Type': 'multipart/form-data' },
     method: "PUT",
     postData: formData,
@@ -257,7 +257,8 @@ export const GET_DELEGATES_LIST_FROM_SERVER_FOR_MENTION_V1 = ({ token, navigatio
       search_text,
       event_id,
       type,
-      allow_all_option_in_mention_feed
+      allow_all_option_in_mention_feed,
+				community_levels
     },
     token,
     navigation,

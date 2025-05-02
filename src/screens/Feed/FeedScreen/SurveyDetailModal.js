@@ -9,9 +9,10 @@ import { colors } from '../../../utilities/colors';
 import MemberView from '../../../components/MemberView';
 import { convertTimezone2 } from '../../../functions/convertTime';
 import MyImage from '../../../components/MyImage';
-import { S3_URL } from '../../../utilities/constants';
 import EmptyView from '../../../components/EmptyView';
 import { icons } from '../../../utilities/icons';
+import { useSelector } from 'react-redux'
+import { selectUser } from '../../../redux/reducers/userSlice'
 import Toast from 'react-native-toast-message';
 
 
@@ -27,6 +28,7 @@ const SurveyDetailModal = forwardRef(({ token, member, navigation, timezone }, r
   const [memberList, setMemberList] = useState([]);
   const [listLoader, setListLoader] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const { S3_URL } = useSelector(selectUser)
 
   useImperativeHandle(ref, () => {
     return {

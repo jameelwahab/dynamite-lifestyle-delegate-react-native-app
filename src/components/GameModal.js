@@ -8,8 +8,9 @@ import Modal from 'react-native-modal';
 import { colors } from '../utilities/colors';
 import MyRefreshControl from './MyRefreshControl';
 import MyImage from './MyImage';
-import { S3_URL } from '../utilities/constants';
 import { check, cross } from '../utilities/icons';
+import { useSelector } from 'react-redux'
+import { selectUser } from '../redux/reducers/userSlice'
 
 const GameModal = ({ isVisible, closeModal, selectGame, value, multiple = false }) => {
   const [state, updateState] = useState({
@@ -20,6 +21,7 @@ const GameModal = ({ isVisible, closeModal, selectGame, value, multiple = false 
     selectedSport: null,
   })
   const setData = (updation) => updateState({ ...state, ...updation })
+  const { S3_URL } = useSelector(selectUser)
 
 
   const api_gameslist = async () => {

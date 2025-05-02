@@ -19,7 +19,6 @@ import { dateTimeFormat, months } from "../../utilities/constants"
 import { fonts } from "../../utilities/fonts"
 import { colors } from "../../utilities/colors"
 import { icons } from "../../utilities/icons"
-import { S3_URL } from "../../utilities/constants"
 import { textSize } from "../../utilities/styles"
 import { GET_MISSION_DETAIL, GET_MISSION_INFO } from "../../DAL"
 import { selectUser } from '../../redux/reducers/userSlice'

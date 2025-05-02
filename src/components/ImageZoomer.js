@@ -13,7 +13,6 @@ import {
 import React, { useEffect, useState } from 'react';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import Modal from 'react-native-modal';
-import { S3_URL } from '../utilities/constants';
 import { icons } from '../utilities/icons';
 import { colors } from '../utilities/colors';
 import { SimpleLoader } from './MyLoader';
@@ -21,6 +20,8 @@ import List from '../screens/Notes/List';
 import MyText from './MyText';
 import downloadImage from '../functions/downloadImage';
 import Toast from 'react-native-toast-message';
+import { useSelector } from 'react-redux'
+import { selectUser } from '../redux/reducers/userSlice'
 
 const ImageZoomer = ({
   visible,
@@ -31,6 +32,7 @@ const ImageZoomer = ({
   url,
   noUrl = false,
 }) => {
+		const { S3_URL } = useSelector(selectUser)
   const [curIndex, setIndex] = useState(0);
   useEffect(() => {
     setIndex(index)

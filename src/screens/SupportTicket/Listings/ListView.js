@@ -10,7 +10,7 @@ import { CHANGE_DEPARTMENT_OF_TICKET, MARK_RESOLVE_TICKET, MOVE_TICKET, SUPPORT_
 import MyLoader, { SimpleLoader } from '../../../components/MyLoader';
 import { useSelector } from 'react-redux';
 import { selectUser } from '../../../redux/reducers/userSlice';
-import { dateTimeFormat, S3_URL } from '../../../utilities/constants';
+import { dateTimeFormat } from '../../../utilities/constants';
 import moment from 'moment';
 import EmptyView from '../../../components/EmptyView';
 import MyImage from '../../../components/MyImage';
@@ -26,7 +26,7 @@ import { selectTimeZone } from '../../../redux/reducers/timezoneSlice';
 import MyInputs from '../../../components/MyInputs';
 
 
-const ListView = ({ isLoading, list, active, route, departmentList, token, refresh, user, setLoader, isLoadingMore, loadMore, type }) => {
+const ListView = ({ isLoading, list, active, route, departmentList, token, refresh, user, setLoader, isLoadingMore, loadMore, type, }) => {
   const timezone = useSelector(selectTimeZone);
   const [isOptionModalShown, setIsOptionModal] = useState({ isVisible: false, for: "" })
   const [isDepartmentModalShown, setIsDepartmentModalShown] = useState(false);
@@ -54,11 +54,11 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
 
     else if (option.key == "detail") {
       navigation.navigate(routes.supportTicketDeatail, {
-        ticket: isOptionModalShown.for
+        ticket: isOptionModalShown.for,
+					route,
       })
       setIsOptionModal({ isVisible: false, for: "" })
     }
-
 
 
     else if (option.key == "move_to_needs_fixes") {
@@ -528,7 +528,7 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
           navigation.navigate(routes.supportTicketDeatail, {
             ticket: item,
             refreshList: refresh,
-            route: route
+            route: route,
           })
         }}
         // onLongPress={() => setIsOptionModal({ isVisible: true, for: item })}
@@ -549,11 +549,10 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
                 <MyText fontSize={14} type='medium' >{!!item?.member?.first_name ? item?.member?.first_name + " " + item?.member?.last_name : "N/A"}</MyText>
               </View>
               <View style={{ flexDirection: "row", alignItems: "center", }}>
-                <View style={{ alignItems: "flex-end" }}>
-                  <MyText fontSize={10} type='light'>{convertTimezone2(!!item?.last_action_date ? item.last_action_date : item?.support_ticket_date, timezone).fromNow()}</MyText>
-                  
-
-
+                <View style={{ alignItems: "flex-end", marginRight:5 }}>
+                  <MyText
+												fontSize={10}
+												type='light'>{convertTimezone2(!!item?.last_action_date ? item.last_action_date : item?.support_ticket_date, timezone).fromNow()}</MyText>
                 </View>
                 <MenuButton
                   // backgroundColor={colors.transparent}
@@ -564,7 +563,7 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
             </View>
             {route == "need_fixes" &&
                     <MyText style={{}}   color={colors.white} fontSize={12} >{`Target Date: ${moment(item?.issue_fix_date).format(dateTimeFormat.date)}`}</MyText>}
-            <MyText style={{ marginTop: 3 }} fontSize={12} >{item?.subject}</MyText>
+           <MyText style={{ marginTop: 3 }} fontSize={12} >{item?.subject}</MyText>
             <MyText style={{ marginTop: 3 }} numberOfLines={1} color={colors.lightText} fontSize={12} >
               {item?.description.slice(0, 60)}
             </MyText>
@@ -590,6 +589,7 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
         <FlatList
           data={list}
           indicatorStyle="white"
+				  showsVerticalScrollIndicator={false}
           keyExtractor={(item, index) => index.toString()}
           renderItem={renderList}
           ListEmptyComponent={!isLoading && active && <EmptyView />}

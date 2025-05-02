@@ -14,7 +14,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useDispatch, useSelector } from 'react-redux';
 import { selectUser, setConsultant, } from '../../redux/reducers/userSlice'
 import ImageUploadModal from '../../components/ImageUploadModal'
-import { S3_URL } from '../../utilities/constants'
 import timeZones from '../../assets/data/timeZones.json'
 import TimeZoneModal from '../../components/TimeZoneModal'
 import { EDIT_PROFILE } from '../../DAL'
@@ -30,7 +29,7 @@ const EditProfile = ({ navigation }) => {
   const [loader, setLoader] = useState(false)
   const pickerRef = useRef();
   const dispatch = useDispatch()
-  const { user, token } = useSelector(selectUser);
+  const { user, token, S3_URL } = useSelector(selectUser);
   const [userData, updateUser] = useState({
     imageToUpload: "",
     alreadyUploadedImage: user?.image?.thumbnail_1,

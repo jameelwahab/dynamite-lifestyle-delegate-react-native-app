@@ -19,7 +19,6 @@ import ConfirmationModal from '../../../components/ConfirmationModal';
 import LikeModalForComments from './LikeModalForComments';
 import ImageUploadModal from '../../../components/ImageUploadModal';
 import MyImage from '../../../components/MyImage';
-import { S3_URL } from '../../../utilities/constants';
 import ImageZoomer from '../../../components/ImageZoomer';
 import Collapsible from 'react-native-collapsible';
 import MemberView from '../../../components/MemberView';
@@ -65,7 +64,7 @@ const CommentModal = ({
   isChatAllowed,
   keywords
 }) => {
-  const { access } = useSelector(selectUser);
+  const { access, S3_URL } = useSelector(selectUser);
   const cmtTextInputRef = useRef();
   const likeModalRef = useRef();
   const [commentText, setCommentText] = useState("");
@@ -261,11 +260,12 @@ const CommentModal = ({
   }
 
   const getTheDelegateListFromServer = async (text) => {
+			if(!isVisible) return;
     setMentionListLoading(true);
     let res = await GET_DELEGATES_LIST_FROM_SERVER_FOR_MENTION_V1({
       navigation, token, data: {
         search_text: text,
-        community_levels: !isNoteMainFeed ? [feedCreatedFor] : undefined,
+        community_levels: !isNoteMainFeed ? feedCreatedFor.map(el=>el?._id) : undefined,
         event_id: isNoteMainFeed ? eventId : undefined,
         list_type: isCosmos ? "the_cosmos" : "the_source",
         allow_all_option_in_mention_feed: !isCosmos && !isNoteMainFeed ? access.allow_all_option_in_mention_feed : undefined,

@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, TextInput, Pressable, ScrollView, useWindowDimensions, Image } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, TextInput, Pressable, Platform, ScrollView, useWindowDimensions, Image } from 'react-native'
 import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import UserImage from '../../../components/UserImage'
 import Modal from 'react-native-modal'
@@ -15,6 +15,7 @@ import utilities from '../../../utilities'
 import MyImage from '../../../components/MyImage'
 import OptionModal from '../../../components/OptionModal'
 import Toast from 'react-native-toast-message'
+import MyChip from "../../../components/MyChip"
 import { CREATE_FEED, FEED_DETAIL, GET_DELEGATES_LIST_FROM_SERVER_FOR_MENTION_V1, GET_KEYWORDS_ADDED_BY_USER, UPDATE_FEED, UPLOAD_FEED_IMAGES } from '../../../DAL'
 import showToast from '../../../functions/showToast'
 import { S3_URL, communityLevelWithAllObj, dateTimeFormat } from '../../../utilities/constants'
@@ -44,7 +45,6 @@ import breakReference from '../../../functions/breakReference'
 
 
 
-
 let cursor = {
   start: 0,
   end: 0
@@ -62,7 +62,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   isFeedFilterAllowed,
   isNoteMainFeed,
   isMissionFeed,
-  hideOnlyAddPostView = false
+  hideOnlyAddPostView = false,
 
 }, ref) => {
 
@@ -71,7 +71,6 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   const inset = useSafeAreaInsets();
   const ref_poll = useRef()
   const ref_survey = useRef()
-  const ref_badges = useRef()
 
   const { socket } = useSelector(selectSocket);
   const lvlModalRef = useRef()
@@ -83,7 +82,8 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   const [feedTypeModalVisibility, setFeedTypeModalVisibility] = useState(false)
   const [notifyUser, setNotifyUser] = useState(false);
   const [memberList, setMemberList] = useState([])
-  const [badge, setBadge] = useState({ title: "All", key: "all" })
+	const [badges, setBadge] = useState([access.badge_levels[0]])
+  const [showBadges, setShowBadges] = useState({isVisible:false, list:access.badge_levels})
   const [options, setOption] = useState({
     list: [],
     type: "",
@@ -128,13 +128,15 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   const [eventModalVisible, setEventModalVisible] = useState(false)
   const [multipleLevelModalVisiblity, setMultipleLevelModalVisiblity] = useState(false);
   const [pollData, setPollData] = useState(null);
+  const [actionBy, setActionBy] = useState("");
   const [surveyData, setSurveyData] = useState(null);
   const [notifyTxt, setNotifyTxt] = useState({ state: "", desc: "" })
+		const [badgeFor, setBadgeFor] = useState( access?.multiple_levels_in_source_all_source_scadule_feeds ? 
+				{title:"All", key:"all"} : { title:"Specific", key:"specific"} )
 
 
   useEffect(() => {
     let text = postText;
-
     //* For Mention
     if (text[cursor?.start] == "@" || text == "@") {
       // let _at_index = !!cursor?.start ? cursor?.start : 0;
@@ -324,6 +326,20 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   }
 
   const selectItemForEdit = (item) => {
+			setActionBy(item?.action_info?.action_by)
+			if(isArray(item?.feed_badge_levels)){
+					setBadge(item?.feed_badge_levels)
+					setBadgeFor({title:"Specific", key:"specific"})
+			}
+
+			if(!isCosmos && !isNoteMainFeed){
+					if(!access?.multiple_levels_in_source_all_source_scadule_feeds && item.feed_badge_levels.length > 1){
+							setShowBadges({ ...showBadges, list:item?.feed_badge_levels })
+					}else{
+							setShowBadges({ ...showBadges, list:access.badge_levels })
+					}
+			}
+
     setEditId(item._id);
     setEditFeed(item);
     setPostCategory(item?.feed_appear_by == "public" ? "general" : "win");
@@ -407,10 +423,28 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
       start: 0,
       end: 0
     };
-    setBadge({ title: "All", key: "all" })
+    setBadge([access.badge_levels[0]])
+		setShowBadges({isVisible:false, list:access.badge_levels })
+		setBadgeFor( access?.multiple_levels_in_source_all_source_scadule_feeds ? 
+				{title:"All", key:"all"} : { title:"Specific", key:"specific"} )
     setNotifyUser(false)
     setNotifyTxt({ state: "", desc: "" })
+		setActionBy("")
+
   }
+
+		const filterTheBadgeList = (list) => {
+
+				if(!!list && badges.length == list.length){
+						return [{title:"No options", key:"no"}]
+				} 
+				else if(badges.length ==0){
+						return list
+				} 
+				else {
+						return list.filter(el=> badges.findIndex(x=> x._id == el._id) < 0 && el  )
+				}
+		}
 
   const openOptionModal = (Modalfor) => {
     if (Modalfor == "category") {
@@ -420,13 +454,21 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
         type: Modalfor
       })
     }
+
     else if (Modalfor == "badges") {
       setOption({
-        list: [{ title: "All", key: "all" }, ...access?.badge_levels],
+        list: filterTheBadgeList(access?.badge_levels ),
         visibility: true,
         type: Modalfor
       })
-    }
+    } else if(Modalfor = "badgeFor"){
+      setOption({
+					list:[{title:"All", key:"all"}, 
+							{ title:"Specific", key:"specific"}], 
+        visibility: true,
+        type: Modalfor
+      })
+		}
     else if (Modalfor == "createdFor") {
       let arr = [];
       if (isCosmos) {
@@ -462,7 +504,9 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
       setPostCategory(opt.type)
     } else if (options?.type == "createdFor") {
       setPostCreatedFor(opt.type)
-    } else if (options?.type == "badges") setBadge(opt)
+    } else if (options?.type == "badgeFor"){
+				setBadgeFor(opt)
+		}
 
     closeOptionModal()
   }
@@ -488,6 +532,25 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   const checkSelected = (opt) => {
     return !!postCeatedForArray.find(x => x.type == opt.type)
   }
+
+		const onBadgeSelect = (opt) => {
+				if(access?.multiple_levels_in_source_all_source_scadule_feeds || showBadges.list.length != access.badge_levels.length){
+						if(badges.findIndex(x=> x._id == opt._id) > -1){
+								setBadge(badges.filter(el=> el._id != opt._id))
+						}
+
+						else{
+								setBadge([...badges, opt])
+						}
+				}else{
+						setBadge([opt])
+						setShowBadges({...showBadges, isVisible:false})
+				}
+		}
+		
+		const badgeCheckSelected = (opt) => {
+				return !!badges.find(x=> x._id==opt._id)
+		}
 
   const areTextValuesUnique = (arr) => {
     const textSet = new Set();
@@ -651,16 +714,25 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
       }
     }
 
-    if (!isCosmos && !isNoteMainFeed && !editId) {
-      console.log("badges here", badge)
-      fd.append("show_feed_to", badge.title.toLowerCase() != "all" ? badge._id : "all")
+    if (!isCosmos && !isNoteMainFeed) {
+				if(badges.length == 0 && badgeFor.key != "all") {
+						showToast({ body: "Please Specify a badge level", title: "Alert", type: "info" })
+						setLoader(false);
+						return;
+				}
+				if(badgeFor.key == "all"){
+						fd.append("show_feed_to", badgeFor.key)
+				} else {
+						fd.append("show_feed_to", badgeFor.key)
+						fd.append("feed_badge_level_ids", JSON.stringify(badges.map(x=> x?._id)) )
+				}
     }
 
     if (notifyUser) {
       fd.append("notify_users", notifyUser);
       fd.append("notification_statement", notifyTxt.state);
       fd.append("notification_description", notifyTxt.desc);
-    }
+    } 
 
     if (!!pollData) {
       if (postType == "poll") {
@@ -780,11 +852,12 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   }
 
   const getTheDelegateListFromServer = async (text) => {
+			console.log("called from add and edit post")
     setMentionListLoading(true);
     let res = await GET_DELEGATES_LIST_FROM_SERVER_FOR_MENTION_V1({
       navigation, token, data: {
         search_text: text,
-        community_levels: isNoteMainFeed ? undefined : isCosmos ? [postCeatedFor] : !!editId ? [postCeatedFor] : postCeatedForArray.map(x => x.type),
+        community_levels: isNoteMainFeed ? undefined : isCosmos ? [postCeatedFor] : badges.map(el=> el?._id),
         event_id: isNoteMainFeed ? eventId : undefined,
         list_type: isCosmos ? "the_cosmos" : "the_source",
         type: isEventFeed ? "event" : isProgramFeed ? "program" : undefined,
@@ -801,11 +874,10 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
   }
 
   const getTheDelegateListFromServerForSpecificFeed = async (text) => {
-
+			if(!eventModalVisible) return;
     let res = await GET_DELEGATES_LIST_FROM_SERVER_FOR_MENTION_V1({
       navigation, token, data: {
         search_text: text,
-        community_levels: feedLevel == "all" ? undefined : feedLevel,
         event_id: undefined,
         list_type: "the_source",
       }
@@ -1138,21 +1210,28 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
                 {/* //* Dropdown btns */}
                 <View style={{ marginLeft: 10, flex: 1 }}>
                   <MyText fontSize={16} type="bold">{user?.first_name + " " + user?.last_name}</MyText>
-                  {(!isCosmos && !isNoteMainFeed && !editId) &&
+											{(!isCosmos && !isNoteMainFeed && actionBy=="consultant_user") &&
                     <View style={{ flexDirection: "row", alignItems: "center", marginTop: 5 }}>
-                      <TouchableOpacity
-                        style={__style.modalDropBtns}>
-                        <MyText>{"Publish"}</MyText>
-                      </TouchableOpacity>
-
-                      <TouchableOpacity
-                        onPress={() => openOptionModal("badges")}
-                        style={__style.modalDropBtns}>
-                        <MyText style={{ marginRight: 5 }}>{badge.title}</MyText>
-                        {icons.downwardArrow(17, colors.white)}
-                      </TouchableOpacity>
+													{ access?.multiple_levels_in_source_all_source_scadule_feeds &&  
+															<TouchableOpacity
+																onPress={()=> openOptionModal("badgeFor") }
+																style={__style.modalDropBtns}>
+																		<MyText>{badgeFor.title}</MyText>
+																</TouchableOpacity>
+													}
+												{	badgeFor.key != "all" &&
+										    <TouchableOpacity
+														onPress={() => setShowBadges({ ...showBadges, isVisible:true })}
+														style={__style.modalDropBtns}>
+														<MyText 
+																style={{ marginRight: 5, maxWidth:Platform.OS=="android" ? 170 : 270 }}>
+																{badges.map((el,i)=> i==0 ? el.title : `, ${el.title}`)}
+														</MyText>
+														{icons.downwardArrow(17, colors.white)}
+												</TouchableOpacity>
+											}
                     </View>
-                  }
+											}
                   <View style={__style.modalActionButtonRow}>
 
                     {/* <TouchableOpacity
@@ -1716,6 +1795,15 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
             checkSelected={checkSelected}
           />
 
+				<OptionModal
+            isVisible={showBadges.isVisible}
+            optionList={showBadges.list}
+            closeModal={() => setShowBadges({...showBadges, isVisible:false})}
+            onSelected={onBadgeSelect}
+            multiple={true}
+            checkSelected={badgeCheckSelected}
+          />
+
 
 
 
@@ -1972,6 +2060,7 @@ const FeedTypeList = [
   },
 
 ]
+
 
 const __style = StyleSheet.create({
   lvlbtnView: {
@@ -2244,4 +2333,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.white,
   },
+		viewCards:{
+				flexWrap: "wrap",
+				position: "relative",
+				zIndex: 10 
+		},
+		viewContainer:{
+				flexDirection: "row",
+				flex: 1, alignItems: "center",
+				flexWrap: "wrap",
+				paddingVertical: 2,
+		},
 });

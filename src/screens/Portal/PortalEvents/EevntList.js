@@ -9,7 +9,6 @@ import MyText from '../../../components/MyText';
 import StatView from '../../Members/Components/StatView';
 import { colors } from '../../../utilities/colors';
 import MyImage from '../../../components/MyImage';
-import { S3_URL } from '../../../utilities/constants';
 import { MenuButton } from '../../../components/MyButton';
 import OptionModal from '../../../components/OptionModal';
 import { icons } from '../../../utilities/icons';
@@ -23,7 +22,7 @@ import ImageZoomer from '../../../components/ImageZoomer';
 
 const EevntList = ({ navigation, route }) => {
   const { eventId, slug } = route?.params;
-  const { token } = useSelector(selectUser);
+  const { token, S3_URL } = useSelector(selectUser);
   const [loader, setLoader] = useState(true);
   const [list, setList] = useState([]);
   const [imageForZoom, setImageForZoom] = useState("")

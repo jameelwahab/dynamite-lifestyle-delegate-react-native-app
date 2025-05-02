@@ -2,7 +2,6 @@ import { Image, Platform, Pressable, StyleSheet, Text, TouchableWithoutFeedback,
 import { fonts } from "../utilities/fonts";
 import { colors } from "../utilities/colors";
 import { icons } from "../utilities/icons";
-import { S3_URL } from "../utilities/constants";
 import { useState } from "react";
 import MyImage from "./MyImage";
 import { MenuButton } from './MyButton';
@@ -10,9 +9,12 @@ import MyText from "./MyText";
 import ResponsiveImage3 from "./ResponsiveImage3";
 import { main, textSize } from "../utilities/styles"
 import CollapseText from "./CollapseText";
+import { useSelector } from 'react-redux'
+import { selectUser } from '../redux/reducers/userSlice'
 
 const LessonView = ({ title, style, heading, icon, iconTextColor = colors.white, missionDetail=false, desc, txtlen = 50, handleClick, copyEnable = false, image, handlePress, duration, numberOfTitleLines = 2, showMenu=false, 
 }) => {
+  const { S3_URL } = useSelector(selectUser)
 	const [show, setShow] = useState()
 	const [dynamicNumberOfTitleLines, setDynamicNumberOfTitleLines] = useState(1)
 	return (

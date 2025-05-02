@@ -72,7 +72,8 @@ const EmailModal = forwardRef(({ onReminderSavePress }, ref) => {
     if (cc.length > 0) {
       return (
         <View style={{ flexDirection: "row", flexWrap: "wrap", paddingBottom: 5 }}>
-          {cc.map((x, i) => <MyChip title={x} key={i} onPress={() => removeCc(i)} />)}
+          {cc.map((x, i) =>
+							<MyChip title={typeof x === "string" ? x : x.email} key={i} onPress={() => removeCc(i)} />)}
         </View>
       )
     } else return null

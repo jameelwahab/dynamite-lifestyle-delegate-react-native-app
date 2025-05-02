@@ -1,12 +1,15 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity, Pressable } from 'react-native'
-import React, { memo, useEffect, useState } from 'react'
+import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, Pressable} from 'react-native'
+import React, { memo, useEffect, useState, useRef } from 'react'
 import UserImage from '../../../components/UserImage'
 import MyText from '../../../components/MyText'
+import InfoModal from '../../../components/InfoModal';
 import { convertTimezone, convertTimezone2 } from '../../../functions/convertTime'
 import { colors } from '../../../utilities/colors'
+import { fonts } from '../../../utilities/fonts';
 import { S3_URL, isDev } from '../../../utilities/constants'
 import ImagesForFeed from './ImagesForFeed'
 import { icons } from '../../../utilities/icons'
+import breakReference from '../../../functions/breakReference';
 import MyWebview from '../../../components/MyWebview'
 import MyImage2 from '../../../components/MyImage2'
 import MyImage from '../../../components/MyImage'
@@ -19,13 +22,16 @@ import DropShadow from "react-native-drop-shadow";
 import { isHtml } from '../../../functions/regex'
 import PostWebView from '../../../components/PostWebView'
 import FeedText from '../../../components/FeedText'
+import Divider from '../../../UIComponents/Divider';
 import numFormatter from '../../../functions/numFormatter'
 import { MyButton } from '../../../components/MyButton'
 import { main } from '../../../utilities/styles'
-import { Row } from '../../../UIComponents/FlexViews'
+import { Row, Flex } from '../../../UIComponents/FlexViews'
 import isArray from '../../../functions/isArray'
 
-export const FeedView = ({ item, index, user, token, isInView, timezone, settings,
+const ic_tropy = require("../../../assets/icons/trophy.png");
+
+export const FeedView = ({ item, index, user, token, feedSettings, isInView, timezone, settings,
   openComments, showLikes, openOptions, onLikebtnPress, isCosmos,
   sourceLevelIcons, isScheduledFeed, openScheduleTimeModal, onFeedDetail,
   isNoteMainFeed, filterTheOptions, onVotePress, pollSettings, openPollDetail,
@@ -34,6 +40,7 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
 
 
   const [animationState, setAnimationState] = useState(0)
+  const ref_info = useRef();
 
   useEffect(() => {
     if (index == 1)
@@ -67,6 +74,34 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
       </>
     )
   }
+const badgesView = (badgeList) => {
+    return (
+      <View>
+          <Text style={[main.heading, { fontFamily: fonts.medium, }]}>{"Badges"}</Text>
+        <Divider mt={10} />
+        <View style={{ marginTop: 10 }}>
+          <FlatList
+						horizontal
+            scrollEnabled={false}
+            data={badgeList || []}
+            renderItem={({ item, index }) => {
+              return (
+										<View style={{marginRight:20 }}>
+                    <Row alignItems="center">
+                      <MyImage
+                        source={{ uri: S3_URL + item?.icon?.thumbnail_1 }}
+                        style={{ height: 20, width: 20 }}
+                      />
+                    </Row>
+									</View>
+              )
+
+            }}
+          />
+        </View>
+      </View>
+    )
+  }
 
   const profileView = () => (
     <View style={__style.profileView}>
@@ -77,7 +112,8 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
           name={item?.action_info?.name}
           backgroundTransparent={true}
           borderWidth={isCosmos ? 1 / 4 : 2}
-          borderColor={!isCosmos ? item?.badge_level_info?.color_code : undefined}
+          borderColor={!isCosmos ? 
+							!!item?.show_feed_to ? (item?.show_feed_to == "all" && item?.action_info?.action_by=="consultant_user") ? feedSettings?.color_code_for_all_level : !!item?.badge_level_info ? item?.badge_level_info?.color_code : item?.feed_badge_levels[0]?.color_code : undefined : undefined}
           size={35}
         />
         <View style={__style.profileNameView}>
@@ -97,6 +133,33 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
           />
         </TouchableOpacity>}
 
+      <InfoModal ref={ref_info} />
+
+			{(!!item?.show_feed_to && item?.show_feed_to=="specific" && item?.action_info?.action_by=="consultant_user") &&
+					<>
+					{isArray(item?.feed_badge_levels) &&
+							<Pressable 
+								onPress={() => {
+										if(item?.feed_badge_levels?.length > 1){
+												ref_info?.current?.openModal("", "", false, badgesView(item?.feed_badge_levels))
+										}
+								}}
+								style={{flexDirection:'row', alignItems:"center"}}>
+								<MyImage
+										source={{ uri: S3_URL + item?.feed_badge_levels[0]?.icon?.thumbnail_1 }}
+										style={{ height: 20, width: 20, marginRight:5 }}
+								/>
+						{item?.feed_badge_levels?.length > 1 &&
+							<Text style={[main.description, { textDecorationLine: "underline", color: colors.primary2 }]} >{item?.feed_badge_levels?.length-1}+ </Text>
+						 }
+							</Pressable>} 
+					</>
+        }
+
+			{(!!item?.show_feed_to && item?.show_feed_to=="all" && item?.action_info?.action_by=="consultant_user") && <MyImage
+										source={{ uri: S3_URL + feedSettings?.icon_for_all_level }}
+										style={{ height: 20, width: 20, marginRight:5 }}
+								/>}
 
       {(!!item?.badge_level_info?.icon?.thumbnail_1 || isCosmos) &&
         <View >
@@ -121,6 +184,8 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
           />
         </View>}
 
+
+
       {(((isCosmos || isScheduledFeed) && user?._id == item?.action_info?.action_id) ||
         (!isCosmos && !isScheduledFeed)) && filterTheOptions(item) > 0 &&
         <TouchableOpacity
@@ -133,7 +198,6 @@ export const FeedView = ({ item, index, user, token, isInView, timezone, setting
   )
 
   const inRevivewView = () => {
-    console.log(item, "feed")
     return (
       <View style={__style.review}>
         <MyText color={colors.primary} fontSize={16} type='medium' >Reivew Reason</MyText>

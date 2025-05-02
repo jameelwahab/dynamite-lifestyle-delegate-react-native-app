@@ -11,12 +11,11 @@ import { colors } from '../../utilities/colors'
 import EmptyView from '../../components/EmptyView'
 import ResponsiveImage2 from '../../components/ResponsiveImage2'
 import routes from '../../navigation/routes'
-import { S3_URL } from '../../utilities/constants'
 import utilities from '../../utilities'
 
 const TrainingLessonList = ({ navigation, route }) => {
   let { slug } = route?.params;
-  let { token, user } = useSelector(selectUser);
+  let { token, user, S3_URL } = useSelector(selectUser);
   const [loader, setLoader] = useState(true);
   const [program, setProgram] = useState(null)
   const [list, setList] = useState([]);

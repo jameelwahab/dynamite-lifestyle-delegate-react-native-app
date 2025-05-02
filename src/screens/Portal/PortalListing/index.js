@@ -7,7 +7,6 @@ import { useSelector } from 'react-redux'
 import { selectUser } from '../../../redux/reducers/userSlice'
 import { DELETE_PORTAL_EVENT, GET_PORTAL_LIST, DUBLICATE_PORTAL_EVENT } from '../../../DAL'
 import MyLoader from '../../../components/MyLoader'
-import { S3_URL } from '../../../utilities/constants'
 import ResponsiveImage2 from '../../../components/ResponsiveImage2'
 import { colors } from '../../../utilities/colors'
 import routes from '../../../navigation/routes'
@@ -23,7 +22,7 @@ const PortalListing = ({ navigation, route }) => {
   const { key, value } = route?.params;
   const isDelegatePortals = value == "my_portals";
   const { navbar } = useSelector(selectNavbar);
-  const { token } = useSelector(selectUser);
+  const { token, S3_URL } = useSelector(selectUser);
   const [title] = useState(navbar?.find(x => x._id == key)?.title);
   const [loader, setLoader] = useState(true);
   const [isRefreshing, setRefreshing] = useState(false);
