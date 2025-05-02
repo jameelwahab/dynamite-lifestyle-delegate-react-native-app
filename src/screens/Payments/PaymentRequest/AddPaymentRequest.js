@@ -10,7 +10,7 @@ import MyCheckBox from '../../../components/MyCheckBox'
 import Collapsible from 'react-native-collapsible'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import OptionModalWithSearch from '../../../components/OptionModalWithSearch'
-import { ADD_PAYMENT_REQUEST, EDIT_PAYMENT_REQUEST, GET_MEMBER_LIST_FOR_PAYMENT_REQUEST, GET_PAYMENT_TEMPLATE_AND_PROGRAMMES_LIST, GET_PRODUCT_LIST, GET_TEMPLATE_DETAIL } from '../../../DAL'
+import { ADD_PAYMENT_REQUEST, EDIT_PAYMENT_REQUEST, GET_MEMBER_LIST_FOR_PAYMENT_REQUEST, GET_PAYMENT_TEMPLATE_AND_PROGRAMMES_LIST, GET_PRODUCT_LIST, GET_TEMPLATE_DETAIL, GET_DATE_LIST_PLAN } from '../../../DAL'
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../../redux/reducers/userSlice'
 import CountryModal from '../../../components/CountryModal'
@@ -23,6 +23,7 @@ import TitleView from '../../../components/TitleView'
 import { icons } from '../../../utilities/icons'
 import copyText from '../../../functions/copyText'
 import extractTextFromHTML from '../../../functions/extractTextFromHTML'
+import breakReference from '../../../functions/breakReference'
 
 
 const AddPaymentRequest = ({ navigation, route }) => {
@@ -45,14 +46,18 @@ const AddPaymentRequest = ({ navigation, route }) => {
   const [memberList, setMemberList] = useState([]);
   const [paymentTemplates, setPaymentTemplates] = useState([]);
   const [progammes, setProgammes] = useState([]);
+  const [salePages, setSalePages] = useState([]);
   const [products, setProducts] = useState([])
   const [countryModalVisibility, setCountryModalVisibility] = useState(false);
+  const [showSalePages, setShowSalePages] = useState(false)
   const [loader, setLoader] = useState(false)
   const [selected, updateSelected] = useState({
     template: null, title: "", status: statusList[0], currency: currencyList[1], product: null,
     programme: null, requestType: { title: "Onetime", key: "onetime", }, totalAmount: "", vat: "", note: "",
     initialAmount: "", installments: "", installmentAmount: "", planType: null,
-    noOfDays: "", leadStatus:null, purchasingUser:null
+    noOfDays: "", leadStatus: null, purchasingUser: null,
+    sale_pages: null,
+    templateApplied: false,
   })
 
   const [optionModal, setOptionModal] = useState({
@@ -67,6 +72,11 @@ const AddPaymentRequest = ({ navigation, route }) => {
     setMemberModalVisibility(false);
   }
 
+
+  const onSalePageSelect = (page) => {
+    updateSelected({ ...selected, sale_pages: page })
+    setShowSalePages(false);
+  }
 
   const onOptionSelected = (opt) => {
     let { type } = optionModal;
@@ -85,6 +95,15 @@ const AddPaymentRequest = ({ navigation, route }) => {
     }
   }
 
+  const salePagefilter = (list, text) => {
+    if (text?.trim() == "") {
+      return list
+    } else {
+      return list.slice().filter(x =>
+        x.sale_page_title.toLowerCase().includes(text.toLowerCase().trim()))
+    }
+  }
+
   const getProducts = async () => {
     let res = await GET_PRODUCT_LIST({ navigation, token, });
     if (res.code == 200) {
@@ -96,6 +115,13 @@ const AddPaymentRequest = ({ navigation, route }) => {
     if (res.code == 200) {
       setPaymentTemplates(res?.payment_template);
       setProgammes(res?.programs);
+    }
+  }
+
+  const getDateListPlan = async () => {
+    let res = await GET_DATE_LIST_PLAN({ navigation, token });
+    if (res.code == 200) {
+      setSalePages(res?.sale_pages)
     }
   }
 
@@ -119,8 +145,10 @@ const AddPaymentRequest = ({ navigation, route }) => {
         // installmentAmount: !!data?.installment_amount ? data?.installment_amount : "",
         planType: !!data?.interval_type ? planTypeList.find(x => x.key == data?.interval_type) : "",
         noOfDays: !!data?.number_of_days ? data?.number_of_days : "",
-				leadStatus: !!data?.lead_status?.title ? data?.lead_status?.title : null,
-				purchasingUser: !!data?.consider_purchasing_user ? data?.consider_purchasing_user : null,
+        leadStatus: !!data?.lead_status?.title ? data?.lead_status?.title : null,
+        purchasingUser: !!data?.consider_purchasing_user ? data?.consider_purchasing_user : null,
+        sale_pages: !!data?.sale_page ? data?.sale_page : null,
+        templateApplied: true
       }
       setSelected(obj);
     }
@@ -186,6 +214,13 @@ const AddPaymentRequest = ({ navigation, route }) => {
         number_of_days: selected?.noOfDays
       }
     }
+    if (selected?.sale_pages !== null) {
+      obj = {
+        ...obj,
+        "sale_page": selected?.sale_pages?._id
+      }
+    }
+
     if (!!editItem) {
       delete obj?.is_member_create
       updatePaymentRequestAPI(obj)
@@ -200,7 +235,14 @@ const AddPaymentRequest = ({ navigation, route }) => {
     if (res.code == 200) {
       showToast({ "title": res?.message, type: "success" })
       setLoader(false);
-      route?.params?.backScreenFunc?.(res?.payment_request);
+      // console.log(breakReference(res?.payment_request))
+      route?.params?.backScreenFunc?.(breakReference({
+        ...res?.payment_request,
+        "payment_template": {
+          ...res?.payment_request?.payment_template,
+          "lead_status": res?.payment_request?.lead_status
+        },
+      }));
       navigation.goBack();
     } else {
       setLoader(false);
@@ -214,7 +256,14 @@ const AddPaymentRequest = ({ navigation, route }) => {
     if (res.code == 200) {
       showToast({ "title": res?.message, type: "success" })
       setLoader(false);
-      route?.params?.backScreenFunc?.(res?.payment_request);
+      console.log(res?.payment_request?.sale_page)
+      route?.params?.backScreenFunc?.(breakReference({
+        ...res?.payment_request,
+        "payment_template": {
+          ...res?.payment_request?.payment_template,
+          "lead_status": res?.payment_request?.lead_status
+        },
+      }));
       navigation.goBack();
     } else {
       setLoader(false);
@@ -238,7 +287,8 @@ const AddPaymentRequest = ({ navigation, route }) => {
       planType: !!editItem?.request_iteration_type ? planTypeList.find(x => x.key == editItem?.request_iteration_type) : null,
       noOfDays: !!editItem?.number_of_days ? editItem?.number_of_days : "",
       vat: !!editItem?.vat_number ? editItem?.vat_number : "",
-      note: !!editItem?.transaction_note ? editItem?.transaction_note : editItem?.transaction_note
+      note: !!editItem?.transaction_note ? editItem?.transaction_note : editItem?.transaction_note,
+      sale_pages: !!editItem?.sale_page ? editItem?.sale_page : null,
     })
   }
 
@@ -249,7 +299,11 @@ const AddPaymentRequest = ({ navigation, route }) => {
       currency: currencyList[1], product: null,
       programme: null, requestType: null, totalAmount: "", vat: "", note: "",
       initialAmount: "", installments: "", installmentAmount: "", planType: null,
-      noOfDays: ""
+      noOfDays: "",
+      sale_pages: null,
+      leadStatus: null,
+      purchasingUser: null,
+      templateApplied: false
     })
   }
 
@@ -263,6 +317,7 @@ const AddPaymentRequest = ({ navigation, route }) => {
     }
     getMembers();
     getPaymentAndProgrammes()
+    getDateListPlan()
     getProducts()
   }, [])
 
@@ -427,7 +482,7 @@ const AddPaymentRequest = ({ navigation, route }) => {
               />
 
               <MyTouchableInput
-                label='Product'
+                label='Product*'
                 onPress={() => setOptionModal({ list: products, type: "product", isVisible: true, titlekey: "name" })}
                 value={!!selected?.product ? selected?.product?.name : ""}
               />
@@ -497,22 +552,33 @@ const AddPaymentRequest = ({ navigation, route }) => {
                 value={selected?.vat}
                 onChangeText={(text) => setSelected({ vat: text })} />
 
-						  
-						{!!selected?.leadStatus &&
-						  <MyInputs
-                label='Lead Status'
-                value={selected?.leadStatus}
-                onChangeText={(text) => setSelected({ leadStatus: text })} />
-						}
 
-						{!!selected?.purchasingUser &&
-						  <MyInputs
-                label='Consider Purchasing User As*'
-								capitalizeSentence={true}
-                value={selected?.purchasingUser[0].toUpperCase() + selected?.purchasingUser.slice(1, selected?.purchasingUser.length) + " Source Member"}
-                onChangeText={(text) => setSelected({ purchasingUser: text })} />
-						}
+              {!!selected?.leadStatus &&
+                <MyInputs
+                  label='Lead Status'
+                  value={selected?.leadStatus}
+                  onChangeText={(text) => setSelected({ leadStatus: text })} />
+              }
 
+              {!!selected?.purchasingUser &&
+                <MyInputs
+                  label='Consider Purchasing User As*'
+                  capitalizeSentence={true}
+                  value={selected?.purchasingUser[0].toUpperCase() + selected?.purchasingUser.slice(1, selected?.purchasingUser.length) + " Source Member"}
+                  onChangeText={(text) => setSelected({ purchasingUser: text })} />
+              }
+
+            </View>
+
+
+            <View
+              pointerEvents={(selected?.templateApplied) ? "none" : "auto"}
+              opacity={(selected?.templateApplied) ? 0.6 : 1}>
+              <MyTouchableInput
+                label='Sale Pages'
+                onPress={() => setShowSalePages(true)}
+                value={!!selected?.sale_pages ? selected?.sale_pages?.sale_page_title : ""}
+              />
             </View>
 
             <MyInputs
@@ -537,6 +603,16 @@ const AddPaymentRequest = ({ navigation, route }) => {
         optionList={memberList}
         onSearchTextChange={(text) => getMembers(text)}
         renderText={({ item }) => <MyText>{`${item?.first_name} ${item?.last_name} (${item?.email})`}</MyText>}
+      />
+
+      <OptionModalWithSearch
+        isVisible={showSalePages}
+        closeModal={() => setShowSalePages(false)}
+        onSelected={onSalePageSelect}
+        title='Sale Pages'
+        optionList={salePages}
+        filterTheList={salePagefilter}
+        titleKey={"sale_page_title"}
       />
 
       <CountryModal

@@ -402,11 +402,11 @@ const optionsList = [
     key: "edit",
     icon: icons.edit
   },
-  {
-    title: "Delete",
-    key: "delete",
-    icon: icons.trash
-  },
+  // {
+  //   title: "Delete",
+  //   key: "delete",
+  //   icon: icons.trash
+  // },
   {
     title: "Mark Resolve",
     key: "resolve",

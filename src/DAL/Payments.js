@@ -202,3 +202,11 @@ export const MARK_PAYMENT_AS_CANCELLED_OR_PAID =
     })
   }
 
+export const GET_DATE_LIST_PLAN= ({token, navigation}) => {
+		return invokeApi({
+				path:"api/member/get_data_list/plan",
+				method:"GET",
+				token, navigation
+		})
+}
+
