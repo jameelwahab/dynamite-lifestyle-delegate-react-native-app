@@ -23,6 +23,7 @@ import TitleView from '../../../components/TitleView'
 import { icons } from '../../../utilities/icons'
 import copyText from '../../../functions/copyText'
 import extractTextFromHTML from '../../../functions/extractTextFromHTML'
+import breakReference from '../../../functions/breakReference'
 
 
 const AddPaymentRequest = ({ navigation, route }) => {
@@ -234,8 +235,14 @@ const AddPaymentRequest = ({ navigation, route }) => {
     if (res.code == 200) {
       showToast({ "title": res?.message, type: "success" })
       setLoader(false);
-      console.log(res?.payment_request?.sale_page)
-      route?.params?.backScreenFunc?.(res?.payment_request);
+      // console.log(breakReference(res?.payment_request))
+      route?.params?.backScreenFunc?.(breakReference({
+        ...res?.payment_request,
+        "payment_template": {
+          ...res?.payment_request?.payment_template,
+          "lead_status": res?.payment_request?.lead_status
+        },
+      }));
       navigation.goBack();
     } else {
       setLoader(false);
@@ -250,7 +257,13 @@ const AddPaymentRequest = ({ navigation, route }) => {
       showToast({ "title": res?.message, type: "success" })
       setLoader(false);
       console.log(res?.payment_request?.sale_page)
-      route?.params?.backScreenFunc?.(res?.payment_request);
+      route?.params?.backScreenFunc?.(breakReference({
+        ...res?.payment_request,
+        "payment_template": {
+          ...res?.payment_request?.payment_template,
+          "lead_status": res?.payment_request?.lead_status
+        },
+      }));
       navigation.goBack();
     } else {
       setLoader(false);

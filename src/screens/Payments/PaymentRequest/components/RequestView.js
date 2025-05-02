@@ -16,9 +16,9 @@ import StatusView from "../../../../components/StatusView"
 
 
 const RequestView = ({ item, index, openOptionModal, onDetail }) => {
-  // if(index==2){
-  //   console.log(item,"item")
-  // }
+  if(index==0){
+    console.log(item,"item")
+  }
   return (
     <View style={__styles.itemRootView}>
       <View style={__styles.profileView}>
