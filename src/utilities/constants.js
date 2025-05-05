@@ -27,6 +27,13 @@ if (isDev) {
 export { domain, socketUrl, S3_URL, appName, websiteBaseUrl }
 
 
+export const S3Urls = [
+  "https://dynamite-lifestyle-dev-app-bucket.s3.amazonaws.com/",
+  "https://dynamite-lifestyle-prod-app-bucket.s3.amazonaws.com/",
+  "https://dd-feature-app-bucket.s3.amazonaws.com/"
+]
+
+
 
 export const googleScopes = [
   "https://www.googleapis.com/auth/userinfo.email",

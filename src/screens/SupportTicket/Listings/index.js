@@ -17,7 +17,7 @@ import MyInputs from '../../../components/MyInputs';
 import RNFetchBlob from 'react-native-blob-util';
 import showToast from "../../../functions/showToast"
 import moment from "moment"
-import {dateTimeFormat} from "../../../utilities/constants"
+import { dateTimeFormat } from "../../../utilities/constants"
 
 
 
@@ -244,67 +244,72 @@ const TicketsList = ({ navigation, route }) => {
     />
   }
 
-		function DateFormatorForCsv (date) {
-				if(!!date)
-						return moment(date).format(dateTimeFormat.dateTime.split(' ')[0]);
-				else return "N/A";
-		}
-		function makeCsv () {
-				let file = "";
-				let header = `First Name, Last Name, Email, Subject, Department, Create Date, ${type == "support_ticket" ? " Issue Fix Date," : "" } Response Date, ${((type=="support_ticket" && index==1) || (type=="internal_ticket" && index == 3)) ? "Ressolve Date," : ""} Status, Description\n`;
-				list.forEach((x, i)=> {
-						file += `${x?.member?.first_name}, ${x?.member?.last_name}, ${x?.member?.email}, ${x.subject}, ${x?.department?.title}, ${DateFormatorForCsv(x?.createdAt)}, ${type=="support_ticket"? DateFormatorForCsv(x?.issue_fix_date) + "," : ""} ${!!x?.last_action_date ? DateFormatorForCsv(x?.last_action_date) : "N/a"}, ${((type=="support_ticket" && index==1) || (type=="internal_ticket" && index == 3)) ? (DateFormatorForCsv(x?.resolve_date) + ",") : ""} ${tabs[type][index].key}, "${x?.description.replaceAll("\n", " ")}"\n`;
-				})
-				file = header + file;
-				const pathToWrite = 
-						Platform.OS == "ios" ?
-						`${RNFetchBlob.fs.dirs.DocumentDir}/CSV/${type+"_"+tabs[type][index].key}.csv` :
-						`${RNFetchBlob.fs.dirs.DownloadDir}/CSV/${type+"_"+tabs[type][index].key}.csv`;
+  function DateFormatorForCsv(date) {
+    if (!!date)
+      return moment(date).format(dateTimeFormat.dateTime.split(' ')[0]);
+    else return "N/A";
+  }
 
-				RNFetchBlob.fs
-						.writeFile(pathToWrite, file, 'utf8')
-						.then(async (res) => {
-								if (Platform.OS == "android") {
-										let result = await RNFetchBlob.MediaCollection.copyToMediaStore({
-												name: `${type+"_"+tabs[type][index].key}.csv`, 
-												parentFolder: 'Mission Control', 
-												mimeType: 'text/csv'
-										},
-												'Download', 
-												pathToWrite 
-										);
-										showToast({ title: "CSV File Downloaded", type: "success" })
-								} else if (Platform.OS == "ios") {
-										showToast({ title: "CSV File Downloaded", type: "success" })
-								}
-						})
-						.catch(error => console.error(error));
 
-		}
+  function makeCsv() {
+    let file = "";
+    let header = `First Name,Last Name,Email,Subject,Department,Status,Created Date,Responded Date,${((isSupportTicket && index == 6) || (isInternalTicket && index == 3)) ? "Resolved Date," : ""}Description\n`;
 
-		function titleView () {
-				return(
-						<View style={__styles.topView}>
-						<TitleView 
-								hideBackBottomButton
-								title={type == "support_ticket" ? 'Support Tickets' : type == "internal_ticket" ? "Internal Tickets" : ""}
-								/>
-						{list.length != 0 && <TouchableOpacity
-								disabled={!loader}
-								onPress={() => makeCsv()}
-								style={__styles.headerBtn} >
-								<Image source={icons.csv} style={{ height: 12, aspectRatio: 1.5 }} />
-							</TouchableOpacity> }
 
-						</View>
-				)
-		}
+
+    list.forEach((x, i) => {
+      file += `${x?.member?.first_name}, ${x?.member?.last_name}, ${x?.member?.email}, ${x.subject}, ${x?.department?.title},${tabs[type][index].key}, ${DateFormatorForCsv(x?.createdAt)},${!!x?.last_action_date ? DateFormatorForCsv(x?.last_action_date) : "N/A"},${((isSupportTicket && index == 6) || (isInternalTicket && index == 3)) ? DateFormatorForCsv(x?.resolve_date) + "," : ""}  "${x?.description.replaceAll("\n", " ")}"\n`;
+    })
+    file = header + file;
+    const pathToWrite =
+      Platform.OS == "ios" ?
+        `${RNFetchBlob.fs.dirs.DocumentDir}/CSV/${type + "_" + tabs[type][index].key}.csv` :
+        `${RNFetchBlob.fs.dirs.DownloadDir}/CSV/${type + "_" + tabs[type][index].key}.csv`;
+
+    RNFetchBlob.fs
+      .writeFile(pathToWrite, file, 'utf8')
+      .then(async (res) => {
+        if (Platform.OS == "android") {
+          let result = await RNFetchBlob.MediaCollection.copyToMediaStore({
+            name: `${type + "_" + tabs[type][index].key}.csv`,
+            parentFolder: 'Mission Control',
+            mimeType: 'text/csv'
+          },
+            'Download',
+            pathToWrite
+          );
+          showToast({ title: "CSV File Downloaded", type: "success" })
+        } else if (Platform.OS == "ios") {
+          showToast({ title: "CSV File Downloaded", type: "success" })
+        }
+      })
+      .catch(error => console.error(error));
+
+  }
+
+  function titleView() {
+    return (
+      <View style={__styles.topView}>
+        <TitleView
+          hideBackBottomButton
+          title={type == "support_ticket" ? 'Support Tickets' : type == "internal_ticket" ? "Internal Tickets" : ""}
+        />
+        {list.length != 0 && <TouchableOpacity
+          disabled={!loader}
+          onPress={() => makeCsv()}
+          style={__styles.headerBtn} >
+          <Image source={icons.csv} style={{ height: 12, aspectRatio: 1.5 }} />
+        </TouchableOpacity>}
+
+      </View>
+    )
+  }
 
   return (
     <RootView
       rightButtonIcon={icons.handPromise}
       hideBackBottomButton={true}
-			titleView={titleView}
+      titleView={titleView}
     >
       {searchView()}
       <View style={{ flex: 1, marginHorizontal: -10 }}>
@@ -358,20 +363,20 @@ const __styles = StyleSheet.create({
     top: -8,
     right: -10
   },
-	topView: {
-		flexDirection: "row",
-		alignItems: "center",
-		backgroundColor: colors.darkSecondary,
-		marginHorizontal:17,
-	},
-		headerBtn:{
-				height: 25,
-				width: 25,
-				borderRadius: 28 / 2,
-				alignItems: "center",
-				justifyContent: "center",
-				marginRight: 5,
-				backgroundColor: colors.primary,
-		},
+  topView: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: colors.darkSecondary,
+    marginHorizontal: 17,
+  },
+  headerBtn: {
+    height: 25,
+    width: 25,
+    borderRadius: 28 / 2,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 5,
+    backgroundColor: colors.primary,
+  },
 })
 
