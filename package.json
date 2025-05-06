@@ -6,6 +6,7 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "release": "react-native run-android --mode=release",
+    "gradle:clean": "cd android && ./gradlew clean && cd ..",
     "lint": "eslint .",
     "start": "react-native start",
     "test": "jest",

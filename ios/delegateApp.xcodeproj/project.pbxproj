@@ -13,9 +13,9 @@
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		16E0C4652B1EF29E001379CE /* dummy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E0C4642B1EF29E001379CE /* dummy.swift */; };
-		16FA29602B676A1400A87E94 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 16FA295F2B676A1400A87E94 /* GoogleService-Info.plist */; };
 		7699B88040F8A987B510C191 /* libPods-delegateApp-delegateAppTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19F6CBCC0A4E27FBF8BF4A61 /* libPods-delegateApp-delegateAppTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		A04698942DC9EFE1005A0C90 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = A04698932DC9EFE1005A0C90 /* GoogleService-Info.plist */; };
 		A0A326F82C60A09400FB2E85 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A0A326F72C60A09400FB2E85 /* PrivacyInfo.xcprivacy */; };
 		AC8DFFD584FC411092100154 /* Montserrat-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 802BDFC3E3CE4758B19A8307 /* Montserrat-Medium.ttf */; };
 		AE6953771FF8478DB3AFD11B /* Montserrat-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 98E1718933EB4E1EB59DFE81 /* Montserrat-SemiBold.ttf */; };
@@ -48,7 +48,6 @@
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = delegateApp/main.m; sourceTree = "<group>"; };
 		16E0C4632B1EF29E001379CE /* delegateApp-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "delegateApp-Bridging-Header.h"; sourceTree = "<group>"; };
 		16E0C4642B1EF29E001379CE /* dummy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = dummy.swift; sourceTree = "<group>"; };
-		16FA295F2B676A1400A87E94 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		16FA29612B67913600A87E94 /* delegateApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = delegateApp.entitlements; path = delegateApp/delegateApp.entitlements; sourceTree = "<group>"; };
 		19F6CBCC0A4E27FBF8BF4A61 /* libPods-delegateApp-delegateAppTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-delegateApp-delegateAppTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B4392A12AC88292D35C810B /* Pods-delegateApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-delegateApp.debug.xcconfig"; path = "Target Support Files/Pods-delegateApp/Pods-delegateApp.debug.xcconfig"; sourceTree = "<group>"; };
@@ -61,6 +60,7 @@
 		94AF6DDC591D4F7B9229A154 /* Montserrat-Italic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Montserrat-Italic.ttf"; path = "../src/assets/fonts/Montserrat-Italic.ttf"; sourceTree = "<group>"; };
 		98E1718933EB4E1EB59DFE81 /* Montserrat-SemiBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Montserrat-SemiBold.ttf"; path = "../src/assets/fonts/Montserrat-SemiBold.ttf"; sourceTree = "<group>"; };
 		9CE521E3621D4C9D99D922BA /* Montserrat-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Montserrat-Regular.ttf"; path = "../src/assets/fonts/Montserrat-Regular.ttf"; sourceTree = "<group>"; };
+		A04698932DC9EFE1005A0C90 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		A0A326F72C60A09400FB2E85 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		AD1F912D41384F67B00058E5 /* Montserrat-Light.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Montserrat-Light.ttf"; path = "../src/assets/fonts/Montserrat-Light.ttf"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
@@ -113,7 +113,7 @@
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
-				16FA295F2B676A1400A87E94 /* GoogleService-Info.plist */,
+				A04698932DC9EFE1005A0C90 /* GoogleService-Info.plist */,
 				13B07FB71A68108700A75B9A /* main.m */,
 				16E0C4642B1EF29E001379CE /* dummy.swift */,
 				16E0C4632B1EF29E001379CE /* delegateApp-Bridging-Header.h */,
@@ -285,12 +285,12 @@
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
-				16FA29602B676A1400A87E94 /* GoogleService-Info.plist in Resources */,
 				F2B078A34AA84577ABD884BA /* BlackHanSans-Regular.ttf in Resources */,
 				CB789FDB6C85447CB4816F6C /* Montserrat-Italic.ttf in Resources */,
 				F148E6A25CDD4FFBB61951B2 /* Montserrat-Light.ttf in Resources */,
 				AC8DFFD584FC411092100154 /* Montserrat-Medium.ttf in Resources */,
 				D81756C5DDEA4944AB1FFF94 /* Montserrat-Regular.ttf in Resources */,
+				A04698942DC9EFE1005A0C90 /* GoogleService-Info.plist in Resources */,
 				A0A326F82C60A09400FB2E85 /* PrivacyInfo.xcprivacy in Resources */,
 				AE6953771FF8478DB3AFD11B /* Montserrat-SemiBold.ttf in Resources */,
 			);
@@ -568,8 +568,8 @@
 				CODE_SIGN_ENTITLEMENTS = delegateApp/delegateApp.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 66;
-				DEVELOPMENT_TEAM = ZMHT686M4P;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = J6YMGDQ246;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = delegateApp/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Mission&#x2007;Control&#x2007;100";
@@ -584,7 +584,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.dynamite.missioncontrol100;
+				PRODUCT_BUNDLE_IDENTIFIER = com.sourcemc100.app;
 				PRODUCT_NAME = delegateApp;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -609,8 +609,8 @@
 				CODE_SIGN_ENTITLEMENTS = delegateApp/delegateApp.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 66;
-				DEVELOPMENT_TEAM = ZMHT686M4P;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = J6YMGDQ246;
 				INFOPLIST_FILE = delegateApp/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Mission&#x2007;Control&#x2007;100";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
@@ -624,7 +624,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.dynamite.missioncontrol100;
+				PRODUCT_BUNDLE_IDENTIFIER = com.sourcemc100.app;
 				PRODUCT_NAME = delegateApp;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
