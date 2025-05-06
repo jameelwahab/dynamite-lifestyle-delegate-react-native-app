@@ -6,12 +6,13 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "release": "react-native run-android --mode=release",
+    "gradle:clean": "cd android && ./gradlew clean && cd ..",
     "lint": "eslint .",
     "start": "react-native start",
     "test": "jest",
     "pod": "npx pod-install ios",
     "apk": "cd android && ./gradlew assembleRelease && cd ..",
-    "uni": "adb uninstall com.dynamite.missioncontrol100",
+    "uni": "adb uninstall com.sourcemc100.app",
     "postinstall": "patch-package"
   },
   "dependencies": {
