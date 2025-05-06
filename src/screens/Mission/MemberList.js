@@ -13,7 +13,7 @@ import SearchView from "../../components/SearchView"
 import StatusView from "../../components/StatusView"
 import CounterBox from "../Payments/Commission/components/CounterBox"
 import showToast from "../../functions/showToast"
-import { StyleSheet, View, TouchableOpacity, FlatList, Keyboard, Pressable, Image} from "react-native"
+import { StyleSheet, View, TouchableOpacity, FlatList, Keyboard, Pressable, Image } from "react-native"
 import { GET_MISSION_MEMBER_LIST } from "../../DAL"
 import EmptyView from "../../components/EmptyView"
 import { useState, useEffect, useRef } from "react"
@@ -36,7 +36,7 @@ const MemberList = ({ route, navigation }) => {
 	const [total, setTotal] = useState(0)
 	const [searchText, setSearchText] = useState("")
 	const [result, setResult] = useState([])
-  const [counter, setCounter] = useState({})
+	const [counter, setCounter] = useState({})
 	const [loaders, updateLoaders] = useState({
 		overall: true,
 		pagination: false,
@@ -56,7 +56,7 @@ const MemberList = ({ route, navigation }) => {
 		}
 		updateLoaders(loadersObj)
 	}
-	
+
 
 	const getMemberList = async () => {
 		const res = await GET_MISSION_MEMBER_LIST({
@@ -68,11 +68,11 @@ const MemberList = ({ route, navigation }) => {
 
 		})
 		if (res.code == 200) {
-				setCounter({ 
-						complete:res?.completed_member_count,
-						revenue:res?.total_revenue,
-						in_progress:res?.in_progress_member_count
-				})
+			setCounter({
+				complete: res?.completed_member_count,
+				revenue: res?.total_revenue,
+				in_progress: res?.in_progress_member_count
+			})
 			setResult((pagination.current.page == 0) ? res.users_list : [...result, ...res.users_list])
 			setTotal(res?.total_count)
 			setLoader("")
@@ -87,7 +87,7 @@ const MemberList = ({ route, navigation }) => {
 
 		} else {
 			setResult([])
-		  setCounter({})
+			setCounter({})
 			setLoader("")
 		}
 	}
@@ -133,40 +133,40 @@ const MemberList = ({ route, navigation }) => {
 		setLoader("search")
 		setFilters({ ...filters, search_text: searchText })
 	}
-	
-		const makeCsv = () => {
-				let file = ""
-				let header = `First Name, Last Name, Email, Start Date, ${route.params?.item.type=="mission" ? "Completed Days" :"End Date"}, Accept Time Badge, Current Badges, Coin Attracted, Target Coins, Status\n`;
-				result.forEach((x, i) => {
-						file += `${x?.user_info?.first_name}, ${x?.user_info?.last_name}, ${x?.user_info?.email}, ${moment(x?.mission_start_date).format(dateTimeFormat.dateTime.split(' ')[0])}, ${route.params.item?.type == "mission" ? x?.completed_mission_days : moment(x?.mission_end_date).format(dateTimeFormat.dateTime.split(' ')[0] )}, ${x?.accept_time_badge_details?.title}, ${x?.current_badge_level?.title}, ${numFormatter(x?.attracted_coins, 1)}, ${numFormatter(x?.target_coins, 1)}, ${item?.mission_status==="complete" ? "Complete" : "In Progress"}
+
+	const makeCsv = () => {
+		let file = ""
+		let header = `First Name, Last Name, Email, Start Date, ${route.params?.item.type == "mission" ? "Completed Days" : "End Date"}, Accept Time Badge, Current Badges, Coin Attracted, Target Coins, Status\n`;
+		result.forEach((x, i) => {
+			file += `${x?.user_info?.first_name}, ${x?.user_info?.last_name}, ${x?.user_info?.email}, ${moment(x?.mission_start_date).format(dateTimeFormat.dateTime.split(' ')[0])}, ${route.params.item?.type == "mission" ? x?.completed_mission_days : moment(x?.mission_end_date).format(dateTimeFormat.dateTime.split(' ')[0])}, ${x?.accept_time_badge_details?.title}, ${x?.current_badge_level?.title}, ${numFormatter(x?.attracted_coins, 1)}, ${numFormatter(x?.target_coins, 1)}, ${item?.mission_status === "complete" ? "Complete" : "In Progress"}
 						\n`;
-				})
-				file = header + file;
-				const pathToWrite =
-						Platform.OS == "ios" ?
-						`${RNFetchBlob.fs.dirs.DocumentDir}/CSV/${item?.title || "data"}.csv` :
-						`${RNFetchBlob.fs.dirs.DownloadDir}/CSV/${item?.title || "data"}.csv`;
+		})
+		file = header + file;
+		const pathToWrite =
+			Platform.OS == "ios" ?
+				`${RNFetchBlob.fs.dirs.DocumentDir}/CSV/${item?.title || "data"}.csv` :
+				`${RNFetchBlob.fs.dirs.DownloadDir}/CSV/${item?.title || "data"}.csv`;
 
 
-				RNFetchBlob.fs
-						.writeFile(pathToWrite, file, 'utf8')
-						.then(async (res) => {
-								if (Platform.OS == "android") {
-										let result = await RNFetchBlob.MediaCollection.copyToMediaStore({
-												name: `${item?.title || "data"}.csv`, // name of the file
-												parentFolder: 'Mission Control', // subdirectory in the Media Store, e.g. HawkIntech/Files to create a folder HawkIntech with a subfolder Files and save the image within this folder
-												mimeType: 'text/csv'
-										},
-												'Download', // Media Collection to store the file in ("Audio" | "Image" | "Video" | "Download")
-												pathToWrite // Path to the file being copied in the apps own storage
-										);
-										showToast({ title: "CSV File Downloaded", type: "success" })
-								} else if (Platform.OS == "ios") {
-										showToast({ title: "CSV File Downloaded", type: "success" })
-								}
-						})
-						.catch(error => console.error(error));
-		}
+		RNFetchBlob.fs
+			.writeFile(pathToWrite, file, 'utf8')
+			.then(async (res) => {
+				if (Platform.OS == "android") {
+					let result = await RNFetchBlob.MediaCollection.copyToMediaStore({
+						name: `${item?.title || "data"}.csv`, // name of the file
+						parentFolder: 'Mission Control', // subdirectory in the Media Store, e.g. HawkIntech/Files to create a folder HawkIntech with a subfolder Files and save the image within this folder
+						mimeType: 'text/csv'
+					},
+						'Download', // Media Collection to store the file in ("Audio" | "Image" | "Video" | "Download")
+						pathToWrite // Path to the file being copied in the apps own storage
+					);
+					showToast({ title: "CSV File Downloaded", type: "success" })
+				} else if (Platform.OS == "ios") {
+					showToast({ title: "CSV File Downloaded", type: "success" })
+				}
+			})
+			.catch(error => console.error(error));
+	}
 
 	const topView = () => {
 		return (
@@ -180,11 +180,11 @@ const MemberList = ({ route, navigation }) => {
 				<View style={__styles.topBtnsView}>
 
 					<TouchableOpacity
-						  disabled={loaders.overall}
-              onPress={() => makeCsv()}
-              style={__styles.headerBtn} >
-              <Image source={icons.csv} style={{ height: 12, aspectRatio: 1.5 }} />
-            </TouchableOpacity>
+						disabled={loaders.overall}
+						onPress={() => makeCsv()}
+						style={__styles.headerBtn} >
+						<Image source={icons.csv} style={{ height: 12, aspectRatio: 1.5 }} />
+					</TouchableOpacity>
 
 					<TouchableOpacity onPress={() => navigation.navigate(routes.missionFilter, { filters, item: item })}>
 						{icons.filterCircle(colors.primary, 30)}
@@ -198,36 +198,36 @@ const MemberList = ({ route, navigation }) => {
 		return (
 			<View style={__styles.topViewBg} >
 				<View style={__styles.filterChipsView} >
-						{
-						  (  (filters?.mission_status && filters.mission_status) ||
-								(!!filters?.badge_levels && filters?.badge_levels.length!=0) ||
-								(filters?.from_start_date && filters.to_start_date) ||
-								(filters?.from_end_date && filters.to_end_date) ||
-								(filters?.coins_from && filters.coins_to) ) &&
-								<MyText>Filter by: </MyText>
-						}
+					{
+						((filters?.mission_status && filters.mission_status) ||
+							(!!filters?.badge_levels && filters?.badge_levels.length != 0) ||
+							(filters?.from_start_date && filters.to_start_date) ||
+							(filters?.from_end_date && filters.to_end_date) ||
+							(filters?.coins_from && filters.coins_to)) &&
+						<MyText>Filter by: </MyText>
+					}
 					{filters?.mission_status && filters.mission_status &&
 						<MyChip title={`${filters?.mission_status == "in_progress" && "In Pogress" || filters?.mission_status == "completed" && "Completed"}`}
 							onPress={() => setFilters({ ...filters, mission_status: null, status: null })} />
 					}
-					{!!filters?.badge_levels && filters?.badge_levels.length!=0  &&
+					{!!filters?.badge_levels && filters?.badge_levels.length != 0 &&
 						<>
-									{!!filters.badge_type &&
-										<MyChip title={filters?.badge_type == "accept_time" && "Accept Time" || filters?.badge_type == "current" && "Current"}
-												onPress={() => setFilters({ ...filters, badge_levels:null, badge_type: null, badges:null, filter_member_title:null })} />
-									}
+							{!!filters.badge_type &&
+								<MyChip title={filters?.badge_type == "accept_time" && "Accept Time" || filters?.badge_type == "current" && "Current"}
+									onPress={() => setFilters({ ...filters, badge_levels: null, badge_type: null, badges: null, filter_member_title: null })} />
+							}
 							{filters?.badges?.map((el, index) =>
-									<MyChip
-												title={el.title}
-												key={index}
-										onPress={() => {
-											setFilters({
-												...filters, badge_levels:
-													[...filters.badge_levels.filter(val => val!=el._id )],
-												badges:
-													[...filters.badges.filter(val => val._id != el._id)]
-												})
-										}} />
+								<MyChip
+									title={el.title}
+									key={index}
+									onPress={() => {
+										setFilters({
+											...filters, badge_levels:
+												[...filters.badge_levels.filter(val => val != el._id)],
+											badges:
+												[...filters.badges.filter(val => val._id != el._id)]
+										})
+									}} />
 							)}
 						</>
 					}
@@ -240,90 +240,97 @@ const MemberList = ({ route, navigation }) => {
 						<MyChip title={`End Date from ${filters?.from_end_date} to ${filters?.to_end_date}`}
 							onPress={() => setFilters({ ...filters, from_end_date: null, to_end_date: null })} />
 					}
-
+					{!!filters?.sort_by_coins &&
+						<MyChip title={`Sort by: ${filters?.sort_by_coins === "ascending" ? "Low to high" : "High to low"}`}
+							onPress={() => {
+								let obj = { ...filters }
+								delete obj?.sort_by_coins
+								setFilters({ ...obj })
+							}} />
+					}
 					{filters?.coins_from && filters.coins_to &&
 						<MyChip title={`Coins Attract from ${filters?.coins_from} to ${filters?.coins_to}`}
 							onPress={() => setFilters({ ...filters, coins_from: null, coins_to: null })} />
 					}
-				{
-						  (  (filters?.mission_status && filters.mission_status) ||
-								(!!filters?.badge_levels && filters?.badge_levels.length!=0) ||
-								(filters?.from_start_date && filters.to_start_date) ||
-								(filters?.from_end_date && filters.to_end_date) ||
-								(filters?.coins_from && filters.coins_to) ) &&
-								<TouchableOpacity
-												onPress={() => setFilters({})}
-										style={{ marginLeft: 5, marginTop: 5, marginRight: 10, borderWidth: 1, borderColor: colors.primary, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 5, backgroundColor: colors.primary + "33" }}>
-								<MyText color={colors.primary}>{"Clear Filter"}</MyText>
-            </TouchableOpacity>
-						}
+					{
+						((filters?.mission_status && filters.mission_status) ||
+							(!!filters?.badge_levels && filters?.badge_levels.length != 0) ||
+							(filters?.from_start_date && filters.to_start_date) ||
+							(filters?.from_end_date && filters.to_end_date) ||
+							(filters?.coins_from && filters.coins_to)) &&
+						<TouchableOpacity
+							onPress={() => setFilters({})}
+							style={{ marginLeft: 5, marginTop: 5, marginRight: 10, borderWidth: 1, borderColor: colors.primary, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 5, backgroundColor: colors.primary + "33" }}>
+							<MyText color={colors.primary}>{"Clear Filter"}</MyText>
+						</TouchableOpacity>
+					}
 				</View>
 
-				{!loaders.overall && <View style={{backgroundColor:colors.darkSecondary, flexDirection: "row", }}>
-          <CounterBox color={"#283C35"} count={counter?.complete || 0} subTitle={"Completed Members"} icon={icons.members2(colors.primary)} normal />
-          <CounterBox color={"#3C3834"} count={counter?.in_progress || 0} subTitle={"In Progress Members"} icon={icons.members2(colors.primary)} normal/>
-						{route.params.item?.type=="quest" ? 
-								<CounterBox color={"#3B2837"} count={counter?.revenue || 0} subTitle={"Total Revenue"} /> 
-								: <View style={{flex:1}}/>
-						}
-      </View> }
+				{!loaders.overall && <View style={{ backgroundColor: colors.darkSecondary, flexDirection: "row", }}>
+					<CounterBox color={"#283C35"} count={counter?.complete || 0} subTitle={"Completed Members"} icon={icons.members2(colors.primary)} normal />
+					<CounterBox color={"#3C3834"} count={counter?.in_progress || 0} subTitle={"In Progress Members"} icon={icons.members2(colors.primary)} normal />
+					{route.params.item?.type == "quest" ?
+						<CounterBox color={"#3B2837"} count={counter?.revenue || 0} subTitle={"Total Revenue"} />
+						: <View style={{ flex: 1 }} />
+					}
+				</View>}
 
 
 				{/* search engine */}
 				<View>
-				<SearchView
-					search={searchText}
-					onChangeText={(text) => setSearchText(text)}
-					onSearchPress={onSearch}
-					loader={loaders.searching}
-				/>
+					<SearchView
+						search={searchText}
+						onChangeText={(text) => setSearchText(text)}
+						onSearchPress={onSearch}
+						loader={loaders.searching}
+					/>
 				</View>
 			</View>)
 	}
 
 
-  const memberListView = ({ item, index }) => {
+	const memberListView = ({ item, index }) => {
 
-		  const onMissionList = () => {
-				navigation.navigate(routes.missionReportScreen, {
+		const onMissionList = () => {
+			navigation.navigate(routes.missionReportScreen, {
 				missionId: item?.mission_info?._id,
 				memberId: item?.user_info?._id,
 				type: route.params.item?.type,
-				} )
+			})
 		}
 
-	return (
-		<Pressable
-			onPress={onMissionList}
-			style={__styles.itemView}>
-			<View style={{ flex: 1, flexDirection: 'row', alignItems: "center", justifyContent: "space-between" }}>
-				<MemberView
-					borderColor={item?.current_badge_level?.color_code}
-					member={item?.user_info}
-					customImage={item?.user_info?.profile_image}
-				/>
-				<View style={{ flexDirection: 'row', alignItems: "center", justifyContent: "space-between" }}>
+		return (
+			<Pressable
+				onPress={onMissionList}
+				style={__styles.itemView}>
+				<View style={{ flex: 1, flexDirection: 'row', alignItems: "center", justifyContent: "space-between" }}>
+					<MemberView
+						borderColor={item?.current_badge_level?.color_code}
+						member={item?.user_info}
+						customImage={item?.user_info?.profile_image}
+					/>
+					<View style={{ flexDirection: 'row', alignItems: "center", justifyContent: "space-between" }}>
 						{icons.forwardArrow()}
+					</View>
 				</View>
-			</View>
 
-			<View style={{ padding: 5 }}>
-				<StatView title={"Start Date"} value={moment(item?.mission_start_date).format(dateTimeFormat.dateTime.split(' ')[0])} />
-			{route?.params?.item?.type=="quest" && <StatView title={"End Date"} value={moment(item?.mission_end_date).format(dateTimeFormat.dateTime.split(' ')[0] )} />}
-			{route?.params?.item?.type=="mission" && <StatView title={"Completed Days"} value={item?.completed_mission_days} />}
-        <StatView title={"Accept Time Badge"} view={()=> <ImgAndTxt img={item?.accept_time_badge_details?.icon?.thumbnail_1} txt={item?.accept_time_badge_details?.title} />} />
-        <StatView title={"Current Badge"} view={()=> <ImgAndTxt img={item?.current_badge_level?.icon?.thumbnail_1} txt={item?.current_badge_level?.title} /> } />
-				<StatView title={"Coins Attracted"} value={numFormatter(item?.attracted_coins, 1)} />
-				<StatView title={"Target Coins"} value={numFormatter(item?.target_coins, 1)} />
-				<StatView title={"Status"} view={()=><StatusView
+				<View style={{ padding: 5 }}>
+					<StatView title={"Start Date"} value={moment(item?.mission_start_date).format(dateTimeFormat.dateTime.split(' ')[0])} />
+					{route?.params?.item?.type == "quest" && <StatView title={"End Date"} value={moment(item?.mission_end_date).format(dateTimeFormat.dateTime.split(' ')[0])} />}
+					{route?.params?.item?.type == "mission" && <StatView title={"Completed Days"} value={item?.completed_mission_days} />}
+					<StatView title={"Accept Time Badge"} view={() => <ImgAndTxt img={item?.accept_time_badge_details?.icon?.thumbnail_1} txt={item?.accept_time_badge_details?.title} />} />
+					<StatView title={"Current Badge"} view={() => <ImgAndTxt img={item?.current_badge_level?.icon?.thumbnail_1} txt={item?.current_badge_level?.title} />} />
+					<StatView title={"Coins Attracted"} value={numFormatter(item?.attracted_coins, 1)} />
+					<StatView title={"Target Coins"} value={numFormatter(item?.target_coins, 1)} />
+					<StatView title={"Status"} view={() => <StatusView
 						bgColor={item?.mission_status == "completed" ? colors.green + "33" : colors.delete + "33"}
 						txtColor={item?.mission_status == "completed" ? colors.green : colors.delete}
 						value={item?.mission_status.replace(/_/gm, " ")} />}
-				/>
-			</View>
-		</Pressable>
-	)
-}
+					/>
+				</View>
+			</Pressable>
+		)
+	}
 
 	return (
 		<RootView
@@ -355,7 +362,7 @@ const __styles = StyleSheet.create({
 	filterChipsView: {
 		flexDirection: "row",
 		flexWrap: "wrap",
-		alignItems:"center",
+		alignItems: "center",
 	},
 	topViewBg: {
 		backgroundColor: colors.darkSecondary,
@@ -367,19 +374,19 @@ const __styles = StyleSheet.create({
 		paddingBottom: 5,
 		paddingRight: 5
 	},
-		topBtnsView:{
-				flexDirection:"row",
-				alignItems:"center",
-		},
-		headerBtn:{
-				height: 25,
-				width: 25,
-				borderRadius: 28 / 2,
-				alignItems: "center",
-				justifyContent: "center",
-				marginRight: 10,
-				backgroundColor: colors.primary,
-		},
+	topBtnsView: {
+		flexDirection: "row",
+		alignItems: "center",
+	},
+	headerBtn: {
+		height: 25,
+		width: 25,
+		borderRadius: 28 / 2,
+		alignItems: "center",
+		justifyContent: "center",
+		marginRight: 10,
+		backgroundColor: colors.primary,
+	},
 	itemView: {
 		backgroundColor: colors.secondary,
 		borderRadius: 10,
@@ -390,19 +397,19 @@ const __styles = StyleSheet.create({
 	icon: {
 		width: 18,
 		height: 18,
-		marginRight:5
+		marginRight: 5
 	},
-		modalDropBtns:{
-				flexDirection: "row",
-				alignItems: "center",
-				flexWrap: "wrap",
-				borderWidth: 1,
-				borderColor: colors.border,
-				paddingVertical: 5,
-				paddingHorizontal: 8,
-				borderRadius: 10,
-				marginRight: 5,
-		}
+	modalDropBtns: {
+		flexDirection: "row",
+		alignItems: "center",
+		flexWrap: "wrap",
+		borderWidth: 1,
+		borderColor: colors.border,
+		paddingVertical: 5,
+		paddingHorizontal: 8,
+		borderRadius: 10,
+		marginRight: 5,
+	}
 })
 
 export default MemberList

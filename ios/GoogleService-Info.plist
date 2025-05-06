@@ -9,11 +9,11 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.dynamite.missioncontrol100</string>
+	<string>com.sourcemc100.app</string>
 	<key>PROJECT_ID</key>
 	<string>dynamite-lifestyle</string>
 	<key>STORAGE_BUCKET</key>
-	<string>dynamite-lifestyle.appspot.com</string>
+	<string>dynamite-lifestyle.firebasestorage.app</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -25,7 +25,7 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:942508686264:ios:76cd1030ba2684db65ad4d</string>
+	<string>1:942508686264:ios:75f5f97a25e5449265ad4d</string>
 	<key>DATABASE_URL</key>
 	<string>https://dynamite-lifestyle.firebaseio.com</string>
 </dict>

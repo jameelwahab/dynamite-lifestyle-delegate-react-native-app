@@ -27,40 +27,49 @@ const Filter = ({ route, navigation }) => {
 	const ref_badges = useRef(null);
 	const ref_badge_type = useRef(null);
 	const ref_calendar = useRef(null)
+	const ref_coinList = useRef(null);
 	const { access } = useSelector(selectUser);
 
-	const [status, setStatus] = useState({ title: statusList[0].title, key: statusList[0].key });
 	const [showStart, setShowStart] = useState(!!route.params.filters?.from_start_date)
 	const [showEnd, setShowEnd] = useState(!!route.params.filters?.to_end_date)
 	const [showAttract, setShowAttract] = useState(!!route.params.filters?.coins_from)
 	const [badges, setBadges] = useState(!!route.params.filters?.badges ? route.params.filters?.badges : [])
 	const [filter, setFilter] = useState(route.params.filters)
-  const [coins, setCoins] = useState( {from: route.params.filters?.coins_from || "0", to:  route.params.filters?.coins_to ||"0"})
+	const [coins, setCoins] = useState({ from: route.params.filters?.coins_from || "0", to: route.params.filters?.coins_to || "0" })
 
 	const optionStatus = () => ref_status.current.openModal()
 	const optionBadges = () => ref_badges.current.openModal()
 	const optionBadgeType = () => ref_badge_type.current.openModal()
 
-	const handleSelect = (item) => item.key != 'all' ? setFilter({ ...filter, mission_status: item.key, status: item.title }) : setFilter({...filter, mission_status: null, status:null })
+	const handleSelect = (item) => item.key != 'all' ? setFilter({ ...filter, mission_status: item.key, status: item.title }) : setFilter({ ...filter, mission_status: null, status: null })
 
 	const handleSelect2 = (item) => {
-				if(badges.length != access.badge_levels.length) { 
-						setBadges(badges.length == 0 ? [item] : [...badges, item]) }
+		if (badges.length != access.badge_levels.length) {
+			setBadges(badges.length == 0 ? [item] : [...badges, item])
+		}
 	}
 
-	const handleSelect3 = (item) =>  setFilter({ ...filter, badge_type: item.key, filter_member_title: item.title });
+	const handleSelect3 = (item) => setFilter({ ...filter, badge_type: item.key, filter_member_title: item.title });
 
-	const toUpper = (txt) => txt[0].toUpperCase() + txt.slice(1, txt.length)
+	const handleSelect4 = (item) => {
+		if (item.key == "none") {
+			let obj = { ...filter }
+			delete obj?.sort_by_coins
+			setFilter({ ...obj })
+		} else {
+			setFilter({ ...filter, sort_by_coins: item.key })
+		}
+	}
 
 	const filterList = () => {
-			if(badges.length==access.badge_levels.length){
-					return [{title:"No options"}]
-			}
-			else if(badges.length == 0){ return [...access?.badge_levels] }  	
-			else {
-						return access?.badge_levels.filter(el =>
-			badges.findIndex(x => x._id == el._id) < 0 && el )  
-			}
+		if (badges.length == access.badge_levels.length) {
+			return [{ title: "No options" }]
+		}
+		else if (badges.length == 0) { return [...access?.badge_levels] }
+		else {
+			return access?.badge_levels.filter(el =>
+				badges.findIndex(x => x._id == el._id) < 0 && el)
+		}
 	}
 	useEffect(() => {
 		setFilter(route.params.filters)
@@ -69,15 +78,6 @@ const Filter = ({ route, navigation }) => {
 	useEffect(() => {
 		console.log(filter)
 	}, [filter])
-
-	const ListBadge = () => {
-		return (
-			<FlatList
-				data={filter.badge_level}
-				KeyExtraction
-			/>
-		)
-	}
 
 	return (
 		<RootView title={"Filter"}>
@@ -93,6 +93,13 @@ const Filter = ({ route, navigation }) => {
 				/>
 
 				<MyTouchableInput
+					label='Sort coins by'
+					value={!!filter?.sort_by_coins ? (filter?.sort_by_coins === "ascending" ? "Low to high" : "High to low") : ""}
+					icon={() => icons.down()}
+					onPress={() => ref_coinList?.current.openModal()}
+				/>
+
+				<MyTouchableInput
 					label='Filter Member by Badge Level*'
 					value={filter?.filter_member_title || ""}
 					icon={() => icons.down()}
@@ -100,7 +107,7 @@ const Filter = ({ route, navigation }) => {
 				/>
 
 				<MyTouchableInput
-					label={filter?.badge_type == "accept_time" && filter?.filter_member_title || "Current User Badge level" }
+					label={filter?.badge_type == "accept_time" && filter?.filter_member_title || "Current User Badge level"}
 					iconOnPress={optionBadges}
 					view={() =>
 						<View style={{ flexDirection: "row", flex: 1, alignItems: "center", flexWrap: "wrap", paddingVertical: 2 }}>
@@ -180,7 +187,7 @@ const Filter = ({ route, navigation }) => {
 							<MyInputs
 								label='Coin From*'
 								value={coins.from}
-								onChangeText={(text) => setCoins({...coins,from: text })}
+								onChangeText={(text) => setCoins({ ...coins, from: text })}
 								keyboardType='number-pad'
 							/>
 						</View>
@@ -188,7 +195,7 @@ const Filter = ({ route, navigation }) => {
 							<MyInputs
 								label='Coin To*'
 								value={coins.to}
-								onChangeText={(text) => setCoins({...coins,to: text })}
+								onChangeText={(text) => setCoins({ ...coins, to: text })}
 								keyboardType='number-pad'
 							/>
 						</View>
@@ -213,6 +220,12 @@ const Filter = ({ route, navigation }) => {
 					optionList={filterMember}
 				/>
 
+				<OptionModal2
+					ref={ref_coinList}
+					onSelected={handleSelect4}
+					optionList={coinsList}
+				/>
+
 				<View style={{ flexDirection: "row", marginTop: 10 }}>
 					<MyClearButton
 						style={{ flex: 1, marginRight: 10 }}
@@ -229,21 +242,22 @@ const Filter = ({ route, navigation }) => {
 						style={{ flex: 1 }}
 						title='Submit'
 						onPress={() => {
-								if( (!!filter?.badge_type && badges.length ==0) || (badges.length!=0 && !!filter?.badge_type==false)  ){
-										showToast({body: "Please Select the Filter Member by Badge Type", title: "Filter Badege Level Not Selected" })
-								} else{
+							if ((!!filter?.badge_type && badges.length == 0) || (badges.length != 0 && !!filter?.badge_type == false)) {
+								showToast({ body: "Please Select the Filter Member by Badge Type", title: "Filter Badege Level Not Selected" })
+							} else {
 								nav.navigate(routes.missionMemberList, {
-										filter: {
-												...filter,
-												badge_levels: [...badges.map(el => el._id)],
-												badges,
-												coins_from: showAttract ? coins.from:null,
-												coins_to: showAttract ? coins.to :null
-							},
-							item: route.params.item
-						})
+									filter: {
+										...filter,
+										badge_levels: [...badges.map(el => el._id)],
+										badges,
+										coins_from: showAttract ? coins.from : null,
+										coins_to: showAttract ? coins.to : null
+									},
+									item: route.params.item
+								})
 
-						} }}
+							}
+						}}
 					/>
 
 				</View>
@@ -278,15 +292,30 @@ const statusList = [
 	}
 ]
 
+const coinsList = [
+	{
+		title: "None",
+		key: "none"
+	},
+	{
+		title: "High to low",
+		key: "descending",
+	},
+	{
+		title: "Low to high",
+		key: "ascending",
+	}
+]
+
 const filterMember = [
-		{
-				title:"Member's Current Badge Level",
-				key:"current",
-		},
-		{
-				title:"Acceptance Time User Badge Level",
-				key:"accept_time",
-		}
+	{
+		title: "Member's Current Badge Level",
+		key: "current",
+	},
+	{
+		title: "Acceptance Time User Badge Level",
+		key: "accept_time",
+	}
 ]
 
 export default Filter

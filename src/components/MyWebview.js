@@ -1,65 +1,59 @@
-import { Dimensions, Text, TouchableOpacity } from "react-native";
+import { Dimensions } from "react-native";
 import RenderHTML, { HTMLContentModel, HTMLElementModel, defaultSystemFonts } from "react-native-render-html";
-import IframeRenderer, { iframeModel } from '@native-html/iframe-plugin';
+import IframeRenderer from '@native-html/iframe-plugin';
 import { colors } from "../utilities/colors";
 import { fonts } from "../utilities/fonts";
-import { Component, useMemo, useRef } from "react";
+import { useMemo } from "react";
 import WebView from "react-native-webview";
-import { isUrl } from "../functions/regex";
-import openUrl from "../functions/openUrl";
-import { urlifyWithAchorTag } from "../functions/urlify";
-import AudioPlayer from "./AudioPlayer";
-import DeviceInfo from "react-native-device-info";
 import { useSelector } from "react-redux";
 import { S3Urls } from "../utilities/constants";
 import { selectUser } from "../redux/reducers/userSlice";
 
 
 const MyWebview = ({
-  html: rawHtml, style, baseStyle, spanColor, fullWidth, width, invert 
+	html: rawHtml, style, baseStyle, fullWidth, width, invert
 }) => {
-  console.log(rawHtml,"rawHtml")
   const { S3_URL } = useSelector(selectUser)
   // Preprocess HTML
   const htmlModified = useMemo(() => {
     let processed = "<div>" + rawHtml.replace(/padding:/g, "") + "</div>";
     processed = "<div>" + processed.replace(/height:100%/g, "") + "</div>";
 
-    for (const link of S3Urls) {
-      if (processed.includes(link)) {
-        processed = processed.replaceAll(link, S3_URL);
-      }
-    }
+		for (const link of S3Urls) {
+			if (processed.includes(link)) {
+				processed = processed.replaceAll(link, S3_URL);
+			}
+		}
 
-    return processed;
-  }, [rawHtml]);
+		return processed;
+	}, [rawHtml]);
 
-  const renderers = {
-    iframe: IframeRenderer,
-  };
+	const renderers = {
+		iframe: IframeRenderer,
+	};
 
-  const customHTMLElementModels = {
-    iframe: HTMLElementModel.fromCustomModel({
-      tagName: 'iframe',
-      contentModel: HTMLContentModel.block,
-    }),
-    font: HTMLElementModel.fromCustomModel({
-      tagName: 'font',
-      contentModel: HTMLContentModel.mixed,
-      getUADerivedStyleFromAttributes({ face, color, size }) {
-        const style = {};
-        if (face) style.fontFamily = face;
-        if (color) style.color = color;
-        return style;
-      },
-    }),
-  };
+	const customHTMLElementModels = {
+		iframe: HTMLElementModel.fromCustomModel({
+			tagName: 'iframe',
+			contentModel: HTMLContentModel.block,
+		}),
+		font: HTMLElementModel.fromCustomModel({
+			tagName: 'font',
+			contentModel: HTMLContentModel.mixed,
+			getUADerivedStyleFromAttributes({ face, color }) {
+				const style = {};
+				if (face) style.fontFamily = face;
+				if (color) style.color = color;
+				return style;
+			},
+		}),
+	};
 
-  const contentWidth = fullWidth
-    ? Dimensions.get('window').width - 40
-    : width
-    ? width
-    : Dimensions.get('window').width / 1.5;
+	const contentWidth = fullWidth
+		? Dimensions.get('window').width - 40
+		: width
+			? width
+			: Dimensions.get('window').width / 1.5;
 
   return (
     <RenderHTML
@@ -331,7 +325,7 @@ export default MyWebview;
 //             color: this.props?.invert ? colors.black : colors.lightText,
 //           },
 
-          
+
 //           ol: {
 //             margin: 0,
 //             marginTop: 5,
