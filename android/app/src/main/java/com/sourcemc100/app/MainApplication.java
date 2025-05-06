@@ -1,4 +1,4 @@
-package com.dynamite.missioncontrol100;
+package com.sourcemc100.app;
 
 import android.app.Application;
 

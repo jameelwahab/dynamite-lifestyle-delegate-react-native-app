@@ -12,7 +12,7 @@
     "test": "jest",
     "pod": "npx pod-install ios",
     "apk": "cd android && ./gradlew assembleRelease && cd ..",
-    "uni": "adb uninstall com.dynamite.missioncontrol100",
+    "uni": "adb uninstall com.sourcemc100.app",
     "postinstall": "patch-package"
   },
   "dependencies": {
