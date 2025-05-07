@@ -93,7 +93,7 @@ const Filter = ({ route, navigation }) => {
 				/>
 
 				<MyTouchableInput
-					label='Sort coins by'
+					label='Sort by'
 					value={!!filter?.sort_by_coins ? (filter?.sort_by_coins === "ascending" ? "Low to high" : "High to low") : ""}
 					icon={() => icons.down()}
 					onPress={() => ref_coinList?.current.openModal()}
