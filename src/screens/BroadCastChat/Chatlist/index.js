@@ -32,8 +32,7 @@ import { selectNavbar } from '../../../redux/reducers/navbarSlice'
 
 let page = 0;
 let canLoadMore = false;
-let firstTime = true;
-let isNewChat = false;
+
 
 const ChatList = ({ navigation, route }) => {
   const { key } = route?.params;
@@ -74,7 +73,7 @@ const ChatList = ({ navigation, route }) => {
       setLoader(false);
       setFooterLoader(false);
       setChatList(newArray ? res?.broadcasts : [...chatList, ...res?.broadcasts]);
-      firstTime = false;
+
     } else {
       setLoader(false)
       setFooterLoader(false);
@@ -98,19 +97,19 @@ const ChatList = ({ navigation, route }) => {
 
 
 
-  useEffect(() => {
-    if (!firstTime) {
-      page = 0;
-      canLoadMore = false;
-      debounce(() => api_ChatList(true))
-    }
-  }, [searchText])
+  // useEffect(() => {
+  //   if (!firstTime) {
+  //     page = 0;
+  //     canLoadMore = false;
+  //     debounce(() => api_ChatList(true))
+  //   }
+  // }, [searchText])
 
 
 
 
   useEffect(() => {
-    firstTime = true;
+    // firstTime = true;
     page = 0;
     canLoadMore = false;
     api_ChatList(true)
@@ -119,13 +118,11 @@ const ChatList = ({ navigation, route }) => {
     return () => {
       page = 0;
       canLoadMore = false;
-      isNewChat = false;
-
     }
-  }, [route])
+  }, [route, searchText])
 
 
- 
+
 
 
 

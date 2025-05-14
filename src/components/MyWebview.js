@@ -99,7 +99,7 @@ const ItsWebView = ({
 				span: {
 					fontFamily: rawHtml.includes('<b>') ? undefined : fonts.light,
 					margin: 0,
-					lineHeight: 12,
+					lineHeight: 20,
 					fontSize: 13,
 					color: invert ? colors.black : colors.lightText,
 				},
