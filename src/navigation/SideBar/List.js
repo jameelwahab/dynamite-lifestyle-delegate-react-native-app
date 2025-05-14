@@ -644,7 +644,8 @@ export const ChildComponents = {
 		key: routes.goalStatementCompleteNavigator,
 		component: StackGoalStatementCompleted,
 		params: {
-			value: "complete", parentValue: "member_goal_statement",
+			value: "complete",
+			parentValue: "member_goal_statement",
 			key: "f18f9630-2dc1-4e42-a498-0a0e7e9407be",
 			parentKey: "75176cef-cff2-4741-8139-67ce23bdca6c",
 			type: "complete"
@@ -665,6 +666,7 @@ export const ChildComponents = {
 		component: StackGoalStatementResponded,
 		params: {
 			value: "responded", parentValue: "member_goal_statement",
+			module: "goal_statement",
 			key: "46eb45b0-1e4a-4903-b3a2-1f0823d990d7",
 			parentKey: "75176cef-cff2-4741-8139-67ce23bdca6c",
 			type: "responded"

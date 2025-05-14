@@ -1,15 +1,11 @@
-
 import { View, Text } from 'react-native'
 import React from 'react'
-import RootView from '../../components/RootView'
-import MyText from '../../components/MyText'
-import GoalStatementList from './components/GoalStatementList'
+import ListForAllTypes from '../SelfImage/components/ListForAllTypes'
 
-const Complete = (props) => {
+const Completed = (props) => {
   return (
-    <GoalStatementList
-     {...props} />
+    <ListForAllTypes type2="goal_statment" {...props} />
   )
 }
 
-export default Complete
+export default Completed

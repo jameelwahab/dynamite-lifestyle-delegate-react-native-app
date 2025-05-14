@@ -8,9 +8,26 @@ import WebView from "react-native-webview";
 import { useSelector } from "react-redux";
 import { S3Urls } from "../utilities/constants";
 import { selectUser } from "../redux/reducers/userSlice";
+import React, { Component } from 'react'
+
+class MyWebview extends Component {
+	shouldComponentUpdate(nextProps, nextState) {
+		return !(JSON.stringify(this.props) == JSON.stringify(nextProps))
+	}
+
+	render() {
+		return (
+			<ItsWebView
+				{...this.props}
+			/>
+		)
+	}
+}
+
+export default MyWebview
 
 
-const MyWebview = ({
+const ItsWebView = ({
 	html: rawHtml, style, baseStyle, fullWidth, width, invert
 }) => {
 	const { S3_URL } = useSelector(selectUser)
@@ -206,7 +223,7 @@ const MyWebview = ({
 	);
 };
 
-export default MyWebview;
+
 
 // export class MyWebview extends Component {
 //   constructor(props) {

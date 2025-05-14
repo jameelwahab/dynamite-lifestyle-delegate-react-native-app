@@ -3,7 +3,7 @@ import invokeApi from "../functions/invokeAPI";
 export const GOAL_STATEMENT_LIST = ({ token, navigation, type, }) => {
   return invokeApi({
     path: type == "responded" ?
-      `api/goal_statement_question/user_list_goal_statement_save_and_close_for_consultant` :
+      `api/member/history/list?page=0&limit=50&search_text=&type=goal_statement` :
       `api/goal_statement_question/user_list_goal_statement_for_consultant?type=${type}`,
     method: "GET",
     token,

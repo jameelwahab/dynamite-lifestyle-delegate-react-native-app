@@ -20,6 +20,7 @@ import OptionModal from '../../../components/OptionModal'
 import { communityLevelObj } from '../../../utilities/constants'
 import breakReference from '../../../functions/breakReference'
 import isArray from '../../../functions/isArray'
+import capitalize from '../../../functions/capitalize'
 
 const GroupAddEdit = ({ navigation, route }) => {
   const { group, ammendList } = route?.params;
@@ -164,7 +165,8 @@ const GroupAddEdit = ({ navigation, route }) => {
       } else if (obj.group_by == "mission") {
         obj["missions"] = groupData.mission.map(item => ({
           _id: item?._id,
-          title: item?.title
+          title: item?.title,
+          // type: item?.type
         }))
       }
       // console.log(obj,"obj")
@@ -219,7 +221,7 @@ const GroupAddEdit = ({ navigation, route }) => {
       <View style={__styles.chipsLisView}>
         {list.map((item, index) =>
           <MyChip
-            title={item[variable]}
+            title={item[variable] + `${(type == "mission" && item?.type) ? " (" + capitalize(item?.type).trim() + ")" : ""}`}
             onPress={() => removeItem(index, type)}
           />
         )}
@@ -328,7 +330,7 @@ const GroupAddEdit = ({ navigation, route }) => {
             iconOnPress={() => setOptionModal({ isVisible: true, type: groupData.groupBy })}
             view={() => selectedView(groupData?.program, "program")}
           /> : groupData.groupBy == "event" ?
-            <MyTouchableIntitltitleeput
+            <MyTouchableInput
               label='Event'
               view={() => selectedView(groupData?.event, "event")}
               iconOnPress={() => setOptionModal({ isVisible: true, type: groupData.groupBy })}
@@ -339,7 +341,7 @@ const GroupAddEdit = ({ navigation, route }) => {
                 iconOnPress={() => setOptionModal({ isVisible: true, type: groupData.groupBy })}
               /> : groupData.groupBy == "mission" ?
                 <MyTouchableInput
-                  label='Mission \ Quest'
+                  label='Mission | Quest'
                   view={() => selectedView(groupData?.mission, "mission", "title")}
                   iconOnPress={() => setOptionModal({ isVisible: true, type: groupData.groupBy })}
                 /> : null}
@@ -397,7 +399,7 @@ const GroupAddEdit = ({ navigation, route }) => {
               optionModal?.type == "sale_page" ? "Sale Page" :
                 optionModal?.type == "plans" ? "Plan" :
                   optionModal?.type == "member" || optionModal?.type == "exclude_members" ? "Member" :
-                    optionModal?.type == "mission" ? "Mission" :
+                    optionModal?.type == "mission" ? "Missions and Quests" :
                       ""
         }
         renderText={({ item }) => (
@@ -406,7 +408,7 @@ const GroupAddEdit = ({ navigation, route }) => {
               optionModal?.type == "sale_page" ? `${item?.sale_page_title}` :
                 optionModal?.type == "plans" ? `${item?.plan_title}` :
                   optionModal?.type == "member" || optionModal?.type == "exclude_members" ? `${item?.first_name} ${item?.last_name} (${item?.email})` :
-                    optionModal?.type == "mission" ? item?.title : ""}
+                    optionModal?.type == "mission" ? item?.title + " |" + capitalize(item?.type) : ""}
           </MyText>
         )}
       />
@@ -499,7 +501,7 @@ const grpByTypeList = {
     value: "sale_page"
   },
   "mission_quest": {
-    title: "Missions \\ Quests",
+    title: "Missions | Quests",
     value: "mission"
   },
 }

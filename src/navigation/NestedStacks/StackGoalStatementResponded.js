@@ -7,6 +7,7 @@ import { defaultScreens } from './defaultScreens'
 import { colors } from '../../utilities/colors'
 import GoalstatmentDetail from '../../screens/GoalStatement/GoalstatmentDetail'
 import Responded from '../../screens/GoalStatement/Responded'
+import SelfImageDetail from '../../screens/SelfImage/Detail'
 
 
 
@@ -24,6 +25,7 @@ const StackGoalStatementResponded = ({ route }) => {
         <GoalStatementRespondedStack.Screen initialParams={route.params}
           name={routes.goalStatementResponedScreen} component={Responded} />
         <GoalStatementRespondedStack.Screen name={routes.goalStatmentDetail} component={GoalstatmentDetail} />
+        <GoalStatementRespondedStack.Screen name={routes.selfImageDetail} component={SelfImageDetail} />
 
         {/*//? Default Screens Start */}
         {defaultScreens.map((x, i) => (

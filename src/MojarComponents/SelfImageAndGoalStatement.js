@@ -1,48 +1,45 @@
 import { View, Text, FlatList, StyleSheet, Pressable } from 'react-native'
-import React, { useEffect, useRef, useState } from 'react'
-import RootView from '../../../components/RootView'
-import { selectUser } from '../../../redux/reducers/userSlice';
+import React, { useEffect, useState } from 'react'
+import RootView from '../components/RootView';
+import { selectUser } from '../redux/reducers/userSlice';
 import { useSelector } from 'react-redux';
-import { GET_USER_LISTING_WHO_ASNWERED_BY_MODULE, PORTAL_DELETE_EVENT, PORTAL_EVENT_DELETE_MEMBER, PORTAL_EVENT_LIST, PORTAL_MEMBER_LISTING, SELF_IMAGE_INCOMPLETE, SELF_IMAGE_RESPONDED_MEMBER_LIST, SELF_IMAGE_SAVE_AND_CLOSE } from '../../../DAL';
-import MyLoader from '../../../components/MyLoader';
-import MyText from '../../../components/MyText';
-import { colors } from '../../../utilities/colors';
-import MyImage from '../../../components/MyImage';
-import { S3_URL, dateTimeFormat } from '../../../utilities/constants';
-import { MenuButton } from '../../../components/MyButton';
-import OptionModal from '../../../components/OptionModal';
-import { icons } from '../../../utilities/icons';
-import ConfirmationModal from '../../../components/ConfirmationModal';
-import EmptyView from '../../../components/EmptyView';
-import routes from '../../../navigation/routes';
-import FAB from '../../../components/FAB';
-import ImageZoomer from '../../../components/ImageZoomer';
-import UserImage from '../../../components/UserImage';
+import { GET_USER_LISTING_WHO_ASNWERED_BY_MODULE, PORTAL_DELETE_EVENT, PORTAL_EVENT_DELETE_MEMBER, PORTAL_EVENT_LIST, PORTAL_MEMBER_LISTING, SELF_IMAGE_INCOMPLETE, SELF_IMAGE_RESPONDED_MEMBER_LIST, SELF_IMAGE_SAVE_AND_CLOSE } from '../DAL';
+import MyLoader from '../components/MyLoader';
+import MyText from '../components/MyText';
+import { colors } from '../utilities/colors';
+import MyImage from '../components/MyImage';
+import { S3_URL, dateTimeFormat } from '../utilities/constants';
+import { MenuButton } from '../components/MyButton';
+import OptionModal from '../components/OptionModal';
+import { icons } from '../utilities/icons';
+import ConfirmationModal from '../components/ConfirmationModal';
+import EmptyView from '../components/EmptyView';
+import routes from '../navigation/routes';
+import FAB from '../components/FAB';
+import ImageZoomer from '../components/ImageZoomer';
+import UserImage from '../components/UserImage';
 import moment from 'moment';
-import SearchView from '../../../components/SearchView';
-import FooterLoader from '../../../components/FooterLoader';
-import StatView from '../../../components/StatView';
-import { selectNavbar } from '../../../redux/reducers/navbarSlice';
-import MyRefreshControl from '../../../components/MyRefreshControl';
-import showToast from '../../../functions/showToast';
-import AssignModal from './AssignModal';
-import breakReference from '../../../functions/breakReference';
+import SearchView from '../components/SearchView';
+import FooterLoader from '../components/FooterLoader';
+import StatView from '../components/StatView';
+import { selectNavbar } from '../redux/reducers/navbarSlice';
+import MyRefreshControl from '../components/MyRefreshControl';
+import showToast from '../functions/showToast';
+import MemberView from '../components/MemberView';
+
 
 
 
 
 let page = 0;
 let canLoadMore = false;
-const ListForAllTypes = ({ navigation, route }) => {
-  const ref_assignModal = useRef()
-  const { _id, module, type, parentKey, key,  } = route?.params;
-  const isComplete = type == "completed";
-  const isIncomplete = type == "incompleted";
-  const isResponded = type == "responded";
+const SelfImageAndGoalStatement = ({ navigation, route }) => {
+  const { _id, module, type, parentKey, key } = route?.params;
+  const isGoalStatment = module == "goal_statement";
   const { navbar } = useSelector(selectNavbar);
   const [title] = useState(navbar?.find(x => x._id == parentKey)?.title);
   const [subTitle] = useState(navbar?.find(x => x._id == parentKey)?.child_options?.find(y => y._id == key)?.title);
-  const { token, access } = useSelector(selectUser);
+  const { token } = useSelector(selectUser);
   const [loader, setLoader] = useState(true);
   const [list, setList] = useState([]);
   const [searchText, setSearchText] = useState("");
@@ -50,26 +47,11 @@ const ListForAllTypes = ({ navigation, route }) => {
   const [footerLoader, setFooterLoader] = useState(false);
   const [searchLoader, setSearchLoader] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const [options] = useState(isComplete ? getOptions(optionsListForComplete) : isIncomplete ? getOptions(optionsListForother) : optionsListForother)
   const [confirmModal, setConfirmModal] = useState({ isVisible: false, item: null, statement: "", type: "" });
   const [optionModal, setOptionModal] = useState({
     isVisible: false,
     selectedItem: null,
   })
-
-  function getOptions(list) {
-    let nlist = list;
-    if (access?.allow_assign_option_in_self_image) {
-      nlist = [...nlist, {
-        title: "Assign To",
-        key: "assign_to",
-        icon: icons.edit
-      }]
-    }
-    return nlist
-
-  }
-
 
 
   useEffect(() => {
@@ -94,18 +76,12 @@ const ListForAllTypes = ({ navigation, route }) => {
 
   const onSelected = (opt) => {
     let { selectedItem: item } = optionModal;
-    console.log(item, 'item')
     setOptionModal({ isVisible: false, item: null });
     setTimeout(() => {
       if (opt.key == "save") {
         setConfirmModal({
           isVisible: true, item, type: opt.key,
-          statement: "Are you sure you want save and notify user?"
-        })
-      } if (opt.key == "close") {
-        setConfirmModal({
-          isVisible: true, item, type: opt.key,
-          statement: "Are you sure you want close?"
+          statement: "Are you sure you want save and close?"
         })
       } else if (opt.key == "incomplete") {
         setConfirmModal({
@@ -114,14 +90,6 @@ const ListForAllTypes = ({ navigation, route }) => {
         })
       } else if (opt.key == "detail") {
         onAnswerScreen(item)
-      } else if (opt.key == "assign_to") {
-        setTimeout(() => {
-          ref_assignModal?.current?.openModal({
-            itemId: item?._id,
-            userId: item?.member_id,
-            delegateId: item?.self_image_assign_to?._id
-          });
-        }, 500);
       }
     }, 500);
 
@@ -132,55 +100,48 @@ const ListForAllTypes = ({ navigation, route }) => {
     setConfirmModal({ isVisible: false, item: null, statement: "", type: "" });
     if (type == "incomplete") {
       incompleteFromServer(item)
-    }
-    // else if (type == "reminder") {
-    //   sendReminder(item)
-    // } 
-    else if (type == "save") {
-      SaveAndCompleteFromServer(item, "close_and_notify")
-    }
-    else if (type == "close") {
-      SaveAndCompleteFromServer(item, "close")
+    } else if (type == "reminder") {
+      sendReminder(item)
+    } else if (type == "save") {
+      SaveAndCompleteFromServer(item)
     }
   }
 
   const onAnswerScreen = (item) => {
-    let obj = {
-      created_for: item?.created_for,
-      id: "",
-      memberId: item?.member_id,
-      type: type
-    };
-    navigation.navigate(routes.selfImageDetail, obj)
+    // if (isGoalStatment) {
+    //   navigation.navigate(routes.goalStatmentDetail, {
+    //     memberId: item?.user_info?._id
+    //   })
+    // } else {
+      let obj = {
+        created_for: item?.plan_type,
+        id: "",
+        memberId: item?._id,
+        type: type
+      };
+      navigation.navigate(routes.selfImageDetail, obj)
+    // }
+    // navigation.navigate(routes.selfImageRespondedHistoryList, params)
   }
 
-  const onAssigned = (itemId, delegate) => {
-    let nlist = breakReference(list);
-    let index = nlist.findIndex(x => x?._id == itemId);
-    if (index > -1) {
-      nlist[index]["self_image_assign_to"] = delegate;
-      setList(breakReference(nlist))
-    }
-
-  }
 
   //!  APIs
 
 
 
   const getDataFromServer = async () => {
-    let res = await GET_USER_LISTING_WHO_ASNWERED_BY_MODULE({ navigation, token, page, search_text: searchText, created_for: module, created_for_id: _id, type });
+    let res = await SELF_IMAGE_RESPONDED_MEMBER_LIST({ navigation, token, page, search: searchText, module: module });
     if (res.code == 200) {
       let isFirstTime = page == 0;
-      let totalItems = page == 0 ? res?.members.length : (list.length + res?.members.length);
-      if (res?.toal_count > totalItems) {
+      let totalItems = page == 0 ? res?.history.length : (list.length + res?.history.length);
+      if (res?.total_count > totalItems) {
         canLoadMore = true;
         page += 1;
       } else {
         canLoadMore = false;
       }
-      setTotal(res?.toal_count)
-      setList(isFirstTime ? res?.members : [...list, ...res?.members]);
+      setTotal(res?.total_count)
+      setList(isFirstTime ? res?.history : [...list, ...res?.history]);
       setLoader(false);
       setFooterLoader(false);
       setSearchLoader(false);
@@ -194,9 +155,9 @@ const ListForAllTypes = ({ navigation, route }) => {
     }
   }
 
-  const SaveAndCompleteFromServer = async (member, type) => {
+  const SaveAndCompleteFromServer = async (member) => {
     setLoader(true);
-    let res = await SELF_IMAGE_SAVE_AND_CLOSE({ navigation, token, memberId: member?.member_id, type })
+    let res = await SELF_IMAGE_SAVE_AND_CLOSE({ navigation, token, memberId: member?.member_id, })
     if (res.code == 200) {
       showToast({ type: 'success', title: res.message });
       setList((old) => old.filter(x => x._id != member?._id))
@@ -261,7 +222,12 @@ const ListForAllTypes = ({ navigation, route }) => {
         <Pressable
           onPress={() => onAnswerScreen(item)}
           style={__styles.itemHead} >
-          <UserImage
+          <View style={{ flex: 1 }}>
+            <MemberView
+              member={item?.user_info}
+            />
+          </View>
+          {/* <UserImage
             size={35}
             image={item?.profile_image}
             name={item?.first_name}
@@ -270,14 +236,14 @@ const ListForAllTypes = ({ navigation, route }) => {
           <View style={{ flex: 1, marginLeft: 10 }}>
             <MyText type='medium' >{item?.first_name + " " + item?.last_name}</MyText>
             <MyText fontSize={12} color={colors.lightText}>{item?.email}</MyText>
-          </View>
+          </View> */}
           <MenuButton
             onPress={() => setOptionModal({ isVisible: true, selectedItem: item })}
           />
         </Pressable>
         <View style={{ marginTop: 10 }}>
-          <StatView title={"Status"} view={() => statusView(item?.self_image_status == "completed" || item?.self_image_status == "responded", "completed", "incomplete")} />
-          {!isIncomplete && <StatView title={"Completed Date"} value={moment(item?.self_image_completed_date).format(dateTimeFormat.date)} />}
+          <StatView title={"Status"} view={() => statusView(item?.plan_status == "completed" || item?.plan_status == "responded", "completed", "incomplete")} />
+          <StatView title={"Completed Date"} value={moment(item?.completed_date).format(dateTimeFormat.date)} />
         </View>
 
       </View>)
@@ -314,7 +280,7 @@ const ListForAllTypes = ({ navigation, route }) => {
 
 
       <OptionModal
-        optionList={options}
+        optionList={optionsListForother}
         isVisible={optionModal?.isVisible}
         onSelected={onSelected}
         closeModal={() => setOptionModal({ isVisible: false, selectedItem: null })}
@@ -329,16 +295,11 @@ const ListForAllTypes = ({ navigation, route }) => {
       />
 
       <MyLoader enable={loader} />
-      <AssignModal
-        type="self_image"
-        ref={ref_assignModal}
-        onSuccess={onAssigned}
-      />
     </RootView>
   )
 }
 
-export default ListForAllTypes
+export default SelfImageAndGoalStatement
 
 const __styles = StyleSheet.create({
   itemRootView: {
@@ -366,19 +327,10 @@ const optionsListForComplete = [
     icon: icons.edit
   },
   {
-    title: "Close",
-    key: "close",
-    icon: icons.edit
-  },
-  {
-    title: "Save & Notify",
+    title: "Save & Close",
     key: "save",
     icon: icons.edit
   },
-
-
-
-
   {
     title: "Incomplete",
     key: "incomplete",
