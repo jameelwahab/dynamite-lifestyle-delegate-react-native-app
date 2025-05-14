@@ -281,7 +281,7 @@ const ListForAllTypes = ({ navigation, route }) => {
           {!isIncomplete && <StatView title={"Completed Date"} value={moment(item?.self_image_completed_date).format(dateTimeFormat.date)} />}
           {access?.show_members_list_for_self_image=="all" &&
             <StatView title={"Assigned To"} value={isObject(item?.self_image_assign_to) ?
-              `${item?.self_image_assign_to?.first_name} ${item?.self_image_assign_to?.last_name}`
+              `${item?.self_image_assign_to?.first_name} ${item?.self_image_assign_to?.last_name} (${item?.self_image_assign_to?.email})`
               : "N/A"
             } />}
         </View>

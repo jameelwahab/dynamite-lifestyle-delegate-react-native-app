@@ -246,7 +246,7 @@ const SelfImageAndGoalStatement = ({ navigation, route }) => {
           <StatView title={"Status"} view={() => statusView(item?.plan_status == "completed" || item?.plan_status == "responded", "completed", "incomplete")} />
           <StatView title={"Completed Date"} value={moment(item?.completed_date).format(dateTimeFormat.date)} />
           <StatView title={"Closed by"} value={isObject(item?.closed_by) ?
-            `${item?.closed_by?.first_name} ${item?.closed_by?.last_name}`
+            `${item?.closed_by?.first_name} ${item?.closed_by?.last_name} (${item?.closed_by?.email})`
             : "N/A"
           } />
         </View>
