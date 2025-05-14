@@ -27,6 +27,7 @@ import MyRefreshControl from '../../../components/MyRefreshControl';
 import showToast from '../../../functions/showToast';
 import AssignModal from './AssignModal';
 import breakReference from '../../../functions/breakReference';
+import isObject from '../../../functions/isObject';
 
 
 
@@ -35,7 +36,7 @@ let page = 0;
 let canLoadMore = false;
 const ListForAllTypes = ({ navigation, route }) => {
   const ref_assignModal = useRef()
-  const { _id, module, type, parentKey, key,  } = route?.params;
+  const { _id, module, type, parentKey, key, } = route?.params;
   const isComplete = type == "completed";
   const isIncomplete = type == "incompleted";
   const isResponded = type == "responded";
@@ -278,6 +279,11 @@ const ListForAllTypes = ({ navigation, route }) => {
         <View style={{ marginTop: 10 }}>
           <StatView title={"Status"} view={() => statusView(item?.self_image_status == "completed" || item?.self_image_status == "responded", "completed", "incomplete")} />
           {!isIncomplete && <StatView title={"Completed Date"} value={moment(item?.self_image_completed_date).format(dateTimeFormat.date)} />}
+          {access?.show_members_list_for_self_image=="all" &&
+            <StatView title={"Assigned To"} value={isObject(item?.self_image_assign_to) ?
+              `${item?.self_image_assign_to?.first_name} ${item?.self_image_assign_to?.last_name}`
+              : "N/A"
+            } />}
         </View>
 
       </View>)

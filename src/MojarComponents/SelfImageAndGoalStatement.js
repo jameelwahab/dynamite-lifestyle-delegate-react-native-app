@@ -26,6 +26,7 @@ import { selectNavbar } from '../redux/reducers/navbarSlice';
 import MyRefreshControl from '../components/MyRefreshControl';
 import showToast from '../functions/showToast';
 import MemberView from '../components/MemberView';
+import isObject from '../functions/isObject';
 
 
 
@@ -113,13 +114,13 @@ const SelfImageAndGoalStatement = ({ navigation, route }) => {
     //     memberId: item?.user_info?._id
     //   })
     // } else {
-      let obj = {
-        created_for: item?.plan_type,
-        id: "",
-        memberId: item?._id,
-        type: type
-      };
-      navigation.navigate(routes.selfImageDetail, obj)
+    let obj = {
+      created_for: item?.plan_type,
+      id: "",
+      memberId: item?._id,
+      type: type
+    };
+    navigation.navigate(routes.selfImageDetail, obj)
     // }
     // navigation.navigate(routes.selfImageRespondedHistoryList, params)
   }
@@ -244,6 +245,10 @@ const SelfImageAndGoalStatement = ({ navigation, route }) => {
         <View style={{ marginTop: 10 }}>
           <StatView title={"Status"} view={() => statusView(item?.plan_status == "completed" || item?.plan_status == "responded", "completed", "incomplete")} />
           <StatView title={"Completed Date"} value={moment(item?.completed_date).format(dateTimeFormat.date)} />
+          <StatView title={"Closed by"} value={isObject(item?.closed_by) ?
+            `${item?.closed_by?.first_name} ${item?.closed_by?.last_name}`
+            : "N/A"
+          } />
         </View>
 
       </View>)
