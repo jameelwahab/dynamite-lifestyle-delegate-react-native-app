@@ -35,12 +35,12 @@ let canLoadMore = false;
 
 
 const ChatList = ({ navigation, route }) => {
-  const { key } = route?.params;
+  const { value } = route?.params;
   const { token, user } = useSelector(selectUser);
   const { socket } = useSelector(selectSocket);
   const { navbar } = useSelector(selectNavbar);
   const timezone = useSelector(selectTimeZone);
-  const [title] = useState(navbar?.find(x => x._id == key)?.title);
+  const [title] = useState(navbar?.find(x => x.value == value)?.title);
   const [loader, setLoader] = useState(true);
   const [footerLoader, setFooterLoader] = useState(false);
   const [chatList, setChatList] = useState([]);

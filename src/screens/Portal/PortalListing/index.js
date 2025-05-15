@@ -19,11 +19,11 @@ import MyRefreshControl from '../../../components/MyRefreshControl'
 import EmptyView from '../../../components/EmptyView'
 
 const PortalListing = ({ navigation, route }) => {
-  const { key, value } = route?.params;
+  const {  value } = route?.params;
   const isDelegatePortals = value == "my_portals";
   const { navbar } = useSelector(selectNavbar);
   const { token, S3_URL } = useSelector(selectUser);
-  const [title] = useState(navbar?.find(x => x._id == key)?.title);
+  const [title] = useState(navbar?.find(x => x.value == value)?.title);
   const [loader, setLoader] = useState(true);
   const [isRefreshing, setRefreshing] = useState(false);
   const [list, setList] = useState([])

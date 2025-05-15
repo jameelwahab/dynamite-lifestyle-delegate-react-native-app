@@ -39,10 +39,10 @@ import MyImage from '../../components/MyImage'
 let page = 0;
 let canLoadMore = false;
 const ProgressList = ({ navigation, route }) => {
-  const { key } = route.params
+  const { value } = route.params
   const { navbar } = useSelector(selectNavbar);
   const { user, token } = useSelector(selectUser);
-  const [title] = useState(navbar?.find(x => x._id == key)?.title);
+  const [title] = useState(navbar?.find(x => x.value == value)?.title);
   const [list, setList] = useState([]);
   const [loader, setLoader] = useState(false);
   const [total, setTotal] = useState(0);

@@ -34,11 +34,11 @@ let page = 0;
 let canLoadMore = false;
 const Bookings = ({ navigation, route }) => {
 
-  const { key } = route.params
+  const { value } = route.params
   const { navbar } = useSelector(selectNavbar);
   const { token } = useSelector(selectUser);
   const timezone = useSelector(selectTimeZone)
-  const [title] = useState(navbar?.find(x => x._id == key)?.title);
+  const [title] = useState(navbar?.find(x => x.value == value)?.title);
   const [list, setList] = useState([]);
   const [loader, setLoader] = useState(false);
   const [total, setTotal] = useState(0);
