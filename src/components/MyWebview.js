@@ -8,9 +8,26 @@ import WebView from "react-native-webview";
 import { useSelector } from "react-redux";
 import { S3Urls } from "../utilities/constants";
 import { selectUser } from "../redux/reducers/userSlice";
+import React, { Component } from 'react'
+
+class MyWebview extends Component {
+	shouldComponentUpdate(nextProps, nextState) {
+		return !(JSON.stringify(this.props) == JSON.stringify(nextProps))
+	}
+
+	render() {
+		return (
+			<ItsWebView
+				{...this.props}
+			/>
+		)
+	}
+}
+
+export default MyWebview
 
 
-const MyWebview = ({
+const ItsWebView = ({
 	html: rawHtml, style, baseStyle, fullWidth, width, invert
 }) => {
   const { S3_URL } = useSelector(selectUser)
@@ -55,158 +72,158 @@ const MyWebview = ({
 			? width
 			: Dimensions.get('window').width / 1.5;
 
-  return (
-    <RenderHTML
-      WebView={WebView}
-      contentWidth={contentWidth}
-      source={{ html:htmlModified, baseUrl: '' }}
-      customHTMLElementModels={customHTMLElementModels}
-      renderers={renderers}
-      enableExperimentalMarginCollapsing={true}
-      baseStyle={baseStyle}
-      enableExperimentalBRCollapsing={true}
-      enableExperimentalGhostLinesPrevention={true}
-      tagsStyles={{
-        a: {
-          color: colors.primary,
-          textDecorationColor: colors.primary,
-          fontFamily: htmlModified.includes('<b>') ? undefined : fonts.regular,
-          fontSize: 16,
-          margin: 0,
-        },
-        div: {
-          color: invert ? colors.black : colors.white,
-          fontFamily: htmlModified.includes('<b>') ? undefined : fonts.regular,
-          margin: 0,
-        },
-        span: {
-          fontFamily: htmlModified.includes('<b>') ? undefined : fonts.light,
-          margin: 0,
-          lineHeight: 20,
-          fontSize: 13,
-          color: invert ? colors.black : colors.lightText,
-        },
-        p: {
-          margin: 0,
-          fontSize: 13,
-          marginTop: 5,
-          lineHeight: 20,
-          color: invert ? colors.black : colors.lightText,
-        },
-        ol: {
-          margin: 0,
-          marginTop: 5,
-          fontFamily: fonts.regular,
-          lineHeight: 20,
-          fontSize: 13,
-          fontWeight: Platform.OS === 'android' ? 'normal' : undefined,
-          color: invert ? colors.black : colors.lightText,
-        },
-        ul: {
-          margin: 0,
-          marginTop: 5,
-          fontFamily: fonts.regular,
-          lineHeight: 20,
-          fontSize: 13,
-          fontWeight: Platform.OS === 'android' ? 'normal' : undefined,
-          color: invert ? colors.black : colors.lightText,
-        },
-        h1: {
-          margin: 0,
-          marginTop: 5,
-          color: invert ? colors.black : colors.primary,
-          fontWeight: Platform.OS === 'android' ? 'normal' : undefined,
-          fontFamily: fonts.bold,
-        },
-        h2: {
-          margin: 0,
-          color: colors.primary,
-          marginTop: 5,
-          fontSize: 18,
-          fontWeight: Platform.OS === 'android' ? 'normal' : undefined,
-          fontFamily: fonts.bold,
-        },
-        h3: {
-          margin: 0,
-          marginTop: 5,
-          fontSize: 16,
-          fontFamily: fonts.bold,
-          fontWeight: Platform.OS === 'android' ? 'normal' : undefined,
-          color: invert ? colors.black : colors.primary,
-        },
-        h4: {
-          margin: 0,
-          marginTop: 5,
-          fontSize: 14,
-          fontFamily: fonts.medium,
-          fontWeight: Platform.OS === 'android' ? 'normal' : undefined,
-          color: invert ? colors.black : colors.white,
-        },
-        h5: {
-          margin: 0,
-          marginTop: 5,
-          fontSize: 12,
-          fontFamily: fonts.medium,
-          fontWeight: Platform.OS === 'android' ? 'normal' : undefined,
-          color: invert ? colors.black : colors.white,
-        },
-        h6: {
-          margin: 0,
-          marginTop: 5,
-          fontSize: 10,
-          fontFamily: fonts.medium,
-          fontWeight: Platform.OS === 'android' ? 'normal' : undefined,
-          color: invert ? colors.black : colors.white,
-        },
-        strong: {
-          fontFamily: fonts.bold,
-          fontWeight: Platform.OS === 'android' ? 'normal' : undefined,
-        },
-        b: {
-          fontFamily: fonts.bold,
-          fontWeight: Platform.OS === 'android' ? 'normal' : undefined,
-        },
-        img: {
-          marginTop: 5,
-        },
-        ...style,
-      }}
-      classesStyles={{
-        'mentioned-name': {
-          color: colors.primary,
-        },
-        required: {
-          fontFamily: fonts.regular,
-          lineHeight: 20,
-          fontSize: 16,
-          color: colors.delete,
-        },
-        question: {
-          fontFamily: fonts.regular,
-          lineHeight: 20,
-          fontSize: 16,
-          color: colors.primary2,
-        },
-      }}
-      systemFonts={[...defaultSystemFonts, ...Object.values(fonts)]}
-      renderersProps={{
-        iframe: {
-          javaScriptEnabled: true,
-          webViewProps: {
-            cacheEnabled: false,
-            startInLoadingState: false,
-            scrollEnabled: false,
-            allowsAirPlayForMediaPlayback: true,
-            allowsInlineMediaPlayback: true,
-            allowsFullscreenVideo: true,
-          },
-        },
-      }}
-    />
-  );
+	return (
+		<RenderHTML
+			WebView={WebView}
+			contentWidth={contentWidth}
+			source={{ html, baseUrl: '' }}
+			customHTMLElementModels={customHTMLElementModels}
+			renderers={renderers}
+			enableExperimentalMarginCollapsing={true}
+			baseStyle={baseStyle}
+			enableExperimentalBRCollapsing={true}
+			enableExperimentalGhostLinesPrevention={true}
+			tagsStyles={{
+				a: {
+					color: colors.primary,
+					textDecorationColor: colors.primary,
+					fontFamily: rawHtml.includes('<b>') ? undefined : fonts.regular,
+					fontSize: 16,
+					margin: 0,
+				},
+				div: {
+					color: invert ? colors.black : colors.white,
+					fontFamily: rawHtml.includes('<b>') ? undefined : fonts.regular,
+					margin: 0,
+				},
+				span: {
+					fontFamily: rawHtml.includes('<b>') ? undefined : fonts.light,
+					margin: 0,
+					lineHeight: 20,
+					fontSize: 13,
+					color: invert ? colors.black : colors.lightText,
+				},
+				p: {
+					margin: 0,
+					fontSize: 13,
+					marginTop: 5,
+					lineHeight: 20,
+					color: invert ? colors.black : colors.lightText,
+				},
+				ol: {
+					margin: 0,
+					marginTop: 5,
+					fontFamily: fonts.regular,
+					lineHeight: 20,
+					fontSize: 13,
+					fontWeight: Platform.OS === 'android' ? 'normal' : undefined,
+					color: invert ? colors.black : colors.lightText,
+				},
+				ul: {
+					margin: 0,
+					marginTop: 5,
+					fontFamily: fonts.regular,
+					lineHeight: 20,
+					fontSize: 13,
+					fontWeight: Platform.OS === 'android' ? 'normal' : undefined,
+					color: invert ? colors.black : colors.lightText,
+				},
+				h1: {
+					margin: 0,
+					marginTop: 5,
+					color: invert ? colors.black : colors.primary,
+					fontWeight: Platform.OS === 'android' ? 'normal' : undefined,
+					fontFamily: fonts.bold,
+				},
+				h2: {
+					margin: 0,
+					color: colors.primary,
+					marginTop: 5,
+					fontSize: 18,
+					fontWeight: Platform.OS === 'android' ? 'normal' : undefined,
+					fontFamily: fonts.bold,
+				},
+				h3: {
+					margin: 0,
+					marginTop: 5,
+					fontSize: 16,
+					fontFamily: fonts.bold,
+					fontWeight: Platform.OS === 'android' ? 'normal' : undefined,
+					color: invert ? colors.black : colors.primary,
+				},
+				h4: {
+					margin: 0,
+					marginTop: 5,
+					fontSize: 14,
+					fontFamily: fonts.medium,
+					fontWeight: Platform.OS === 'android' ? 'normal' : undefined,
+					color: invert ? colors.black : colors.white,
+				},
+				h5: {
+					margin: 0,
+					marginTop: 5,
+					fontSize: 12,
+					fontFamily: fonts.medium,
+					fontWeight: Platform.OS === 'android' ? 'normal' : undefined,
+					color: invert ? colors.black : colors.white,
+				},
+				h6: {
+					margin: 0,
+					marginTop: 5,
+					fontSize: 10,
+					fontFamily: fonts.medium,
+					fontWeight: Platform.OS === 'android' ? 'normal' : undefined,
+					color: invert ? colors.black : colors.white,
+				},
+				strong: {
+					fontFamily: fonts.bold,
+					fontWeight: Platform.OS === 'android' ? 'normal' : undefined,
+				},
+				b: {
+					fontFamily: fonts.bold,
+					fontWeight: Platform.OS === 'android' ? 'normal' : undefined,
+				},
+				img: {
+					marginTop: 5,
+				},
+				...style,
+			}}
+			classesStyles={{
+				'mentioned-name': {
+					color: colors.primary,
+				},
+				required: {
+					fontFamily: fonts.regular,
+					lineHeight: 20,
+					fontSize: 16,
+					color: colors.delete,
+				},
+				question: {
+					fontFamily: fonts.regular,
+					lineHeight: 20,
+					fontSize: 16,
+					color: colors.primary2,
+				},
+			}}
+			systemFonts={[...defaultSystemFonts, ...Object.values(fonts)]}
+			renderersProps={{
+				iframe: {
+					javaScriptEnabled: true,
+					webViewProps: {
+						cacheEnabled: false,
+						startInLoadingState: false,
+						scrollEnabled: false,
+						allowsAirPlayForMediaPlayback: true,
+						allowsInlineMediaPlayback: true,
+						allowsFullscreenVideo: true,
+					},
+				},
+			}}
+		/>
+	);
 };
 
-export default MyWebview;
+
 
 // export class MyWebview extends Component {
 //   constructor(props) {

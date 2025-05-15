@@ -111,32 +111,37 @@ const ChatList = ({ navigation }) => {
     }
   }
 
-  useEffect(() => {
-    if (!firstTime) {
-      clpage = 0;
-      clcanLoadMore = false;
-      debounce(() => api_ChatList(true))
-    }
-  }, [searchText, JSON.stringify(eventId)])
+  // useEffect(() => {
+  //   if (!firstTime) {
+  //     clpage = 0;
+  //     clcanLoadMore = false;
+  //     debounce(() => api_ChatList(true))
+  //   }
+  // }, [searchText, JSON.stringify(eventId)])
+
+  // useEffect(() => {
+  //   if (!firstTime) {
+  //     clpage = 0;
+  //     clcanLoadMore = false;
+  //     setLoader(true);
+  //     setChatList([])
+  //     debounce(() => api_ChatList(true))
+  //   }
+  // }, [tab])
 
   useEffect(() => {
-    if (!firstTime) {
-      clpage = 0;
-      clcanLoadMore = false;
-      setLoader(true);
-      setChatList([])
-      debounce(() => api_ChatList(true))
-    }
-  }, [tab])
-
+    socketEvents();
+  }, [])
 
   useEffect(() => {
     firstTime = true;
     clpage = 0;
     clcanLoadMore = false;
-    api_ChatList(true)
+    setChatList([])
+    debounce(() => api_ChatList(true))
+    // api_ChatList(true)
     api_portalList()
-    socketEvents();
+
 
     return () => {
       clpage = 0;
@@ -144,7 +149,7 @@ const ChatList = ({ navigation }) => {
       isNewChat = false;
       removeSocketEvents()
     }
-  }, [])
+  }, [searchText, JSON.stringify(eventId), tab])
 
 
   const socketEvents = () => {
@@ -371,6 +376,7 @@ const ChatList = ({ navigation }) => {
                   return (
                     <TouchableOpacity
                       onPress={() => {
+                        setLoader(true)
                         setEventId(item);
                         setPortalModalVisiblity(false)
                       }}
@@ -397,13 +403,19 @@ const ChatList = ({ navigation }) => {
       <View style={{ backgroundColor: colors.darkSecondary }}>
         <View style={__style.tabsView}>
           <TouchableOpacity
-            onPress={() => setTab("all")}
+            onPress={() => {
+              setTab("all")
+              setLoader(true)
+            }}
             style={[__style.tabView, tab == "all" && __style.tabSelectedView]}>
             <MyText color={tab == "all" ? colors.primary : undefined}>All</MyText>
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => setTab("unread")}
+            onPress={() => {
+              setTab("unread")
+              setLoader(true)
+            }}
             style={[__style.tabView, tab == "unread" && __style.tabSelectedView]}>
             <MyText color={tab == "unread" ? colors.primary : undefined} >Unread</MyText>
           </TouchableOpacity>

@@ -1,5 +1,5 @@
 import { View, Text, SafeAreaView, TouchableOpacity, StyleSheet, FlatList } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { colors } from '../../../utilities/colors'
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../../redux/reducers/userSlice'
@@ -23,6 +23,7 @@ import { QUESTIONS_DELETE_DYNAMIYE_REPLY } from '../../../DAL/Questions'
 import showToast from '../../../functions/showToast'
 import { GOAL_STATEMENT_DELETE_DYNAMITE_REPLY } from '../../../DAL/GoalStatement'
 const List = ({ list, refresh, }) => {
+  
   const navigation = useNavigation();
   const { token } = useSelector(selectUser);
   const [loader, setLoader] = useState(false)

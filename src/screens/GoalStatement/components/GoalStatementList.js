@@ -1,5 +1,5 @@
 import { View, Text, FlatList, StyleSheet, Pressable } from 'react-native'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import RootView from '../../../components/RootView'
 import MyText from '../../../components/MyText'
 import { useSelector } from 'react-redux'
@@ -21,23 +21,41 @@ import { icons } from '../../../utilities/icons'
 import showToast from '../../../functions/showToast'
 import routes from '../../../navigation/routes'
 import { selectSocket } from '../../../redux/reducers/socketSlice'
+import breakReference from '../../../functions/breakReference'
+import AssignModal from '../../SelfImage/components/AssignModal'
+import isObject from '../../../functions/isObject'
 
 const GoalStatementList = ({ navigation, route }) => {
   const { key, parentKey, type } = route.params;
+  const ref_assignModal = useRef()
   const isComplete = type == "complete";
   const isIncomplete = type == "incomplete";
   const isResponded = type == "responded";
   const { navbar } = useSelector(selectNavbar);
-  const { token } = useSelector(selectUser);
+  const { token, access } = useSelector(selectUser);
   const { socket } = useSelector(selectSocket);
   const [title] = useState(navbar?.find(x => x._id == parentKey)?.title);
   const [subTitle] = useState(navbar?.find(x => x._id == parentKey)?.child_options?.find(y => y._id == key)?.title);
   const [list, setList] = useState([]);
   const [loader, setLoader] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [options] = useState(isComplete ? optionsListForComplete : isIncomplete ? optionsListForInComplete : [optionsListForComplete[0]])
+  const [options] = useState(isComplete ? getOptions(optionsListForComplete) : isIncomplete ? getOptions(optionsListForInComplete) : [optionsListForComplete[0]])
   const [optionModal, setOptionModal] = useState({ isVisible: false, item: null });
   const [confirmModal, setConfirmModal] = useState({ isVisible: false, item: null, statement: "", type: "" });
+
+
+  function getOptions(list) {
+    let nlist = list;
+    if (access?.allow_assign_option_in_goal_statement) {
+      nlist = [...nlist, {
+        title: "Assign To",
+        key: "assign_to",
+        icon: icons.edit
+      }]
+    }
+    return nlist
+
+  }
 
   useEffect(() => {
     getDataFromServer();
@@ -45,6 +63,7 @@ const GoalStatementList = ({ navigation, route }) => {
 
   const onSelected = (opt) => {
     let { item } = optionModal;
+    console.log(item, "item")
     setOptionModal({ isVisible: false, item: null });
     setTimeout(() => {
       if (opt.key == "save") {
@@ -65,6 +84,14 @@ const GoalStatementList = ({ navigation, route }) => {
       }
       else if (opt.key == "detail") {
         onDetailScreen(item)
+      } else if (opt.key == "assign_to") {
+        setTimeout(() => {
+          ref_assignModal?.current?.openModal({
+            itemId: item?._id,
+            userId: item?._id,
+            delegateId: item?.goal_statement_assign_to?._id
+          });
+        }, 500);
       }
     }, 500);
 
@@ -91,6 +118,16 @@ const GoalStatementList = ({ navigation, route }) => {
     navigation.navigate(routes.goalStatmentDetail, {
       memberId: member?._id
     })
+  }
+
+  const onAssigned = (itemId, delegate) => {
+    let nlist = breakReference(list);
+    let index = nlist.findIndex(x => x?._id == itemId);
+    if (index > -1) {
+      nlist[index]["goal_statement_assign_to"] = delegate;
+      setList(breakReference(nlist))
+    }
+
   }
 
   //! APIs
@@ -179,7 +216,12 @@ const GoalStatementList = ({ navigation, route }) => {
           {isComplete && <StatView title={"Completed Date"} value={moment(item?.goal_statement_completed_date).format(dateTimeFormat.date)} />}
           <StatView title={"Goal"} view={() => statusView(item?.goal_statement_status, "unlock", "lock",)} />
           {isIncomplete && <StatView title={"Incomplete Date"} value={moment(item?.goal_statement_incompleted_date).format(dateTimeFormat.date)} />}
-
+          {console.log(access, "access")}
+          {access?.show_members_list_for_goal_statement == "all" &&
+            <StatView title={"Assigned To"} value={isObject(item?.goal_statement_assign_to) ?
+              `${item?.goal_statement_assign_to?.first_name} ${item?.goal_statement_assign_to?.last_name} (${item?.goal_statement_assign_to?.email})`
+              : "N/A"
+            } />}
         </View>
       </View>
     )
@@ -215,6 +257,12 @@ const GoalStatementList = ({ navigation, route }) => {
         closeModal={() => setConfirmModal({ isVisible: false, item: null, statement: "", type: "" })}
         onAgree={onConfirmPress}
         title={confirmModal.statement}
+      />
+
+      <AssignModal
+        type="goal_statement"
+        ref={ref_assignModal}
+        onSuccess={onAssigned}
       />
     </RootView>
   )
