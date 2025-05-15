@@ -16,13 +16,13 @@ import MyWebview from '../../components/MyWebview'
 import EmptyView from '../../components/EmptyView'
 
 const StudyAssessmentList = ({ navigation, route }) => {
-  const { key, parentKey, type } = route?.params
+  const { parentValue, value } = route?.params
   const { navbar } = useSelector(selectNavbar);
   const { settings } = useSelector(selectSettings);
   const { token, S3_URL } = useSelector(selectUser);
   const [loader, setLoader] = useState(true);
   const [list, setList] = useState([]);
-  const [title] = useState(navbar?.find(x => x._id == parentKey)?.child_options?.find(y => y._id == key)?.title);
+  const [title] = useState(navbar?.find(x => x.value == parentValue)?.child_options?.find(y => y.value == value)?.title);
 
 
   useEffect(() => {

@@ -37,11 +37,11 @@ let page = 0;
 let canLoadMore = false;
 const Listing = ({ navigation, route }) => {
   const ref_changeStatusModal = useRef();
-  const { key, parentKey, type } = route.params;
+  const { value, parentValue, type } = route.params;
   const isBookCall = type == "booking";
   const { navbar } = useSelector(selectNavbar);
   const { token } = useSelector(selectUser);
-  const [title] = useState(navbar?.find(x => x._id == parentKey)?.child_options?.find(y => y._id == key)?.title);
+  const [title] = useState(navbar?.find(x => x.value == parentValue)?.child_options?.find(y => y.value == value)?.title);
   const [list, setList] = useState([]);
   const [loader, setLoader] = useState(false);
   const [total, setTotal] = useState(0);

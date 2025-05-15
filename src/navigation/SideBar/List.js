@@ -473,7 +473,8 @@ export const ChildComponents = {
 			value: "inprogress_missions",
 			type: "in_progress",
 			key: "hhfhhfhfhf-31d9-4154-b3a9-81619gdhb4va",
-			parentKey: "5bd62bab-3f70-471a-ad80-d788cd481c39"
+			parentKey: "5bd62bab-3f70-471a-ad80-d788cd481c39",
+			parentValue: "mission_member_report",
 		}
 	},
 	"completed_missions": {
@@ -482,9 +483,9 @@ export const ChildComponents = {
 		params: {
 			value: "completed_missions",
 			type: "completed",
-			parentValue: "members",
+			parentValue: "mission_member_report",
 			key: "hhfhhfhfhf-31d9-41bb-b3c9-81619fd1b49c",
-			parentKey: "5bd62bab-3f70-471a-ad80-d788cd481c39"
+			parentKey: "5bd62bab-3f70-471a-ad80-d788cd481c39",
 		}
 	},
 	"members": {

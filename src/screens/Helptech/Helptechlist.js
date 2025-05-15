@@ -16,9 +16,9 @@ import routes from '../../navigation/routes'
 
 const Helptechlist = ({ navigation, route }) => {
   const { token } = useSelector(selectUser);
-  const { key, parentKey } = route?.params;
+  const { value, parentValue } = route?.params;
   const { navbar } = useSelector(selectNavbar)
-  const [title] = useState(navbar?.find(x => x._id == parentKey)?.child_options?.find(y => y._id == key)?.title);
+  const [title] = useState(navbar?.find(x => x.value == parentValue)?.child_options?.find(y => y.value == value)?.title);
   const [list, setList] = useState([])
   const [loader, setLoader] = useState(true)
   const [width] = useState(utilities.screenWidth())

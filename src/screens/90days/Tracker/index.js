@@ -30,9 +30,9 @@ import numFormatter from '../../../functions/numFormatter'
 
 
 const _90daysTracker = ({ navigation, route }) => {
-  const { key, parentKey } = route?.params
+  const { parentValue, value, } = route?.params
   const { navbar } = useSelector(selectNavbar);
-  const [title] = useState(navbar?.find(x => x._id == parentKey)?.child_options?.find(y => y._id == key)?.title);
+  const [title] = useState(navbar?.find(x => x.value == parentValue)?.child_options?.find(y => y.value == value)?.title);
   const ref_calendar = useRef();
   const { token } = useSelector(selectUser);
   const [loader, setLoader] = useState(true);
@@ -115,7 +115,7 @@ const _90daysTracker = ({ navigation, route }) => {
         for (let x of arr) {
           let bDate = moment(x.date);
           let diff = moment(bDate).diff(startDate, "days") + 1;
-          if(diff<0){
+          if (diff < 0) {
             diff = 0
           }
           if (bDate.isSameOrAfter(startDate, "date") && bDate.isSameOrBefore(moment(startDate).add({ days: 90 }))) {
@@ -154,8 +154,8 @@ const _90daysTracker = ({ navigation, route }) => {
         }
 
         filteredData = Object.values(filteredData)
-						
-						console.log(filteredData,"filteredData")
+
+        console.log(filteredData, "filteredData")
 
         chartData = {
           labels: filteredData.length <= 0 ? [0] : filteredData.map(x => numFormatter(x?.day)),
@@ -229,7 +229,7 @@ const _90daysTracker = ({ navigation, route }) => {
   const header = (
     <View>
       <View style={[__styles.earningView]}>
-        {!!chartData && 
+        {!!chartData &&
           <ScrollView showsHorizontalScrollIndicator={false} horizontal={true} >
             <LineChart
               data={chartData}

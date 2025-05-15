@@ -32,10 +32,10 @@ let page = 0;
 let canLoadMore = false;
 const PaymentRequest = ({ navigation, route }) => {
   const bankOptionModalRef = useRef()
-  const { key, parentKey } = route.params
+  const { value, parentValue } = route.params
   const { navbar } = useSelector(selectNavbar);
   const { token, access } = useSelector(selectUser);
-  const [title] = useState(navbar?.find(x => x._id == parentKey)?.child_options?.find(y => y._id == key)?.title);
+  const [title] = useState(navbar?.find(x => x.value == parentValue)?.child_options?.find(y => y.value == value)?.title);
   const [list, setList] = useState([]);
   const [total, setTotal] = useState(0);
   const [loader, setLoader] = useState(false);

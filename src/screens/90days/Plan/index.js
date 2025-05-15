@@ -8,11 +8,10 @@ import QuestionConfig from '../../../MojarComponents/QuestionConfig'
 import { selectUser } from '../../../redux/reducers/userSlice'
 
 const _90daysPlan = ({ navigation, route }) => {
-  const { key, parentKey,type } = route?.params
+  const { type, parentValue, value, } = route?.params
   const { navbar } = useSelector(selectNavbar);
   const { token } = useSelector(selectUser);
-  const [title] = useState(navbar?.find(x => x._id == parentKey)?.child_options?.find(y => y._id == key)?.title);
-
+  const [title] = useState(navbar?.find(x => x.value == parentValue)?.child_options?.find(y => y.value == value)?.title);
   return (
     <RootView
       hideBackBottomButton
