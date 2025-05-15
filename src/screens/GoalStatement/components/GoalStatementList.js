@@ -216,7 +216,6 @@ const GoalStatementList = ({ navigation, route }) => {
           {isComplete && <StatView title={"Completed Date"} value={moment(item?.goal_statement_completed_date).format(dateTimeFormat.date)} />}
           <StatView title={"Goal"} view={() => statusView(item?.goal_statement_status, "unlock", "lock",)} />
           {isIncomplete && <StatView title={"Incomplete Date"} value={moment(item?.goal_statement_incompleted_date).format(dateTimeFormat.date)} />}
-          {console.log(access, "access")}
           {access?.show_members_list_for_goal_statement == "all" &&
             <StatView title={"Assigned To"} value={isObject(item?.goal_statement_assign_to) ?
               `${item?.goal_statement_assign_to?.first_name} ${item?.goal_statement_assign_to?.last_name} (${item?.goal_statement_assign_to?.email})`

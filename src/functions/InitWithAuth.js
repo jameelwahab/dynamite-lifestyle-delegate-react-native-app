@@ -15,7 +15,9 @@ const InitWithAuth = async (token, navigation, setLoader, dispatch) => {
     let isChatAllowed = !!res?.access_object?.is_chat_allowed;
     let isWhatsappChatAllowed = false;
     res?.nav_items.forEach(item => {
-      console.table(item.title + "  --->  ", item.value, item)
+      if (__DEV__) {
+        console.table(item.title + "  --->  ", item.value, item)
+      }
       if (item.value == "whatsapp_chat") {
         isWhatsappChatAllowed = true
       }
@@ -45,8 +47,8 @@ const InitWithAuth = async (token, navigation, setLoader, dispatch) => {
       googleClientIdIOS: res?.site_setting?.delegate_ios_client_id,
       googleClientIdWeb: res?.site_setting?.client_id,
       access: res?.access_object,
-		  feedSettings: res?.delegate_feed_settings,
-      S3_URL : res?.bucket_url + "/",
+      feedSettings: res?.delegate_feed_settings,
+      S3_URL: res?.bucket_url + "/",
     }));
     dispatch(setNavbar(res?.nav_items));
     dispatch(setTimeZone({ user: res?.consultant?.time_zone, admin: res?.time_zone }))

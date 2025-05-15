@@ -1,10 +1,11 @@
 import { View, Text } from 'react-native'
 import React from 'react'
-import ListForAllTypes from '../SelfImage/components/ListForAllTypes'
+import GoalStatementList from './components/GoalStatementList'
+
 
 const Completed = (props) => {
   return (
-    <ListForAllTypes type2="goal_statment" {...props} />
+    <GoalStatementList {...props} />
   )
 }
 
