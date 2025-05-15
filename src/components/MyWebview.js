@@ -30,11 +30,11 @@ export default MyWebview
 const ItsWebView = ({
 	html: rawHtml, style, baseStyle, fullWidth, width, invert
 }) => {
-  const { S3_URL } = useSelector(selectUser)
-  // Preprocess HTML
-  const htmlModified = useMemo(() => {
-    let processed = "<div>" + rawHtml.replace(/padding:/g, "") + "</div>";
-    processed = "<div>" + processed.replace(/height:100%/g, "") + "</div>";
+	const { S3_URL } = useSelector(selectUser)
+	// Preprocess HTML
+	const htmlModified = useMemo(() => {
+		let processed = "<div>" + rawHtml.replace(/padding:/g, "") + "</div>";
+		processed = "<div>" + processed.replace(/height:100%/g, "") + "</div>";
 
 		for (const link of S3Urls) {
 			if (processed.includes(link)) {
@@ -76,7 +76,7 @@ const ItsWebView = ({
 		<RenderHTML
 			WebView={WebView}
 			contentWidth={contentWidth}
-			source={{ html, baseUrl: '' }}
+			source={{ html: htmlModified, baseUrl: '' }}
 			customHTMLElementModels={customHTMLElementModels}
 			renderers={renderers}
 			enableExperimentalMarginCollapsing={true}
