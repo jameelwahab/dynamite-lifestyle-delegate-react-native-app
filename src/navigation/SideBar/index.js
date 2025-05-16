@@ -17,10 +17,11 @@ import MyImage from '../../components/MyImage';
 import messaging from '@react-native-firebase/messaging';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import notificationHandler from '../../functions/notificationHandler';
-import { selectUser, setUnReadCount } from '../../redux/reducers/userSlice';
+import { selectUser, setMsgCount, setUnReadCount, incrementMsgCount, decrementMsgCount } from '../../redux/reducers/userSlice';
 import RootView from '../../components/RootView';
 import { INIT_WITH_TOKEN } from '../../DAL';
 import notifee, { AndroidBadgeIconType, EventType } from '@notifee/react-native';
+import debounce from '../../functions/debounce';
 // import { Notifications } from 'react-native-notifications';
 
 
@@ -36,7 +37,7 @@ const index = (props) => {
   const dispatch = useDispatch()
   const isDrawerOpen = useDrawerStatus() == "open";
   const { navbar } = useSelector(selectNavbar);
-  const { token, user, S3_URL } = useSelector(selectUser);
+  const { token, user, S3_URL, } = useSelector(selectUser);
   const { settings } = useSelector(selectSettings);
   const { socket } = useSelector(selectSocket);
   const [isCollapsed, setCollapsed] = useState([]);
@@ -164,6 +165,7 @@ const index = (props) => {
   //! Socket Events 
 
   const enableSocketEvents = () => {
+    console.log("enableSocketEvents")
     socket.on("new_notification_receiver_for_delegate", (data) => handleSocketEvents(data, "new_notification_receiver_for_delegate"))
     socket.on("mention_user_event_trigger", (data) => handleMentionNotificationCount(data, "mention_user_event_trigger"))
     socket.on("comment_mention_user_event_trigger", (data) => handleMentionNotificationCount(data, "comment_mention_user_event_trigger"))
@@ -177,6 +179,7 @@ const index = (props) => {
   }
 
   const disbaleSocketEvents = () => {
+    console.log("disbaleSocketEvents")
     socket.off("mention_user_event_trigger", handleSocketEvents)
     socket.off("comment_mention_user_event_trigger", handleSocketEvents)
     socket.off("new_notification_receiver_for_delegate", handleMentionNotificationCount);
@@ -187,6 +190,23 @@ const index = (props) => {
     socket.off("dynamite_streak_event", handleSocketEvents);
     socket.on("send_chat_message_receiver", handleSocketEvents);
     socket.on("delete_chat_message_receiver", handleSocketEvents);
+  }
+
+  const chatMsgCounter = (event) => {
+    console.log(event, "chatMsgCounter")
+    if (event == "send_chat_message_receiver") {
+      dispatch(incrementMsgCount())
+    } else if (event == "delete_chat_message_receiver") {
+      dispatch(decrementMsgCount())
+    }
+  }
+
+  const initAPI = async () => {
+    let res = await INIT_WITH_TOKEN({ navigation, token });
+    if (res.code == 200) {
+      setCount(res?.unread_notification_count)
+      dispatch(setMsgCount(res?.unread_message_count))
+    }
   }
 
   const handleSocketEvents = async (data, event) => {
@@ -205,12 +225,10 @@ const index = (props) => {
     } else if (data?.unread_notification_count != undefined && typeof (data?.unread_notification_count) == "number") {
       setCount(data?.unread_notification_count)
     } else {
-      let res = await INIT_WITH_TOKEN({ navigation, token });
-      if (res.code == 200) {
-        setCount(res?.unread_notification_count)
-      }
+      debounce(initAPI)
     }
   }
+
   const handleMentionNotificationCount = (data, event) => {
     let notification = data?.action_response?.notification_users.find(x => x?.user_id == user?._id);
     if (!!notification && notification?.unread_notification_count > -1) {
@@ -330,7 +348,7 @@ const index = (props) => {
   }
 
   const nestedOptionView = (item, index, parentItem) => {
-    
+
     if (!!ChildComponents[item.value]) {
       let isSelected = ChildComponents[item.value].key == props.state.routeNames[props.state.index]
       return (

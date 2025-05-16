@@ -132,6 +132,7 @@ const AssignModal = forwardRef(({ type, onSuccess }, ref) => {
               setSelectedDelegate(delegate)
               setIsOptionListVisible(false)
             }}
+            closeModal={()=>setIsOptionListVisible(false)}
             isVisible={isOptionListVisible}
             optionList={delegatesList}
             filterTheList={(list, searchText) => {

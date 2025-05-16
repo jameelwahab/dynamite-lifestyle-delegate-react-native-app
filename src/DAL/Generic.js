@@ -2,7 +2,7 @@ import invokeApi from "../functions/invokeAPI";
 
 export const GET_ACTIVE_DELEGATES = ({ token, navigation, }) => {
   return invokeApi({
-    path: `api/consultant/active_consultant_list/department`,
+    path: `api/consultant/active_delegate_list/for_assign`,
     method: "GET",
     token,
     navigation,
