@@ -6,6 +6,7 @@ const initialState = {
   isChatAllowed: false,
   isWhatsappChatAllowed: false,
   unreadCount: 0,
+  unreadMsgCount: 0,
   isSyncWithGoogleAllowed: false,
   googleSyncedData: null,
   googleClientIdForIOS: "",
@@ -31,6 +32,7 @@ const userSlice = createSlice({
       state.isChatAllowed = action.payload.isChatAllowed;
       state.isWhatsappChatAllowed = action.payload.isWhatsappChatAllowed;
       state.unreadCount = action.payload.count;
+      state.unreadMsgCount = action.payload.unreadMsgCount;
       state.googleClientIdForIOS = action.payload.googleClientIdIOS;
       state.googleClientIdForAndriod = action.payload.googleClientIdAndroid;
       state.googleClientIdForWeb = action.payload.googleClientIdWeb;
@@ -55,9 +57,20 @@ const userSlice = createSlice({
     removeGoogleSyncedData: (state,) => {
       state.googleSyncedData = null;
     },
-    setS3Url: (state) => {
-      state.S3_URL = state;
-    }
+    setS3Url: (state, action) => {
+      state.S3_URL = action.payload;
+    },
+    setMsgCount: (state, action) => {
+      state.unreadMsgCount = action.payload;
+    },
+    incrementMsgCount: (state, action) => {
+      state.unreadMsgCount++;
+    },
+    decrementMsgCount: (state, action) => {
+      if (state.unreadMsgCount > 0) {
+        state.unreadMsgCount--;
+      }
+    },
   }
 })
 export const { setConsultant,
@@ -65,7 +78,8 @@ export const { setConsultant,
   clearUserAndToken, setUnReadCount,
   setGoogleSyncedData, removeGoogleSyncedData,
   googleClientIdForIOS, googleClientIdForAndriod,
-  googleClientIdForWeb, access, feedSettings, setS3Url
+  googleClientIdForWeb, access, feedSettings, setS3Url,
+  setMsgCount, incrementMsgCount, decrementMsgCount
 } = userSlice.actions;
 export const selectUser = (state) => state.user;
 export default userSlice.reducer;

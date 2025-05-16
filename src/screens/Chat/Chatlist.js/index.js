@@ -4,8 +4,8 @@ import RootView from '../../../components/RootView'
 import MyLoader, { SimpleLoader } from '../../../components/MyLoader'
 import MyText from '../../../components/MyText'
 import { CHAT_LIST, PORTAL_LIST } from '../../../DAL'
-import { useSelector } from 'react-redux'
-import { selectUser } from '../../../redux/reducers/userSlice'
+import { useDispatch, useSelector } from 'react-redux'
+import { selectUser, setMsgCount } from '../../../redux/reducers/userSlice'
 import UserImage from '../../../components/UserImage'
 import { S3_URL, dateTimeFormat } from '../../../utilities/constants'
 import MyWebview from '../../../components/MyWebview'
@@ -38,6 +38,7 @@ let isNewChat = false;
 const ChatList = ({ navigation }) => {
   const { token, user, isChatAllowed } = useSelector(selectUser);
   const { socket } = useSelector(selectSocket);
+  const dispatch = useDispatch()
   const timezone = useSelector(selectTimeZone);
   const [loader, setLoader] = useState(true);
   const [footerLoader, setFooterLoader] = useState(false);
@@ -83,6 +84,8 @@ const ChatList = ({ navigation }) => {
       setFooterLoader(false);
       setChatList(newArray ? res?.chat : [...chatList, ...res?.chat]);
       firstTime = false;
+      dispatch(setMsgCount(res?.unread_message_count))
+
     } else {
       setLoader(false)
       setFooterLoader(false);

@@ -32,8 +32,8 @@ const Header = ({
   hideUpperHeader = false,
   subTitle = ""
 }) => {
-  const { user, token, isChatAllowed, unreadCount, S3_URL } = useSelector(selectUser)
-  
+  const { user, token, isChatAllowed, unreadCount, unreadMsgCount, S3_URL } = useSelector(selectUser)
+
   const navigation = useNavigation()
   const [isUserModalVisible, setIsUserModalVisible] = useState(false)
 
@@ -68,7 +68,7 @@ const Header = ({
         closeModal={() => setIsUserModalVisible(false)}
       />
 
-      
+
 
       <View style={__header.rootView}>
         <View style={__header.leftButtonView}>
@@ -93,13 +93,19 @@ const Header = ({
         </View> */}
         <View style={{ flex: 1, justifyContent: "flex-end", alignItems: "center", flexDirection: "row", paddingRight: 10 }}>
 
-      
+
 
           {!hideChatIcon && isChatAllowed &&
             <TouchableOpacity
               onPress={() => navigateToChatScreen()}
               style={__header.RightButtonView}>
-              <Ionicons name="chatbox-ellipses" color={colors.primary} size={17} />
+              {/* <Ionicons name="chatbox-ellipses" color={colors.primary} size={17} /> */}
+              {icons.chat(colors.primary, 17)}
+
+              {unreadMsgCount > 0 ?
+                <View style={__header.badge}>
+                  <Text style={__header.badgeText}> {unreadMsgCount > 99 ? "+99" : unreadMsgCount}</Text>
+                </View> : null}
             </TouchableOpacity>}
 
           {!hideNotificaitonIcon &&
@@ -186,7 +192,7 @@ const __header = StyleSheet.create({
     // backgroundColor: "green",
     flexDirection: "row",
     alignItems: "center",
-			zIndex:1,
+    zIndex: 1,
   },
   titleView: {
     flex: 1,
@@ -228,9 +234,9 @@ const __header = StyleSheet.create({
   },
   badge: {
     height: 20,
-    // width: 20,
-    minWidth:20,
-    paddingHorizontal:2,
+    width: 20,
+    // minWidth: 20,
+    // paddingHorizontal: 2,
     borderRadius: 20 / 2,
     alignItems: "center",
     justifyContent: "center",

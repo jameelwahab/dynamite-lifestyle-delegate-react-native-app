@@ -41,6 +41,7 @@ const InitWithAuth = async (token, navigation, setLoader, dispatch) => {
       isChatAllowed,
       isWhatsappChatAllowed,
       count: res?.unread_notification_count,
+      unreadMsgCount: res?.unread_message_count,
       isSyncWithGoogleAllowed: res?.site_setting?.is_calendar_enabled_for_delegate,
       googleSyncedData: res?.consultant?.is_google_signin ? res?.consultant?.google_account_info : null,
       googleClientIdAndroid: res?.site_setting?.delegate_android_client_id,
