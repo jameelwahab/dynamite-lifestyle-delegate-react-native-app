@@ -19,9 +19,9 @@ import { MyButton } from '../../components/MyButton'
 
 const VaultList = ({ navigation, route }) => {
   const { token } = useSelector(selectUser);
-  const { key } = route?.params;
+  const { value } = route?.params;
   const { navbar } = useSelector(selectNavbar)
-  const [title] = useState(navbar?.find(x => x._id == key)?.title);
+  const [title] = useState(navbar?.find(x => x.value == value)?.title);
   const [list, setList] = useState([])
   const [loader, setLoader] = useState(false)
   const [width] = useState(utilities.screenWidth())

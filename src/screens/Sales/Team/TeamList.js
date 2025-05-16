@@ -30,10 +30,10 @@ import MyChip from '../../../components/MyChip'
 let tlPage = 0;
 let tlCanLoadMore = false;
 const TeamList = ({ navigation, route }) => {
-  const { key, parentKey } = route?.params
+  const { value, parentValue } = route?.params
   const { token } = useSelector(selectUser);
   const { navbar } = useSelector(selectNavbar);
-  const [title] = useState(navbar?.find(x => x._id == parentKey)?.child_options?.find(y => y._id == key)?.title);
+  const [title] = useState(navbar?.find(x => x.value == parentValue)?.child_options?.find(y => y.value == value)?.title);
   const [list, setList] = useState([]);
   const [loader, setLoader] = useState(true);
   const [searchText, setSearchText] = useState("")

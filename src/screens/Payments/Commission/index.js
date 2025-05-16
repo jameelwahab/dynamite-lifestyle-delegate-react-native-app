@@ -19,11 +19,11 @@ import TransactionView from './components/TransactionView'
 let page = 0;
 let canLoadMore = false;
 const Commission = ({ navigation, route }) => {
-  const { key, parentKey } = route.params
+  const { value, parentValue } = route.params
   const { navbar } = useSelector(selectNavbar);
   const { token } = useSelector(selectUser);
   const timezone = useSelector(selectTimeZone);
-  const [title] = useState(navbar?.find(x => x._id == parentKey)?.child_options?.find(y => y._id == key)?.title);
+  const [title] = useState(navbar?.find(x => x.value == parentValue)?.child_options?.find(y => y.value == value)?.title);
   const [list, setList] = useState([]);
   const [loader, setLoader] = useState(false);
   const [footerLoader, setFooterLoader] = useState(false);
@@ -84,7 +84,7 @@ const Commission = ({ navigation, route }) => {
 
   const topView = () => {
     return (
-      <View style={{backgroundColor:colors.darkSecondary}}>
+      <View style={{ backgroundColor: colors.darkSecondary }}>
         <View style={{ flexDirection: "row", }}>
           <CounterBox color={"#283C35"} count={commision?.total} subTitle={"Total Commission"} />
           <CounterBox color={"#3C3834"} count={commision?.paid} subTitle={"Paid Commission"} />

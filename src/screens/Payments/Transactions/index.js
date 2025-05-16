@@ -26,9 +26,9 @@ import MyChip from '../../../components/MyChip'
 let page = 0;
 let canLoadMore = false;
 const Transactions = ({ navigation, route }) => {
-  const { key, parentKey } = route?.params
+  const { value, parentValue } = route?.params
   const { navbar } = useSelector(selectNavbar);
-  const [title] = useState(navbar?.find(x => x._id == parentKey)?.child_options?.find(y => y._id == key)?.title);
+  const [title] = useState(navbar?.find(x => x.value == parentValue)?.child_options?.find(y => y.value == value)?.title);
   const { token } = useSelector(selectUser);
   const timezone = useSelector(selectTimeZone)
   const [loader, setLoader] = useState(false);

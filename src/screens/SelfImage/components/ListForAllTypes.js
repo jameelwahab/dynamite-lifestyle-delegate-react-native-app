@@ -36,13 +36,13 @@ let page = 0;
 let canLoadMore = false;
 const ListForAllTypes = ({ navigation, route }) => {
   const ref_assignModal = useRef()
-  const { _id, module, type, parentKey, key, } = route?.params;
+  const { _id, module, type, parentValue, value, } = route?.params;
   const isComplete = type == "completed";
   const isIncomplete = type == "incompleted";
   const isResponded = type == "responded";
   const { navbar } = useSelector(selectNavbar);
-  const [title] = useState(navbar?.find(x => x._id == parentKey)?.title);
-  const [subTitle] = useState(navbar?.find(x => x._id == parentKey)?.child_options?.find(y => y._id == key)?.title);
+  const [title] = useState(navbar?.find(x => x.value == parentValue)?.title);
+  const [subTitle] = useState(navbar?.find(x => x.value == parentValue)?.child_options?.find(y => y.value == value)?.title);
   const { token, access } = useSelector(selectUser);
   const [loader, setLoader] = useState(true);
   const [list, setList] = useState([]);

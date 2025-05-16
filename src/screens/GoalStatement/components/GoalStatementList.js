@@ -26,7 +26,7 @@ import AssignModal from '../../SelfImage/components/AssignModal'
 import isObject from '../../../functions/isObject'
 
 const GoalStatementList = ({ navigation, route }) => {
-  const { key, parentKey, type } = route.params;
+  const { type, value, parentValue } = route.params;
   const ref_assignModal = useRef()
   const isComplete = type == "complete";
   const isIncomplete = type == "incomplete";
@@ -34,8 +34,8 @@ const GoalStatementList = ({ navigation, route }) => {
   const { navbar } = useSelector(selectNavbar);
   const { token, access } = useSelector(selectUser);
   const { socket } = useSelector(selectSocket);
-  const [title] = useState(navbar?.find(x => x._id == parentKey)?.title);
-  const [subTitle] = useState(navbar?.find(x => x._id == parentKey)?.child_options?.find(y => y._id == key)?.title);
+  const [title] = useState(navbar?.find(x => x.value == parentValue)?.title);
+  const [subTitle] = useState(navbar?.find(x => x.value == parentValue)?.child_options?.find(y => y.value == value)?.title);
   const [list, setList] = useState([]);
   const [loader, setLoader] = useState(true);
   const [refreshing, setRefreshing] = useState(false);

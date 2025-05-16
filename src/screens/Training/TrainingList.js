@@ -21,11 +21,11 @@ import SearchView from '../../components/SearchView'
 import breakReference from '../../functions/breakReference'
 
 const TrainingList = ({ navigation, route }) => {
-  const { key } = route?.params;
+  const { value } = route?.params;
   const pagination = useRef({ page: 0, canLoadMore: false })
   const { navbar } = useSelector(selectNavbar);
   const { token, S3_URL } = useSelector(selectUser);
-  const [title] = useState(navbar?.find(x => x._id == key)?.title);
+  const [title] = useState(navbar?.find(x => x.value == value)?.title);
   const [loader,] = useState(true);
   const [list, setList] = useState([]);
   const [total, setTotal] = useState(0);

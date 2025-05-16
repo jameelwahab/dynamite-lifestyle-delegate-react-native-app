@@ -26,12 +26,12 @@ import TimePicker from '../../components/TimePicker'
 import InfoModal from '../../components/InfoModal'
 
 const PerformanceStreak = ({ navigation, route }) => {
-  const { key } = route?.params
+  const { value } = route?.params
   const { token } = useSelector(selectUser);
   const { navbar } = useSelector(selectNavbar);
   const ref_infoModal = useRef();
   const timezone = useSelector(selectTimeZone);
-  const [title] = useState(navbar?.find(x => x._id == key)?.title);
+  const [title] = useState(navbar?.find(x => x.value == value)?.title);
   const [loader, setLoader] = useState(true);
   const [streak, updateStreak] = useState({
     attitude_performance_rate: 0,

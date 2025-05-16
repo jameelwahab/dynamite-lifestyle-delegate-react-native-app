@@ -22,11 +22,11 @@ import { selectNavbar } from '../../redux/reducers/navbarSlice'
 let page = 0;
 let canLoadMore = false;
 const QuaterList = ({ navigation, route }) => {
-  const { key } = route?.params
+  const { value } = route?.params
   const { token } = useSelector(selectUser);
   const [list, setList] = useState([]);
   const { navbar } = useSelector(selectNavbar);
-  const [title] = useState(navbar?.find(x => x._id == key)?.title);
+  const [title] = useState(navbar?.find(x => x.value == value)?.title);
   const [loader, setLoader] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [footerLoader, setFooterLoader] = useState(false);

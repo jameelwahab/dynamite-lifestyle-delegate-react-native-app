@@ -26,11 +26,11 @@ import MyChip from '../../../components/MyChip'
 import { dateTimeFormat } from '../../../utilities/constants'
 
 const List = ({ navigation, route }) => {
-  const { key, parentKey, } = route?.params
+  const { parentValue, value, } = route?.params
   const { token } = useSelector(selectUser);
   const timezone = useSelector(selectTimeZone);
   const { navbar } = useSelector(selectNavbar)
-  const [title] = useState(navbar?.find(x => x._id == parentKey)?.child_options?.find(y => y._id == key)?.title);
+  const [title] = useState(navbar?.find(x => x.value == parentValue)?.child_options?.find(y => y.value == value)?.title);
   const [list, setList] = useState([]);
   const [loader, setLoader] = useState(false);
   const [filter, setFilter] = useState({ isModalShown: false, value: "all", temp: "all" });
@@ -250,7 +250,7 @@ const List = ({ navigation, route }) => {
             <View style={{ flex: 1 }}>
               <MyText numberOfLines={2} fontSize={16} type='medium' style={{ flex: 1 }} >{item?.subject}</MyText>
             </View>
-            <MyText fontSize={10} style={{marginRight:5}} >
+            <MyText fontSize={10} style={{ marginRight: 5 }} >
               {convertTimezone(item.support_ticket_date, timezone).fromNow()}
             </MyText>
             <View style={{ marginRight: -20, marginTop: -4 }}>
@@ -272,7 +272,7 @@ const List = ({ navigation, route }) => {
             </View>
           </View>
 
-				{/*(getStatusOfTicket(item).title=="solved" && !!item?.last_action_info) &&
+          {/*(getStatusOfTicket(item).title=="solved" && !!item?.last_action_info) &&
           <View style={{ flexDirection: "row", marginTop: 10, borderBottomWidth: 1 / 3, borderBottomColor: colors.lightText, paddingBottom: 5 }}>
             <View style={{ flex: 0.7 }}>
               <MyText color={colors.lightText2}>Name :</MyText>
@@ -281,7 +281,7 @@ const List = ({ navigation, route }) => {
               <MyText type='medium'>{item?.last_action_info?.name}</MyText>
             </View>
           </View>*/
-				}
+          }
           <View style={{ flexDirection: "row", marginTop: 10, borderBottomWidth: 1 / 3, borderBottomColor: colors.lightText, paddingBottom: 5 }}>
             <View style={{ flex: 0.7 }}>
               <MyText color={colors.lightText2}>Department :</MyText>

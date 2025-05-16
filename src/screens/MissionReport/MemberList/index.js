@@ -31,13 +31,14 @@ import StatView from '../../../components/StatView'
 
 
 const MemberList = ({ navigation, route }) => {
-  const { key, parentKey, type } = route.params
+  const { parentValue, value, type } = route.params
+  console.log(parentValue, "parentValue")
   const isCompleted = type == "completed";
   const paging = useRef({ page: 0, canLoadMore: false })?.current;
   const { navbar } = useSelector(selectNavbar);
   const { user, token, access } = useSelector(selectUser);
   const timezone = useSelector(selectTimeZone);
-  const [title] = useState(navbar?.find(x => x._id == parentKey)?.child_options?.find(y => y._id == key)?.title);
+  const [title] = useState(navbar?.find(x => x.value == parentValue)?.child_options?.find(y => y.value == value)?.title);
   const [searchText, setSearchText] = useState("")
   const [list, setList] = useState([]);
   const [loader, setLoader] = useState(false);
@@ -153,11 +154,11 @@ const MemberList = ({ navigation, route }) => {
         <StatView title={"Mission Title"} value={item?.mission_info?.title} original />
         <StatView title={"Duration"} value={item?.mission_duration + " days"} />
 
-        <StatView title={"Accept Time Badge"} view={()=> 
-						<ImgAndTxt img={item?.accept_time_badge_details?.icon?.thumbnail_1} txt={item?.accept_time_badge_details?.title}/>
-				}/> 
+        <StatView title={"Accept Time Badge"} view={() =>
+          <ImgAndTxt img={item?.accept_time_badge_details?.icon?.thumbnail_1} txt={item?.accept_time_badge_details?.title} />
+        } />
 
-        <StatView title={"Current Badge"} view={()=> <ImgAndTxt img={item?.current_badge_level?.icon?.thumbnail_1} txt={item?.current_badge_level?.title} />}/> 
+        <StatView title={"Current Badge"} view={() => <ImgAndTxt img={item?.current_badge_level?.icon?.thumbnail_1} txt={item?.current_badge_level?.title} />} />
 
         <StatView title={"Coins Earned"} value={item?.mission_attracted_coins} />
         <StatView title={"Achievable Coins"} value={item?.mission_reward_coins} />

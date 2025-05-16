@@ -33,10 +33,10 @@ let page = 0;
 let canLoadMore = false;
 const Bookings = ({ navigation, route }) => {
   const ref_changeStatusModal = useRef();
-  const { key, parentKey } = route.params
+  const { parentValue, value, } = route.params
   const { navbar } = useSelector(selectNavbar);
   const { token } = useSelector(selectUser);
-  const [title] = useState(navbar?.find(x => x._id == parentKey)?.child_options?.find(y => y._id == key)?.title);
+  const [title] = useState(navbar?.find(x => x.value == parentValue)?.child_options?.find(y => y.value == value)?.title);
   const [list, setList] = useState([]);
   const [loader, setLoader] = useState(false);
   const [total, setTotal] = useState(0);

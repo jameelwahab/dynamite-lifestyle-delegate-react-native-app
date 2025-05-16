@@ -23,11 +23,11 @@ import FooterLoader from '../../components/FooterLoader'
 import MyRefreshControl from '../../components/MyRefreshControl'
 
 const LinksList = ({ navigation, route }) => {
-  const { key } = route?.params;
+  const { value } = route?.params;
   let pagination = useRef({ page: 0, canLoadMore: false })
   const { navbar } = useSelector(selectNavbar);
   const { token, user } = useSelector(selectUser);
-  const [title] = useState(navbar?.find(x => x._id == key)?.title);
+  const [title] = useState(navbar?.find(x => x.value == value)?.title);
   const [list, setList] = useState([]);
   const [loader, setLoader] = useState(true);
   const [affiliate, setAffiliate] = useState(null)

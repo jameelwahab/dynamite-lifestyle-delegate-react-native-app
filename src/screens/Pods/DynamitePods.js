@@ -16,10 +16,10 @@ import SearchView from '../../components/SearchView'
 import routes from '../../navigation/routes'
 
 const DynamitePods = ({ navigation, route }) => {
-  const { key } = route?.params
+  const { value } = route?.params
   const { token, S3_URL } = useSelector(selectUser);
   const { navbar } = useSelector(selectNavbar);
-  const [title] = useState(navbar?.find(x => x._id == key)?.title);
+  const [title] = useState(navbar?.find(x => x.value == value)?.title);
   const [list, setList] = useState([]);
   const [loader, setLoader] = useState(true);
   const [searchText, setSearchText] = useState("")

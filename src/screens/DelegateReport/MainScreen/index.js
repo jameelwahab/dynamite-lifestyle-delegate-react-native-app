@@ -35,11 +35,11 @@ let page = 0;
 let canLoadMore = false;
 
 const MainScreen = ({ navigation, route }) => {
-  const { key } = route?.params
+  const { value } = route?.params
   const { token } = useSelector(selectUser);
   const { navbar } = useSelector(selectNavbar);
   const ref_streakPerformanceModal = useRef();
-  const [title] = useState(navbar?.find(x => x._id == key)?.title);
+  const [title] = useState(navbar?.find(x => x.value == value)?.title);
   const [list, setList] = useState([]);
   const [loader, setLoader] = useState(false);
   const [footerLoader, setFooterLoader] = useState(false)

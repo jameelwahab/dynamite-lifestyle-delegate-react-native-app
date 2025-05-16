@@ -35,11 +35,11 @@ import isObject from '../functions/isObject';
 let page = 0;
 let canLoadMore = false;
 const SelfImageAndGoalStatement = ({ navigation, route }) => {
-  const { _id, module, type, parentKey, key } = route?.params;
+  const { module, type, value, parentValue } = route?.params;
   const isGoalStatment = module == "goal_statement";
   const { navbar } = useSelector(selectNavbar);
-  const [title] = useState(navbar?.find(x => x._id == parentKey)?.title);
-  const [subTitle] = useState(navbar?.find(x => x._id == parentKey)?.child_options?.find(y => y._id == key)?.title);
+  const [title] = useState(navbar?.find(x => x.value == parentValue)?.title);
+  const [subTitle] = useState(navbar?.find(x => x.value == parentValue)?.child_options?.find(y => y.value == value)?.title);
   const { token } = useSelector(selectUser);
   const [loader, setLoader] = useState(true);
   const [list, setList] = useState([]);

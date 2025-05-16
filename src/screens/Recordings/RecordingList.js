@@ -20,10 +20,10 @@ import showToast from '../../functions/showToast'
 import SearchView from '../../components/SearchView'
 
 const PortalListing = ({ navigation, route }) => {
-  const { key } = route?.params;
+  const { value } = route?.params;
   const { navbar } = useSelector(selectNavbar);
   const { token, S3_URL } = useSelector(selectUser);
-  const [title] = useState(navbar?.find(x => x._id == key)?.title);
+  const [title] = useState(navbar?.find(x => x.value == value)?.title);
   const [loader, setLoader] = useState(true);
   const [list, setList] = useState([]);
   const [searchText, setSearchText] = useState("");
