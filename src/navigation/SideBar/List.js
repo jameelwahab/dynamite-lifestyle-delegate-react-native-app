@@ -499,12 +499,12 @@ export const ChildComponents = {
 			parentKey: "d2ff9f8b-20a8-4646-a08b-cbdfd931fb54"
 		}
 	},
-	"nurture": {
+	"nurture_members": {
 		key: routes.nurtureNavigator,
 		component: StackNurtureMembers,
 		params: {
 			type: "nurture",
-			value: "nurture",
+			value: "nurture_members",
 			parentValue: "members",
 			key: "06cafbd4-cee7-4723-acc5-ce265d01a148",
 			parentKey: "d2ff9f8b-20a8-4646-a08b-cbdfd931fb54"

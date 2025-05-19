@@ -39,6 +39,7 @@ import ConfirmationModal2 from '../../../components/ConfirmationModal2'
 import OptionModal2 from '../../../components/OptionModal2'
 import breakReference from '../../../functions/breakReference'
 import countries from "../../../assets/data/countryList.json"
+import { Row } from '../../../UIComponents/FlexViews'
 
 
 
@@ -119,25 +120,25 @@ const MemberList = ({ navigation, route }) => {
         member: item
       })
     }
-      else if(opt?.key == "manage-mission" ){
-	  navigation.navigate(routes.memberManage,{
-	    memberId: item?._id,
-	  })
-      
-      }  else if (opt?.key == "profile") {
+    else if (opt?.key == "manage-mission") {
+      navigation.navigate(routes.memberManage, {
+        memberId: item?._id,
+      })
+
+    } else if (opt?.key == "profile") {
       navigation.navigate(routes.memberProfile, {
         memberId: item?._id,
-				contactNumber: item?.contact_number
+        contactNumber: item?.contact_number
       })
     } else if (opt?.key == "update_call") {
       setTimeout(() => {
-        
-      
-      ref_confirmModal?.current?.openModal({
-        title: `Are you sure you want to ${item?.is_call_allowed ? "disable" : "enable"} call functionality for this user?`,
-        agreeFunc: () => updateCallAPI(item)
-      })
-    }, 500);
+
+
+        ref_confirmModal?.current?.openModal({
+          title: `Are you sure you want to ${item?.is_call_allowed ? "disable" : "enable"} call functionality for this user?`,
+          agreeFunc: () => updateCallAPI(item)
+        })
+      }, 500);
     }
 
   }
@@ -353,14 +354,14 @@ const MemberList = ({ navigation, route }) => {
       _id: leadStatus?._id
 
     }
-			if(leadStatus?.is_lead_status_locked){
-					lead = {...lead, is_lead_status_locked:leadStatus?.is_lead_status_locked}
-			}
+    if (leadStatus?.is_lead_status_locked) {
+      lead = { ...lead, is_lead_status_locked: leadStatus?.is_lead_status_locked }
+    }
 
     let obj = {
       ...member,
       lead_status: lead,
-		  lead_status_expiry:expiry,
+      lead_status_expiry: expiry,
       lead_status_history: [{
         income_value: icome,
         changed_date_time: date,
@@ -807,6 +808,33 @@ const MemberList = ({ navigation, route }) => {
       </View>)
   }
 
+  const membershipView = (item) => {
+    return (
+      <Row alignItems="center">
+        <MyText fontSize={12} type='medium'>
+          {!!item?.membership_purchase_expiry ?
+            !isAllMembers ? moment(new Date(item?.membership_purchase_expiry)).format(dateTimeFormat.date) :
+              item?.membership_purchase_expiry
+            : "N/A"}
+        </MyText>
+        <View
+          style={{
+            backgroundColor: item?.is_membership_active ? colors.active : colors.delete,
+            borderRadius: 5,
+            padding: 3,
+            marginLeft: 5
+          }}
+        >
+          <MyText
+            fontSize={10}
+            uppercase
+            type='bold'
+            // color={item?.is_membership_active ? colors.active : colors.delete}
+            color={colors.white}
+          >{item?.is_membership_active ? "Active" : "Expired"}</MyText>
+        </View>
+      </Row>)
+  }
   const leadStatusView = (item) => {
     return (
       <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -862,15 +890,15 @@ const MemberList = ({ navigation, route }) => {
             style={{ flexDirection: "row", flex: 1, alignItems: "center" }}>
             <View>
               <UserImage
-								borderWidth={2}
-								borderColor={item?.membership_level_badge_info?.membership_level_badge_color_code}
+                borderWidth={2}
+                borderColor={item?.membership_level_badge_info?.membership_level_badge_color_code}
                 image={item?.profile_image}
                 name={item?.first_name}
                 size={30} />
 
               <View style={[{ backgroundColor: item?.is_online ? colors.online : colors.primary2, }, __styles.memberStatusView]} />
 
-              <View style={[{ backgroundColor: item?.is_membership_active ? colors.active: colors.expire, }, __styles.memberActiveView]} />
+              {/* <View style={[{ backgroundColor: item?.is_membership_active ? colors.active : colors.expire, }, __styles.memberActiveView]} /> */}
             </View>
 
             <View style={__styles.memberProfileNameView}>
@@ -882,9 +910,9 @@ const MemberList = ({ navigation, route }) => {
 
 
 
-	  <MyText style={{ marginRight: 10 }} >
-		{countries.find((el)=> el.code===item?.country)?.flag || ""}	
-	  </MyText>
+          <MyText style={{ marginRight: 10 }} >
+            {countries.find((el) => el.code === item?.country)?.flag || ""}
+          </MyText>
           <Pressable
             onPress={() => ref_infoModal?.current?.openModal(item?.downloaded_app ?
               "This Member has downloaded the app" :
@@ -915,6 +943,13 @@ const MemberList = ({ navigation, route }) => {
         </View>
 
         <View>
+          <StatView title={"Membership Expire"}
+            view={() => membershipView(item)}
+          // value={!!item?.membership_purchase_expiry ?
+          //   !isAllMembers ? moment(new Date(item?.membership_purchase_expiry)).format(dateTimeFormat.date) :
+          //     item?.membership_purchase_expiry
+          //   : "N/A"} 
+          />
           <StatView title={"Coins"} value={numFormatter(item?.coins_count)} uppercase />
           {/* <StatView title={"App Downloaded"} value={numFormatter(item?.coins_count)} uppercase /> */}
           {isAllMembers && <StatView title={"Reffered User"} value={!!item?.affliliate?.affiliate_user_info?.first_name ?
@@ -922,15 +957,12 @@ const MemberList = ({ navigation, route }) => {
           {!isNurture && access?.Show_nurture_in_filter && <StatView title={"Nurture"} value={!!item?.nurture ? item?.nurture?.first_name + " " + item?.nurture?.last_name : "N/A"} />}
           {!isMembers && <StatView title={"Delegate"} value={!!item?.consultant ? item?.consultant?.first_name + " " + item?.consultant?.last_name : "N/A"} />}
           <StatView title={"Badge Level"}
-		icon_img={item?.membership_level_badge_info?.membership_level_badge_icon?.thumbnail_1}
-		value={item?.membership_level_badge_info?.membership_level_badge_title} 
-		noFontTransform />
+            icon_img={item?.membership_level_badge_info?.membership_level_badge_icon?.thumbnail_1}
+            value={item?.membership_level_badge_info?.membership_level_badge_title}
+            noFontTransform />
           <StatView title={"Last Login Activity"} uppercase value={convertTimezone(item?.last_login_activity, timezone).format(dateTimeFormat.dateTime)} />
           <StatView title={"Lead Status"} view={() => leadStatusView(item)} />
-          <StatView title={"Membership Expire"} value={!!item?.membership_purchase_expiry ?
-            !isAllMembers ? moment(new Date(item?.membership_purchase_expiry)).format(dateTimeFormat.date) :
-              item?.membership_purchase_expiry
-            : "N/A"} />
+
           {/* <StatView title={"Regis Expire"} value={convertTimezone(item?.createdAt, timezone).format(dateTimeFormat.date)} /> */}
         </View>
 
@@ -1079,7 +1111,7 @@ const filteroObj = {
 const __styles = StyleSheet.create({
   memberRootView: { backgroundColor: colors.secondary, marginTop: 10, borderRadius: 10, padding: 10 },
   memberProfileView: { flexDirection: "row", alignItems: "center" },
-  memberStatusView: { position: "absolute", bottom: 0, right: 0, height: 9, width: 9, borderRadius: 10 / 2,borderWidth:1, borderColor:colors.white },
+  memberStatusView: { position: "absolute", bottom: 0, right: 0, height: 9, width: 9, borderRadius: 10 / 2, borderWidth: 1, borderColor: colors.white },
   memberActiveView: { position: "absolute", top: 0, right: 0, height: 10, width: 10, borderRadius: 10 / 2, },
   memberProfileNameView: { flex: 1, marginLeft: 10 },
   headerBtn: {
