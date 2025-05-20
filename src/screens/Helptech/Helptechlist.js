@@ -24,6 +24,7 @@ import moment from 'moment'
 import MyRefreshControl from '../../components/MyRefreshControl'
 import EmptyView from '../../components/EmptyView'
 import SearchView from '../../components/SearchView'
+import LessonView2 from '../../components/LessonView2'
 
 
 
@@ -119,31 +120,43 @@ const Helptechlist = ({ navigation, route }) => {
 
 
   const descView = (item, index) => {
-    return (
-      <View style={{ marginTop: "auto", marginBottom: 5 }} >
-        <Row flexWrap="wrap"  >
-          {isArray(item?.help_video_departments) &&
-            item?.help_video_departments.map((x, i) => {
-              return (<MyChip title={x?.title} />)
-            })}
-        </Row>
+    if (isArray(item?.help_video_departments)) {
+      return (
+        <View style={{ marginTop: "auto", marginTop: 5 }} >
+          <Row flexWrap="wrap"  >
+            {
+              item?.help_video_departments.map((x, i) => {
+                return (<MyChip title={x?.title} />)
+              })}
+          </Row>
 
-      </View>
-    )
+        </View>
+      )
+    } else return null
   }
 
   const renderTutorials = ({ item, index, }) => {
 
     return (
-      <View style={[{ marginTop: index == 0 ? 5 : 10, borderWidth: 1, borderColor: colors.white + "22", borderRadius: 10 }, {}]} >
-        <LessonView
-          handlePress={() => onHelpTechDetailScreen(item)}
-          heading={item.title}
-          numberOfTitleLines={3}
-          durationText={moment(item?.createdAt).format("DD MMM, YYYY")}
-          descView={() => descView(item, index)}
-          // desc={"aoidjaio jdijas iodjioasj diojasoidj ioasjdioj asiojd oasij asoidjasijd oasjdiojas ojdioasj doi j asidj asoijdiasj o sdijf "}
-          image={item.image.thumbnail_1} />
+      <View style={{ flex: 1 / 2 }}>
+        <View style={[{
+          marginTop: 10,
+          marginLeft: index % 2 != 0 ? 5 : 0,
+          marginRight: index % 2 == 0 ? 5 : 0,
+          borderWidth: 1,
+          borderColor: colors.white + "22",
+          borderRadius: 10,
+          flex: 1,
+          backgroundColor: colors.secondary
+        }, {}]} >
+          <LessonView2
+            handlePress={() => onHelpTechDetailScreen(item)}
+            heading={item.title}
+            numberOfTitleLines={3}
+            durationText={moment(item?.createdAt).format("DD MMM, YYYY")}
+            descView={() => descView(item, index)}
+            image={item.image.thumbnail_1} />
+        </View>
       </View>
     )
     // return (
@@ -182,25 +195,29 @@ const Helptechlist = ({ navigation, route }) => {
             backgroundColor: colors.primary
           }} />
         </View>
-        {item?.help_videos.map((x, i) => renderTutorials({ item: x, index: i }))}
+        <FlatList
+          data={item?.help_videos}
+          renderItem={renderTutorials}
+          scrollEnabled={false}
+          showsVerticalScrollIndicator={false}
+          numColumns={2}
+        />
+        {/* {item?.help_videos.map((x, i) => renderTutorials({ item: x, index: i }))} */}
       </View>
     )
   }
 
   const headerComponent = () => {
     return (
-      <View style={{ paddingTop: 10, backgroundColor: colors.darkSecondary }}>
+      <View style={{ paddingTop: 5, backgroundColor: colors.darkSecondary }}>
         <Row flexWrap="wrap">
           {isArray(appliedFilter?.categories) &&
             appliedFilter?.categories.map((x, i) => <MyChip title={x?.title} onPress={() => removeFromArrayFilter(i, "categories")} />)}
           {isArray(appliedFilter?.departments) &&
             appliedFilter?.departments.map((x, i) => <MyChip title={x?.title} onPress={() => removeFromArrayFilter(i, "departments")} />)}
-
           {appliedFilter.from && appliedFilter.to &&
             <MyChip title={`From ${moment(appliedFilter.from).format(dateTimeFormat.date)} to ${moment(appliedFilter.to).format(dateTimeFormat.date)}`} onPress={() => removeFromDateFilter()} />
           }
-
-
         </Row>
         {mySearchView()}
       </View>
