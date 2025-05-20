@@ -72,7 +72,7 @@ export const main = StyleSheet.create({
     lineHeight: 20,
     color: colors.white,
     includeFontPadding: false,
-    letterSpacing: 1
+    letterSpacing: 0.5
   },
   hitSlop: {
     top: 10,

@@ -87,7 +87,7 @@ const Commission = ({ navigation, route }) => {
       <View style={{ backgroundColor: colors.darkSecondary }}>
         <View style={{ flexDirection: "row", }}>
           <CounterBox color={"#283C35"} count={commision?.total} subTitle={"Total Commission"} />
-          <CounterBox color={"#3C3834"} count={commision?.paid} subTitle={"Paid Commission"} />
+          <CounterBox style={{ marginHorizontal: 8}} color={"#3C3834"} count={commision?.paid} subTitle={"Paid Commission"} />
           <CounterBox color={"#3B2837"} count={commision?.pending} subTitle={"Pending Commission"} />
         </View>
         <View>
@@ -101,7 +101,7 @@ const Commission = ({ navigation, route }) => {
 
   const Mytitle = () => {
     return (
-      <View style={{ flex: 1, paddingHorizontal: 15 }}>
+      <View style={{ flex: 1, paddingHorizontal: 10 }}>
         <MyText fontSize={18} type='bold' color={colors.primary} >{title}</MyText>
         <MyText fontSize={10} type='medium' color={colors.lightText2}>{`Showing ${list.length} of ${total}`}</MyText>
       </View>

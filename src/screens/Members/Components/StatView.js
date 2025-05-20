@@ -18,16 +18,16 @@ const StatView = ({ title, value, view = null, uppercase = false, icon_img, noFo
       </View>
       <View style={{ flex: 1 }}>
         {!!view ? view() :
-	    <View style={{flexDirection:'row', alignItems:"center"}}>
-		    {icon_img &&
-			<>
-			    <Image source={{uri: S3_URL + icon_img}} style={{width:15, height:15}} />
-			    <View style={{width:5}}/>
-			</>
-		    }
-		<MyText style={{ textTransform: noFontTransform ? "none" : uppercase ? "uppercase" : "capitalize" }} fontSize={12} type='medium' >{value}</MyText>
-	    </View>
-	}
+          <View style={{ flexDirection: 'row', alignItems: "center" }}>
+            {icon_img &&
+              <>
+                <Image source={{ uri: S3_URL + icon_img }} style={{ width: 15, height: 15 }} />
+                <View style={{ width: 5 }} />
+              </>
+            }
+            <MyText style={{ textTransform: noFontTransform ? "none" : uppercase ? "uppercase" : "capitalize" }} fontSize={12} type='medium' >{value}</MyText>
+          </View>
+        }
       </View>
     </View>
   )

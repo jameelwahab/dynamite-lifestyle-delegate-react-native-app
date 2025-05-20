@@ -15,6 +15,7 @@ interface RowProps {
     | 'space-around'
     | 'space-evenly';
   alignSelf?: FlexAlignType;
+  flexWrap?: 'wrap' | 'nowrap' | 'wrap-reverse' | undefined;
 }
 
 interface FlexProps {
@@ -30,6 +31,7 @@ interface FlexProps {
     | 'space-around'
     | 'space-evenly';
   ph?: number;
+  ml?: number;
 }
 
 export const Row: React.FC<RowProps> = ({
@@ -40,13 +42,21 @@ export const Row: React.FC<RowProps> = ({
   paddingHorizontal,
   padding,
   alignSelf,
+  flexWrap,
 }) => {
   return (
     <View
       style={[
         __styles.row,
         style,
-        {alignItems, justifyContent, padding, paddingHorizontal, alignSelf},
+        {
+          alignItems,
+          justifyContent,
+          padding,
+          paddingHorizontal,
+          alignSelf,
+          flexWrap,
+        },
       ]}>
       {children}
     </View>
@@ -60,6 +70,7 @@ export const Flex: React.FC<FlexProps> = ({
   justifyContent,
   flex,
   ph,
+  ml,
 }) => {
   return (
     <View
@@ -67,7 +78,7 @@ export const Flex: React.FC<FlexProps> = ({
         __styles.flex1,
         {flex},
         style,
-        {alignItems, justifyContent, paddingHorizontal: ph},
+        {alignItems, justifyContent, paddingHorizontal: ph, marginLeft: ml},
       ]}>
       {children}
     </View>

@@ -150,7 +150,7 @@ const Header = ({
               <Ionicons name="arrow-back-outline" color={colors.primary} size={25} />
             </Pressable>}
           {!!title ?
-            <View style={[__header.titleView, { paddingLeft: hideBackBottomButton ? 15 : 0 }]}>
+            <View style={[__header.titleView, { paddingLeft: hideBackBottomButton ? 10 : 0 }]}>
               <Text style={__header.titleText}>{title}</Text>
               {!!subTitle && <Text style={__header.subTitle}>{subTitle}</Text>}
             </View>
@@ -208,7 +208,7 @@ const __header = StyleSheet.create({
     includeFontPadding: false
   },
   leftButtonView: {
-    width: 50,
+    width: 40,
     height: 50,
     alignItems: "center",
     justifyContent: "center",

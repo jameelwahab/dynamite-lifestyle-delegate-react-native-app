@@ -47,8 +47,17 @@ const index = (props) => {
     if (!isDrawerOpen) {
       Keyboard.dismiss()
       setSearchText("")
+
+      setTimeout(() => {
+        scrollToSelected()
+      }, 300);
     }
   }, [isDrawerOpen])
+
+  function scrollToSelected() {
+    
+
+  }
 
   const pushNotificationhandlers = async () => {
     sub2 = null;

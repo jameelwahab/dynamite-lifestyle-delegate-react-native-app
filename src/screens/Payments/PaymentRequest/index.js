@@ -345,6 +345,7 @@ const PaymentRequest = ({ navigation, route }) => {
       <View style={{ flex: 1, }}>
         <FlatList
           data={list}
+          contentContainerStyle={{paddingTop:10}}
           showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item?._id}
           // ListHeaderComponent={topView()}

@@ -4,7 +4,9 @@ import MyText from './MyText'
 import UserImage from './UserImage'
 import { colors } from '../utilities/colors'
 
-const MemberView = ({ member, borderColor = null, showPhoneNumber = false, marginLeft = 5, size = 30, titleSize = 12, customImage = "", hideEmail = false, secondText = "", subText }) => {
+const MemberView = ({ member, borderColor = null, showPhoneNumber = false, marginLeft = 5, size = 30, titleSize = 12, customImage = "", hideEmail = false, secondText = "", subText 
+  
+}) => {
   let image = !!customImage ? customImage : member?.profile_image
   return (
 

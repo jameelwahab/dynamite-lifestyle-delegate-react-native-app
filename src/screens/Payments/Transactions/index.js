@@ -174,7 +174,6 @@ const __styles = StyleSheet.create({
   topView: { paddingHorizontal: 10 },
   headingView: { flexDirection: "row", alignItems: "center", },
   headerView: {
-    paddingHorizontal: 5,
     backgroundColor: colors.darkSecondary
   }
 })

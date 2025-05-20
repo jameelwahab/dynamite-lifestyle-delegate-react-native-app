@@ -147,7 +147,8 @@ const __styles = StyleSheet.create({
     borderRadius: 10,
     marginTop: 15,
     borderWidth: 1,
-    borderColor: colors.white + "22",
+    borderColor: colors.white +"0F",
+    // borderColor:colors.border,
     backgroundColor: colors.secondaryVariant,
   },
   row: {

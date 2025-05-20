@@ -12,7 +12,7 @@ import CollapseText from "./CollapseText";
 import { useSelector } from 'react-redux'
 import { selectUser } from '../redux/reducers/userSlice'
 
-const LessonView = ({
+const LessonView2 = ({
 	title,
 	style,
 	heading,
@@ -48,9 +48,9 @@ const LessonView = ({
 						{image &&
 							<View>
 								<ResponsiveImage3
-									width={150}
+
 									source={{ uri: S3_URL + image }}
-									defaultSize={{ width: 150, height: 85 }}
+									// defaultSize={{ width: 150, height: 85 }}
 									style={{ width: "100%" }} />
 								{(duration || durationText) &&
 									<View style={__styles.imgTag}>
@@ -63,9 +63,10 @@ const LessonView = ({
 					<View
 						style={{
 							width: '100%',
-							paddingHorizontal: image ? 5 : 0,
-							paddingVertical: 1,
-							flex: 1
+							// paddingHorizontal: image ? 5 : 0,
+							padding: 5,
+							// paddingVertical: 1,
+							// flex: 1
 						}}>
 						<View style={{ flexDirection: "row", justifyContent: "space-between", paddingVertical: showMenu ? 5 : 0, paddingRight: 5 }}>
 							{!!heading &&
@@ -94,10 +95,11 @@ const LessonView = ({
 		</>
 	)
 }
+export default LessonView2
 
 const __styles = StyleSheet.create({
 	container: {
-		flexDirection: 'row',
+		// flexDirection: 'row',
 		borderRadius: 10,
 		overflow: "hidden"
 	},
@@ -116,7 +118,7 @@ const __styles = StyleSheet.create({
 	imgTag: {
 		position: "absolute",
 		right: 10,
-		bottom: 10,
+		top: 10,
 		borderRadius: 3,
 		paddingHorizontal: 10,
 		paddingVertical: 2,
@@ -153,5 +155,5 @@ const __styles = StyleSheet.create({
 	}
 })
 
-export default LessonView
+
 

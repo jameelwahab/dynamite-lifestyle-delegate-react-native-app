@@ -230,7 +230,8 @@ const __styles = StyleSheet.create({
 
   },
   topView: {
-    flexDirection: "row", alignItems: "center", backgroundColor: colors.darkSecondary, paddingBottom: 5
+    flexDirection: "row", alignItems: "center", backgroundColor: colors.darkSecondary,
+     paddingBottom: 5
   },
   topBtnsView: { flexDirection: "row", alignItems: "flex-end", },
 

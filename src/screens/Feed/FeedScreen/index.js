@@ -1293,7 +1293,7 @@ const FeedScreen = ({ navigation, route, CustomHeader, CustomTabs, showTabView, 
         {!!!feedId &&
           <>
             {route?.params?.title &&
-              <View style={{ marginTop: 5, marginLeft: 5 }}>
+              <View style={{ marginTop: 5, }}>
                 <MyText fontSize={18} type='bold' color={colors.primary} >{route?.params?.title}</MyText></View>
             }
             {!!CustomHeader && CustomHeader()}

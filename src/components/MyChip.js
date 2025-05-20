@@ -8,14 +8,13 @@ import MyText from './MyText'
 const MyChip = ({ title, onPress, isCapitalize = false }) => {
 
   return (
-    <View
-      style={__styles.chipView}>
+    <View style={__styles.chipView}>
       <View style={{}}>
-        <MyText capitalize={isCapitalize} fontSize={12} color={colors.white} >{title}</MyText>
+        <MyText capitalize={isCapitalize} type='medium' fontSize={12} color={colors.white} >{title}</MyText>
       </View>
       {!!onPress &&
         <TouchableOpacity
-        hitSlop={{top:5,left:5,bottom:5,right:5}}
+          hitSlop={{ top: 5, left: 5, bottom: 5, right: 5 }}
           onPress={onPress}
           style={__styles.chipBtn}>
           {icons.crosss(colors.primary, 15)}

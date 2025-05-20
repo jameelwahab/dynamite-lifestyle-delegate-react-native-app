@@ -28,9 +28,9 @@ const FeedTabs = ({ isCosmos, changeTab, tab, CustomTabs, isScheduleFeedTabAllow
     <View style={{ marginHorizontal: -10 }}>
       {!!settings?.the_cosmos_banner_image && isCosmos &&
         <HeaderBanner image={settings?.the_cosmos_banner_image} user={user} />}
-      <View style={{ height: 50, marginTop: 10 }}>
+      <View style={{ height: 50, marginTop: 5 }}>
         <FlatList
-          contentContainerStyle={{ paddingHorizontal: 10 }}
+          // contentContainerStyle={{ paddingHorizontal: 10 }}
           data={!!CustomTabs ?
             isScheduleFeedTabAllowed ? tabsForEventsWithSchedule.concat(CustomTabs) :
               tabsForEvents.concat(CustomTabs)
