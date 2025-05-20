@@ -364,7 +364,7 @@ const __styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     backgroundColor: colors.darkSecondary,
-    marginHorizontal: 15
+    marginHorizontal: 10
   },
   heading_font: {
     color: colors.primary,

@@ -1,5 +1,5 @@
 
-import { View, Text, FlatList, StyleSheet, Pressable, SectionList } from 'react-native'
+import { View, Text, FlatList, StyleSheet, Pressable, SectionList, ScrollView } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import RootView from '../../components/RootView'
 import MyText from '../../components/MyText'
@@ -15,6 +15,9 @@ import ResponsiveImage2 from '../../components/ResponsiveImage2'
 import routes from '../../navigation/routes'
 import WebPlayer from '../../components/WebPlayer'
 import MyWebview from '../../components/MyWebview'
+import isArray from '../../functions/isArray'
+import { Row } from '../../UIComponents/FlexViews'
+import MyChip from '../../components/MyChip'
 
 
 const HelptechDetail = ({ navigation, route }) => {
@@ -51,26 +54,37 @@ const HelptechDetail = ({ navigation, route }) => {
       subTitle={category?.short_description}
     >
       <View style={{ flex: 1 }} >
-        {!!category?.video_url &&
-          <View style={{ marginTop: 10 }}>
-            <WebPlayer
-              width={width - 20}
-              url={category?.video_url}
-              height={250}
-            />
-          </View>
-        }
+        <ScrollView showsVerticalScrollIndicator={false}>
+          {!!category?.video_url &&
+            <View style={{ marginTop: 10 }}>
+              <WebPlayer
+                width={width - 20}
+                url={category?.video_url}
+                height={250}
+              />
+            </View>
+          }
 
-        {!!category?.detailed_description &&
-          <View style={{ marginTop: 10 }}>
-            <MyWebview
-              width={width - 20}
-              html={category?.detailed_description}
-            />
-          </View>
-        }
+          {isArray(category?.help_video_departments) &&
+            <View style={{ marginTop: 10 }} >
+              <Row flexWrap="wrap"  >
+                {category?.help_video_departments.map((x, i) => {
+                  return (<MyChip title={x?.title} />)
+                })}
+              </Row>
+            </View>
+          }
 
+          {!!category?.detailed_description &&
+            <View style={{ marginTop: 10 }}>
+              <MyWebview
+                width={width - 20}
+                html={category?.detailed_description}
+              />
+            </View>
+          }
 
+        </ScrollView>
       </View>
 
     </RootView>

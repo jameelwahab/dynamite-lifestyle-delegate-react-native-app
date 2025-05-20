@@ -242,7 +242,7 @@ const List = ({ navigation, route }) => {
         onPress={() => onTicketDetail(item)}
         // onLongPress={() => setOptions({ isModalVisible: true, selected: item })}
         // delayLongPress={400}
-        style={{ marginTop: 10, borderRadius: 20 }}>
+        style={{ marginBottom: 10, borderRadius: 20 }}>
 
         <View style={{ padding: 15, backgroundColor: colors.secondaryVariant, borderRadius: 20 }}>
 

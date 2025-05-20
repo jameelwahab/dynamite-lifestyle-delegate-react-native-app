@@ -236,7 +236,7 @@ const LinksList = ({ navigation, route }) => {
 
   const searchView = () => {
     return (
-      <View style={{ marginHorizontal: 4 }}>
+      <View style={{  }}>
         <SearchView
           onChangeText={(text) => setSearchText(text)}
           search={searchText}

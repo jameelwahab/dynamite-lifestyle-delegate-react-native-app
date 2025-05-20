@@ -32,7 +32,13 @@ export const __styles = StyleSheet.create({
 
     borderRadius: 10,
     marginTop: 5
-  }
+  },
+  memberStatusView: {
+    position: "absolute",
+    bottom: 0,
+    left: 25,
+    height: 9, width: 9, borderRadius: 10 / 2, borderWidth: 1, borderColor: colors.white
+  },
 })
 
 export const calendarStyles = StyleSheet.create({

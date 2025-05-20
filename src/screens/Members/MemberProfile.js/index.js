@@ -1,4 +1,4 @@
-import { View, Text, Pressable, ScrollView, FlatList, TouchableOpacity } from 'react-native'
+import { View, Text, Pressable, ScrollView, FlatList, TouchableOpacity, StyleSheet } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import RootView from '../../../components/RootView'
 import MyText from '../../../components/MyText'
@@ -40,7 +40,7 @@ const MemberProfile = ({ navigation, route }) => {
   const [events, setEvents] = useState(null);
   const [type, setType] = useState('month')
   const [_90DayGraph, set_90DayGraph] = useState([])
-  
+
   const geMemberDataFromServer = async (selectedDate, ttype) => {
     let sDATE = moment(selectedDate).subtract({ month: 1 }).endOf(ttype).format('YYYY-MM-DD');
     let eDATE = moment(selectedDate).endOf(ttype).format('YYYY-MM-DD');
@@ -144,9 +144,9 @@ const MemberProfile = ({ navigation, route }) => {
     geMemberDataFromServer(date, ntype);
   }
 
-  const onSmsModal = (token, navigation)=>{
+  const onSmsModal = (token, navigation) => {
 
-    ref_sms?.current?.openModal({ token, navigation, user: member?.member?.contact_number})
+    ref_sms?.current?.openModal({ token, navigation, user: member?.member?.contact_number })
   }
 
   useEffect(() => {
@@ -158,7 +158,14 @@ const MemberProfile = ({ navigation, route }) => {
     return (
       <View style={{ flexDirection: "row", alignItems: "center", flex: 1, paddingRight: 15 }}>
         <View style={{ flex: 1 }}>
-          {!!member?.member && <MemberView member={member?.member}  borderColor={member?.member?.membership_level_badge_info?.membership_level_badge_id?.color_code}  showPhoneNumber />}
+          {!!member?.member &&
+            <View>
+              <MemberView
+                member={member?.member}
+                borderColor={member?.member?.membership_level_badge_info?.membership_level_badge_id?.color_code}
+                showPhoneNumber />
+              <View style={[{ backgroundColor: member?.member?.is_online ? colors.online : colors.primary2, }, __styles.memberStatusView]} />
+            </View>}
 
 
         </View>
@@ -177,7 +184,7 @@ const MemberProfile = ({ navigation, route }) => {
 
         {access?.allow_to_send_sms &&
           <Pressable
-            onPress={() => onSmsModal( token, navigation )}
+            onPress={() => onSmsModal(token, navigation)}
             style={[__styles.topBtn, { backgroundColor: "#366FB1" }]}>
             {icons.sms(colors.white, 18)}
           </Pressable>}
@@ -276,6 +283,8 @@ const MemberProfile = ({ navigation, route }) => {
 }
 
 export default MemberProfile
+
+
 
 const tabs = [{
   key: "wol",

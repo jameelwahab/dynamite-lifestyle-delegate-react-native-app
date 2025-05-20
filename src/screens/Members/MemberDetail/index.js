@@ -31,10 +31,11 @@ import showToast from '../../../functions/showToast'
 import breakReference from '../../../functions/breakReference'
 import country from '../../../assets/data/countryList.json'
 import { Row } from '../../../UIComponents/FlexViews'
+import MyImage from '../../../components/MyImage'
 
 const MemberDetail = ({ navigation, route }) => {
   const { type } = route?.params;
-  const { access } = useSelector(selectUser);
+  const { access, S3_URL } = useSelector(selectUser);
   const isAllMembers = type == "all-member";
   const isMembers = type == "member";
   const isNurture = type == "nurture";
@@ -422,15 +423,17 @@ const MemberDetail = ({ navigation, route }) => {
       </View>)
   }
 
-    const membershipView = (item) => {
+  const badgeLevelView = (item) => {
     return (
       <Row alignItems="center">
-        <MyText fontSize={12} type='medium'>
-          {!!item?.membership_purchase_expiry ?
-            !isAllMembers ? moment(new Date(item?.membership_purchase_expiry)).format(dateTimeFormat.date) :
-              item?.membership_purchase_expiry
-            : "N/A"}
-        </MyText>
+        {!!item?.membership_level_badge_info?.membership_level_badge_icon?.thumbnail_1 &&
+          <MyImage
+            source={{ uri: S3_URL + item?.membership_level_badge_info?.membership_level_badge_icon?.thumbnail_1 }}
+            style={{ width: 15, height: 15, marginRight: 5 }} />}
+        {!!item?.membership_level_badge_info?.membership_level_badge_title &&
+          <MyText fontSize={12} type='medium'>
+            {item?.membership_level_badge_info?.membership_level_badge_title}
+          </MyText>}
         <View
           style={{
             backgroundColor: item?.is_membership_active ? colors.active : colors.delete,
@@ -454,14 +457,14 @@ const MemberDetail = ({ navigation, route }) => {
   const memberStatView = () => {
     return (
       <View>
-        <StatView title={"Membership Expire"} 
-        // value={!!member?.membership_purchase_expiry ?
-        //   isAllMembers ? member?.membership_purchase_expiry :
-        //     moment(new Date(member?.membership_purchase_expiry)).tz(timezone.admin).format(dateTimeFormat.date)
-        //   : "N/A"}
-          view={() => membershipView(member)}
-          />
-          
+        <StatView title={"Membership Expire"}
+          value={!!member?.membership_purchase_expiry ?
+            isAllMembers ? member?.membership_purchase_expiry :
+              moment(new Date(member?.membership_purchase_expiry)).tz(timezone.admin).format(dateTimeFormat.date)
+            : "N/A"}
+        // view={() => membershipView(member)}
+        />
+
         <StatView title={"Coins"} value={numFormatter(member?.coins_count)} uppercase />
         <StatView title={"App Downloaded"} view={() => appDownloadedView(member?.downloaded_app)} uppercase />
         {isAllMembers && <StatView title={"Reffered User"} value={!!member?.affliliate?.affiliate_user_info ?
@@ -470,8 +473,8 @@ const MemberDetail = ({ navigation, route }) => {
         {!isMembers && <StatView title={"Delegate"} value={!!member?.consultant ? member?.consultant?.first_name + " " + member?.consultant?.last_name : "N/A"} />}
         <StatView
           title={"Badge Level"}
-          icon_img={member?.membership_level_badge_info?.membership_level_badge_icon?.thumbnail_1}
-          value={member?.membership_level_badge_info?.membership_level_badge_title} noFontTransform />
+          view={() => badgeLevelView(member)}
+        />
         <StatView title={"Wheel of life"} view={wheelOfLifeStatus} />
         <StatView title={"Last Login Activity"} uppercase value={convertTimezone(member?.last_login_activity, timezone).format(dateTimeFormat.dateTime)} />
         <StatView title={"Phone Number"} view={() => contactNumberView(member?.contact_number, !!member?.call_history?.is_checked, member?.is_call_allowed)} />

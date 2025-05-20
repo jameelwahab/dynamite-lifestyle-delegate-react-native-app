@@ -11,22 +11,23 @@ const CounterBox = ({
   color,
   count,
   subTitle,
-		icon=null,
-		normal=false,
+  icon = null,
+  normal = false,
+  style
 }) => {
   return (
-    <View style={__style.box}>
+    <View style={[__style.box, style]}>
       <LinearGradient
         start={{ x: 0.0, y: 0.25 }} end={{ x: 0.5, y: 1.0 }}
         locations={[0, 0.4,]}
         colors={[color + "55", color]}
         style={__style.gradientBox}
       >
-        {icon ||icons.pound(colors.primary)}
+        {icon || icons.pound(colors.primary)}
       </LinearGradient>
 
-      <MyText style={{ marginTop: 10, textAlign: "center" }} fontSize={16} type='medium' >{(normal ? "" :"£ ")  + numFormatter(count, 2)}</MyText>
-      <MyText adjustsFontSizeToFit={true} fontSize={10} style={{ marginTop: 2, textAlign: "center",paddingHorizontal:3 }}>{subTitle}</MyText>
+      <MyText style={{ marginTop: 10, textAlign: "center" }} fontSize={16} type='medium' >{(normal ? "" : "£ ") + numFormatter(count, 2)}</MyText>
+      <MyText adjustsFontSizeToFit={true} fontSize={10} style={{ marginTop: 2, textAlign: "center", paddingHorizontal: 3 }}>{subTitle}</MyText>
 
     </View>
   )
@@ -41,7 +42,7 @@ const __style = StyleSheet.create({
     // marginBottom:20,
     // padding:,
     flex: 1,
-    margin: 3,
+    // margin: 3,
     backgroundColor: colors.secondary,
     borderRadius: 20,
     alignItems: "center",

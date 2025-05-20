@@ -15,7 +15,7 @@ import routes from '../../../navigation/routes'
 import StatView from '../Components/StatView'
 import { convertTimezone } from '../../../functions/convertTime'
 import { selectTimeZone } from '../../../redux/reducers/timezoneSlice'
-import { communityLevelWithAllObj, dateTimeFormat } from '../../../utilities/constants'
+import { communityLevelWithAllObj, dateTimeFormat, S3_URL } from '../../../utilities/constants'
 import MyInputs from '../../../components/MyInputs'
 import SortModal from '../Components/SortModal'
 import debounce from '../../../functions/debounce'
@@ -40,6 +40,7 @@ import OptionModal2 from '../../../components/OptionModal2'
 import breakReference from '../../../functions/breakReference'
 import countries from "../../../assets/data/countryList.json"
 import { Row } from '../../../UIComponents/FlexViews'
+import MyImage from '../../../components/MyImage'
 
 
 
@@ -518,7 +519,7 @@ const MemberList = ({ navigation, route }) => {
 
   const topView = () => {
     return (
-      <View style={{ flexDirection: "row", flex: 1, marginHorizontal: 15, alignItems: "center", }}>
+      <View style={{ flexDirection: "row", flex: 1, marginHorizontal: 10, alignItems: "center", }}>
         <View>
           <MyText fontSize={18} type='bold' color={colors.primary} >{
             isAllMembers ? "All Members" :
@@ -675,7 +676,7 @@ const MemberList = ({ navigation, route }) => {
 
   const headerView = () => {
     return (
-      <View style={{ paddingHorizontal: 5, backgroundColor: colors.darkSecondary }}>
+      <View style={{  backgroundColor: colors.darkSecondary }}>
         {filterChipList.length > 0 &&
           <>
 
@@ -808,15 +809,17 @@ const MemberList = ({ navigation, route }) => {
       </View>)
   }
 
-  const membershipView = (item) => {
+  const badgeLevelView = (item) => {
     return (
       <Row alignItems="center">
-        <MyText fontSize={12} type='medium'>
-          {!!item?.membership_purchase_expiry ?
-            !isAllMembers ? moment(new Date(item?.membership_purchase_expiry)).format(dateTimeFormat.date) :
-              item?.membership_purchase_expiry
-            : "N/A"}
-        </MyText>
+        {!!item?.membership_level_badge_info?.membership_level_badge_icon?.thumbnail_1 &&
+          <MyImage
+            source={{ uri: S3_URL + item?.membership_level_badge_info?.membership_level_badge_icon?.thumbnail_1 }}
+            style={{ width: 15, height: 15, marginRight: 5 }} />}
+        {!!item?.membership_level_badge_info?.membership_level_badge_title &&
+          <MyText fontSize={12} type='medium'>
+            {item?.membership_level_badge_info?.membership_level_badge_title}
+          </MyText>}
         <View
           style={{
             backgroundColor: item?.is_membership_active ? colors.active : colors.delete,
@@ -835,6 +838,7 @@ const MemberList = ({ navigation, route }) => {
         </View>
       </Row>)
   }
+
   const leadStatusView = (item) => {
     return (
       <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -944,11 +948,11 @@ const MemberList = ({ navigation, route }) => {
 
         <View>
           <StatView title={"Membership Expire"}
-            view={() => membershipView(item)}
-          // value={!!item?.membership_purchase_expiry ?
-          //   !isAllMembers ? moment(new Date(item?.membership_purchase_expiry)).format(dateTimeFormat.date) :
-          //     item?.membership_purchase_expiry
-          //   : "N/A"} 
+
+            value={!!item?.membership_purchase_expiry ?
+              !isAllMembers ? moment(new Date(item?.membership_purchase_expiry)).format(dateTimeFormat.date) :
+                item?.membership_purchase_expiry
+              : "N/A"}
           />
           <StatView title={"Coins"} value={numFormatter(item?.coins_count)} uppercase />
           {/* <StatView title={"App Downloaded"} value={numFormatter(item?.coins_count)} uppercase /> */}
@@ -957,9 +961,10 @@ const MemberList = ({ navigation, route }) => {
           {!isNurture && access?.Show_nurture_in_filter && <StatView title={"Nurture"} value={!!item?.nurture ? item?.nurture?.first_name + " " + item?.nurture?.last_name : "N/A"} />}
           {!isMembers && <StatView title={"Delegate"} value={!!item?.consultant ? item?.consultant?.first_name + " " + item?.consultant?.last_name : "N/A"} />}
           <StatView title={"Badge Level"}
-            icon_img={item?.membership_level_badge_info?.membership_level_badge_icon?.thumbnail_1}
-            value={item?.membership_level_badge_info?.membership_level_badge_title}
-            noFontTransform />
+            // icon_img={item?.membership_level_badge_info?.membership_level_badge_icon?.thumbnail_1}
+            // value={item?.membership_level_badge_info?.membership_level_badge_title}
+            view={() => badgeLevelView(item)}
+          />
           <StatView title={"Last Login Activity"} uppercase value={convertTimezone(item?.last_login_activity, timezone).format(dateTimeFormat.dateTime)} />
           <StatView title={"Lead Status"} view={() => leadStatusView(item)} />
 
@@ -995,6 +1000,7 @@ const MemberList = ({ navigation, route }) => {
           stickyHeaderIndices={[0]}
           data={list}
           renderItem={renderMemberList}
+          showsVerticalScrollIndicator={false}
           ListEmptyComponent={!loader && <EmptyView />}
           ListFooterComponent={<FooterLoader isVisible={footerLoader} />}
           onEndReached={() => {

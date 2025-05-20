@@ -11,7 +11,7 @@ const Tabs = ({ list, changeTab, tab, style }) => {
     <View style={[{ marginHorizontal: -10 }, style]}>
       <View style={{ height: 50, }}>
         <FlatList
-          contentContainerStyle={{ paddingHorizontal: 10 }}
+          // contentContainerStyle={{ paddingHorizontal: 10 }}
           data={list}
           horizontal
           showsHorizontalScrollIndicator={false}

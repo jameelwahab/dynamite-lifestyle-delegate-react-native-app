@@ -12,69 +12,86 @@ import CollapseText from "./CollapseText";
 import { useSelector } from 'react-redux'
 import { selectUser } from '../redux/reducers/userSlice'
 
-const LessonView = ({ title, style, heading, icon, iconTextColor = colors.white, missionDetail=false, desc, txtlen = 50, handleClick, copyEnable = false, image, handlePress, duration, numberOfTitleLines = 2, showMenu=false, 
+const LessonView = ({
+	title,
+	style,
+	heading,
+	icon,
+	missionDetail = false,
+	desc,
+	descView,
+	handleClick,
+	image,
+	handlePress,
+	duration,
+	durationText,
+	numberOfTitleLines = 2,
+	showMenu = false,
 }) => {
-  const { S3_URL } = useSelector(selectUser)
+	const { S3_URL } = useSelector(selectUser)
 	const [show, setShow] = useState()
 	const [dynamicNumberOfTitleLines, setDynamicNumberOfTitleLines] = useState(1)
 	return (
-	    <>
-	    {icon &&
-		<View style={__styles.icon_container}>
-		    <MyImage source={{ uri: S3_URL + icon }} style={__styles.icon}
-			resizeMode="contain" />
-		    <View style={{ marginLeft: 10,flex:1 }} >
-			<Text style={[main.title,{textTransform:"uppercase"}]}>{title}</Text>
-		    </View>
-		</View>
-	    }
-	    <Pressable onPress={handlePress}>
-		<View style={[__styles.container, style, !missionDetail && {backgroundColor: colors.secondary,} ]} >
-		    <View style={{ overflow: 'hidden', position:"relative", }}>
-			{image &&
-			<View>
-			    <ResponsiveImage3
-				width={150}
-				source={{uri: S3_URL +image }}
-				defaultSize={{ width: 150, height: 85 }}
-				style={{ width: "100%" }} />
-			{duration &&
-			    <View style={__styles.imgTag}>
-				<MyText fontSize={10} type="medium" color={colors.black} >{duration} Days</MyText>
-			    </View>
+		<>
+			{icon &&
+				<View style={__styles.icon_container}>
+					<MyImage source={{ uri: S3_URL + icon }} style={__styles.icon}
+						resizeMode="contain" />
+					<View style={{ marginLeft: 10, flex: 1 }} >
+						<Text style={[main.title, { textTransform: "uppercase" }]}>{title}</Text>
+					</View>
+				</View>
 			}
-				</View>}
-		</View>
+			<Pressable onPress={handlePress}>
+				<View style={[__styles.container, style, !missionDetail && { backgroundColor: colors.secondary, }]} >
+					<View style={{ overflow: 'hidden', position: "relative", }}>
+						{image &&
+							<View>
+								<ResponsiveImage3
+									width={150}
+									source={{ uri: S3_URL + image }}
+									defaultSize={{ width: 150, height: 85 }}
+									style={{ width: "100%" }} />
+								{(duration || durationText) &&
+									<View style={__styles.imgTag}>
+										<MyText fontSize={10} type="medium" color={colors.black} >{durationText ? durationText : duration + " Days"}</MyText>
+									</View>
+								}
+							</View>}
+					</View>
 
-		<View
-		    style={{
-			width: '100%',
-		        paddingHorizontal: image ? 5 : 0,
-			 paddingVertical: 1,
-			flex: 1
-		    }}>
-			<View style={{flexDirection:"row", justifyContent:"space-between", paddingVertical: showMenu? 5: 0, paddingRight:5}}>
-		    {!!heading &&
-						<Text
-								onTextLayout={({ nativeEvent: { lines } }) => {
-								setDynamicNumberOfTitleLines(lines.length) }}
-								numberOfLines={numberOfTitleLines}
-								style={[main.title]}>
-								{heading}
-						</Text> }
-			{!!showMenu && <MenuButton
-					marginHorizontal={0}
-					onPress={handleClick}
-					size={20}
-				/>}
-		</View>
-		<View style={{ marginVertical: 2 }}>
-		    <CollapseText numOfLines={!missionDetail ? (dynamicNumberOfTitleLines > 1 ? 2 : 3) : 100} disable={missionDetail} desc={desc} style={main.miniDesc} />
-		</View>
-	    </View>
-	    </View>
-	    </Pressable>
-	    </>
+					<View
+						style={{
+							width: '100%',
+							paddingHorizontal: image ? 5 : 0,
+							paddingVertical: 1,
+							flex: 1
+						}}>
+						<View style={{ flexDirection: "row", justifyContent: "space-between", paddingVertical: showMenu ? 5 : 0, paddingRight: 5 }}>
+							{!!heading &&
+								<Text
+									onTextLayout={({ nativeEvent: { lines } }) => {
+										setDynamicNumberOfTitleLines(lines.length)
+									}}
+									numberOfLines={numberOfTitleLines}
+									style={[main.title]}>
+									{heading}
+								</Text>}
+							{!!showMenu && <MenuButton
+								marginHorizontal={0}
+								onPress={handleClick}
+								size={20}
+							/>}
+						</View>
+						{descView ? descView() :
+							desc ?
+								<View style={{ marginVertical: 2 }}>
+									<CollapseText numOfLines={!missionDetail ? (dynamicNumberOfTitleLines > 1 ? 2 : 3) : 100} disable={missionDetail} desc={desc} style={main.miniDesc} />
+								</View> : null}
+					</View>
+				</View>
+			</Pressable>
+		</>
 	)
 }
 

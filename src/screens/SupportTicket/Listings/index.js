@@ -172,7 +172,7 @@ const TicketsList = ({ navigation, route }) => {
 
   const searchView = useCallback(() => {
     return (
-      <View style={{ marginVertical: -10, marginHorizontal: 10, backgroundColor: colors.darkSecondary }}>
+      <View style={{ marginVertical: -10,  backgroundColor: colors.darkSecondary }}>
         <MyInputs
           leftIcon={icons.search}
           placeholder='Search...'
@@ -367,7 +367,7 @@ const __styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: colors.darkSecondary,
-    marginHorizontal: 17,
+    marginHorizontal: 10,
   },
   headerBtn: {
     height: 25,

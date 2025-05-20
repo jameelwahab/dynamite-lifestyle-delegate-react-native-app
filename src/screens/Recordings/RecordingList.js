@@ -174,7 +174,7 @@ const PortalListing = ({ navigation, route }) => {
 
   const searchView = () => {
     return (
-      <View style={{ paddingHorizontal: 5, backgroundColor: colors.darkSecondary, paddingBottom: 5 }}>
+      <View style={{  backgroundColor: colors.darkSecondary, paddingBottom: 5 }}>
         <SearchView
           search={searchText}
           onChangeText={(text) => setSearchText(text)}

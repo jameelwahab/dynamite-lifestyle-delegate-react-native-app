@@ -162,7 +162,7 @@ const TrainingList = ({ navigation, route }) => {
 
   const listHeader = () => {
     return (
-      <View style={{backgroundColor:colors.darkSecondary,paddingBottom:5}}>
+      <View style={{ backgroundColor: colors.darkSecondary, paddingBottom: 5 }}>
         <SearchView
           onChangeText={(text) => setSearchText(text)}
           onSearchPress={onSearchPress}

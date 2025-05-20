@@ -48,7 +48,7 @@ export default TitleView
 
 const __header = StyleSheet.create({
   secondView: {
-    height: 40,
+    height: 50,
     width: "100%",
     // backgroundColor: "green",
     flexDirection: "row",
@@ -77,7 +77,7 @@ const __header = StyleSheet.create({
     marginTop: 3
   },
   leftButtonView: {
-    width: 50,
+    width: 40,
     height: 50,
     alignItems: "center",
     justifyContent: "center"
