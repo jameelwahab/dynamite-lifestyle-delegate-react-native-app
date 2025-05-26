@@ -219,12 +219,19 @@ const GroupAddEdit = ({ navigation, route }) => {
   const selectedView = (list, type, variable = "title") => {
     return (
       <View style={__styles.chipsLisView}>
-        {list.map((item, index) =>
-          <MyChip
-            title={item[variable] + `${(type == "mission" && item?.type) ? " (" + capitalize(item?.type).trim() + ")" : ""}`}
-            onPress={() => removeItem(index, type)}
-          />
-        )}
+        {list.map((item, index) => {
+          let subTitle = ""
+          if (type == "sale_page") {
+            subTitle = item?.type_of_page == "clickfunnel_page" ? " | Click Funnel" : " | Moon"
+          } else if (type == "mission" && item?.type) {
+            subTitle = " | " + capitalize(item?.type).trim()
+          }
+          return (
+            <MyChip
+              title={item[variable] + subTitle}
+              onPress={() => removeItem(index, type)}
+            />)
+        })}
       </View>
     )
   }
@@ -405,7 +412,7 @@ const GroupAddEdit = ({ navigation, route }) => {
         renderText={({ item }) => (
           <MyText>
             {(optionModal?.type == "program" || optionModal?.type == "event") ? `${item?.title}` :
-              optionModal?.type == "sale_page" ? `${item?.sale_page_title}` :
+              optionModal?.type == "sale_page" ? `${item?.sale_page_title} | ${item?.type_of_page == "clickfunnel_page" ? "Click Funnel" : "Moon"}` :
                 optionModal?.type == "plans" ? `${item?.plan_title}` :
                   optionModal?.type == "member" || optionModal?.type == "exclude_members" ? `${item?.first_name} ${item?.last_name} (${item?.email})` :
                     optionModal?.type == "mission" ? item?.title + " |" + capitalize(item?.type) : ""}

@@ -40,6 +40,7 @@ const OptionModal = ({
               <MyText color={colors.primary} fontSize={16} type='medium' >{!!multipleLabel ? multipleLabel : "Select Level"}</MyText>
             </View>
             <Pressable
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               onPress={closeModal}
               style={{ alignSelf: "flex-end", }}>
               {icons.crosss(colors.primary)}

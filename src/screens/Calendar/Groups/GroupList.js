@@ -22,8 +22,12 @@ import MyRefreshControl from '../../../components/MyRefreshControl'
 import showToast from '../../../functions/showToast'
 import isArray from '../../../functions/isArray'
 import SearchView from '../../../components/SearchView'
+import capitalize from '../../../functions/capitalize'
+import ViewMoreModal from '../../../components/ViewMoreModal'
+import { main } from '../../../utilities/styles'
 
 const GroupList = ({ navigation, route }) => {
+  const ref_viewMore = React.useRef();
   const { parentValue, value, } = route?.params
   const { token, access } = useSelector(selectUser);
   const { navbar } = useSelector(selectNavbar);
@@ -139,14 +143,32 @@ const GroupList = ({ navigation, route }) => {
       </View>)
   }
 
-  const eventView = (list, variable = "title") => {
+  const eventView = (list, variable = "title", grpType) => {
     return (
       <View style={{ paddingVertical: 2, alignSelf: "flex-start", borderRadius: 10 }}>
-        {list.map((x, i) => (
-          <MyText key={x?._id?._id || x?._id}>{x?._id?.[variable] || x?.[variable]},</MyText>
-        ))}
+        {list.map((x, i) => {
+          let subTitle = ""
+          if (grpType == "sale_page") {
+            subTitle = x?.type_of_page == "clickfunnel_page" ? " | Click Funnel" : " | Moon"
+          } else if (grpType == "mission" && grpType) {
+            subTitle = " | " + capitalize(x?.type).trim()
+          }
+          if (i < 3) {
+            return (
+              <MyText type='medium' fontSize={12} key={x?._id?._id || x?._id}>{x?._id?.[variable] || x?.[variable]}{subTitle},</MyText>
+            )
+          } else return null
+        })}
 
-
+        {list.length > 3 ?
+          <TouchableOpacity
+            style={{ marginTop: 2 }}
+            hitSlop={main.hitSlop}
+            onPress={() => {
+              ref_viewMore?.current?.openModal({ title: groupBy[grpType] + "s", data: list, type: grpType, })
+            }} >
+            <MyText underlined type='bold' fontSize={13} color={colors.primary} >View More</MyText>
+          </TouchableOpacity> : null}
       </View>)
   }
 
@@ -168,15 +190,17 @@ const GroupList = ({ navigation, route }) => {
           />
         </View>
         <View style={__styles.statView}>
-          <StatView title={groupBy[item?.group_by] + "s"}
+          <StatView
+
+            title={groupBy[item?.group_by] + "s"}
             view={() => eventView(
               item?.group_by == "event" ? item?.event
                 : item?.group_by == "program" ? item?.program
                   : item?.group_by == "sale_page" ? item?.sale_pages :
                     item?.group_by == "mission" ? item?.missions : [],
-              item?.group_by == "sale_page" ? "sale_page_title" : "title")
+              item?.group_by == "sale_page" ? "sale_page_title" : "title",
+              item?.group_by)
             } />
-
           <StatView title={"Type"} value={item?.group_type} />
           <StatView title={"Group By"} value={groupBy[item?.group_by]} />
           <StatView title={"Members"} value={item?.member.length} />
@@ -300,6 +324,25 @@ const GroupList = ({ navigation, route }) => {
         onAgree={onAgree}
         closeModal={() => setConfirmation({ isVisible: false, item: null })}
       />
+
+      <ViewMoreModal
+        ref={ref_viewMore}
+        renderItem={({ item, type }) => {
+          let subTitle = ""
+          let variable = type ? "sale_page_title" : "title"
+          if (type == "sale_page") {
+            subTitle = item?.type_of_page == "clickfunnel_page" ? " | Click Funnel" : " | Moon"
+          } else if (type == "mission") {
+            subTitle = " | " + capitalize(type).trim()
+          }
+          return (
+            <View style={{ padding: 10, borderBottomWidth: 0.5, borderBottomColor: colors.lightText + "11" }}>
+              <MyText fontSize={12} key={item?._id?._id || item?._id}>{item?._id?.[variable] || item?.[variable]}{subTitle}</MyText>
+            </View>
+          )
+        }}
+
+      />
     </RootView>
   )
 }
@@ -357,7 +400,7 @@ const __styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     alignItems: "center",
-		padding:10,
+    padding: 10,
   },
   heading_container: {
     flexDirection: "row",
