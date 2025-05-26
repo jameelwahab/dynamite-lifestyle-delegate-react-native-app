@@ -329,7 +329,7 @@ const GroupList = ({ navigation, route }) => {
         ref={ref_viewMore}
         renderItem={({ item, type }) => {
           let subTitle = ""
-          let variable = type ? "sale_page_title" : "title"
+          let variable = type == "sale_page" ? "sale_page_title" : "title"
           if (type == "sale_page") {
             subTitle = item?.type_of_page == "clickfunnel_page" ? " | Click Funnel" : " | Moon"
           } else if (type == "mission") {
