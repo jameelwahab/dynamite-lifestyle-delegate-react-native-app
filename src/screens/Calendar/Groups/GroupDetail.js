@@ -24,6 +24,7 @@ import MyCheckBox from '../../../components/MyCheckBox'
 import FAB from '../../../components/FAB'
 import { icons } from '../../../utilities/icons'
 import ConfirmationModal from '../../../components/ConfirmationModal'
+import capitalize from '../../../functions/capitalize'
 
 let gdPage = 0;
 let gdCanLoadMore = false;
@@ -217,17 +218,18 @@ const GroupDetail = ({ navigation, route }) => {
 
 
   const renderList = ({ item, index }) => {
-    if (tabIndex == 0)
+    if (tabIndex == 0) {
+
       return (
         <View style={__styles.listRootView}>
           {group?.group_by == "mission" ?
             <>
-              <StatView title={"Title"} value={item?.title} />
+              <StatView title={"Title"} value={item?.title + " | " + capitalize(item?.type).trim()} />
               <StatView title={"Duration"} value={item?.mission_duration + " days"} />
             </> :
             group?.group_by == "sale_page" ?
               <>
-                <StatView title={"Sale Page Title"} value={item?.sale_page_title} />
+                <StatView title={"Sale Page Title"} value={`${item?.sale_page_title}${item?.type_of_page == "clickfunnel_page" ? " | Click Funnel" : " | Moon"}`} />
                 <StatView title={"Payment Plan"} value={!!data?.plans && data?.plans?.map(x => {
                   if (x?.sale_page == item?._id) {
                     return `${x?.plan_title},`
@@ -251,6 +253,7 @@ const GroupDetail = ({ navigation, route }) => {
                 </View>
               </>}
         </View>)
+    }
     else {
       return (
         <View style={__styles.listRootView}>

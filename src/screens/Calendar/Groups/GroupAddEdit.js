@@ -61,6 +61,19 @@ const GroupAddEdit = ({ navigation, route }) => {
     type: "",
   })
 
+  const findSalePage = (pageId) => {
+    if (pageId) {
+      let salePage = groupData.sale_page.find(x => x?._id == pageId);
+      if (salePage) {
+        return ` | ${salePage?.sale_page_title} | ${salePage?.type_of_page == "clickfunnel_page" ? "Click Funnel" : "Moon"}`;
+      } else {
+        return ""
+      }
+    } else {
+      return ""
+    }
+  }
+
   useEffect(() => {
     getProgrammsListFromServer()
 
@@ -219,15 +232,37 @@ const GroupAddEdit = ({ navigation, route }) => {
   const selectedView = (list, type, variable = "title") => {
     return (
       <View style={__styles.chipsLisView}>
-        {list.map((item, index) =>
-          <MyChip
-            title={item[variable] + `${(type == "mission" && item?.type) ? " (" + capitalize(item?.type).trim() + ")" : ""}`}
-            onPress={() => removeItem(index, type)}
-          />
-        )}
+        {list.map((item, index) => {
+          let subTitle = ""
+          if (type == "sale_page") {
+            subTitle = item?.type_of_page == "clickfunnel_page" ? " | Click Funnel" : " | Moon"
+          } else if (type == "mission" && item?.type) {
+            subTitle = " | " + capitalize(item?.type).trim()
+          }
+          return (
+            <MyChip
+              title={item[variable] + subTitle}
+              onPress={() => removeItem(index, type)}
+            />)
+        })}
       </View>
     )
   }
+
+  const selectedPlanView = (list, type, variable = "title") => {
+    return (
+      <View style={__styles.chipsLisView}>
+        {list.map((item, index) => {
+          return (
+            <MyChip
+              title={item[variable] + findSalePage(item?.sale_page)}
+              onPress={() => removeItem(index, type)}
+            />)
+        })}
+      </View>
+    )
+  }
+
 
 
   const selectedMemberView = (list, type, variable) => {
@@ -349,7 +384,7 @@ const GroupAddEdit = ({ navigation, route }) => {
         {groupData.groupBy == "sale_page" && groupData?.sale_page.length > 0 &&
           <MyTouchableInput
             label='Payment Plans'
-            view={() => selectedView(groupData?.plans, "plans", "plan_title")}
+            view={() => selectedPlanView(groupData?.plans, "plans", "plan_title")}
             iconOnPress={() => setOptionModal({ type: "plans", isVisible: true, })}
           />}
 
@@ -405,8 +440,8 @@ const GroupAddEdit = ({ navigation, route }) => {
         renderText={({ item }) => (
           <MyText>
             {(optionModal?.type == "program" || optionModal?.type == "event") ? `${item?.title}` :
-              optionModal?.type == "sale_page" ? `${item?.sale_page_title}` :
-                optionModal?.type == "plans" ? `${item?.plan_title}` :
+              optionModal?.type == "sale_page" ? `${item?.sale_page_title} | ${item?.type_of_page == "clickfunnel_page" ? "Click Funnel" : "Moon"}` :
+                optionModal?.type == "plans" ? `${item?.plan_title}${findSalePage(item?.sale_page)}` :
                   optionModal?.type == "member" || optionModal?.type == "exclude_members" ? `${item?.first_name} ${item?.last_name} (${item?.email})` :
                     optionModal?.type == "mission" ? item?.title + " |" + capitalize(item?.type) : ""}
           </MyText>
