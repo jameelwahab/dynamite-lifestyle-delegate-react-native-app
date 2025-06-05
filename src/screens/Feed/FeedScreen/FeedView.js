@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, Pressable} from 'react-native'
+import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, Pressable } from 'react-native'
 import React, { memo, useEffect, useState, useRef } from 'react'
 import UserImage from '../../../components/UserImage'
 import MyText from '../../../components/MyText'
@@ -74,26 +74,26 @@ export const FeedView = ({ item, index, user, token, feedSettings, isInView, tim
       </>
     )
   }
-const badgesView = (badgeList) => {
+  const badgesView = (badgeList) => {
     return (
       <View>
-          <Text style={[main.heading, { fontFamily: fonts.medium, }]}>{"Badges"}</Text>
+        <Text style={[main.heading, { fontFamily: fonts.medium, }]}>{"Badges"}</Text>
         <Divider mt={10} />
         <View style={{ marginTop: 10 }}>
           <FlatList
-						horizontal
+            horizontal
             scrollEnabled={false}
             data={badgeList || []}
             renderItem={({ item, index }) => {
               return (
-										<View style={{marginRight:20 }}>
-                    <Row alignItems="center">
-                      <MyImage
-                        source={{ uri: S3_URL + item?.icon?.thumbnail_1 }}
-                        style={{ height: 20, width: 20 }}
-                      />
-                    </Row>
-									</View>
+                <View style={{ marginRight: 20 }}>
+                  <Row alignItems="center">
+                    <MyImage
+                      source={{ uri: S3_URL + item?.icon?.thumbnail_1 }}
+                      style={{ height: 20, width: 20 }}
+                    />
+                  </Row>
+                </View>
               )
 
             }}
@@ -112,8 +112,8 @@ const badgesView = (badgeList) => {
           name={item?.action_info?.name}
           backgroundTransparent={true}
           borderWidth={isCosmos ? 1 / 4 : 2}
-          borderColor={!isCosmos ? 
-							!!item?.show_feed_to ? (item?.show_feed_to == "all" && item?.action_info?.action_by=="consultant_user") ? feedSettings?.color_code_for_all_level : !!item?.badge_level_info ? item?.badge_level_info?.color_code : item?.feed_badge_levels[0]?.color_code : undefined : undefined}
+          borderColor={!isCosmos ?
+            !!item?.show_feed_to ? (item?.show_feed_to == "all" && item?.action_info?.action_by == "consultant_user") ? feedSettings?.color_code_for_all_level : !!item?.badge_level_info ? item?.badge_level_info?.color_code : item?.feed_badge_levels[0]?.color_code : undefined : undefined}
           size={35}
         />
         <View style={__style.profileNameView}>
@@ -135,31 +135,31 @@ const badgesView = (badgeList) => {
 
       <InfoModal ref={ref_info} />
 
-			{(!!item?.show_feed_to && item?.show_feed_to=="specific" && item?.action_info?.action_by=="consultant_user") &&
-					<>
-					{isArray(item?.feed_badge_levels) &&
-							<Pressable 
-								onPress={() => {
-										if(item?.feed_badge_levels?.length > 1){
-												ref_info?.current?.openModal("", "", false, badgesView(item?.feed_badge_levels))
-										}
-								}}
-								style={{flexDirection:'row', alignItems:"center"}}>
-								<MyImage
-										source={{ uri: S3_URL + item?.feed_badge_levels[0]?.icon?.thumbnail_1 }}
-										style={{ height: 20, width: 20, marginRight:5 }}
-								/>
-						{item?.feed_badge_levels?.length > 1 &&
-							<Text style={[main.description, { textDecorationLine: "underline", color: colors.primary2 }]} >{item?.feed_badge_levels?.length-1}+ </Text>
-						 }
-							</Pressable>} 
-					</>
-        }
+      {(!!item?.show_feed_to && item?.show_feed_to == "specific" && item?.action_info?.action_by == "consultant_user") &&
+        <>
+          {isArray(item?.feed_badge_levels) &&
+            <Pressable
+              onPress={() => {
+                if (item?.feed_badge_levels?.length > 1) {
+                  ref_info?.current?.openModal("", "", false, badgesView(item?.feed_badge_levels))
+                }
+              }}
+              style={{ flexDirection: 'row', alignItems: "center" }}>
+              <MyImage
+                source={{ uri: S3_URL + item?.feed_badge_levels[0]?.icon?.thumbnail_1 }}
+                style={{ height: 20, width: 20, marginRight: 5 }}
+              />
+              {item?.feed_badge_levels?.length > 1 &&
+                <Text style={[main.description, { textDecorationLine: "underline", color: colors.primary2 }]} >{item?.feed_badge_levels?.length - 1}+ </Text>
+              }
+            </Pressable>}
+        </>
+      }
 
-			{(!!item?.show_feed_to && item?.show_feed_to=="all" && item?.action_info?.action_by=="consultant_user") && <MyImage
-										source={{ uri: S3_URL + feedSettings?.icon_for_all_level }}
-										style={{ height: 20, width: 20, marginRight:5 }}
-								/>}
+      {(!!item?.show_feed_to && item?.show_feed_to == "all" && item?.action_info?.action_by == "consultant_user") && <MyImage
+        source={{ uri: S3_URL + feedSettings?.icon_for_all_level }}
+        style={{ height: 20, width: 20, marginRight: 5 }}
+      />}
 
       {(!!item?.badge_level_info?.icon?.thumbnail_1 || isCosmos) &&
         <View >
@@ -218,7 +218,7 @@ const badgesView = (badgeList) => {
             <PostWebView enableCollapse={true} html={item?.description} />
             // <CollapsibleText>{item?.description}</CollapsibleText>
             : !!item?.mentioned_users ?
-              <FeedText keywords={isArray(item?.feed_keywords)?item?.feed_keywords:[]} list={item?.mentioned_users} text={item?.description} /> :
+              <FeedText keywords={isArray(item?.feed_keywords) ? item?.feed_keywords : []} list={item?.mentioned_users} text={item?.description} /> :
               <CollapsibleText>{item?.description}</CollapsibleText>
             // <MyWebview html={item?.description} /> 
           }
@@ -492,6 +492,10 @@ const badgesView = (badgeList) => {
   } else {
     return (
       <View style={__style.rootShadowView}>
+        {item?.feed_appear_by == "win" &&
+          <View style={__style.winfeedIcon}>
+            {icons.winFeed(50)}
+          </View>}
         <View style={[__style.rootView,]}>
           {animationView()}
           <View >
@@ -528,6 +532,13 @@ const btnAligmnet = {
 }
 
 const __style = StyleSheet.create({
+  winfeedIcon: {
+    position: "absolute",
+    top: -15,
+    left: -15,
+    zIndex: 2,
+    transform: [{ rotateZ: "-45deg" }],
+  },
   shadow: {
     shadowOffset: {
       width: 0,

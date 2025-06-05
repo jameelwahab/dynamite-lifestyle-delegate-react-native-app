@@ -60,7 +60,7 @@ export const icons = {
   secondRank: (size = 20) => <Image source={require('../assets/icons/2.png')} style={{ height: size, width: size, }} />,
   thirdRank: (size = 20) => <Image source={require('../assets/icons/3.png')} style={{ height: size, width: size, }} />,
   casinoWhite: (size = 20) => <Image source={require('../assets/icons/casinoWhite.png')} style={{ height: size, width: size, }} />,
-	casinoPrimary: (size = 20) => <Image source={require('../assets/icons/casinoPrimary.png')} style={{ height: size, width: size, }} />,
+  casinoPrimary: (size = 20) => <Image source={require('../assets/icons/casinoPrimary.png')} style={{ height: size, width: size, }} />,
   share: (size = 20) => <Image source={require('../assets/icons/share.png')} style={{ height: size, width: size, }} />,
   user: () => { return (<FontAwesome6 name="user-large" color={colors.primary} size={17} />) },
   backMajor: (color = colors.primary, size = 20) => { return (<Ionicons name="arrow-back-outline" color={color} size={size} />) },
@@ -160,5 +160,6 @@ export const icons = {
   unread: (color = colors.white, size = 20) => { return (<MaterialCommunityIcons name="message-badge-outline" color={color} size={size} />) },
   menuCircle: (color = colors.white, size = 20) => { return (<Ionicons name="list-circle" color={color} size={size} />) },
   check_circle: (color = colors.primary, size = 17) => { return (<Octicons name="check-circle" color={color} size={size} />) },
-   flag: (color = colors.golden, size = 17) => { return (<Ionicons name="flag" color={color} size={size} />) },
+  flag: (color = colors.golden, size = 17) => { return (<Ionicons name="flag" color={color} size={size} />) },
+  winFeed: (size = 17) => <Image source={require('../assets/icons/winfeed.png')} style={{ height: size, width: size,resizeMode:"contain" }} />,
 }
