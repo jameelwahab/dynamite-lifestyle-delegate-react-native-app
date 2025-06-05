@@ -1,5 +1,5 @@
 import { Text, View, useWindowDimensions, StyleSheet, Keyboard, TouchableOpacity, Image } from 'react-native'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import RootView from '../../../components/RootView'
 import TitleView from "../../../components/TitleView"
 import { icons } from '../../../utilities/icons'
@@ -23,12 +23,9 @@ import { dateTimeFormat } from "../../../utilities/constants"
 
 
 
-let page = 0;
-let totalPage = 0;
-let canLoadMore = false;
-
 
 const TicketsList = ({ navigation, route }) => {
+  const paging = useRef({ page: 0, canLoadMore: false });
   const { type } = route?.params;
   const isInternalTicket = type == "internal_ticket";
   const isSupportTicket = type == "support_ticket";
@@ -56,8 +53,9 @@ const TicketsList = ({ navigation, route }) => {
 
 
   const loadMore = () => {
-    if (canLoadMore) {
-      canLoadMore = false;
+    console.log(paging?.current?.canLoadMore, "canLoadMore")
+    if (paging?.current?.canLoadMore) {
+      paging.current.canLoadMore = false;
       getSupportTickets(false, true);
     }
   }
@@ -76,7 +74,7 @@ const TicketsList = ({ navigation, route }) => {
     let res;
     if (type == "support_ticket") {
       res = await SUPPORT_TCIKETS_LIST_BY_TYPE({
-        page: page,
+        page: paging?.current?.page,
         body: {
           filter_by: routes[index].key
         },
@@ -86,7 +84,7 @@ const TicketsList = ({ navigation, route }) => {
       })
     } else if (type == "internal_ticket") {
       res = await INETRNAL_TCIKETS_LIST_BY_TYPE({
-        page: page,
+        page: paging?.current?.page,
         body: {
           filter_by: routes[index].key
         },
@@ -98,12 +96,14 @@ const TicketsList = ({ navigation, route }) => {
 
 
     if (res?.code == 200) {
-
-      page++;
-      if (page > (res?.total_pages - 1)) {
-        canLoadMore = false
+      let count = paging.current.page == 0 ? res?.support_ticket.length : (res?.support_ticket.length + list.length)
+      // paging.current.page++;
+      console.log(count,res?.total_count,"Check")
+      if (count < res?.total_count) {
+        paging.current.page++;
+        paging.current.canLoadMore = true
       } else {
-        canLoadMore = true
+        paging.current.canLoadMore = false
       }
       setLoader(-1)
       setFooterLoader(-1)
@@ -151,7 +151,7 @@ const TicketsList = ({ navigation, route }) => {
   }, [])
 
   const refresh = () => {
-    page = 0;
+    paging.current.page = 0;
     setList([])
     setLoader(index)
     debounce(() => getSupportTickets(false, false))
@@ -159,8 +159,8 @@ const TicketsList = ({ navigation, route }) => {
 
   useEffect(() => {
     debounce(() => {
-      page = 0;
-      canLoadMore = false;
+      paging.current.page = 0;
+      paging.current.canLoadMore = false;
       setList([])
       setLoader(index)
       getSupportTickets(false, false)
@@ -172,7 +172,7 @@ const TicketsList = ({ navigation, route }) => {
 
   const searchView = useCallback(() => {
     return (
-      <View style={{ marginVertical: -10,  backgroundColor: colors.darkSecondary }}>
+      <View style={{ marginVertical: -10, backgroundColor: colors.darkSecondary }}>
         <MyInputs
           leftIcon={icons.search}
           placeholder='Search...'
@@ -319,8 +319,8 @@ const TicketsList = ({ navigation, route }) => {
           navigationState={{ index, routes }}
           renderScene={renderScene}
           onIndexChange={(index) => {
-            canLoadMore = false
-            page = 0;
+            paging.current.canLoadMore = false
+            paging.current.page = 0;
             setIndex(index);
             setList([])
             setLoader(index)
