@@ -237,6 +237,7 @@ const TicketsList = ({ navigation, route }) => {
       departmentList={depList}
       isLoading={loader == route.index}
       setLoader={setLoader}
+      setList={setList}
       active={index == route.index}
       isLoadingMore={footerLoader == route.index}
       loadMore={loadMore}

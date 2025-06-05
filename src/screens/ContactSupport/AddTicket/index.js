@@ -1,5 +1,5 @@
 import { View, Text, ScrollView, FlatList, TouchableOpacity, Pressable, SafeAreaView, TouchableHighlight, Image } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import RootView from '../../../components/RootView'
 import MyTouchableInput from '../../../components/MyTouchableInput';
 import utilities from '../../../utilities';
@@ -22,12 +22,16 @@ import MyInputs from '../../../components/MyInputs';
 import getFileIconByType from '../../../functions/getFileIconByType';
 import openUrl from '../../../functions/openUrl';
 import FileViewer from "react-native-file-viewer";
+import OptionModal2 from '../../../components/OptionModal2';
+import { PRIORITY_ARR, PRIORITY_OBJECT } from '../../../utilities/constants';
+import { Flex, Row } from '../../../UIComponents/FlexViews';
 
 
 const oneFourthOfScreen = (utilities.windowWidth() - 40) / 4;
 const AddTicket = ({ navigation, route }) => {
   const { token, S3_URL } = useSelector(selectUser);
   const { ticket: oldTicket } = route.params;
+  const ref_proirityModal = useRef()
   const [loader, setLoader] = useState(false);
   const [images, setImages] = useState([{ type: "button" }]);
   const [isImageModalVisible, setIsImageModalVisible] = useState(false)
@@ -37,6 +41,7 @@ const AddTicket = ({ navigation, route }) => {
   const [departmentList, setDepartmentList] = useState([]);
   const [subject, setSubject] = useState(!!oldTicket ? oldTicket?.subject : "");
   const [description, setDescription] = useState(!!oldTicket ? oldTicket?.description : "");
+  const [priority, setPriority] = useState(!!oldTicket ? oldTicket?.priority : 1)
 
 
 
@@ -94,7 +99,8 @@ const AddTicket = ({ navigation, route }) => {
             ticket_images: [...msgImages, ...imagesLink],
             department: deparment._id,
             subject: subject.trim(),
-            description: description.trim()
+            description: description.trim(),
+            priority:priority,
           },
           ticketId: oldTicket?._id
         });
@@ -104,7 +110,8 @@ const AddTicket = ({ navigation, route }) => {
             ticket_images: [...msgImages, ...imagesLink],
             department: deparment._id,
             subject: subject.trim(),
-            description: description.trim()
+            description: description.trim(),
+            priority:priority,
           }
         });
       }
@@ -131,6 +138,10 @@ const AddTicket = ({ navigation, route }) => {
   const removeImage = (index) => {
     images.splice(index, 1);
     setImages([...images]);
+  }
+
+  const onSelected = (item) => {
+    setPriority(item?.value)
   }
 
 
@@ -202,6 +213,21 @@ const AddTicket = ({ navigation, route }) => {
           value={deparment?.title}
         />
 
+
+        <MyTouchableInput
+          label='Priority*'
+          onPress={() => ref_proirityModal?.current?.openModal(PRIORITY_ARR)}
+          view={() => (
+            <Flex flex={1}>
+              <Row paddingHorizontal={10}>
+                {icons.flag(PRIORITY_OBJECT[priority]?.color, 20)}
+                <Flex ml={10}>
+                  <MyText>{PRIORITY_OBJECT[priority]?.title}</MyText>
+                </Flex>
+              </Row>
+            </Flex>)}
+        />
+
         <MyInputs
           label='Description*'
           multiline
@@ -226,10 +252,9 @@ const AddTicket = ({ navigation, route }) => {
 
   return (
     <RootView title='New Ticket' >
-
       <FlatList
         ListHeaderComponent={HeaderView()}
-        contentContainerStyle={{ paddingTop: 20, paddingHorizontal: 10 }}
+        contentContainerStyle={{ paddingTop: 10 }}
         automaticallyAdjustKeyboardInsets={true}
         showsVerticalScrollIndicator={false}
         ListFooterComponent={viewButton}
@@ -319,6 +344,14 @@ const AddTicket = ({ navigation, route }) => {
         visible={!!modalImage.uri}
         url={modalImage.uri}
         noUrl={modalImage.noUrl}
+      />
+
+
+      <OptionModal2
+        ref={ref_proirityModal}
+        optionList={PRIORITY_ARR}
+        onSelected={onSelected}
+
       />
 
 

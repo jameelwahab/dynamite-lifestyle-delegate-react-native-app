@@ -24,24 +24,24 @@ export const DEPARTMENT_LIST_FOR_DELEGATE = ({ token, navigation, }) => {
 }
 
 export const ADD_TICKET_CONTECT_SUPPORT = ({ token, navigation, body: {
-  subject, description, department, ticket_images
+  subject, description, department, ticket_images, priority
 } }) => {
   return invokeApi({
     path: `api/support_ticket/add_support_ticket`,
     method: "POST",
-    postData: { subject, description, department, ticket_images, },
+    postData: { subject, description, department, ticket_images, priority },
     token,
     navigation,
   })
 }
 
 export const EDIT_TICKET_CONTECT_SUPPORT = ({ token, navigation, ticketId, body: {
-  subject, description, department, ticket_images
+  subject, description, department, ticket_images, priority
 } }) => {
   return invokeApi({
     path: `api/support_ticket/edit_support_ticket/${ticketId}`,
     method: "PUT",
-    postData: { subject, description, department, ticket_images, status: true },
+    postData: { subject, description, department, ticket_images, priority, status: true },
     token,
     navigation,
   })

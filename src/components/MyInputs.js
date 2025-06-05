@@ -31,6 +31,7 @@ const MyInputs = ({
   noLable = false,
   myref = null,
   capitalizeSentence = false,
+  autoFocus=false,
   style
 }) => {
   const [isFocused, setFocused] = useState(false)
@@ -59,6 +60,7 @@ const MyInputs = ({
           editable={editable}
           selectionColor={colors.selection}
           autoCorrect={false}
+          autoFocus={autoFocus}
           multiline={multiline}
           maxLength={!!limited ? 500 : maxLength}
           placeholder={placeholder}

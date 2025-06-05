@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, FlatList, Image, SafeAreaView, TouchableHighlight, Pressable, Dimensions, Platform, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { colors } from '../../../utilities/colors';
 import MyText from '../../../components/MyText';
@@ -10,7 +10,7 @@ import { CHANGE_DEPARTMENT_OF_TICKET, MARK_RESOLVE_TICKET, MOVE_TICKET, SUPPORT_
 import MyLoader, { SimpleLoader } from '../../../components/MyLoader';
 import { useSelector } from 'react-redux';
 import { selectUser } from '../../../redux/reducers/userSlice';
-import { dateTimeFormat } from '../../../utilities/constants';
+import { dateTimeFormat, PRIORITY_OBJECT } from '../../../utilities/constants';
 import moment from 'moment';
 import EmptyView from '../../../components/EmptyView';
 import MyImage from '../../../components/MyImage';
@@ -24,9 +24,16 @@ import utilities from '../../../utilities';
 import { convertTimezone, convertTimezone2 } from '../../../functions/convertTime';
 import { selectTimeZone } from '../../../redux/reducers/timezoneSlice';
 import MyInputs from '../../../components/MyInputs';
+import { Flex, Row } from '../../../UIComponents/FlexViews';
+import isArray from '../../../functions/isArray';
+import Svg, { Line } from 'react-native-svg';
+import StatView from '../../../components/StatView';
+import LabelModal from './LabelModal';
+import { main } from '../../../utilities/styles';
 
 
-const ListView = ({ isLoading, list, active, route, departmentList, token, refresh, user, setLoader, isLoadingMore, loadMore, type, }) => {
+const ListView = ({ isLoading, list, setList, active, route, departmentList, token, refresh, user, setLoader, isLoadingMore, loadMore, type, }) => {
+  const ref_labelModal = useRef()
   const timezone = useSelector(selectTimeZone);
   const [isOptionModalShown, setIsOptionModal] = useState({ isVisible: false, for: "" })
   const [isDepartmentModalShown, setIsDepartmentModalShown] = useState(false);
@@ -40,6 +47,24 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
   const [resolveNoteModal, setResolveNoteModal] = useState({ isVisible: false, note: "", })
   const [date, setDate] = useState(moment().format("YYYY-MM-DD"))
   const navigation = useNavigation();
+
+
+
+  const onLabelsUpdate = (lables, ticketId) => {
+    let index = list.findIndex(x => x?._id == ticketId);
+    if (index > -1) {
+      list.splice(index, 1, {
+        ...list[index],
+        labels: lables,
+      })
+      setList([...list])
+    }
+  }
+
+
+  const openLabelModal = (ticket) => {
+    ref_labelModal?.current?.openModal(ticket)
+  }
 
   //? Actions functions
 
@@ -55,7 +80,7 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
     else if (option.key == "detail") {
       navigation.navigate(routes.supportTicketDeatail, {
         ticket: isOptionModalShown.for,
-					route,
+        route,
       })
       setIsOptionModal({ isVisible: false, for: "" })
     }
@@ -519,10 +544,11 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
 
   //? list
 
-  const renderList = ({ item, index }) => {
+  const renderListOld = ({ item, index }) => {
+
     return (
-      <TouchableHighlight
-        underlayColor={colors.secondary}
+      <TouchableOpacity
+        // underlayColor={colors.secondary}
         // delayLongPress={400}
         onPress={() => {
           navigation.navigate(routes.supportTicketDeatail, {
@@ -531,49 +557,241 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
             route: route,
           })
         }}
-        // onLongPress={() => setIsOptionModal({ isVisible: true, for: item })}
+      >
+        <View style={{ marginHorizontal: 10, backgroundColor: colors.secondary, padding: 10, borderRadius: 10, marginTop: 10 }}>
 
-        style={{ paddingVertical: 20, paddingLeft: 10, paddingRight: 10, flexDirection: "row" }} >
-        <>
-          <View style={{}}>
-            <UserImage
-              image={item?.member?.profile_image}
-              name={!!item?.member?.first_name ? item?.member?.first_name : "N/A"}
-              size={35}
-            />
+          <View style={{ marginTop: 5, flexDirection: "row" }}  >
+            <View style={{}}>
+              {route == "need_fixes" && moment(item.issue_fix_date).diff(moment(), 'days') < 2 &&
+                <View style={__styles.badges} />}
+              <UserImage
+                image={item?.member?.profile_image}
+                name={!!item?.member?.first_name ? item?.member?.first_name : "N/A"}
+                size={35}
+              />
 
-          </View>
-          <View style={{ flex: 1, marginLeft: 10, }}>
-            <View style={{ flexDirection: "row", alignItems: "center", }}>
-              <View style={{ flex: 1 }}>
-                <MyText fontSize={14} type='medium' >{!!item?.member?.first_name ? item?.member?.first_name + " " + item?.member?.last_name : "N/A"}</MyText>
-              </View>
-              <View style={{ flexDirection: "row", alignItems: "center", }}>
-                <View style={{ alignItems: "flex-end", marginRight:5 }}>
-                  <MyText
-												fontSize={10}
-												type='light'>{convertTimezone2(!!item?.last_action_date ? item.last_action_date : item?.support_ticket_date, timezone).fromNow()}</MyText>
-                </View>
-                <MenuButton
-                  // backgroundColor={colors.transparent}
-                  size={22}
-                  onPress={() => setIsOptionModal({ isVisible: true, for: item })}
-                />
-              </View>
+
+
             </View>
-            {route == "need_fixes" &&
-                    <MyText style={{}}   color={colors.white} fontSize={12} >{`Target Date: ${moment(item?.issue_fix_date).format(dateTimeFormat.date)}`}</MyText>}
-           <MyText style={{ marginTop: 3 }} fontSize={12} >{item?.subject}</MyText>
-            <MyText style={{ marginTop: 3 }} numberOfLines={1} color={colors.lightText} fontSize={12} >
-              {item?.description.slice(0, 60)}
-            </MyText>
+            <View style={{ flex: 1, marginLeft: 10, }}>
+              <View style={{ flexDirection: "row", alignItems: "center", }}>
+                <Flex flex={1} >
+                  <Row>
+                    <MyText fontSize={14} type='medium' >{!!item?.member?.first_name ? item?.member?.first_name + " " + item?.member?.last_name : "N/A"}</MyText>
+                    <Flex ml={5} >
+                      {icons.flag(PRIORITY_OBJECT[item?.priority]?.color, 20)}
+                    </Flex>
+                  </Row>
+                </Flex>
+                <View style={{ flexDirection: "row", alignItems: "center", }}>
+                  <View style={{ alignItems: "flex-end", marginRight: 5 }}>
+                    <MyText
+                      fontSize={10}
+                      type='light'>{convertTimezone2(!!item?.last_action_date ? item.last_action_date : item?.support_ticket_date, timezone).fromNow()}</MyText>
+                  </View>
+                  <MenuButton
+                    // backgroundColor={colors.transparent}
+                    size={22}
+                    onPress={() => setIsOptionModal({ isVisible: true, for: item })}
+                  />
+                </View>
+              </View>
+              {route == "need_fixes" &&
+                <MyText style={{}} color={colors.white} fontSize={12} >{`Target Date: ${moment(item?.issue_fix_date).format(dateTimeFormat.date)}`}</MyText>}
+              <MyText style={{ marginTop: 3 }} fontSize={12} >{item?.subject}</MyText>
 
 
-            {route == "need_fixes" && moment(item.issue_fix_date).diff(moment(), 'days') < 2 &&
-              <View style={__styles.badges} />}
+
+              <Row style={{ marginTop: 5, }}  >
+                <Flex flex={1}>
+                  <MyText style={{ marginTop: 3 }} numberOfLines={1} color={colors.lightText} fontSize={12} >
+                    {item?.description.slice(0, 60)}
+                  </MyText>
+                </Flex>
+
+              </Row>
+
+
+
+
+
+
+              <Row style={{ marginTop: 5 }} alignSelf="flex-end">
+                {isArray(item.labels) ?
+                  item.labels.map((label, index) => {
+                    if (index == 0)
+                      return (
+                        <View style={{ borderRadius: 5, backgroundColor: colors.secondaryVariant, paddingHorizontal: 10, paddingVertical: 5, marginRight: 5, borderLeftWidth: 5, borderLeftColor: label?.label_color }} >
+                          <MyText fontSize={11} type='bold' >{label?.label_text}</MyText>
+                        </View>
+                      )
+                  }) :
+                  <View style={{ overflow: 'hidden' }}>
+                    <View style={{ borderRadius: 5, backgroundColor: colors.primary + "22", paddingHorizontal: 10, paddingVertical: 5, marginRight: 5, borderWidth: 1, borderColor: colors.primary, borderStyle: "dashed" }} >
+                      <Row alignItems="center">
+                        {icons.plus(colors.primary, 12)}
+                        <MyText style={{ marginLeft: 2 }} fontSize={11} type='bold' color={colors.primary} >{"Add Label"}</MyText>
+                      </Row>
+                    </View>
+
+
+
+
+
+                  </View>
+                }
+              </Row>
+            </View>
+
           </View>
-        </>
-      </TouchableHighlight >)
+
+        </View>
+      </ TouchableOpacity>)
+  }
+
+  const renderList = ({ item, index }) => {
+
+    return (
+      <TouchableOpacity
+        // underlayColor={colors.secondary}
+        // delayLongPress={400}
+        onPress={() => {
+          navigation.navigate(routes.supportTicketDeatail, {
+            ticket: item,
+            refreshList: refresh,
+            route: route,
+          })
+        }}
+      >
+        <View style={{ marginHorizontal: 10, backgroundColor: colors.secondary, padding: 10, borderRadius: 10, marginTop: 10 }}>
+
+          <View style={{ marginTop: 5, flexDirection: "row", alignItems: "center" }}  >
+            <View style={{}}>
+              {route == "need_fixes" && moment(item.issue_fix_date).diff(moment(), 'days') < 2 &&
+                <View style={__styles.badges} />}
+              <UserImage
+                image={item?.member?.profile_image}
+                name={!!item?.member?.first_name ? item?.member?.first_name : "N/A"}
+                size={30}
+              />
+
+
+
+            </View>
+            <View style={{ flex: 1, marginLeft: 10, }}>
+              <View style={{ flexDirection: "row", alignItems: "center", }}>
+                <Flex flex={1} >
+                  <Row>
+                    <MyText fontSize={14} type='medium' >{!!item?.member?.first_name ? item?.member?.first_name + " " + item?.member?.last_name : "N/A"}</MyText>
+                    <Flex ml={5} >
+                      {icons.flag(PRIORITY_OBJECT[item?.priority]?.color, 20)}
+                    </Flex>
+                  </Row>
+                  <MyText
+                    fontSize={10}
+                    type='light'>{convertTimezone2(!!item?.last_action_date ? item.last_action_date : item?.support_ticket_date, timezone).fromNow()}</MyText>
+                </Flex>
+                <View style={{ flexDirection: "row", alignItems: "center", }}>
+                  <View style={{ alignItems: "flex-end", marginRight: 5 }}>
+
+                  </View>
+                  <MenuButton
+                    // backgroundColor={colors.transparent}
+                    size={22}
+                    onPress={() => setIsOptionModal({ isVisible: true, for: item })}
+                  />
+                </View>
+              </View>
+
+              {/* {route == "need_fixes" &&
+                <MyText style={{}} color={colors.white} fontSize={12} >{`Target Date: ${moment(item?.issue_fix_date).format(dateTimeFormat.date)}`}</MyText>} */}
+              {/* <MyText style={{ marginTop: 3 }} fontSize={12} >{item?.subject}</MyText> */}
+
+
+              {/* 
+              <Row style={{ marginTop: 5, }}  >
+                <Flex flex={1}>
+                  <MyText style={{ marginTop: 3 }} numberOfLines={1} color={colors.lightText} fontSize={12} >
+                    {item?.description.slice(0, 60)}
+                  </MyText>
+                </Flex>
+
+              </Row> */}
+
+
+
+
+
+
+            </View>
+
+
+
+          </View>
+
+
+          <View style={{ marginTop: 10 }}>
+            {route == "need_fixes" &&
+              <StatView title={"Target Date"} flex={1.5} value={moment(item?.issue_fix_date).format(dateTimeFormat.date)} />}
+            <StatView title={"ID"} flex={1.5} value={item?.reference_number} />
+            <StatView title={"Subject"} flex={1.5} value={item?.subject} />
+            <StatView title={"Description"} flex={1.5} value={item?.description} numberOfLinesValues={3} />
+            <StatView title={"Department"} flex={1.5} value={!!item?.department ? item?.department?.title : "N/A"} numberOfLinesValues={3} />
+            {/* <StatView border={0}  title={"Labels"} value={""}/> */}
+            <View style={{ marginTop: 10, }}>
+              <Row alignItems="center">
+                <MyText fontSize={12} color={colors.lightText2}>{"Labels"}</MyText>
+
+                <TouchableOpacity
+                  onPress={() => openLabelModal(item)}
+                  hitSlop={main.hitSlop}
+                  style={{ marginLeft: 5 }}>
+                  {icons.plusCircle(colors.primary, 20)}
+                </TouchableOpacity>
+              </Row>
+            </View>
+            <Row style={{}} justifyContent="flex-end" flexWrap="wrap">
+
+
+              {isArray(item.labels) ?
+                <>
+                  {item.labels.map((label, index) => {
+                    if (index < 3)
+                      return (
+                        <Pressable
+                          onPress={() => openLabelModal(item)}
+                          hitSlop={main.hitSlop}
+                          style={{ marginTop: 10, borderRadius: 5, backgroundColor: colors.darkSecondary, paddingHorizontal: 10, paddingVertical: 5, marginLeft: 5, borderLeftWidth: 5, borderLeftColor: label?.label_color }} >
+                          <MyText color={label?.label_color} fontSize={11} type='bold' >{label?.label_text}</MyText>
+                        </Pressable>
+                      )
+                  })}
+                  {item.labels.length > 3 &&
+                    <TouchableOpacity
+                      onPress={() => openLabelModal(item)}
+                      hitSlop={main.hitSlop} >
+                      <MyText style={{ marginLeft: 5, marginTop: 10, paddingVertical: 5, }} underlined color={colors.primary} type='medium' fontSize={12} >+{item.labels.length - 3} More </MyText>
+                    </TouchableOpacity>}
+
+                </> : null
+                // <View style={{ overflow: 'hidden', marginTop: 10 }}>
+                //   <View style={{ borderRadius: 5, paddingHorizontal: 10, paddingVertical: 5, marginRight: 5, borderWidth: 1, borderColor: colors.primary, borderStyle: "dashed" }} >
+                //     <Row alignItems="center">
+                //       {/* {icons.plus(colors.primary, 12)} */}
+                //       <MyText style={{ marginLeft: 2 }} fontSize={11} type='bold' color={colors.primary} >{"Add Label"}</MyText>
+                //     </Row>
+                //   </View>
+
+
+
+
+
+                // </View>
+              }
+            </Row>
+          </View>
+        </View>
+      </ TouchableOpacity >)
   }
 
   //? main
@@ -589,7 +807,7 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
         <FlatList
           data={list}
           indicatorStyle="white"
-				  showsVerticalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
           keyExtractor={(item, index) => index.toString()}
           renderItem={renderList}
           ListEmptyComponent={!isLoading && active && <EmptyView />}
@@ -604,6 +822,7 @@ const ListView = ({ isLoading, list, active, route, departmentList, token, refre
           }}
         />
       </View>
+      <LabelModal onUpdate={onLabelsUpdate} ref={ref_labelModal} />
       <MyLoader enable={isLoading} />
     </View>
   );
@@ -619,7 +838,7 @@ const __styles = StyleSheet.create({
     backgroundColor: colors.delete,
     position: "absolute",
     top: -10,
-    right: -10
+    left: -5
   }
 })
 

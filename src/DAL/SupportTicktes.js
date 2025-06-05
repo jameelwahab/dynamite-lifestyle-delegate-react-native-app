@@ -147,3 +147,51 @@ export const SEND_TICKET_REMINDER = ({ token, body: { message, support_ticket },
   })
 }
 
+
+
+export const GET_LABEL_LIST = ({ token, navigation, }) => {
+  return invokeApi({
+    path: `app/labels/list`,
+    method: "POST",
+    postData: {},
+    token,
+    navigation,
+  })
+}
+
+
+export const ADD_OR_UPDATE_LABEL = ({ token, navigation, labelId, color, text }) => {
+  return invokeApi({
+    path: `app/labels/update/${labelId ?? ""}`,
+    method: "POST",
+    postData: {
+      label_color: color,
+      label_text: text,
+    },
+    token,
+    navigation,
+  })
+}
+
+
+export const DELETE_LABEL = ({ token, navigation, labelId, }) => {
+  return invokeApi({
+    path: `app/labels/delete/${labelId}`,
+    method: "DELETE",
+    token,
+    navigation,
+  })
+}
+
+
+export const ASSIGN_LABEL_IN_TICKET = ({ token, navigation, labelsArr, ticketId }) => {
+  return invokeApi({
+    path: `api/support_ticket/labels/update/${ticketId}`,
+    method: "PUT",
+    postData: {
+      labels: labelsArr
+    },
+    token,
+    navigation,
+  })
+}

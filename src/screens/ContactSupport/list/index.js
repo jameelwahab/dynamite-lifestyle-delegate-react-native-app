@@ -23,7 +23,9 @@ import showToast from '../../../functions/showToast'
 import TitleView from '../../../components/TitleView'
 import { selectNavbar } from '../../../redux/reducers/navbarSlice'
 import MyChip from '../../../components/MyChip'
-import { dateTimeFormat } from '../../../utilities/constants'
+import { dateTimeFormat, PRIORITY_OBJECT } from '../../../utilities/constants'
+import { Flex, Row } from '../../../UIComponents/FlexViews'
+import StatView from '../../../components/StatView'
 
 const List = ({ navigation, route }) => {
   const { parentValue, value, } = route?.params
@@ -235,6 +237,17 @@ const List = ({ navigation, route }) => {
     </Modal>)
   }
 
+  const priorityView = (item) => {
+    return (
+      <Row alignItems="center">
+        {icons.flag(PRIORITY_OBJECT[item?.priority]?.color, 15)}
+        <Flex ml={5}>
+          <MyText fontSize={12} type='medium' >{PRIORITY_OBJECT[item?.priority]?.title}</MyText>
+        </Flex>
+      </Row>
+    )
+  }
+
 
   const renderTicketList = ({ item, index }) => {
     return (
@@ -248,7 +261,12 @@ const List = ({ navigation, route }) => {
 
           <View style={{ paddingRight: 15, flexDirection: "row", }}>
             <View style={{ flex: 1 }}>
+              {/* <Row alignItems="center"> */}
+
+              {/* <Flex ml={5} flex={1}> */}
               <MyText numberOfLines={2} fontSize={16} type='medium' style={{ flex: 1 }} >{item?.subject}</MyText>
+              {/* </Flex> */}
+              {/* </Row> */}
             </View>
             <MyText fontSize={10} style={{ marginRight: 5 }} >
               {convertTimezone(item.support_ticket_date, timezone).fromNow()}
@@ -261,16 +279,19 @@ const List = ({ navigation, route }) => {
             </View>
           </View>
 
+          {StatView({ title: "ID :", value: item.reference_number })}
+          {StatView({ title: "Department :", value: !!item.department ? item.department?.title : "N/A" })}
+          {StatView({ title: "Priority :", view: () => priorityView(item) })}
+          {StatView({ title: "Status :", view: () => (<MyText fontSize={12} style={{ textTransform: "capitalize" }} color={getStatusOfTicket(item).color} type='medium'>{getStatusOfTicket(item).title}</MyText>) })}
 
-
-          <View style={{ flexDirection: "row", marginTop: 20, borderBottomWidth: 1 / 3, borderBottomColor: colors.lightText, paddingBottom: 5 }}>
+          {/* <View style={{ flexDirection: "row", marginTop: 20, borderBottomWidth: 1 / 3, borderBottomColor: colors.lightText, paddingBottom: 5 }}>
             <View style={{ flex: 0.7 }}>
               <MyText color={colors.lightText2}>ID :</MyText>
             </View>
             <View style={{ flex: 1 }}>
               <MyText type='medium' >{item.reference_number}</MyText>
             </View>
-          </View>
+          </View> */}
 
           {/*(getStatusOfTicket(item).title=="solved" && !!item?.last_action_info) &&
           <View style={{ flexDirection: "row", marginTop: 10, borderBottomWidth: 1 / 3, borderBottomColor: colors.lightText, paddingBottom: 5 }}>
@@ -282,24 +303,23 @@ const List = ({ navigation, route }) => {
             </View>
           </View>*/
           }
-          <View style={{ flexDirection: "row", marginTop: 10, borderBottomWidth: 1 / 3, borderBottomColor: colors.lightText, paddingBottom: 5 }}>
+          {/* <View style={{ flexDirection: "row", marginTop: 10, borderBottomWidth: 1 / 3, borderBottomColor: colors.lightText, paddingBottom: 5 }}>
             <View style={{ flex: 0.7 }}>
               <MyText color={colors.lightText2}>Department :</MyText>
             </View>
             <View style={{ flex: 1 }}>
               <MyText type='medium'>{!!item.department ? item.department?.title : "N/A"}</MyText>
             </View>
-          </View>
+          </View> */}
 
-          <View style={{ flexDirection: "row", marginTop: 10, borderBottomWidth: 1 / 3, borderBottomColor: colors.lightText, paddingBottom: 5 }}>
+          {/* <View style={{ flexDirection: "row", marginTop: 10, borderBottomWidth: 1 / 3, borderBottomColor: colors.lightText, paddingBottom: 5 }}>
             <View style={{ flex: 0.7 }}>
               <MyText color={colors.lightText2}>Status :</MyText>
             </View>
             <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
-              {/* <View style={{ height: 10, width: 10, borderRadius: 10 / 2, backgroundColor: getStatusOfTicket(item).color, marginRight: 10 }} /> */}
               <MyText style={{ textTransform: "capitalize" }} color={getStatusOfTicket(item).color} type='medium'>{getStatusOfTicket(item).title}</MyText>
             </View>
-          </View>
+          </View> */}
 
 
         </View>

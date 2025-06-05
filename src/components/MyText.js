@@ -16,13 +16,14 @@ const MyText = ({
   capitalize = false,
   uppercase = false,
   isHeading = false,
+  isItalic = false,
   ...props
 }) => {
   return (
     <Text
       onPress={onPress}
       style={[{
-        fontFamily: type == "bold" ? fonts.bold : type == "medium" ? fonts.medium : type == "semi" ? fonts.semiBold : type == "light" ? fonts.light : fonts.regular,
+        fontFamily: type == "i" ? fonts.italic : type == "bold" ? fonts.bold : type == "medium" ? fonts.medium : type == "semi" ? fonts.semiBold : type == "light" ? fonts.light : fonts.regular,
         includeFontPadding: false,
         fontSize,
         color,
@@ -47,7 +48,7 @@ const MyText = ({
         marginLeft: 2,
 
       }]}
-      
+
       {...props}
     >{children}</Text>
   )

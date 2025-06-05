@@ -1,8 +1,9 @@
 import { displayName } from '../../app.json';
+import { icons } from './icons';
 
 
-// export const isDev = true;
-export const isDev = false;
+export const isDev = true;
+// export const isDev = false;
 let domain, socketUrl, S3_URL, appName, websiteBaseUrl
 if (isDev) {
   // domain = "https://apidevfeatures.dynamitelifestyle.com/";
@@ -12,7 +13,7 @@ if (isDev) {
   // appName = displayName;
 
   domain = "https://apidev.dynamitelifestyle.com/";
-socketUrl = "https://apidev.dynamitelifestyle.com";
+  socketUrl = "https://apidev.dynamitelifestyle.com";
   S3_URL = "https://dynamite-lifestyle-dev-app-bucket.s3.amazonaws.com/";
   appName = displayName;
   websiteBaseUrl = "https://sourcedev.dynamitelifestyle.com/"
@@ -109,6 +110,57 @@ export const dateTimeFormat = {
   dateTimeWithText: (text) => `DD-MM-YYYY [${text}] hh:mm A`,
   conversion: "YYYY-MM-DD HH:mm:ss",
 }
+
+export const PRIORITY_ARR = [
+  {
+    value: 1,
+    color: "#959292",
+    title: "Low",
+    icon: () => icons.flag("#959292",20)
+  },
+  {
+    value: 2,
+    color: "#79D34C",
+    title: "Medium",
+    icon: () => icons.flag("#79D34C",20)
+  },
+  {
+    value: 3,
+    color: "#F8D748",
+    title: "High",
+    icon: () => icons.flag("#F8D748",20)
+  },
+  {
+    value: 4,
+    color: "#EB574C",
+    title: "Critical",
+    icon: () => icons.flag("#EB574C",20)
+  },
+]
+
+export const PRIORITY_OBJECT = {
+  "1": {
+    value: 1,
+    color: "#959292",
+    title: "Low",
+  },
+  "2": {
+    value: 2,
+    color: "#79D34C",
+    title: "Medium",
+  },
+  "3": {
+    value: 3,
+    color: "#F8D748",
+    title: "High",
+  },
+  "4": {
+    value: 4,
+    color: "#EB574C",
+    title: "Critical",
+  },
+}
+
 
 export const TimeZones = [
   "Europe/Andorra",
