@@ -37,9 +37,10 @@ const GroupAddEdit = ({ navigation, route }) => {
     isVisible: false,
     type: "",
   })
-  const [communityLevelModal, setCommunityLevelModal] = useState(false);
+  const [communityLevelModal, setCommunityLevelModal] = useState({ isVisible: false, type: "" });
   const [memberModal, setMemberModal] = useState(false);
   const [isGrpModalVisible, setGrpModalVisible] = useState(false);
+  const [includeMemberModal, setIncludeMemberModal] = useState(false)
   const [groupData, updateGroupData] = useState({
     title: !!group?.title ? group?.title : "",
     status: isEdit && !!group?.status == false ? false : true,
@@ -52,7 +53,9 @@ const GroupAddEdit = ({ navigation, route }) => {
     member: !!group?.member ? group?.member.map(x => x?._id) : [],
     exclude_members: !!group?.exclude_members ? group?.exclude_members.map(x => x?._id) : [],
     memberType: !!group?.group_for_member ? group?.group_for_member : memberTypeList[0]?.value,
-    communityLevel: !!group?.badge_levels ? group?.badge_levels : []
+    communityLevel: !!group?.badge_levels ? group?.badge_levels : [],
+    grpBadgeLevels: !!group?.group_badge_levels ? group?.group_badge_levels : [],
+    include: !!group?.include_users ? group?.include_users : "all",
   })
   const setGroupData = (update) => updateGroupData({ ...groupData, ...update });
 
@@ -170,8 +173,10 @@ const GroupAddEdit = ({ navigation, route }) => {
             return ({ program_slug: slug })
           }
         })
+        obj["include_users"] = groupData?.include
       } else if (obj.group_by == "event") {
         obj["event"] = groupData.event.map(item => ({ event_slug: item?.event_slug }))
+        obj["include_users"] = groupData?.include
       } else if (obj.group_by == "sale_page") {
         obj["sale_page"] = groupData.sale_page.map(item => ({ _id: item?._id }))
         obj["plans"] = groupData.plans.map(item => ({ _id: item?._id }))
@@ -179,8 +184,14 @@ const GroupAddEdit = ({ navigation, route }) => {
         obj["missions"] = groupData.mission.map(item => ({
           _id: item?._id,
           title: item?.title,
-          // type: item?.type
         }))
+      } else if (obj.group_by == "badge_level") {
+        obj["group_badge_levels"] = groupData.grpBadgeLevels.map(item => ({
+          _id: item?._id,
+          title: item?.title,
+          is_access: item?.is_access
+        }))
+        obj["include_users"] = groupData?.include
       }
       // console.log(obj,"obj")
       // return
@@ -319,6 +330,15 @@ const GroupAddEdit = ({ navigation, route }) => {
         // iconOnPress={() => setOptionModal({ isVisible: true, type: groupData.groupBy })}
         // view={() => selectedView(groupData?.program, "program")}
         />
+
+
+        {(groupData.groupBy == "program" || groupData.groupBy == "event" || groupData.groupBy == "badge_level") &&
+          <MyTouchableInput
+            label='include Users of these Badge Levels *'
+            value={includeMembersObj[groupData?.include]?.title || ""}
+            onPress={() => setIncludeMemberModal(true)}
+          />}
+
         {/* <View style={__styles.radioRootView}>
           <MyText isLabel>Group By *</MyText>
           <View style={__styles.radioView}>
@@ -351,9 +371,9 @@ const GroupAddEdit = ({ navigation, route }) => {
 
           />}
 
-        {access?.allow_community_level_in_group &&
+        {access?.allow_community_level_in_group && groupData.groupBy != "badge_level" &&
           <MyTouchableInput
-            iconOnPress={() => setCommunityLevelModal(true)}
+            iconOnPress={() => setCommunityLevelModal({ isVisible: true, type: "overall" })}
             label='Badge Level'
             view={() => selectedMemberView(groupData?.communityLevel, "communityLevel", "title")}
           // value={!!groupData?.communityLevel ? communityLevelObj[groupData?.communityLevel] : ""}
@@ -379,7 +399,12 @@ const GroupAddEdit = ({ navigation, route }) => {
                   label='Mission | Quest'
                   view={() => selectedView(groupData?.mission, "mission", "title")}
                   iconOnPress={() => setOptionModal({ isVisible: true, type: groupData.groupBy })}
-                /> : null}
+                /> : groupData.groupBy == "badge_level" ?
+                  <MyTouchableInput
+                    label='Badge Levels'
+                    view={() => selectedMemberView(groupData?.grpBadgeLevels, "grpBadgeLevels", "title")}
+                    iconOnPress={() => setCommunityLevelModal({ isVisible: true, type: "grp_type" })}
+                  /> : null}
 
         {groupData.groupBy == "sale_page" && groupData?.sale_page.length > 0 &&
           <MyTouchableInput
@@ -481,22 +506,52 @@ const GroupAddEdit = ({ navigation, route }) => {
       <OptionModal
         multiple
         onSelected={(item) => {
-          let arr = breakReference(groupData?.communityLevel);
+          let arr = [];
+          if (communityLevelModal?.type == "overall") {
+            arr = breakReference(groupData?.communityLevel);
+          } else if (communityLevelModal?.type == "grp_type") {
+            arr = breakReference(groupData?.grpBadgeLevels);
+          }
+
+
           let index = arr?.findIndex(x => x?._id == item?._id);
           if (index > -1) {
             arr.splice(index, 1);
           } else {
             arr.push(item)
           }
-          setGroupData({ ...groupData, communityLevel: arr })
+
+
+          if (communityLevelModal?.type == "overall") {
+            setGroupData({ ...groupData, communityLevel: arr })
+          } else {
+            setGroupData({ ...groupData, grpBadgeLevels: arr })
+          }
         }}
         checkSelected={(item) => {
-          return groupData?.communityLevel.some(x => x?._id == item?._id)
+          if (communityLevelModal?.type == "overall") {
+            return groupData?.communityLevel.some(x => x?._id == item?._id)
+          } else if (communityLevelModal?.type == "grp_type") {
+            return groupData?.grpBadgeLevels.some(x => x?._id == item?._id)
+          }
+
         }}
         noIcon
-        isVisible={communityLevelModal}
-        closeModal={() => setCommunityLevelModal(false)}
+        isVisible={communityLevelModal?.isVisible}
+        closeModal={() => setCommunityLevelModal({ isVisible: false, type: "" })}
         optionList={isArray(access?.badge_levels) ? access?.badge_levels.slice().filter(x => x?.is_access) : []}
+      />
+
+      <OptionModal
+        noIcon
+        isVisible={includeMemberModal}
+        closeModal={() => setIncludeMemberModal(false)}
+        optionList={Object.values(includeMembersObj)}
+        onSelected={(item) => {
+          setIncludeMemberModal(false)
+          setGroupData({ ...groupData, include: item?.value })
+        }}
+        checkSelected={(item) => item?.value == groupData?.include}
       />
 
 
@@ -522,6 +577,28 @@ const memberTypeList = [
   },
 ]
 
+const includeMembersArr = [
+  {
+    title: "Active Members",
+    value: "active"
+  },
+  {
+    title: "All Members",
+    value: "all"
+  },
+]
+
+const includeMembersObj = {
+  "active": {
+    title: "Active Members",
+    value: "active"
+  },
+  "all": {
+    title: "All Members",
+    value: "all"
+  },
+}
+
 const grpByTypeList = {
   "program": {
     title: "Programmme",
@@ -539,6 +616,10 @@ const grpByTypeList = {
     title: "Missions | Quests",
     value: "mission"
   },
+  "badge_level": {
+    title: "Badge Level",
+    value: "badge_level"
+  }
 }
 
 

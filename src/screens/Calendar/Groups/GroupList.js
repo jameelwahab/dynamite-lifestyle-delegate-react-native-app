@@ -190,21 +190,26 @@ const GroupList = ({ navigation, route }) => {
           />
         </View>
         <View style={__styles.statView}>
-          <StatView
+          {item?.group_by != "badge_level" &&
+            <StatView
 
-            title={groupBy[item?.group_by] + "s"}
-            view={() => eventView(
-              item?.group_by == "event" ? item?.event
-                : item?.group_by == "program" ? item?.program
-                  : item?.group_by == "sale_page" ? item?.sale_pages :
-                    item?.group_by == "mission" ? item?.missions : [],
-              item?.group_by == "sale_page" ? "sale_page_title" : "title",
-              item?.group_by)
-            } />
+              title={groupBy[item?.group_by] + "s"}
+              view={() => eventView(
+                item?.group_by == "event" ? item?.event
+                  : item?.group_by == "program" ? item?.program
+                    : item?.group_by == "sale_page" ? item?.sale_pages :
+                      item?.group_by == "mission" ? item?.missions : [],
+                item?.group_by == "sale_page" ? "sale_page_title" : "title",
+                item?.group_by)
+              } />}
           <StatView title={"Type"} value={item?.group_type} />
           <StatView title={"Group By"} value={groupBy[item?.group_by]} />
           <StatView title={"Members"} value={item?.member.length} />
-          <StatView original title={"Community Level"} value={isArray(item?.badge_levels) ? item?.badge_levels.map(item => item?.title + ", ") : ""} />
+          {item?.group_by != "sale_page" && item?.group_by != "mission" &&
+            <StatView title={"Include Members"} value={includeMembersObj[item?.include_users]?.title} />}
+          <StatView original title={"Community Level"}
+            value={item?.group_by == "badge_level" ? item?.group_badge_levels.map(item => item?.title + ", ") :
+              isArray(item?.badge_levels) ? item?.badge_levels.map(item => item?.title + ", ") : ""} />
           <StatView title={"Status"} view={() => statusView(item?.status)} />
         </View>
       </Pressable>
@@ -349,11 +354,24 @@ const GroupList = ({ navigation, route }) => {
 
 export default GroupList
 
+const includeMembersObj = {
+  "active": {
+    title: "Active Members",
+    value: "active"
+  },
+  "all": {
+    title: "All Members",
+    value: "all"
+  },
+}
+
+
 const groupBy = {
   event: "Event",
   program: "Programme",
   sale_page: "Sale Page",
   mission: "Mission",
+  badge_level: "Badge Levels",
 }
 
 const optionsList = [
