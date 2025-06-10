@@ -1,5 +1,5 @@
-import { View, Text, KeyboardAvoidingView, ScrollView, Platform, StyleSheet } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import { View, Text, KeyboardAvoidingView, ScrollView, Platform, StyleSheet, TouchableOpacity } from 'react-native'
+import React, { useEffect, useRef, useState } from 'react'
 import RootView from '../../../components/RootView'
 import MyText from '../../../components/MyText'
 import { useSelector } from 'react-redux'
@@ -21,8 +21,12 @@ import { communityLevelObj } from '../../../utilities/constants'
 import breakReference from '../../../functions/breakReference'
 import isArray from '../../../functions/isArray'
 import capitalize from '../../../functions/capitalize'
+import { icons } from '../../../utilities/icons'
+import { main } from '../../../utilities/styles'
+import InfoModal from '../../../components/InfoModal'
 
 const GroupAddEdit = ({ navigation, route }) => {
+  const ref_info = useRef();
   const { group, ammendList } = route?.params;
   const isEdit = !!group;
   const { token, access } = useSelector(selectUser);
@@ -206,6 +210,33 @@ const GroupAddEdit = ({ navigation, route }) => {
 
   //Todo /// optoion functions
 
+  const selectInfo = (type) => {
+    let info = type === "program"
+      ? `
+          <h4>Active Members</h4>
+          <p>Includes users who have access to a programme and it has not yet expired.</p>
+          <h4/><h4/>
+          <h4>All Members</h4>
+          <p>Includes users in a programme, regardless of whether it has expired or not.</p>
+        `
+      : type === "event"
+        ? `
+          <h4>Active Members</h4>
+          <p>Includes users who have access to an event and it has not yet expired.</p>
+          <h4/><h4/>
+          <h4>All Members</h4>
+          <p>Includes users in an event, regardless of whether it has expired or not.</p>
+        `
+        : `
+          <h4>Active Members</h4>
+          <p>Includes users with an active membership in a badge level.</p>
+          <h4/><h4/>
+          <h4>All Members</h4>
+          <p>Include users in a badge level with both active and expired memberships.</p>`
+
+    ref_info?.current?.openModal(info, undefined, true)
+  }
+
   const onSelected = (item) => {
     let { type } = optionModal;
     closeModal();
@@ -334,6 +365,14 @@ const GroupAddEdit = ({ navigation, route }) => {
 
         {(groupData.groupBy == "program" || groupData.groupBy == "event" || groupData.groupBy == "badge_level") &&
           <MyTouchableInput
+            subTextView={() => (
+              <TouchableOpacity
+                onPress={() => selectInfo(groupData.groupBy)}
+                hitSlop={main.hitSlop}
+                style={{ marginBottom: 5 }} >
+                {icons.info_filled(colors.primary, 17)}
+              </TouchableOpacity>
+            )}
             label='include Users of these Badge Levels *'
             value={includeMembersObj[groupData?.include]?.title || ""}
             onPress={() => setIncludeMemberModal(true)}
@@ -464,9 +503,9 @@ const GroupAddEdit = ({ navigation, route }) => {
         }
         renderText={({ item }) => (
           <MyText>
-            {(optionModal?.type == "program" || optionModal?.type == "event") ? `${item?.title}` :
-              optionModal?.type == "sale_page" ? `${item?.sale_page_title} | ${item?.type_of_page == "clickfunnel_page" ? "Click Funnel" : "Moon"}` :
-                optionModal?.type == "plans" ? `${item?.plan_title}${findSalePage(item?.sale_page)}` :
+            {(optionModal?.type == "program" || optionModal?.type == "event") ? `${item?.title} ` :
+              optionModal?.type == "sale_page" ? `${item?.sale_page_title} | ${item?.type_of_page == "clickfunnel_page" ? "Click Funnel" : "Moon"} ` :
+                optionModal?.type == "plans" ? `${item?.plan_title}${findSalePage(item?.sale_page)} ` :
                   optionModal?.type == "member" || optionModal?.type == "exclude_members" ? `${item?.first_name} ${item?.last_name} (${item?.email})` :
                     optionModal?.type == "mission" ? item?.title + " |" + capitalize(item?.type) : ""}
           </MyText>
@@ -553,6 +592,8 @@ const GroupAddEdit = ({ navigation, route }) => {
         }}
         checkSelected={(item) => item?.value == groupData?.include}
       />
+
+      <InfoModal ref={ref_info} />
 
 
       <MyLoader enable={loader} />

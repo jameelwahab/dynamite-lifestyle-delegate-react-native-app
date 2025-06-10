@@ -20,7 +20,7 @@ const MyTouchableInput = ({
   disabled = false,
   error = false,
   style,
-  hidelable=false,
+  hidelable = false,
 }) => {
   const [isFocused, setFocused] = useState(false)
   return (
@@ -28,9 +28,9 @@ const MyTouchableInput = ({
       onPress={onPress}
       disabled={disabled}
       opacity={disabled ? 0.6 : 1}
-      style={[{ marginBottom: noSpace ? 0 : 15 },style]}>
+      style={[{ marginBottom: noSpace ? 0 : 15 }, style]}>
       <View pointerEvents={disabled ? "none" : "auto"} style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-			{!hidelable && <Text pointerEvents={!!iconOnPress ? "auto" : "none"} style={[__MyInputStyles.labelText, isFocused ? __MyInputStyles.focusedLabelText : undefined, error ? __MyInputStyles.TextError : undefined,]}>{label}</Text>}
+        {!hidelable && <Text pointerEvents={!!iconOnPress ? "auto" : "none"} style={[__MyInputStyles.labelText, isFocused ? __MyInputStyles.focusedLabelText : undefined, error ? __MyInputStyles.TextError : undefined,]}>{label}</Text>}
         {!!clearbutton && !disabled ?
           <Pressable
             style={__MyInputStyles.clearbtnView}
@@ -113,11 +113,11 @@ const __MyInputStyles = StyleSheet.create({
     alignSelf: "center",
     marginRight: 5
   },
-  borderError:{
-    borderColor:colors.delete
+  borderError: {
+    borderColor: colors.delete
   },
-  TextError:{
-    color:colors.delete
+  TextError: {
+    color: colors.delete
   },
   eyeIcon: {
     height: 25,

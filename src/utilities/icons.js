@@ -102,6 +102,7 @@ export const icons = {
   rightcircle: (color = colors.white, size = 20) => { return (<AntDesign name="rightcircle" color={color} size={size} />) },
   leftcircle: (color = colors.white, size = 20) => { return (<AntDesign name="leftcircle" color={color} size={size} />) },
   info: (color = colors.white, size = 20) => { return (<FontAwesome6 name="info" color={color} size={size} />) },
+  info_filled: (color = colors.white, size = 20) => { return (<Octicons name="info" color={color} size={size} />) },
   upward: (color = colors.white, size = 20) => { return (<Ionicons name="caret-up" color={color} size={size} />) },
   downward: (color = colors.white, size = 20) => { return (<Ionicons name="caret-down" color={color} size={size} />) },
   mic: (color = colors.white, size = 20) => { return (<Ionicons name="mic" color={color} size={size} />) },
