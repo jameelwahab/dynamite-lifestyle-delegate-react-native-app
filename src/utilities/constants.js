@@ -2,8 +2,8 @@ import { displayName } from '../../app.json';
 import { icons } from './icons';
 
 
-export const isDev = true;
-// export const isDev = false;
+// export const isDev = true;
+export const isDev = false;
 let domain, socketUrl, S3_URL, appName, websiteBaseUrl
 if (isDev) {
   // domain = "https://apidevfeatures.dynamitelifestyle.com/";
