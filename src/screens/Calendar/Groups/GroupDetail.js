@@ -416,7 +416,7 @@ const __styles = StyleSheet.create({
 })
 
 const tablist = (type) => {
-  return [
+  let list = [
     {
       key: "0",
       title: grptype[type]?.tab,
@@ -440,4 +440,9 @@ const tablist = (type) => {
       type: "all"
     }
   ]
+
+  if (type == "badge_level") {
+    list = list.filter(x => x.key != "0");
+  }
+  return list
 }
