@@ -59,7 +59,7 @@ const GroupAddEdit = ({ navigation, route }) => {
     memberType: !!group?.group_for_member ? group?.group_for_member : memberTypeList[0]?.value,
     communityLevel: !!group?.badge_levels ? group?.badge_levels : [],
     grpBadgeLevels: !!group?.group_badge_levels ? group?.group_badge_levels : [],
-    include: !!group?.include_users ? group?.include_users : "all",
+    include: !!group?.include_users ? group?.include_users : "active",
   })
   const setGroupData = (update) => updateGroupData({ ...groupData, ...update });
 
@@ -373,7 +373,7 @@ const GroupAddEdit = ({ navigation, route }) => {
                 {icons.info_filled(colors.primary, 17)}
               </TouchableOpacity>
             )}
-            label='include Users of these Badge Levels *'
+            label={`Include users of these ${grpByTypeList[groupData?.groupBy]?.title} *`}
             value={includeMembersObj[groupData?.include]?.title || ""}
             onPress={() => setIncludeMemberModal(true)}
           />}
