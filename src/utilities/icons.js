@@ -163,4 +163,5 @@ export const icons = {
   check_circle: (color = colors.primary, size = 17) => { return (<Octicons name="check-circle" color={color} size={size} />) },
   flag: (color = colors.golden, size = 17) => { return (<Ionicons name="flag" color={color} size={size} />) },
   winFeed: (size = 17) => <Image source={require('../assets/icons/winfeed.png')} style={{ height: size, width: size,resizeMode:"contain" }} />,
+group: (color = colors.golden, size = 17) => { return (<FontAwesome name="group" color={color} size={size} />) },
 }

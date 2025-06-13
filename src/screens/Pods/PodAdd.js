@@ -19,7 +19,7 @@ import CalendarModal from '../../components/CalendarModal'
 import { dateTimeFormat } from '../../utilities/constants'
 import OptionModal from '../../components/OptionModal'
 import DateTimePicker from 'react-native-modal-datetime-picker'
-import { POD_ADD, POD_DETAIL, POD_GROUPS_AND_MEMBERS, POD_UPDATE } from '../../DAL'
+import { POD_ADD, POD_AUTOMATED_GROUPS, POD_DETAIL, POD_GROUPS_AND_MEMBERS, POD_UPDATE } from '../../DAL'
 import MyLoader from '../../components/MyLoader'
 import OptionModalWithSearch from '../../components/OptionModalWithSearch'
 import MyChip from '../../components/MyChip'
@@ -41,7 +41,9 @@ const PodAdd = ({ navigation, route }) => {
   const [exMemberModalVisibility, setExMemberModalVisibility] = useState(false);
   const [timePicker, setTimePicker] = useState(false);
   const [groupList, setGroupList] = useState([]);
+  const [automatedGroupList, setAutomatedGroupList] = useState([]);
   const [memberList, setMemberList] = useState([]);
+  const [autoGrpModal, setAutoGrpModal] = useState(false)
   const [isLoaded, setIsLoaded] = useState(false);
   const [order, setOrder] = useState("");
   const [cred, updateCred] = useState({
@@ -50,6 +52,7 @@ const PodAdd = ({ navigation, route }) => {
     zoomlink: "",
     password: "",
     isRecurring: false,
+    roomType: roomTypeObj["general"],
     // communityLvl: isArray(access?.badge_levels) ? [access?.badge_levels[0]] : [],
     startDate: moment(),
     startTime: "00:00",
@@ -61,12 +64,13 @@ const PodAdd = ({ navigation, route }) => {
     groups: [],
     members: [],
     excludedMembers: [],
+    automatedGroups: [],
     logo: null,
     shortDesc: "",
     longDesc: "",
   })
 
-  const { title, status, zoomlink, password, isRecurring, startDate, startTime, hours, minutes, recurrenceType, recurrenceDays, recurrenceEndDate, groups, members, excludedMembers, logo, shortDesc, longDesc } = cred;
+  const { title, status, automatedGroups, roomType, zoomlink, password, isRecurring, startDate, startTime, hours, minutes, recurrenceType, recurrenceDays, recurrenceEndDate, groups, members, excludedMembers, logo, shortDesc, longDesc } = cred;
   const setCred = (updation) => updateCred((old) => ({ ...old, ...updation }));
 
   useEffect(() => {
@@ -76,6 +80,7 @@ const PodAdd = ({ navigation, route }) => {
       setIsLoaded(true);
     }
     getGroupsAndMembersFromServer()
+    getAutomatedGroupsFromServer()
   }, [])
 
   const closeModal = () => {
@@ -96,6 +101,17 @@ const PodAdd = ({ navigation, route }) => {
       groups.push(opt);
     }
     setCred({ groups: [...groups] });
+  }
+
+
+  const onMultipleAutoGrpSelect = (opt) => {
+    let index = automatedGroups.findIndex(x => x._id == opt?._id);
+    if (index > -1) {
+      automatedGroups.splice(index, 1);
+    } else {
+      automatedGroups.push(opt);
+    }
+    setCred({ automatedGroups: [...automatedGroups] });
   }
 
   const onMemberSelect = (opt) => {
@@ -158,6 +174,11 @@ const PodAdd = ({ navigation, route }) => {
 
   }
 
+  const multipleGrpSelected = (item) => {
+    return !!automatedGroups.find(x => x._id == item?._id);
+
+  }
+
 
   const handlerWeekdays = (day) => {
 
@@ -189,6 +210,19 @@ const PodAdd = ({ navigation, route }) => {
     }
   }
 
+  const getAutomatedGroupsFromServer = async () => {
+    setLoader(true);
+    let res = await POD_AUTOMATED_GROUPS({ navigation, token, })
+    if (res.code == 200) {
+      setAutomatedGroupList(res?.group);
+      if (isEdit == false) {
+        setLoader(false)
+      }
+    } else {
+      setLoader(false)
+    }
+  }
+
   const getPodDetailFromServer = async () => {
     setLoader(true);
     let res = await POD_DETAIL({ navigation, token, slug: editableItem?.room_slug })
@@ -208,12 +242,14 @@ const PodAdd = ({ navigation, route }) => {
         recurrenceType: !!room?.recurring_type ? recurrencelist.find(x => x.key == room?.recurring_type) : recurrencelist[1],
         recurrenceDays: !!room?.weekdays ? room?.weekdays : [],
         recurrenceEndDate: !!room?.end_date ? moment(room?.end_date, "YYYY-MM-DD") : moment(),
-        groups: !!room?.group ? room?.group.map(x => x._id) : [],
+        groups: (!!room?.group && room?.room_type != "automated") ? room?.group.map(x => x._id) : [],
         members: !!res.room_members ? res.room_members : res.room_members,
         excludedMembers: !!room?.exclude_members ? room?.exclude_members.map(x => x._id) : [],
         logo: !!room?.room_image?.thumbnail_1 ? room?.room_image?.thumbnail_1 : null,
         shortDesc: !!room?.short_description ? room?.short_description : "",
         longDesc: !!room?.detail_description ? room?.detail_description : "",
+        roomType: !!room?.room_type ? roomTypeObj[room?.room_type] : room?.room_type["general"],
+        automatedGroups: (!!room?.group && room?.room_type && room?.room_type == "automated") ? room?.group.map(x => x._id) : [],
       })
       setOrder(String(room?.order))
       setIsLoaded(true);
@@ -234,7 +270,7 @@ const PodAdd = ({ navigation, route }) => {
     fd.append("short_description", shortDesc);
     fd.append("detail_description", longDesc);
     fd.append("status", status)
-    fd.append("room_type", "general");
+    fd.append("room_type", roomType?.key);
     fd.append("zoom_link", zoomlink)
     fd.append("password", password)
     fd.append("is_recurring", isRecurring)
@@ -246,9 +282,13 @@ const PodAdd = ({ navigation, route }) => {
     fd.append("weekdays", JSON.stringify(recurrenceDays))
     fd.append("start_date", moment(startDate).format("YYYY-MM-DD"))
     fd.append("end_date", moment(recurrenceEndDate).format("YYYY-MM-DD"))
-    fd.append("group", JSON.stringify(groups.map(grp => ({ group_slug: grp.group_slug }))))
-    fd.append("member", JSON.stringify(members.map(member => ({ member_id: member._id }))));
-    fd.append("exclude_members", JSON.stringify(excludedMembers.map(member => ({ _id: member._id }))));
+    if (roomType?.key == "general") {
+      fd.append("group", JSON.stringify(groups.map(grp => ({ group_slug: grp.group_slug }))))
+      fd.append("member", JSON.stringify(members.map(member => ({ member_id: member._id }))));
+      fd.append("exclude_members", JSON.stringify(excludedMembers.map(member => ({ _id: member._id }))));
+    } else {
+      fd.append("group", JSON.stringify(automatedGroups.map(grp => ({ group_slug: grp.group_slug }))))
+    }
     if (isEdit) {
       fd.append("order", Number(order))
     }
@@ -344,6 +384,12 @@ const PodAdd = ({ navigation, route }) => {
             </View>
           </View>
         </View>
+
+        <MyTouchableInput
+          label='Pod Type *'
+          value={roomType?.title}
+          onPress={() => setOptionModal({ isVisible: true, list: Object.values(roomTypeObj), type: "roomType", })}
+        />
 
         <MyInputs
           label='Zoom Link'
@@ -510,56 +556,69 @@ const PodAdd = ({ navigation, route }) => {
 
             </View>
           </View>}
+        {roomType?.key == "general" ?
+          <>
+            <MyTouchableInput
+              label='Groups'
+              onPress={() => setMultipleOptionModal(true)}
+              view={() => {
+                return (<View style={{ flex: 1, paddingHorizontal: 10 }}>
+                  <MyText>{groups.map(x => x.title).join(", ")}</MyText>
+                </View>)
+              }}
+            />
 
-        <MyTouchableInput
-          label='Groups'
-          onPress={() => setMultipleOptionModal(true)}
-          view={() => {
-            return (<View style={{ flex: 1, paddingHorizontal: 10 }}>
-              <MyText>{groups.map(x => x.title).join(", ")}</MyText>
-            </View>)
-          }}
-        />
+            <MyTouchableInput
+              label='Members'
+              iconOnPress={() => setMemberModalVisibility(true)}
+              clearbutton={members?.length > 0}
+              onClearButtonPress={() => setCred({ members: [] })}
+              view={() => {
+                return (
+                  <View style={{ flexDirection: "row", flex: 1, alignItems: "center", flexWrap: "wrap", paddingVertical: 2 }}>
+                    {members.map((item, index) => (
+                      <MyChip
+                        key={item?._id}
+                        title={item?.first_name + " (" + item?.email + ")"}
+                        onPress={() => onMemberSelect(item)}
+                      />
+                    ))}
+                  </View>
+                )
+              }}
+            />
 
-        <MyTouchableInput
-          label='Members'
-          iconOnPress={() => setMemberModalVisibility(true)}
-          clearbutton={members?.length > 0}
-          onClearButtonPress={() => setCred({ members: [] })}
-          view={() => {
-            return (
-              <View style={{ flexDirection: "row", flex: 1, alignItems: "center", flexWrap: "wrap", paddingVertical: 2 }}>
-                {members.map((item, index) => (
-                  <MyChip
-                    key={item?._id}
-                    title={item?.first_name + " (" + item?.email + ")"}
-                    onPress={() => onMemberSelect(item)}
-                  />
-                ))}
-              </View>
-            )
-          }}
-        />
+            <MyTouchableInput
+              label='Exclude Members'
+              iconOnPress={() => setExMemberModalVisibility(true)}
+              clearbutton={excludedMembers?.length > 0}
+              onClearButtonPress={() => setCred({ excludedMembers: [] })}
+              view={() => {
+                return (
+                  <View style={{ flexDirection: "row", flex: 1, alignItems: "center", flexWrap: "wrap", paddingVertical: 2 }}>
+                    {excludedMembers.map((item, index) => (
+                      <MyChip
+                        key={item?._id}
+                        title={item?.first_name + " (" + item?.email + ")"}
+                        onPress={() => onMemberSelectforEx(item)}
+                      />
+                    ))}
+                  </View>
+                )
+              }}
+            />
 
-        <MyTouchableInput
-          label='Exclude Members'
-          iconOnPress={() => setExMemberModalVisibility(true)}
-          clearbutton={excludedMembers?.length > 0}
-          onClearButtonPress={() => setCred({ excludedMembers: [] })}
-          view={() => {
-            return (
-              <View style={{ flexDirection: "row", flex: 1, alignItems: "center", flexWrap: "wrap", paddingVertical: 2 }}>
-                {excludedMembers.map((item, index) => (
-                  <MyChip
-                    key={item?._id}
-                    title={item?.first_name + " (" + item?.email + ")"}
-                    onPress={() => onMemberSelectforEx(item)}
-                  />
-                ))}
-              </View>
-            )
-          }}
-        />
+          </> :
+          <MyTouchableInput
+            label='Automated Groups'
+            onPress={() => setAutoGrpModal(true)}
+            view={() => {
+              return (<View style={{ flex: 1, paddingHorizontal: 10 }}>
+                <MyText>{automatedGroups.map(x => x.title).join(", ")}</MyText>
+              </View>)
+            }}
+          />
+        }
 
 
         <UploadFileInput
@@ -636,6 +695,20 @@ const PodAdd = ({ navigation, route }) => {
         noIcon
       />
 
+      <OptionModal
+        optionList={automatedGroupList}
+        isVisible={autoGrpModal}
+        closeModal={() => setAutoGrpModal(false)}
+        onSelected={onMultipleAutoGrpSelect}
+        checkSelected={multipleGrpSelected}
+        multiple={true}
+        multipleLabel={"Select Groups"}
+        noIcon
+      />
+
+
+
+
       <OptionModalWithSearch
         optionList={memberList}
         isVisible={memberModalVisibility}
@@ -685,6 +758,18 @@ const PodAdd = ({ navigation, route }) => {
 export default PodAdd
 
 
+const roomTypeObj = {
+  "general": {
+    title: "General",
+    key: "general"
+  },
+  "automated": {
+    title: "Automated",
+    key: "automated"
+  },
+
+
+}
 const communityLevels = [
   {
     title: "Dynamite",

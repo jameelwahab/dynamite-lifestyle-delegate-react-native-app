@@ -69,6 +69,15 @@ export const POD_GROUPS_AND_MEMBERS = ({ token, navigation, }) => {
   })
 }
 
+export const POD_AUTOMATED_GROUPS = ({ token, navigation, }) => {
+  return invokeApi({
+    path: `api/group/active_automated_group_list`,
+    method: "GET",
+    token,
+    navigation,
+  })
+}
+
 export const POD_DETAIL_V1 = ({ token, navigation, slug }) => {
   return invokeApi({
     path: `api/room/detail/v1/${slug}`,
