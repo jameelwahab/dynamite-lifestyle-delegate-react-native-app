@@ -3,6 +3,9 @@ import { domain } from '../utilities/constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import showToast from './showToast';
 import routes from '../navigation/routes';
+import DeviceInfo from 'react-native-device-info';
+import { Platform } from 'react-native';
+
 
 axios.defaults.headers.post['Content-Type'] = 'application/json';
 let alertShown = false;
@@ -19,6 +22,15 @@ export default async function invokeApi({
   excludeBaseURL = false,
   showConsole = __DEV__
 }) {
+
+  try {
+    headers["version"] = DeviceInfo.getVersion();
+    headers["platform"] = Platform.OS;
+    headers["device"] = DeviceInfo.getDeviceNameSync();
+  } catch (e) {
+    console.log(e, "version issue")
+  }
+
   const reqObj = {
     method,
     url: excludeBaseURL ? path : domain + path,

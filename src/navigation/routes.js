@@ -81,6 +81,10 @@ const routes = {
   missionDetail: "MISSION_DETAIL",
   missionSchedule: "MISSION_Schedule",
 
+  automatedGrpList:"AUTOMATED_GROUP_LIST",
+  automatedGrpAddEdit:"ADD_AUTOMATED_GROUP",
+  automatedGrpDetail:"AUTOMATED_GROUP_DETAIL",
+
   //? Mission Report
   missionMembers: "MISSION_MEMBERS_LIST",
   missionMembersFilterScreen: "MISSION_MEMBERS_LIST_FILTER_SCREEN",

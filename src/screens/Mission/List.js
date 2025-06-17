@@ -97,16 +97,30 @@ const List = ({ navigation, route }) => {
 		else return null
 	}
 	const handlePress = (item) => ref.current.openModal?.(item)
+
 	const handleSelect = (opt, item) => {
-		if (opt.key == "copy") handleCopyMethod(item?.app_branch_url, item?._id, item?.type)
-		else if (opt.key = "member") nav.navigate(routes.missionMemberList, { item })
+		if (opt.key == "copy") {
+			handleCopyMethod(item?.app_branch_url, item?._id, item?.type)
+		} else if (opt.key == "member") {
+			nav.navigate(routes.missionMemberList, { item })
+		} else if (opt.key == "auto-grp") {
+			nav.navigate(routes.automatedGrpList, {
+				item: {
+					title: item?.title,
+					_id: item?._id,
+					type: "mission"
+				}
+			})
+		}
 	}
+
+
 	const filterList = (item) => {
 		if (item?.type == "mission") {
-			return [optionList[0], optionList[2]]
+			return [optionList[0], optionList[2], optionList[3]]
 		}
 		else if (item?.type == "quest") {
-			return [optionList[0], optionList[1]]
+			return [optionList[0], optionList[1], optionList[3]]
 		}
 	}
 	return (
@@ -192,12 +206,17 @@ const optionList = [
 	},
 	{
 		title: "Quest Members",
-		key: "quest",
+		key: "member",
 		icon: icons.members2,
 	},
 	{
 		title: "Mission Members",
-		key: "mission",
+		key: "member",
 		icon: icons.members2,
+	},
+	{
+		title: "Automated Group",
+		key: "auto-grp",
+		icon: icons.group,
 	},
 ]

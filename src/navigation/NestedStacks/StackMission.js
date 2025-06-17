@@ -11,6 +11,9 @@ import FeedDetail from "../../screens/Feed/Detail"
 import MemberList from "../../screens/Mission/MemberList"
 import MissionReport from '../../screens/MissionReport/MissionReport'
 import { defaultScreens } from "./defaultScreens"
+import AutomatedGroupList from "../../screens/Mission/AutomatedGroups/AutomatedGroupList"
+import AutomatedGroupAddEdit from "../../screens/Mission/AutomatedGroups/AutomatedGroupAddEdit"
+import AutomatedGroupDetail from "../../screens/Mission/AutomatedGroups/AutomatedGroupDetail"
 
 const MissionStack = createNativeStackNavigator()
 
@@ -41,7 +44,7 @@ const StackMission = ({ route }) => {
 					name={routes.missionMemberList}
 					component={MemberList}
 				/>
-				
+
 				<MissionStack.Screen
 					initialParams={routes.params}
 					name={routes.missionReportScreen}
@@ -62,6 +65,20 @@ const StackMission = ({ route }) => {
 				<MissionStack.Screen
 					name={routes.feedDetailScreen}
 					component={FeedDetail}
+				/>
+
+				<MissionStack.Screen
+					name={routes.automatedGrpList}
+					component={AutomatedGroupList}
+				/>
+				<MissionStack.Screen
+					name={routes.automatedGrpAddEdit}
+					component={AutomatedGroupAddEdit}
+				/>
+
+				<MissionStack.Screen
+					name={routes.automatedGrpDetail}
+					component={AutomatedGroupDetail}
 				/>
 
 				{/* ye extra screens hoti hain jo har jaga se call ki jaye */}

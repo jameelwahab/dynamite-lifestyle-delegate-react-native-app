@@ -25,10 +25,10 @@ const StackMissionReport = ({ route }) => {
         {/*//? Default Screens End */}
         <MissionReportStack.Screen initialParams={route?.params} name={routes.missionMembers} component={MemberList} />
         <MissionReportStack.Screen name={routes.missionList} component={MissisonList} />
-        <MissionReportStack.Screen 
-	    name={routes.missionMembersFilterScreen} 
-	    component={FilterScreen}
-	    />
+        <MissionReportStack.Screen
+          name={routes.missionMembersFilterScreen}
+          component={FilterScreen}
+        />
         <MissionReportStack.Screen name={routes.missionReportScreen} component={MissionReport} />
 
 
