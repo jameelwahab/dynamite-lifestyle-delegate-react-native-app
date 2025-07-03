@@ -15,10 +15,12 @@ const MyButton = ({
 	textStyle = {},
 	leftIcon = null,
 	noSpace = false,
+	disable = false,
 	noCapitalize = false,
 }) => {
 	return (
 		<TouchableOpacity
+			disabled={disable}
 			style={[invert ? __MyButtonStyles.rootInvertView : __MyButtonStyles.rootView, style]}
 			onPress={onPress}>
 			{!!leftIcon &&
