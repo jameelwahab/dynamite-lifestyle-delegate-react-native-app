@@ -35,6 +35,7 @@ const RecordingDetail = ({navigation, route}) => {
           </View>
         )}
 
+      {isArray(recording?.programs) &&
         <Row flexWrap="wrap">
           {recording?.programs.map((program, index) => (
             <View
@@ -48,7 +49,7 @@ const RecordingDetail = ({navigation, route}) => {
               />
             </View>
           ))}
-        </Row>
+        </Row>}
       </ScrollView>
     </RootView>
   );
