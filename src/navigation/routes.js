@@ -302,6 +302,7 @@ const routes = {
   //? Help tech
   helptechListScreen: "HELP_TECH_LIST_SCREEN",
   helptechDetailScreen: "HELP_TECH_DETAIL_SCREEN",
+  helptechCategorylistScreen:"HELP_TECH_CATEGORY_LIST_SCREEN",
 
   //? Digitall Assets
   digitalAssetCategoryListScreen: "DIGITALL_ASSETMENT_CATEGORY_LIST_SCREEN",

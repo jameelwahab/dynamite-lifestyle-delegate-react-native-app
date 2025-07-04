@@ -33,11 +33,9 @@ const Filter = forwardRef(({ applyFilter }, ref) => {
 
   })
   const [lists, setLists] = useState({
-    categories: [],
     departments: []
   })
   const [fields, setFields] = useState({
-    categories: [],
     departments: [],
     from: "",
     to: ""
@@ -55,7 +53,7 @@ const Filter = forwardRef(({ applyFilter }, ref) => {
 
   const filterTheList = (list, text) => {
     let nlist = [];
-
+// console.log(list,optionModal,"list")
     list.forEach(element => {     
       if (!fields[optionModal?.type].find(x => x?._id == element?._id)) {
         nlist.push(element);
@@ -102,7 +100,6 @@ const Filter = forwardRef(({ applyFilter }, ref) => {
 
   const clear = () => {
     applyFilter({
-      categories: [],
       departments: [],
       from: "",
       to: ""
@@ -126,7 +123,7 @@ const Filter = forwardRef(({ applyFilter }, ref) => {
     if (res.code == 200) {
       setLists({
         departments: res?.departments,
-        categories: res?.categories
+
       })
     }
   }
@@ -174,11 +171,11 @@ const Filter = forwardRef(({ applyFilter }, ref) => {
           </View>
           <ScrollView showsVerticalScrollIndicator={false}>
             <View style={{ flex: 1, paddingHorizontal: 10, paddingTop: 10 }}>
-              <MyTouchableInput
+              {/* <MyTouchableInput
                 label='Category'
                 view={() => views("categories")}
                 iconOnPress={() => setOptionModal({ isVisible: true, type: "categories" })}
-              />
+              /> */}
 
               <MyTouchableInput
                 label='Department'

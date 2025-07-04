@@ -7,6 +7,7 @@ import { defaultScreens } from './defaultScreens'
 import { colors } from '../../utilities/colors'
 import Helptechlist from '../../screens/Helptech/Helptechlist'
 import HelptechDetail from '../../screens/Helptech/HelptechDetail'
+import HelpTechCategory from '../../screens/Helptech/HelpTechCategory'
 
 
 
@@ -19,7 +20,8 @@ const StackHelpTech = ({ route }) => {
     <View style={{ flex: 1, backgroundColor: colors.darkSecondary }}>
       <HelpTechStack.Navigator
         screenOptions={{ headerShown: false }}>
-        <HelpTechStack.Screen initialParams={route.params} name={routes.helptechListScreen} component={Helptechlist} />
+        <HelpTechStack.Screen initialParams={route.params} name={routes.helptechCategorylistScreen} component={HelpTechCategory} />
+        <HelpTechStack.Screen  name={routes.helptechListScreen} component={Helptechlist} />
         <HelpTechStack.Screen name={routes.helptechDetailScreen} component={HelptechDetail} />
 
         {/*//? Default Screens Start */}
