@@ -278,6 +278,19 @@ const notificationHandler = (remoteMessage, navigation, navbar) => {
         }
       }],
     })
+  } else if (data?.type == "slot_reminder_notification") {
+    // navigation.navigate(routes.commissionNavigator)
+    navigation.reset({
+      routes: [{
+        name: routes?.bookingConfigurationsNavigator,
+        state: {
+          routes: [
+            {
+              name: routes.bookingConfigurationScreen,
+            }],
+        }
+      }],
+    })
   }
 
 

@@ -39,6 +39,7 @@ const ItsWebView = ({
 		for (const link of S3Urls) {
 			if (processed.includes(link)) {
 				processed = processed.replaceAll(link, S3_URL);
+				console.log(processed,"processed")
 			}
 		}
 
