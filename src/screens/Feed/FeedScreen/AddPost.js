@@ -18,7 +18,7 @@ import Toast from 'react-native-toast-message'
 import MyChip from "../../../components/MyChip"
 import { CREATE_FEED, FEED_DETAIL, GET_DELEGATES_LIST_FROM_SERVER_FOR_MENTION_V1, GET_KEYWORDS_ADDED_BY_USER, UPDATE_FEED, UPLOAD_FEED_IMAGES } from '../../../DAL'
 import showToast from '../../../functions/showToast'
-import { S3_URL, communityLevelWithAllObj, dateTimeFormat } from '../../../utilities/constants'
+import {  communityLevelWithAllObj, dateTimeFormat } from '../../../utilities/constants'
 import LevelModal from './LevelModal'
 import MyTouchableInput from '../../../components/MyTouchableInput'
 import Editor from '../../../components/Editor'
@@ -66,7 +66,7 @@ const AddPost = forwardRef(({ user, token, navigation, refresh, updateFeedItem, 
 
 }, ref) => {
 
-  const { access } = useSelector(selectUser);
+  const { access,S3_URLß } = useSelector(selectUser);
   const { height, width } = useWindowDimensions();
   const inset = useSafeAreaInsets();
   const ref_poll = useRef()

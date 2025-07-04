@@ -6,7 +6,7 @@ import MyText from '../../../../components/MyText'
 import UserImage from '../../../../components/UserImage'
 import prependCurency from '../../../../functions/prependCurency';
 import openUrl from '../../../../functions/openUrl'
-import { S3_URL, dateTimeFormat } from '../../../../utilities/constants'
+import {  dateTimeFormat } from '../../../../utilities/constants'
 import { convertTimezone } from '../../../../functions/convertTime'
 import numFormatter from '../../../../functions/numFormatter'
 

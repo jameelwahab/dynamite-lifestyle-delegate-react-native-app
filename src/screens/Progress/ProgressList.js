@@ -12,7 +12,7 @@ import MemberView from '../../components/MemberView'
 import { MenuButton } from '../../components/MyButton'
 import StatView from '../Members/Components/StatView'
 import moment from 'moment'
-import { S3_URL, dateTimeFormat } from '../../utilities/constants'
+import {  dateTimeFormat } from '../../utilities/constants'
 import FooterLoader from '../../components/FooterLoader'
 import EmptyView from '../../components/EmptyView'
 import MyRefreshControl from '../../components/MyRefreshControl'
@@ -41,7 +41,7 @@ let canLoadMore = false;
 const ProgressList = ({ navigation, route }) => {
   const { value } = route.params
   const { navbar } = useSelector(selectNavbar);
-  const { user, token } = useSelector(selectUser);
+  const { user, token,S3_URL } = useSelector(selectUser);
   const [title] = useState(navbar?.find(x => x.value == value)?.title);
   const [list, setList] = useState([]);
   const [loader, setLoader] = useState(false);

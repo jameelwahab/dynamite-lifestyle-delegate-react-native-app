@@ -10,7 +10,7 @@ import { colors } from '../../../utilities/colors'
 import StatView from '../Components/StatView'
 import EmptyView from '../../../components/EmptyView'
 import moment from 'moment'
-import { S3_URL, dateTimeFormat } from '../../../utilities/constants'
+import {  dateTimeFormat } from '../../../utilities/constants'
 import { MenuButton } from '../../../components/MyButton'
 import OptionModal from '../../../components/OptionModal'
 import { icons } from '../../../utilities/icons'
@@ -27,7 +27,7 @@ let page = 0;
 let canLoadMore = false
 const SubscriptionList = ({ navigation, route }) => {
   const { memberId } = route?.params
-  const { token, user } = useSelector(selectUser);
+  const { token, user,S3_URL } = useSelector(selectUser);
   const [optionModal, setOptionModal] = useState({ isVisible: false, selectedItem: null });
   const [confirmationModal, setConfirmationModal] = useState({ isVisible: false, selectedItem: null, opt: "" })
   const [list, setList] = useState([])

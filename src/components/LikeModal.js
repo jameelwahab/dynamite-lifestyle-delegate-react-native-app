@@ -6,7 +6,7 @@ import { colors } from '../utilities/colors';
 import MyText from './MyText';
 import { icons } from '../utilities/icons';
 import UserImage from './UserImage';
-import { S3_URL, dateTimeFormat } from '../utilities/constants';
+import { dateTimeFormat } from '../utilities/constants';
 import { convertTimezone } from '../functions/convertTime';
 import FooterLoader from './FooterLoader';
 import { GET_PORTAL_CHAT_MESSAGE_LIKES } from '../DAL';
