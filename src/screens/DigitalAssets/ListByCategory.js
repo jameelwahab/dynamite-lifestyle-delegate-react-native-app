@@ -8,7 +8,6 @@ import { selectNavbar } from '../../redux/reducers/navbarSlice'
 import { GET_ASSETS_CATEGORY_LIST, GET_ASSETS_LIST_BY_CATEGORY, } from '../../DAL'
 import MyLoader from '../../components/MyLoader'
 import utilities from '../../utilities'
-import { S3_URL, } from '../../utilities/constants'
 import { colors } from '../../utilities/colors'
 import ResponsiveImage2 from '../../components/ResponsiveImage2'
 import routes from '../../navigation/routes'
@@ -17,7 +16,7 @@ import openUrl from '../../functions/openUrl'
 
 
 const ListByCategory = ({ navigation, route }) => {
-  const { token } = useSelector(selectUser);
+  const { token,S3_URL } = useSelector(selectUser);
   const { catId } = route?.params;
   const [list, setList] = useState([])
   const [loader, setLoader] = useState(true);

@@ -1,175 +1,240 @@
-import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, Pressable } from 'react-native'
-import React, { memo, useEffect, useState, useRef } from 'react'
-import UserImage from '../../../components/UserImage'
-import MyText from '../../../components/MyText'
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  Image,
+  TouchableOpacity,
+  Pressable,
+} from 'react-native';
+import React, {memo, useEffect, useState, useRef} from 'react';
+import UserImage from '../../../components/UserImage';
+import MyText from '../../../components/MyText';
 import InfoModal from '../../../components/InfoModal';
-import { convertTimezone, convertTimezone2 } from '../../../functions/convertTime'
-import { colors } from '../../../utilities/colors'
-import { fonts } from '../../../utilities/fonts';
-import { S3_URL, isDev } from '../../../utilities/constants'
-import ImagesForFeed from './ImagesForFeed'
-import { icons } from '../../../utilities/icons'
+import {
+  convertTimezone,
+  convertTimezone2,
+} from '../../../functions/convertTime';
+import {colors} from '../../../utilities/colors';
+import {fonts} from '../../../utilities/fonts';
+import {isDev} from '../../../utilities/constants';
+import ImagesForFeed from './ImagesForFeed';
+import {icons} from '../../../utilities/icons';
 import breakReference from '../../../functions/breakReference';
-import MyWebview from '../../../components/MyWebview'
-import MyImage2 from '../../../components/MyImage2'
-import MyImage from '../../../components/MyImage'
-import CollapsibleText from '../../../components/CollapsibleText'
-import WebPlayer from '../../../components/WebPlayer'
-import ResponsiveImage2 from '../../../components/ResponsiveImage2'
-import utilities from '../../../utilities'
-import openUrl from '../../../functions/openUrl'
-import DropShadow from "react-native-drop-shadow";
-import { isHtml } from '../../../functions/regex'
-import PostWebView from '../../../components/PostWebView'
-import FeedText from '../../../components/FeedText'
+import MyWebview from '../../../components/MyWebview';
+import MyImage2 from '../../../components/MyImage2';
+import MyImage from '../../../components/MyImage';
+import CollapsibleText from '../../../components/CollapsibleText';
+import WebPlayer from '../../../components/WebPlayer';
+import ResponsiveImage2 from '../../../components/ResponsiveImage2';
+import utilities from '../../../utilities';
+import openUrl from '../../../functions/openUrl';
+import DropShadow from 'react-native-drop-shadow';
+import {isHtml} from '../../../functions/regex';
+import PostWebView from '../../../components/PostWebView';
+import FeedText from '../../../components/FeedText';
 import Divider from '../../../UIComponents/Divider';
-import numFormatter from '../../../functions/numFormatter'
-import { MyButton } from '../../../components/MyButton'
-import { main } from '../../../utilities/styles'
-import { Row, Flex } from '../../../UIComponents/FlexViews'
-import isArray from '../../../functions/isArray'
+import numFormatter from '../../../functions/numFormatter';
+import {MyButton} from '../../../components/MyButton';
+import {main} from '../../../utilities/styles';
+import {Row, Flex} from '../../../UIComponents/FlexViews';
+import isArray from '../../../functions/isArray';
 
-const ic_tropy = require("../../../assets/icons/trophy.png");
+const ic_tropy = require('../../../assets/icons/trophy.png');
 
-export const FeedView = ({ item, index, user, token, feedSettings, isInView, timezone, settings,
-  openComments, showLikes, openOptions, onLikebtnPress, isCosmos,
-  sourceLevelIcons, isScheduledFeed, openScheduleTimeModal, onFeedDetail,
-  isNoteMainFeed, filterTheOptions, onVotePress, pollSettings, openPollDetail,
-  onStartQuestionnairPress, openSurveyDetail, onReportedPress
+export const FeedView = ({
+  item,
+  index,
+  user,
+  token,
+  feedSettings,
+  isInView,
+  timezone,
+  settings,
+  openComments,
+  showLikes,
+  openOptions,
+  onLikebtnPress,
+  isCosmos,
+  sourceLevelIcons,
+  isScheduledFeed,
+  openScheduleTimeModal,
+  onFeedDetail,
+  isNoteMainFeed,
+  filterTheOptions,
+  onVotePress,
+  pollSettings,
+  openPollDetail,
+  onStartQuestionnairPress,
+  openSurveyDetail,
+  onReportedPress,
+  S3_URL,
 }) => {
-
-
-  const [animationState, setAnimationState] = useState(0)
+  const [animationState, setAnimationState] = useState(0);
   const ref_info = useRef();
 
   useEffect(() => {
     if (index == 1)
       if (isInView) {
-        startAnimation()
+        startAnimation();
       } else {
-        setAnimationState(0)
+        setAnimationState(0);
       }
-  }, [isInView])
+  }, [isInView]);
 
   const startAnimation = () => {
-    setAnimationState(1)
+    setAnimationState(1);
     setTimeout(() => {
-      setAnimationState(0)
+      setAnimationState(0);
     }, 5000);
-  }
-
+  };
 
   const animationView = () => {
     return (
       <>
-        {!!item?.reward_data?.reward_feed_gif && animationState == 1 &&
+        {!!item?.reward_data?.reward_feed_gif && animationState == 1 && (
           <View style={__style.animationView}>
             <Image
-              indicatorProps={{ indeterminate: false }}
-              source={{ uri: S3_URL + item?.reward_data?.reward_feed_gif }}
-              style={{ height: "100%", width: "100%" }}
-
+              indicatorProps={{indeterminate: false}}
+              source={{uri: S3_URL + item?.reward_data?.reward_feed_gif}}
+              style={{height: '100%', width: '100%'}}
             />
-          </View>}
+          </View>
+        )}
       </>
-    )
-  }
-  const badgesView = (badgeList) => {
+    );
+  };
+  const badgesView = badgeList => {
     return (
       <View>
-        <Text style={[main.heading, { fontFamily: fonts.medium, }]}>{"Badges"}</Text>
+        <Text style={[main.heading, {fontFamily: fonts.medium}]}>
+          {'Badges'}
+        </Text>
         <Divider mt={10} />
-        <View style={{ marginTop: 10 }}>
+        <View style={{marginTop: 10}}>
           <FlatList
             horizontal
             scrollEnabled={false}
             data={badgeList || []}
-            renderItem={({ item, index }) => {
+            renderItem={({item, index}) => {
               return (
-                <View style={{ marginRight: 20 }}>
+                <View style={{marginRight: 20}}>
                   <Row alignItems="center">
                     <MyImage
-                      source={{ uri: S3_URL + item?.icon?.thumbnail_1 }}
-                      style={{ height: 20, width: 20 }}
+                      source={{uri: S3_URL + item?.icon?.thumbnail_1}}
+                      style={{height: 20, width: 20}}
                     />
                   </Row>
                 </View>
-              )
-
+              );
             }}
           />
         </View>
       </View>
-    )
-  }
+    );
+  };
 
   const profileView = () => (
     <View style={__style.profileView}>
-      <View
-        style={[__style.profileView, { flex: 1 }]} >
+      <View style={[__style.profileView, {flex: 1}]}>
         <UserImage
           image={item?.action_info?.profile_image}
           name={item?.action_info?.name}
           backgroundTransparent={true}
           borderWidth={isCosmos ? 1 / 4 : 2}
-          borderColor={!isCosmos ?
-            !!item?.show_feed_to ? (item?.show_feed_to == "all" && item?.action_info?.action_by == "consultant_user") ? feedSettings?.color_code_for_all_level : !!item?.badge_level_info ? item?.badge_level_info?.color_code : item?.feed_badge_levels[0]?.color_code : undefined : undefined}
+          borderColor={
+            !isCosmos
+              ? !!item?.show_feed_to
+                ? item?.show_feed_to == 'all' &&
+                  item?.action_info?.action_by == 'consultant_user'
+                  ? feedSettings?.color_code_for_all_level
+                  : !!item?.badge_level_info
+                  ? item?.badge_level_info?.color_code
+                  : item?.feed_badge_levels[0]?.color_code
+                : undefined
+              : undefined
+          }
           size={35}
         />
         <View style={__style.profileNameView}>
-          <MyText type='bold'  >{item?.action_info?.name}</MyText>
+          <MyText type="bold">{item?.action_info?.name}</MyText>
 
-          <View style={{ marginTop: 2 }}>
-            <MyText type="light" color={colors.lightText2} fontSize={10}>{convertTimezone(item?.createdAt, timezone).format("DD MMM YYYY [at] hh:mm A")}</MyText>
+          <View style={{marginTop: 2}}>
+            <MyText type="light" color={colors.lightText2} fontSize={10}>
+              {convertTimezone(item?.createdAt, timezone).format(
+                'DD MMM YYYY [at] hh:mm A',
+              )}
+            </MyText>
           </View>
         </View>
       </View>
-      {!item?.is_publish &&
+      {!item?.is_publish && (
         <TouchableOpacity
           onPress={() => openScheduleTimeModal(item?.schedule_date_time)}
-          style={{ marginRight: 5 }}>
-          <Image source={icons.schedule}
-            style={{ tintColor: colors.primary, height: 25, width: 25 }}
+          style={{marginRight: 5}}>
+          <Image
+            source={icons.schedule}
+            style={{tintColor: colors.primary, height: 25, width: 25}}
           />
-        </TouchableOpacity>}
+        </TouchableOpacity>
+      )}
 
       <InfoModal ref={ref_info} />
 
-      {(!!item?.show_feed_to && item?.show_feed_to == "specific" && item?.action_info?.action_by == "consultant_user") &&
-        <>
-          {isArray(item?.feed_badge_levels) &&
-            <Pressable
-              onPress={() => {
-                if (item?.feed_badge_levels?.length > 1) {
-                  ref_info?.current?.openModal("", "", false, badgesView(item?.feed_badge_levels))
-                }
-              }}
-              style={{ flexDirection: 'row', alignItems: "center" }}>
-              <MyImage
-                source={{ uri: S3_URL + item?.feed_badge_levels[0]?.icon?.thumbnail_1 }}
-                style={{ height: 20, width: 20, marginRight: 5 }}
-              />
-              {item?.feed_badge_levels?.length > 1 &&
-                <Text style={[main.description, { textDecorationLine: "underline", color: colors.primary2 }]} >{item?.feed_badge_levels?.length - 1}+ </Text>
-              }
-            </Pressable>}
-        </>
-      }
+      {!!item?.show_feed_to &&
+        item?.show_feed_to == 'specific' &&
+        item?.action_info?.action_by == 'consultant_user' && (
+          <>
+            {isArray(item?.feed_badge_levels) && (
+              <Pressable
+                onPress={() => {
+                  if (item?.feed_badge_levels?.length > 1) {
+                    ref_info?.current?.openModal(
+                      '',
+                      '',
+                      false,
+                      badgesView(item?.feed_badge_levels),
+                    );
+                  }
+                }}
+                style={{flexDirection: 'row', alignItems: 'center'}}>
+                <MyImage
+                  source={{
+                    uri: S3_URL + item?.feed_badge_levels[0]?.icon?.thumbnail_1,
+                  }}
+                  style={{height: 20, width: 20, marginRight: 5}}
+                />
+                {item?.feed_badge_levels?.length > 1 && (
+                  <Text
+                    style={[
+                      main.description,
+                      {textDecorationLine: 'underline', color: colors.primary2},
+                    ]}>
+                    {item?.feed_badge_levels?.length - 1}+{' '}
+                  </Text>
+                )}
+              </Pressable>
+            )}
+          </>
+        )}
 
-      {(!!item?.show_feed_to && item?.show_feed_to == "all" && item?.action_info?.action_by == "consultant_user") && <MyImage
-        source={{ uri: S3_URL + feedSettings?.icon_for_all_level }}
-        style={{ height: 20, width: 20, marginRight: 5 }}
-      />}
-
-      {(!!item?.badge_level_info?.icon?.thumbnail_1 || isCosmos) &&
-        <View >
+      {!!item?.show_feed_to &&
+        item?.show_feed_to == 'all' &&
+        item?.action_info?.action_by == 'consultant_user' && (
           <MyImage
-            indicatorProps={{ color: colors.secondaryVariant }}
-            resizeMode={"contain"}
+            source={{uri: S3_URL + feedSettings?.icon_for_all_level}}
+            style={{height: 20, width: 20, marginRight: 5}}
+          />
+        )}
+
+      {(!!item?.badge_level_info?.icon?.thumbnail_1 || isCosmos) && (
+        <View>
+          <MyImage
+            indicatorProps={{color: colors.secondaryVariant}}
+            resizeMode={'contain'}
             source={{
-              uri:
-                isCosmos ?
-                  //   // item?.created_for_level_or_type == "delegate" ?
+              uri: isCosmos
+                ? //   // item?.created_for_level_or_type == "delegate" ?
                   //   // S3_URL + settings?.delegate_feed_icon :
                   //   // item?.created_for_level_or_type == "consultant" ?
                   //   //   S3_URL + settings?.consultant_feed_icon :
@@ -177,262 +242,358 @@ export const FeedView = ({ item, index, user, token, feedSettings, isInView, tim
                   //   //     S3_URL + settings?.marketing_feed_icon :
                   //   //     item?.created_for_level_or_type == "inner_circle" ?
                   //   //       S3_URL + settings?.inner_circle_feed_icon :
-                  S3_URL + settings?.[`${item?.created_for_level_or_type}_feed_icon`] :
-                  S3_URL + item?.badge_level_info?.icon?.thumbnail_1
+                  S3_URL +
+                  settings?.[`${item?.created_for_level_or_type}_feed_icon`]
+                : S3_URL + item?.badge_level_info?.icon?.thumbnail_1,
             }}
             style={__style.feedTypeIcon}
           />
-        </View>}
+        </View>
+      )}
 
-
-
-      {(((isCosmos || isScheduledFeed) && user?._id == item?.action_info?.action_id) ||
-        (!isCosmos && !isScheduledFeed)) && filterTheOptions(item) > 0 &&
-        <TouchableOpacity
-          onPress={() => openOptions(item)}
-          style={__style.profileTypeIconView}>
-          {icons.threeDots(colors.primary, 15)}
-        </TouchableOpacity>
-      }
+      {(((isCosmos || isScheduledFeed) &&
+        user?._id == item?.action_info?.action_id) ||
+        (!isCosmos && !isScheduledFeed)) &&
+        filterTheOptions(item) > 0 && (
+          <TouchableOpacity
+            onPress={() => openOptions(item)}
+            style={__style.profileTypeIconView}>
+            {icons.threeDots(colors.primary, 15)}
+          </TouchableOpacity>
+        )}
     </View>
-  )
+  );
 
   const inRevivewView = () => {
     return (
       <View style={__style.review}>
-        <MyText color={colors.primary} fontSize={16} type='medium' >Reivew Reason</MyText>
-        <View style={{ marginTop: 3 }}>
-          <MyText color={colors.lightText2} type='regular' >{item?.review_info?.reason}</MyText>
+        <MyText color={colors.primary} fontSize={16} type="medium">
+          Reivew Reason
+        </MyText>
+        <View style={{marginTop: 3}}>
+          <MyText color={colors.lightText2} type="regular">
+            {item?.review_info?.reason}
+          </MyText>
         </View>
       </View>
-    )
-  }
+    );
+  };
 
   const descriptionView = () => (
     <View style={__style.descriptionRootView}>
-      {!!item?.description &&
+      {!!item?.description && (
         <>
           {/*  <MyText fontSize={13}>{item?.description}</MyText> */}
           {/* <CollapsibleText>{item?.description}</CollapsibleText> */}
-          {isHtml(item?.description) ?
-            <PostWebView enableCollapse={true} html={item?.description} />
-            // <CollapsibleText>{item?.description}</CollapsibleText>
-            : !!item?.mentioned_users ?
-              <FeedText keywords={isArray(item?.feed_keywords) ? item?.feed_keywords : []} list={item?.mentioned_users} text={item?.description} /> :
+          {
+            isHtml(item?.description) ? (
+              <PostWebView enableCollapse={true} html={item?.description} />
+            ) : // <CollapsibleText>{item?.description}</CollapsibleText>
+            !!item?.mentioned_users ? (
+              <FeedText
+                keywords={
+                  isArray(item?.feed_keywords) ? item?.feed_keywords : []
+                }
+                list={item?.mentioned_users}
+                text={item?.description}
+              />
+            ) : (
               <CollapsibleText>{item?.description}</CollapsibleText>
-            // <MyWebview html={item?.description} /> 
+            )
+            // <MyWebview html={item?.description} />
           }
         </>
-      }
-
-
-
-      {item.feed_type == "image" && !!item?.feed_images && item?.feed_images.length > 0 && (
-        <View style={{ marginTop: 10 }}>
-          <ImagesForFeed id={item._id} list={item.feed_images} />
-        </View>
       )}
 
-      {item.feed_type == "video" && item.video_url != '' && (
-        <View style={{ alignItems: "center", marginTop: 10 }}>
+      {item.feed_type == 'image' &&
+        !!item?.feed_images &&
+        item?.feed_images.length > 0 && (
+          <View style={{marginTop: 10}}>
+            <ImagesForFeed id={item._id} list={item.feed_images} />
+          </View>
+        )}
+
+      {item.feed_type == 'video' && item.video_url != '' && (
+        <View style={{alignItems: 'center', marginTop: 10}}>
           <WebPlayer height={250} url={item.video_url} />
         </View>
       )}
 
-
-      {isDev && item.feed_type == "live" && !!item?.image?.thumbnail_1 &&
-        <View style={{ alignItems: "center", minHeight: 20 }} >
+      {isDev && item.feed_type == 'live' && !!item?.image?.thumbnail_1 && (
+        <View style={{alignItems: 'center', minHeight: 20}}>
           <ResponsiveImage2
             width={utilities.screenWidth() - 40}
             uri={S3_URL + item?.image?.thumbnail_1}
           />
-          {item.feed_type == "live" && (
-            <View style={__style.streamingStatusView} >
-              <View style={[{ backgroundColor: item?.is_live_streaming ? colors.delete : colors.lightText, }, __style.liveSteamStatus]} />
-              <MyText type='bold' color={colors.white} fontSize={12}  >
-                {item?.is_live_streaming ? "Live" : "Offline"}</MyText>
+          {item.feed_type == 'live' && (
+            <View style={__style.streamingStatusView}>
+              <View
+                style={[
+                  {
+                    backgroundColor: item?.is_live_streaming
+                      ? colors.delete
+                      : colors.lightText,
+                  },
+                  __style.liveSteamStatus,
+                ]}
+              />
+              <MyText type="bold" color={colors.white} fontSize={12}>
+                {item?.is_live_streaming ? 'Live' : 'Offline'}
+              </MyText>
             </View>
           )}
-
-
-
         </View>
-      }
+      )}
 
-      {item.feed_type == "embed_code" && !!item.embed_code &&
-        <View style={{ marginTop: 10 }} >
-          <MyWebview
-            fullWidth
-            html={item.embed_code.replace("width", "")}
-
-          />
+      {item.feed_type == 'embed_code' && !!item.embed_code && (
+        <View style={{marginTop: 10}}>
+          <MyWebview fullWidth html={item.embed_code.replace('width', '')} />
         </View>
-      }
+      )}
 
-      {item.feed_type == "poll" &&
-        <View style={{ margin: 10, }}>
+      {item.feed_type == 'poll' && (
+        <View style={{margin: 10}}>{pollFeedView(item)}</View>
+      )}
 
-          {pollFeedView(item)}
-        </View>}
+      {item.feed_type == 'survey' && (
+        <View style={{margin: 10}}>{surveyFeedView(item)}</View>
+      )}
 
-
-      {item.feed_type == "survey" &&
-        <View style={{ margin: 10, }}>
-
-          {surveyFeedView(item)}
-        </View>}
-
-
-      {!!item?.event_info?.is_event_info &&
-        <View style={__style.eventRootView} >
+      {!!item?.event_info?.is_event_info && (
+        <View style={__style.eventRootView}>
           <View style={__style.eventTitleView}>
             <MyWebview html={item?.event_info?.event_title} />
           </View>
           <TouchableOpacity
             onPress={() => openUrl(item?.event_info?.button_link)}
-            style={[__style.eventBtnView, {
-              backgroundColor: item?.event_info?.button_background_color,
-              alignSelf: btnAligmnet[item?.event_info?.button_alignment]
-            }]}>
+            style={[
+              __style.eventBtnView,
+              {
+                backgroundColor: item?.event_info?.button_background_color,
+                alignSelf: btnAligmnet[item?.event_info?.button_alignment],
+              },
+            ]}>
             <MyText
               color={item?.event_info?.button_text_color}
-              type='medium'
-              style={{ paddingHorizontal: 10, }}
-            >{item?.event_info?.button_text}</MyText>
+              type="medium"
+              style={{paddingHorizontal: 10}}>
+              {item?.event_info?.button_text}
+            </MyText>
           </TouchableOpacity>
-        </View>}
+        </View>
+      )}
 
-      {item?.is_reported &&
+      {item?.is_reported && (
         <TouchableOpacity onPress={onReportedPress}>
           <Row paddingHorizontal={5} style={__style.reportedView}>
             {icons.warnOctagon(colors.delete, 20)}
-            <Text style={__style.reportedText} >This post has been reported by some users</Text>
+            <Text style={__style.reportedText}>
+              This post has been reported by some users
+            </Text>
           </Row>
-        </TouchableOpacity>}
-
-
+        </TouchableOpacity>
+      )}
     </View>
-  )
+  );
 
   const statsView = () => (
     <View style={__style.statView}>
-      {!!item?.like_count > 0 ?
+      {!!item?.like_count > 0 ? (
         <TouchableOpacity
           onPress={() => showLikes(item?._id)}
           style={__style.likeView}>
           {icons.heartFilled(colors.heart, 15)}
           <View style={__style.likeImagesView}>
-
             <MyText fontSize={12}>{numFormatter(item?.like_count, 1)}</MyText>
           </View>
-        </TouchableOpacity> :
-        <View />}
+        </TouchableOpacity>
+      ) : (
+        <View />
+      )}
 
-      {item?.comment_count > 0 &&
+      {item?.comment_count > 0 && (
         <TouchableOpacity
           onPress={() => openComments(item?._id, false)}
           style={__style.likeView}>
           {icons.comment(colors.white, 15)}
           <View style={__style.likeImagesView}>
-            <MyText fontSize={12}>{`${numFormatter(item?.comment_count, 1)}`}</MyText>
+            <MyText fontSize={12}>{`${numFormatter(
+              item?.comment_count,
+              1,
+            )}`}</MyText>
           </View>
         </TouchableOpacity>
-      }
-
+      )}
     </View>
-  )
+  );
 
   const actionView = () => (
     <View style={__style.actionView}>
-
       <TouchableOpacity
         onPress={() => onLikebtnPress(item?._id, item?.is_liked)}
         style={__style.actionBtn}>
-        {item?.is_liked ?
-          icons.heartFilled(colors.heart, 18) :
-          icons.heartUnfilled(colors.white, 18)}
-        <MyText fontSize={12} style={{ marginLeft: 5 }}>{item?.is_liked ? "Liked" : "Like"}</MyText>
+        {item?.is_liked
+          ? icons.heartFilled(colors.heart, 18)
+          : icons.heartUnfilled(colors.white, 18)}
+        <MyText fontSize={12} style={{marginLeft: 5}}>
+          {item?.is_liked ? 'Liked' : 'Like'}
+        </MyText>
       </TouchableOpacity>
 
       <TouchableOpacity
         onPress={() => openComments(item?._id, true)}
         style={__style.actionBtn}>
         {icons.comment(colors.white, 18)}
-        <MyText fontSize={12} style={{ marginLeft: 5 }}>{"Comment"}</MyText>
+        <MyText fontSize={12} style={{marginLeft: 5}}>
+          {'Comment'}
+        </MyText>
       </TouchableOpacity>
     </View>
-  )
+  );
 
-  const get_winner_option = (options) => {
+  const get_winner_option = options => {
     if (options.length === 0) {
       return null;
     }
     return options.reduce(
       (max, option) => (option.votes > max.votes ? option : max),
-      options[0]
+      options[0],
     );
-  }
+  };
 
-  const pollFeedView = (item) => {
+  const pollFeedView = item => {
     let feed_setting = pollSettings;
     return (
-      <View style={{}} >
-        {item?.poll_info?.poll_status == "expired" ?
+      <View style={{}}>
+        {item?.poll_info?.poll_status == 'expired' ? (
           <>
-            <View style={{ marginBottom: 10 }}>
-              {!!feed_setting?.poll_winner_description &&
+            <View style={{marginBottom: 10}}>
+              {!!feed_setting?.poll_winner_description && (
                 <MyWebview
-                  html={feed_setting?.poll_winner_description.replace(/{winner_option}/g, get_winner_option(item?.poll_info?.options)?.text)}
-                />}
+                  html={feed_setting?.poll_winner_description.replace(
+                    /{winner_option}/g,
+                    get_winner_option(item?.poll_info?.options)?.text,
+                  )}
+                />
+              )}
             </View>
-          </> :
+          </>
+        ) : (
           <>
-            {item?.poll_info?.options.map((option) => {
-              let isSelected = !!item?.selected_options && item?.selected_options.some(x => x._id == option?._id)
+            {item?.poll_info?.options.map(option => {
+              let isSelected =
+                !!item?.selected_options &&
+                item?.selected_options.some(x => x._id == option?._id);
               return (
                 <TouchableOpacity
                   onPress={() => onVotePress?.(item?._id, option?._id)}
-                  style={{ flexDirection: "row", alignItems: "center", marginBottom: 10, }}>
-                  <View style={{ backgroundColor: isSelected ? colors.primary : colors.transparent, flex: 1, flexDirection: "row", justifyContent: "space-between", alignItems: "center", minHeight: 40, borderWidth: 1 / 2, borderColor: colors.border, borderRadius: 5, paddingHorizontal: 10 }} >
-                    <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
-                      <View style={{ marginRight: 10, height: 20, width: 20, borderRadius: 20 / 2, borderWidth: 1, borderColor: isSelected ? colors.black : colors.primary, marginHorizontal: 5, alignItems: "center", justifyContent: "center" }} >
-                        {isSelected &&
-                          <View style={{ height: 12, width: 12, borderRadius: 12 / 2, backgroundColor: colors.black }} />}
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    marginBottom: 10,
+                  }}>
+                  <View
+                    style={{
+                      backgroundColor: isSelected
+                        ? colors.primary
+                        : colors.transparent,
+                      flex: 1,
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      minHeight: 40,
+                      borderWidth: 1 / 2,
+                      borderColor: colors.border,
+                      borderRadius: 5,
+                      paddingHorizontal: 10,
+                    }}>
+                    <View
+                      style={{
+                        flex: 1,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                      }}>
+                      <View
+                        style={{
+                          marginRight: 10,
+                          height: 20,
+                          width: 20,
+                          borderRadius: 20 / 2,
+                          borderWidth: 1,
+                          borderColor: isSelected
+                            ? colors.black
+                            : colors.primary,
+                          marginHorizontal: 5,
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}>
+                        {isSelected && (
+                          <View
+                            style={{
+                              height: 12,
+                              width: 12,
+                              borderRadius: 12 / 2,
+                              backgroundColor: colors.black,
+                            }}
+                          />
+                        )}
                       </View>
-                      <MyText color={isSelected ? colors.black : colors.white} >{option?.text}</MyText>
+                      <MyText color={isSelected ? colors.black : colors.white}>
+                        {option?.text}
+                      </MyText>
                     </View>
-                    {option?.votes > 0 &&
-                      <MyText color={isSelected ? colors.black : colors.white}>{numFormatter(option?.votes, 1)}</MyText>}
+                    {option?.votes > 0 && (
+                      <MyText color={isSelected ? colors.black : colors.white}>
+                        {numFormatter(option?.votes, 1)}
+                      </MyText>
+                    )}
                   </View>
                 </TouchableOpacity>
-              )
+              );
             })}
-
-          </>}
-        <View style={{ alignItems: "center" }}>
-          <MyText fontSize={12} color={colors.lightText2} >{item?.poll_info?.poll_status == "expired" ?
-            `Poll Expired on ${convertTimezone2(item?.poll_info?.expiry_date_time, timezone).format("MMMM DD, YYYY [at] hh:mm A")}` :
-            `Poll Expires on ${convertTimezone2(item?.poll_info?.expiry_date_time, timezone).format("MMMM DD, YYYY [at] hh:mm A")}`}</MyText>
+          </>
+        )}
+        <View style={{alignItems: 'center'}}>
+          <MyText fontSize={12} color={colors.lightText2}>
+            {item?.poll_info?.poll_status == 'expired'
+              ? `Poll Expired on ${convertTimezone2(
+                  item?.poll_info?.expiry_date_time,
+                  timezone,
+                ).format('MMMM DD, YYYY [at] hh:mm A')}`
+              : `Poll Expires on ${convertTimezone2(
+                  item?.poll_info?.expiry_date_time,
+                  timezone,
+                ).format('MMMM DD, YYYY [at] hh:mm A')}`}
+          </MyText>
         </View>
 
         {/* <View style={{ height: 1, width: "100%", backgroundColor: colors.lightGolden3, marginTop: 10 }} /> */}
-        {(item?.poll_info?.poll_result == "public" || (user?._id == item?.action_info?.action_id)) &&
+        {(item?.poll_info?.poll_result == 'public' ||
+          user?._id == item?.action_info?.action_id) && (
           <Pressable
             onPress={() => openPollDetail?.(item)}
-            style={{ borderWidth: 1, borderColor: colors.lightPrimary, borderRadius: 5, marginTop: 10, height: 35, alignItems: "center", justifyContent: "center" }} >
-            <MyText color={colors.primary} >View Details</MyText>
-          </Pressable>}
+            style={{
+              borderWidth: 1,
+              borderColor: colors.lightPrimary,
+              borderRadius: 5,
+              marginTop: 10,
+              height: 35,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+            <MyText color={colors.primary}>View Details</MyText>
+          </Pressable>
+        )}
       </View>
-    )
+    );
+  };
 
-  }
-
-  const surveyFeedView = (item) => {
+  const surveyFeedView = item => {
     return (
-      <View style={{ marginTop: 10 }} >
-        {item?.survey_info?.survey_status == "expired" ?
+      <View style={{marginTop: 10}}>
+        {item?.survey_info?.survey_status == 'expired' ? (
           <>
-            <View style={{ marginBottom: 10 }}>
+            <View style={{marginBottom: 10}}>
               <MyButton
                 onPress={() => onStartQuestionnairPress(item)}
                 fullWidth
@@ -440,7 +601,8 @@ export const FeedView = ({ item, index, user, token, feedSettings, isInView, tim
                 title="View Survey Questionnaire"
               />
             </View>
-          </> :
+          </>
+        ) : (
           <View style={{}}>
             <MyButton
               onPress={() => onStartQuestionnairPress(item)}
@@ -449,95 +611,121 @@ export const FeedView = ({ item, index, user, token, feedSettings, isInView, tim
               title="Survey Questionnaire"
             />
           </View>
-        }
+        )}
 
-        <View style={{ alignItems: "center", marginTop: 10 }}>
-          <MyText fontSize={12} color={colors.lightText2} >{item?.survey_info?.survey_status == "expired" ?
-            `Survey Expired on ${convertTimezone2(item?.survey_info?.expiry_date_time, timezone).format("MMMM DD, YYYY [at] hh:mm A")}` :
-            `Survey Expires on ${convertTimezone2(item?.survey_info?.expiry_date_time, timezone).format("MMMM DD, YYYY [at] hh:mm A")}`}</MyText>
+        <View style={{alignItems: 'center', marginTop: 10}}>
+          <MyText fontSize={12} color={colors.lightText2}>
+            {item?.survey_info?.survey_status == 'expired'
+              ? `Survey Expired on ${convertTimezone2(
+                  item?.survey_info?.expiry_date_time,
+                  timezone,
+                ).format('MMMM DD, YYYY [at] hh:mm A')}`
+              : `Survey Expires on ${convertTimezone2(
+                  item?.survey_info?.expiry_date_time,
+                  timezone,
+                ).format('MMMM DD, YYYY [at] hh:mm A')}`}
+          </MyText>
         </View>
 
-        {(item?.survey_info?.survey_result == "public" || (user?._id == item?.action_info?.action_id)) &&
+        {(item?.survey_info?.survey_result == 'public' ||
+          user?._id == item?.action_info?.action_id) && (
           <Pressable
             onPress={() => openSurveyDetail?.(item)}
-            style={{ borderWidth: 1, borderColor: colors.lightPrimary, borderRadius: 5, marginTop: 10, height: 35, alignItems: "center", justifyContent: "center" }} >
-            <MyText color={colors.primary} >View Details</MyText>
-          </Pressable>}
-
+            style={{
+              borderWidth: 1,
+              borderColor: colors.lightPrimary,
+              borderRadius: 5,
+              marginTop: 10,
+              height: 35,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+            <MyText color={colors.primary}>View Details</MyText>
+          </Pressable>
+        )}
       </View>
-    )
-
-  }
-
-
+    );
+  };
 
   if (item?.is_reward_feed) {
     return (
-      <DropShadow style={[__style.shadow, __style.rootShadowView,
-      { shadowColor: item?.is_reward_feed ? colors.primary : colors.darkSecondary, }]}>
-        <View style={[__style.rootView, item?.is_reward_feed ? __style.rewardBorderView : null]}>
+      <DropShadow
+        style={[
+          __style.shadow,
+          __style.rootShadowView,
+          {
+            shadowColor: item?.is_reward_feed
+              ? colors.primary
+              : colors.darkSecondary,
+          },
+        ]}>
+        <View
+          style={[
+            __style.rootView,
+            item?.is_reward_feed ? __style.rewardBorderView : null,
+          ]}>
           {animationView()}
-          <View >
+          <View>
             {profileView()}
             {descriptionView()}
-            {item?.is_publish &&
+            {item?.is_publish && (
               <>
                 {statsView()}
                 {actionView()}
-              </>}
+              </>
+            )}
           </View>
         </View>
       </DropShadow>
-    )
+    );
   } else {
     return (
       <View style={__style.rootShadowView}>
-        {item?.feed_appear_by == "win" &&
-          <View style={__style.winfeedIcon}>
-            {icons.winFeed(50)}
-          </View>}
-        <View style={[__style.rootView,]}>
+        {item?.feed_appear_by == 'win' && (
+          <View style={__style.winfeedIcon}>{icons.winFeed(50)}</View>
+        )}
+        <View style={[__style.rootView]}>
           {animationView()}
-          <View >
+          <View>
             {profileView()}
             {descriptionView()}
-            {item?.review_status == "pending" ?
-              inRevivewView() :
-              item?.is_publish &&
-              <>
-                {statsView()}
-                {actionView()}
-              </>}
+            {item?.review_status == 'pending'
+              ? inRevivewView()
+              : item?.is_publish && (
+                  <>
+                    {statsView()}
+                    {actionView()}
+                  </>
+                )}
           </View>
         </View>
       </View>
-    )
+    );
   }
 };
 
 function areEqual(prevProps, nextProps) {
   if (JSON.stringify(prevProps) == JSON.stringify(nextProps)) {
-    return true
+    return true;
   }
-  return false
+  return false;
 }
-
 
 export default React.memo(FeedView);
 
 const btnAligmnet = {
-  "center": "center",
-  "left": "flex-start",
-  "right": "flex-end"
-}
+  center: 'center',
+  left: 'flex-start',
+  right: 'flex-end',
+};
 
 const __style = StyleSheet.create({
   winfeedIcon: {
-    position: "absolute",
+    position: 'absolute',
     top: -15,
     left: -15,
     zIndex: 2,
-    transform: [{ rotateZ: "-45deg" }],
+    transform: [{rotateZ: '-45deg'}],
   },
   shadow: {
     shadowOffset: {
@@ -546,7 +734,6 @@ const __style = StyleSheet.create({
     },
     shadowOpacity: 1,
     shadowRadius: 7,
-
   },
   rewardBorderView: {
     borderWidth: 1,
@@ -565,10 +752,10 @@ const __style = StyleSheet.create({
   reportedView: {
     borderLeftWidth: 3,
     borderColor: colors.delete,
-    backgroundColor: colors.delete + "22",
+    backgroundColor: colors.delete + '22',
     borderRadius: 5,
     paddingVertical: 7,
-    marginTop: 10
+    marginTop: 10,
   },
   reportedText: {
     marginLeft: 10,
@@ -576,21 +763,18 @@ const __style = StyleSheet.create({
     color: colors.white,
     // fontStyle: "italic",
     // textDecorationLine: "underline"
-
-
   },
   animationView: {
-    width: "100%",
-    height: "100%",
+    width: '100%',
+    height: '100%',
     position: 'absolute',
     zIndex: -1,
-    overflow: "hidden",
+    overflow: 'hidden',
   },
 
   profileView: {
-    flexDirection: "row",
-    alignItems: "center",
-
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   eventRootView: {
     borderWidth: 1,
@@ -599,17 +783,17 @@ const __style = StyleSheet.create({
     backgroundColor: colors.black,
     paddingHorizontal: 5,
     marginHorizontal: 2,
-    borderRadius: 5
+    borderRadius: 5,
   },
   eventTitleView: {
     margin: 0,
-    padding: 5
+    padding: 5,
   },
   eventBtnView: {
     flexGrow: 1,
     minHeight: 35,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     borderRadius: 5,
     paddingVertical: 3,
     marginVertical: 3,
@@ -618,38 +802,40 @@ const __style = StyleSheet.create({
     // minWidth: 50
   },
   liveSteamStatus: {
-    borderRadius: 999, height: 10, width: 10,
-    marginRight: 5
+    borderRadius: 999,
+    height: 10,
+    width: 10,
+    marginRight: 5,
   },
   streamingStatusView: {
     borderRadius: 15,
     borderWidth: 1,
     borderColor: colors.primary2,
     paddingHorizontal: 10,
-    position: "absolute",
+    position: 'absolute',
     top: 5,
     left: 5,
     paddingVertical: 3,
     backgroundColor: colors.secondary,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   profileNameView: {
     marginLeft: 10,
-    flex: 1
+    flex: 1,
   },
   profileTypeIconView: {
     height: 25,
     width: 25,
     alignItems: 'center',
-    justifyContent: "center"
+    justifyContent: 'center',
   },
   feedTypeIcon: {
     height: 22,
-    width: 22
+    width: 22,
   },
   descriptionRootView: {
-    marginTop: 10
+    marginTop: 10,
   },
   actionView: {
     borderTopColor: colors.lightText2,
@@ -658,27 +844,34 @@ const __style = StyleSheet.create({
     borderTopWidth: 1 / 3,
     height: 40,
     marginTop: 5,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between"
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   actionBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    height: "100%",
-    paddingHorizontal: 30
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: '100%',
+    paddingHorizontal: 30,
   },
   statView: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     marginTop: 10,
-    paddingHorizontal: 10
+    paddingHorizontal: 10,
   },
-  likeView: { flexDirection: "row", alignItems: "center", paddingVertical: 2, },
-  likeImagesView: { flexDirection: "row", alignItems: "center", marginLeft: 5 },
-  likeImageView: { width: 18, height: 18, borderRadius: 18 / 2, overflow: "hidden", borderWidth: 2, borderColor: colors.white },
-  likeImage: { width: 16, height: 16 },
+  likeView: {flexDirection: 'row', alignItems: 'center', paddingVertical: 2},
+  likeImagesView: {flexDirection: 'row', alignItems: 'center', marginLeft: 5},
+  likeImageView: {
+    width: 18,
+    height: 18,
+    borderRadius: 18 / 2,
+    overflow: 'hidden',
+    borderWidth: 2,
+    borderColor: colors.white,
+  },
+  likeImage: {width: 16, height: 16},
   review: {
     marginTop: 10,
     // backgroundColor:colors.lightPrimary2
@@ -686,6 +879,6 @@ const __style = StyleSheet.create({
     borderLeftColor: colors.primary,
     borderRadius: 5,
     padding: 5,
-    backgroundColor: colors.primary + "0F"
-  }
-})
+    backgroundColor: colors.primary + '0F',
+  },
+});

@@ -1,43 +1,80 @@
-import { View, Text, StyleSheet, SafeAreaView, Pressable, FlatList, TouchableOpacity, TextInput, Platform } from 'react-native'
-import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react'
+import {
+  View,
+  Text,
+  StyleSheet,
+  SafeAreaView,
+  Pressable,
+  FlatList,
+  TouchableOpacity,
+  TextInput,
+  Platform,
+} from 'react-native';
+import React, {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
 import Modal from 'react-native-modal';
 import MyText from './MyText';
-import { colors } from '../utilities/colors';
-import { icons } from '../utilities/icons';
-import { ADD_PERSONAL_NOTE_FOR_PORTAL_CHAT, GET_LIVE_CHAT_LIST, GET_PORTAL_EXISTING_CHAT_BY_VIDEO_ID, UPLOAD_FILE_FOR_CHAT } from '../DAL';
-import MyLoader, { SimpleLoader } from './MyLoader';
-import { load } from 'react-native-track-player/lib/trackPlayer';
+import {colors} from '../utilities/colors';
+import {icons} from '../utilities/icons';
+import {
+  ADD_PERSONAL_NOTE_FOR_PORTAL_CHAT,
+  GET_LIVE_CHAT_LIST,
+  GET_PORTAL_EXISTING_CHAT_BY_VIDEO_ID,
+  UPLOAD_FILE_FOR_CHAT,
+} from '../DAL';
+import MyLoader, {SimpleLoader} from './MyLoader';
+import {load} from 'react-native-track-player/lib/trackPlayer';
 import CollapsibleText from './CollapsibleText';
 import UserImage from './UserImage';
-import { convertTimezone } from '../functions/convertTime';
-import { S3_URL, dateTimeFormat } from '../utilities/constants';
-import { MenuButton } from './MyButton';
+import {convertTimezone} from '../functions/convertTime';
+import {dateTimeFormat} from '../utilities/constants';
+import {MenuButton} from './MyButton';
 import MyImage from './MyImage';
 import ImageZoomer from './ImageZoomer';
 import OptionModal from './OptionModal';
-import { fonts } from '../utilities/fonts';
+import {fonts} from '../utilities/fonts';
 import ImageUploadModal from './ImageUploadModal';
 import ResponsiveImage2 from './ResponsiveImage2';
 import openUrl from '../functions/openUrl';
-import { useSelector } from 'react-redux';
-import { selectSocket } from '../redux/reducers/socketSlice';
+import {useSelector} from 'react-redux';
+import {selectSocket} from '../redux/reducers/socketSlice';
 import LikeModal from './LikeModal';
 import showToast from '../functions/showToast';
-import { onChatScreen } from '../functions/onChatScreen';
+import {onChatScreen} from '../functions/onChatScreen';
 import ConfirmationModal from './ConfirmationModal';
 import Toast from 'react-native-toast-message';
 import EmptyView from './EmptyView';
 import FooterLoader from './FooterLoader';
-import moment from "moment"
+import moment from 'moment';
 import isArray from '../functions/isArray';
-
+import {selectUser} from '../redux/reducers/userSlice';
 
 let page = 0;
 let canLoadMore = false;
 
-const LiveChat = ({ isVisible, closeModal, type, token, navigation, videoId, timezone, purchaseLink, linkImage, eventId, user, flex = 0.6, access }) => {
-  const paging = useRef({ page: 0, canLoadMore: false })?.current;
-  const { socket } = useSelector(selectSocket);
+const LiveChat = ({
+  isVisible,
+  closeModal,
+  type,
+  token,
+  navigation,
+  videoId,
+  timezone,
+  purchaseLink,
+  linkImage,
+  eventId,
+  user,
+  flex = 0.6,
+  access,
+}) => {
+  const paging = useRef({page: 0, canLoadMore: false})?.current;
+  const {socket} = useSelector(selectSocket);
+  const {S3_URL} = useSelector(selectUser);
   const likeModalRef = useRef();
   const chatListRef = useRef();
   const inputRef = useRef();
@@ -45,63 +82,64 @@ const LiveChat = ({ isVisible, closeModal, type, token, navigation, videoId, tim
   const [list, setList] = useState([]);
   const [pinList, setPinList] = useState([]);
   const [loader, setLoader] = useState(false);
-  const [imageZoomer, setImageZoomer] = useState("");
+  const [imageZoomer, setImageZoomer] = useState('');
   const [optionModal, setOptionModal] = useState({
     isVisible: false,
     item: null,
-  })
-  const [text, setText] = useState("");
-  const [image, setImage] = useState("")
-  const [inputModalVisibility, setInputModalVisibility] = useState(false)
-  const [imageModalVisibility, setImageModalVisibility] = useState(false)
-  const [sendMsgLoader, setsendMsgLoader] = useState(false)
+  });
+  const [text, setText] = useState('');
+  const [image, setImage] = useState('');
+  const [inputModalVisibility, setInputModalVisibility] = useState(false);
+  const [imageModalVisibility, setImageModalVisibility] = useState(false);
+  const [sendMsgLoader, setsendMsgLoader] = useState(false);
   const [confirmationsModal, setConfirmationsModal] = useState({
     isVisible: false,
     item: null,
-    title: "",
-    type: ""
-  })
-  const [selectedMsg, setSelectedMsg] = useState(null)
-  const [selectedCommentFor, setSelectedCommentFor] = useState("");
+    title: '',
+    type: '',
+  });
+  const [selectedMsg, setSelectedMsg] = useState(null);
+  const [selectedCommentFor, setSelectedCommentFor] = useState('');
   const [showScroller, setShowScroller] = useState(false);
   const [footerLoader, setFooterLoader] = useState(false);
   useEffect(() => {
     return () => {
-      onModalHide()
-    }
-  }, [])
+      onModalHide();
+    };
+  }, []);
   const socketEvents = () => {
+    socket.emit('general_live_chat', eventId);
 
-    socket.emit("general_live_chat", eventId);
-
-    socket.on("send_live_chat_message_receiver", async (data) => {
-
-      setList((list) => {
+    socket.on('send_live_chat_message_receiver', async data => {
+      setList(list => {
         if (!!data?.parent_message) {
           let index = list.findIndex(x => x._id == data?.parent_message);
 
           if (index > -1) {
             if (!!list[index]?.replies) {
-              list[index].replies = [...list[index]?.replies, data?.comment_id]
+              list[index].replies = [...list[index]?.replies, data?.comment_id];
             } else {
-              list[index].replies = [data?.comment_id]
+              list[index].replies = [data?.comment_id];
             }
           }
         } else {
-          list.unshift(data?.comment_id)
+          list.unshift(data?.comment_id);
         }
-        return [...list]
-      })
+        return [...list];
+      });
     });
 
-    socket.on("update_live_chat_message_receiver", (data) => {
-
-      setList((list) => {
+    socket.on('update_live_chat_message_receiver', data => {
+      setList(list => {
         if (!!data?.comment_id?.parent_message) {
-          let parentIndex = list.findIndex(x => x._id == data?.comment_id?.parent_message);
+          let parentIndex = list.findIndex(
+            x => x._id == data?.comment_id?.parent_message,
+          );
           if (parentIndex != -1) {
             let replies = list[parentIndex].replies;
-            let childIndex = replies.findIndex(x => x._id == data?.comment_id?._id)
+            let childIndex = replies.findIndex(
+              x => x._id == data?.comment_id?._id,
+            );
             if (childIndex != -1) {
               list[parentIndex].replies.splice(childIndex, 1, {
                 ...list[parentIndex].replies[childIndex],
@@ -110,31 +148,28 @@ const LiveChat = ({ isVisible, closeModal, type, token, navigation, videoId, tim
               });
             }
           }
-
-        }
-        else {
-
+        } else {
           let index = list.findIndex(x => x?._id == data?.comment_id?._id);
           if (index > -1) {
             list.splice(index, 1, data?.comment_id);
           }
         }
-        return [...list]
-      })
+        return [...list];
+      });
 
-      setPinList((list) => {
-        if (!(!!data?.comment_id?.parent_message)) {
+      setPinList(list => {
+        if (!!!data?.comment_id?.parent_message) {
           let index = list.findIndex(x => x._id == data?.comment_id?._id);
           if (index > -1) {
             list.splice(index, 1, data?.comment_id);
           }
         }
-        return [...list]
-      })
+        return [...list];
+      });
     });
 
-    socket.on("delete_live_chat_message_receiver", (data) => {
-      setList((list) => {
+    socket.on('delete_live_chat_message_receiver', data => {
+      setList(list => {
         list.forEach((x, i) => {
           if (x._id == data.comment_id) {
             list.splice(i, 1);
@@ -143,55 +178,55 @@ const LiveChat = ({ isVisible, closeModal, type, token, navigation, videoId, tim
               if (y._id == data.comment_id) {
                 x.replies.splice(j, 1);
               }
-            })
+            });
           }
-        })
+        });
 
+        return [...list];
+      });
 
-        return [...list]
-      })
-
-      setPinList((list) => {
+      setPinList(list => {
         list.forEach((x, i) => {
           if (x._id == data.comment_id) {
             list.splice(i, 1);
           }
-        })
-        return [...list]
-      })
-
+        });
+        return [...list];
+      });
     });
 
-    socket.on("live_chat_featured_unfeatured_receiver", (data) => {
-
-      getLiveChatFromServer(true)
+    socket.on('live_chat_featured_unfeatured_receiver', data => {
+      getLiveChatFromServer(true);
     });
 
-    socket.on("action_live_chat_message_receiver", (data) => {
-      console.log("like receiver", data)
+    socket.on('action_live_chat_message_receiver', data => {
+      console.log('like receiver', data);
       setList(list => {
         if (!!data?.parent_message == false) {
           let index = list.findIndex(x => x._id == data.comment_id);
           if (index > -1) {
             if (user._id == data.member._id) {
-              list[index].is_liked = data.action == "like" ? true : false;
+              list[index].is_liked = data.action == 'like' ? true : false;
             }
-            if (data.action == "like") {
+            if (data.action == 'like') {
               list[index].like_count++;
             } else {
               list[index].like_count--;
             }
           }
         } else {
-          console.log(list, "list")
+          console.log(list, 'list');
           let parentIndex = list.findIndex(x => x._id == data.parent_message);
           if (parentIndex > -1) {
-            let childIndex = list[parentIndex].replies.findIndex(x => x._id == data.comment_id);
+            let childIndex = list[parentIndex].replies.findIndex(
+              x => x._id == data.comment_id,
+            );
             if (childIndex > -1) {
               if (user._id == data.member._id) {
-                list[parentIndex].replies[childIndex].is_liked = data.action == "like" ? true : false;
+                list[parentIndex].replies[childIndex].is_liked =
+                  data.action == 'like' ? true : false;
               }
-              if (data.action == "like") {
+              if (data.action == 'like') {
                 list[parentIndex].replies[childIndex].like_count++;
               } else {
                 list[parentIndex].replies[childIndex].like_count--;
@@ -200,206 +235,215 @@ const LiveChat = ({ isVisible, closeModal, type, token, navigation, videoId, tim
           }
         }
 
-        return [...list]
-      })
-      setPinList((list) => {
+        return [...list];
+      });
+      setPinList(list => {
         if (!!data?.parent_message == false) {
           let index = list.findIndex(x => x._id == data.comment_id);
           if (index > -1) {
             if (user._id == data.member._id) {
-              list[index].is_liked = data.action == "like" ? true : false;
+              list[index].is_liked = data.action == 'like' ? true : false;
             }
-            if (data.action == "like") {
+            if (data.action == 'like') {
               list[index].like_count++;
             } else {
               list[index].like_count--;
             }
           }
         }
-        return [...list]
-      })
-
+        return [...list];
+      });
     });
-
-
-  }
+  };
 
   const offSocketEvents = () => {
     if (!!socket) {
-      socket.off("send_live_chat_message_receiver");
-      socket.off("update_live_chat_message_receiver");
-      socket.off("delete_live_chat_message_receiver");
-      socket.off("live_chat_featured_unfeatured_receiver");
-      socket.off("action_live_chat_message_receiver");
+      socket.off('send_live_chat_message_receiver');
+      socket.off('update_live_chat_message_receiver');
+      socket.off('delete_live_chat_message_receiver');
+      socket.off('live_chat_featured_unfeatured_receiver');
+      socket.off('action_live_chat_message_receiver');
     }
-  }
+  };
 
-  const onSelectedOption = (opt) => {
-    let { item } = optionModal;
+  const onSelectedOption = opt => {
+    let {item} = optionModal;
 
-    setOptionModal({ isVisible: false, item: null });
+    setOptionModal({isVisible: false, item: null});
 
-    if (opt.type == "delete") {
+    if (opt.type == 'delete') {
       setTimeout(() => {
         setConfirmationsModal({
           isVisible: true,
-          title: "Are you sure you want to delete this message?",
+          title: 'Are you sure you want to delete this message?',
           item: item,
-          type: "delete"
-        })
+          type: 'delete',
+        });
       }, 1000);
-    }
-    else if (opt.type == "edit") {
+    } else if (opt.type == 'edit') {
       setSelectedMsg(item);
-      setSelectedCommentFor("edit")
+      setSelectedCommentFor('edit');
       setText(item?.message);
       setImage(item?.file_url);
       setTimeout(() => {
-        openInputModal()
+        openInputModal();
       }, 1000);
-    } else if (opt.type == "pin" || opt.type == "unpin") {
-      pinUnpinComment(item)
-    } else if (opt.type == "note") {
+    } else if (opt.type == 'pin' || opt.type == 'unpin') {
+      pinUnpinComment(item);
+    } else if (opt.type == 'note') {
       setTimeout(() => {
-        setConfirmationsModal({ isVisible: true, item: item, type: "note", title: "Are you sure you want to add the comment as personal note?" })
+        setConfirmationsModal({
+          isVisible: true,
+          item: item,
+          type: 'note',
+          title: 'Are you sure you want to add the comment as personal note?',
+        });
       }, 1000);
+    } else if (opt?.type == 'message') {
+      onChatScreen(
+        optionModal?.item?.member?._id,
+        token,
+        navigation,
+        user?._id,
+      );
     }
-    else if (opt?.type == "message") {
-      onChatScreen(optionModal?.item?.member?._id, token, navigation, user?._id)
-    }
-  }
+  };
 
   const onConfirmAgree = () => {
-    let { item, type } = confirmationsModal;
-
+    let {item, type} = confirmationsModal;
 
     setConfirmationsModal({
       isVisible: false,
-      title: "",
+      title: '',
       item: null,
-      type: ""
-    })
+      type: '',
+    });
 
     setTimeout(() => {
-      if (type == "delete") {
+      if (type == 'delete') {
         deleteComment(item?._id);
-      } else if (type == "note") {
-        addNotesToServer(item?._id)
+      } else if (type == 'note') {
+        addNotesToServer(item?._id);
       }
     }, 300);
-  }
+  };
 
-
-  const addNotesToServer = async (messageId) => {
+  const addNotesToServer = async messageId => {
     setLoader(true);
-    let res = await ADD_PERSONAL_NOTE_FOR_PORTAL_CHAT({ navigation, token, messageId });
+    let res = await ADD_PERSONAL_NOTE_FOR_PORTAL_CHAT({
+      navigation,
+      token,
+      messageId,
+    });
     if (res.code == 200) {
-      showToast({ type: "success", title: res?.message })
-      setLoader(false)
-
+      showToast({type: 'success', title: res?.message});
+      setLoader(false);
     } else {
-      setLoader(false)
+      setLoader(false);
     }
-  }
-
+  };
 
   const getLiveChatFromServer = async (onlyPinMessages = false) => {
-    let res = await GET_LIVE_CHAT_LIST({ token, navigation, module_id: eventId, user_id: user?._id, page: paging?.page });
+    let res = await GET_LIVE_CHAT_LIST({
+      token,
+      navigation,
+      module_id: eventId,
+      user_id: user?._id,
+      page: paging?.page,
+    });
     if (res.code == 200) {
       if (!onlyPinMessages) {
-        setList(paging?.page == 0 ? res?.chat_list.slice().reverse() : [...list, ...res?.chat_list.slice().reverse()]);
-        let length = paging?.page == 0 ? res?.chat_list.length : list.length + res?.chat_list.length;
+        setList(
+          paging?.page == 0
+            ? res?.chat_list.slice().reverse()
+            : [...list, ...res?.chat_list.slice().reverse()],
+        );
+        let length =
+          paging?.page == 0
+            ? res?.chat_list.length
+            : list.length + res?.chat_list.length;
         if (length < res?.total_count) {
           paging.page++;
           paging.canLoadMore = true;
         } else {
           paging.canLoadMore = false;
         }
-
       }
       setPinList(res?.featured_chat);
     } else {
-      showToast({ body: res?.message, title: "Error", type: "error" })
+      showToast({body: res?.message, title: 'Error', type: 'error'});
     }
-    setFooterLoader(false)
+    setFooterLoader(false);
     setLoader(false);
-  }
+  };
 
   const callAPi = () => {
     paging.canLoadMore = false;
     paging.page = 0;
-    setList([])
+    setList([]);
     setLoader(true);
-    getLiveChatFromServer()
-  }
+    getLiveChatFromServer();
+  };
 
   const loadMore = () => {
     if (paging.canLoadMore) {
       paging.canLoadMore = false;
       setFooterLoader(true);
-      getLiveChatFromServer()
+      getLiveChatFromServer();
     }
-  }
-
-
+  };
 
   const enableEocketEvents = () => {
-    socketEvents()
+    socketEvents();
 
-    socket.on("disconnect", () => {
-      offSocketEvents()
-    })
+    socket.on('disconnect', () => {
+      offSocketEvents();
+    });
 
-    socket.on("connect", () => {
-      socketEvents()
-    })
-  }
+    socket.on('connect', () => {
+      socketEvents();
+    });
+  };
 
   const onModalShow = () => {
     setLoader(true);
     if (isLive) {
-      callAPi()
-      enableEocketEvents()
+      callAPi();
+      enableEocketEvents();
     } else {
       // getOldChatFromServer()
     }
-  }
+  };
 
   const onModalHide = () => {
-
     setList([]);
     setPinList([]);
     setLoader(false);
-    setText("");
+    setText('');
     setSelectedMsg(null);
-    setImage("")
-    offSocketEvents()
+    setImage('');
+    offSocketEvents();
     setFooterLoader(false);
-    setShowScroller(false)
-  }
+    setShowScroller(false);
+  };
 
   const uploadImage = async () => {
-    let fd = new FormData()
-    fd.append("image", image);
-    let res = await UPLOAD_FILE_FOR_CHAT({ token, navigation, file: fd });
+    let fd = new FormData();
+    fd.append('image', image);
+    let res = await UPLOAD_FILE_FOR_CHAT({token, navigation, file: fd});
     if (res.code === 200) {
-      return res.image_path
+      return res.image_path;
     }
-  }
+  };
 
-
-  const deleteComment = (id) => {
-
-    socket.emit("delete_live_chat_message", {
+  const deleteComment = id => {
+    socket.emit('delete_live_chat_message', {
       comment_id: id,
       module_id: eventId,
     });
-
-  }
-
+  };
 
   const likeChatComment = (item, isChild) => {
-
     let socketObj = {
       module_id: eventId,
       // video_id: videoId,
@@ -408,48 +452,49 @@ const LiveChat = ({ isVisible, closeModal, type, token, navigation, videoId, tim
         _id: user?._id,
         first_name: user?.first_name,
         last_name: user?.last_name,
-        profile_image: !!user?.image?.thumbnail_1 ? user?.image?.thumbnail_1 : "",
+        profile_image: !!user?.image?.thumbnail_1
+          ? user?.image?.thumbnail_1
+          : '',
       },
       // action_by: "consultant_user",
-      action_type: "like"
-    }
+      action_type: 'like',
+    };
     if (isChild) {
       socketObj['parent_message'] = item.parent_message;
     }
-    console.log(socketObj, "for Like")
+    console.log(socketObj, 'for Like');
 
-    socket.emit("action_live_chat_message", socketObj)
-  }
+    socket.emit('action_live_chat_message', socketObj);
+  };
 
-  const pinUnpinComment = (comment) => {
+  const pinUnpinComment = comment => {
     const event_id = eventId;
 
-    socket.emit("live_chat_featured_unfeatured", {
+    socket.emit('live_chat_featured_unfeatured', {
       comment_id: comment?._id,
       event_id,
       is_featured: !comment.is_featured,
-      action_by: "consultant"
+      action_by: 'consultant',
     });
-  }
+  };
 
   const sendMsg = async () => {
     if (text.trim() === '') {
-      showToast({ body: "Please write something to comment.", title: "Alert" })
+      showToast({body: 'Please write something to comment.', title: 'Alert'});
       return;
     }
     setsendMsgLoader(true);
 
-    let file_url = "";
+    let file_url = '';
     if (!!image.uri) {
-      file_url = await uploadImage()
+      file_url = await uploadImage();
       if (!!file_url == false) {
         setsendMsgLoader(false);
-        return
+        return;
       }
     } else if (!!image) {
-      file_url = image
+      file_url = image;
     }
-
 
     let socketObj = {
       module_id: eventId,
@@ -460,39 +505,38 @@ const LiveChat = ({ isVisible, closeModal, type, token, navigation, videoId, tim
         _id: user?._id,
         first_name: user?.first_name,
         last_name: user?.last_name,
-        profile_image: !!user?.image?.thumbnail_1 ? user?.image?.thumbnail_1 : "",
+        profile_image: !!user?.image?.thumbnail_1
+          ? user?.image?.thumbnail_1
+          : '',
       },
-      action_by: "consultant_user",
-      chat_created_for: type
-    }
-    let socketEventString = "send_live_chat_message";
-    if (!!selectedMsg && selectedCommentFor == "edit") {
-      socketEventString = "update_live_chat_message";
-      socketObj["comment_id"] = selectedMsg?._id;
-    } else if (!!selectedMsg && selectedCommentFor == "reply") {
+      action_by: 'consultant_user',
+      chat_created_for: type,
+    };
+    let socketEventString = 'send_live_chat_message';
+    if (!!selectedMsg && selectedCommentFor == 'edit') {
+      socketEventString = 'update_live_chat_message';
+      socketObj['comment_id'] = selectedMsg?._id;
+    } else if (!!selectedMsg && selectedCommentFor == 'reply') {
       socketObj.member.parent_message = selectedMsg?._id;
       socketObj.parent_message = selectedMsg?._id;
     }
-    console.log(socketObj, "socketObj")
+    console.log(socketObj, 'socketObj');
     socket.emit(socketEventString, socketObj);
 
-
     setsendMsgLoader(false);
-    setText("");
-    setImage("");
+    setText('');
+    setImage('');
     setInputModalVisibility(false);
-    setSelectedCommentFor("");
-    setSelectedMsg(null)
-
-  }
-
+    setSelectedCommentFor('');
+    setSelectedMsg(null);
+  };
 
   const openInputModal = () => {
-    setInputModalVisibility(true)
+    setInputModalVisibility(true);
     setTimeout(() => {
-      inputRef?.current?.focus()
+      inputRef?.current?.focus();
     }, 300);
-  }
+  };
 
   // const filterOptions = (list) => {
   //   let nlist = []
@@ -512,7 +556,6 @@ const LiveChat = ({ isVisible, closeModal, type, token, navigation, videoId, tim
   //     nlist = nlist.slice().filter(x => x.type != "note")
   //   }
 
-
   //   return nlist
 
   // }
@@ -520,67 +563,71 @@ const LiveChat = ({ isVisible, closeModal, type, token, navigation, videoId, tim
   const filterOptions = (item = null) => {
     const comment = item || optionModal?.item;
     const isMe = comment?.member?._id === user?._id;
-    const { allow_edit_delete_in_live_chat, allow_pin_unpin_in_live_chat, is_chat_allowed } = access || {};
+    const {
+      allow_edit_delete_in_live_chat,
+      allow_pin_unpin_in_live_chat,
+      is_chat_allowed,
+    } = access || {};
 
     const filteredList = [];
 
     for (const item of OptionList) {
-      const { type } = item;
-      if (type === "pin" || type === "unpin") {
+      const {type} = item;
+      if (type === 'pin' || type === 'unpin') {
         if (!allow_pin_unpin_in_live_chat) {
-          continue
+          continue;
         } else if (!!comment?.parent_message) {
-          continue
-        };
+          continue;
+        }
       }
 
+      if (comment?.is_featured && type === 'pin') {
+        continue;
+      }
 
-      if (comment?.is_featured && type === "pin") {
-        continue
-      };
+      if (!comment?.is_featured && type === 'unpin') {
+        continue;
+      }
 
-      if (!comment?.is_featured && type === "unpin") {
-        continue
-      };
+      if (
+        !allow_edit_delete_in_live_chat &&
+        !isMe &&
+        (type === 'edit' || type === 'delete')
+      ) {
+        continue;
+      }
 
-      if (!allow_edit_delete_in_live_chat && !isMe && (type === "edit" || type === "delete")) {
-        continue
-      };
-
-      if (type === "message") {
+      if (type === 'message') {
         if (isMe) {
-          continue
+          continue;
         } else if (!is_chat_allowed) {
-          continue
-        } else if (comment?.action_by == "consultant_user") {
-          continue
+          continue;
+        } else if (comment?.action_by == 'consultant_user') {
+          continue;
         }
-      };
+      }
 
-      if (type === "note") {
-        if (comment?.action_by == "consultant_user") {
-          continue
+      if (type === 'note') {
+        if (comment?.action_by == 'consultant_user') {
+          continue;
         }
-      };
+      }
 
       filteredList.push(item);
     }
     if (!optionModal?.item && !item) {
-      return []
+      return [];
     }
     return filteredList;
   };
 
-
-
-
-  const onViewableItemsChanged = useCallback(({ viewableItems }) => {
+  const onViewableItemsChanged = useCallback(({viewableItems}) => {
     if (viewableItems.find(x => x.index == 0)) {
-      setShowScroller(false)
+      setShowScroller(false);
     } else {
-      setShowScroller(true)
+      setShowScroller(true);
     }
-  }, [])
+  }, []);
 
   const InputModal = () => {
     return (
@@ -594,80 +641,84 @@ const LiveChat = ({ isVisible, closeModal, type, token, navigation, videoId, tim
         animationInTiming={200}
         animationOutTiming={200}
         avoidKeyboard
-        style={{ margin: 0 }}>
-
-        <SafeAreaView style={{ marginTop: "auto", backgroundColor: colors.darkSecondary }}>
+        style={{margin: 0}}>
+        <SafeAreaView
+          style={{marginTop: 'auto', backgroundColor: colors.darkSecondary}}>
           {inputView(true)}
-
         </SafeAreaView>
         {inputModalVisibility && <Toast />}
-      </Modal>)
-  }
+      </Modal>
+    );
+  };
 
-  const inputView = (forModal) => {
+  const inputView = forModal => {
     return (
       <View style={__style.sendMsgView}>
-        <View style={{ flexDirection: "row", alignItems: "flex-end", }}>
-          {!!image &&
-            <View style={{ width: 80, }}>
+        <View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
+          {!!image && (
+            <View style={{width: 80}}>
               <View style={__style.selectedImageView}>
                 <MyImage
-                  source={{ uri: !!image?.uri ? image?.uri : S3_URL + image }}
-                  style={{ width: "100%", height: "100%" }}
+                  source={{uri: !!image?.uri ? image?.uri : S3_URL + image}}
+                  style={{width: '100%', height: '100%'}}
                 />
               </View>
               <TouchableOpacity
-                hitSlop={{ top: 10, left: 10, right: 10, bottom: 10 }}
-                onPress={() => setImage("")}
+                hitSlop={{top: 10, left: 10, right: 10, bottom: 10}}
+                onPress={() => setImage('')}
                 style={__style.removeImage}>
                 {icons.crosss(colors.white, 18)}
               </TouchableOpacity>
             </View>
-          }
+          )}
 
-
-          {!!selectedMsg &&
-            <View
-              style={__style.commentUpperViewOptions}>
-              <MyText
-                type='bold'
-                color={colors.lightText2}
-              >{selectedCommentFor == "edit" ?
-                <Text>{"Editing"}</Text> :
-                selectedCommentFor == "reply" ?
-                  <Text style={{ fontFamily: fonts.regular }} >{"Replying to "}
-                    <Text style={{ fontFamily: fonts.bold, }} >{selectedMsg?.member?.first_name}</Text>
-                  </Text> : null}
-                <Text>{"  •  "}</Text>
+          {!!selectedMsg && (
+            <View style={__style.commentUpperViewOptions}>
+              <MyText type="bold" color={colors.lightText2}>
+                {selectedCommentFor == 'edit' ? (
+                  <Text>{'Editing'}</Text>
+                ) : selectedCommentFor == 'reply' ? (
+                  <Text style={{fontFamily: fonts.regular}}>
+                    {'Replying to '}
+                    <Text style={{fontFamily: fonts.bold}}>
+                      {selectedMsg?.member?.first_name}
+                    </Text>
+                  </Text>
+                ) : null}
+                <Text>{'  •  '}</Text>
                 <MyText
                   color={colors.white}
                   fontSize={15}
                   onPress={() => {
                     setSelectedMsg(null);
-                    setText("");
-                    setImage("")
-                    setSelectedCommentFor("");
-                    inputRef?.current?.blur()
-                    setInputModalVisibility(false)
+                    setText('');
+                    setImage('');
+                    setSelectedCommentFor('');
+                    inputRef?.current?.blur();
+                    setInputModalVisibility(false);
                   }}
-                  type='bold'>{"Cancel"}</MyText></MyText>
-
-            </View>}
+                  type="bold">
+                  {'Cancel'}
+                </MyText>
+              </MyText>
+            </View>
+          )}
         </View>
         <View style={__style.sendMsgViewTextWithButton}>
-
-
-
           <View style={__style.inputView}>
             <TouchableOpacity
               onPress={() => setImageModalVisibility(true)}
               style={__style.attachmentBtnView}>
               {icons.attachment(colors.primary, 17)}
             </TouchableOpacity>
-            {forModal ?
+            {forModal ? (
               <TextInput
                 style={__style.sendMsgTextView}
-                placeholder={selectedCommentFor == "reply" ? 'Write a reply...*' : 'Write a comment...*'}
+                placeholder={
+                  selectedCommentFor == 'reply'
+                    ? 'Write a reply...*'
+                    : 'Write a comment...*'
+                }
                 placeholderTextColor={colors.lightGrey}
                 multiline={true}
                 selectionColor={colors.selection}
@@ -675,18 +726,21 @@ const LiveChat = ({ isVisible, closeModal, type, token, navigation, videoId, tim
                 autoCapitalize="none"
                 autoCorrect={false}
                 value={text}
-                onChangeText={(val) => setText(val)}
-                keyboardAppearance={"dark"}
+                onChangeText={val => setText(val)}
+                keyboardAppearance={'dark'}
                 textAlignVertical="center"
                 ref={inputRef}
-              /> :
-              <TouchableOpacity
-                style={{ flex: 1 }}
-                onPress={openInputModal}>
+              />
+            ) : (
+              <TouchableOpacity style={{flex: 1}} onPress={openInputModal}>
                 <TextInput
                   pointerEvents="none"
                   style={__style.sendMsgTextView}
-                  placeholder={selectedCommentFor == "reply" ? 'Write a reply...*' : 'Write a comment...*'}
+                  placeholder={
+                    selectedCommentFor == 'reply'
+                      ? 'Write a reply...*'
+                      : 'Write a comment...*'
+                  }
                   placeholderTextColor={colors.lightGrey}
                   multiline={true}
                   selectionColor={colors.selection}
@@ -695,39 +749,36 @@ const LiveChat = ({ isVisible, closeModal, type, token, navigation, videoId, tim
                   autoCorrect={false}
                   editable={false}
                   value={text}
-                  keyboardAppearance={"dark"}
+                  keyboardAppearance={'dark'}
                   textAlignVertical="center"
                 />
               </TouchableOpacity>
-            }
-
+            )}
           </View>
 
-          <TouchableOpacity
-            onPress={sendMsg}
-            style={__style.sendMsgBtnView}>
-            {sendMsgLoader ?
-              <SimpleLoader />
-              : icons.send(colors.primary, 20)}
+          <TouchableOpacity onPress={sendMsg} style={__style.sendMsgBtnView}>
+            {sendMsgLoader ? <SimpleLoader /> : icons.send(colors.primary, 20)}
           </TouchableOpacity>
 
           <ImageUploadModal
             closeModal={() => setImageModalVisibility(false)}
-            onImagePicked={(image) => setImage(image)}
+            onImagePicked={image => setImage(image)}
             isVisible={imageModalVisibility}
-
           />
         </View>
       </View>
-    )
-  }
+    );
+  };
 
   const commentView = (item, index, isChild, pinned = false) => {
     let haveOptions = isArray(filterOptions(item));
     return (
-      <View
-        key={item?._id}>
-        <View style={[__style.commentView, { marginLeft: isChild ? "10%" : undefined }]}>
+      <View key={item?._id}>
+        <View
+          style={[
+            __style.commentView,
+            {marginLeft: isChild ? '10%' : undefined},
+          ]}>
           <View style={__style.profileView}>
             <UserImage
               borderWidth={2}
@@ -738,78 +789,97 @@ const LiveChat = ({ isVisible, closeModal, type, token, navigation, videoId, tim
             />
 
             <View style={__style.profileNameView}>
-              <View style={{ flexDirection: "row" }}>
-                <MyText type='medium'>{item?.member?.first_name + " " + item?.member?.last_name + "  "}</MyText>
-                {pinned ? icons.pin(colors.white) : ""}
+              <View style={{flexDirection: 'row'}}>
+                <MyText type="medium">
+                  {item?.member?.first_name +
+                    ' ' +
+                    item?.member?.last_name +
+                    '  '}
+                </MyText>
+                {pinned ? icons.pin(colors.white) : ''}
               </View>
-              <MyText fontSize={10} color={colors.lightGrey} type='medium' >{moment(item?.createdAt).format(dateTimeFormat.dateTime)}</MyText>
+              <MyText fontSize={10} color={colors.lightGrey} type="medium">
+                {moment(item?.createdAt).format(dateTimeFormat.dateTime)}
+              </MyText>
             </View>
-            {isLive ?
+            {isLive ? (
               <>
-                {haveOptions &&
+                {haveOptions && (
                   <MenuButton
                     size={20}
-                    onPress={() => setOptionModal({ isVisible: true, item: item })}
-                  />}
+                    onPress={() =>
+                      setOptionModal({isVisible: true, item: item})
+                    }
+                  />
+                )}
               </>
-              :
-              item?.like_count > 0 ?
-                <TouchableOpacity
-                  onPress={() => likeModalRef?.current?.openLikeModal?.(item?._id, "event")}
-                  style={[__style.actionsBtn]}>
-                  {icons.heartFilled(colors.heart, 18)}
-                  <MyText> {item?.like_count}</MyText>
-                </TouchableOpacity> :
-                null
-            }
+            ) : item?.like_count > 0 ? (
+              <TouchableOpacity
+                onPress={() =>
+                  likeModalRef?.current?.openLikeModal?.(item?._id, 'event')
+                }
+                style={[__style.actionsBtn]}>
+                {icons.heartFilled(colors.heart, 18)}
+                <MyText> {item?.like_count}</MyText>
+              </TouchableOpacity>
+            ) : null}
           </View>
           <CollapsibleText>{item?.message}</CollapsibleText>
-          {!!item.file_url &&
+          {!!item.file_url && (
             <Pressable
               onPress={() => setImageZoomer(item.file_url)}
               style={__style.image}>
               <MyImage
-                source={{ uri: S3_URL + item.file_url }}
-                style={{ height: "100%", width: "100%" }}
+                source={{uri: S3_URL + item.file_url}}
+                style={{height: '100%', width: '100%'}}
               />
-            </Pressable>}
+            </Pressable>
+          )}
 
-          {isLive && <View style={[__style.actionsRow, { marginTop: 10 }]}>
-
-            <View style={[__style.actionsRow, { flex: 1 }]}>
-              <TouchableOpacity
-                onPress={() => likeChatComment(item, isChild)}
-                style={__style.actionsBtn}>
-                {item?.is_liked ? icons.heartFilled(colors.heart, 18) : icons.heartUnfilled(colors.primary, 18)}
-                <MyText>
-                  {item?.is_liked ? " Liked" : " Like"}
-                </MyText>
-              </TouchableOpacity>
-              {!isChild && !item?.is_featured &&
+          {isLive && (
+            <View style={[__style.actionsRow, {marginTop: 10}]}>
+              <View style={[__style.actionsRow, {flex: 1}]}>
                 <TouchableOpacity
-                  onPress={() => {
-                    setSelectedCommentFor("reply");
-                    setSelectedMsg(item);
-                    openInputModal()
-                  }}
-                  style={[__style.actionsBtn, { marginLeft: 30 }]}>
-                  {icons.comment(colors.primary, 18)}
-                  <MyText> Reply</MyText>
-                </TouchableOpacity>}
+                  onPress={() => likeChatComment(item, isChild)}
+                  style={__style.actionsBtn}>
+                  {item?.is_liked
+                    ? icons.heartFilled(colors.heart, 18)
+                    : icons.heartUnfilled(colors.primary, 18)}
+                  <MyText>{item?.is_liked ? ' Liked' : ' Like'}</MyText>
+                </TouchableOpacity>
+                {!isChild && !item?.is_featured && (
+                  <TouchableOpacity
+                    onPress={() => {
+                      setSelectedCommentFor('reply');
+                      setSelectedMsg(item);
+                      openInputModal();
+                    }}
+                    style={[__style.actionsBtn, {marginLeft: 30}]}>
+                    {icons.comment(colors.primary, 18)}
+                    <MyText> Reply</MyText>
+                  </TouchableOpacity>
+                )}
+              </View>
+              {item?.like_count > 0 && (
+                <TouchableOpacity
+                  onPress={() =>
+                    likeModalRef?.current?.openLikeModal?.(item?._id, 'event')
+                  }
+                  style={[__style.actionsBtn]}>
+                  {icons.heartFilled(colors.heart, 18)}
+                  <MyText> {item?.like_count}</MyText>
+                </TouchableOpacity>
+              )}
             </View>
-            {item?.like_count > 0 &&
-              <TouchableOpacity
-                onPress={() => likeModalRef?.current?.openLikeModal?.(item?._id, "event")}
-                style={[__style.actionsBtn]}>
-                {icons.heartFilled(colors.heart, 18)}
-                <MyText> {item?.like_count}</MyText>
-              </TouchableOpacity>}
-          </View>}
+          )}
         </View>
-        {item?.replies && item?.replies.map((item2, index2) => commentView(item2, index2, true))}
+        {item?.replies &&
+          item?.replies.map((item2, index2) =>
+            commentView(item2, index2, true),
+          )}
       </View>
-    )
-  }
+    );
+  };
   return (
     <Modal
       isVisible={isVisible}
@@ -825,82 +895,81 @@ const LiveChat = ({ isVisible, closeModal, type, token, navigation, videoId, tim
       onModalShow={onModalShow}
       onModalHide={onModalHide}
       hideModalContentWhileAnimating={true}
-      style={{ margin: 0 }}>
-      <SafeAreaView style={[__style.root, { flex }]}>
+      style={{margin: 0}}>
+      <SafeAreaView style={[__style.root, {flex}]}>
         <View style={__style.innerRoot}>
           <View style={__style.header}>
-            <MyText fontSize={20} type='bold' >
-              {isLive ? "Live Chat" : "Chat"}
+            <MyText fontSize={20} type="bold">
+              {isLive ? 'Live Chat' : 'Chat'}
             </MyText>
             <Pressable
               onPress={closeModal}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+              hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
               {icons.crosssWithCircle(colors.white, 30)}
             </Pressable>
           </View>
 
-          <View style={{ flex: 1 }}>
-            {!!purchaseLink ?
+          <View style={{flex: 1}}>
+            {!!purchaseLink ? (
               <TouchableOpacity onPress={() => openUrl(S3_URL + purchaseLink)}>
                 <ResponsiveImage2 uri={S3_URL + linkImage} />
-              </TouchableOpacity> :
-              pinList?.length > 0 &&
-              <View style={__style.pinnedView}>
-                <FlatList
-                  nestedScrollEnabled={true}
-                  data={pinList}
-                  showsVerticalScrollIndicator={false}
-                  renderItem={({ item, index }) => commentView(item, index, false, true)}
+              </TouchableOpacity>
+            ) : (
+              pinList?.length > 0 && (
+                <View style={__style.pinnedView}>
+                  <FlatList
+                    nestedScrollEnabled={true}
+                    data={pinList}
+                    showsVerticalScrollIndicator={false}
+                    renderItem={({item, index}) =>
+                      commentView(item, index, false, true)
+                    }
+                  />
+                  <View style={{height: 1, backgroundColor: colors.golden}} />
+                </View>
+              )
+            )}
 
-                />
-                <View style={{ height: 1, backgroundColor: colors.golden, }} />
-              </View>
-
-            }
-
-            <View style={{ flex: 1 }}>
+            <View style={{flex: 1}}>
               <FlatList
-                contentContainerStyle={{ paddingVertical: 10 }}
+                contentContainerStyle={{paddingVertical: 10}}
                 data={list}
-                renderItem={({ item, index }) => commentView(item, index, false)}
+                renderItem={({item, index}) => commentView(item, index, false)}
                 inverted={isLive ? true : false}
                 ref={chatListRef}
                 onViewableItemsChanged={onViewableItemsChanged}
                 onEndReached={loadMore}
                 ListEmptyComponent={!loader && !isLive && <EmptyView />}
                 ListFooterComponent={<FooterLoader isVisible={footerLoader} />}
-
-
               />
-              {showScroller && isLive &&
-                <Pressable onPress={() => {
-                  chatListRef?.current?.scrollToIndex({
-                    animated: true,
-                    index: 0
-                  })
-                }}
+              {showScroller && isLive && (
+                <Pressable
+                  onPress={() => {
+                    chatListRef?.current?.scrollToIndex({
+                      animated: true,
+                      index: 0,
+                    });
+                  }}
                   style={__style.scrollToBottomView}>
-                  <MyText color={colors.black} >Scroll to Bottom </MyText>
+                  <MyText color={colors.black}>Scroll to Bottom </MyText>
                   {icons.downArrow(colors.black, 18)}
-                </Pressable>}
+                </Pressable>
+              )}
             </View>
 
             {isLive ? inputView(false) : undefined}
-
           </View>
 
-
           <ImageZoomer
-            closeModal={() => setImageZoomer("")}
+            closeModal={() => setImageZoomer('')}
             url={imageZoomer}
             visible={!!imageZoomer}
-
           />
 
           <OptionModal
             isVisible={optionModal?.isVisible}
             onSelected={onSelectedOption}
-            closeModal={() => setOptionModal({ isVisible: false, item: null })}
+            closeModal={() => setOptionModal({isVisible: false, item: null})}
             optionList={filterOptions()}
           />
 
@@ -914,7 +983,9 @@ const LiveChat = ({ isVisible, closeModal, type, token, navigation, videoId, tim
           />
 
           <ConfirmationModal
-            closeModal={() => setConfirmationsModal({ isVisible: false, item: null, title: "" })}
+            closeModal={() =>
+              setConfirmationsModal({isVisible: false, item: null, title: ''})
+            }
             isVisible={confirmationsModal?.isVisible}
             onAgree={onConfirmAgree}
             title={confirmationsModal?.title}
@@ -924,34 +995,36 @@ const LiveChat = ({ isVisible, closeModal, type, token, navigation, videoId, tim
         </View>
       </SafeAreaView>
     </Modal>
-  )
-}
+  );
+};
 
 export default LiveChat;
 
 const __style = StyleSheet.create({
-  pinnedView: { maxHeight: 130, borderBottomWidth: 1, borderBottomColor: colors.primary },
+  pinnedView: {
+    maxHeight: 130,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.primary,
+  },
   root: {
     backgroundColor: colors.secondary,
-    marginTop: "auto",
+    marginTop: 'auto',
     // flex: 0.59,
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
-    marginHorizontal: -10
-
+    marginHorizontal: -10,
   },
   innerRoot: {
     flex: 1,
     // paddingHorizontal: 10,
     // paddingTop: 10,
-
   },
   header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     backgroundColor: colors.secondary,
-    shadowColor: "#FFF",
+    shadowColor: '#FFF',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -969,31 +1042,29 @@ const __style = StyleSheet.create({
     marginTop: 10,
     marginHorizontal: 10,
     padding: 8,
-    borderRadius: 10
+    borderRadius: 10,
   },
   profileView: {
-    flexDirection: "row",
-    paddingVertical: 5
+    flexDirection: 'row',
+    paddingVertical: 5,
   },
   profileNameView: {
     flex: 1,
     marginHorizontal: 10,
-    justifyContent: "center"
+    justifyContent: 'center',
   },
   actionsRow: {
-
-    flexDirection: "row",
-
+    flexDirection: 'row',
   },
   actionsBtn: {
-    flexDirection: "row",
+    flexDirection: 'row',
   },
   image: {
     height: 50,
     width: 50,
     borderRadius: 10,
-    overflow: "hidden",
-    marginTop: 5
+    overflow: 'hidden',
+    marginTop: 5,
   },
   sendMsgView: {
     marginHorizontal: 10,
@@ -1001,8 +1072,8 @@ const __style = StyleSheet.create({
     marginTop: 10,
   },
   sendMsgViewTextWithButton: {
-    flexDirection: "row",
-    alignItems: "flex-end",
+    flexDirection: 'row',
+    alignItems: 'flex-end',
   },
   inputView: {
     minHeight: 40,
@@ -1010,75 +1081,74 @@ const __style = StyleSheet.create({
     backgroundColor: colors.secondarySelect,
     borderRadius: 20,
     flex: 1,
-    flexDirection: "row",
-
+    flexDirection: 'row',
   },
   sendMsgBtnView: {
     height: 40,
     width: 40,
     backgroundColor: colors.lightPrimary3,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     borderRadius: 40 / 2,
     marginLeft: 5,
-    marginBottom: 5
+    marginBottom: 5,
   },
   attachmentBtnView: {
     height: 45,
     width: 45,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     borderRadius: 45 / 2,
   },
   sendMsgTextView: {
     flex: 1,
     fontFamily: fonts.regular,
     paddingTop: 12,
-    color: colors.white
+    color: colors.white,
   },
   selectedImageView: {
     width: 80,
     height: 50,
     borderRadius: 10,
-    overflow: "hidden",
-    marginBottom: 10
+    overflow: 'hidden',
+    marginBottom: 10,
   },
   removeImage: {
     backgroundColor: colors.delete,
     height: 20,
     width: 20,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     borderRadius: 20 / 2,
-    position: "absolute",
+    position: 'absolute',
     top: -8,
-    right: -8
+    right: -8,
   },
-  commentUpperViewOptions: { paddingHorizontal: 10, flex: 1, paddingBottom: 10, },
+  commentUpperViewOptions: {paddingHorizontal: 10, flex: 1, paddingBottom: 10},
   scrollToBottomView: {
     paddingHorizontal: 15,
     paddingVertical: 8,
     backgroundColor: colors.primary,
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "row",
-    alignSelf: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+    alignSelf: 'center',
     borderRadius: 20,
-    position: "absolute",
-    bottom: 10
-  }
-})
+    position: 'absolute',
+    bottom: 10,
+  },
+});
 
 const OptionList = [
   {
     icon: icons.edit,
-    title: "Edit",
-    type: "edit"
+    title: 'Edit',
+    type: 'edit',
   },
   {
     icon: icons.trash,
-    title: "Delete",
-    type: "delete"
+    title: 'Delete',
+    type: 'delete',
   },
   // {
   //   icon: icons.pin,
@@ -1087,12 +1157,12 @@ const OptionList = [
   // },
   {
     icon: icons.share,
-    title: "Message",
-    type: "message"
+    title: 'Message',
+    type: 'message',
   },
   {
     icon: icons.edit,
-    title: "Add as Note",
-    type: "note"
+    title: 'Add as Note',
+    type: 'note',
   },
-]
+];

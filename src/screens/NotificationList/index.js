@@ -389,6 +389,19 @@ const NotificationList = ({ navigation, route }) => {
           }
         }],
       })
+    }else if (notification_type == "slot_reminder_notification") {
+      // navigation.navigate(routes.commissionNavigator)
+      navigation.reset({
+        routes: [{
+          name: routes?.bookingConfigurationsNavigator,
+          state: {
+            routes: [
+              {
+                name: routes.bookingConfigurationScreen,
+              }],
+          }
+        }],
+      })
     }
 
 

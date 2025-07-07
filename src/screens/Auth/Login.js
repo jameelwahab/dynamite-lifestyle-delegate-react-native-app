@@ -14,9 +14,9 @@ import { INIT_WITH_TOKEN, LOGIN } from '../../DAL';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import MyLoader from '../../components/MyLoader';
-import { S3_URL, socketUrl } from '../../utilities/constants';
+import {  socketUrl } from '../../utilities/constants';
 import { useDispatch, useSelector } from 'react-redux';
-import { setUserAndToken } from '../../redux/reducers/userSlice';
+import { selectUser, setUserAndToken } from '../../redux/reducers/userSlice';
 import { selectSettings, setSettings } from '../../redux/reducers/settingSlice';
 import FastImage from 'react-native-fast-image';
 import MyImage2 from '../../components/MyImage2';
@@ -35,6 +35,7 @@ import InitWithAuth from '../../functions/InitWithAuth';
 const Login = ({ navigation }) => {
   const dispatch = useDispatch()
   const { settings } = useSelector(selectSettings);
+const {S3_URL}= useSelector(selectUser)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [loader, setLoader] = useState(false)

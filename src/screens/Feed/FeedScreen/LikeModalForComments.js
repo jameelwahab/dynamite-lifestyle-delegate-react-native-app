@@ -8,7 +8,7 @@ import { colors } from '../../../utilities/colors';
 import MyText from '../../../components/MyText';
 import { icons } from '../../../utilities/icons';
 import UserImage from '../../../components/UserImage';
-import { S3_URL, dateTimeFormat } from '../../../utilities/constants';
+import {  dateTimeFormat } from '../../../utilities/constants';
 import { convertTimezone } from '../../../functions/convertTime';
 import FooterLoader from '../../../components/FooterLoader';
 import { GET_COMMENT_LIKES_LIST } from '../../../DAL';

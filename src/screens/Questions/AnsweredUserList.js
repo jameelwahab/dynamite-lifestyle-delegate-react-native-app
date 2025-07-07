@@ -8,7 +8,7 @@ import MyLoader from '../../components/MyLoader';
 import MyText from '../../components/MyText';
 import { colors } from '../../utilities/colors';
 import MyImage from '../../components/MyImage';
-import { S3_URL, dateTimeFormat } from '../../utilities/constants';
+import {  dateTimeFormat } from '../../utilities/constants';
 import { MenuButton } from '../../components/MyButton';
 import OptionModal from '../../components/OptionModal';
 import { icons } from '../../utilities/icons';

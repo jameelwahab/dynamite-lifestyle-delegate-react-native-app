@@ -9,14 +9,13 @@ import { selectNavbar } from '../../redux/reducers/navbarSlice'
 import { GET_ASSETS_CATEGORY_LIST, } from '../../DAL'
 import MyLoader from '../../components/MyLoader'
 import utilities from '../../utilities'
-import { S3_URL, } from '../../utilities/constants'
 import { colors } from '../../utilities/colors'
 import ResponsiveImage2 from '../../components/ResponsiveImage2'
 import routes from '../../navigation/routes'
 
 
 const CategoryList = ({ navigation, route }) => {
-  const { token } = useSelector(selectUser);
+  const { token,S3_URL } = useSelector(selectUser);
   const { parentValue, value, } = route?.params;
   const { navbar } = useSelector(selectNavbar)
   const [title] = useState(navbar?.find(x => x.value == parentValue)?.child_options?.find(y => y.value == value)?.title);
