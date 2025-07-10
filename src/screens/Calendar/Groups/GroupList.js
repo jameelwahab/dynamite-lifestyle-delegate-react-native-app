@@ -113,9 +113,6 @@ const GroupList = ({ navigation, route }) => {
     setSearching(false)
 
     if (res.code == 200) {
-      res?.groups.forEach((element, index) => {
-        console.log("element :" + index, element?._id);
-      });
       setList(res?.groups)
     }
   }
