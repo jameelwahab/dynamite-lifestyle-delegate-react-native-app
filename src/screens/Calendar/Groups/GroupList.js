@@ -113,6 +113,9 @@ const GroupList = ({ navigation, route }) => {
     setSearching(false)
 
     if (res.code == 200) {
+      res?.groups.forEach((element, index) => {
+        console.log("element :" + index, element?._id);
+      });
       setList(res?.groups)
     }
   }
@@ -155,7 +158,7 @@ const GroupList = ({ navigation, route }) => {
           }
           if (i < 3) {
             return (
-              <MyText type='medium' fontSize={12} key={x?._id?._id || x?._id}>{x?._id?.[variable] || x?.[variable]}{subTitle},</MyText>
+              <MyText type='medium' fontSize={12} key={"event"+i}>{x?._id?.[variable] || x?.[variable]}{subTitle},</MyText>
             )
           } else return null
         })}
@@ -207,9 +210,9 @@ const GroupList = ({ navigation, route }) => {
           <StatView title={"Members"} value={item?.member.length} />
           {item?.group_by != "sale_page" && item?.group_by != "mission" &&
             <StatView title={"Include Members"} value={includeMembersObj[item?.include_users]?.title} />}
-          <StatView original title={"Community Level"}
+          <StatView original title={"Badge Level"}
             value={item?.group_by == "badge_level" ? item?.group_badge_levels.map(item => item?.title + ", ") :
-              isArray(item?.badge_levels) ? item?.badge_levels.map(item => item?.title + ", ") : ""} />
+              isArray(item?.badge_levels) ? item?.badge_levels.map(item => item?.title + ", ") : "N/A"} />
           <StatView title={"Status"} view={() => statusView(item?.status)} />
         </View>
       </Pressable>
@@ -300,6 +303,7 @@ const GroupList = ({ navigation, route }) => {
           data={list}
           ListHeaderComponent={headerView()}
           renderItem={renderItem}
+          keyExtractor={(item, index) => item?._id}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={!loader && <EmptyView data={"No Groups found"} />}
           stickyHeaderIndices={[0]}
@@ -363,6 +367,10 @@ const includeMembersObj = {
     title: "All Members",
     value: "all"
   },
+  "no_prior_access": {
+    title: "Members Without Any Prior Access",
+    value: "no_prior_access"
+  }
 }
 
 

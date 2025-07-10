@@ -211,29 +211,17 @@ const GroupAddEdit = ({ navigation, route }) => {
   //Todo /// optoion functions
 
   const selectInfo = (type) => {
-    let info = type === "program"
-      ? `
-          <h4>Active Members</h4>
-          <p>Includes users who have access to a programme and it has not yet expired.</p>
+    console.log(type, "type")
+    let typeTitle = type == "badge_level" ? "Badge Level" : type == "program" ? "Programme" : type == "event" ? "Event" : "";
+    let info = `<h4>Active Members</h4>
+          <p>Refers to users who currently have access to a ${typeTitle}, and whose access has not yet expired.</p>
           <h4/><h4/>
           <h4>All Members</h4>
-          <p>Includes users in a programme, regardless of whether it has expired or not.</p>
-        `
-      : type === "event"
-        ? `
-          <h4>Active Members</h4>
-          <p>Includes users who have access to an event and it has not yet expired.</p>
+          <p>Refers to all users associated with a ${typeTitle}, regardless of whether their access is currently active or has expired.</p>
           <h4/><h4/>
-          <h4>All Members</h4>
-          <p>Includes users in an event, regardless of whether it has expired or not.</p>
-        `
-        : `
-          <h4>Active Members</h4>
-          <p>Includes users with an active membership in a badge level.</p>
-          <h4/><h4/>
-          <h4>All Members</h4>
-          <p>Include users in a badge level with both active and expired memberships.</p>`
-
+          <h4>Members with No Prior Access</h4>
+          <p>This includes users who have never been granted access to the ${typeTitle} at any point. It does not include users whose access was previously granted but has since expired.</p>
+        `;
     ref_info?.current?.openModal(info, undefined, true)
   }
 
@@ -627,6 +615,10 @@ const includeMembersArr = [
     title: "All Members",
     value: "all"
   },
+  {
+    title: "Members Without Any Prior Access",
+    value: "no_prior_access"
+  },
 ]
 
 const includeMembersObj = {
@@ -638,6 +630,10 @@ const includeMembersObj = {
     title: "All Members",
     value: "all"
   },
+  "no_prior_access": {
+    title: "Members Without Any Prior Access",
+    value: "no_prior_access"
+  }
 }
 
 const grpByTypeList = {
