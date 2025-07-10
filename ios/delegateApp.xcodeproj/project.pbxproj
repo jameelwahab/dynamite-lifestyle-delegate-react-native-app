@@ -568,7 +568,7 @@
 				CODE_SIGN_ENTITLEMENTS = delegateApp/delegateApp.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 11;
+				CURRENT_PROJECT_VERSION = 12;
 				DEVELOPMENT_TEAM = J6YMGDQ246;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = delegateApp/Info.plist;
@@ -609,7 +609,7 @@
 				CODE_SIGN_ENTITLEMENTS = delegateApp/delegateApp.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 11;
+				CURRENT_PROJECT_VERSION = 12;
 				DEVELOPMENT_TEAM = J6YMGDQ246;
 				INFOPLIST_FILE = delegateApp/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Mission&#x2007;Control&#x2007;100";
