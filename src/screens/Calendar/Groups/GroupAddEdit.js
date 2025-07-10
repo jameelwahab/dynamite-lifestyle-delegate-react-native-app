@@ -189,6 +189,7 @@ const GroupAddEdit = ({ navigation, route }) => {
           _id: item?._id,
           title: item?.title,
         }))
+        obj["include_users"] = groupData?.include
       } else if (obj.group_by == "badge_level") {
         obj["group_badge_levels"] = groupData.grpBadgeLevels.map(item => ({
           _id: item?._id,
@@ -211,7 +212,6 @@ const GroupAddEdit = ({ navigation, route }) => {
   //Todo /// optoion functions
 
   const selectInfo = (type) => {
-    console.log(type, "type")
     let typeTitle = type == "badge_level" ? "Badge Level" : type == "program" ? "Programme" : type == "event" ? "Event" : "";
     let info = `<h4>Active Members</h4>
           <p>Refers to users who currently have access to a ${typeTitle}, and whose access has not yet expired.</p>
@@ -309,6 +309,14 @@ const GroupAddEdit = ({ navigation, route }) => {
     )
   }
 
+  const filterMembetTypeList = (obj) => {
+    let nList = breakReference(obj);
+    if (groupData?.groupBy == "badge_level") {
+      delete nList["no_prior_access"];
+    }
+    return Object.values(nList)
+  }
+
 
 
 
@@ -351,7 +359,7 @@ const GroupAddEdit = ({ navigation, route }) => {
         />
 
 
-        {(groupData.groupBy == "program" || groupData.groupBy == "event" || groupData.groupBy == "badge_level") &&
+        {(groupData.groupBy != "sale_page") &&
           <MyTouchableInput
             subTextView={() => (
               <TouchableOpacity
@@ -573,7 +581,7 @@ const GroupAddEdit = ({ navigation, route }) => {
         noIcon
         isVisible={includeMemberModal}
         closeModal={() => setIncludeMemberModal(false)}
-        optionList={Object.values(includeMembersObj)}
+        optionList={filterMembetTypeList(includeMembersObj)}
         onSelected={(item) => {
           setIncludeMemberModal(false)
           setGroupData({ ...groupData, include: item?.value })

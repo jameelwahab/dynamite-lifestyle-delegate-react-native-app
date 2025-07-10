@@ -208,7 +208,7 @@ const GroupList = ({ navigation, route }) => {
           <StatView title={"Type"} value={item?.group_type} />
           <StatView title={"Group By"} value={groupBy[item?.group_by]} />
           <StatView title={"Members"} value={item?.member.length} />
-          {item?.group_by != "sale_page" && item?.group_by != "mission" &&
+          {item?.group_by != "sale_page" &&
             <StatView title={"Include Members"} value={includeMembersObj[item?.include_users]?.title} />}
           <StatView original title={"Badge Level"}
             value={item?.group_by == "badge_level" ? item?.group_badge_levels.map(item => item?.title + ", ") :
