@@ -86,6 +86,9 @@ const ReminderSettings = ({ navigation }) => {
 
   const btn_update = async () => {
 
+    try {
+      
+   
     for (let i = 0; i < list_length; i++) {
       let x = list[i];
       if (x?.reminder_days == "") {
@@ -109,7 +112,10 @@ const ReminderSettings = ({ navigation }) => {
     } else {
       showToast({ title: res.message, type: "error" });
     }
-
+ } catch (error) {
+     console.log(error," Error in btn_update ReminderSettings.js");
+     setLoader(false) 
+    }
   }
 
   const UpdateButton = () => {

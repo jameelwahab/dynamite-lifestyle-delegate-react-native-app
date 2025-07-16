@@ -35,3 +35,14 @@ export const CHANGE_AFFILIATE_NAME = ({ token, navigation, consultantId, newAffi
     }
   })
 }
+
+export const UPDATE_REMINDER_MESSAGES = ({ body, token, navigation }) => {
+  return invokeApi({
+    path: `api/consultant/welcome_reminder_setting_for_delegate`,
+    method: "POST",
+    token: token,
+    navigation: navigation,
+    postData: body
+  })
+}
+
