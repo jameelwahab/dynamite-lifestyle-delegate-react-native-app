@@ -39,7 +39,7 @@ const ItsWebView = ({
 		for (const link of S3Urls) {
 			if (processed.includes(link)) {
 				processed = processed.replaceAll(link, S3_URL);
-				console.log(processed,"processed")
+				console.log(processed, "processed")
 			}
 		}
 
@@ -193,6 +193,19 @@ const ItsWebView = ({
 				'mentioned-name': {
 					color: colors.primary,
 				},
+				'highlight-text': {
+					color: colors.primary,
+					fontFamily: fonts.bold,
+				},
+				"italic-text": {
+					fontFamily: fonts.italic,
+					fontStyle: "italic",
+					margin: 0,
+					marginTop: 5,
+					fontWeight: Platform.OS === 'android' ? 'normal' : undefined,
+					color: colors.white,
+				},
+
 				required: {
 					fontFamily: fonts.regular,
 					lineHeight: 20,

@@ -20,8 +20,11 @@ import showToast from '../../functions/showToast'
 import invokeApi from '../../functions/invokeAPI'
 import MyLoader from '../../components/MyLoader'
 import MyInputs from '../../components/MyInputs'
+import { Flex } from '../../UIComponents/FlexViews'
+import InfoModal from '../../components/InfoModal'
 
 const ReminderSettings = ({ navigation }) => {
+  const ref_infoModal = React.useRef();
   const dispatch = useDispatch()
   const { user, token } = useSelector(selectUser);
   const [loader, setLoader] = useState(false);
@@ -200,7 +203,15 @@ const ReminderSettings = ({ navigation }) => {
           backgroundColor={"#232c43"}
           initialValue={item.reminder_message}
           onChange={(text) => itemHander({ type: "reminder_message", value: text, index })}
-
+          autoResonderMsgs={autoMsgsList}
+          viewAccrossLabel={() => (
+            <TouchableOpacity
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              style={{ padding: 5 }}
+              onPress={() => ref_infoModal.current.openModal(infoForEditor,"",true)}>
+              {icons.info_filled(colors.primary, 15)}
+            </TouchableOpacity>
+          )}
         />
       </View>
     )
@@ -208,7 +219,7 @@ const ReminderSettings = ({ navigation }) => {
 
   return (
     <RootView
-    hideNotificaitonIcon
+      hideNotificaitonIcon
       hideChatIcon
       hideProfile title='Welcome Reminder Setting'>
       <View style={{ flex: 1 }}>
@@ -235,12 +246,26 @@ const ReminderSettings = ({ navigation }) => {
         closeModal={() => setImage({ isVisible: false, index: -1 })}
       />
       <MyLoader enable={loader} />
+      <InfoModal ref={ref_infoModal} />
     </RootView>
   )
 }
 
 export default ReminderSettings;
 const type = ["general", "image", "video"]
+const autoMsgsList = [{ title: "First Name", message: "{first_name}" }, { title: "Last Name", message: "{last_name}" }, { title: "Full Name", message: "{full_name}" }]
+const infoForEditor = `
+<Br/>
+Below are the available short codes that will automatically be replaced with the member’s details:
+<Br/>
+<span class='highlight-text'>{first_name}</span> – This will be replaced with the member’s first name.
+<Br/>
+<span class='highlight-text'>{last_name}</span> – This will be replaced with the member’s last name.
+<Br/>
+<span class='highlight-text'>{full_name}</span> – This will be replaced with the member’s full name.
+<Br/>
+<span class='italic-text'>These codes can be used in messages to personalize communication with members.</span>
+`
 const reminderObj = {
   reminder_days: "0",
   notify_time: "00:00",

@@ -33,7 +33,8 @@ const Editor = ({
   backgroundColor = colors.secondary,
   label = "",
   autoResonderMsgs = [],
-  placeholder = 'Type a message...'
+  placeholder = 'Type a message...',
+  viewAccrossLabel
 }) => {
   const navigation = useNavigation();
   const { token, S3_URL } = useSelector(selectUser);
@@ -216,7 +217,12 @@ const Editor = ({
     <View>
       {/* {colorModal()} */}
       <View style={{}}>
-        {!!label ? <MyText isLabel>{label}</MyText> : null}
+        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+          <View style={{ flex: 1 }}>
+            {!!label ? <MyText isLabel>{label}</MyText> : null}
+          </View>
+          {!!viewAccrossLabel && viewAccrossLabel?.()}
+        </View>
         <View style={{ backgroundColor: backgroundColor, borderRadius: 10, overflow: "hidden", }}>
           {LinkDialog()}
 
@@ -263,7 +269,7 @@ const Editor = ({
           </View>
           <RichToolbar
             editor={RichText}
-    
+
             onInsertLink={openDialogue}
             selectedIconTint={colors.primary}
             // keyboardDisplayRequiresUserAction={true}
