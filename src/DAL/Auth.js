@@ -4,7 +4,7 @@ import invokeApi from "../functions/invokeAPI"
 
 export const LOGIN = ({ body }) => {
   return invokeApi({
-    path: "api/consultant/login",
+    path: "api/consultant/login_consultant",
     method: "POST",
     checkAuth: false,
     postData: body,
@@ -41,7 +41,7 @@ export const VERIFY_OTP = ({ body }) => {
 
 export const RESET_PASSWORD = ({ body }) => {
   return invokeApi({
-    path: "api/consultant/reset_password",
+    path: "api/consultant/reset_password_consultant",
     method: "POST",
     checkAuth: false,
     postData: body,
@@ -53,7 +53,7 @@ export const RESET_PASSWORD = ({ body }) => {
 
 export const CHNAGE_PASSWORD = ({ body, token, navigation }) => {
   return invokeApi({
-    path: "api/consultant/change_password_by_consultant",
+    path: "api/consultant/change_password_by_consultant_user",
     method: "POST",
     token: token,
     navigation: navigation,

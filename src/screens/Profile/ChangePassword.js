@@ -12,6 +12,7 @@ import MyText from '../../components/MyText'
 import { colors } from '../../utilities/colors'
 import MyCheckBox from '../../components/MyCheckBox'
 import routes from '../../navigation/routes'
+import { encryptPassword } from '../../functions/encryptPassword'
 
 const ChangePassword = ({ navigation }) => {
   const [oldPassword, setOldPassword] = useState("");
@@ -30,10 +31,11 @@ const ChangePassword = ({ navigation }) => {
       showToast({ body: "Passwords do not match" });
     } else {
       setLoader(true);
+      let enc_Password = encryptPassword(newPassword);
       let body = {
         // old_password: oldPassword,
-        password: newPassword,
-        confirm_password: confirmPasswrod,
+        password: enc_Password,
+        confirm_password: enc_Password,
         logout_from: logoutFrom
       }
       let token = await AsyncStorage.getItem("@token")

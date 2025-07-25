@@ -27,6 +27,7 @@ import { io } from 'socket.io-client';
 import MyInputs from '../../components/MyInputs';
 import messaging from '@react-native-firebase/messaging';
 import InitWithAuth from '../../functions/InitWithAuth';
+import { encryptPassword } from '../../functions/encryptPassword';
 
 
 
@@ -65,7 +66,7 @@ const {S3_URL}= useSelector(selectUser)
       fd.append("platform", "app")
       fd.append("login_by_device", Platform.OS)
       fd.append("email", email.trim())
-      fd.append("password", password)
+      fd.append("password", encryptPassword(password))
       let res = await LOGIN({ body: fd });
       if (res.code == 200) {
         let savedTOken = await AsyncStorage.setItem("@token", res?.token);

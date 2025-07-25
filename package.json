@@ -64,6 +64,7 @@
     "react-native-color": "^0.0.10",
     "react-native-color-picker": "^0.6.0",
     "react-native-confirmation-code-field": "^7.3.2",
+    "react-native-crypto-js": "1.0.0",
     "react-native-date-picker": "^4.3.5",
     "react-native-device-info": "^11.1.0",
     "react-native-dialog": "^9.3.0",

@@ -11,6 +11,7 @@ import showToast from '../../functions/showToast'
 import { RESET_PASSWORD } from '../../DAL'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import MyInputs from '../../components/MyInputs'
+import { encryptPassword } from '../../functions/encryptPassword'
 
 const ResetPassword = ({ navigation, route }) => {
   const [loader, setLoader] = useState(false);
@@ -25,9 +26,10 @@ const ResetPassword = ({ navigation, route }) => {
     } else {
       setLoader(true)
       let fd = new FormData();
+      let enc_Password = encryptPassword(newPassword);
       fd.append("email", route.params?.email);
-      fd.append("password", newPassword);
-      fd.append("confirm_password", confirmPassword);
+      fd.append("password", enc_Password);
+      fd.append("confirm_password", enc_Password);
 
       let res = await RESET_PASSWORD({ body: fd });
       setLoader(false)

@@ -68,19 +68,19 @@ const CalendarScreen = ({ navigation, route }) => {
     }
   }, [route])
 
-  useEffect(() => {
-    if (isSyncWithGoogleAllowed) {
-      GoogleSignin.configure({
-        scopes: googleScopes,
-        iosClientId: googleClientIdForIOS,
-        webClientId: googleClientIdForWeb,
-        androidClientId: __DEV__ ?
-          GoogleClientIdsForAndroidDebugMode :
-          googleClientIdForAndriod,
-        offlineAccess: true,
-      });
-    }
-  }, [])
+  // useEffect(() => {
+  //   if (isSyncWithGoogleAllowed) {
+  //     GoogleSignin.configure({
+  //       scopes: googleScopes,
+  //       iosClientId: googleClientIdForIOS,
+  //       webClientId: googleClientIdForWeb,
+  //       androidClientId: __DEV__ ?
+  //         GoogleClientIdsForAndroidDebugMode :
+  //         googleClientIdForAndriod,
+  //       offlineAccess: true,
+  //     });
+  //   }
+  // }, [])
 
 
 
@@ -136,78 +136,78 @@ const CalendarScreen = ({ navigation, route }) => {
     }
   }
 
-  const syncWithGoogleAPI = async (gCode) => {
-    setLoader(true);
-    let res = await SYNC_GOOGLE_CALENDAR_WITH_SERVER({ navigation, token, googleServerCode: gCode });
-    if (res.code == 200) {
-      dispatch(setGoogleSyncedData(res?.google_account_info))
-      showToast({ title: res.message, type: "success" })
-      setLoader(false);
-    } else {
-      setLoader(false);
-    }
-  }
+  // const syncWithGoogleAPI = async (gCode) => {
+  //   setLoader(true);
+  //   let res = await SYNC_GOOGLE_CALENDAR_WITH_SERVER({ navigation, token, googleServerCode: gCode });
+  //   if (res.code == 200) {
+  //     dispatch(setGoogleSyncedData(res?.google_account_info))
+  //     showToast({ title: res.message, type: "success" })
+  //     setLoader(false);
+  //   } else {
+  //     setLoader(false);
+  //   }
+  // }
 
-  const deSyncWithGoogleAPI = async () => {
-    setGoogleRemoveCofirmationShown(false)
-    setLoader(true);
-    let res = await DESYNC_GOOGLE_CALENDAR_WITH_SERVER({ navigation, token, });
-    if (res.code == 200) {
-      dispatch(removeGoogleSyncedData())
-      showToast({ title: res.message, type: "success" })
-      setLoader(false);
+  // const deSyncWithGoogleAPI = async () => {
+  //   setGoogleRemoveCofirmationShown(false)
+  //   setLoader(true);
+  //   let res = await DESYNC_GOOGLE_CALENDAR_WITH_SERVER({ navigation, token, });
+  //   if (res.code == 200) {
+  //     dispatch(removeGoogleSyncedData())
+  //     showToast({ title: res.message, type: "success" })
+  //     setLoader(false);
 
-      try {
-        let user = GoogleSignin.getCurrentUser();
+  //     try {
+  //       let user = GoogleSignin.getCurrentUser();
 
-        if (!!user)
-          await GoogleSignin.revokeAccess();
-        await GoogleSignin.signOut()
-      } catch (error) {
+  //       if (!!user)
+  //         await GoogleSignin.revokeAccess();
+  //       await GoogleSignin.signOut()
+  //     } catch (error) {
 
-      }
-    } else {
-      setLoader(false);
-    }
-  }
+  //     }
+  //   } else {
+  //     setLoader(false);
+  //   }
+  // }
 
   //? Google Functions
 
-  const signInWithGoogle = async () => {
-    try {
-      await GoogleSignin.hasPlayServices({
-        showPlayServicesUpdateDialog: true,
-      });
-      const userInfo = await GoogleSignin.signIn();
+  // const signInWithGoogle = async () => {
+  //   try {
+  //     await GoogleSignin.hasPlayServices({
+  //       showPlayServicesUpdateDialog: true,
+  //     });
+  //     const userInfo = await GoogleSignin.signIn();
 
 
-      const isCalendarPermissionGranted = googleScopes.every((val) => userInfo?.scopes.includes(val));
-      if (isCalendarPermissionGranted) {
-        syncWithGoogleAPI(userInfo.serverAuthCode)
-      } else {
-        // Alert.alert("Alert", "You didn't allow all Calendar permissions\nPlease try again and allow all Calendar Permissions");
-        showToast({ title: "Alert", body: "You didn't allow all Calendar permissions\nPlease try again and allow all Calendar Permissions", type: "info" })
-        await GoogleSignin.revokeAccess();
-        let signOut = await GoogleSignin.signOut()
+  //     const isCalendarPermissionGranted = googleScopes.every((val) => userInfo?.scopes.includes(val));
+  //     if (isCalendarPermissionGranted) {
+  //       syncWithGoogleAPI(userInfo.serverAuthCode)
+  //     } else {
+  //       // Alert.alert("Alert", "You didn't allow all Calendar permissions\nPlease try again and allow all Calendar Permissions");
+  //       showToast({ title: "Alert", body: "You didn't allow all Calendar permissions\nPlease try again and allow all Calendar Permissions", type: "info" })
+  //       await GoogleSignin.revokeAccess();
+  //       let signOut = await GoogleSignin.signOut()
 
-      }
-    } catch (error) {
-      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-        // Alert.alert("Alert", "User cancelled the process")
-      } else if (error.code === statusCodes.IN_PROGRESS) {
-        Alert.alert("Alert", "Already signed in")
-        // operation (e.g. sign in) is in progress already
-      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+  //     }
+  //   } catch (error) {
+  //     if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+  //       // Alert.alert("Alert", "User cancelled the process")
+  //     } else if (error.code === statusCodes.IN_PROGRESS) {
+  //       Alert.alert("Alert", "Already signed in")
+  //       // operation (e.g. sign in) is in progress already
+  //     } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
 
-        showToast({ title: "Alert", body: "Goolge Play Services not available", type: "info" })
-        // play services not available or outdated
-      } else {
-        showToast({ title: "Alert", body: error?.message, type: "info" })
+  //       showToast({ title: "Alert", body: "Goolge Play Services not available", type: "info" })
+  //       // play services not available or outdated
+  //     } else {
+  //       showToast({ title: "Alert", body: error?.message, type: "info" })
 
-        // some other error happened
-      }
-    }
-  }
+  //       // some other error happened
+  //     }
+  //   }
+  // }
 
 
 
@@ -270,7 +270,7 @@ const CalendarScreen = ({ navigation, route }) => {
   const topView = () => {
     return (
       <>
-        {isSyncWithGoogleAllowed && isDelegateEvents &&
+        {/* {isSyncWithGoogleAllowed && isDelegateEvents &&
           <>
             {!!googleSyncedData ?
               <>
@@ -303,7 +303,7 @@ const CalendarScreen = ({ navigation, route }) => {
                 </View>
               </TouchableOpacity>}
           </>
-        }
+        } */}
 
         <View style={__styles.topView}>
           <View style={{ flex: 1, alignItems: "flex-end" }}>
@@ -545,12 +545,12 @@ const CalendarScreen = ({ navigation, route }) => {
         closeModal={() => setConfirmation({ isVisible: false, item: null })}
       />
 
-      <ConfirmationModal
+      {/* <ConfirmationModal
         title={"Are you sure you want to remove this account?"}
         isVisible={googleRemoveCofirmationShown}
         onAgree={() => deSyncWithGoogleAPI()}
         closeModal={() => setGoogleRemoveCofirmationShown(false)}
-      />
+      /> */}
       <FAB onPress={onAddEventScreen} />
       <MyLoader enable={loader} />
     </RootView>

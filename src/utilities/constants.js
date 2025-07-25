@@ -12,20 +12,22 @@ if (isDev) {
   // websiteBaseUrl = "https://galaxy.dynamitelifestyle.com/"
   // appName = displayName;
 
-  domain = "https://apidev.dynamitelifestyle.com/";
+  domain = "https://apidev.dynamitelifestyle.com/v1/auth/";
   socketUrl = "https://apidev.dynamitelifestyle.com";
   S3_URL = "https://dynamite-lifestyle-dev-app-bucket.s3.amazonaws.com/";
   appName = displayName;
   websiteBaseUrl = "https://sourcedev.dynamitelifestyle.com/"
 } else {
-  domain = "https://api.dynamitelifestyle.com/";
+  domain = "https://api.dynamitelifestyle.com/v1/auth/";
   socketUrl = "https://apicron.dynamitelifestyle.com";
   S3_URL = "https://dynamite-lifestyle-prod-app-bucket.s3.amazonaws.com/";
   appName = displayName;
   websiteBaseUrl = "https://source.dynamitelifestyle.com/"
 }
 
-export { domain, socketUrl, S3_URL, appName, websiteBaseUrl }
+const  passwordEncryptionKey = "lU0WFyJoLnN6FGxyoWap7O13yG6zSJBUKiFdizpfwyixdwf83ClzJMBgJaUCtGIibiC6mY8dmuxwd2xpVoCrooODlTiXBlkoaWeeedLn1O3ebbaDxAZwMXDDc1DOH4aaUjg7I7kYJf4iHMZVlmRvsbtfwvixw6SlAzWAdTnv79EySnNc57uQyjmZfevuPtFrkdozFlTjT51ltOkFE30EwKGPkjWqmPtgqYaE7cEA0Bu0t1UL7Bf7QaIAd3fugvDF";
+
+export { domain, socketUrl, S3_URL, appName, websiteBaseUrl,passwordEncryptionKey }
 
 
 export const S3Urls = [
