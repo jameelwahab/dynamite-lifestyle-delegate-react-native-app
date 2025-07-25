@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { domain } from '../utilities/constants';
+import { apiKey, domain } from '../utilities/constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import showToast from './showToast';
 import routes from '../navigation/routes';
@@ -36,7 +36,8 @@ export default async function invokeApi({
     url: excludeBaseURL ? path : domain + path,
     headers: {
       ...headers,
-      "x-sh-auth": token
+      "x-sh-auth": token,
+      "x-api-key": apiKey,
     },
   };
 

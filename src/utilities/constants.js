@@ -26,7 +26,7 @@ if (isDev) {
 }
 
 const  passwordEncryptionKey = "lU0WFyJoLnN6FGxyoWap7O13yG6zSJBUKiFdizpfwyixdwf83ClzJMBgJaUCtGIibiC6mY8dmuxwd2xpVoCrooODlTiXBlkoaWeeedLn1O3ebbaDxAZwMXDDc1DOH4aaUjg7I7kYJf4iHMZVlmRvsbtfwvixw6SlAzWAdTnv79EySnNc57uQyjmZfevuPtFrkdozFlTjT51ltOkFE30EwKGPkjWqmPtgqYaE7cEA0Bu0t1UL7Bf7QaIAd3fugvDF";
-
+export const apiKey = "DynamiteLifestyle@3ZGErMDCyxTOZYFr56HGD"
 export { domain, socketUrl, S3_URL, appName, websiteBaseUrl,passwordEncryptionKey }
 
 
