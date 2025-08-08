@@ -46,7 +46,7 @@ const Scheduler = ({ navigation, route }) => {
 	const [enableChat, setEnableChat] = useState(false)
 
 
-		console.log("here is the type", route.params.type)
+	console.log("here is the type", route.params.type)
 	const getResult = async (loader) => {
 		setLoading(loader)
 		const res = await GET_MISSION_SCHEDULE({
@@ -87,7 +87,7 @@ const Scheduler = ({ navigation, route }) => {
 	return (
 		<View style={__styles.container}>
 			<View style={__styles.heading_container}>
-				<View style={{ flexDirection: 'row', alignItems: "center",paddingVeritcal:10, flex:1}}>
+				<View style={{ flexDirection: 'row', alignItems: "center", paddingVeritcal: 10, flex: 1 }}>
 
 					<Pressable
 						onPress={() => navigation.goBack()} >
@@ -96,7 +96,7 @@ const Scheduler = ({ navigation, route }) => {
 					<View style={{ width: 10, }} />
 					<MyText
 						type="bold"
-						style={{flex:0.95}}
+						style={{ flex: 0.95 }}
 						fontSize={textSize.title}
 						color={colors.primary}>
 						{res?.mission_schedule?.main_heading || route?.params?.heading || "The Source Code"}
@@ -133,7 +133,8 @@ const Scheduler = ({ navigation, route }) => {
 							img_url: res?.mission_schedule?.image?.thumbnail_1,
 							title: res?.mission_schedule?.audio_title,
 							desc: res?.mission_schedule?.audio_description,
-							focuse: isFocused
+							focuse: isFocused,
+							S3_URL: S3_URL
 
 						})}
 						<View style={{ height: 10 }} />
@@ -163,7 +164,7 @@ const Scheduler = ({ navigation, route }) => {
 	)
 }
 
-export const HeaderView = ({ type = "", embed_code = "", video_url = "", mission_id = "", audio_url = "", img_url = "", title = "", desc = "", focuse = true }) => {
+export const HeaderView = ({ S3_URL, type = "", embed_code = "", video_url = "", mission_id = "", audio_url = "", img_url = "", title = "", desc = "", focuse = true }) => {
 
 	if (type == "quest" && !!embed_code) {
 		return (
@@ -247,14 +248,14 @@ const __styles = StyleSheet.create({
 		borderRadius: 30,
 		opacity: 0.8
 	},
-		heading_container:{
-				flexDirection: "row",
-				justifyContent: "space-between",
-				alignItems: 'center',
-				marginTop:10,
-				backgroundColor: colors.darkSecondary, 
-				zIndex:10 
-		},
+	heading_container: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		alignItems: 'center',
+		marginTop: 10,
+		backgroundColor: colors.darkSecondary,
+		zIndex: 10
+	},
 })
 
 

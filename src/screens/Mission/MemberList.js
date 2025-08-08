@@ -266,18 +266,22 @@ const MemberList = ({ route, navigation }) => {
 					}
 				</View>
 
-				{!loaders.overall && <View style={{ backgroundColor: colors.darkSecondary, flexDirection: "row", }}>
+				{!loaders.overall && <View style={{ backgroundColor: colors.darkSecondary, flexDirection: "row", marginTop: 5 }}>
 					<CounterBox color={"#283C35"} count={counter?.complete || 0} subTitle={"Completed Members"} icon={icons.members2(colors.primary)} normal />
+					<View style={{ width: 10 }} />
 					<CounterBox color={"#3C3834"} count={counter?.in_progress || 0} subTitle={"In Progress Members"} icon={icons.members2(colors.primary)} normal />
 					{route.params.item?.type == "quest" ?
-						<CounterBox color={"#3B2837"} count={counter?.revenue || 0} subTitle={"Total Revenue"} />
+						<>
+							<View style={{ width: 10 }} />
+							<CounterBox color={"#3B2837"} count={counter?.revenue || 0} subTitle={"Total Revenue"} />
+						</>
 						: <View style={{ flex: 1 }} />
 					}
 				</View>}
 
 
 				{/* search engine */}
-				<View>
+				<View style={{ marginTop: 5 }}>
 					<SearchView
 						search={searchText}
 						onChangeText={(text) => setSearchText(text)}

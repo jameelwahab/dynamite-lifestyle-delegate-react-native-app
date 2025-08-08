@@ -17,6 +17,7 @@ import EmptyView from '../../../components/EmptyView';
 import routes from '../../../navigation/routes';
 import FAB from '../../../components/FAB';
 import ImageZoomer from '../../../components/ImageZoomer';
+import breakReference from '../../../functions/breakReference';
 
 
 
@@ -42,7 +43,9 @@ const VideoList = ({ navigation, route }) => {
   }, [route]);
 
   const onOptionSelected = (opt) => {
-    let item = optionModal?.selectedItem;
+    let item = breakReference(optionModal?.selectedItem);
+    console.log(item, "item")
+    console.log(opt, "opt")
     setOptionModal({ isVisible: false, selectedItem: null });
     setTimeout(() => {
       if (opt.type == "edit") {
@@ -58,9 +61,9 @@ const VideoList = ({ navigation, route }) => {
         }, 200);
       }
       else if (opt.type == "q_setting") {
-        onQuestionsScreen(routes.portalVideoQuestionSettings, item)
+        onQuestionsScreen(routes.portalVideoQuestionSettings, { videoId: item?._id })
       } else if (opt.type == "q_manage") {
-        onQuestionsScreen(routes.portalVideoQuestionManage, item)
+        onQuestionsScreen(routes.portalVideoQuestionManage, { _id: item?._id })
       } else if (opt.type == "q_answer") {
         onUserAnswerScreen(item)
       }
@@ -75,10 +78,8 @@ const VideoList = ({ navigation, route }) => {
   }
 
 
-  const onQuestionsScreen = (screen, item) => {
-    navigation.navigate(screen, {
-      _id: item?._id
-    })
+  const onQuestionsScreen = (screen, params) => {
+    navigation.navigate(screen, params)
   }
 
   const onAddEditScreen = (item) => {

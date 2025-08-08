@@ -69,11 +69,12 @@ const ListView = ({ isLoading, list, setList, active, route, departmentList, tok
   //? Actions functions
 
   const ticketActions = (option) => {
+    console.log(option,"option")
     if (option?.key == "change-department") {
       setIsOptionModal({ ...isOptionModalShown, isVisible: false, })
       setTimeout(() => {
         setIsDepartmentModalShown(true)
-      }, 400);
+      }, __DEV__ ? 600 : 400);
     }
 
 
@@ -91,7 +92,7 @@ const ListView = ({ isLoading, list, setList, active, route, departmentList, tok
       setDate(moment().format("YYYY-MM-DD"))
       setTimeout(() => {
         setCalendarModalVisiblity(true)
-      }, 400);
+      }, __DEV__ ? 1000 : 400);
     }
 
     else if (option.key == "needs_to_attention") {
@@ -103,7 +104,7 @@ const ListView = ({ isLoading, list, setList, active, route, departmentList, tok
           title: "Are you sure you want to move this ticket to need attention?",
           for: "needs_to_attention"
         })
-      }, 400);
+      }, __DEV__ ? 1000 : 400);
     }
 
     else if (option.key == "fixed") {
@@ -114,7 +115,7 @@ const ListView = ({ isLoading, list, setList, active, route, departmentList, tok
           title: "Are you sure you want to move this ticket to fixed?",
           for: "fixed"
         })
-      }, 400);
+      }, __DEV__ ? 1000 : 400);
     }
     else if (option.key == "attended") {
       setIsOptionModal({ ...isOptionModalShown, isVisible: false, })
@@ -124,14 +125,14 @@ const ListView = ({ isLoading, list, setList, active, route, departmentList, tok
           title: "Are you sure you want to move this ticket to attended?",
           for: "attended"
         })
-      }, 400);
+      }, __DEV__ ? 1000 : 400);
     }
 
     else if (option.key == "mark-resolve") {
       setIsOptionModal({ ...isOptionModalShown, isVisible: false, })
       setTimeout(() => {
         setMarkResolveModalVisiblity(true)
-      }, 400);
+      }, __DEV__ ? 1000 : 400);
     }
     else if (option.key == "send_reminder") {
       navigation.navigate(routes.sendReminderScreen, {
@@ -154,7 +155,7 @@ const ListView = ({ isLoading, list, setList, active, route, departmentList, tok
       setTimeout(() => {
         setResolveNoteModal({ isVisible: true, note: isOptionModalShown?.for?.close_note })
         setIsOptionModal({ for: "", isVisible: false, })
-      }, 400);
+      }, __DEV__ ? 1000 : 400);
     }
 
     else {

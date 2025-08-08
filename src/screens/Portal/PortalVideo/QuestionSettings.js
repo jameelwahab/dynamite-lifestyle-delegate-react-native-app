@@ -17,6 +17,7 @@ import MyCheckBox from '../../../components/MyCheckBox'
 import showToast from '../../../functions/showToast'
 
 const QuestionSettings = ({ route, navigation }) => {
+  console.log(route.params,"route.params")
   let { config, eventId, slug, videoId } = route.params;
   let { token } = useSelector(selectUser);
   const [loader, setLoader] = useState(true);

@@ -46,7 +46,8 @@ const TransactionAddEdit = ({ navigation, route }) => {
       showToast({ body: "Payable amount must be greater than 0", title: "Alert", type: "info" })
     } else if (payouts?.member?.commission_due <= 0) {
       showToast({ body: "Net Remaining amount must be greater than 0", title: "Alert", type: "info" })
-    } else {
+    } 
+    else {
       addTransactionToServer()
     }
   }

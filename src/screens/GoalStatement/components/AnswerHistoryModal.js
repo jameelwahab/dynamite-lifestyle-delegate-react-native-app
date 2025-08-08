@@ -22,7 +22,7 @@ const AnswerHistoryModal = forwardRef(({ member, token, navigation }, ref) => {
     return {
       open
     }
-  }, [])
+  }, [JSON.stringify(member)])
 
   //! APIs
   const getDataFromServer = async (question) => {

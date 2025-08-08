@@ -88,7 +88,7 @@ export const SALE_TEAM_BY_PENDING_COMMISSION = ({ token, navigation, page, searc
 
 export const SALE_TRANSACTION_LIST = ({ token, navigation, page, searchText }) => {
   return invokeApi({
-    path: `api/affiliate_transaction/get/for_delegate??page=${page}&limit=20&search_text=${searchText}`,
+    path: `api/affiliate_transaction/get/for_delegate?page=${page}&limit=20&search_text=${searchText}`,
     method: "GET",
     token,
     navigation,

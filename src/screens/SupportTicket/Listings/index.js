@@ -53,7 +53,6 @@ const TicketsList = ({ navigation, route }) => {
 
 
   const loadMore = () => {
-    console.log(paging?.current?.canLoadMore, "canLoadMore")
     if (paging?.current?.canLoadMore) {
       paging.current.canLoadMore = false;
       getSupportTickets(false, true);
