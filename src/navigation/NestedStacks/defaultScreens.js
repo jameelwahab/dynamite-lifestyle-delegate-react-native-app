@@ -2,13 +2,13 @@ import MessageList from "../../screens/Chat/MessageList.js";
 import NotificationList from "../../screens/NotificationList";
 import ChangePassword from "../../screens/Profile/ChangePassword";
 import FeedKeywords from "../../screens/Profile/FeedKeywords";
-import ScheduleNotifications from "../../screens/Profile/ScheduleNotifications";
 import EditProfile from "../../screens/Profile/EditProfile";
 import ChangeAffiliateId from "../../screens/Settings/ChangeAffiliateId.js";
 import OtherSettings from "../../screens/Settings/OtherSettings";
 import ReminderSettings from "../../screens/Settings/ReminderSettings";
 import ZoomSettings from "../../screens/Settings/ZoomSettings";
 import routes from "../routes";
+import VerifyAccount from "../../screens/Profile/VerifyAccount.js";
 
 
 export const defaultScreens = [
@@ -51,6 +51,10 @@ export const defaultScreens = [
   {
     name: routes.changeAffiliateIdScreen,
     component: ChangeAffiliateId
+  },
+  {
+    name: routes.verifyAccount,
+    component: VerifyAccount
   }
 
 ]

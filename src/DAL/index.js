@@ -4,7 +4,10 @@ export {
   SEND_OTP,
   VERIFY_OTP,
   LOGOUT,
-  CHNAGE_PASSWORD,
+  CHANGE_PASSWORD,
+  VERIFY_CHANGE_PASSWORD,
+  VERIFY_LOGIN,
+  RESEND_OTP
 } from './Auth';
 export {INIT_WITHOUT_TOKEN, INIT_WITH_TOKEN} from './Init';
 export {EDIT_PROFILE} from './Profile';

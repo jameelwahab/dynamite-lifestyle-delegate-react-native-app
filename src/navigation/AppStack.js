@@ -9,6 +9,7 @@ import ForgotPassword from '../screens/Auth/ForgotPassword';
 import SideDrawer from './SideBar/SideDrawer';
 import Splash from '../screens/Auth/Splash';
 import TicketDetail from '../screens/SupportTicket/Detail.js';
+import VerifyAccount from '../screens/Profile/VerifyAccount.js';
 
 const Stack = createNativeStackNavigator();
 const AppStack = () => {
@@ -28,6 +29,7 @@ const AppStack = () => {
 
       {/* Drawer */}
       <Stack.Screen name={routes.mainScreen} component={SideDrawer} />
+      <Stack.Screen name={routes.verifyAccount} component={VerifyAccount} />
 
       {/* <Stack.Screen name={routes.supportTicketDeatail} component={TicketDetail} /> */}
 

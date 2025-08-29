@@ -5,7 +5,7 @@ import { MyButton } from '../../components/MyButton'
 import showToast from '../../functions/showToast'
 import MyLoader from '../../components/MyLoader'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { CHNAGE_PASSWORD } from '../../DAL'
+import { CHANGE_PASSWORD } from '../../DAL'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import MyInputs from '../../components/MyInputs'
 import MyText from '../../components/MyText'
@@ -39,20 +39,34 @@ const ChangePassword = ({ navigation }) => {
         logout_from: logoutFrom
       }
       let token = await AsyncStorage.getItem("@token")
-      let res = await CHNAGE_PASSWORD({ body, token, navigation });
+      let res = await CHANGE_PASSWORD({ body, token, navigation });
       setLoader(false);
       if (res.code == 200) {
-        showToast({ title: "Password Changed", body: "Your password has been Changed Successfully!", type: "success" });
-        if (logoutFrom == "all_devices") {
-          await AsyncStorage.multiRemove(["token"]);
-          navigation.reset({
-            index: 0,
-            routes: [{
-              name: routes.login
-            }]
-          })
+        if (res?.consultant_2fa_enabled) {
+          navigation.navigate(routes.verifyAccount, {
+            purpose: "change-password",
+            timer: res?.expiresIn,
+            apiBody: {
+              ...body,
+              email: res?.tempData?.email,
+              sessionId: res?.sessionId,
+              action: res?.action,
+              context: res?.context
+            }
+          });
         } else {
-          navigation.goBack()
+          showToast({ title: "Password Changed", body: "Your password has been Changed Successfully!", type: "success" });
+          if (logoutFrom == "all_devices") {
+            await AsyncStorage.multiRemove(["token"]);
+            navigation.reset({
+              index: 0,
+              routes: [{
+                name: routes.login
+              }]
+            })
+          } else {
+            navigation.goBack()
+          }
         }
       }
     }

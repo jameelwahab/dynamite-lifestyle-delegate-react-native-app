@@ -391,7 +391,8 @@ const routes = {
   templateQuestionAnswers:"TEMPLATE_QUESTION_ANSWERS_SCREEN",
   templateAnswersDetails: "TEMPLATE_ANSWERS_DETAILS",
   templatePaymentPlans:"TEMPLATE_PAYMENT_PLANS",
-  templatePaymentManagePlan:"TEMPLATE_PAYMENT_PLAN_MANAGE_ACCESS"
+  templatePaymentManagePlan:"TEMPLATE_PAYMENT_PLAN_MANAGE_ACCESS",
+  verifyAccount:"VERIFY_ACCOUNT_SCREEN",
 
 
 

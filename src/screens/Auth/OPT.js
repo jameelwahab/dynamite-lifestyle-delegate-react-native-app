@@ -52,27 +52,6 @@ const OPTscreen = ({ navigation, route }) => {
 
             <View style={{}}>
               <View style={{ marginVertical: "10%", alignItems: "center" }}>
-                {/* <CodeField
-                value={code}
-                caretHidden={false}
-                onChangeText={text => setCode(text)}
-                cellCount={6}
-                autoFocus={true}
-                keyboardAppearance="dark"
-                rootStyle={styles.codeFieldRoot}
-                keyboardType="number-pad"
-                textContentType="oneTimeCode"
-                renderCell={({ index, symbol, isFocused }) => (
-                  <View key={index} style={styles.cellView}>
-                    <Text
-                      key={index}
-                      style={styles.cell}
-                      selectionColor={colors.text}>
-                      {symbol || (isFocused ? <Cursor /> : null)}
-                    </Text>
-                  </View>
-                )}
-              /> */}
 
                 <SmoothPinCodeInput
                   ref={codeInput}
@@ -120,40 +99,3 @@ const OPTscreen = ({ navigation, route }) => {
 }
 
 export default OPTscreen;
-const styles = StyleSheet.create({
-  root: { flex: 1, padding: 20 },
-  title: { textAlign: 'center', fontSize: 30 },
-  codeFieldRoot: { marginTop: 20 },
-  cellView: {
-    textAlign: 'center',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: colors.secondary,
-    borderBottomColor: colors.primary,
-    borderBottomWidth: 4,
-    // height: 50,
-
-    aspectRatio: 1,
-    width: Platform.OS == 'android' ? 45 : 50,
-    marginHorizontal: 1,
-    borderColor: colors.primary,
-    borderRadius: 10,
-    fontSize: 24,
-    fontFamily: fonts.regular,
-
-    // borderWidth: 1,
-    // borderColor: colors.lightGrey,
-  },
-  cell: {
-    width: 40,
-    height: 40,
-    lineHeight: 35,
-    fontSize: 24,
-    textAlign: 'center',
-    color: colors.text,
-    fontFamily: fonts.regular
-  },
-  focusCell: {
-    borderColor: '#000',
-  },
-});
