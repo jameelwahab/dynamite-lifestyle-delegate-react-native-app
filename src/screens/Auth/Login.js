@@ -82,12 +82,13 @@ const Login = ({ navigation }) => {
           navigation.navigate(routes.verifyAccount, {
             purpose: "login",
             timer: res?.expiresIn,
+            showLogo: true,
             apiBody: {
               ...obj,
               email: res?.tempData?.email,
               sessionId: res?.sessionId,
               action: res?.action,
-              context: res?.context
+              context: res?.context,
             }
           });
         } else {

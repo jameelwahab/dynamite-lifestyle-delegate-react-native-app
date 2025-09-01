@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, Platform, Dimensions } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import RootView from '../../components/RootView';
 import TitleView from '../../components/TitleView';
@@ -20,9 +20,12 @@ import InitWithAuth from '../../functions/InitWithAuth';
 import showToast from '../../functions/showToast';
 import routes from '../../navigation/routes';
 import { setUserTimeZone } from '../../redux/reducers/timezoneSlice';
+import MyImage2 from '../../components/MyImage2';
+import { S3_URL } from '../../utilities/constants';
+import { selectSettings } from '../../redux/reducers/settingSlice';
 
 const VerifyAccount = ({ navigation, route }) => {
-  const { token, user } = useSelector(selectUser);
+  const { token, user, S3_URL } = useSelector(selectUser);
   const { params } = route
   const timerSeconds = params?.timer || 30;
   const sessionId = useRef({ value: params?.apiBody?.sessionId || "" });
@@ -30,6 +33,7 @@ const VerifyAccount = ({ navigation, route }) => {
   const [code, setCode] = useState('');
   const [loader, setLoader] = useState(false);
   const [resendOTPLoader, setResendOTPLoader] = useState(false);
+  const { settings } = useSelector(selectSettings);
   const [countDown, setCountDown] = useState(timerSeconds);
   const codeInput = useRef();
   const dispatch = useDispatch();
@@ -125,12 +129,16 @@ const VerifyAccount = ({ navigation, route }) => {
   }
 
   const onSubmitPress = () => {
-    if (params?.purpose == "login") {
-      verifyLogin();
-    } else if (params?.purpose == "change-password") {
-      verifyChangePassword();
-    } else if (params?.purpose == "edit-profile") {
-      verifyEditProfile();
+    if (code.length != 6) {
+      showToast({ title: 'Please enter 6-digit code', type: 'error' });
+    } else {
+      if (params?.purpose == "login") {
+        verifyLogin();
+      } else if (params?.purpose == "change-password") {
+        verifyChangePassword();
+      } else if (params?.purpose == "edit-profile") {
+        verifyEditProfile();
+      }
     }
   };
 
@@ -191,8 +199,8 @@ const VerifyAccount = ({ navigation, route }) => {
             style={[{ marginTop: 5 }]}>
             {countDown != 0 ? (
               <MyText color={colors.lightText} style={{ letterSpacing: 0.5 }}>
-                {' '}
-                {'Resend Code in ' + moment.utc(countDown * 1000).format("mm:ss")}{' '}
+                <MyText color={colors.lightText}>{'Resend Code in '}</MyText>
+                <MyText type='bold' color={colors.primary} >{moment.utc(countDown * 1000).format("mm:ss")}</MyText>
               </MyText>
             ) : (
               <MyText color={colors.primary}> {'Resend Code'} </MyText>
@@ -211,12 +219,33 @@ const VerifyAccount = ({ navigation, route }) => {
         <Flex flex={1}>
           <KeyboardAwareScrollView keyboardShouldPersistTaps="handled">
             <View style={{ marginTop: 10 }}>
-              <MyText fontSize={20} type="medium">
+
+              {!!params?.showLogo && !!settings?.brand_logo && !!S3_URL &&
+                <Flex alignItems="center">
+                  <MyImage2
+                    uri={S3_URL + settings?.brand_logo}
+                    width={Dimensions.get('screen').width - 100}
+                  />
+                  <View style={{ height: 10 }} />
+                </Flex>
+              }
+
+
+
+
+              <MyText align='center' fontSize={20} type="medium">
                 Verify Your Account
               </MyText>
               <View style={{ marginTop: 5 }}>
-                <MyText color={colors.lightText}>
-                  Enter 6 digit code sent to your email address.
+                <MyText align='center' color={colors.lightText}>
+                  {"Enter 6 digit code sent to your "}
+                  <MyText color={colors.primary} >{params?.api?.email || user?.email}</MyText>.
+                </MyText>
+              </View>
+
+              <View style={{ marginTop: 5 }}>
+                <MyText align='center' color={colors.lightText}>
+                  Please check your inbox and enter the verification code below to confirm your email address.
                 </MyText>
               </View>
 
@@ -230,7 +259,7 @@ const VerifyAccount = ({ navigation, route }) => {
                     cellSize={(utilities.windowWidth() - 45) / 6}
                     // placeholder={"x"}
                     cellStyle={{
-                      borderBottomWidth: 5,
+                      borderBottomWidth: 3,
                       borderColor: colors.lightText,
                       borderRadius: 5,
                       // justifyContent:"space-between"
