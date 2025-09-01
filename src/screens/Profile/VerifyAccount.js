@@ -239,7 +239,7 @@ const VerifyAccount = ({ navigation, route }) => {
               <View style={{ marginTop: 5 }}>
                 <MyText align='center' color={colors.lightText}>
                   {"Enter 6 digit code sent to your "}
-                  <MyText color={colors.primary} >{params?.api?.email || user?.email}</MyText>.
+                  <MyText color={colors.primary} >{params?.apiBody?.email || user?.email}</MyText>.
                 </MyText>
               </View>
 
