@@ -54,6 +54,12 @@ const ProfileDropDown = ({ isVisible = false, closeModal = () => { }, user }) =>
     navigation.navigate(screen)
   }
 
+  const navigateToEditProfile = () => {
+    closeModal()
+    let lastRouteName = navigation.getState().routes[navigation.getState().index].name
+    navigation.navigate(routes.editProfile, { lastRouteName })
+  }
+
 
   const copyTheText = (text1, text2) => {
     copyText(text1, text2);
@@ -91,7 +97,7 @@ const ProfileDropDown = ({ isVisible = false, closeModal = () => { }, user }) =>
 
         <View style={{ marginTop: 10 }}>
 
-          {optionsView(icons.user, "Edit Profile", () => navigateTo(routes.editProfile))}
+          {optionsView(icons.user, "Edit Profile", () => navigateToEditProfile())}
           {optionsView(icons.copy, "Copy Refferal Id", () => copyTheText(user?.affiliate_url_name, "Refferal Id Copied"))}
           {optionsView(icons.copy, "Copy App Refferal Id", () => copyTheText(user?.affiliate_link, "App Refferal Id Copied"))}
           {optionsView(icons.edit, "Change Affiliate Id", () => navigateTo(routes?.changeAffiliateIdScreen))}

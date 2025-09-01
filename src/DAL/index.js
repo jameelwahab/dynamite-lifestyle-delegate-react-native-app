@@ -7,10 +7,10 @@ export {
   CHANGE_PASSWORD,
   VERIFY_CHANGE_PASSWORD,
   VERIFY_LOGIN,
-  RESEND_OTP
+  RESEND_OTP,
 } from './Auth';
-export {INIT_WITHOUT_TOKEN, INIT_WITH_TOKEN} from './Init';
-export {EDIT_PROFILE} from './Profile';
+export { INIT_WITHOUT_TOKEN, INIT_WITH_TOKEN } from './Init';
+export { EDIT_PROFILE, VERIFY_EDIT_PROFILE } from './Profile';
 export {
   CHANGE_ZOOM_CRED,
   UPDATE_REMINDER_MESSAGES,
@@ -62,7 +62,7 @@ export {
   DELETE_TICKET_CONTECT_SUPPORT,
   MARK_RESOLVE_TICKET_CONTECT_SUPPORT,
 } from './ContactSupport';
-export {DASHBAORD} from './MissionControl';
+export { DASHBAORD } from './MissionControl';
 export {
   GET_FEED_LIST,
   GET_COMMENT_LIST,
@@ -214,7 +214,7 @@ export {
   GET_LINKS_SALES_TEAM_LIST_FOR_ACCESS,
   UPDATE_LINKS_SALES_TEAM_ACCESS,
 } from './Links';
-export {GET_MEMBERS_ANSWERS_LIST} from './MemberAnswers';
+export { GET_MEMBERS_ANSWERS_LIST } from './MemberAnswers';
 export {
   GET_SALE_PAGES_LIST_FOR_SUBSCRIPTION,
   GET_SUBSCRIPTION_LIST_OF_MEMBERS,
@@ -277,7 +277,7 @@ export {
   RECORDING_PROGRAMMES_AND_CATEGORY,
   RECORDING_REMOVE_AUDIO,
 } from './Recordings';
-export {GET_VAULT_LIST} from './Vault';
+export { GET_VAULT_LIST } from './Vault';
 export {
   GET_ASSESSMENT_LIST,
   ASSESSMENT_NOTE_ADD,
@@ -329,7 +329,7 @@ export {
   SET_DAILY_STREAK_REMINDER,
   GET_DAILY_STREAK_LIST,
 } from './DailyStreakPerformance';
-export {GET_MONTHLY_REPORT} from './MonthyReport';
+export { GET_MONTHLY_REPORT } from './MonthyReport';
 export {
   CREATE_NEW_BROADCAST_CHAT,
   GET_BROADCAST_CHAT_DETAIL,
@@ -340,7 +340,7 @@ export {
   EDIT_SCHEDULE_BROADCAST_MESSAGE,
   DELETE_SCHEDULE_BROADCAST_MESSAGE,
 } from './Broadcast';
-export {GET_QUATER_QUESTION_LIST} from './QuaterQuestions';
+export { GET_QUATER_QUESTION_LIST } from './QuaterQuestions';
 export {
   GET_ACCOUNTABILITY_TRACKER_BY_DATE,
   ACCOUNTABILITY_TRACKER_LIST,
@@ -434,7 +434,7 @@ export {
   GET_MISSION_MEMBER_LIST,
 } from './Mission';
 
-export {GET_LIVE_CHAT_LIST} from './LiveChat';
+export { GET_LIVE_CHAT_LIST } from './LiveChat';
 
 export {
   GET_REVIEW_FEEDS,
@@ -448,9 +448,9 @@ export {
   APPROVE_COMMENT_REVIEW,
 } from './commentReview.js';
 
-export {GET_UPDATES_LIST} from './Updates';
+export { GET_UPDATES_LIST } from './Updates';
 
-export {GET_AFFILAITE_LINK} from './Affiliates';
+export { GET_AFFILAITE_LINK } from './Affiliates';
 
 export {
   GET_FEED_KEYWORDS_SETTINGS,
@@ -468,7 +468,7 @@ export {
   GET_PAYMENT_LIST,
   GET_TEMPLATE_PAYMENT_MANAGE_LIST,
 } from './Templates';
-export {GET_GROUP_LIST} from './SendNotifications.js';
+export { GET_GROUP_LIST } from './SendNotifications.js';
 export {
   GET_ACTIVE_DELEGATES,
   ASSIGN_DELEGATES_FOR_SELF_IMAGE_OR_GOAL_STATEMENT,

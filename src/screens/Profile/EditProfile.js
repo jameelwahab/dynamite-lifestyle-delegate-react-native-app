@@ -21,8 +21,10 @@ import MyLoader from '../../components/MyLoader'
 import showToast from '../../functions/showToast'
 import { setUserTimeZone } from '../../redux/reducers/timezoneSlice'
 import MyInputs from '../../components/MyInputs'
+import routes from '../../navigation/routes'
 
-const EditProfile = ({ navigation }) => {
+const EditProfile = ({ navigation, route }) => {
+  const { params } = route
   const [isCountryModalVisible, setIsCountryModalVisible] = useState(false);
   const [isImageModalVisible, setIsImageModalVisible] = useState(false)
   const [isTimeZonePickerVisible, setTimeZonePickerVisible] = useState(false)
@@ -65,10 +67,31 @@ const EditProfile = ({ navigation }) => {
 
     let res = await EDIT_PROFILE({ navigation, token, body: fd, params: user?._id });
     if (res.code == 200) {
-      dispatch(setConsultant(res?.consultant));
-      dispatch(setUserTimeZone(res?.consultant?.time_zone));
-      showToast({ type: 'success', title: res.message, });
-      navigation.goBack()
+      if (res?.consultant_2fa_enabled) {
+        let body = {
+          ...res?.tempData?.originalRequestData
+        }
+        if (userData?.imageToUpload) {
+          body['image'] = userData?.imageToUpload
+        }
+        navigation.navigate(routes.verifyAccount, {
+          lastRouteName: params?.lastRouteName,
+          purpose: "edit-profile",
+          timer: res?.expiresIn,
+          apiBody: {
+            body: body,
+            email: res?.tempData?.oldEmail,
+            sessionId: res?.sessionId,
+            action: res?.action,
+            context: res?.context
+          }
+        });
+      } else {
+        dispatch(setConsultant(res?.consultant));
+        dispatch(setUserTimeZone(res?.consultant?.time_zone));
+        showToast({ type: 'success', title: res.message, });
+        navigation.goBack()
+      }
     }
     setLoader(false)
   }

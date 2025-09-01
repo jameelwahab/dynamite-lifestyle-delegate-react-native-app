@@ -11,14 +11,15 @@ import MyText from '../../components/MyText';
 import AuthHeader from '../../components/AuthHeader';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectUser } from '../../redux/reducers/userSlice';
+import { selectUser, setConsultant } from '../../redux/reducers/userSlice';
 import moment from 'moment';
-import { RESEND_OTP, VERIFY_CHANGE_PASSWORD, VERIFY_LOGIN } from '../../DAL';
+import { RESEND_OTP, VERIFY_CHANGE_PASSWORD, VERIFY_EDIT_PROFILE, VERIFY_LOGIN } from '../../DAL';
 import MyLoader from '../../components/MyLoader';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import InitWithAuth from '../../functions/InitWithAuth';
 import showToast from '../../functions/showToast';
 import routes from '../../navigation/routes';
+import { setUserTimeZone } from '../../redux/reducers/timezoneSlice';
 
 const VerifyAccount = ({ navigation, route }) => {
   const { token, user } = useSelector(selectUser);
@@ -97,11 +98,39 @@ const VerifyAccount = ({ navigation, route }) => {
     }
   }
 
+  const verifyEditProfile = async () => {
+    setLoader(true)
+
+    let fd = new FormData();
+    fd.append("sessionId", sessionId?.current?.value)
+    fd.append("otpCode", code)
+
+    for (const [key, value] of Object.entries(params.apiBody.body)) {
+      fd.append(key, value);
+    }
+    const res = await VERIFY_EDIT_PROFILE({
+      token,
+      navigation,
+      body: fd
+    })
+    if (res.code == 200) {
+      showToast({ type: 'success', title: res.message, });
+      dispatch(setConsultant(res?.consultant));
+      dispatch(setUserTimeZone(res?.consultant?.time_zone));
+      showToast({ type: 'success', title: res.message, });
+      navigation.navigate(params?.lastRouteName)
+    } else {
+      setLoader(false)
+    }
+  }
+
   const onSubmitPress = () => {
     if (params?.purpose == "login") {
       verifyLogin();
     } else if (params?.purpose == "change-password") {
       verifyChangePassword();
+    } else if (params?.purpose == "edit-profile") {
+      verifyEditProfile();
     }
   };
 
