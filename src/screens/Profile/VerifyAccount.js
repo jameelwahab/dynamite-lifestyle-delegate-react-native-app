@@ -146,7 +146,7 @@ const VerifyAccount = ({ navigation, route }) => {
     setResendOTPLoader(true);
     let resp = await RESEND_OTP({
       body: {
-        email: user?.email,
+        email: params?.apiBody?.email || user?.email,
         consultantId: user?._id,
         context: params?.apiBody?.context,
         sessionId: sessionId?.current?.value
@@ -162,7 +162,7 @@ const VerifyAccount = ({ navigation, route }) => {
       setCountDown(timerSeconds);
       showToast({ title: "Code has been sent to your email", type: 'success' });
     } else {
-      showToast({ title: 'Error', message: resp?.message, type: 'error' });
+      showToast({ title: 'Error', body: resp?.message, type: 'error' });
     }
   }
 
