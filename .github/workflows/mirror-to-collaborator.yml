@@ -9,7 +9,7 @@ on:
 jobs:
   mirror:
     runs-on: ubuntu-latest
-
+    if: github.repository == 'DDLifeCoaching/dynamite-lifestyle-delegate-react-native-app.git`'
     steps:
       - name: Checkout full repository
         uses: actions/checkout@v4
