@@ -6,15 +6,27 @@ on:
       - dev
       - master
 
+permissions:
+  contents: write
+
 jobs:
   mirror:
     runs-on: ubuntu-latest
-    if: github.repository == 'DDLifeCoaching/dynamite-lifestyle-delegate-react-native-app.git`'
+    # ✅ Corrected condition (no .git, no backtick, lowercase)
+    if: github.repository == 'ddlifecoaching/dynamite-lifestyle-delegate-react-native-app'
+
     steps:
       - name: Checkout full repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Debug Repository Info
+        run: |
+          echo "Repository: ${{ github.repository }}"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Commit: ${{ github.sha }}"
+          echo "✅ Running mirror job"
 
       - name: Setup SSH key for pushing
         run: |
