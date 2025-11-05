@@ -1,34 +1,24 @@
-import {View, Text, FlatList, StyleSheet, TouchableOpacity} from 'react-native';
-import React, {useEffect, useRef, useState} from 'react';
+import { View, Text, FlatList, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
 import RootView from '../../components/RootView';
-import {useSelector} from 'react-redux';
-import {selectUser} from '../../redux/reducers/userSlice';
-import {selectNavbar} from '../../redux/reducers/navbarSlice';
-import {GET_HELPTECH_CATEGORIES, GET_TECH_CATEGORY_LIST} from '../../DAL';
+import { useSelector } from 'react-redux';
+import { selectUser } from '../../redux/reducers/userSlice';
+import { selectNavbar } from '../../redux/reducers/navbarSlice';
+import { GET_HELPTECH_CATEGORIES } from '../../DAL';
 import MyLoader from '../../components/MyLoader';
-import utilities from '../../utilities';
-import {dateTimeFormat} from '../../utilities/constants';
-import {colors} from '../../utilities/colors';
+import { colors } from '../../utilities/colors';
 import routes from '../../navigation/routes';
-import {main} from '../../utilities/styles';
-import MyChip from '../../components/MyChip';
-import {Flex, Row} from '../../UIComponents/FlexViews';
-import {icons} from '../../utilities/icons';
-import TitleView from '../../components/TitleView';
-import Filter from './components/Filter';
-import isArray from '../../functions/isArray';
-import moment from 'moment';
+import { main } from '../../utilities/styles';
 import MyRefreshControl from '../../components/MyRefreshControl';
 import EmptyView from '../../components/EmptyView';
 import SearchView from '../../components/SearchView';
 import LessonView2 from '../../components/LessonView2';
-import LessonView from '../../components/LessonView';
 
-const HelpTechCategory = ({navigation, route}) => {
-  const {token} = useSelector(selectUser);
-  const {value, parentValue} = route?.params;
+const HelpTechCategory = ({ navigation, route }) => {
+  const { token } = useSelector(selectUser);
+  const { value, parentValue } = route?.params;
   console.log(value, parentValue, 'value, parentValue');
-  const {navbar} = useSelector(selectNavbar);
+  const { navbar } = useSelector(selectNavbar);
   const [title] = useState(
     navbar
       ?.find(x => x.value == parentValue)
@@ -51,7 +41,7 @@ const HelpTechCategory = ({navigation, route}) => {
   };
 
   const getDataFromServer = async () => {
-    let res = await GET_HELPTECH_CATEGORIES({navigation, token});
+    let res = await GET_HELPTECH_CATEGORIES({ navigation, token });
     if (res.code == 200) {
       setList(res?.help_video_category);
       setLoader(false);
@@ -63,15 +53,15 @@ const HelpTechCategory = ({navigation, route}) => {
   };
 
   const onHelpTechDetailScreen = (item) => {
-	navigation.navigate(routes.helptechListScreen, {
-		categoryId: item?._id,
-		title:item?.title
-	})
-}
+    navigation.navigate(routes.helptechListScreen, {
+      categoryId: item?._id,
+      title: item?.title
+    })
+  }
 
-  const renderTutorials = ({item, index}) => {
+  const renderTutorials = ({ item, index }) => {
     return (
-      <View style={{flex: 1 / 2}}>
+      <View style={{ flex: 1 / 2 }}>
         <View
           style={[
             {
@@ -114,10 +104,10 @@ const HelpTechCategory = ({navigation, route}) => {
     //   </Pressable>)
   };
 
-  const sectionHeader = ({item}) => {
+  const sectionHeader = ({ item }) => {
     return (
       <View style={[__styles.header, {}]}>
-        <View style={{alignSelf: 'flex-start', paddingBottom: 5}}>
+        <View style={{ alignSelf: 'flex-start', paddingBottom: 5 }}>
           <Text style={main.heading}>{item?.title}</Text>
           <View
             style={{
@@ -146,7 +136,7 @@ const HelpTechCategory = ({navigation, route}) => {
 
   const headerComponent = () => {
     return (
-      <View style={{paddingTop: 5, backgroundColor: colors.darkSecondary}}>
+      <View style={{ paddingTop: 5, backgroundColor: colors.darkSecondary }}>
         {mySearchView()}
       </View>
     );
@@ -154,7 +144,7 @@ const HelpTechCategory = ({navigation, route}) => {
 
   const mySearchView = () => {
     return (
-      <View style={{paddingBottom: 5}}>
+      <View style={{ paddingBottom: 5 }}>
         <SearchView
           hideBtn
           search={searchText}
@@ -169,14 +159,14 @@ const HelpTechCategory = ({navigation, route}) => {
       title={title}
       subTitle={`Total : ${list.length}`}
       hideBackBottomButton>
-      <View style={{flex: 1}}>
+      <View style={{ flex: 1 }}>
         <FlatList
           ListHeaderComponent={headerComponent()}
           stickyHeaderIndices={[0]}
           stickyHeaderHiddenOnScroll={true}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{paddingBottom: 30}}
-			 numColumns={2}
+          contentContainerStyle={{ paddingBottom: 30 }}
+          numColumns={2}
           refreshControl={
             <MyRefreshControl
               refreshing={refreshing}

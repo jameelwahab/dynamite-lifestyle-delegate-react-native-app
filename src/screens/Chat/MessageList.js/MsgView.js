@@ -1,22 +1,22 @@
-import {View, Text, TouchableOpacity, Pressable, Image} from 'react-native';
-import React, {useEffect, useState} from 'react';
+import { View, Text, TouchableOpacity, Pressable, Image } from 'react-native';
+import React, { useEffect, useState } from 'react';
 import utilities from '../../../utilities';
 import MyText from '../../../components/MyText';
-import {convertTimezone} from '../../../functions/convertTime';
-import {dateTimeFormat} from '../../../utilities/constants';
-import {colors} from '../../../utilities/colors';
+import { convertTimezone } from '../../../functions/convertTime';
+import { dateTimeFormat } from '../../../utilities/constants';
+import { colors } from '../../../utilities/colors';
 import ResponsiveImage from '../../../components/ResponsiveImage';
-import {isHtml} from '../../../functions/regex';
+import { isHtml } from '../../../functions/regex';
 import MyWebview from '../../../components/MyWebview';
 import copyText from '../../../functions/copyText';
-import Markdown from '@ronradtke/react-native-markdown-display';
-import {fonts} from '../../../utilities/fonts';
+import Markdown, { MarkdownIt } from '@ronradtke/react-native-markdown-display';
+import { fonts } from '../../../utilities/fonts';
 import AudioChatView from './AudioChatView';
 import openUrl from '../../../functions/openUrl';
-import {icons} from '../../../utilities/icons';
+import { icons } from '../../../utilities/icons';
 import urlify from '../../../functions/urlify';
-import {useSelector} from 'react-redux';
-import {selectUser} from '../../../redux/reducers/userSlice';
+import { useSelector } from 'react-redux';
+import { selectUser } from '../../../redux/reducers/userSlice';
 
 const MsgView = ({
   item,
@@ -30,10 +30,15 @@ const MsgView = ({
   state,
   setState,
 }) => {
-  const {S3_URL} = useSelector(selectUser);
+  const { S3_URL } = useSelector(selectUser);
   const isOtherMember = id => {
     return id == user?._id;
   };
+
+  let breakChar = ' ';
+  const doBreak = false;
+  doBreak ? (breakChar = '\n') : (breakChar = ' ');
+
   return (
     <TouchableOpacity
       onLongPress={onMsgLongPress}
@@ -62,10 +67,10 @@ const MsgView = ({
               pointerEvents="box-only"
               onLongPress={onMsgLongPress}
               onPress={() => openImageZommer(item?.image)}
-              style={{padding: 2}}>
+              style={{ padding: 2 }}>
               <ResponsiveImage
                 uri={S3_URL + item?.image}
-                source={{uri: S3_URL + item?.image}}
+                source={{ uri: S3_URL + item?.image }}
               />
             </TouchableOpacity>
           )}
@@ -92,9 +97,9 @@ const MsgView = ({
           )}
 
           {/*//?   Message View  */}
-
+          {index == 0 && console.log(item?.message.replace(/\n/g, '  \n'))}
           {!!item?.message && (
-            <View style={{paddingHorizontal: 5}}>
+            <View style={{ paddingHorizontal: 5 }}>
               {isHtml(item?.message) ? (
                 <MyWebview
                   style={
@@ -115,8 +120,7 @@ const MsgView = ({
                     openUrl(url);
                     return false;
                   }}>
-                  {urlify(item?.message)}
-                  {/* <MyText>{item.message}</MyText> */}
+                  {urlify(item?.message.replace(/\n/g, '\n\u200B'))}
                 </Markdown>
               )}
             </View>
@@ -130,20 +134,20 @@ const MsgView = ({
               alignItems: 'center',
             }}>
             {!isOtherMember(item?.receiver_id) && (
-              <View style={{marginRight: 5}}>
+              <View style={{ marginRight: 5 }}>
                 {!!item?.status == false || item?.status == 'sent'
                   ? icons.sent(colors.white, 18)
                   : icons.seen(
-                      item?.status == 'read' ? colors.primary : colors.white,
-                      18,
-                    )}
+                    item?.status == 'read' ? colors.primary : colors.white,
+                    18,
+                  )}
               </View>
             )}
             {!!item?.is_broadcast && (
-              <View style={{marginRight: 5}}>
+              <View style={{ marginRight: 5 }}>
                 <Image
                   source={icons.broadcast}
-                  style={{height: 20, width: 20, tintColor: colors.primary}}
+                  style={{ height: 20, width: 20, tintColor: colors.primary }}
                 />
               </View>
             )}

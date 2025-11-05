@@ -242,7 +242,8 @@ const MissionReport = ({ navigation, route }) => {
             renderItem={({ item, index }) => {
               return (
                 <QuestionsView schedule={item}
-                  isAllow={(mission?.mission_status == "completed" && (index == schedules.length - 1)) || hasPermission}
+                  isAllow={(mission?.mission_status == "completed" && hasPermission) ?
+                    true : (index == schedules.length - 1)}
                   isLast={(schedules.length - 1 == index)} />
               )
             }}

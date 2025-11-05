@@ -1,6 +1,7 @@
 {
   "name": "delegateApp",
   "version": "0.0.1",
+  "packageManager": "yarn@3.8.7",
   "private": true,
   "scripts": {
     "android": "react-native run-android",

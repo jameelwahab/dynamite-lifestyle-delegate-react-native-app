@@ -7,7 +7,7 @@ export const LIST_OF_MEMBERS = ({ token, navigation, page, searchText, body: {
   is_date_range = false, lead_status = [], member_ship_expiry = "", membership_expiry = null,
   membership_purchase_expiry_from = moment(), membership_purchase_expiry_to = moment(),
   nurture = null, delegate = null, plan = null, sort_by = null, status = "", to_date = null,
-  user_status_type = "", search_text = ""
+  user_status_type = "", program_status = "", program = [], search_text = ""
 } }) => {
   return invokeApi({
     path: `api/member/member_list_for_delegate?page=${page}&limit=20&search_text=${searchText}`,
@@ -16,7 +16,7 @@ export const LIST_OF_MEMBERS = ({ token, navigation, page, searchText, body: {
       coins, coins_from, coins_range, coins_to, community, date, event_page, expiry_in, filter_From,
       filter_name, from_date, is_date_range, lead_status, member_ship_expiry, membership_expiry, membership_expiry,
       membership_purchase_expiry_from, downloaded_app, membership_purchase_expiry_to, nurture, delegate, plan, sort_by, status, to_date, user_status_type,
-      search_text, badge_levels
+      search_text, badge_levels, program_status, program
     },
     token,
     navigation,
@@ -29,7 +29,7 @@ export const LIST_OF_MEMBERS_ONLY = ({ token, navigation, page, searchText, body
   is_date_range = false, lead_status = [], member_ship_expiry = "", membership_expiry = null,
   membership_purchase_expiry_from = moment(), membership_purchase_expiry_to = moment(),
   nurture = null, plan = null, sort_by = null, status = "", to_date = null,
-  user_status_type = "", search_text = "", badge_levels = []
+  user_status_type = "", search_text = "", badge_levels = [], program = [], program_status = ""
 } }) => {
   return invokeApi({
     path: `api/event_subscriber/subscriber_list_for_member_with_filter?page=${page}&limit=20&search_text=${searchText}`,
@@ -38,7 +38,7 @@ export const LIST_OF_MEMBERS_ONLY = ({ token, navigation, page, searchText, body
       coins, coins_from, coins_range, coins_to, community, date, event_page, expiry_in, filter_From,
       filter_name, from_date, is_date_range, lead_status, member_ship_expiry, membership_expiry, membership_expiry,
       membership_purchase_expiry_from, downloaded_app, membership_purchase_expiry_to, nurture, plan, sort_by, status, to_date, user_status_type,
-      search_text, badge_levels
+      search_text, badge_levels, program_status, program
     },
     token,
     navigation,
@@ -51,7 +51,7 @@ export const LIST_OF_NURTURE = ({ token, navigation, page, searchText, body: {
   is_date_range = false, lead_status = [], member_ship_expiry = "", membership_expiry = null,
   membership_purchase_expiry_from = moment(), membership_purchase_expiry_to = moment(),
   delegate = null, plan = null, sort_by = null, status = "", to_date = null,
-  user_status_type = "", search_text = "", badge_levels = []
+  user_status_type = "", search_text = "", badge_levels = [], program = [], program_status = ""
 } }) => {
   return invokeApi({
     path: `api/consultant/member_list_for/associate?page=${page}&limit=20&search_text=${searchText}`,
@@ -60,7 +60,7 @@ export const LIST_OF_NURTURE = ({ token, navigation, page, searchText, body: {
       coins, coins_from, coins_range, coins_to, community, date, event_page, expiry_in, filter_From,
       filter_name, from_date, is_date_range, lead_status, member_ship_expiry, membership_expiry, membership_expiry,
       membership_purchase_expiry_from, downloaded_app, membership_purchase_expiry_to, delegate, plan, sort_by, status, to_date, user_status_type,
-      search_text, badge_levels
+      search_text, badge_levels, program_status, program
     },
     token,
     navigation,
@@ -99,7 +99,7 @@ export const LEAD_STATUS_LIST = ({ token, navigation, }) => {
 
 
 export const CHANGE_LEAD_STATUS = ({ token, navigation, body: {
-  changed_date_time, income_value, lead_status, member_id, lead_status_expiry=undefined
+  changed_date_time, income_value, lead_status, member_id, lead_status_expiry = undefined
 } }) => {
   return invokeApi({
     path: `api/lead_status/change/for_member`,
@@ -113,7 +113,7 @@ export const CHANGE_LEAD_STATUS = ({ token, navigation, body: {
 }
 
 export const EDIT_LEAD_STATUS = ({ token, navigation, body: {
-  id, changed_date_time, income_value, lead_status, member_id,lead_status_expiry=undefined
+  id, changed_date_time, income_value, lead_status, member_id, lead_status_expiry = undefined
 } }) => {
   return invokeApi({
     path: `api/lead_status/edit_lead_status/for_member`,

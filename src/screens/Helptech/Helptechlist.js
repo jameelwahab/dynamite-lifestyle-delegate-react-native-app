@@ -1,19 +1,16 @@
-import {View, Text, FlatList, StyleSheet, TouchableOpacity} from 'react-native';
-import React, {useEffect, useRef, useState} from 'react';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
 import RootView from '../../components/RootView';
-import {useSelector} from 'react-redux';
-import {selectUser} from '../../redux/reducers/userSlice';
-import {selectNavbar} from '../../redux/reducers/navbarSlice';
-import {GET_TECH_CATEGORY_LIST} from '../../DAL';
+import { useSelector } from 'react-redux';
+import { selectUser } from '../../redux/reducers/userSlice';
+import { GET_TECH_CATEGORY_LIST } from '../../DAL';
 import MyLoader from '../../components/MyLoader';
-import utilities from '../../utilities';
-import {dateTimeFormat} from '../../utilities/constants';
-import {colors} from '../../utilities/colors';
+import { dateTimeFormat } from '../../utilities/constants';
+import { colors } from '../../utilities/colors';
 import routes from '../../navigation/routes';
-import {main} from '../../utilities/styles';
 import MyChip from '../../components/MyChip';
-import {Flex, Row} from '../../UIComponents/FlexViews';
-import {icons} from '../../utilities/icons';
+import { Flex, Row } from '../../UIComponents/FlexViews';
+import { icons } from '../../utilities/icons';
 import TitleView from '../../components/TitleView';
 import Filter from './components/Filter';
 import isArray from '../../functions/isArray';
@@ -24,10 +21,10 @@ import SearchView from '../../components/SearchView';
 import LessonView2 from '../../components/LessonView2';
 import FooterLoader from '../../components/FooterLoader';
 
-const Helptechlist = ({navigation, route}) => {
-  const paging = useRef({page: 0, canLoadMore: false})?.current;
+const Helptechlist = ({ navigation, route }) => {
+  const paging = useRef({ page: 0, canLoadMore: false })?.current;
   const categoryId = route?.params?.categoryId;
-  const {token} = useSelector(selectUser);
+  const { token } = useSelector(selectUser);
   const ref_filterModal = useRef();
   const [title] = useState(route?.params?.title || '');
   const [list, setList] = useState([]);
@@ -45,16 +42,16 @@ const Helptechlist = ({navigation, route}) => {
   const removeFromArrayFilter = (index, type) => {
     if (appliedFilter[type]) {
       appliedFilter[type].splice(index, 1);
-      setAppliedFilter({...appliedFilter});
+      setAppliedFilter({ ...appliedFilter });
     }
   };
 
   const removeFromDateFilter = () => {
-    setAppliedFilter({...appliedFilter, to: '', from: ''});
+    setAppliedFilter({ ...appliedFilter, to: '', from: '' });
   };
 
   const applyFilter = filters => {
-    setAppliedFilter({...filters});
+    setAppliedFilter({ ...filters });
   };
 
   const getDataFromServer = async () => {
@@ -106,10 +103,11 @@ const Helptechlist = ({navigation, route}) => {
   };
 
   const onLoadMore = () => {
-    paging.page = 0;
-    paging.canLoadMore = false;
-    setisLoadingMore(true);
-    getDataFromServer();
+    if (paging.canLoadMore) {
+      paging.canLoadMore = false;
+      setisLoadingMore(true);
+      getDataFromServer();
+    }
   };
 
   const callAPI = () => {
@@ -132,7 +130,7 @@ const Helptechlist = ({navigation, route}) => {
   const descView = (item, index) => {
     if (isArray(item?.help_video_departments)) {
       return (
-        <View style={{marginTop: 'auto', marginTop: 5}}>
+        <View style={{ marginTop: 'auto', marginTop: 5 }}>
           <Row flexWrap="wrap">
             {item?.help_video_departments.map((x, i) => {
               return <MyChip title={x?.title} />;
@@ -143,9 +141,9 @@ const Helptechlist = ({navigation, route}) => {
     } else return null;
   };
 
-  const renderTutorials = ({item, index}) => {
+  const renderTutorials = ({ item, index }) => {
     return (
-      <View style={{flex: 1 / 2}}>
+      <View style={{ flex: 1 / 2 }}>
         <View
           style={[
             {
@@ -164,7 +162,7 @@ const Helptechlist = ({navigation, route}) => {
             handlePress={() => onHelpTechDetailScreen(item)}
             heading={item.title}
             numberOfTitleLines={3}
-            durationText={moment(item?.createdAt).format('DD MMM, YYYY')}
+            durationText={moment(item?.createdAt,"DD-MM-YYYY").format('DD MMM, YYYY')}
             descView={() => descView(item, index)}
             image={item.image.thumbnail_1}
           />
@@ -190,7 +188,7 @@ const Helptechlist = ({navigation, route}) => {
 
   const headerComponent = () => {
     return (
-      <View style={{paddingTop: 5, backgroundColor: colors.darkSecondary}}>
+      <View style={{ paddingTop: 5, backgroundColor: colors.darkSecondary }}>
         <Row flexWrap="wrap">
           {/* {isArray(appliedFilter?.categories) &&
             appliedFilter?.categories.map((x, i) => (
@@ -222,7 +220,7 @@ const Helptechlist = ({navigation, route}) => {
 
   const mySearchView = () => {
     return (
-      <View style={{paddingBottom: 5}}>
+      <View style={{ paddingBottom: 5 }}>
         <SearchView
           loader={searching}
           search={searchText}
@@ -241,10 +239,10 @@ const Helptechlist = ({navigation, route}) => {
             <TitleView
               hideBackBottomButton
               title={title}
-              //   subTitle={`Total : ${list.reduce(
-              //     (count, category) => count + category.help_videos.length,
-              //     0,
-              //   )}`}
+            //   subTitle={`Total : ${list.reduce(
+            //     (count, category) => count + category.help_videos.length,
+            //     0,
+            //   )}`}
             />
           </Flex>
           <TouchableOpacity
@@ -258,18 +256,19 @@ const Helptechlist = ({navigation, route}) => {
 
   return (
     <RootView titleView={titleView}>
-      <View style={{flex: 1}}>
+      <View style={{ flex: 1 }}>
         <FlatList
           ListHeaderComponent={headerComponent()}
           stickyHeaderIndices={[0]}
           numColumns={2}
           stickyHeaderHiddenOnScroll={true}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{paddingBottom: 30}}
+          contentContainerStyle={{ paddingBottom: 30 }}
           refreshControl={
             <MyRefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
-			 ListFooterComponent={<FooterLoader isVisible={isLoadingMore} />}
+          keyExtractor={item => item?._id}
+          ListFooterComponent={<FooterLoader isVisible={isLoadingMore} />}
           ListEmptyComponent={!loader && <EmptyView />}
           data={list}
           // renderSectionHeader={sectionHeader}

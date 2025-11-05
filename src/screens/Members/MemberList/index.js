@@ -24,7 +24,7 @@ import Collapsible from 'react-native-collapsible'
 import FooterLoader from '../../../components/FooterLoader'
 import FilterModal from '../Components/FilterModal'
 import moment from 'moment'
-import { filterFromlist, levelList, memberStatusList, onlineStatusList, membershipStatusList, expireDaysList, optionList } from '../Components/list'
+import { filterFromlist, levelList, memberStatusList, onlineStatusList, membershipStatusList, expireDaysList, optionList, programStatusList } from '../Components/list'
 import utilities from '../../../utilities'
 import { MenuButton, MyButton, TransparentButton } from '../../../components/MyButton'
 import SaveFilterModal from '../Components/SaveFilterModal'
@@ -41,6 +41,7 @@ import breakReference from '../../../functions/breakReference'
 import countries from "../../../assets/data/countryList.json"
 import { Row } from '../../../UIComponents/FlexViews'
 import MyImage from '../../../components/MyImage'
+import isArray from '../../../functions/isArray'
 
 
 
@@ -249,6 +250,18 @@ const MemberList = ({ navigation, route }) => {
               list.push(nOBj);
             }
           })
+        } else if (x == "program") {
+          obj[x].forEach((z, j) => {
+            let label = data?.programs.find(y => y._id == z)?.title;
+            if (label) {
+              let nOBj = {
+                label: label,
+                value: z,
+                type: x
+              }
+              list.push(nOBj);
+            }
+          })
         }
       } else if (x == 'delegate' && !!obj[x]) {
         let label = getNameForDelage(data?.delegates_list, obj[x]);
@@ -290,6 +303,14 @@ const MemberList = ({ navigation, route }) => {
       } else if (x == 'downloaded_app' && typeof (obj[x]) == "boolean") {
         let nOBj = {
           label: obj[x] ? "Downloaded" : "Not Downloaded",
+          value: obj[x],
+          type: x
+        }
+        list.push(nOBj);
+      } else if (x == 'program_status') {
+        let statusObj = programStatusList.find(y => y.key == obj[x]);
+        let nOBj = {
+          label: statusObj?.title,
           value: obj[x],
           type: x
         }
@@ -386,7 +407,6 @@ const MemberList = ({ navigation, route }) => {
       setList([])
     }
     let res;
-    console.log(Filter, 'Filter')
     Keyboard.dismiss();
     if (isAllMembers) {
       res = await LIST_OF_MEMBERS({
@@ -661,8 +681,18 @@ const MemberList = ({ navigation, route }) => {
       updateFilter({ is_date_range: false, from_date: null, to_date: null })
     } else if (item.type == "coins_range") {
       updateFilter({ coins_range: false, coins_from: 0, coins_to: 0 })
+    } else if (item.type == "program") {
+      let status = "";
+      let pList = Filter?.program.filter(y => y != item.value);
+      if (!isArray(pList)) {
+        status = ""
+      } else {
+        status = Filter?.program_status
+      }
+      updateFilter({ program: pList, program_status: status })
+    } else if (item.type == "program_status") {
+      updateFilter({ program_status: "" })
     }
-
     setFilterChipList((list) => list.slice().filter((x) => x.value != item.value))
   }
 
@@ -676,7 +706,7 @@ const MemberList = ({ navigation, route }) => {
 
   const headerView = () => {
     return (
-      <View style={{  backgroundColor: colors.darkSecondary }}>
+      <View style={{ backgroundColor: colors.darkSecondary }}>
         {filterChipList.length > 0 &&
           <>
 
@@ -1111,6 +1141,8 @@ const filteroObj = {
   "expiry_in": 3,
   "member_ship_expiry": "",
   "user_status_type": "",
+  "program": [],
+  "program_status": ""
 }
 
 

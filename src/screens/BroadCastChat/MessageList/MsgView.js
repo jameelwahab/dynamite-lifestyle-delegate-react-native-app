@@ -122,7 +122,7 @@ const MsgView = ({
                     openUrl(url);
                     return false;
                   }}>
-                  {urlify(item.message)}
+                  {urlify(item.message.replace(/\n/g, '\n\u200B'))}
                 </Markdown>
               )}
             </View>

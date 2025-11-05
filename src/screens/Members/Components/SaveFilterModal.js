@@ -98,6 +98,17 @@ const SaveFilterModal = forwardRef(({ access, tabName, filters, navigation, toke
         }
       }),
 
+      program: filters?.program.map((x) => {
+        let prog = filterData?.programs.find(y => y._id == x);
+        if (!!prog) {
+          return {
+            ...prog,
+            chip_label: prog?.title,
+            chip_value: prog?._id,
+          }
+        }
+      }),
+
       nurture: !!nurture ? {
         ...nurture,
         chip_label: nurture?.first_name + " " + nurture?.last_name,
@@ -127,7 +138,7 @@ const SaveFilterModal = forwardRef(({ access, tabName, filters, navigation, toke
     } else if (isMembers) {
       delete obj.delegate
     }
-
+    // console.log(obj, "obj")
     saveFilterToServer(obj);
   }
   const saveFilterToServer = async (obj) => {
@@ -141,7 +152,7 @@ const SaveFilterModal = forwardRef(({ access, tabName, filters, navigation, toke
     if (res.code == 200) {
       setLoader(false);
       setIsVisible(false);
-      showToast({ type: "success", body: res?.message })
+      showToast({ type: "success", title: res?.message })
     } else {
       setLoader(false)
     }

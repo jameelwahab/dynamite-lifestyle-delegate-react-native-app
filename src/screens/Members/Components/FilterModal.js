@@ -16,7 +16,7 @@ import CheckBox from '@react-native-community/checkbox';
 import MyCheckBox from '../../../components/MyCheckBox';
 import MyInputs from '../../../components/MyInputs';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { filterFromlist, memberStatusList, onlineStatusList, membershipStatusList, expireDaysList, appDownloadedStatusList } from './list'
+import { filterFromlist, memberStatusList, onlineStatusList, membershipStatusList, expireDaysList, appDownloadedStatusList, programStatusList } from './list'
 import Toast from 'react-native-toast-message';
 import showToast from '../../../functions/showToast';
 import OptionModalWithSearch from '../../../components/OptionModalWithSearch';
@@ -33,6 +33,8 @@ const FilterModal = forwardRef(({ token, type, filterTheData, appliedFilter, isM
   const [filterData, setFilterData] = useState(null);
   const [filterFrom, setfilterFrom] = useState(filterFromlist[0]);
   const [selectedSavedFilter, setSelectedSavedFilter] = useState(null)
+  const [program, setProgram] = useState([]);
+  const [programStatus, setProgramStatus] = useState("");
   const [salePage, setSalePage] = useState("");
   const [plan, setPlan] = useState("")
   const [nurture, setNurture] = useState("")
@@ -76,6 +78,8 @@ const FilterModal = forwardRef(({ token, type, filterTheData, appliedFilter, isM
       setfilterFrom(filterFromlist[0]);
     }
     setSelectedSavedFilter(null);
+    setProgram([]);
+    setProgramStatus("");
     setSalePage("");
     setPlan("");
     setNurture("");
@@ -136,6 +140,16 @@ const FilterModal = forwardRef(({ token, type, filterTheData, appliedFilter, isM
     setCoinsFrom((prev) => !!appliedFilter?.coins_range ? prev : "0");
     setCoinsTo((prev) => !!appliedFilter?.coins_range ? prev : "0");
     setIsAppDownloaded((prev) => !!appliedFilter?.downloaded_app ? prev : "");
+    setProgram((prev) => {
+      let list = [];
+      prev.forEach((x) => {
+        if (appliedFilter?.program?.findIndex(y => y == x._id) > -1) {
+          list.push(x)
+        }
+      })
+      return list;
+    });
+    setMembershipStatus((prev) => !!appliedFilter?.program_status ? prev : "");
   }
 
 
@@ -191,7 +205,9 @@ const FilterModal = forwardRef(({ token, type, filterTheData, appliedFilter, isM
       "expiry_in": !!expireIn?.key ? expireIn?.key : 3,
       "member_ship_expiry": !!membershipStatus?.key ? membershipStatus?.key : "",
       "user_status_type": !!onlineStatus?.key ? onlineStatus?.key : "",
-      "downloaded_app": !!isAppDownloaded ? isAppDownloaded?.value : null
+      "downloaded_app": !!isAppDownloaded ? isAppDownloaded?.value : null,
+      "program": program.map(x => x._id),
+      "program_status": !!programStatus?.key ? programStatus?.key : "",
     }
     setApplied(!reset)
     filterTheData(obj, filterData, !!selectedSavedFilter, !reset);
@@ -244,6 +260,8 @@ const FilterModal = forwardRef(({ token, type, filterTheData, appliedFilter, isM
       list = expireDaysList
     } else if (openFor == "appDownloaded") {
       list = appDownloadedStatusList
+    } else if (openFor == "programStatus") {
+      list = programStatusList
     }
 
     setOptionModal({
@@ -282,6 +300,9 @@ const FilterModal = forwardRef(({ token, type, filterTheData, appliedFilter, isM
           }
         }
       })
+    } else if (openFor == "program") {
+      list = isArray(filterData?.programs) ? filterData?.programs : []
+      heading = "Programmes"
     }
 
 
@@ -319,7 +340,6 @@ const FilterModal = forwardRef(({ token, type, filterTheData, appliedFilter, isM
       setfilterFrom(seletecOpt)
     } else if (selectedFor == "savedfilter") {
       let filterObj = seletecOpt?.filter_object;
-      console.log(filterObj, "filterObj")
       setSelectedSavedFilter(seletecOpt);
       setSalePage(filterObj?.event_page);
       setPlan(filterObj?.event_page?.payment_plans.find(x => x._id == filterObj?.plan?._id));
@@ -337,6 +357,8 @@ const FilterModal = forwardRef(({ token, type, filterTheData, appliedFilter, isM
         })
         return list;
       });
+      setProgram(filterObj?.program);
+      setProgramStatus(!!filterObj?.program_status ? programStatusList.find(x => x.key == filterObj?.program_status) : "");
       setMemberStatus(!!filterObj?.status ? filterObj?.status ? memberStatusList[1] : memberStatusList[0] : "");
       setOnlineStatus(!!filterObj?.user_status_type ? onlineStatusList.find(x => x.key == filterObj?.user_status_type) : "");
       setMembershipStatus(!!filterObj?.member_ship_expiry ? membershipStatusList.find(x => x.key == filterObj?.member_ship_expiry) : "");
@@ -369,6 +391,13 @@ const FilterModal = forwardRef(({ token, type, filterTheData, appliedFilter, isM
       setExpireIn(seletecOpt)
     } else if (selectedFor == "appDownloaded") {
       setIsAppDownloaded(seletecOpt)
+    } else if (selectedFor == "program") {
+      if (!isArray(program)) {
+        setProgramStatus(programStatusList[0])
+      }
+      setProgram((list) => [...list, seletecOpt])
+    } else if (selectedFor == "programStatus") {
+      setProgramStatus(seletecOpt)
     }
   }
 
@@ -435,6 +464,25 @@ const FilterModal = forwardRef(({ token, type, filterTheData, appliedFilter, isM
 
   const closeModal = () => {
     setIsVisible(false);
+  }
+  const selectedProgramView = () => {
+    return (
+      <View style={__styles.chipRoot}>
+        {program.map((item, index) => {
+          return (
+            <View style={__styles.chipView} >
+              <MyText fontSize={12} color={colors.white} >{item?.title}</MyText>
+              <Pressable
+                style={__styles.chipBtn}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                onPress={() => setProgram((prev) => prev.filter(x => x._id != item?._id))}>
+                {icons.crosss(colors.black, 20)}
+              </Pressable>
+            </View>
+          )
+        })}
+      </View>
+    )
   }
 
   const selectedleadStatusView = () => {
@@ -535,6 +583,42 @@ const FilterModal = forwardRef(({ token, type, filterTheData, appliedFilter, isM
                   </Pressable>
                 )}
               />
+
+
+
+
+              <MyTouchableInput
+                label='Choose Programmes'
+                view={selectedProgramView}
+                iconOnPress={() => openSearchOptionModal("program", "title")}
+                icon={() => icons.down(colors.primary, 15)}
+                subTextView={() => isArray(program) && (
+                  <Pressable
+                    style={__styles.clearbtnView}
+                    onPress={() => {
+                      setProgram([])
+                      setProgramStatus("")
+                    }}>
+                    <MyText color={colors.primary} >Clear</MyText>
+                  </Pressable>
+                )}
+              />
+              {isArray(program) &&
+                <MyTouchableInput
+                  label='Programmes Status'
+                  value={programStatus?.title}
+                  onPress={() => openOptionModal("programStatus", "title")}
+                  icon={() => icons.down(colors.primary, 15)}
+                  subTextView={() => !!programStatus && (
+                    <Pressable
+                      style={__styles.clearbtnView}
+                      onPress={() => setProgramStatus("")}>
+                      <MyText color={colors.primary} >Clear</MyText>
+                    </Pressable>
+                  )}
+                />}
+
+
               {!isNurture && isNurtureAccessable &&
                 <MyTouchableInput
                   label='Choose Nuture'
@@ -653,6 +737,8 @@ const FilterModal = forwardRef(({ token, type, filterTheData, appliedFilter, isM
                   </Pressable>
                 )}
               />
+
+
               {membershipStatus?.key == "not_expired" &&
                 <>
                   <MyTouchableInput
@@ -859,7 +945,9 @@ const filteroObj = {
   "expiry_in": 3,
   "member_ship_expiry": "",
   "user_status_type": "",
-  "downloaded_app": null
+  "downloaded_app": null,
+  "program": [],
+  "program_status": ""
 }
 
 
