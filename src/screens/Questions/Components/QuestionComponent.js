@@ -50,10 +50,11 @@ const QuestionComponent = ({ item, index, showRepliesbtns = false, onShowReplyPr
   }
 
   const RadioButtonView = (item, index) => {
+    console.log(item,"item")
     return (
       <Pressable onPress={() => { }}>
         {item.options.map((item2, index2) => {
-          let isCheck = item?.answer?.answer_statement == item2;
+          let isCheck = item?.answer?.answer_statement.trim() == item2.trim();
           return (
             <View key={"radio" + index2} style={{ paddingTop: 10, justifyContent: "center", backgroundColor: isCheck ? colors.lightPrimary3 : colors.transparent }}>
               <MyCheckBox

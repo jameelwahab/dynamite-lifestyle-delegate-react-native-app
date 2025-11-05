@@ -226,8 +226,8 @@ const Transaction = ({ navigation, route }) => {
             data={list}
             renderItem={renderList}
             ListEmptyComponent={!loader && <EmptyView />}
-            stickyHeaderHiddenOnScroll={true}
-            stickyHeaderIndices={[0]}
+            // stickyHeaderHiddenOnScroll={true}
+            // stickyHeaderIndices={[0]}
             // ListHeaderComponent={listHeaderView()}
             onEndReached={() => {
               if (canLoadMore) {

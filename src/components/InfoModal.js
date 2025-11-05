@@ -44,7 +44,7 @@ const InfoModal = forwardRef(({ header, footer }, ref) => {
   const modalSchedule = () => {
     return (
       <Modal
-        isVisible={isVisible}
+        isVisible={isVisible }
         onBackdropPress={closeScheduleTimeModal}
         onBackButtonPress={closeScheduleTimeModal}
         useNativeDriverForBackdrop={true}

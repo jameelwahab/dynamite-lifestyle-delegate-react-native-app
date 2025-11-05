@@ -27,12 +27,14 @@ import DefaultStatusView from '../../../components/DefaultStatusView'
 import { Flex, Row } from '../../../UIComponents/FlexViews'
 import copyText from '../../../functions/copyText'
 import MyRefreshControl from '../../../components/MyRefreshControl'
+import InfoModal from '../../../components/InfoModal'
 
 let page = 0;
 let canLoadMore = false
 
 const SubscriptionsList = ({ navigation, route }) => {
   const { memberId } = route?.params
+  const infoRef = React.useRef();
   const { token, user, S3_URL } = useSelector(selectUser);
   const [optionModal, setOptionModal] = useState({ isVisible: false, selectedItem: null });
   const [confirmationModal, setConfirmationModal] = useState({ isVisible: false, selectedItem: null, opt: "" })
@@ -47,14 +49,13 @@ const SubscriptionsList = ({ navigation, route }) => {
   const onSelectedOpt = (opt) => {
     let { selectedItem } = optionModal;
     setOptionModal({ isVisible: false, selectedItem: null })
-    if (opt.key == "delete") {
+    if (opt.key == "view_cancel_request") {
       setTimeout(() => {
-        setConfirmationModal({
-          isVisible: true,
-          selectedItem: selectedItem,
-          opt: opt.key
-        })
-      }, 400);
+        let str = `<h5 style="text-align: center;"> Cancellation Reason </h5>
+        <p style="text-align: left;">${selectedItem?.cancellation_reason }</p>`
+        infoRef?.current?.openModal(str, "", true)
+  
+      }, __DEV__ ? 1000 : 400);
     }
   }
 
@@ -186,9 +187,10 @@ const SubscriptionsList = ({ navigation, route }) => {
       <View style={{ backgroundColor: colors.secondary, borderRadius: 10, marginTop: 10, padding: 10 }}>
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
           <MyText color={colors.primary} > {`${index + 1}.`}</MyText>
-          {/* <MenuButton
-            onPress={() => setOptionModal({ isVisible: true, selectedItem: item })}
-            size={20} /> */}
+          {!!item?.cancelation_requested && !!item?.subscription_status &&
+            <MenuButton
+              onPress={() => setOptionModal({ isVisible: true, selectedItem: item })}
+              size={20} />}
         </View>
         <StatView title={"Product"} value={getProduct(item)} />
         <StatView title={"Created By"} value={item?.subscription_created_by} />
@@ -254,8 +256,8 @@ const SubscriptionsList = ({ navigation, route }) => {
             data={list}
             renderItem={renderList}
             ListEmptyComponent={!loader && <EmptyView />}
-            stickyHeaderHiddenOnScroll={true}
-            stickyHeaderIndices={[0]}
+            // stickyHeaderHiddenOnScroll={true}
+            // stickyHeaderIndices={[0]}
             // ListHeaderComponent={listHeaderView()}
             onEndReached={() => {
               if (canLoadMore) {
@@ -275,6 +277,8 @@ const SubscriptionsList = ({ navigation, route }) => {
           onSelected={onSelectedOpt}
           optionList={optionsList}
         />
+
+        <InfoModal ref={infoRef} />
         <ConfirmationModal
           title={"Are you sure you want to delete this subscription?"}
           closeModal={() => setConfirmationModal({ isVisible: false, selectedItem: null, opt: "" })}
@@ -298,9 +302,9 @@ const optionsList = [
   //   icon: icons.edit
   // },
   {
-    title: "Delete",
-    key: "delete",
-    icon: icons.trash
+    title: "View Cancelation Request",
+    key: "view_cancel_request",
+    icon: icons.eye
   },
 
 ]

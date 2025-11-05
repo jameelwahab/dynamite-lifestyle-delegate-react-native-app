@@ -81,6 +81,7 @@ const ItsWebView = ({
 			customHTMLElementModels={customHTMLElementModels}
 			renderers={renderers}
 			enableExperimentalMarginCollapsing={true}
+			// enableCSSInlineProcessing={true}
 			baseStyle={baseStyle}
 			enableExperimentalBRCollapsing={true}
 			enableExperimentalGhostLinesPrevention={true}
