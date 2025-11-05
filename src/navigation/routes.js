@@ -161,6 +161,7 @@ const routes = {
   memberProfile: "MEMBER_PROFILE",
   memberSubscriptionList:"MEMBER_SUBSCRIPTION_LIST",
   memberTransactionList:"MEMBER_TRANSACTION_LIST",
+  memberTickets:"MEMBER_TICKETS",
 
   //? Questions
   genericQestionListing: "QUESTION_LISTING",

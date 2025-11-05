@@ -26,6 +26,7 @@ import StatusView from '../../../components/StatusView'
 import DefaultStatusView from '../../../components/DefaultStatusView'
 import { Flex, Row } from '../../../UIComponents/FlexViews'
 import copyText from '../../../functions/copyText'
+import MyRefreshControl from '../../../components/MyRefreshControl'
 
 let page = 0;
 let canLoadMore = false
@@ -41,6 +42,7 @@ const SubscriptionsList = ({ navigation, route }) => {
   const [searchText, setSearchText] = useState("")
   const [member, setMember] = useState(null)
   const [total, setTotal] = useState(0)
+  const [refreshing, setRefreshing] = useState(false)
 
   const onSelectedOpt = (opt) => {
     let { selectedItem } = optionModal;
@@ -92,11 +94,21 @@ const SubscriptionsList = ({ navigation, route }) => {
       setMember(res?.member)
       setLoader(false)
       setFooterLoader(false)
+      setRefreshing(false)
     } else {
       setLoader(false)
       setFooterLoader(false)
+      setRefreshing(false)
     }
   }
+
+  const onRefresh = () => {
+    page = 0;
+    canLoadMore = false;
+    setRefreshing(true)
+    getSubscriptionListFromServer(true)
+  }
+
   useEffect(() => {
     page = 0;
     canLoadMore = false;
@@ -224,17 +236,27 @@ const SubscriptionsList = ({ navigation, route }) => {
   }
 
   return (
-    <RootView titleView={topView} >
+    <RootView
+      title='Member Subscriptions'
+      subTitle={!!member ? `${member?.first_name} ${member?.last_name} (${member?.email})` : ""}
+    //  titleView={topView} 
+    >
 
       <View style={{ flex: 1 }}>
         <View style={{ flex: 1 }}>
           <FlatList
+            refreshControl={
+              <MyRefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+              />
+            }
             data={list}
             renderItem={renderList}
             ListEmptyComponent={!loader && <EmptyView />}
             stickyHeaderHiddenOnScroll={true}
             stickyHeaderIndices={[0]}
-            ListHeaderComponent={listHeaderView()}
+            // ListHeaderComponent={listHeaderView()}
             onEndReached={() => {
               if (canLoadMore) {
                 canLoadMore = false;

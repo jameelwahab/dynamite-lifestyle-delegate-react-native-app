@@ -32,6 +32,8 @@ import { PaymentIdView } from './PaymentIdView'
 import { ReferralUserView } from './ReferralUserView'
 import { OtherInformationView } from './OtherInformationView'
 import { DiscountInformationView } from './DiscountInformationView'
+import { TicketCountView } from './TicketCountView'
+import MyRefreshControl from '../../../components/MyRefreshControl'
 
 let page = 0;
 let canLoadMore = false
@@ -47,6 +49,7 @@ const Transaction = ({ navigation, route }) => {
   const [searchText, setSearchText] = useState("")
   const [member, setMember] = useState(null)
   const [total, setTotal] = useState(0)
+  const [refreshing, setRefreshing] = useState(false)
 
   const onSelectedOpt = (opt) => {
     let { selectedItem } = optionModal;
@@ -98,11 +101,21 @@ const Transaction = ({ navigation, route }) => {
       setMember(res?.member)
       setLoader(false)
       setFooterLoader(false)
+      setRefreshing(false)
     } else {
       setLoader(false)
       setFooterLoader(false)
+      setRefreshing(false)
     }
   }
+
+  const onRefresh = () => {
+    page = 0;
+    canLoadMore = false;
+    setRefreshing(true)
+    getSubscriptionListFromServer(true)
+  }
+
   useEffect(() => {
     page = 0;
     canLoadMore = false;
@@ -160,7 +173,7 @@ const Transaction = ({ navigation, route }) => {
         <StatView title={"Payment Refferal Commission"} value={!!item?.card_details?.last4 ? `**** **** **** ${item?.card_details?.last4}` : "N/A"} />
         <StatView title={"Payment Refferal"} view={() => <DefaultStatusView value={item?.subscription_status} inactiveText='Expired' />} />
         <StatView title={"Transaction Date"} value={!!item?.transaction_date ? moment(item?.transaction_date).format("DD-MM-YYYY") : ""} />
-        <StatView title={"Total Tickets"} />
+        <StatView title={"Total Tickets"} view={() => <TicketCountView item={item} navigation={navigation} />} />
         <StatView title={"Agreement PDF"} view={() => pdfLinkView(item)} />
         <StatView title={"Created By"} value={`${removeUnderscore(item?.created_by)} ${!!item?.payment_made_by_platform ? "(" + removeUnderscore(item?.payment_made_by_platform) + ")" : ""}`} />
         <StatView title={"Other Information"} view={() => <OtherInformationView row={item} />} />
@@ -186,26 +199,36 @@ const Transaction = ({ navigation, route }) => {
             <View style={{ flex: 1, height: 35 }} />
           }
 
-          <View style={{ marginTop: -2, paddingBottom: 5 }}>
+          {/* <View style={{ marginTop: -2, paddingBottom: 5 }}>
             <MyText fontSize={10} type='medium' color={colors.lightText2}>{`Showing ${list.length} of ${total}`}</MyText>
-          </View>
+          </View> */}
         </View>
       </View>
     )
   }
 
   return (
-    <RootView titleView={topView} >
-
+    <RootView
+      // titleView={topView} 
+      title='Transactions'
+      subTitle={!!member ? `${member?.first_name} ${member?.last_name} (${member?.email})` : ""}
+    >
+      {/* {topView()} */}
       <View style={{ flex: 1 }}>
         <View style={{ flex: 1 }}>
           <FlatList
+            refreshControl={
+              <MyRefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+              />
+            }
             data={list}
             renderItem={renderList}
             ListEmptyComponent={!loader && <EmptyView />}
             stickyHeaderHiddenOnScroll={true}
             stickyHeaderIndices={[0]}
-            ListHeaderComponent={listHeaderView()}
+            // ListHeaderComponent={listHeaderView()}
             onEndReached={() => {
               if (canLoadMore) {
                 canLoadMore = false;

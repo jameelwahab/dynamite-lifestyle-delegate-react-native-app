@@ -19,6 +19,7 @@ import MessageList from '../../screens/WhatsappChat/MessageList.js'
 import MissionReport from '../../screens/MissionReport/MissionReport'
 import SubscriptionsList from '../../screens/Members/SubscriptionsList'
 import Transaction from '../../screens/Members/Transaction'
+import MemberTickets from '../../screens/Members/MemberTickets'
 
 
 
@@ -44,6 +45,7 @@ const StackAllMember = ({ route }) => {
         <AllMemberStack.Screen name={routes.missionReportScreen} component={MissionReport} />
         <AllMemberStack.Screen name={routes.memberSubscriptionList} component={SubscriptionsList} />
         <AllMemberStack.Screen name={routes.memberTransactionList} component={Transaction} />
+        <AllMemberStack.Screen name={routes.memberTickets} component={MemberTickets} />
         {/*//? Default Screens Start */}
         {defaultScreens.map((x, i) => (
           <AllMemberStack.Screen key={x.name} name={x.name} component={x.component} />

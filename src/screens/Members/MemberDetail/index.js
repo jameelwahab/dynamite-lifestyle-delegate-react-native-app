@@ -110,6 +110,8 @@ const MemberDetail = ({ navigation, route }) => {
     return list.slice().filter(x => {
       if (x.key == "profile") {
         return access?.view_profile
+      } else if (x.key == "subscription-list" || x.key == "transaction-list") {
+        return isAllMembers
       } else return true
     })
   }

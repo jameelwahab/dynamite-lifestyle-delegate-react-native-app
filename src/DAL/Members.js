@@ -194,7 +194,7 @@ export const MEMBER_DELETE_NOTE = ({ token, navigation, member_id, note_id }) =>
 }
 
 
-export const MEMBER_SUBSCRIPTION_LIST = ({ token, navigation, memberId, page, searchText,type=undefined }) => {
+export const MEMBER_SUBSCRIPTION_LIST = ({ token, navigation, memberId, page, searchText, type = undefined }) => {
   return invokeApi({
     path: `api/member/event_subscriber_list/member_id/${memberId}?page=${page}&limit=20&search_text=${searchText}&type=${type}`,
     method: "GET",
@@ -294,3 +294,12 @@ export const MEMBER_SMS_SYSTEM = ({ token, navigation, msg, to }) => invokeApi({
     to,
   }
 })
+
+
+export const MEMBER_TICKETS_LIST = ({ token, navigation, transId }) => invokeApi({
+  path: "admin_users/transaction/detail/" + transId,
+  method: "GET",
+  token,
+  navigation,
+})
+
