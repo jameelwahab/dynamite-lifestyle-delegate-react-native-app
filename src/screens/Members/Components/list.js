@@ -130,7 +130,7 @@ const sortList = [
 const optionList = [
   {
     key: "subscription",
-    title: "View Subscription",
+    title: "View Subscriber",
     icon: () => icons.eye(colors.primary, 20)
   },
   {
@@ -157,6 +157,16 @@ const optionList = [
     key: "manage-mission",
     title: "Manage Mission",
     icon: () => icons.lock(colors.primary, 20)
+  },
+  {
+    key: "subscription-list",
+    title: "View Subscription",
+    icon: () => icons.eye(colors.primary, 20)
+  },
+  {
+    key: "transaction-list",
+    title: "Transactions",
+    icon: () => icons.eye(colors.primary, 20)
   },
 
 ]

@@ -156,9 +156,11 @@ const routes = {
   memberManage: "MEMBER_MANAGE",
   memberAddNote: "MEMBER_ADD_NOTE",
   memberNotesListing: "MEMBER_NOTES_LISTING",
-  memberSubscribersListing: "MEMBER_SUBSCRIPTION_LISTING",
+  memberSubscribersListing: "MEMBER_SUBSCRIBER_LISTING",
   memberQuestionListing: "MEMBER_QUESTIONS_LISTING",
   memberProfile: "MEMBER_PROFILE",
+  memberSubscriptionList:"MEMBER_SUBSCRIPTION_LIST",
+  memberTransactionList:"MEMBER_TRANSACTION_LIST",
 
   //? Questions
   genericQestionListing: "QUESTION_LISTING",

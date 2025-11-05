@@ -15,7 +15,7 @@ import routes from '../../../navigation/routes'
 import StatView from '../Components/StatView'
 import { convertTimezone } from '../../../functions/convertTime'
 import { selectTimeZone } from '../../../redux/reducers/timezoneSlice'
-import { communityLevelWithAllObj, dateTimeFormat, S3_URL } from '../../../utilities/constants'
+import { communityLevelWithAllObj, dateTimeFormat, } from '../../../utilities/constants'
 import MyInputs from '../../../components/MyInputs'
 import SortModal from '../Components/SortModal'
 import debounce from '../../../functions/debounce'
@@ -57,7 +57,7 @@ const MemberList = ({ navigation, route }) => {
   const isAllMembers = type == "all-member";
   const isMembers = type == "member";
   const isNurture = type == "nurture";
-  const { token, user, isChatAllowed, access } = useSelector(selectUser);
+  const { token, user, isChatAllowed, access, S3_URL } = useSelector(selectUser);
   const [showChips, setShowChips] = useState(false);
   const [member, setMember] = useState(null)
   const sortModalRef = useRef();
@@ -134,13 +134,19 @@ const MemberList = ({ navigation, route }) => {
       })
     } else if (opt?.key == "update_call") {
       setTimeout(() => {
-
-
         ref_confirmModal?.current?.openModal({
           title: `Are you sure you want to ${item?.is_call_allowed ? "disable" : "enable"} call functionality for this user?`,
           agreeFunc: () => updateCallAPI(item)
         })
       }, 500);
+    } else if (opt?.key == "subscription-list") {
+      navigation.navigate(routes.memberSubscriptionList, {
+        memberId: item?._id
+      })
+    } else if (opt?.key == "transaction-list") {
+      navigation.navigate(routes.memberTransactionList, {
+        memberId: item?._id
+      })
     }
 
   }
@@ -700,6 +706,8 @@ const MemberList = ({ navigation, route }) => {
     return list.slice().filter(x => {
       if (x.key == "profile") {
         return access?.view_profile
+      } if (x.key == "subscription-list" || x.key == "transaction-list") {
+        return isAllMembers
       } else return true
     })
   }

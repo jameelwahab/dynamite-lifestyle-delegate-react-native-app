@@ -32,7 +32,9 @@ const StackMembers = ({ route }) => {
       <MemberStack.Navigator
         initialRouteName={routes.allMemberScreens}
         screenOptions={{ headerShown: false }}>
-        <MemberStack.Screen initialParams={route.params} name={routes.allMemberScreens} component={user?.team_type == "sub_team" ? MemberListForSubTeam : MemberList} />
+        <MemberStack.Screen initialParams={route.params} name={routes.allMemberScreens} component={
+          // user?.team_type == "sub_team" ? MemberListForSubTeam :
+          MemberList} />
         <MemberStack.Screen initialParams={route.params} name={routes.memberManage} component={MemberManage} />
         <MemberStack.Screen initialParams={route.params} name={routes.memberDetails} component={MemberDetail} />
         <MemberStack.Screen name={routes.memberNotesListing} component={List} />
@@ -43,6 +45,8 @@ const StackMembers = ({ route }) => {
         <MemberStack.Screen name={routes.memberProfile} component={MemberProfile} />
         <MemberStack.Screen name={routes.whtasappChatMessageList} component={MessageList} />
         <MemberStack.Screen name={routes.missionReportScreen} component={MissionReport} />
+        
+
         {/*//? Default Screens Start */}
         {defaultScreens.map((x, i) => (
           <MemberStack.Screen key={x.name} name={x.name} component={x.component} />

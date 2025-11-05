@@ -22,10 +22,21 @@ import MyInputs from '../../../components/MyInputs'
 import debounce from '../../../functions/debounce'
 import TitleView from '../../../components/TitleView'
 import UserImage from '../../../components/UserImage'
+import StatusView from '../../../components/StatusView'
+import DefaultStatusView from '../../../components/DefaultStatusView'
+import { Flex, Row } from '../../../UIComponents/FlexViews'
+import copyText from '../../../functions/copyText'
+import removeUnderscore from '../../../functions/removeUnderscore'
+import { getProduct } from './getProduct'
+import { PaymentIdView } from './PaymentIdView'
+import { ReferralUserView } from './ReferralUserView'
+import { OtherInformationView } from './OtherInformationView'
+import { DiscountInformationView } from './DiscountInformationView'
 
 let page = 0;
 let canLoadMore = false
-const SubscriptionList = ({ navigation, route }) => {
+
+const Transaction = ({ navigation, route }) => {
   const { memberId } = route?.params
   const { token, user, S3_URL } = useSelector(selectUser);
   const [optionModal, setOptionModal] = useState({ isVisible: false, selectedItem: null });
@@ -73,17 +84,17 @@ const SubscriptionList = ({ navigation, route }) => {
 
   const getSubscriptionListFromServer = async (firstTime = false) => {
 
-    let res = await MEMBER_SUBSCRIPTION_LIST({ token, navigation, memberId: memberId, page: page, searchText: searchText })
+    let res = await MEMBER_SUBSCRIPTION_LIST({ token, navigation, memberId: memberId, page: page, searchText: searchText, type: "transaction_list" })
     if (res.code == 200) {
-      let listLength = firstTime ? (0 + res.event_subscriber.length) : (list.length + res.event_subscriber.length);
+      let listLength = firstTime ? (0 + res.transaction_list.length) : (list.length + res.transaction_list.length);
       if (res?.total_count > listLength) {
         page = page + 1;
         canLoadMore = true
       } else {
         canLoadMore = false
       }
-      setList(firstTime ? res.event_subscriber : [...list, ...res.event_subscriber])
-      setTotal(res?.total_count)
+      setList(firstTime ? res.transaction_list : [...list, ...res.transaction_list])
+      setTotal(res?.total_count || res.transaction_list.length)
       setMember(res?.member)
       setLoader(false)
       setFooterLoader(false)
@@ -136,17 +147,25 @@ const SubscriptionList = ({ navigation, route }) => {
       <View style={{ backgroundColor: colors.secondary, borderRadius: 10, marginTop: 10, padding: 10 }}>
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
           <MyText color={colors.primary} > {`${index + 1}.`}</MyText>
-          <MenuButton
+          {/* <MenuButton
             onPress={() => setOptionModal({ isVisible: true, selectedItem: item })}
-            size={20} />
+            size={20} /> */}
         </View>
-        <StatView title={"Page Title"} value={!!item?.page_info?.sale_page_title ? item?.page_info?.sale_page_title :
-          !!item?.module_info?.title ? item?.module_info?.title : "N/A"} />
-        <StatView title={"Plan Title"} value={!!item?.plan_info?.plan_title ? `${item?.plan_info?.plan_title} (${item?.plan_info?.payment_access == "recursion" ? "recurring" : item?.plan_info?.payment_access})` : "N/A"} />
-        <StatView title={"Referral User"} value={!!item?.affiliate_info?.affiliate_user_info ? `${item?.affiliate_info?.affiliate_user_info?.first_name} ${item?.affiliate_info?.affiliate_user_info?.last_name}` : "N/A"} />
-        <StatView title={"Subscription Date"} value={moment(item?.createdAt).format(dateTimeFormat.date)} />
-        <StatView title={"Agreement PDF"} view={() => pdfLinkView(item?.aggrement_pdf_url)} />
-        <StatView title={"Register Link"} value={item?.register_url} />
+        <StatView title={"Transaction Type"} value={getProduct(item)} />
+        <StatView title={"Payment Made By (Transaction ID)"} view={() => <PaymentIdView item={item} />} />
+        <StatView title={"Amount"} value={item?.plan_price || "0"} />
+        <StatView title={"Team Diego"} value={item?.dynamite_commission || "0"} />
+        <StatView title={"Refferal Commission"} value={item?.referral_commission || "0"} />
+        <StatView title={"Refferal User"} view={() => <ReferralUserView row={item} />} />
+        <StatView title={"Payment Refferal Commission"} value={!!item?.card_details?.last4 ? `**** **** **** ${item?.card_details?.last4}` : "N/A"} />
+        <StatView title={"Payment Refferal"} view={() => <DefaultStatusView value={item?.subscription_status} inactiveText='Expired' />} />
+        <StatView title={"Transaction Date"} value={!!item?.transaction_date ? moment(item?.transaction_date).format("DD-MM-YYYY") : ""} />
+        <StatView title={"Total Tickets"} />
+        <StatView title={"Agreement PDF"} view={() => pdfLinkView(item)} />
+        <StatView title={"Created By"} value={`${removeUnderscore(item?.created_by)} ${!!item?.payment_made_by_platform ? "(" + removeUnderscore(item?.payment_made_by_platform) + ")" : ""}`} />
+        <StatView title={"Other Information"} view={() => <OtherInformationView row={item} />} />
+        <StatView title={"Discount Information"} view={() => <DiscountInformationView item={item} />} />
+        <StatView title={"Transaction Mode"} value={item?.transaction_mode} />
       </View>
     )
   }
@@ -176,7 +195,7 @@ const SubscriptionList = ({ navigation, route }) => {
   }
 
   return (
-    <RootView titleView={topView}>
+    <RootView titleView={topView} >
 
       <View style={{ flex: 1 }}>
         <View style={{ flex: 1 }}>
@@ -218,7 +237,7 @@ const SubscriptionList = ({ navigation, route }) => {
 
 
 
-export default SubscriptionList
+export default Transaction
 
 const optionsList = [
 

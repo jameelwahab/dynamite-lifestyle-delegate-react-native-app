@@ -22,10 +22,15 @@ import MyInputs from '../../../components/MyInputs'
 import debounce from '../../../functions/debounce'
 import TitleView from '../../../components/TitleView'
 import UserImage from '../../../components/UserImage'
+import StatusView from '../../../components/StatusView'
+import DefaultStatusView from '../../../components/DefaultStatusView'
+import { Flex, Row } from '../../../UIComponents/FlexViews'
+import copyText from '../../../functions/copyText'
 
 let page = 0;
 let canLoadMore = false
-const SubscriptionList = ({ navigation, route }) => {
+
+const SubscriptionsList = ({ navigation, route }) => {
   const { memberId } = route?.params
   const { token, user, S3_URL } = useSelector(selectUser);
   const [optionModal, setOptionModal] = useState({ isVisible: false, selectedItem: null });
@@ -73,17 +78,17 @@ const SubscriptionList = ({ navigation, route }) => {
 
   const getSubscriptionListFromServer = async (firstTime = false) => {
 
-    let res = await MEMBER_SUBSCRIPTION_LIST({ token, navigation, memberId: memberId, page: page, searchText: searchText })
+    let res = await MEMBER_SUBSCRIPTION_LIST({ token, navigation, memberId: memberId, page: page, searchText: searchText, type: "subscription_list" })
     if (res.code == 200) {
-      let listLength = firstTime ? (0 + res.event_subscriber.length) : (list.length + res.event_subscriber.length);
+      let listLength = firstTime ? (0 + res.subscription_list.length) : (list.length + res.subscription_list.length);
       if (res?.total_count > listLength) {
         page = page + 1;
         canLoadMore = true
       } else {
         canLoadMore = false
       }
-      setList(firstTime ? res.event_subscriber : [...list, ...res.event_subscriber])
-      setTotal(res?.total_count)
+      setList(firstTime ? res.subscription_list : [...list, ...res.subscription_list])
+      setTotal(res?.total_count || res.subscription_list.length)
       setMember(res?.member)
       setLoader(false)
       setFooterLoader(false)
@@ -131,22 +136,65 @@ const SubscriptionList = ({ navigation, route }) => {
     )
   }
 
+  const getProduct = (item) => {
+    if (item?.subscription_type === "quest") {
+      return `Quest (${item?.mission_info?.title})`
+    } if (item?.subscription_type === "mission") {
+      return `Mission (${item?.mission_info?.title})`
+    } else if (!!item?.payment_request_id) {
+      return `Payment Request (${item?.payment_request_id?.request_title} | ${item?.payment_request_id?.request_type})`
+    } else if (!!item?.sale_page) {
+      return `Sale Page (${item?.sale_page?.sale_page_title} | ${item?.plan?.plan_title})`
+    }
+  }
+
+  const subscriptionIdView = (item) => {
+    return (
+      <>
+        {!!item?.stripe_subscription_id ?
+          <TouchableOpacity onPress={() => copyText(item?.stripe_subscription_id, "Subscription ID copied Successfully")}>
+            <Row>
+              {icons.copyOulined(15, colors.primary)}
+              <Flex flex={1} ml={5}>
+                <MyText style={{ textTransform: "capitalize" }} fontSize={12} type='medium' >
+                  {item?.stripe_subscription_id}
+                </MyText>
+              </Flex>
+            </Row>
+          </TouchableOpacity> :
+          <MyText style={{ textTransform: "capitalize" }} fontSize={12} type='medium' >
+            N/A
+          </MyText>}
+      </>
+    )
+  }
+
   const renderList = ({ item, index }) => {
     return (
       <View style={{ backgroundColor: colors.secondary, borderRadius: 10, marginTop: 10, padding: 10 }}>
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
           <MyText color={colors.primary} > {`${index + 1}.`}</MyText>
-          <MenuButton
+          {/* <MenuButton
             onPress={() => setOptionModal({ isVisible: true, selectedItem: item })}
-            size={20} />
+            size={20} /> */}
         </View>
-        <StatView title={"Page Title"} value={!!item?.page_info?.sale_page_title ? item?.page_info?.sale_page_title :
-          !!item?.module_info?.title ? item?.module_info?.title : "N/A"} />
-        <StatView title={"Plan Title"} value={!!item?.plan_info?.plan_title ? `${item?.plan_info?.plan_title} (${item?.plan_info?.payment_access == "recursion" ? "recurring" : item?.plan_info?.payment_access})` : "N/A"} />
+        <StatView title={"Product"} value={getProduct(item)} />
+        <StatView title={"Created By"} value={item?.subscription_created_by} />
+        <StatView title={"Subscription Mode"} value={item?.stripe_mode} />
+        <StatView title={"Next Invoice Date"} value={!!item?.next_invoice_date ? moment(item?.next_invoice_date).format("DD-MM-YYYY") : "N/A"} />
+        <StatView title={"Subscription Date"} value={!!item?.subscription_date ? moment(item?.subscription_date).format("DD-MM-YYYY") : "N/A"} />
+        <StatView title={"Subscription ID"} view={() => subscriptionIdView(item)} />
+        <StatView title={"Card"} value={!!item?.card_details?.last4 ? `**** **** **** ${item?.card_details?.last4}` : "N/A"} />
+        <StatView title={"Status"} view={() => <DefaultStatusView value={item?.subscription_status} inactiveText='Expired' />} />
+        {/* <StatView title={"Page Title"} value={!!item?.page_info?.sale_page_title ? item?.page_info?.sale_page_title :
+          !!item?.plan_info?.plan_title ? item?.plan_info?.plan_title :
+
+            "N/A"} />
+        <StatView title={"Plan Title"} value={!!item?.plan_info?.plan_title ? `${item?.plan_info?.plan_title} (${item?.plan_info?.payment_access})` : "N/A"} />
         <StatView title={"Referral User"} value={!!item?.affiliate_info?.affiliate_user_info ? `${item?.affiliate_info?.affiliate_user_info?.first_name} ${item?.affiliate_info?.affiliate_user_info?.last_name}` : "N/A"} />
         <StatView title={"Subscription Date"} value={moment(item?.createdAt).format(dateTimeFormat.date)} />
         <StatView title={"Agreement PDF"} view={() => pdfLinkView(item?.aggrement_pdf_url)} />
-        <StatView title={"Register Link"} value={item?.register_url} />
+        <StatView title={"Register Link"} value={item?.register_url} /> */}
       </View>
     )
   }
@@ -176,7 +224,7 @@ const SubscriptionList = ({ navigation, route }) => {
   }
 
   return (
-    <RootView titleView={topView}>
+    <RootView titleView={topView} >
 
       <View style={{ flex: 1 }}>
         <View style={{ flex: 1 }}>
@@ -218,7 +266,7 @@ const SubscriptionList = ({ navigation, route }) => {
 
 
 
-export default SubscriptionList
+export default SubscriptionsList
 
 const optionsList = [
 
