@@ -1,212 +1,245 @@
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image, ScrollView, Pressable, Keyboard, Platform, TouchableHighlight } from 'react-native'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
-import RootView from '../../../components/RootView'
-import MyText from '../../../components/MyText'
-import invokeApi from '../../../functions/invokeAPI'
-import { useSelector } from 'react-redux'
-import { selectUser } from '../../../redux/reducers/userSlice'
-import { IS_CHAT_EXIST, LIST_OF_MEMBERS, LIST_OF_MEMBERS_ONLY, LIST_OF_NURTURE, UPDATE_CALL_FUNCTIONALITY } from '../../../DAL'
-import { colors } from '../../../utilities/colors'
-import numFormatter from '../../../functions/numFormatter'
-import UserImage from '../../../components/UserImage'
-import { icons } from '../../../utilities/icons'
-import MyLoader from '../../../components/MyLoader'
-import routes from '../../../navigation/routes'
-import StatView from '../Components/StatView'
-import { convertTimezone } from '../../../functions/convertTime'
-import { selectTimeZone } from '../../../redux/reducers/timezoneSlice'
-import { communityLevelWithAllObj, dateTimeFormat, } from '../../../utilities/constants'
-import MyInputs from '../../../components/MyInputs'
-import SortModal from '../Components/SortModal'
-import debounce from '../../../functions/debounce'
-import EmptyView from '../../../components/EmptyView'
-import Collapsible from 'react-native-collapsible'
-import FooterLoader from '../../../components/FooterLoader'
-import FilterModal from '../Components/FilterModal'
-import moment from 'moment'
-import { filterFromlist, levelList, memberStatusList, onlineStatusList, membershipStatusList, expireDaysList, optionList, programStatusList } from '../Components/list'
-import utilities from '../../../utilities'
-import { MenuButton, MyButton, TransparentButton } from '../../../components/MyButton'
-import SaveFilterModal from '../Components/SaveFilterModal'
-import OptionModal from '../../../components/OptionModal'
-import downloadImage from '../../../functions/downloadImage'
+import {
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  ScrollView,
+  Pressable,
+  Keyboard,
+  Platform,
+  TouchableHighlight,
+} from 'react-native';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
+import RootView from '../../../components/RootView';
+import MyText from '../../../components/MyText';
+import invokeApi from '../../../functions/invokeAPI';
+import {useSelector} from 'react-redux';
+import {selectUser} from '../../../redux/reducers/userSlice';
+import {
+  IS_CHAT_EXIST,
+  LIST_OF_MEMBERS,
+  LIST_OF_MEMBERS_ONLY,
+  LIST_OF_NURTURE,
+  UPDATE_CALL_FUNCTIONALITY,
+} from '../../../DAL';
+import {colors} from '../../../utilities/colors';
+import numFormatter from '../../../functions/numFormatter';
+import UserImage from '../../../components/UserImage';
+import {icons} from '../../../utilities/icons';
+import MyLoader from '../../../components/MyLoader';
+import routes from '../../../navigation/routes';
+import StatView from '../Components/StatView';
+import {convertTimezone} from '../../../functions/convertTime';
+import {selectTimeZone} from '../../../redux/reducers/timezoneSlice';
+import {
+  communityLevelWithAllObj,
+  dateTimeFormat,
+} from '../../../utilities/constants';
+import MyInputs from '../../../components/MyInputs';
+import SortModal from '../Components/SortModal';
+import debounce from '../../../functions/debounce';
+import EmptyView from '../../../components/EmptyView';
+import Collapsible from 'react-native-collapsible';
+import FooterLoader from '../../../components/FooterLoader';
+import FilterModal from '../Components/FilterModal';
+import moment from 'moment';
+import {
+  filterFromlist,
+  levelList,
+  memberStatusList,
+  onlineStatusList,
+  membershipStatusList,
+  expireDaysList,
+  optionList,
+  programStatusList,
+} from '../Components/list';
+import utilities from '../../../utilities';
+import {
+  MenuButton,
+  MyButton,
+  TransparentButton,
+} from '../../../components/MyButton';
+import SaveFilterModal from '../Components/SaveFilterModal';
+import OptionModal from '../../../components/OptionModal';
+import downloadImage from '../../../functions/downloadImage';
 import RNFetchBlob from 'react-native-blob-util';
-import showToast from '../../../functions/showToast'
-import LeadModal from '../Components/LeadModal'
-import LeadHistoryModal from '../Components/LeadHistoryModal'
-import InfoModal from '../../../components/InfoModal'
-import ConfirmationModal2 from '../../../components/ConfirmationModal2'
-import OptionModal2 from '../../../components/OptionModal2'
-import breakReference from '../../../functions/breakReference'
-import countries from "../../../assets/data/countryList.json"
-import { Row } from '../../../UIComponents/FlexViews'
-import MyImage from '../../../components/MyImage'
-import isArray from '../../../functions/isArray'
-
-
+import showToast from '../../../functions/showToast';
+import LeadModal from '../Components/LeadModal';
+import LeadHistoryModal from '../Components/LeadHistoryModal';
+import InfoModal from '../../../components/InfoModal';
+import ConfirmationModal2 from '../../../components/ConfirmationModal2';
+import OptionModal2 from '../../../components/OptionModal2';
+import breakReference from '../../../functions/breakReference';
+import countries from '../../../assets/data/countryList.json';
+import {Row} from '../../../UIComponents/FlexViews';
+import MyImage from '../../../components/MyImage';
+import isArray from '../../../functions/isArray';
 
 let canLoadMore = false;
 let page = 0;
 let isFirst = true;
 let controller;
-const MemberList = ({ navigation, route }) => {
-  const ref_infoModal = useRef()
-  const ref_optionModal = useRef()
-  const ref_confirmModal = useRef()
-  const { type } = route?.params;
-  const isAllMembers = type == "all-member";
-  const isMembers = type == "member";
-  const isNurture = type == "nurture";
-  const { token, user, isChatAllowed, access, S3_URL } = useSelector(selectUser);
+const MemberList = ({navigation, route}) => {
+  const ref_infoModal = useRef();
+  const ref_optionModal = useRef();
+  const ref_confirmModal = useRef();
+  const {type} = route?.params;
+  const isAllMembers = type == 'all-member';
+  const isMembers = type == 'member';
+  const isNurture = type == 'nurture';
+  const {token, user, isChatAllowed, access, S3_URL} = useSelector(selectUser);
+  const isSubTeam = user?.team_type == 'sub_team';
   const [showChips, setShowChips] = useState(false);
-  const [member, setMember] = useState(null)
+  const [member, setMember] = useState(null);
   const sortModalRef = useRef();
   const filterModalRef = useRef();
   const saveModalRef = useRef();
   const leadModalRef = useRef();
-  const hitoryModalRef = useRef()
+  const hitoryModalRef = useRef();
   const [loader, setLoader] = useState(true);
-  const [footerLoader, setFooterLoader] = useState(false)
+  const [footerLoader, setFooterLoader] = useState(false);
   const [list, setList] = useState([]);
   const [total, setTotal] = useState(0);
-  const [search, setSearch] = useState("")
+  const [search, setSearch] = useState('');
   const timezone = useSelector(selectTimeZone);
   const [sorted, setSorted] = useState(sort);
-  const [Filter, setFilter] = useState({ ...filteroObj });
+  const [Filter, setFilter] = useState({...filteroObj});
   const [filterData, setFilterData] = useState(null);
   const [isSavedFilterApplied, setIsSavedFilterApplied] = useState(false);
   const [isFilterApplied, setIsFilterApplied] = useState(false);
-  const [filterChipList, setFilterChipList] = useState([{
-    label: sort.title,
-    value: sort.key,
-    type: "sort"
-  }])
+  const [filterChipList, setFilterChipList] = useState([
+    {
+      label: sort.title,
+      value: sort.key,
+      type: 'sort',
+    },
+  ]);
 
-  const updateFilter = (updation) => {
-    setFilter((filter) => ({ ...filter, ...updation }))
-    setIsSavedFilterApplied(false)
-  }
+  const updateFilter = updation => {
+    setFilter(filter => ({...filter, ...updation}));
+    setIsSavedFilterApplied(false);
+  };
 
-  const updateCallAPI = async (member) => {
-
+  const updateCallAPI = async member => {
     let res = await UPDATE_CALL_FUNCTIONALITY({
-      token, navigation, body: {
+      token,
+      navigation,
+      body: {
         is_call_allowed: !member?.is_call_allowed,
         member_id: member?._id,
-      }
+      },
     });
     if (res?.code == 200) {
-      showToast({ type: "success", title: res?.message });
+      showToast({type: 'success', title: res?.message});
       let data = breakReference(member);
-      data["is_call_allowed"] = !data["is_call_allowed"]
-      updateData(data)
+      data['is_call_allowed'] = !data['is_call_allowed'];
+      updateData(data);
     } else {
-
     }
-  }
+  };
 
   const onOptSelected = (opt, item) => {
-    if (opt?.key == "notes") {
+    if (opt?.key == 'notes') {
       navigation.navigate(routes.memberNotesListing, {
-        for: "members",
+        for: 'members',
         memberId: item?._id,
-        updateNotes: updateNotes
-      })
-    } else if (opt?.key == "subscription") {
+        updateNotes: updateNotes,
+      });
+    } else if (opt?.key == 'subscription') {
       navigation.navigate(routes.memberSubscribersListing, {
-        memberId: item?._id
-      })
-    } else if (opt?.key == "question-answer") {
+        memberId: item?._id,
+      });
+    } else if (opt?.key == 'question-answer') {
       navigation.navigate(routes.memberQuestionListing, {
         memberId: item?._id,
-        member: item
-      })
-    }
-    else if (opt?.key == "manage-mission") {
+        member: item,
+      });
+    } else if (opt?.key == 'manage-mission') {
       navigation.navigate(routes.memberManage, {
         memberId: item?._id,
-      })
-
-    } else if (opt?.key == "profile") {
+      });
+    } else if (opt?.key == 'profile') {
       navigation.navigate(routes.memberProfile, {
         memberId: item?._id,
-        contactNumber: item?.contact_number
-      })
-    } else if (opt?.key == "update_call") {
+        contactNumber: item?.contact_number,
+      });
+    } else if (opt?.key == 'update_call') {
       setTimeout(() => {
         ref_confirmModal?.current?.openModal({
-          title: `Are you sure you want to ${item?.is_call_allowed ? "disable" : "enable"} call functionality for this user?`,
-          agreeFunc: () => updateCallAPI(item)
-        })
+          title: `Are you sure you want to ${
+            item?.is_call_allowed ? 'disable' : 'enable'
+          } call functionality for this user?`,
+          agreeFunc: () => updateCallAPI(item),
+        });
       }, 500);
-    } else if (opt?.key == "subscription-list") {
+    } else if (opt?.key == 'subscription-list') {
       navigation.navigate(routes.memberSubscriptionList, {
-        memberId: item?._id
-      })
-    } else if (opt?.key == "transaction-list") {
+        memberId: item?._id,
+      });
+    } else if (opt?.key == 'transaction-list') {
       navigation.navigate(routes.memberTransactionList, {
-        memberId: item?._id
-      })
+        memberId: item?._id,
+      });
     }
+  };
 
-  }
-
-  const updateData = (memberObj) => {
+  const updateData = memberObj => {
     let index = list.findIndex(x => x._id === memberObj?._id);
     if (index > -1) {
       list.splice(index, 1, memberObj);
       setList([...list]);
     }
-  }
+  };
 
   const makeCsv = async () => {
-    let file = ""
+    let file = '';
     let header = `First Name, Last Name, Email, Contact Number\n`;
     list.forEach((x, i) => {
       file += `${x?.first_name}, ${x?.last_name}, ${x?.email}, ${x?.contact_number} \n`;
-
-    })
+    });
     file = header + file;
     const pathToWrite =
-      Platform.OS == "ios" ?
-        `${RNFetchBlob.fs.dirs.DocumentDir}/CSV/data.csv` :
-        `${RNFetchBlob.fs.dirs.DownloadDir}/CSV/data.csv`;
-
+      Platform.OS == 'ios'
+        ? `${RNFetchBlob.fs.dirs.DocumentDir}/CSV/data.csv`
+        : `${RNFetchBlob.fs.dirs.DownloadDir}/CSV/data.csv`;
 
     RNFetchBlob.fs
       .writeFile(pathToWrite, file, 'utf8')
-      .then(async (res) => {
-        if (Platform.OS == "android") {
-          let result = await RNFetchBlob.MediaCollection.copyToMediaStore({
-            name: "data.csv", // name of the file
-            parentFolder: 'Mission Control', // subdirectory in the Media Store, e.g. HawkIntech/Files to create a folder HawkIntech with a subfolder Files and save the image within this folder
-            mimeType: 'text/csv'
-          },
+      .then(async res => {
+        if (Platform.OS == 'android') {
+          let result = await RNFetchBlob.MediaCollection.copyToMediaStore(
+            {
+              name: 'data.csv', // name of the file
+              parentFolder: 'Mission Control', // subdirectory in the Media Store, e.g. HawkIntech/Files to create a folder HawkIntech with a subfolder Files and save the image within this folder
+              mimeType: 'text/csv',
+            },
             'Download', // Media Collection to store the file in ("Audio" | "Image" | "Video" | "Download")
-            pathToWrite // Path to the file being copied in the apps own storage
+            pathToWrite, // Path to the file being copied in the apps own storage
           );
-          showToast({ title: "CSV File Downloaded", type: "success" })
-        } else if (Platform.OS == "ios") {
-          showToast({ title: "CSV File Downloaded", type: "success" })
+          showToast({title: 'CSV File Downloaded', type: 'success'});
+        } else if (Platform.OS == 'ios') {
+          showToast({title: 'CSV File Downloaded', type: 'success'});
         }
       })
       .catch(error => console.error(error));
-  }
+  };
 
-  const setSortfilter = (sort) => {
+  const setSortfilter = sort => {
     let nOBj = {
       label: sort.title,
       value: sort.key,
-      type: "sort"
-    }
+      type: 'sort',
+    };
     let index = filterChipList.findIndex(x => x.type == 'sort');
     if (index > -1) {
-      filterChipList.splice(index, 1, nOBj)
+      filterChipList.splice(index, 1, nOBj);
     } else {
-      filterChipList.push(nOBj)
+      filterChipList.push(nOBj);
     }
     setFilterChipList([...filterChipList]);
-  }
+  };
 
   const filterTheData = (obj, data, isSavedFilter, isFilter) => {
     let list = [];
@@ -215,59 +248,59 @@ const MemberList = ({ navigation, route }) => {
       let nOBj = {
         label: sorted.title,
         value: sorted.key,
-        type: "sort"
-      }
-      list.push(nOBj)
+        type: 'sort',
+      };
+      list.push(nOBj);
     }
     Object.keys(obj).forEach((x, i) => {
       if (Array.isArray(obj[x])) {
-        if (x == "badge_levels") {
-
+        if (x == 'badge_levels') {
           obj[x].forEach((z, j) => {
-            let obj = access?.badge_levels.find(y => y?._id == z)
+            let obj = access?.badge_levels.find(y => y?._id == z);
             let nOBj = {
               label: obj?.title,
               value: obj?._id,
-              type: x
-            }
+              type: x,
+            };
             list.push(nOBj);
-
-          })
-        } else if (x == "event_page") {
-          let id = obj[x][0]
+          });
+        } else if (x == 'event_page') {
+          let id = obj[x][0];
           if (!!id) {
-            let label = data?.sale_pages.find((x) => x._id == id)?.sale_page_title;
+            let label = data?.sale_pages.find(
+              x => x._id == id,
+            )?.sale_page_title;
             let nOBj = {
               label: label,
               value: id,
-              type: x
-            }
+              type: x,
+            };
             list.push(nOBj);
           }
-        } else if (x == "lead_status") {
+        } else if (x == 'lead_status') {
           obj[x].forEach((z, j) => {
             let label = data?.lead_status.find(y => y._id == z)?.title;
             if (label) {
               let nOBj = {
                 label: label,
                 value: z,
-                type: x
-              }
+                type: x,
+              };
               list.push(nOBj);
             }
-          })
-        } else if (x == "program") {
+          });
+        } else if (x == 'program') {
           obj[x].forEach((z, j) => {
             let label = data?.programs.find(y => y._id == z)?.title;
             if (label) {
               let nOBj = {
                 label: label,
                 value: z,
-                type: x
-              }
+                type: x,
+              };
               list.push(nOBj);
             }
-          })
+          });
         }
       } else if (x == 'delegate' && !!obj[x]) {
         let label = getNameForDelage(data?.delegates_list, obj[x]);
@@ -275,8 +308,8 @@ const MemberList = ({ navigation, route }) => {
           let nOBj = {
             label: label,
             value: obj[x],
-            type: x
-          }
+            type: x,
+          };
           list.push(nOBj);
         }
       } else if (x == 'nurture' && !!obj[x]) {
@@ -285,242 +318,274 @@ const MemberList = ({ navigation, route }) => {
           let nOBj = {
             label: label,
             value: obj[x],
-            type: x
-          }
+            type: x,
+          };
           list.push(nOBj);
         }
       } else if (x == 'plan' && !!obj[x]) {
         let pageId = obj.event_page[0];
         if (!!pageId) {
           let nOBj = {
-            label: data?.sale_pages.find((x) => x._id == pageId)?.payment_plans.find(z => z?._id == obj[x])?.plan_title,
+            label: data?.sale_pages
+              .find(x => x._id == pageId)
+              ?.payment_plans.find(z => z?._id == obj[x])?.plan_title,
             value: obj[x],
-            type: x
-          }
+            type: x,
+          };
           list.push(nOBj);
         }
-      } else if (x == 'status' && typeof (obj[x]) == "boolean") {
+      } else if (x == 'status' && typeof obj[x] == 'boolean') {
         let nOBj = {
-          label: obj[x] ? "Active" : "Inactive",
-          value: "statusActive",
-          type: x
-        }
+          label: obj[x] ? 'Active' : 'Inactive',
+          value: 'statusActive',
+          type: x,
+        };
         list.push(nOBj);
-      } else if (x == 'downloaded_app' && typeof (obj[x]) == "boolean") {
+      } else if (x == 'downloaded_app' && typeof obj[x] == 'boolean') {
         let nOBj = {
-          label: obj[x] ? "Downloaded" : "Not Downloaded",
+          label: obj[x] ? 'Downloaded' : 'Not Downloaded',
           value: obj[x],
-          type: x
-        }
+          type: x,
+        };
         list.push(nOBj);
       } else if (x == 'program_status') {
         let statusObj = programStatusList.find(y => y.key == obj[x]);
         let nOBj = {
           label: statusObj?.title,
           value: obj[x],
-          type: x
-        }
+          type: x,
+        };
         list.push(nOBj);
       } else if (x == 'user_status_type' && !!obj[x]) {
         let nOBj = {
           label: obj[x],
           value: obj[x],
-          type: x
-        }
+          type: x,
+        };
         list.push(nOBj);
-      } else if (x == 'member_ship_expiry' && obj[x] == "expired") {
+      } else if (x == 'member_ship_expiry' && obj[x] == 'expired') {
         let nOBj = {
-          label: "Expired",
+          label: 'Expired',
           value: obj[x],
-          type: x
-        }
+          type: x,
+        };
         list.push(nOBj);
-      } else if (x == 'member_ship_expiry' && obj[x] == "not_expired" && obj.expiry_in != 'custom') {
+      } else if (
+        x == 'member_ship_expiry' &&
+        obj[x] == 'not_expired' &&
+        obj.expiry_in != 'custom'
+      ) {
         let nOBj = {
           label: `Expire in ${obj.expiry_in} days`,
           value: obj[x],
-          type: "expiry_in"
-        }
+          type: 'expiry_in',
+        };
         list.push(nOBj);
-      } else if (x == 'member_ship_expiry' && obj[x] == "not_expired" && obj.expiry_in == 'custom') {
+      } else if (
+        x == 'member_ship_expiry' &&
+        obj[x] == 'not_expired' &&
+        obj.expiry_in == 'custom'
+      ) {
         let nOBj = {
-          label: `Membership Expiry Start Date : ${moment(obj?.membership_purchase_expiry_from).format("YYYY-MM-DD")} - Membership Expiry End Date : ${moment(obj?.membership_purchase_expiry_to).format("YYYY-MM-DD")}`,
+          label: `Membership Expiry Start Date : ${moment(
+            obj?.membership_purchase_expiry_from,
+          ).format('YYYY-MM-DD')} - Membership Expiry End Date : ${moment(
+            obj?.membership_purchase_expiry_to,
+          ).format('YYYY-MM-DD')}`,
           value: obj[x],
-          type: "expiry_in"
-        }
+          type: 'expiry_in',
+        };
         list.push(nOBj);
       } else if (x == 'is_date_range' && !!obj[x]) {
         let nOBj = {
-          label: `Start Date : ${moment(obj?.from_date).format("YYYY-MM-DD")} - End Date : ${moment(obj?.to_date).format("YYYY-MM-DD")}`,
+          label: `Start Date : ${moment(obj?.from_date).format(
+            'YYYY-MM-DD',
+          )} - End Date : ${moment(obj?.to_date).format('YYYY-MM-DD')}`,
           value: obj[x],
-          type: x
-        }
+          type: x,
+        };
         list.push(nOBj);
-      }
-      else if (x == 'coins_range' && !!obj[x]) {
+      } else if (x == 'coins_range' && !!obj[x]) {
         let nOBj = {
           label: `Start Coins : ${obj.coins_from} - End Coins : ${obj.coins_to}`,
-          value: "coins_range_true",
-          type: x
-        }
+          value: 'coins_range_true',
+          type: x,
+        };
         list.push(nOBj);
       }
-    })
+    });
     setFilterChipList(list);
-    setIsFilterApplied(isFilter)
-    setIsSavedFilterApplied(isSavedFilter)
-    setFilter({ ...obj })
-    setFilterData(data)
-  }
-
+    setIsFilterApplied(isFilter);
+    setIsSavedFilterApplied(isSavedFilter);
+    setFilter({...obj});
+    setFilterData(data);
+  };
 
   const updateLeadStatus = (leadStatus, icome, date, expiry) => {
     let lead = {
       background_color: leadStatus?.background_color,
       text_color: leadStatus?.text_color,
       title: leadStatus?.title,
-      _id: leadStatus?._id
-
-    }
+      _id: leadStatus?._id,
+    };
     if (leadStatus?.is_lead_status_locked) {
-      lead = { ...lead, is_lead_status_locked: leadStatus?.is_lead_status_locked }
+      lead = {
+        ...lead,
+        is_lead_status_locked: leadStatus?.is_lead_status_locked,
+      };
     }
 
     let obj = {
       ...member,
       lead_status: lead,
       lead_status_expiry: expiry,
-      lead_status_history: [{
-        income_value: icome,
-        changed_date_time: date,
-        lead_status: lead
-      },
-      ...member?.lead_status_history]
-    }
-    setList((members) => {
+      lead_status_history: [
+        {
+          income_value: icome,
+          changed_date_time: date,
+          lead_status: lead,
+        },
+        ...member?.lead_status_history,
+      ],
+    };
+    setList(members => {
       let index = members.findIndex(x => x?._id == member?._id);
       if (index > -1) {
-        members[index] = { ...member[index], ...obj }
+        members[index] = {...member[index], ...obj};
       }
-      return [...members]
-    })
+      return [...members];
+    });
     // route?.params?.updateData?.({ ...obj });
-  }
+  };
 
   const getMembers = async (isFirstTime, noSearch = false) => {
     if (isFirstTime) {
       setLoader(true);
-      setList([])
+      setList([]);
     }
     let res;
     Keyboard.dismiss();
     if (isAllMembers) {
       res = await LIST_OF_MEMBERS({
-        token, navigation, page: page, searchText: noSearch ? "" : search, body: {
+        token,
+        navigation,
+        page: page,
+        searchText: noSearch ? '' : search,
+        body: {
           sort_by: !!sorted ? sorted?.key : null,
           ...Filter,
-          search_text: search
+          search_text: search,
         },
       });
     } else if (isMembers) {
       res = await LIST_OF_MEMBERS_ONLY({
-        token, navigation, page: page, searchText: noSearch ? "" : search, body: {
+        token,
+        navigation,
+        page: page,
+        searchText: noSearch ? '' : search,
+        body: {
           sort_by: !!sorted ? sorted?.key : null,
           ...Filter,
-          search_text: search
+          search_text: search,
         },
       });
     } else if (isNurture) {
       res = await LIST_OF_NURTURE({
-        token, navigation, page: page, searchText: noSearch ? "" : search, body: {
+        token,
+        navigation,
+        page: page,
+        searchText: noSearch ? '' : search,
+        body: {
           sort_by: !!sorted ? sorted?.key : null,
           ...Filter,
-          search_text: search
+          search_text: search,
         },
       });
     }
     if (res.code == 200) {
       let length = isFirstTime ? 0 : list.length;
 
-
-
-
       if (isAllMembers) {
-        if (res?.total_member_count > (res?.member.length + length)) {
+        if (res?.total_member_count > res?.member.length + length) {
           page = page + 1;
-          canLoadMore = true
+          canLoadMore = true;
         } else {
-          canLoadMore = false
+          canLoadMore = false;
         }
-        setList(isFirstTime ? res?.member : [...list, ...res?.member])
+        setList(isFirstTime ? res?.member : [...list, ...res?.member]);
         setTotal(res?.total_member_count);
       } else if (isMembers) {
-        if (res?.total_count > (res?.event_subscriber.length + length)) {
+        if (res?.total_count > res?.event_subscriber.length + length) {
           page = page + 1;
-          canLoadMore = true
+          canLoadMore = true;
         } else {
-          canLoadMore = false
+          canLoadMore = false;
         }
-        setList(isFirstTime ? res?.event_subscriber : [...list, ...res?.event_subscriber])
+        setList(
+          isFirstTime
+            ? res?.event_subscriber
+            : [...list, ...res?.event_subscriber],
+        );
         setTotal(res?.total_count);
       } else if (isNurture) {
-        if (res?.total_count > (res?.member_array.length + length)) {
+        if (res?.total_count > res?.member_array.length + length) {
           page = page + 1;
-          canLoadMore = true
+          canLoadMore = true;
         } else {
-          canLoadMore = false
+          canLoadMore = false;
         }
-        setList(isFirstTime ? res?.member_array : [...list, ...res?.member_array])
+        setList(
+          isFirstTime ? res?.member_array : [...list, ...res?.member_array],
+        );
         setTotal(res?.total_count);
       }
 
       setLoader(false);
       setFooterLoader(false);
     } else {
-      setLoader(false)
+      setLoader(false);
       setFooterLoader(false);
     }
     isFirst = false;
-  }
+  };
 
   const saveFilter = () => {
-    saveModalRef?.current?.openModal()
-  }
+    saveModalRef?.current?.openModal();
+  };
 
   const clearFilter = () => {
-    setFilterChipList([])
-    setFilter({ ...filteroObj });
+    setFilterChipList([]);
+    setFilter({...filteroObj});
     setSorted(null);
-    setIsFilterApplied(false)
-    setIsSavedFilterApplied(false)
-
-  }
+    setIsFilterApplied(false);
+    setIsSavedFilterApplied(false);
+  };
   const updateNotes = (notes, MemberId) => {
-    let newList = [...list]
+    let newList = [...list];
     let index = list.findIndex(x => x._id === MemberId);
     if (index > -1) {
-      let obj = { ...list[index], personal_note: notes }
-      newList.splice(index, 1, obj)
-      setList(newList)
+      let obj = {...list[index], personal_note: notes};
+      newList.splice(index, 1, obj);
+      setList(newList);
     }
-  }
+  };
 
   const updateCallNote = (notes, MemberId) => {
-    let newList = [...list]
+    let newList = [...list];
     let index = list.findIndex(x => x._id === MemberId);
     if (index > -1) {
-      let obj = { ...list[index], call_history: notes }
-      newList.splice(index, 1, obj)
-      setList(newList)
+      let obj = {...list[index], call_history: notes};
+      newList.splice(index, 1, obj);
+      setList(newList);
     }
-  }
+  };
 
   useEffect(() => {
     page = 0;
-    canLoadMore = false
-    getMembers(true)
+    canLoadMore = false;
+    getMembers(true);
     // debounce(() => getMembers(true), 100)
-  }, [JSON.stringify(sorted), JSON.stringify(Filter)])
+  }, [JSON.stringify(sorted), JSON.stringify(Filter)]);
 
   // useEffect(() => {
   //   if (!isFirst) {
@@ -531,39 +596,63 @@ const MemberList = ({ navigation, route }) => {
   //   }
   // }, [search])
 
-
-  const onMemberDetail = (item) => {
+  const onMemberDetail = item => {
     navigation.navigate(routes.memberDetails, {
       member: item,
       updateNotes: updateNotes,
       updateCallNote: updateCallNote,
-      updateData: updateData
-    })
-  }
-
-
+      updateData: updateData,
+    });
+  };
 
   const topView = () => {
     return (
-      <View style={{ flexDirection: "row", flex: 1, marginHorizontal: 10, alignItems: "center", }}>
+      <View
+        style={{
+          flexDirection: 'row',
+          flex: 1,
+          marginHorizontal: 10,
+          alignItems: 'center',
+        }}>
         <View>
-          <MyText fontSize={18} type='bold' color={colors.primary} >{
-            isAllMembers ? "All Members" :
-              isMembers ? "Members" :
-                isNurture ? "Nurture Members" : ""
-          }</MyText>
-          <MyText fontSize={10} type='medium' color={colors.lightText2}>{`Showing ${list.length} of ${total}`}</MyText>
+          <MyText fontSize={18} type="bold" color={colors.primary}>
+            {isAllMembers
+              ? 'All Members'
+              : isMembers
+              ? 'Members'
+              : isNurture
+              ? 'Nurture Members'
+              : ''}
+          </MyText>
+          <MyText
+            fontSize={10}
+            type="medium"
+            color={
+              colors.lightText2
+            }>{`Showing ${list.length} of ${total}`}</MyText>
         </View>
-        <View style={{ flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "flex-end" }}>
-          {((isMembers && access?.member_export_csv) || (isNurture && access?.nurture_export_csv) || (isAllMembers && access?.all_member_export_csv)) &&
+        <View
+          style={{
+            flex: 1,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+          }}>
+          {((isMembers && access?.member_export_csv) ||
+            (isNurture && access?.nurture_export_csv) ||
+            (isAllMembers && access?.all_member_export_csv)) && (
             <TouchableOpacity
               onPress={() => makeCsv()}
-              style={__styles.headerBtn} >
-              <Image source={icons.csv} style={{ height: 12, aspectRatio: 1.5 }} />
-            </TouchableOpacity>}
+              style={__styles.headerBtn}>
+              <Image
+                source={icons.csv}
+                style={{height: 12, aspectRatio: 1.5}}
+              />
+            </TouchableOpacity>
+          )}
           <TouchableOpacity
             onPress={() => sortModalRef?.current?.openModal()}
-            style={__styles.headerBtn} >
+            style={__styles.headerBtn}>
             {icons.sort(colors.black, 17)}
           </TouchableOpacity>
           <TouchableOpacity
@@ -572,42 +661,42 @@ const MemberList = ({ navigation, route }) => {
             {icons.filter(colors.black, 17)}
           </TouchableOpacity>
         </View>
-      </View >
-    )
-  }
+      </View>
+    );
+  };
 
   const chip = (title, onPress) => {
     return (
-      <View key={"chip" + title} style={__styles.chipView}>
+      <View key={'chip' + title} style={__styles.chipView}>
         <View style={{}}>
-          <MyText fontSize={12} color={colors.white} >{title}</MyText>
+          <MyText fontSize={12} color={colors.white}>
+            {title}
+          </MyText>
         </View>
-        <TouchableOpacity
-          onPress={onPress}
-          style={__styles.chipBtn}>
+        <TouchableOpacity onPress={onPress} style={__styles.chipBtn}>
           {icons.crosss(colors.primary, 15)}
         </TouchableOpacity>
       </View>
-    )
-  }
+    );
+  };
 
-  const onChatScreen = async (memberId) => {
-    let res = await IS_CHAT_EXIST({ token, navigation, memberId })
+  const onChatScreen = async memberId => {
+    let res = await IS_CHAT_EXIST({token, navigation, memberId});
     if (res.code == 200) {
       if (res.is_chat_exist) {
-        let member = res.chat.member.find(x => x._id != user?._id)
+        let member = res.chat.member.find(x => x._id != user?._id);
         navigation.navigate(routes.chatMessageList, {
           isOnline: member?.is_online,
           memberId: member?._id,
           firstName: member?.first_name,
           lastName: member?.last_name,
-          lastSeen: "",
-          profileImage: !!member?.profile_image ? member?.profile_image : "",
+          lastSeen: '',
+          profileImage: !!member?.profile_image ? member?.profile_image : '',
           chatId: res?.chat?._id,
           canGoBack: true,
-          resetCountToZero: () => { },
-          refresh: () => { },
-        })
+          resetCountToZero: () => {},
+          refresh: () => {},
+        });
       } else {
         let member = res.user_info;
         navigation.navigate(routes.chatMessageList, {
@@ -615,23 +704,25 @@ const MemberList = ({ navigation, route }) => {
           memberId: member?._id,
           firstName: member?.first_name,
           lastName: member?.last_name,
-          lastSeen: !!member?.last_login_activity ? member?.last_login_activity : "",
-          profileImage: !!member?.member ? member?.member : "",
-          chatId: "",
+          lastSeen: !!member?.last_login_activity
+            ? member?.last_login_activity
+            : '',
+          profileImage: !!member?.member ? member?.member : '',
+          chatId: '',
           canGoBack: true,
-          resetCountToZero: () => { },
-          refresh: () => { },
-        })
+          resetCountToZero: () => {},
+          refresh: () => {},
+        });
       }
     }
-  }
+  };
 
   const getNameForDelage = (list, id) => {
-    let obj = list.find((x) => x._id == id);
+    let obj = list.find(x => x._id == id);
     if (obj) {
-      return obj?.first_name + " " + obj?.last_name
-    } else return null
-  }
+      return obj?.first_name + ' ' + obj?.last_name;
+    } else return null;
+  };
 
   const countLength = () => {
     let count = 0;
@@ -639,105 +730,122 @@ const MemberList = ({ navigation, route }) => {
     Object.keys(Filter).forEach(filter => {
       if (Array.isArray(Filter[filter])) {
         count = count + Filter[filter].length;
-      } else if (typeof (Filter[filter]) == "string") {
-        if (filter != "from_date" && filter != "to_date" && filter != "membership_purchase_expiry_from" && filter != "membership_purchase_expiry_to" && filter != "date" && filter != "status" && !!Filter[filter] && filter != "coins_from" && filter != "coins_to") {
+      } else if (typeof Filter[filter] == 'string') {
+        if (
+          filter != 'from_date' &&
+          filter != 'to_date' &&
+          filter != 'membership_purchase_expiry_from' &&
+          filter != 'membership_purchase_expiry_to' &&
+          filter != 'date' &&
+          filter != 'status' &&
+          !!Filter[filter] &&
+          filter != 'coins_from' &&
+          filter != 'coins_to'
+        ) {
           count = count + 1;
         }
-      } else if (typeof (Filter[filter]) == "boolean") {
+      } else if (typeof Filter[filter] == 'boolean') {
         if (Filter[filter]) {
-
           count = count + 1;
         }
-
       }
-
-    })
+    });
     if (!!sorted) {
       count = count + 1;
     }
     return count;
-  }
+  };
 
-  const filterRemoveAction = (item) => {
-    if (item.type == "sort") {
-      setSorted(null)
-    } else if (item.type == "badge_levels") {
-      updateFilter({ badge_levels: Filter?.badge_levels.slice().filter(z => z != item.value) });
-    } else if (item.type == "event_page") {
-      updateFilter({ event_page: [] })
-    } else if (item.type == "lead_status") {
-      updateFilter({ lead_status: Filter?.lead_status.filter(y => y != item.value) })
-    } else if (item.type == "plan") {
-      updateFilter({ plan: null })
-    } else if (item.type == "delegate") {
-      updateFilter({ delegate: null })
-    } else if (item.type == "nurture") {
-      updateFilter({ nurture: null })
-    } else if (item.type == "nurture") {
-      updateFilter({ nurture: null })
-    } else if (item.type == "downloaded_app") {
-      updateFilter({ downloaded_app: null })
-    } else if (item.type == "user_status_type") {
-      updateFilter({ user_status_type: "" })
-    } else if (item.type == "member_ship_expiry") {
-      updateFilter({ member_ship_expiry: "", expiry_in: 3, })
-    } else if (item.type == "expiry_in") {
-      updateFilter({ expiry_in: 3, member_ship_expiry: "" })
-    } else if (item.type == "is_date_range") {
-      updateFilter({ is_date_range: false, from_date: null, to_date: null })
-    } else if (item.type == "coins_range") {
-      updateFilter({ coins_range: false, coins_from: 0, coins_to: 0 })
-    } else if (item.type == "program") {
-      let status = "";
+  const filterRemoveAction = item => {
+    if (item.type == 'sort') {
+      setSorted(null);
+    } else if (item.type == 'badge_levels') {
+      updateFilter({
+        badge_levels: Filter?.badge_levels.slice().filter(z => z != item.value),
+      });
+    } else if (item.type == 'event_page') {
+      updateFilter({event_page: []});
+    } else if (item.type == 'lead_status') {
+      updateFilter({
+        lead_status: Filter?.lead_status.filter(y => y != item.value),
+      });
+    } else if (item.type == 'plan') {
+      updateFilter({plan: null});
+    } else if (item.type == 'delegate') {
+      updateFilter({delegate: null});
+    } else if (item.type == 'nurture') {
+      updateFilter({nurture: null});
+    } else if (item.type == 'nurture') {
+      updateFilter({nurture: null});
+    } else if (item.type == 'downloaded_app') {
+      updateFilter({downloaded_app: null});
+    } else if (item.type == 'user_status_type') {
+      updateFilter({user_status_type: ''});
+    } else if (item.type == 'member_ship_expiry') {
+      updateFilter({member_ship_expiry: '', expiry_in: 3});
+    } else if (item.type == 'expiry_in') {
+      updateFilter({expiry_in: 3, member_ship_expiry: ''});
+    } else if (item.type == 'is_date_range') {
+      updateFilter({is_date_range: false, from_date: null, to_date: null});
+    } else if (item.type == 'coins_range') {
+      updateFilter({coins_range: false, coins_from: 0, coins_to: 0});
+    } else if (item.type == 'program') {
+      let status = '';
       let pList = Filter?.program.filter(y => y != item.value);
       if (!isArray(pList)) {
-        status = ""
+        status = '';
       } else {
-        status = Filter?.program_status
+        status = Filter?.program_status;
       }
-      updateFilter({ program: pList, program_status: status })
-    } else if (item.type == "program_status") {
-      updateFilter({ program_status: "" })
+      updateFilter({program: pList, program_status: status});
+    } else if (item.type == 'program_status') {
+      updateFilter({program_status: ''});
     }
-    setFilterChipList((list) => list.slice().filter((x) => x.value != item.value))
-  }
+    setFilterChipList(list => list.slice().filter(x => x.value != item.value));
+  };
 
-  const filterTheList = (list) => {
+  const filterTheList = list => {
     return list.slice().filter(x => {
-      if (x.key == "profile") {
-        return access?.view_profile
-      } if (x.key == "subscription-list" || x.key == "transaction-list") {
-        return isAllMembers
-      } else return true
-    })
-  }
+      if (x.key == 'profile') {
+        return access?.view_profile;
+      } else if (x.key == 'subscription-list' || x.key == 'transaction-list') {
+        return isAllMembers;
+      } else if (x.key == 'question-answer') {
+        if (isSubTeam) {
+          return isAllMembers;
+        } else {
+          return true;
+        }
+      } else return true;
+    });
+  };
 
   const headerView = () => {
     return (
-      <View style={{ backgroundColor: colors.darkSecondary }}>
-        {filterChipList.length > 0 &&
+      <View style={{backgroundColor: colors.darkSecondary}}>
+        {filterChipList.length > 0 && (
           <>
-
-            <View style={[__styles.allChipView,]}>
+            <View style={[__styles.allChipView]}>
               <View style={{}}>
-                <MyText type='bold' >{"Filtered By : "}</MyText>
+                <MyText type="bold">{'Filtered By : '}</MyText>
               </View>
               {filterChipList.map((item, index) => {
                 if ((index >= 4 && showChips) || index < 4)
-                  return chip(item.label, () => filterRemoveAction(item))
+                  return chip(item.label, () => filterRemoveAction(item));
               })}
-              {filterChipList.length > 4 &&
+              {filterChipList.length > 4 && (
                 <Pressable onPress={() => setShowChips(!showChips)}>
-                  <MyText type='medium'
+                  <MyText
+                    type="medium"
                     style={{
                       color: colors.primary,
                       paddingVertical: 5,
-                      paddingHorizontal: 10
-                    }} >{showChips ? "See Less..." : "See All..."}</MyText>
-                </Pressable>}
-
-
-
+                      paddingHorizontal: 10,
+                    }}>
+                    {showChips ? 'See Less...' : 'See All...'}
+                  </MyText>
+                </Pressable>
+              )}
 
               {/* <TouchableOpacity
                 onPress={clearFilter}
@@ -761,8 +869,13 @@ const MemberList = ({ navigation, route }) => {
               {!!Filter?.coins_range && chip(`Start Coins : ${Filter?.coins_from} - End Coins : ${Filter?.coins_to}`, () => updateFilter({ coins_range: false, coins_from: 0, coins_to: 0 }))} */}
             </View>
 
-            {filterChipList.length > 0 &&
-              <View style={{ flexDirection: "row", marginTop: 10, justifyContent: "flex-end" }}>
+            {filterChipList.length > 0 && (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  marginTop: 10,
+                  justifyContent: 'flex-end',
+                }}>
                 <Pressable style={{}} onPress={clearFilter}>
                   {/* <MyText type='medium'
                   style={{
@@ -775,23 +888,39 @@ const MemberList = ({ navigation, route }) => {
                   }} >{"Clear Filter"}</MyText> */}
                   <TouchableOpacity
                     onPress={clearFilter}
-                    style={{ borderWidth: 1, borderColor: colors.primary, borderRadius: 10, paddingHorizontal: 10, marginRight: 10, paddingVertical: 5, backgroundColor: colors.lightPrimary3 }}>
-                    <MyText color={colors.primary}>{"Clear Filter"}</MyText>
+                    style={{
+                      borderWidth: 1,
+                      borderColor: colors.primary,
+                      borderRadius: 10,
+                      paddingHorizontal: 10,
+                      marginRight: 10,
+                      paddingVertical: 5,
+                      backgroundColor: colors.lightPrimary3,
+                    }}>
+                    <MyText color={colors.primary}>{'Clear Filter'}</MyText>
                   </TouchableOpacity>
                 </Pressable>
 
-                <View style={{ flexDirection: "row", }}>
-                  {!isSavedFilterApplied &&
-                    <TouchableOpacity
-                      onPress={saveFilter}
-                      style={{ borderWidth: 1, borderColor: colors.primary, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 5, backgroundColor: colors.lightPrimary3 }}>
-                      <MyText color={colors.primary}>{"Save Filter"}</MyText>
-                    </TouchableOpacity>
+                <View style={{flexDirection: 'row'}}>
+                  {
+                    !isSavedFilterApplied && (
+                      <TouchableOpacity
+                        onPress={saveFilter}
+                        style={{
+                          borderWidth: 1,
+                          borderColor: colors.primary,
+                          borderRadius: 10,
+                          paddingHorizontal: 10,
+                          paddingVertical: 5,
+                          backgroundColor: colors.lightPrimary3,
+                        }}>
+                        <MyText color={colors.primary}>{'Save Filter'}</MyText>
+                      </TouchableOpacity>
+                    )
                     // <MyButton invert textStyle={{fontSize:12}} style={{paddingHorizontal:5,height:30}} title='Save Filter' onPress={saveFilter} />
                   }
 
                   {/* <TransparentButton title='Clear All' onPress={clearFilter} /> */}
-
                 </View>
                 {/* {filterChipList.length > 4 &&
                   <TouchableOpacity
@@ -807,231 +936,331 @@ const MemberList = ({ navigation, route }) => {
                   "Show Less" : "Show All"} onPress={() => setShowChips(!showChips)} />
                   } */}
               </View>
-            }
-          </>}
+            )}
+          </>
+        )}
         {/* <Collapsible collapsed={searchCollapsed}> */}
-        <View style={{ marginTop: 5 }}>
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <View style={{ flex: 1, marginTop: -15 }}>
+        <View style={{marginTop: 5}}>
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <View style={{flex: 1, marginTop: -15}}>
               <MyInputs
-                rightIcon={search.length > 0 ? icons.crosssWithCircle_20 : icons.noIcon}
+                rightIcon={
+                  search.length > 0 ? icons.crosssWithCircle_20 : icons.noIcon
+                }
                 value={search}
-                placeholder='Search...'
-                onChangeText={(text) => setSearch(text)}
+                placeholder="Search..."
+                onChangeText={text => setSearch(text)}
                 rightIconOnPress={() => {
-                  setSearch("")
+                  setSearch('');
                 }}
                 noSpace
                 isSearch={true}
                 onSubmitEditing={() => {
                   page = 0;
-                  canLoadMore = false
-                  getMembers(true)
+                  canLoadMore = false;
+                  getMembers(true);
                 }}
               />
             </View>
-            <View style={{ marginLeft: 5 }}>
+            <View style={{marginLeft: 5}}>
               <TouchableOpacity
                 onPress={() => {
                   page = 0;
-                  canLoadMore = false
-                  getMembers(true)
+                  canLoadMore = false;
+                  getMembers(true);
                 }}
-                style={{ borderWidth: 1, borderColor: colors.primary, flex: 1, marginTop: 5, paddingHorizontal: 10, borderRadius: 5, justifyContent: "center" }} >
+                style={{
+                  borderWidth: 1,
+                  borderColor: colors.primary,
+                  flex: 1,
+                  marginTop: 5,
+                  paddingHorizontal: 10,
+                  borderRadius: 5,
+                  justifyContent: 'center',
+                }}>
                 {icons.search(colors.primary, 20)}
               </TouchableOpacity>
             </View>
           </View>
         </View>
         {/* </Collapsible> */}
-      </View>)
-  }
+      </View>
+    );
+  };
 
-  const badgeLevelView = (item) => {
+  const badgeLevelView = item => {
     return (
       <Row alignItems="center">
-        {!!item?.membership_level_badge_info?.membership_level_badge_icon?.thumbnail_1 &&
+        {!!item?.membership_level_badge_info?.membership_level_badge_icon
+          ?.thumbnail_1 && (
           <MyImage
-            source={{ uri: S3_URL + item?.membership_level_badge_info?.membership_level_badge_icon?.thumbnail_1 }}
-            style={{ width: 15, height: 15, marginRight: 5 }} />}
-        {!!item?.membership_level_badge_info?.membership_level_badge_title &&
-          <MyText fontSize={12} type='medium'>
+            source={{
+              uri:
+                S3_URL +
+                item?.membership_level_badge_info?.membership_level_badge_icon
+                  ?.thumbnail_1,
+            }}
+            style={{width: 15, height: 15, marginRight: 5}}
+          />
+        )}
+        {!!item?.membership_level_badge_info?.membership_level_badge_title && (
+          <MyText fontSize={12} type="medium">
             {item?.membership_level_badge_info?.membership_level_badge_title}
-          </MyText>}
+          </MyText>
+        )}
         <View
           style={{
-            backgroundColor: item?.is_membership_active ? colors.active : colors.delete,
+            backgroundColor: item?.is_membership_active
+              ? colors.active
+              : colors.delete,
             borderRadius: 5,
             padding: 3,
-            marginLeft: 5
-          }}
-        >
+            marginLeft: 5,
+          }}>
           <MyText
             fontSize={10}
             uppercase
-            type='bold'
+            type="bold"
             // color={item?.is_membership_active ? colors.active : colors.delete}
-            color={colors.white}
-          >{item?.is_membership_active ? "Active" : "Expired"}</MyText>
+            color={colors.white}>
+            {item?.is_membership_active ? 'Active' : 'Expired'}
+          </MyText>
         </View>
-      </Row>)
-  }
+      </Row>
+    );
+  };
 
-  const leadStatusView = (item) => {
+  const leadStatusView = item => {
     return (
-      <View style={{ flexDirection: "row", alignItems: "center" }}>
+      <View style={{flexDirection: 'row', alignItems: 'center'}}>
         <TouchableHighlight
-          style={{ flex: 1 }}
+          style={{flex: 1}}
           onPress={() => {
-            setMember(item)
-            leadModalRef?.current?.openModal()
-          }}
-        >
-          <View style={[__styles.leadRootView, !!item?.lead_status && {
-            backgroundColor: item?.lead_status?.background_color
-          }]}>
+            setMember(item);
+            leadModalRef?.current?.openModal();
+          }}>
+          <View
+            style={[
+              __styles.leadRootView,
+              !!item?.lead_status && {
+                backgroundColor: item?.lead_status?.background_color,
+              },
+            ]}>
             <View style={__styles.leadStatusTextView}>
               <MyText
-                color={!!item?.lead_status ? item?.lead_status?.text_color : colors.white}>
-                {!!item?.lead_status ?
-                  item?.lead_status?.title :
-                  "Lead Status"}</MyText>
+                color={
+                  !!item?.lead_status
+                    ? item?.lead_status?.text_color
+                    : colors.white
+                }>
+                {!!item?.lead_status ? item?.lead_status?.title : 'Lead Status'}
+              </MyText>
             </View>
             <View style={__styles.leadStatusIconView}>
               {icons.down(colors.primary, 15)}
             </View>
           </View>
         </TouchableHighlight>
-        {!!item?.lead_status > 0 &&
+        {!!item?.lead_status > 0 && (
           <TouchableOpacity
             onPress={() => {
               setMember(item);
-              hitoryModalRef?.current?.openModal()
+              hitoryModalRef?.current?.openModal();
             }}
             style={__styles.historyBtn}>
             {icons.history(colors.primary, 15)}
-          </TouchableOpacity>}
-      </View>
-    )
-  }
-
-
-
-  const renderMemberList = useCallback(({ item, index }) => {
-    return (
-      <View style={[__styles.memberRootView]}>
-
-        <View style={__styles.memberProfileView}>
-          <Pressable
-            onPress={() => {
-              if (access?.view_profile)
-                navigation.navigate(routes.memberProfile, {
-                  memberId: item?._id
-                })
-            }}
-            style={{ flexDirection: "row", flex: 1, alignItems: "center" }}>
-            <View>
-              <UserImage
-                borderWidth={2}
-                borderColor={item?.membership_level_badge_info?.membership_level_badge_color_code}
-                image={item?.profile_image}
-                name={item?.first_name}
-                size={30} />
-
-              <View style={[{ backgroundColor: item?.is_online ? colors.online : colors.primary2, }, __styles.memberStatusView]} />
-
-              {/* <View style={[{ backgroundColor: item?.is_membership_active ? colors.active : colors.expire, }, __styles.memberActiveView]} /> */}
-            </View>
-
-            <View style={__styles.memberProfileNameView}>
-              <MyText fontSize={14} type='bold'>{item?.first_name + " " + item?.last_name}</MyText>
-              {isAllMembers && <MyText fontSize={12} >{item?.email}</MyText>}
-            </View>
-          </Pressable>
-
-
-
-
-          <MyText style={{ marginRight: 10 }} >
-            {countries.find((el) => el.code === item?.country)?.flag || ""}
-          </MyText>
-          <Pressable
-            onPress={() => ref_infoModal?.current?.openModal(item?.downloaded_app ?
-              "This Member has downloaded the app" :
-              "This Member has not downloaded the app yet")}
-            style={{ marginRight: 10 }}>
-            {item?.downloaded_app ? icons.appDownloadedEmoji(25) : icons.appNotDownloadedEmoji(25)}
-          </Pressable>
-
-          {item?.is_wheel_of_life &&
-            <View style={{ marginRight: 10 }}>
-              <Image source={icons.wheelOfLife} style={{ height: 20, width: 20 }} />
-            </View>}
-
-          {isChatAllowed &&
-            <TouchableOpacity
-              style={{ marginRight: 5 }}
-              onPress={() => onChatScreen(item?._id)}>
-              {icons.message(colors.primary, 20)}
-            </TouchableOpacity>}
-
-          <MenuButton
-            size={20}
-            onPress={() => {
-              ref_optionModal?.current?.openModal?.(item)
-            }}
-          />
-
-        </View>
-
-        <View>
-          <StatView title={"Membership Expire"}
-
-            value={!!item?.membership_purchase_expiry ?
-              !isAllMembers ? moment(new Date(item?.membership_purchase_expiry)).format(dateTimeFormat.date) :
-                item?.membership_purchase_expiry
-              : "N/A"}
-          />
-          <StatView title={"Coins"} value={numFormatter(item?.coins_count)} uppercase />
-          {/* <StatView title={"App Downloaded"} value={numFormatter(item?.coins_count)} uppercase /> */}
-          {isAllMembers && <StatView title={"Reffered User"} value={!!item?.affliliate?.affiliate_user_info?.first_name ?
-            item?.affliliate?.affiliate_user_info?.first_name + " " + item?.affliliate?.affiliate_user_info?.last_name + " (" + item?.affliliate?.affiliate_url_name + ") " : "Master Link"} />}
-          {!isNurture && access?.Show_nurture_in_filter && <StatView title={"Nurture"} value={!!item?.nurture ? item?.nurture?.first_name + " " + item?.nurture?.last_name : "N/A"} />}
-          {!isMembers && <StatView title={"Delegate"} value={!!item?.consultant ? item?.consultant?.first_name + " " + item?.consultant?.last_name : "N/A"} />}
-          <StatView title={"Badge Level"}
-            // icon_img={item?.membership_level_badge_info?.membership_level_badge_icon?.thumbnail_1}
-            // value={item?.membership_level_badge_info?.membership_level_badge_title}
-            view={() => badgeLevelView(item)}
-          />
-          <StatView title={"Last Login Activity"} uppercase value={convertTimezone(item?.last_login_activity, timezone).format(dateTimeFormat.dateTime)} />
-          <StatView title={"Lead Status"} view={() => leadStatusView(item)} />
-
-          {/* <StatView title={"Regis Expire"} value={convertTimezone(item?.createdAt, timezone).format(dateTimeFormat.date)} /> */}
-        </View>
-
-        <View style={{ alignItems: "flex-end" }}>
-          <TouchableOpacity
-            onPress={() => onMemberDetail(item)}
-            style={{ padding: 5, marginTop: 10 }}>
-            <MyText color={colors.primary} type='medium' >View More...</MyText>
           </TouchableOpacity>
-        </View>
+        )}
       </View>
-    )
-  }, [list])
+    );
+  };
 
+  const renderMemberList = useCallback(
+    ({item, index}) => {
+      return (
+        <View style={[__styles.memberRootView]}>
+          <View style={__styles.memberProfileView}>
+            <Pressable
+              onPress={() => {
+                if (access?.view_profile)
+                  navigation.navigate(routes.memberProfile, {
+                    memberId: item?._id,
+                  });
+              }}
+              style={{flexDirection: 'row', flex: 1, alignItems: 'center'}}>
+              <View>
+                <UserImage
+                  borderWidth={2}
+                  borderColor={
+                    item?.membership_level_badge_info
+                      ?.membership_level_badge_color_code
+                  }
+                  image={item?.profile_image}
+                  name={item?.first_name}
+                  size={30}
+                />
 
+                <View
+                  style={[
+                    {
+                      backgroundColor: item?.is_online
+                        ? colors.online
+                        : colors.primary2,
+                    },
+                    __styles.memberStatusView,
+                  ]}
+                />
 
+                {/* <View style={[{ backgroundColor: item?.is_membership_active ? colors.active : colors.expire, }, __styles.memberActiveView]} /> */}
+              </View>
 
+              <View style={__styles.memberProfileNameView}>
+                <MyText fontSize={14} type="bold">
+                  {item?.first_name + ' ' + item?.last_name}
+                </MyText>
+                {isAllMembers && <MyText fontSize={12}>{item?.email}</MyText>}
+              </View>
+            </Pressable>
 
+            <MyText style={{marginRight: 10}}>
+              {countries.find(el => el.code === item?.country)?.flag || ''}
+            </MyText>
+            <Pressable
+              onPress={() =>
+                ref_infoModal?.current?.openModal(
+                  item?.downloaded_app
+                    ? 'This Member has downloaded the app'
+                    : 'This Member has not downloaded the app yet',
+                )
+              }
+              style={{marginRight: 10}}>
+              {item?.downloaded_app
+                ? icons.appDownloadedEmoji(25)
+                : icons.appNotDownloadedEmoji(25)}
+            </Pressable>
+
+            {item?.is_wheel_of_life && (
+              <View style={{marginRight: 10}}>
+                <Image
+                  source={icons.wheelOfLife}
+                  style={{height: 20, width: 20}}
+                />
+              </View>
+            )}
+
+            {isChatAllowed && (
+              <TouchableOpacity
+                style={{marginRight: 5}}
+                onPress={() => onChatScreen(item?._id)}>
+                {icons.message(colors.primary, 20)}
+              </TouchableOpacity>
+            )}
+
+            <MenuButton
+              size={20}
+              onPress={() => {
+                ref_optionModal?.current?.openModal?.(item);
+              }}
+            />
+          </View>
+
+          <View>
+            <StatView
+              title={'Membership Expire'}
+              value={
+                !!item?.membership_purchase_expiry
+                  ? !isAllMembers
+                    ? moment(new Date(item?.membership_purchase_expiry)).format(
+                        dateTimeFormat.date,
+                      )
+                    : item?.membership_purchase_expiry
+                  : 'N/A'
+              }
+            />
+            <StatView
+              title={'Coins'}
+              value={numFormatter(item?.coins_count)}
+              uppercase
+            />
+            {/* <StatView title={"App Downloaded"} value={numFormatter(item?.coins_count)} uppercase /> */}
+            {isAllMembers && (
+              <StatView
+                title={'Reffered User'}
+                value={
+                  !!item?.affliliate?.affiliate_user_info?.first_name
+                    ? item?.affliliate?.affiliate_user_info?.first_name +
+                      ' ' +
+                      item?.affliliate?.affiliate_user_info?.last_name +
+                      ' (' +
+                      item?.affliliate?.affiliate_url_name +
+                      ') '
+                    : 'Master Link'
+                }
+              />
+            )}
+            {!isNurture && access?.Show_nurture_in_filter && (
+              <StatView
+                title={'Nurture'}
+                value={
+                  !!item?.nurture
+                    ? item?.nurture?.first_name + ' ' + item?.nurture?.last_name
+                    : 'N/A'
+                }
+              />
+            )}
+            {!isMembers && (
+              <StatView
+                title={'Delegate'}
+                value={
+                  !!item?.consultant
+                    ? item?.consultant?.first_name +
+                      ' ' +
+                      item?.consultant?.last_name
+                    : 'N/A'
+                }
+              />
+            )}
+            <StatView
+              title={'Badge Level'}
+              // icon_img={item?.membership_level_badge_info?.membership_level_badge_icon?.thumbnail_1}
+              // value={item?.membership_level_badge_info?.membership_level_badge_title}
+              view={() => badgeLevelView(item)}
+            />
+            <StatView
+              title={'Last Login Activity'}
+              uppercase
+              value={convertTimezone(
+                item?.last_login_activity,
+                timezone,
+              ).format(dateTimeFormat.dateTime)}
+            />
+            <StatView title={'Lead Status'} view={() => leadStatusView(item)} />
+
+            {/* <StatView title={"Regis Expire"} value={convertTimezone(item?.createdAt, timezone).format(dateTimeFormat.date)} /> */}
+          </View>
+
+          <View style={{alignItems: 'flex-end'}}>
+            <TouchableOpacity
+              onPress={() => onMemberDetail(item)}
+              style={{padding: 5, marginTop: 10}}>
+              <MyText color={colors.primary} type="medium">
+                View More...
+              </MyText>
+            </TouchableOpacity>
+          </View>
+        </View>
+      );
+    },
+    [list],
+  );
 
   return (
     <RootView hideBackBottomButton titleView={topView}>
-      <View style={{ flex: 1 }}>
+      <View style={{flex: 1}}>
         <FlatList
           removeClippedSubviews={true}
           windowSize={10}
-          keyExtractor={(item) => item?._id}
+          keyExtractor={item => item?._id}
           keyboardShouldPersistTaps="handled"
           ListHeaderComponent={headerView()}
           stickyHeaderHiddenOnScroll={true}
@@ -1044,8 +1273,8 @@ const MemberList = ({ navigation, route }) => {
           onEndReached={() => {
             if (canLoadMore) {
               canLoadMore = false;
-              setFooterLoader(true)
-              getMembers(false)
+              setFooterLoader(true);
+              getMembers(false);
             }
           }}
         />
@@ -1057,9 +1286,9 @@ const MemberList = ({ navigation, route }) => {
 
       <SortModal
         ref={sortModalRef}
-        onSelected={(selected) => {
-          setSorted(selected)
-          setSortfilter(selected)
+        onSelected={selected => {
+          setSorted(selected);
+          setSortfilter(selected);
         }}
         alreadySelected={sorted}
       />
@@ -1067,7 +1296,7 @@ const MemberList = ({ navigation, route }) => {
         token={token}
         filterTheData={filterTheData}
         ref={filterModalRef}
-        appliedFilter={{ ...Filter, isSavedFilterApplied: isSavedFilterApplied }}
+        appliedFilter={{...Filter, isSavedFilterApplied: isSavedFilterApplied}}
         type={type}
         isMembers={isMembers}
         isNurture={isNurture}
@@ -1111,69 +1340,85 @@ const MemberList = ({ navigation, route }) => {
         navigation={navigation}
         token={token}
       />
-
     </RootView>
-  )
-}
+  );
+};
 
-export default MemberList
-
-
+export default MemberList;
 
 const sort = {
-  key: "registration_date_desc",
-  title: "Registration Date (Newest First)"
-}
+  key: 'registration_date_desc',
+  title: 'Registration Date (Newest First)',
+};
 
 const filteroObj = {
   // "community": [],
-  "badge_levels": [],
-  "event_page": [],
-  "lead_status": [],
-  "plan": null,
-  "nurture": null,
-  "delegate": null,
-  "is_date_range": false,
-  "coins_range": false,
-  "coins_from": 0,
-  "coins_to": 0,
-  "from_date": null,
-  "to_date": null,
-  "downloaded_app": null,
-  "membership_purchase_expiry_from": moment(),
-  "membership_purchase_expiry_to": moment(),
-  "date": null,
-  "coins": null,
-  "membership_expiry": null,
-  "status": "",
-  "expiry_in": 3,
-  "member_ship_expiry": "",
-  "user_status_type": "",
-  "program": [],
-  "program_status": ""
-}
-
+  badge_levels: [],
+  event_page: [],
+  lead_status: [],
+  plan: null,
+  nurture: null,
+  delegate: null,
+  is_date_range: false,
+  coins_range: false,
+  coins_from: 0,
+  coins_to: 0,
+  from_date: null,
+  to_date: null,
+  downloaded_app: null,
+  membership_purchase_expiry_from: moment(),
+  membership_purchase_expiry_to: moment(),
+  date: null,
+  coins: null,
+  membership_expiry: null,
+  status: '',
+  expiry_in: 3,
+  member_ship_expiry: '',
+  user_status_type: '',
+  program: [],
+  program_status: '',
+};
 
 const __styles = StyleSheet.create({
-  memberRootView: { backgroundColor: colors.secondary, marginTop: 10, borderRadius: 10, padding: 10 },
-  memberProfileView: { flexDirection: "row", alignItems: "center" },
-  memberStatusView: { position: "absolute", bottom: 0, right: 0, height: 9, width: 9, borderRadius: 10 / 2, borderWidth: 1, borderColor: colors.white },
-  memberActiveView: { position: "absolute", top: 0, right: 0, height: 10, width: 10, borderRadius: 10 / 2, },
-  memberProfileNameView: { flex: 1, marginLeft: 10 },
+  memberRootView: {
+    backgroundColor: colors.secondary,
+    marginTop: 10,
+    borderRadius: 10,
+    padding: 10,
+  },
+  memberProfileView: {flexDirection: 'row', alignItems: 'center'},
+  memberStatusView: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    height: 9,
+    width: 9,
+    borderRadius: 10 / 2,
+    borderWidth: 1,
+    borderColor: colors.white,
+  },
+  memberActiveView: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    height: 10,
+    width: 10,
+    borderRadius: 10 / 2,
+  },
+  memberProfileNameView: {flex: 1, marginLeft: 10},
   headerBtn: {
     height: 28,
     width: 28,
     borderRadius: 28 / 2,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     marginLeft: 10,
     backgroundColor: colors.primary,
   },
   allChipView: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    alignItems: "center",
-
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
   },
   chipView: {
     paddingVertical: 2,
@@ -1181,22 +1426,23 @@ const __styles = StyleSheet.create({
     paddingLeft: 10,
     backgroundColor: colors.chip,
     borderRadius: 15,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     margin: 2,
-    maxWidth: utilities.screenWidth() - 40
+    maxWidth: utilities.screenWidth() - 40,
   },
   chipBtn: {
     marginLeft: 5,
     height: 20,
     width: 20,
     backgroundColor: colors.black,
-    alignItems: "center", justifyContent: "center",
-    borderRadius: 20 / 2
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 20 / 2,
   },
   leadRootView: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     borderWidth: 1.2,
     borderColor: colors.placeholder,
     height: 40,
@@ -1204,14 +1450,12 @@ const __styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   leadStatusTextView: {
-    flex: 1
+    flex: 1,
   },
-  leadStatusIconView: {
-
-  },
+  leadStatusIconView: {},
   historyBtn: {
     width: 30,
     paddingVertical: 5,
-    alignItems: "center"
+    alignItems: 'center',
   },
-})
+});

@@ -1,6 +1,9 @@
 import {View, Text, LogBox} from 'react-native';
-import React, {useEffect} from 'react';
-import {NavigationContainer} from '@react-navigation/native';
+import React, {useEffect, useRef} from 'react';
+import {
+  NavigationContainer,
+  useNavigationContainerRef,
+} from '@react-navigation/native';
 import AppStack from './src/navigation/AppStack';
 import {colors} from './src/utilities/colors';
 import Toast, {
@@ -37,6 +40,9 @@ const toastConfig = {
 };
 
 const App = () => {
+  const routeNameRef = useRef();
+  const navigationRef = useNavigationContainerRef();
+
   const setupPlayer = () => {
     TrackPlayer.setupPlayer({waitForBuffer: true}).then(() => {
       TrackPlayer.updateOptions({
@@ -75,7 +81,19 @@ const App = () => {
   return (
     <View style={{flex: 1, backgroundColor: colors.darkSecondary}}>
       <Provider store={store}>
-        <NavigationContainer>
+        <NavigationContainer
+          ref={navigationRef}
+          onReady={() => {
+            routeNameRef.current = navigationRef.getCurrentRoute().name;
+          }}
+          onStateChange={async () => {
+            const currentRouteName = navigationRef.getCurrentRoute().name;
+            if (__DEV__) {
+              console.log(`----->  ${currentRouteName}  <-----`);
+            }
+
+            routeNameRef.current = currentRouteName;
+          }}>
           <AppStack />
           <Toast config={toastConfig} />
         </NavigationContainer>

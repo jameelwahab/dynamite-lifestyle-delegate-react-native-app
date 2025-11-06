@@ -1,16 +1,15 @@
-
-
-const capitalize = (text) => {
-  if (text == "") {
+const capitalize = text => {
+  if (text == '') {
     return text;
   }
-  let newtext = "";
-  let array = text.split(" ");
+  let newtext = '';
+  let array = text.split(' ');
   array.forEach(element => {
-    newtext = newtext + " " + element.charAt(0).toUpperCase() + element.slice(1,)
+    newtext =
+      newtext + ' ' + element.charAt(0).toUpperCase() + element.slice(1);
   });
 
-  return newtext
-}
+  return newtext;
+};
 
-export default capitalize
+export default capitalize;

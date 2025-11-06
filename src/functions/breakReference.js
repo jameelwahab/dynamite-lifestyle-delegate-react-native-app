@@ -1,8 +1,8 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import {View, Text} from 'react-native';
+import React from 'react';
 
-const breakReference = (value) => {
-  return JSON.parse(JSON.stringify(value))
-}
+const breakReference = value => {
+  return JSON.parse(JSON.stringify(value));
+};
 
-export default breakReference
+export default breakReference;
