@@ -1,27 +1,33 @@
-import { View, Text, TextInput, StyleSheet, Pressable, TouchableHighlight, Image, Platform } from 'react-native'
-import React, { useState } from 'react'
-import { fonts } from '../utilities/fonts'
-import { colors } from '../utilities/colors'
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  Pressable,
+  TouchableHighlight,
+  Image,
+  Platform,
+} from 'react-native';
+import React, {useState} from 'react';
+import {fonts} from '../utilities/fonts';
+import {colors} from '../utilities/colors';
 // import { closeEye, openEye } from '../utilities/icons'
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MyText from './MyText';
 
-
-
-
 const MyInputs = ({
-  label = "",
-  placeholder = "",
-  value = "",
+  label = '',
+  placeholder = '',
+  value = '',
   onChangeText,
-  keyboardType = "default",
+  keyboardType = 'default',
   isPassword = false,
   multiline = false,
-  maxLength = isPassword ? 24 : !!maxLength ? maxLength : undefined,
+  maxLength = isPassword ? undefined : !!maxLength ? maxLength : undefined,
   leftIcon = null,
   rightIcon = null,
-  rightIconOnPress = () => { },
-  disableRightIconHighlight=false,
+  rightIconOnPress = () => {},
+  disableRightIconHighlight = false,
   noSpace = false,
   editable = true,
   isSearch = false,
@@ -31,31 +37,52 @@ const MyInputs = ({
   noLable = false,
   myref = null,
   capitalizeSentence = false,
-  autoFocus=false,
-  style
+  autoFocus = false,
+  style,
 }) => {
-  const [isFocused, setFocused] = useState(false)
-  const [showPassword, setShowPassword] = useState(false)
+  const [isFocused, setFocused] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   return (
-    <View pointerEvents={editable ? "auto" : "none"} style={[{ marginBottom: noSpace ? 0 : 15 }, style]}>
-      {!noLable &&
-        <Text style={[__MyInputStyles.labelText, isFocused ? __MyInputStyles.focusedLabelText : undefined]}>{label}</Text>}
+    <View
+      pointerEvents={editable ? 'auto' : 'none'}
+      style={[{marginBottom: noSpace ? 0 : 15}, style]}>
+      {!noLable && (
+        <Text
+          style={[
+            __MyInputStyles.labelText,
+            isFocused ? __MyInputStyles.focusedLabelText : undefined,
+          ]}>
+          {label}
+        </Text>
+      )}
       {!!customView && customView()}
-      <View style={[__MyInputStyles.inputView, multiline ? __MyInputStyles.multilineView : undefined, isFocused ? __MyInputStyles.focusedView : undefined,]}>
-        {!!leftIcon && <View style={[__MyInputStyles.leftButton]} >{leftIcon()}</View>}
+      <View
+        style={[
+          __MyInputStyles.inputView,
+          multiline ? __MyInputStyles.multilineView : undefined,
+          isFocused ? __MyInputStyles.focusedView : undefined,
+        ]}>
+        {!!leftIcon && (
+          <View style={[__MyInputStyles.leftButton]}>{leftIcon()}</View>
+        )}
 
         <TextInput
           ref={myref}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
-          style={[__MyInputStyles.input, multiline ? __MyInputStyles.multilineView : undefined, !!rightIcon && { paddingLeft: !!leftIcon ? 0 : 10 }, { color: !editable ? colors.lightText : colors.white }]}
+          style={[
+            __MyInputStyles.input,
+            multiline ? __MyInputStyles.multilineView : undefined,
+            !!rightIcon && {paddingLeft: !!leftIcon ? 0 : 10},
+            {color: !editable ? colors.lightText : colors.white},
+          ]}
           value={value}
           onChangeText={onChangeText}
           scrollEnabled={multiline}
           keyboardAppearance="dark"
           keyboardType={keyboardType}
           // keyboardType="number-pad"
-          returnKeyType={isSearch ? "search" : "default"}
+          returnKeyType={isSearch ? 'search' : 'default'}
           onSubmitEditing={onSubmitEditing}
           editable={editable}
           selectionColor={colors.selection}
@@ -66,44 +93,53 @@ const MyInputs = ({
           placeholder={placeholder}
           placeholderTextColor={colors.placeholder}
           secureTextEntry={isPassword ? !showPassword : false}
-          textAlignVertical={multiline ? "top" : "center"}
-          autoCapitalize={capitalizeSentence ? "sentences" : "none"}
+          textAlignVertical={multiline ? 'top' : 'center'}
+          autoCapitalize={capitalizeSentence ? 'sentences' : 'none'}
         />
-        {isPassword ?
+        {isPassword ? (
           <TouchableHighlight
             onPress={() => setShowPassword(!showPassword)}
             style={__MyInputStyles.eyeButton}>
-            <Ionicons name={showPassword ? "eye" : "eye-off"} color={colors.primary} size={25} />
+            <Ionicons
+              name={showPassword ? 'eye' : 'eye-off'}
+              color={colors.primary}
+              size={25}
+            />
             {/* <Image style={__MyInputStyles.eyeIcon} source={showPassword ? openEye : closeEye} /> */}
-          </TouchableHighlight> :
-          rightIcon &&
-						<>
-						{ disableRightIconHighlight ?  
-          <Pressable
-            onPress={rightIconOnPress}
-            style={[__MyInputStyles.rightButton, { marginRight: 0 }]}>
-            {rightIcon()}
-          </Pressable>
-								:
-          <TouchableHighlight
-            onPress={rightIconOnPress}
-            style={[__MyInputStyles.rightButton, { marginRight: 0 }]}>
-            {rightIcon()}
           </TouchableHighlight>
-        }
-				</>
-				}
+        ) : (
+          rightIcon && (
+            <>
+              {disableRightIconHighlight ? (
+                <Pressable
+                  onPress={rightIconOnPress}
+                  style={[__MyInputStyles.rightButton, {marginRight: 0}]}>
+                  {rightIcon()}
+                </Pressable>
+              ) : (
+                <TouchableHighlight
+                  onPress={rightIconOnPress}
+                  style={[__MyInputStyles.rightButton, {marginRight: 0}]}>
+                  {rightIcon()}
+                </TouchableHighlight>
+              )}
+            </>
+          )
+        )}
       </View>
-      {limited && <MyText
-        color={colors.lightText + "AA"}
-        fontSize={12}
-        style={{ marginTop: 5 }}
-      >Maximum limit 500 charachters</MyText>}
+      {limited && (
+        <MyText
+          color={colors.lightText + 'AA'}
+          fontSize={12}
+          style={{marginTop: 5}}>
+          Maximum limit 500 charachters
+        </MyText>
+      )}
     </View>
-  )
-}
+  );
+};
 
-export default MyInputs
+export default MyInputs;
 
 const __MyInputStyles = StyleSheet.create({
   rootView: {},
@@ -112,13 +148,12 @@ const __MyInputStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.lightText,
     borderRadius: 5,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     // backgroundColor: colors.lightGrey
   },
   multilineView: {
     height: 100,
-
   },
   labelText: {
     fontFamily: fonts.regular,
@@ -146,18 +181,18 @@ const __MyInputStyles = StyleSheet.create({
     height: 40,
     width: 40,
     borderRadius: 40 / 2,
-    alignItems: "center",
-    justifyContent: "center",
-    alignSelf: "center",
-    marginRight: 5
+    alignItems: 'center',
+    justifyContent: 'center',
+    alignSelf: 'center',
+    marginRight: 5,
   },
 
   leftButton: {
     height: 30,
     width: 30,
     borderRadius: 30 / 2,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     marginLeft: 5,
     // marginRight: -5
     // backgroundColor:"pink"
@@ -166,16 +201,16 @@ const __MyInputStyles = StyleSheet.create({
     height: 30,
     width: 30,
     borderRadius: 30 / 2,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     // marginLeft: 5,
-    marginRight: -5
+    marginRight: -5,
     // backgroundColor:"pink"
   },
 
   eyeIcon: {
     height: 25,
     width: 25,
-    tintColor: colors.disableText
-  }
-})
+    tintColor: colors.disableText,
+  },
+});
