@@ -76,6 +76,7 @@ import countries from '../../../assets/data/countryList.json';
 import {Row} from '../../../UIComponents/FlexViews';
 import MyImage from '../../../components/MyImage';
 import isArray from '../../../functions/isArray';
+import isObject from '../../../functions/isObject';
 
 let canLoadMore = false;
 let page = 0;
@@ -252,6 +253,8 @@ const MemberList = ({navigation, route}) => {
       };
       list.push(nOBj);
     }
+
+    console.log(obj, 'filterobj');
     Object.keys(obj).forEach((x, i) => {
       if (Array.isArray(obj[x])) {
         if (x == 'badge_levels') {
@@ -350,12 +353,14 @@ const MemberList = ({navigation, route}) => {
         list.push(nOBj);
       } else if (x == 'program_status') {
         let statusObj = programStatusList.find(y => y.key == obj[x]);
-        let nOBj = {
-          label: statusObj?.title,
-          value: obj[x],
-          type: x,
-        };
-        list.push(nOBj);
+        if (isObject(statusObj)) {
+          let nOBj = {
+            label: statusObj?.title,
+            value: obj[x],
+            type: x,
+          };
+          list.push(nOBj);
+        }
       } else if (x == 'user_status_type' && !!obj[x]) {
         let nOBj = {
           label: obj[x],
@@ -414,6 +419,7 @@ const MemberList = ({navigation, route}) => {
         list.push(nOBj);
       }
     });
+    console.log(list, 'list');
     setFilterChipList(list);
     setIsFilterApplied(isFilter);
     setIsSavedFilterApplied(isSavedFilter);
