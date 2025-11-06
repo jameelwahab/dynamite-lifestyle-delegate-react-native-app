@@ -657,9 +657,9 @@ const MemberDetail = ({navigation, route}) => {
         )}
         <StatView title={'Client Note'} view={noteView} />
         <StatView title={'Pages'} view={pagesView} />
+        <StatView title={'Programmes'} view={ProgrammsView} />
         {isAllMembers && (
           <>
-            <StatView title={'Programmes'} view={ProgrammsView} />
             <StatView
               title={'Wheel of Life Enable'}
               value={member?.is_wheel_of_life_enable ? 'YES' : 'No'}

@@ -204,9 +204,7 @@ const Transaction = ({navigation, route}) => {
         />
         <StatView
           title={'Amount'}
-          value={
-            prependCurency(item?.currency) + ' ' + (item?.plan_price || '0')
-          }
+          value={prependCurency(item?.currency) + ' ' + (item?.amount || '0')}
         />
         <StatView
           title={'Team Diego'}
@@ -239,7 +237,10 @@ const Transaction = ({navigation, route}) => {
         <StatView
           title={'Transaction Refferal'}
           view={() => (
-            <ReferralUserView affiliate={item?.transaction_referral_info} />
+            <ReferralUserView
+              affiliate={item?.transaction_referral_info}
+              defaultRefferal={'N/A'}
+            />
           )}
         />
         <StatView

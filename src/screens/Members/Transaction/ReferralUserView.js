@@ -1,10 +1,13 @@
 import React from 'react';
 import MyText from '../../../components/MyText';
 
-export const ReferralUserView = ({affiliate}) => {
+export const ReferralUserView = ({
+  affiliate,
+  defaultRefferal = 'Master Link',
+}) => {
   let affiliate_user = affiliate?.affiliate_user_info;
   let affiliate_url_name = affiliate?.affiliate_url_name;
-  let refferal_name = 'Master Link';
+  let refferal_name = defaultRefferal;
   let userType = '';
 
   if (affiliate_url_name && affiliate_user) {
