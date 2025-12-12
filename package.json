@@ -4,7 +4,7 @@
   "packageManager": "yarn@3.8.7",
   "private": true,
   "scripts": {
-    "android": "react-native run-android",
+    "android": "react-native run-android --active-arch-only",
     "ios": "react-native run-ios",
     "release": "react-native run-android --mode=release",
     "gradle:clean": "cd android && ./gradlew clean && cd ..",

@@ -1,63 +1,79 @@
-import { View, Text, Pressable, Image, StyleSheet, Platform, Dimensions, TextInput, Keyboard, SafeAreaView, ScrollView, StatusBar } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import { DrawerContentScrollView, useDrawerStatus } from '@react-navigation/drawer';
+import {
+  View,
+  Text,
+  Pressable,
+  Image,
+  StyleSheet,
+  Platform,
+  Dimensions,
+  TextInput,
+  Keyboard,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {
+  DrawerContentScrollView,
+  useDrawerStatus,
+} from '@react-navigation/drawer';
 import MyText from '../../components/MyText';
-import { colors } from '../../utilities/colors';
-import { icons } from '../../utilities/icons';
-import { ChildComponents, ParentComponents, } from './List';
+import {colors} from '../../utilities/colors';
+import {icons} from '../../utilities/icons';
+import {ChildComponents, ParentComponents} from './List';
 import Collapsible from 'react-native-collapsible';
-import { selectNavbar } from '../../redux/reducers/navbarSlice';
-import { useDispatch, useSelector } from 'react-redux';
-import { selectSettings } from '../../redux/reducers/settingSlice';
+import {selectNavbar} from '../../redux/reducers/navbarSlice';
+import {useDispatch, useSelector} from 'react-redux';
+import {selectSettings} from '../../redux/reducers/settingSlice';
 import MyImage2 from '../../components/MyImage2';
 import ResponsiveImage2 from '../../components/ResponsiveImage2';
 import utilities from '../../utilities';
-import { selectSocket } from '../../redux/reducers/socketSlice';
+import {selectSocket} from '../../redux/reducers/socketSlice';
 import MyImage from '../../components/MyImage';
 import messaging from '@react-native-firebase/messaging';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import notificationHandler from '../../functions/notificationHandler';
-import { selectUser, setMsgCount, setUnReadCount, incrementMsgCount, decrementMsgCount } from '../../redux/reducers/userSlice';
+import {
+  selectUser,
+  setMsgCount,
+  setUnReadCount,
+  incrementMsgCount,
+  decrementMsgCount,
+} from '../../redux/reducers/userSlice';
 import RootView from '../../components/RootView';
-import { INIT_WITH_TOKEN } from '../../DAL';
-import notifee, { AndroidBadgeIconType, EventType } from '@notifee/react-native';
+import {INIT_WITH_TOKEN} from '../../DAL';
+import notifee, {AndroidBadgeIconType, EventType} from '@notifee/react-native';
 import debounce from '../../functions/debounce';
 // import { Notifications } from 'react-native-notifications';
-
-
-
 
 let sub2 = null;
 let sub3 = null;
 let sub4 = null;
 let sub5 = null;
-const index = (props) => {
+const index = props => {
   const inset = useSafeAreaInsets();
-  const { navigation, state } = props;
-  const dispatch = useDispatch()
-  const isDrawerOpen = useDrawerStatus() == "open";
-  const { navbar } = useSelector(selectNavbar);
-  const { token, user, S3_URL, } = useSelector(selectUser);
-  const { settings } = useSelector(selectSettings);
-  const { socket } = useSelector(selectSocket);
+  const {navigation, state} = props;
+  const dispatch = useDispatch();
+  const isDrawerOpen = useDrawerStatus() == 'open';
+  const {navbar} = useSelector(selectNavbar);
+  const {token, user, S3_URL} = useSelector(selectUser);
+  const {settings} = useSelector(selectSettings);
+  const {socket} = useSelector(selectSocket);
   const [isCollapsed, setCollapsed] = useState([]);
-  const [searchText, setSearchText] = useState("")
+  const [searchText, setSearchText] = useState('');
 
   useEffect(() => {
     if (!isDrawerOpen) {
-      Keyboard.dismiss()
-      setSearchText("")
+      Keyboard.dismiss();
+      setSearchText('');
 
       setTimeout(() => {
-        scrollToSelected()
+        scrollToSelected();
       }, 300);
     }
-  }, [isDrawerOpen])
+  }, [isDrawerOpen]);
 
-  function scrollToSelected() {
-    
-
-  }
+  function scrollToSelected() {}
 
   const pushNotificationhandlers = async () => {
     sub2 = null;
@@ -77,14 +93,11 @@ const index = (props) => {
     //   }
     // }
 
-
-    sub2 = notifee.onForegroundEvent(({ type, detail }) => {
+    sub2 = notifee.onForegroundEvent(({type, detail}) => {
       switch (type) {
         case EventType.DISMISSED:
-
           break;
         case EventType.PRESS:
-
           notificationHandler(detail.notification, navigation, navbar);
           // this.notificationActions(detail)
           // notificationHandler(detail.notification, this.props.dispatch, setSideBarScreen, this.props.state, this.state.menu_visible)
@@ -92,14 +105,12 @@ const index = (props) => {
       }
     });
 
-    sub3 = notifee.onBackgroundEvent(async ({ type, detail }) => {
-      console.log("onBackgroundEvent", type, detail)
+    sub3 = notifee.onBackgroundEvent(async ({type, detail}) => {
+      console.log('onBackgroundEvent', type, detail);
       switch (type) {
         case EventType.DISMISSED:
-
           break;
         case EventType.PRESS:
-
           // this.notificationActions(detail)
           notificationHandler(detail.notification, navigation, navbar);
           break;
@@ -112,24 +123,25 @@ const index = (props) => {
       }
     });
 
-
-    messaging().getInitialNotification().then(remoteMessage => {
-      if (remoteMessage) {
-        notificationHandler(remoteMessage, navigation, navbar);
-      }
-    });
-
-  }
-  const newPushHandler = () => {
-
-  }
+    messaging()
+      .getInitialNotification()
+      .then(remoteMessage => {
+        if (remoteMessage) {
+          notificationHandler(remoteMessage, navigation, navbar);
+        }
+      });
+  };
+  const newPushHandler = () => {};
   useEffect(() => {
-    pushNotificationhandlers()
+    pushNotificationhandlers();
 
-
-    enableSocketEvents()
-    socket.on("connect_error", () => {
-      console.log("%c connect_error", 'background:#0000FF; color: #FFF', socket,)
+    enableSocketEvents();
+    socket.on('connect_error', () => {
+      console.log(
+        '%c connect_error',
+        'background:#0000FF; color: #FFF',
+        socket,
+      );
       socket.connect();
     });
 
@@ -138,8 +150,12 @@ const index = (props) => {
     //   disbaleSocketEvents();
     // });
 
-    socket.on("connect", () => {
-      console.log("%c socket connected ", 'background:#A020F0; color: #FFF', socket)
+    socket.on('connect', () => {
+      console.log(
+        '%c socket connected ',
+        'background:#A020F0; color: #FFF',
+        socket,
+      );
       disbaleSocketEvents();
       setTimeout(() => {
         enableSocketEvents();
@@ -151,258 +167,329 @@ const index = (props) => {
         title: remoteMessage?.notification?.title,
         body: remoteMessage?.notification?.body,
         android: {
-          channelId: "default",
+          channelId: 'default',
           color: colors.secondary,
-          smallIcon: "ic_notification"
+          smallIcon: 'ic_notification',
         },
-        data: remoteMessage?.data
-      })
+        data: remoteMessage?.data,
+      });
     });
 
     return () => {
-      socket.off("connect");
-      socket.off("connect_error");
+      socket.off('connect');
+      socket.off('connect_error');
       disbaleSocketEvents();
       unsubscribe();
       !!sub2 && sub2();
       !!sub3 && sub3();
       !!sub4 && sub4();
       // !!sub5 && sub5();
-    }
-  }, [])
+    };
+  }, []);
 
-  //! Socket Events 
+  //! Socket Events
 
   const enableSocketEvents = () => {
-    console.log("enableSocketEvents")
-    socket.on("new_notification_receiver_for_delegate", (data) => handleSocketEvents(data, "new_notification_receiver_for_delegate"))
-    socket.on("mention_user_event_trigger", (data) => handleMentionNotificationCount(data, "mention_user_event_trigger"))
-    socket.on("comment_mention_user_event_trigger", (data) => handleMentionNotificationCount(data, "comment_mention_user_event_trigger"))
-    socket.on("goal_stetement_event_reciever", (data) => handleSocketEvents(data, "goal_stetement_event_reciever"))
-    socket.on("new_notification_receiver", (data) => handleSocketEvents(data, "new_notification_receiver"))
-    socket.on("reminder_event_for_delegate", (data) => handleSocketEvents(data, "reminder_event_for_delegate"))
-    socket.on("daily_dynamite_reminder_event", (data) => handleSocketEvents(data, "daily_dynamite_reminder_event"))
-    socket.on("dynamite_streak_event", (data) => handleSocketEvents(data, "dynamite_streak_event"))
-    socket.on("send_chat_message_receiver", (data) => handleSocketEvents(data, "send_chat_message_receiver"));
-    socket.on("delete_chat_message_receiver", (data) => handleSocketEvents(data, "delete_chat_message_receiver"));
-  }
+    console.log('enableSocketEvents');
+    socket.on('new_notification_receiver_for_delegate', data =>
+      handleSocketEvents(data, 'new_notification_receiver_for_delegate'),
+    );
+    socket.on('mention_user_event_trigger', data =>
+      handleMentionNotificationCount(data, 'mention_user_event_trigger'),
+    );
+    socket.on('comment_mention_user_event_trigger', data =>
+      handleMentionNotificationCount(
+        data,
+        'comment_mention_user_event_trigger',
+      ),
+    );
+    socket.on('goal_stetement_event_reciever', data =>
+      handleSocketEvents(data, 'goal_stetement_event_reciever'),
+    );
+    socket.on('new_notification_receiver', data =>
+      handleSocketEvents(data, 'new_notification_receiver'),
+    );
+    socket.on('reminder_event_for_delegate', data =>
+      handleSocketEvents(data, 'reminder_event_for_delegate'),
+    );
+    socket.on('daily_dynamite_reminder_event', data =>
+      handleSocketEvents(data, 'daily_dynamite_reminder_event'),
+    );
+    socket.on('dynamite_streak_event', data =>
+      handleSocketEvents(data, 'dynamite_streak_event'),
+    );
+    socket.on('send_chat_message_receiver', data =>
+      handleSocketEvents(data, 'send_chat_message_receiver'),
+    );
+    socket.on('delete_chat_message_receiver', data =>
+      handleSocketEvents(data, 'delete_chat_message_receiver'),
+    );
+  };
 
   const disbaleSocketEvents = () => {
-    console.log("disbaleSocketEvents")
-    socket.off("mention_user_event_trigger", handleSocketEvents)
-    socket.off("comment_mention_user_event_trigger", handleSocketEvents)
-    socket.off("new_notification_receiver_for_delegate", handleMentionNotificationCount);
-    socket.off("goal_stetement_event_reciever", handleSocketEvents);
-    socket.off("new_notification_receiver", handleSocketEvents);
-    socket.off("reminder_event_for_delegate", handleSocketEvents);
-    socket.off("daily_dynamite_reminder_event", handleSocketEvents);
-    socket.off("dynamite_streak_event", handleSocketEvents);
-    socket.on("send_chat_message_receiver", handleSocketEvents);
-    socket.on("delete_chat_message_receiver", handleSocketEvents);
-  }
+    console.log('disbaleSocketEvents');
+    socket.off('mention_user_event_trigger', handleSocketEvents);
+    socket.off('comment_mention_user_event_trigger', handleSocketEvents);
+    socket.off(
+      'new_notification_receiver_for_delegate',
+      handleMentionNotificationCount,
+    );
+    socket.off('goal_stetement_event_reciever', handleSocketEvents);
+    socket.off('new_notification_receiver', handleSocketEvents);
+    socket.off('reminder_event_for_delegate', handleSocketEvents);
+    socket.off('daily_dynamite_reminder_event', handleSocketEvents);
+    socket.off('dynamite_streak_event', handleSocketEvents);
+    socket.on('send_chat_message_receiver', handleSocketEvents);
+    socket.on('delete_chat_message_receiver', handleSocketEvents);
+  };
 
-  const chatMsgCounter = (event) => {
-    console.log(event, "chatMsgCounter")
-    if (event == "send_chat_message_receiver") {
-      dispatch(incrementMsgCount())
-    } else if (event == "delete_chat_message_receiver") {
-      dispatch(decrementMsgCount())
+  const chatMsgCounter = event => {
+    console.log(event, 'chatMsgCounter');
+    if (event == 'send_chat_message_receiver') {
+      dispatch(incrementMsgCount());
+    } else if (event == 'delete_chat_message_receiver') {
+      dispatch(decrementMsgCount());
     }
-  }
+  };
 
   const initAPI = async () => {
-    let res = await INIT_WITH_TOKEN({ navigation, token });
+    let res = await INIT_WITH_TOKEN({navigation, token});
     if (res.code == 200) {
-      setCount(res?.unread_notification_count)
-      dispatch(setMsgCount(res?.unread_message_count))
+      setCount(res?.unread_notification_count);
+      dispatch(setMsgCount(res?.unread_message_count));
     }
-  }
+  };
 
   const handleSocketEvents = async (data, event) => {
     if (data?.action_response?.unread_notification_count != undefined) {
-      if (typeof (data?.action_response?.unread_notification_count) == "number") {
-        setCount(data?.action_response?.unread_notification_count)
-      } else if (Array.isArray(data?.action_response?.unread_notification_count)) {
-        let count = data?.action_response?.unread_notification_count.find(x => x?._id == user?._id);
+      if (typeof data?.action_response?.unread_notification_count == 'number') {
+        setCount(data?.action_response?.unread_notification_count);
+      } else if (
+        Array.isArray(data?.action_response?.unread_notification_count)
+      ) {
+        let count = data?.action_response?.unread_notification_count.find(
+          x => x?._id == user?._id,
+        );
         if (count) {
-          setCount(count)
+          setCount(count);
         }
-
       }
-    } if (data?.data?.action_response?.unread_notification_count != undefined && typeof (data?.data?.action_response?.unread_notification_count) == "number") {
-      setCount(data?.data?.action_response?.unread_notification_count)
-    } else if (data?.unread_notification_count != undefined && typeof (data?.unread_notification_count) == "number") {
-      setCount(data?.unread_notification_count)
-    } else {
-      debounce(initAPI)
     }
-  }
+    if (
+      data?.data?.action_response?.unread_notification_count != undefined &&
+      typeof data?.data?.action_response?.unread_notification_count == 'number'
+    ) {
+      setCount(data?.data?.action_response?.unread_notification_count);
+    } else if (
+      data?.unread_notification_count != undefined &&
+      typeof data?.unread_notification_count == 'number'
+    ) {
+      setCount(data?.unread_notification_count);
+    } else {
+      debounce(initAPI);
+    }
+  };
 
   const handleMentionNotificationCount = (data, event) => {
-    let notification = data?.action_response?.notification_users.find(x => x?.user_id == user?._id);
+    let notification = data?.action_response?.notification_users.find(
+      x => x?.user_id == user?._id,
+    );
     if (!!notification && notification?.unread_notification_count > -1) {
-      setCount(notification?.unread_notification_count)
+      setCount(notification?.unread_notification_count);
     }
+  };
 
-  }
+  const setCount = count => {
+    notifee.setBadgeCount(count);
+    dispatch(setUnReadCount(count));
+  };
 
-  const setCount = (count) => {
-    notifee.setBadgeCount(count)
-    dispatch(setUnReadCount(count))
-  }
-
-  const toggleCollapse = (item) => {
+  const toggleCollapse = item => {
     let index = isCollapsed.findIndex(x => x == item.value);
     if (index > -1) {
       isCollapsed.splice(index, 1);
     } else {
       isCollapsed.push(item.value);
     }
-    setCollapsed([...isCollapsed])
-  }
+    setCollapsed([...isCollapsed]);
+  };
 
-  const findCollapsed = (item) => {
-    return isCollapsed.includes(item.value)
-  }
+  const findCollapsed = item => {
+    return isCollapsed.includes(item.value);
+  };
 
-  const changeSideBarScreen = async (screen) => {
-
-
-    Keyboard.dismiss()
-    navigation.closeDrawer()
+  const changeSideBarScreen = async screen => {
+    Keyboard.dismiss();
+    navigation.closeDrawer();
     setTimeout(() => {
-      navigation.jumpTo(ParentComponents[screen.value].key)
+      navigation.jumpTo(ParentComponents[screen.value].key);
     }, 200);
-
-  }
+  };
 
   const onOptionClick = async (screen, isCollpasable) => {
     if (isCollpasable) {
-      toggleCollapse(screen)
+      toggleCollapse(screen);
     } else {
-      changeSideBarScreen(screen)
+      changeSideBarScreen(screen);
     }
-  }
+  };
 
-  const changeSideBarChildScreen = async (screen) => {
-
-    Keyboard.dismiss()
-    navigation.closeDrawer()
+  const changeSideBarChildScreen = async screen => {
+    Keyboard.dismiss();
+    navigation.closeDrawer();
     setTimeout(() => {
-      navigation.jumpTo(ChildComponents[screen.value].key)
+      navigation.jumpTo(ChildComponents[screen.value].key);
     }, 200);
-
-  }
+  };
 
   const searchableList = () => {
     if (searchText.trim().length == 0) {
-      return navbar
+      return navbar;
     } else {
       let list = [];
       let searchableText = searchText.trim().toLowerCase();
       navbar.forEach((x, i) => {
-        if (x.title.toLowerCase().includes(searchableText) || (!!x?.path && x?.path.toLowerCase().includes(searchableText))) {
+        if (
+          x.title.toLowerCase().includes(searchableText) ||
+          (!!x?.path && x?.path.toLowerCase().includes(searchableText))
+        ) {
           list.push(x);
         }
 
         if (Array.isArray(x?.child_options)) {
           let childList = [];
-          x?.child_options.forEach((y) => {
-            if (y.title.toLowerCase().includes(searchableText) || y?.path.toLowerCase().includes(searchableText)) {
-              childList.push(y)
+          x?.child_options.forEach(y => {
+            if (
+              y.title.toLowerCase().includes(searchableText) ||
+              y?.path.toLowerCase().includes(searchableText)
+            ) {
+              childList.push(y);
             }
-          })
+          });
           if (childList.length > 0) {
             let index = list.findIndex(z => z._id == x._id);
 
             if (index > -1) {
-              list.splice(index, 1, { ...list[index], child_options: childList, })
+              list.splice(index, 1, {...list[index], child_options: childList});
             } else {
-              list.push({ ...x, child_options: childList, });
+              list.push({...x, child_options: childList});
             }
           }
         }
-      })
-      return list
+      });
+      return list;
     }
-  }
-
+  };
 
   const optionView = (item, index, isCollaseable, showDot) => {
-    let isSelected = ParentComponents[item.value].key == props.state.routeNames[props.state.index];
+    let isSelected =
+      ParentComponents[item.value].key ==
+      props.state.routeNames[props.state.index];
 
     return (
       <Pressable
         key={item._id}
         onPress={() => onOptionClick(item, isCollaseable)}
-        style={[{ backgroundColor: isSelected && isCollaseable == false ? colors.lightPrimary3 : undefined, }, __styles.itemRootView]}>
+        style={[
+          {
+            backgroundColor:
+              isSelected && isCollaseable == false
+                ? colors.lightPrimary3
+                : undefined,
+          },
+          __styles.itemRootView,
+        ]}>
         <MyImage
-          source={{ uri: S3_URL + item?.icon }}
-          style={__styles.itemIcon} />
-        <View style={{ flex: 1, }}>
+          source={{uri: S3_URL + item?.icon}}
+          style={__styles.itemIcon}
+        />
+        <View style={{flex: 1}}>
           <MyText
             fontSize={14}
-            color={isSelected && isCollaseable == false ? colors.primary : colors.text}
-            style={{ marginLeft: 20 }} >{item.title}</MyText>
+            color={
+              isSelected && isCollaseable == false
+                ? colors.primary
+                : colors.text
+            }
+            style={{marginLeft: 20}}>
+            {item.title}
+          </MyText>
         </View>
-        {isCollaseable &&
-          <View style={{ paddingRight: 10 }}>
+        {isCollaseable && (
+          <View style={{paddingRight: 10}}>
             {!findCollapsed(item) ? icons.upwardArrow() : icons.downwardArrow()}
-          </View>}
+          </View>
+        )}
 
-        {showDot &&
-          <View style={__styles.notifier} />}
+        {showDot && <View style={__styles.notifier} />}
       </Pressable>
-    )
-  }
+    );
+  };
 
   const nestedOptionView = (item, index, parentItem) => {
-
     if (!!ChildComponents[item.value]) {
-      let isSelected = ChildComponents[item.value].key == props.state.routeNames[props.state.index]
+      let isSelected =
+        ChildComponents[item.value].key ==
+        props.state.routeNames[props.state.index];
       return (
         <Collapsible key={item.value} collapsed={findCollapsed(parentItem)}>
           <Pressable
             key={item.value}
             onPress={() => changeSideBarChildScreen(item)}
-            style={[{ backgroundColor: isSelected ? colors.lightPrimary3 : undefined, }, __styles.itemRootView, __styles.nestedView]}>
-            <MyImage source={{ uri: S3_URL + item?.icon }} style={__styles.itemIcon} />
-            <View style={{ flex: 1, }}>
+            style={[
+              {backgroundColor: isSelected ? colors.lightPrimary3 : undefined},
+              __styles.itemRootView,
+              __styles.nestedView,
+            ]}>
+            <MyImage
+              source={{uri: S3_URL + item?.icon}}
+              style={__styles.itemIcon}
+            />
+            <View style={{flex: 1}}>
               <MyText
                 fontSize={14}
                 color={isSelected ? colors.primary : colors.text}
-                style={{ marginLeft: 20, }} >{item.title}</MyText>
+                style={{marginLeft: 20}}>
+                {item.title}
+              </MyText>
             </View>
           </Pressable>
         </Collapsible>
-      )
+      );
     } else return null;
-  }
+  };
 
-  const { top, bottom, left, right } = inset;
+  const {top, bottom, left, right} = inset;
   return (
-    <View style={{ flex: 1, paddingLeft: left, paddingRight: right, paddingTop: top, paddingBottom: bottom, backgroundColor: colors.secondary }}>
-
-      {!!settings?.brand_logo &&
+    <View
+      style={{
+        flex: 1,
+        paddingLeft: left,
+        paddingRight: right,
+        paddingTop: top,
+        paddingBottom: bottom,
+        backgroundColor: colors.secondary,
+      }}>
+      {!!settings?.brand_logo && (
         <View style={__styles.logoView}>
           <ResponsiveImage2
             width={200}
             uri={S3_URL + settings?.brand_logo}
-            style={__styles.logo} />
-        </View>}
-      <View style={__styles.searchRoot}>
-        <View>
-          {icons.search(colors.placeholder, 20)}
+            style={__styles.logo}
+          />
         </View>
+      )}
+      <View style={__styles.searchRoot}>
+        <View>{icons.search(colors.placeholder, 20)}</View>
         <TextInput
           style={__styles.searchInput}
           placeholderTextColor={colors.placeholder}
-          placeholder='Search...'
+          placeholder="Search..."
           autoComplete="off"
           autoCorrect={false}
           autoCapitalize="none"
           value={searchText}
-          onChangeText={(text) => setSearchText(text)}
+          onChangeText={text => setSearchText(text)}
           selectionColor={colors.selection}
           cursorColor={colors.white}
           keyboardAppearance="dark"
@@ -410,7 +497,7 @@ const index = (props) => {
       </View>
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: inset.bottom + 20 }}
+        contentContainerStyle={{paddingBottom: inset.bottom + 20}}
         keyboardShouldPersistTaps="handled"
         {...props}>
         {searchableList().map((x, i) => {
@@ -419,23 +506,25 @@ const index = (props) => {
             return (
               <View key={x.value}>
                 {optionView(x, i, isCollaseable, user[showDotArray[x?.value]])}
-                {isCollaseable && x?.child_options.map((y, j) => nestedOptionView(y, i, x))}
-              </View>)
+                {isCollaseable &&
+                  x?.child_options.map((y, j) => nestedOptionView(y, i, x))}
+              </View>
+            );
           }
         })}
-      </ScrollView >
+      </ScrollView>
     </View>
-  )
-}
+  );
+};
 
 export default index;
 
 const __styles = StyleSheet.create({
   logoView: {
     width: 200,
-    alignSelf: "center",
+    alignSelf: 'center',
     marginBottom: 10,
-    marginTop: Platform.OS == "android" ? 10 : 0
+    marginTop: Platform.OS == 'android' ? 10 : 0,
   },
 
   itemRootView: {
@@ -443,15 +532,15 @@ const __styles = StyleSheet.create({
     marginHorizontal: 5,
     paddingLeft: 15,
     height: 45,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   itemIcon: {
     height: 25,
     width: 25,
   },
   nestedView: {
-    paddingLeft: "12%"
+    paddingLeft: '12%',
   },
   searchRoot: {
     borderWidth: 1,
@@ -460,21 +549,26 @@ const __styles = StyleSheet.create({
     marginHorizontal: 10,
     paddingHorizontal: 10,
     borderRadius: 10,
-    alignItems: "center",
-    flexDirection: "row",
-    marginBottom: 10
+    alignItems: 'center',
+    flexDirection: 'row',
+    marginBottom: 10,
   },
   searchInput: {
     flex: 1,
     paddingLeft: 10,
-    height: "100%",
-    color: colors.white
+    height: '100%',
+    color: colors.white,
   },
-  notifier: { marginRight: 10, height: 12, width: 12, backgroundColor: colors.primary2, borderRadius: 12 / 2, }
-})
+  notifier: {
+    marginRight: 10,
+    height: 12,
+    width: 12,
+    backgroundColor: colors.primary2,
+    borderRadius: 12 / 2,
+  },
+});
 
 const showDotArray = {
-  "internal-tickets": "is_internal_ticket_notify",
-  "support_ticket": "is_sidebar_notify"
-}
-
+  'internal-tickets': 'is_internal_ticket_notify',
+  support_ticket: 'is_sidebar_notify',
+};

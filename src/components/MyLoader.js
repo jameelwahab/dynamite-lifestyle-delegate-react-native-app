@@ -1,13 +1,9 @@
-import { View, Text, ActivityIndicator, Platform } from 'react-native';
+import {View, Text, ActivityIndicator, Platform} from 'react-native';
 import React from 'react';
-import { colors } from '../utilities/colors';
-import LottieView from "lottie-react-native";
+import {colors} from '../utilities/colors';
+import LottieView from 'lottie-react-native';
 
-
-const MyLoader = ({
-  enable = false,
-  style = {}
-}) => {
+const MyLoader = ({enable = false, style = {}}) => {
   if (enable) {
     return (
       <View
@@ -24,13 +20,15 @@ const MyLoader = ({
             ...style,
           },
         ]}>
-        <View style={{
-          backgroundColor: colors.secondary,
-          borderRadius: 900,
-          alignItems: "center", justifyContent: "center"
-        }} >
+        <View
+          style={{
+            backgroundColor: colors.secondary,
+            borderRadius: 900,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
           <LottieView
-            source={require("../assets/animations/loader1.json")}
+            source={require('../assets/animations/loader1.json')}
             style={{
               height: 50,
               width: 50,
@@ -45,15 +43,21 @@ const MyLoader = ({
   }
 };
 
-const SimpleLoader = ({ size = 30, withBackground }) => {
+const SimpleLoader = ({size = 30, withBackground}) => {
   return (
-    <View style={[withBackground ? {
-      backgroundColor: colors.secondary,
-      borderRadius: 900,
-      alignItems: "center", justifyContent: "center"
-    } : {}]}>
+    <View
+      style={[
+        withBackground
+          ? {
+              backgroundColor: colors.secondary,
+              borderRadius: 900,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }
+          : {},
+      ]}>
       <LottieView
-        source={require("../assets/animations/loader1.json")}
+        source={require('../assets/animations/loader1.json')}
         style={{
           height: size,
           width: size,
@@ -62,9 +66,8 @@ const SimpleLoader = ({ size = 30, withBackground }) => {
         loop
       />
     </View>
-
-  )
-}
+  );
+};
 
 export default MyLoader;
-export { SimpleLoader }
+export {SimpleLoader};
