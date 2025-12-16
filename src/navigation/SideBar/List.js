@@ -61,61 +61,61 @@ import StackAffiliate from '../NestedStacks/StackAffiliate';
 import StackTemplates from '../NestedStacks/StackTemplates';
 
 export const ParentComponents = {
-  //   mission_control: {
-  //     key: routes.dasboardNavigator,
-  //     component: StackMissionControl,
-  //     params: {
-  //       value: 'mission_control',
-  //       key: '867a0259-dafe-40c0-82e4-55bc1d4e548f',
-  //     },
-  //   },
-  //   the_cosmos: {
-  //     key: routes.feedNavigator,
-  //     component: StackFeed,
-  //     params: {
-  //       feedFor: 'the_cosmos',
-  //       value: 'the_cosmos',
-  //       key: '433f8aaf-59cf-46f1-a1d9-ac31d645946d',
-  //     },
-  //   },
-  //   support_ticket: {
-  //     key: routes.supportTicketNavigator,
-  //     component: StackSupportTicket,
-  //     params: {
-  //       type: 'support_ticket',
-  //       value: 'support_ticket',
-  //       key: '83b8897f-5ef3-434d-bc5e-76142371f5e7',
-  //     },
-  //   },
-  //   'internal-tickets': {
-  //     key: routes.internalTicketNavigator,
-  //     component: StackInternalTickets,
-  //     params: {
-  //       type: 'internal_ticket',
-  //       value: 'internal-tickets',
-  //       key: 'c47fa8a3-9f0d-469c-b78c-9f841c251a91',
-  //     },
-  //   },
-  //   chat: {
-  //     key: routes.chatNavigator,
-  //     component: StackChat,
-  //     params: {value: 'chat', key: '34ac8703-da69-4282-9f62-f5295cbcac8d'},
-  //   },
+  mission_control: {
+    key: routes.dasboardNavigator,
+    component: StackMissionControl,
+    params: {
+      value: 'mission_control',
+      key: '867a0259-dafe-40c0-82e4-55bc1d4e548f',
+    },
+  },
+  the_cosmos: {
+    key: routes.feedNavigator,
+    component: StackFeed,
+    params: {
+      feedFor: 'the_cosmos',
+      value: 'the_cosmos',
+      key: '433f8aaf-59cf-46f1-a1d9-ac31d645946d',
+    },
+  },
+  support_ticket: {
+    key: routes.supportTicketNavigator,
+    component: StackSupportTicket,
+    params: {
+      type: 'support_ticket',
+      value: 'support_ticket',
+      key: '83b8897f-5ef3-434d-bc5e-76142371f5e7',
+    },
+  },
+  'internal-tickets': {
+    key: routes.internalTicketNavigator,
+    component: StackInternalTickets,
+    params: {
+      type: 'internal_ticket',
+      value: 'internal-tickets',
+      key: 'c47fa8a3-9f0d-469c-b78c-9f841c251a91',
+    },
+  },
+  chat: {
+    key: routes.chatNavigator,
+    component: StackChat,
+    params: {value: 'chat', key: '34ac8703-da69-4282-9f62-f5295cbcac8d'},
+  },
   members: {
     key: null,
     component: null,
     params: {value: 'members', key: 'd2ff9f8b-20a8-4646-a08b-cbdfd931fb54'},
   },
-  //   the_source_feed: {
-  //     key: routes.sourceFeedNavigator,
-  //     component: StackFeed,
-  //     params: {
-  //       feedFor: 'the_source',
-  //       title: 'The Source Feed',
-  //       value: 'the_source_feed',
-  //       key: '34e7b7db-b8c5-4d55-98fc-700d3c6cd357',
-  //     },
-  //   },
+  the_source_feed: {
+    key: routes.sourceFeedNavigator,
+    component: StackFeed,
+    params: {
+      feedFor: 'the_source',
+      title: 'The Source Feed',
+      value: 'the_source_feed',
+      key: '34e7b7db-b8c5-4d55-98fc-700d3c6cd357',
+    },
+  },
   all_source_feed: {
     key: routes.allSourcesFeedNavigator,
     component: StackFeed,
@@ -126,32 +126,32 @@ export const ParentComponents = {
       key: 'cbd826ec-9082-44c4-a94c-4af0bf98eeb9',
     },
   },
-  //   scheduled_feeds: {
-  //     key: routes.scheduledFeedNavigator,
-  //     component: StackFeed,
-  //     params: {
-  //       feedFor: 'scheduled',
-  //       title: 'Schedule Feed',
-  //       value: 'scheduled_feeds',
-  //       key: '214ab401-1f91-45c6-9250-42df98cd20ee',
-  //     },
-  //   },
-  //   support: {
-  //     value: 'support',
-  //     key: null,
-  //     params: {
-  //       value: 'support',
-  //       key: 'c351eb22-6d51-4187-9111-f05872a6d4b8',
-  //     },
-  //   },
-  //   whatsapp_chat: {
-  //     key: routes.whatsappChatNavigator,
-  //     component: StackWhatsApp,
-  //     params: {
-  //       value: 'whatsapp_chat',
-  //       key: '3fd672ca-06bf-4c59-b66a-44880c8effca',
-  //     },
-  //   },
+  scheduled_feeds: {
+    key: routes.scheduledFeedNavigator,
+    component: StackFeed,
+    params: {
+      feedFor: 'scheduled',
+      title: 'Schedule Feed',
+      value: 'scheduled_feeds',
+      key: '214ab401-1f91-45c6-9250-42df98cd20ee',
+    },
+  },
+  support: {
+    value: 'support',
+    key: null,
+    params: {
+      value: 'support',
+      key: 'c351eb22-6d51-4187-9111-f05872a6d4b8',
+    },
+  },
+  whatsapp_chat: {
+    key: routes.whatsappChatNavigator,
+    component: StackWhatsApp,
+    params: {
+      value: 'whatsapp_chat',
+      key: '3fd672ca-06bf-4c59-b66a-44880c8effca',
+    },
+  },
   payments: {
     key: null,
     component: null,
@@ -160,22 +160,22 @@ export const ParentComponents = {
       key: '455ccc75-c8d3-41b3-856b-5a133a185c5b',
     },
   },
-  //   portals: {
-  //     key: routes.portalNavigator,
-  //     component: StackPortals,
-  //     params: {
-  //       value: 'portals',
-  //       key: 'c4406822-391b-4320-892f-ceb760f157c0',
-  //     },
-  //   },
-  //   my_portals: {
-  //     key: routes.myPortalNavigator,
-  //     component: StackMyPortals,
-  //     params: {
-  //       value: 'my_portals',
-  //       key: '2f8afe1f-58b9-4415-93a6-d2a65b3cfa5e',
-  //     },
-  //   },
+  portals: {
+    key: routes.portalNavigator,
+    component: StackPortals,
+    params: {
+      value: 'portals',
+      key: 'c4406822-391b-4320-892f-ceb760f157c0',
+    },
+  },
+  my_portals: {
+    key: routes.myPortalNavigator,
+    component: StackMyPortals,
+    params: {
+      value: 'my_portals',
+      key: '2f8afe1f-58b9-4415-93a6-d2a65b3cfa5e',
+    },
+  },
   links: {
     key: routes.linksNavigator,
     component: StackLinks,
@@ -185,75 +185,75 @@ export const ParentComponents = {
     },
   },
 
-  //   member_answers_list: {
-  //     key: routes.membersAnswersNavigator,
-  //     component: StackMembersAnswer,
-  //     params: {
-  //       value: 'member_answers_list',
-  //       key: 'c843ea03-df9e-4916-b59f-7357e79b90cb',
-  //     },
-  //   },
-  //   subscription_list: {
-  //     key: routes.subscriptionNavigator,
-  //     component: StackSubscription,
-  //     params: {
-  //       value: 'subscription_list',
-  //       key: '73e12b1a-5c26-4092-ac3c-571fd8738f67',
-  //     },
-  //   },
-  //   delegate_training: {
-  //     key: routes.trainingNavigator,
-  //     component: StackTraining,
-  //     params: {
-  //       value: 'delegate_training',
-  //       key: '50f33585-a162-43f2-9248-5ae844488772',
-  //     },
-  //   },
+  member_answers_list: {
+    key: routes.membersAnswersNavigator,
+    component: StackMembersAnswer,
+    params: {
+      value: 'member_answers_list',
+      key: 'c843ea03-df9e-4916-b59f-7357e79b90cb',
+    },
+  },
+  subscription_list: {
+    key: routes.subscriptionNavigator,
+    component: StackSubscription,
+    params: {
+      value: 'subscription_list',
+      key: '73e12b1a-5c26-4092-ac3c-571fd8738f67',
+    },
+  },
+  delegate_training: {
+    key: routes.trainingNavigator,
+    component: StackTraining,
+    params: {
+      value: 'delegate_training',
+      key: '50f33585-a162-43f2-9248-5ae844488772',
+    },
+  },
   appointment: {
     key: null,
     component: null,
     params: {value: 'appointment', key: '3bc7d829-9b1b-4cba-b657-39485b52f625'},
   },
-  //   '90_day_plan': {
-  //     key: null,
-  //     component: null,
-  //     params: {
-  //       value: '90_day_plan',
-  //       key: '08c114e9-3ce1-40c7-808f-0ac556f3b93c',
-  //     },
-  //   },
-  //   delegate_pods: {
-  //     key: null,
-  //     component: null,
-  //     params: {
-  //       value: 'delegate_pods',
-  //       key: '17fc7008-54ea-4917-b74a-05256563398e',
-  //     },
-  //   },
-  //   dynamite_pods: {
-  //     key: routes.dynamitePodNavigator,
-  //     component: StackDynamitePod,
-  //     params: {
-  //       value: 'dynamite_pods',
-  //       key: '14f2dd46-0399-43d7-b17d-cae069a6244a',
-  //     },
-  //   },
-  //   your_recordings: {
-  //     key: routes.myRecordingNavigator,
-  //     component: StackRecordings,
-  //     params: {
-  //       value: 'your_recordings',
-  //       key: '25a25c8b-b9c0-4f7d-b77d-074c97c55195',
-  //     },
-  //   },
-  //   your_vault: {
-  //     key: routes.vaultNavigator,
-  //     component: StackVault,
-  //     params: {
-  //       value: 'your_vault',
-  //       key: 'bc7d4e01-05aa-49a6-9bb6-09b90e44908d',
-  //     },
-  //   },
+  '90_day_plan': {
+    key: null,
+    component: null,
+    params: {
+      value: '90_day_plan',
+      key: '08c114e9-3ce1-40c7-808f-0ac556f3b93c',
+    },
+  },
+  delegate_pods: {
+    key: null,
+    component: null,
+    params: {
+      value: 'delegate_pods',
+      key: '17fc7008-54ea-4917-b74a-05256563398e',
+    },
+  },
+  dynamite_pods: {
+    key: routes.dynamitePodNavigator,
+    component: StackDynamitePod,
+    params: {
+      value: 'dynamite_pods',
+      key: '14f2dd46-0399-43d7-b17d-cae069a6244a',
+    },
+  },
+  your_recordings: {
+    key: routes.myRecordingNavigator,
+    component: StackRecordings,
+    params: {
+      value: 'your_recordings',
+      key: '25a25c8b-b9c0-4f7d-b77d-074c97c55195',
+    },
+  },
+  your_vault: {
+    key: routes.vaultNavigator,
+    component: StackVault,
+    params: {
+      value: 'your_vault',
+      key: 'bc7d4e01-05aa-49a6-9bb6-09b90e44908d',
+    },
+  },
   attitude_assessment: {
     key: routes.assessmentNavigator,
     component: StackAssessment,
@@ -262,183 +262,183 @@ export const ParentComponents = {
       key: 'd855c0fa-6dd4-45f9-9fc9-f1bed80e2192',
     },
   },
-  //   progress: {
-  //     key: routes.progressNavigator,
-  //     component: StackProgress,
-  //     params: {
-  //       value: 'progress',
-  //       key: '93a6e107-c620-4ba4-81d9-64660b4fb4db',
-  //     },
-  //   },
-  //   certification: {
-  //     key: null,
-  //     component: null,
-  //     params: {
-  //       value: 'certification',
-  //       key: '9ebb9563-c76c-42d0-b2e5-de7a88bbf3c9',
-  //     },
-  //   },
-  //   member_goal_statement: {
-  //     key: null,
-  //     component: null,
-  //     params: {
-  //       value: 'member_goal_statement',
-  //       key: '75176cef-cff2-4741-8139-67ce23bdca6c',
-  //     },
-  //   },
-  //   self_image: {
-  //     key: null,
-  //     component: null,
-  //     params: {
-  //       value: 'self_image',
-  //       key: 'c31a3cf2-ff7a-4957-9546-9c104f68d96c',
-  //     },
-  //   },
+  progress: {
+    key: routes.progressNavigator,
+    component: StackProgress,
+    params: {
+      value: 'progress',
+      key: '93a6e107-c620-4ba4-81d9-64660b4fb4db',
+    },
+  },
+  certification: {
+    key: null,
+    component: null,
+    params: {
+      value: 'certification',
+      key: '9ebb9563-c76c-42d0-b2e5-de7a88bbf3c9',
+    },
+  },
+  member_goal_statement: {
+    key: null,
+    component: null,
+    params: {
+      value: 'member_goal_statement',
+      key: '75176cef-cff2-4741-8139-67ce23bdca6c',
+    },
+  },
+  self_image: {
+    key: null,
+    component: null,
+    params: {
+      value: 'self_image',
+      key: 'c31a3cf2-ff7a-4957-9546-9c104f68d96c',
+    },
+  },
 
-  //   daily_streak_performance: {
-  //     key: routes.dailyStreakPerformerNavigator,
-  //     component: StackDailyStreakPerformance,
-  //     params: {
-  //       value: 'daily_streak_performance',
-  //       key: 'aadbd7a3-91c1-40dd-bf24-532fc288d2659',
-  //     },
-  //   },
+  daily_streak_performance: {
+    key: routes.dailyStreakPerformerNavigator,
+    component: StackDailyStreakPerformance,
+    params: {
+      value: 'daily_streak_performance',
+      key: 'aadbd7a3-91c1-40dd-bf24-532fc288d2659',
+    },
+  },
 
-  //   performance_stats: {
-  //     key: routes.monthlyReportNavigator,
-  //     component: StackMonthReport,
-  //     params: {
-  //       value: 'performance_stats',
-  //       key: 'aadbd7a3-91c1-40dd-bf24-8987688566hhh',
-  //     },
-  //   },
+  performance_stats: {
+    key: routes.monthlyReportNavigator,
+    component: StackMonthReport,
+    params: {
+      value: 'performance_stats',
+      key: 'aadbd7a3-91c1-40dd-bf24-8987688566hhh',
+    },
+  },
 
-  //   broadcast_chats: {
-  //     key: routes.broadcastNavigator,
-  //     component: StackBroadcast,
-  //     params: {
-  //       value: 'broadcast_chats',
-  //       key: 'aadbd7a3-91c1-40dd-bf24-898768876hhh',
-  //     },
-  //   },
+  broadcast_chats: {
+    key: routes.broadcastNavigator,
+    component: StackBroadcast,
+    params: {
+      value: 'broadcast_chats',
+      key: 'aadbd7a3-91c1-40dd-bf24-898768876hhh',
+    },
+  },
 
-  //   quarter_questions: {
-  //     key: routes.quaterQuestionNavigator,
-  //     component: StackQuaterQuestions,
-  //     params: {
-  //       value: 'quarter_questions',
-  //       key: 'aadbd7a3-91c1-40dd-bf24-7846756776677887',
-  //     },
-  //   },
+  quarter_questions: {
+    key: routes.quaterQuestionNavigator,
+    component: StackQuaterQuestions,
+    params: {
+      value: 'quarter_questions',
+      key: 'aadbd7a3-91c1-40dd-bf24-7846756776677887',
+    },
+  },
 
-  //   daily_dynamite_accountabalility_tracker: {
-  //     key: routes.accountabilityTrackerNavigator,
-  //     component: StackAcountabilityTracker,
-  //     params: {
-  //       value: 'daily_dynamite_accountabalility_tracker',
-  //       key: 'aadbd7a3-91c1-40dd-bf24-532fc288d265',
-  //     },
-  //   },
+  daily_dynamite_accountabalility_tracker: {
+    key: routes.accountabilityTrackerNavigator,
+    component: StackAcountabilityTracker,
+    params: {
+      value: 'daily_dynamite_accountabalility_tracker',
+      key: 'aadbd7a3-91c1-40dd-bf24-532fc288d265',
+    },
+  },
 
-  //   accountability_tracker_report: {
-  //     key: routes.delegateReportNavigator,
-  //     component: StackDelegateReport,
-  //     params: {
-  //       value: 'accountability_tracker_report',
-  //       key: 'aadbd7a3-91c1-40dd-bf24-532fc288d265555',
-  //     },
-  //   },
+  accountability_tracker_report: {
+    key: routes.delegateReportNavigator,
+    component: StackDelegateReport,
+    params: {
+      value: 'accountability_tracker_report',
+      key: 'aadbd7a3-91c1-40dd-bf24-532fc288d265555',
+    },
+  },
 
-  //   calendar: {
-  //     key: null,
-  //     component: null,
-  //     params: {
-  //       value: 'calendar',
-  //       key: '79fe1cf4-6cd7-42d0-a855-3fcf5fec045a',
-  //     },
-  //   },
-  //   delegate_events: {
-  //     key: routes.delegateEventsNavigator,
-  //     component: StackDelegateEvents,
-  //     params: {
-  //       type: 'consultant_user',
-  //       value: 'delegate_events',
-  //       key: 'd2ff9f8b-20a8-4646-a08b-cbdfd931f454',
-  //     },
-  //   },
-  //? Sales Tab
-  //   '/sales': {
-  //     key: null,
-  //     component: null,
-  //     params: {
-  //       value: '/sales',
-  //       key: 'aadbd7a3-91c1-499dd-bf24-7846756776677887',
-  //     },
-  //   },
-  //   mission_member_report: {
-  //     key: null,
-  //     component: null,
-  //     params: {
-  //       value: 'mission_member_report',
-  //       key: '5bd62bab-3f70-471a-ad80-d788cd481c39',
-  //     },
-  //   },
+  calendar: {
+    key: null,
+    component: null,
+    params: {
+      value: 'calendar',
+      key: '79fe1cf4-6cd7-42d0-a855-3fcf5fec045a',
+    },
+  },
+  delegate_events: {
+    key: routes.delegateEventsNavigator,
+    component: StackDelegateEvents,
+    params: {
+      type: 'consultant_user',
+      value: 'delegate_events',
+      key: 'd2ff9f8b-20a8-4646-a08b-cbdfd931f454',
+    },
+  },
+  // ? Sales Tab
+  '/sales': {
+    key: null,
+    component: null,
+    params: {
+      value: '/sales',
+      key: 'aadbd7a3-91c1-499dd-bf24-7846756776677887',
+    },
+  },
+  mission_member_report: {
+    key: null,
+    component: null,
+    params: {
+      value: 'mission_member_report',
+      key: '5bd62bab-3f70-471a-ad80-d788cd481c39',
+    },
+  },
 
-  //   missions_levels: {
-  //     key: routes.missionNavigator,
-  //     component: StackMission,
-  //     params: {
-  //       value: 'missions_levels',
-  //       key: 'ad108738-ebe0-428e-9810-55203ee509f7',
-  //     },
-  //   },
+  missions_levels: {
+    key: routes.missionNavigator,
+    component: StackMission,
+    params: {
+      value: 'missions_levels',
+      key: 'ad108738-ebe0-428e-9810-55203ee509f7',
+    },
+  },
 
-  //   content_reviews: {
-  //     key: null,
-  //     component: null,
-  //     params: {
-  //       value: 'content_reviews',
-  //       key: '52f27c5a-44ba-44ba-b0f0-b0b150ea031b',
-  //     },
-  //   },
+  content_reviews: {
+    key: null,
+    component: null,
+    params: {
+      value: 'content_reviews',
+      key: '52f27c5a-44ba-44ba-b0f0-b0b150ea031b',
+    },
+  },
 
-  // "aadbd7a3-444444-40dd-bf24-7846756776677887": {
-  //   key: routes.leadcenterNavigator,
-  //   component: StackLeadCenter,
-  //   params: {
-  //     value: "leads_center",
-  //     key: "aadbd7a3-444444-40dd-bf24-7846756776677887"
-  //   }
-  // },
+  'aadbd7a3-444444-40dd-bf24-7846756776677887': {
+    key: routes.leadcenterNavigator,
+    component: StackLeadCenter,
+    params: {
+      value: 'leads_center',
+      key: 'aadbd7a3-444444-40dd-bf24-7846756776677887',
+    },
+  },
 
   // Update Tab
-  //   updates: {
-  //     key: routes.updates,
-  //     component: StackUpdates,
-  //     params: {
-  //       value: 'updates',
-  //       key: '39f49f30-5a18-4c38-9c91-ad8a89f7218b',
-  //     },
-  //   },
+  updates: {
+    key: routes.updates,
+    component: StackUpdates,
+    params: {
+      value: 'updates',
+      key: '39f49f30-5a18-4c38-9c91-ad8a89f7218b',
+    },
+  },
 
-  //   campaign_url: {
-  //     key: routes.affiliate,
-  //     component: StackAffiliate,
-  //     params: {
-  //       value: 'campaign_url',
-  //       key: 'c6148bbe-118f-492d-b1e7-bec092d7afec',
-  //     },
-  //   },
+  campaign_url: {
+    key: routes.affiliate,
+    component: StackAffiliate,
+    params: {
+      value: 'campaign_url',
+      key: 'c6148bbe-118f-492d-b1e7-bec092d7afec',
+    },
+  },
 
-  // "templates": {
-  // 	key: routes.templates,
-  // 	component: StackTemplates,
-  // 	params: {
-  // 		value: "templates",
-  // 		title: "Templates",
-  // 		key: "0a3fc4be-fac3-46f2-a887-ae1e08f9d351"
-  // 	}
-  // },
+  templates: {
+    key: routes.templates,
+    component: StackTemplates,
+    params: {
+      value: 'templates',
+      title: 'Templates',
+      key: '0a3fc4be-fac3-46f2-a887-ae1e08f9d351',
+    },
+  },
 };
 
 export const ChildComponents = {

@@ -1,22 +1,14 @@
 import {
   View,
-  Text,
   Pressable,
-  Image,
   StyleSheet,
   Platform,
-  Dimensions,
   TextInput,
   Keyboard,
-  SafeAreaView,
   ScrollView,
-  StatusBar,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
-import {
-  DrawerContentScrollView,
-  useDrawerStatus,
-} from '@react-navigation/drawer';
+import {useDrawerStatus} from '@react-navigation/drawer';
 import MyText from '../../components/MyText';
 import {colors} from '../../utilities/colors';
 import {icons} from '../../utilities/icons';
@@ -25,9 +17,7 @@ import Collapsible from 'react-native-collapsible';
 import {selectNavbar} from '../../redux/reducers/navbarSlice';
 import {useDispatch, useSelector} from 'react-redux';
 import {selectSettings} from '../../redux/reducers/settingSlice';
-import MyImage2 from '../../components/MyImage2';
 import ResponsiveImage2 from '../../components/ResponsiveImage2';
-import utilities from '../../utilities';
 import {selectSocket} from '../../redux/reducers/socketSlice';
 import MyImage from '../../components/MyImage';
 import messaging from '@react-native-firebase/messaging';
@@ -40,11 +30,10 @@ import {
   incrementMsgCount,
   decrementMsgCount,
 } from '../../redux/reducers/userSlice';
-import RootView from '../../components/RootView';
 import {INIT_WITH_TOKEN} from '../../DAL';
-import notifee, {AndroidBadgeIconType, EventType} from '@notifee/react-native';
+import notifee, {EventType} from '@notifee/react-native';
 import debounce from '../../functions/debounce';
-// import { Notifications } from 'react-native-notifications';
+import {ModuleListByClient} from './ModuleListByClient';
 
 let sub2 = null;
 let sub3 = null;
@@ -52,7 +41,7 @@ let sub4 = null;
 let sub5 = null;
 const index = props => {
   const inset = useSafeAreaInsets();
-  const {navigation, state} = props;
+  const {navigation} = props;
   const dispatch = useDispatch();
   const isDrawerOpen = useDrawerStatus() == 'open';
   const {navbar} = useSelector(selectNavbar);
@@ -501,7 +490,7 @@ const index = props => {
         keyboardShouldPersistTaps="handled"
         {...props}>
         {searchableList().map((x, i) => {
-          if (!!ParentComponents[x.value]) {
+          if (!!ParentComponents[x.value] && !!ModuleListByClient[x?.value]) {
             let isCollaseable = Array.isArray(x.child_options);
             return (
               <View key={x.value}>
