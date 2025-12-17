@@ -1,40 +1,40 @@
-import MessageList from "../../screens/Chat/MessageList.js";
-import NotificationList from "../../screens/NotificationList";
-import ChangePassword from "../../screens/Profile/ChangePassword";
-import FeedKeywords from "../../screens/Profile/FeedKeywords";
-import EditProfile from "../../screens/Profile/EditProfile";
-import ChangeAffiliateId from "../../screens/Settings/ChangeAffiliateId.js";
-import OtherSettings from "../../screens/Settings/OtherSettings";
-import ReminderSettings from "../../screens/Settings/ReminderSettings";
-import ZoomSettings from "../../screens/Settings/ZoomSettings";
-import routes from "../routes";
-import VerifyAccount from "../../screens/Profile/VerifyAccount.js";
-
+import MessageList from '../../screens/Chat/MessageList.js';
+import NotificationList from '../../screens/NotificationList';
+import ChangePassword from '../../screens/Profile/ChangePassword';
+import FeedKeywords from '../../screens/Profile/FeedKeywords';
+import EditProfile from '../../screens/Profile/EditProfile';
+import ChangeAffiliateId from '../../screens/Settings/ChangeAffiliateId.js';
+import OtherSettings from '../../screens/Settings/OtherSettings';
+import ReminderSettings from '../../screens/Settings/ReminderSettings';
+import ZoomSettings from '../../screens/Settings/ZoomSettings';
+import routes from '../routes';
+import VerifyAccount from '../../screens/Profile/VerifyAccount.js';
+import StackChat from './StackChat.js';
 
 export const defaultScreens = [
   {
     name: routes.otherSettings,
-    component: OtherSettings
+    component: OtherSettings,
   },
   {
     name: routes.editProfile,
-    component: EditProfile
+    component: EditProfile,
   },
   {
     name: routes.changePassword,
-    component: ChangePassword
+    component: ChangePassword,
   },
   {
     name: routes.zoomSettings,
-    component: ZoomSettings
+    component: ZoomSettings,
   },
   {
     name: routes.reminderSettings,
-    component: ReminderSettings
+    component: ReminderSettings,
   },
   {
     name: routes.feedKeywords,
-    component: FeedKeywords
+    component: FeedKeywords,
   },
   // {
   //   name: routes.scheduleNotifications,
@@ -42,19 +42,18 @@ export const defaultScreens = [
   // },
   {
     name: routes.chatMessageList,
-    component: MessageList
+    component: MessageList,
   },
   {
     name: routes.notificationList,
-    component: NotificationList
+    component: NotificationList,
   },
   {
     name: routes.changeAffiliateIdScreen,
-    component: ChangeAffiliateId
+    component: ChangeAffiliateId,
   },
   {
     name: routes.verifyAccount,
-    component: VerifyAccount
-  }
-
-]
+    component: VerifyAccount,
+  },
+];

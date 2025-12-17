@@ -1,13 +1,12 @@
-import { View, Text, StyleSheet, StatusBar, SafeAreaView } from 'react-native'
-import React from 'react'
-import { colors } from '../utilities/colors'
-import Header from './Header'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
-
+import {View, Text, StyleSheet, StatusBar, SafeAreaView} from 'react-native';
+import React from 'react';
+import {colors} from '../utilities/colors';
+import Header from './Header';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 const RootView = ({
-  title = "",
-  subTitle = "",
+  title = '',
+  subTitle = '',
   hideHambugerMenu = false,
   rightButtonIcon = null,
   rightButtonOnPress = null,
@@ -22,15 +21,28 @@ const RootView = ({
   backgroundColor,
   titleView,
   children,
-  customBackPress
+  customBackPress,
 }) => {
-  const { top, bottom, left, right } = useSafeAreaInsets();
+  const {top, bottom, left, right} = useSafeAreaInsets();
   return (
-    <View style={[__RootView.root, !!backgroundColor && { backgroundColor },
-    !noPadding && { paddingTop: top, paddingBottom: bottom, paddingLeft: left, paddingRight: right }
-    ]}>
-      <StatusBar backgroundColor={!!backgroundColor ? backgroundColor : colors.darkSecondary} barStyle={"light-content"} />
-      {!hideHeader &&
+    <View
+      style={[
+        __RootView.root,
+        !!backgroundColor && {backgroundColor},
+        !noPadding && {
+          paddingTop: top,
+          paddingBottom: bottom,
+          paddingLeft: left,
+          paddingRight: right,
+        },
+      ]}>
+      <StatusBar
+        backgroundColor={
+          !!backgroundColor ? backgroundColor : colors.darkSecondary
+        }
+        barStyle={'light-content'}
+      />
+      {!hideHeader && (
         <Header
           title={title}
           subTitle={subTitle}
@@ -40,24 +52,24 @@ const RootView = ({
           rightButtonIcon={rightButtonIcon}
           rightButtonOnPress={rightButtonOnPress}
           hideNotificaitonIcon={hideNotificaitonIcon}
-          hideChatIcon={hideChatIcon}
+          // hideChatIcon={hideChatIcon}
+          hideChatIcon={true}
           hideProfile={hideProfile}
           titleView={titleView}
           customBackPress={customBackPress}
           hideSubHeader={hideSubHeader}
-        />}
-      <View style={{ flex: 1, paddingHorizontal: 10 }}>
-        {children}
-      </View>
+        />
+      )}
+      <View style={{flex: 1, paddingHorizontal: 10}}>{children}</View>
     </View>
-  )
-}
+  );
+};
 
-export default RootView
+export default RootView;
 
 const __RootView = StyleSheet.create({
   root: {
     backgroundColor: colors.darkSecondary,
     flex: 1,
-  }
-})
+  },
+});

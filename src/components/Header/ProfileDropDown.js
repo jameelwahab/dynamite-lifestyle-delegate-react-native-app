@@ -1,31 +1,28 @@
-import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native'
-import React, { useRef } from 'react'
-import Modal from 'react-native-modal'
-import MyText from '../MyText'
-import utilities from '../../utilities'
-import { fonts } from '../../utilities/fonts'
-import { icons } from '../../utilities/icons'
-import { colors } from '../../utilities/colors'
-import { useNavigation } from '@react-navigation/native'
-import routes from '../../navigation/routes'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { LOGOUT } from '../../DAL'
-import copyText from '../../functions/copyText'
-import { useDispatch, useSelector } from 'react-redux'
-import { clearSocket, selectSocket } from '../../redux/reducers/socketSlice'
+import {View, Text, TouchableOpacity, Image, StyleSheet} from 'react-native';
+import React, {useRef} from 'react';
+import Modal from 'react-native-modal';
+import MyText from '../MyText';
+import utilities from '../../utilities';
+import {fonts} from '../../utilities/fonts';
+import {icons} from '../../utilities/icons';
+import {colors} from '../../utilities/colors';
+import {useNavigation} from '@react-navigation/native';
+import routes from '../../navigation/routes';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {LOGOUT} from '../../DAL';
+import copyText from '../../functions/copyText';
+import {useDispatch, useSelector} from 'react-redux';
+import {clearSocket, selectSocket} from '../../redux/reducers/socketSlice';
 import notifee from '@notifee/react-native';
-import LogoutModal from './LogoutModal'
+import LogoutModal from './LogoutModal';
 
-
-const ProfileDropDown = ({ isVisible = false, closeModal = () => { }, user }) => {
+const ProfileDropDown = ({isVisible = false, closeModal = () => {}, user}) => {
   const navigation = useNavigation();
   const ref_logoutModal = useRef();
 
   const logoutBtn = async () => {
-    ref_logoutModal?.current?.openModal?.()
-
-  }
-
+    ref_logoutModal?.current?.openModal?.();
+  };
 
   const optionsView = (icon, text, func) => {
     return (
@@ -36,36 +33,35 @@ const ProfileDropDown = ({ isVisible = false, closeModal = () => { }, user }) =>
           padding: 15,
           alignItems: 'center',
         }}>
-        {typeof icon == "function" ?
-          icon() :
+        {typeof icon == 'function' ? (
+          icon()
+        ) : (
           <Image
             source={icon}
-            style={{ height: 17, width: 17, tintColor: colors.golden }}
-          />}
-        <MyText style={{ marginLeft: 14 }}>
-          {text}
-        </MyText>
+            style={{height: 17, width: 17, tintColor: colors.golden}}
+          />
+        )}
+        <MyText style={{marginLeft: 14}}>{text}</MyText>
       </TouchableOpacity>
-    )
-  }
+    );
+  };
 
-  const navigateTo = (screen) => {
-    closeModal()
-    navigation.navigate(screen)
-  }
+  const navigateTo = screen => {
+    closeModal();
+    navigation.navigate(screen);
+  };
 
   const navigateToEditProfile = () => {
-    closeModal()
-    let lastRouteName = navigation.getState().routes[navigation.getState().index].name
-    navigation.navigate(routes.editProfile, { lastRouteName })
-  }
-
+    closeModal();
+    let lastRouteName =
+      navigation.getState().routes[navigation.getState().index].name;
+    navigation.navigate(routes.editProfile, {lastRouteName});
+  };
 
   const copyTheText = (text1, text2) => {
     copyText(text1, text2);
-    closeModal()
-  }
-
+    closeModal();
+  };
 
   return (
     <Modal
@@ -80,48 +76,48 @@ const ProfileDropDown = ({ isVisible = false, closeModal = () => { }, user }) =>
       useNativeDriverForBackdrop={true}
       hideModalContentWhileAnimating={true}
       style={__styles.modal}>
-      <View
-        style={__styles.modalView}>
+      <View style={__styles.modalView}>
         <View style={__styles.profileView}>
           <View style={__styles.profileInnnerView}>
-            <View style={{ flex: 1 }}>
-              <MyText type='medium'>
-                {user?.first_name + " " + user?.last_name}
+            <View style={{flex: 1}}>
+              <MyText type="medium">
+                {user?.first_name + ' ' + user?.last_name}
               </MyText>
-              <MyText fontSize={13} style={{ marginTop: 3 }}>
+              <MyText fontSize={13} style={{marginTop: 3}}>
                 {user?.email}
               </MyText>
             </View>
           </View>
         </View>
 
-        <View style={{ marginTop: 10 }}>
+        <View style={{marginTop: 10}}>
+          {optionsView(icons.user, 'Edit Profile', () =>
+            navigateToEditProfile(),
+          )}
+          {optionsView(icons.copy, 'Copy Refferal Id', () =>
+            copyTheText(user?.affiliate_url_name, 'Refferal Id Copied'),
+          )}
+          {optionsView(icons.copy, 'Copy App Refferal Id', () =>
+            copyTheText(user?.affiliate_link, 'App Refferal Id Copied'),
+          )}
+          {optionsView(icons.edit, 'Change Affiliate Id', () =>
+            navigateTo(routes?.changeAffiliateIdScreen),
+          )}
+          {optionsView(icons.gear, 'Settings', () =>
+            navigateTo(routes.otherSettings),
+          )}
 
-          {optionsView(icons.user, "Edit Profile", () => navigateToEditProfile())}
-          {optionsView(icons.copy, "Copy Refferal Id", () => copyTheText(user?.affiliate_url_name, "Refferal Id Copied"))}
-          {optionsView(icons.copy, "Copy App Refferal Id", () => copyTheText(user?.affiliate_link, "App Refferal Id Copied"))}
-          {optionsView(icons.edit, "Change Affiliate Id", () => navigateTo(routes?.changeAffiliateIdScreen))}
-          {optionsView(icons.gear, "Settings", () => navigateTo(routes.otherSettings))}
-
-
-          <TouchableOpacity
-            onPress={logoutBtn}
-            style={__styles.btnView}>
-            <MyText>
-              Logout
-            </MyText>
+          <TouchableOpacity onPress={logoutBtn} style={__styles.btnView}>
+            <MyText>Logout</MyText>
           </TouchableOpacity>
         </View>
       </View>
       <LogoutModal closeProfileModal={closeModal} ref={ref_logoutModal} />
     </Modal>
-  )
+  );
+};
 
-}
-
-
-
-export default ProfileDropDown
+export default ProfileDropDown;
 
 const __styles = StyleSheet.create({
   modal: {
@@ -142,7 +138,7 @@ const __styles = StyleSheet.create({
       width: 0,
       height: 4,
     },
-    shadowOpacity: 0.30,
+    shadowOpacity: 0.3,
     shadowRadius: 4.65,
     elevation: 8,
   },
@@ -152,8 +148,8 @@ const __styles = StyleSheet.create({
     padding: 16,
   },
   profileInnnerView: {
-    flexDirection: "row",
-    alignItems: "center"
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   btnView: {
     height: 40,
@@ -167,5 +163,4 @@ const __styles = StyleSheet.create({
     marginBottom: 13,
     marginTop: 10,
   },
-
-})
+});
