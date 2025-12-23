@@ -1,41 +1,28 @@
-import {
-  View,
-  Text,
-  FlatList,
-  StyleSheet,
-  TouchableOpacity,
-  Pressable,
-} from 'react-native';
-import React, {useEffect, useRef, useState} from 'react';
+import {View, FlatList, StyleSheet, Pressable} from 'react-native';
+import React, {useEffect, useState} from 'react';
 import RootView from '../../components/RootView';
-import MyText from '../../components/MyText';
 import {useSelector} from 'react-redux';
 import {selectNavbar} from '../../redux/reducers/navbarSlice';
 import {selectUser} from '../../redux/reducers/userSlice';
-import {
-  BOOKING_DELETE,
-  GET_ASSESSMENT_LIST,
-  GET_BOOKINGS_LIST,
-} from '../../DAL';
+import {GET_ASSESSMENT_LIST} from '../../DAL';
 import MyLoader from '../../components/MyLoader';
 import {colors} from '../../utilities/colors';
 import MemberView from '../../components/MemberView';
 import {MenuButton} from '../../components/MyButton';
-import moment from 'moment';
 import {dateTimeFormat} from '../../utilities/constants';
 import FooterLoader from '../../components/FooterLoader';
 import EmptyView from '../../components/EmptyView';
 import MyRefreshControl from '../../components/MyRefreshControl';
-import FAB from '../../components/FAB';
 import routes from '../../navigation/routes';
 import TitleView from '../../components/TitleView';
 import {icons} from '../../utilities/icons';
 import SearchView from '../../components/SearchView';
 import OptionModal from '../../components/OptionModal';
-import ConfirmationModal from '../../components/ConfirmationModal';
 import StatView from '../../components/StatView';
 import {convertTimezone} from '../../functions/convertTime';
 import {selectTimeZone} from '../../redux/reducers/timezoneSlice';
+import {STRINGS} from '../../utilities/strings';
+import {__assessmentListStyles} from './__styles';
 
 let page = 0;
 let canLoadMore = false;
@@ -137,8 +124,8 @@ const Bookings = ({navigation, route}) => {
 
   const renderBookings = ({item, index}) => {
     return (
-      <View style={__styles.itemView}>
-        <View style={__styles.headerView}>
+      <View style={__assessmentListStyles.itemView}>
+        <View style={__assessmentListStyles.headerView}>
           <Pressable onPress={() => onDetail(item)}>
             <MemberView
               member={item?.member}
@@ -151,40 +138,40 @@ const Bookings = ({navigation, route}) => {
         </View>
         <View>
           <StatView
-            title={'Attitude Coins'}
+            title={STRINGS.ASSESSMENT_LIST.attitudeCoins}
             value={
               !!item?.attitude_assessment_coins_count
                 ? item?.attitude_assessment_coins_count
-                : 'N/A'
+                : STRINGS.GENERIC.N_A
             }
           />
           <StatView
-            title={'Delegate'}
+            title={STRINGS.ASSESSMENT_LIST.delegate}
             value={
               !!item?.consultant
                 ? item?.consultant?.first_name +
                   ' ' +
                   item?.consultant?.last_name
-                : 'N/A'
+                : STRINGS.GENERIC.N_A
             }
           />
           <StatView
-            title={'Nurture'}
+            title={STRINGS.ASSESSMENT_LIST.nurture}
             value={
               !!item?.nurture
                 ? item?.nurture?.first_name + ' ' + item?.nurture?.last_name
-                : 'N/A'
+                : STRINGS.GENERIC.N_A
             }
           />
           <StatView
-            title={'Completed Date'}
+            title={STRINGS.ASSESSMENT_LIST.completedDate}
             value={convertTimezone(item?.activity_date_time, timezone).format(
               dateTimeFormat.dateTime,
             )}
             uppercase
           />
           <StatView
-            title={'Assessment Level'}
+            title={STRINGS.ASSESSMENT_LIST.assessmentLevel}
             value={item?.badge_level_info?.membership_level_badge_title}
             original
           />
@@ -196,11 +183,11 @@ const Bookings = ({navigation, route}) => {
   const topView = () => {
     return (
       <View>
-        <View style={__styles.topView}>
+        <View style={__assessmentListStyles.topView}>
           <TitleView
             title={title}
             hideBackBottomButton
-            subTitle={`Showing ${list.length} of ${total}`}
+            subTitle={`${STRINGS.ASSESSMENT_LIST.showing} ${list.length} ${STRINGS.ASSESSMENT_LIST.of} ${total}`}
           />
         </View>
       </View>
@@ -258,51 +245,8 @@ const Bookings = ({navigation, route}) => {
 export default Bookings;
 const optionsList = [
   {
-    title: 'View History',
+    title: STRINGS.ASSESSMENT_LIST.viewHistory,
     key: 'history',
     icon: icons.edit,
   },
 ];
-
-const __styles = StyleSheet.create({
-  itemView: {
-    backgroundColor: colors.secondary,
-    padding: 10,
-    borderRadius: 10,
-    marginTop: 10,
-  },
-  headerView: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  statusView: {
-    // paddingVertical: 5,
-    // paddingHorizontal: 15,
-    height: 25,
-    paddingHorizontal: 10,
-    // minWidth: 80,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 30,
-    alignSelf: 'flex-start',
-  },
-
-  topView: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.darkSecondary,
-    paddingBottom: 5,
-  },
-  topBtnsView: {flexDirection: 'row', alignItems: 'flex-end'},
-
-  sortBtn: {
-    height: 25,
-    width: 25,
-    borderRadius: 25 / 2,
-    backgroundColor: colors.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginLeft: 5,
-  },
-});

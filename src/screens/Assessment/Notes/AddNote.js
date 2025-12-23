@@ -1,4 +1,4 @@
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import {View, TouchableOpacity} from 'react-native';
 import React, {useState} from 'react';
 import RootView from '../../../components/RootView';
 import {colors} from '../../../utilities/colors';
@@ -7,16 +7,13 @@ import MyLoader from '../../../components/MyLoader';
 import {MyButton} from '../../../components/MyButton';
 import {icons} from '../../../utilities/icons';
 import showToast from '../../../functions/showToast';
-import {
-  ADD_NOTES,
-  ASSESSMENT_NOTE_ADD,
-  ASSESSMENT_NOTE_UPDATE,
-  EDIT_NOTES,
-} from '../../../DAL';
+import {ASSESSMENT_NOTE_ADD, ASSESSMENT_NOTE_UPDATE} from '../../../DAL';
 import {useSelector} from 'react-redux';
 import {selectUser} from '../../../redux/reducers/userSlice';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import MyText from '../../../components/MyText';
+import {STRINGS} from '../../../utilities/strings';
+import {__assessmentNotesAddEditStyles} from '../__styles';
 
 const AddNote = ({navigation, route}) => {
   const {token} = useSelector(selectUser);
@@ -29,7 +26,10 @@ const AddNote = ({navigation, route}) => {
 
   const btn_save = () => {
     if (note.trim() == '') {
-      showToast({body: 'Please enter note', type: 'info'});
+      showToast({
+        body: STRINGS.ASSESSMENT_NOTES_ADD_EDIT.pleaseEnterNote,
+        type: 'info',
+      });
     } else {
       setLoader(true);
       addTheNote();
@@ -67,44 +67,44 @@ const AddNote = ({navigation, route}) => {
     <RootView hideHeader>
       <KeyboardAwareScrollView>
         <View>
-          <View
-            style={{flexDirection: 'row', alignItems: 'center', marginTop: 10}}>
+          <View style={__assessmentNotesAddEditStyles.headerRow}>
             <TouchableOpacity
               onPress={() => navigation.goBack()}
-              style={__styles.closeBtnView}>
+              style={__assessmentNotesAddEditStyles.closeBtnView}>
               {icons.back(colors.primary, 25)}
             </TouchableOpacity>
             <MyText fontSize={18} color={colors.primary} type="bold">
               {' '}
-              {!!oldNote ? 'Edit Note' : 'Add Note'}{' '}
+              {!!oldNote
+                ? STRINGS.ASSESSMENT_NOTES_ADD_EDIT.editNote
+                : STRINGS.ASSESSMENT_NOTES_ADD_EDIT.addNote}{' '}
             </MyText>
           </View>
 
-          <View style={{flex: 1, marginTop: 15}}>
+          <View style={__assessmentNotesAddEditStyles.contentContainer}>
             <Editor
               initialValue={note}
               height={150}
               onChange={text => setNote(text)}
             />
 
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'flex-end',
-                marginTop: 10,
-              }}>
+            <View style={__assessmentNotesAddEditStyles.buttonsRow}>
               <MyButton
                 onPress={() => navigation.goBack()}
                 invert
-                title="Cancel"
-                style={{paddingHorizontal: 10, marginRight: 10}}
+                title={STRINGS.ASSESSMENT_NOTES_ADD_EDIT.cancel}
+                style={__assessmentNotesAddEditStyles.cancelButton}
               />
 
               <MyButton
                 invert
-                title={!!oldNote ? 'Update' : 'Save'}
+                title={
+                  !!oldNote
+                    ? STRINGS.ASSESSMENT_NOTES_ADD_EDIT.update
+                    : STRINGS.ASSESSMENT_NOTES_ADD_EDIT.save
+                }
                 onPress={btn_save}
-                style={{paddingHorizontal: 10}}
+                style={__assessmentNotesAddEditStyles.saveButton}
               />
             </View>
           </View>
@@ -116,18 +116,3 @@ const AddNote = ({navigation, route}) => {
 };
 
 export default AddNote;
-
-const __styles = StyleSheet.create({
-  headerView: {
-    flexDirection: 'row',
-  },
-  closeBtnView: {
-    height: 40,
-    width: 40,
-    backgroundColor: colors.lightPrimary2,
-    borderRadius: 40 / 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 10,
-  },
-});

@@ -5023,6 +5023,7 @@ __metadata:
     react-native-gesture-handler: 2.13.2
     react-native-gifted-charts: ^1.4.10
     react-native-haptic-feedback: ^2.2.0
+    react-native-html-to-pdf: 0.12.0
     react-native-image-crop-picker: ^0.41.2
     react-native-image-progress: ^1.2.0
     react-native-image-zoom-viewer: ^3.0.1
@@ -10156,6 +10157,13 @@ __metadata:
   peerDependencies:
     react-native: ">=0.60.0"
   checksum: 5ff12aaf44fa1cad8ab3d9c58046a11c631c6622955120294060efc51c625203ee4cd7ccb565663c12b27552ebbb7034a386000d9da738b9eea5ff62d58b14c0
+  languageName: node
+  linkType: hard
+
+"react-native-html-to-pdf@npm:0.12.0":
+  version: 0.12.0
+  resolution: "react-native-html-to-pdf@npm:0.12.0"
+  checksum: a5be594ccbfdd501d3ac626fb643f9a87631f1693029cd42679d08925658d03becef9a1dd02d1c38c64b93ef914b6a5f42646d36869dcdeed3d0f6ddcbf013ba
   languageName: node
   linkType: hard
 

@@ -182,6 +182,8 @@ const routes = {
   markAsPaidScreen: 'MARK_AS_PAID_SCREEN',
   addEditPaymenyRequestScreen: 'ADD_EDIT_PAYMENT_REQUEST_SCREEN',
   PaymenyRequestDetailScreen: 'PAYMENT_REQUEST_DETAIL_SCREEN',
+  manageProgrammeAccessScreen: 'MANAGE_PROGRAMME_ACCESS_SCREEN',
+  agreementConfigurationScreen: 'AGREEMENT_CONFIGURATION_SCREEN',
 
   //? Portals
   portalListScreen: 'PORTAL_LIST_SCREEN',

@@ -1,11 +1,10 @@
 import axios from 'axios';
-import { apiKey, domain } from '../utilities/constants';
+import {apiKey, domain} from '../utilities/constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import showToast from './showToast';
 import routes from '../navigation/routes';
 import DeviceInfo from 'react-native-device-info';
-import { Platform } from 'react-native';
-
+import {Platform} from 'react-native';
 
 axios.defaults.headers.post['Content-Type'] = 'application/json';
 let alertShown = false;
@@ -16,31 +15,32 @@ export default async function invokeApi({
   queryParams = {},
   postData = {},
   checkAuth = true,
-  token = "",
+  token = '',
   noAlerts = false,
   navigation = null,
   excludeBaseURL = false,
-  showConsole = __DEV__
+  showConsole = __DEV__,
+  isNewAPI = false,
 }) {
-
   try {
-    headers["version"] = DeviceInfo.getVersion();
-    headers["platform"] = Platform.OS;
-    headers["device"] = DeviceInfo.getDeviceNameSync();
+    headers['version'] = DeviceInfo.getVersion();
+    headers['platform'] = Platform.OS;
+    headers['device'] = DeviceInfo.getDeviceNameSync();
   } catch (e) {
-    console.log(e, "version issue")
+    console.log(e, 'version issue');
   }
 
   const reqObj = {
     method,
-    url: excludeBaseURL ? path : domain + path,
+    url: excludeBaseURL
+      ? path
+      : domain + `${isNewAPI ? 'delegate' : ''}` + path,
     headers: {
       ...headers,
-      "x-sh-auth": token,
-      "x-api-key": apiKey,
+      'x-sh-auth': token,
+      'x-api-key': apiKey,
     },
   };
-
 
   reqObj.params = queryParams;
 
@@ -56,44 +56,63 @@ export default async function invokeApi({
 
   let results;
   if (showConsole && __DEV__) {
-    console.log(`<===REQUEST-OBJECT===>\t%c${path} \n`, 'background:#FF0; color: #000', reqObj,);
+    let bgColor = isNewAPI || excludeBaseURL ? '#FF0' : '#DCC27A';
+    console.log(
+      `<===REQUEST-OBJECT===>\t%c${path} \n`,
+      `background:${bgColor}; color: #000`,
+      reqObj,
+    );
   }
   try {
     results = await axios(reqObj);
     if (showConsole && __DEV__) {
-      console.log(`<===Api-Success-Result===>\t%c${path} \n`, 'background:#0F0; color: #000', results);
+      let bgColor = isNewAPI || excludeBaseURL ? '#92FC4D' : '#60B177';
+      console.log(
+        `<===Api-Success-Result===>\t%c${path} \n`,
+        `background:${bgColor}; color: #000`,
+        results,
+      );
     }
     return results.data;
-
   } catch (error) {
     if (showConsole && __DEV__) {
-      console.log(`<===Api-Error===>\t%c${path} \n`, 'background:#F00; color: #FFF', error);
+      console.log(
+        `<===Api-Error===>\t%c${path} \n`,
+        'background:#F00; color: #FFF',
+        error,
+      );
     }
     if (error.code == 'ERR_NETWORK') {
       if (!noAlerts) {
-        showToast({ body: "No Internet Connection", title: "Network Error" });
+        showToast({body: 'No Internet Connection', title: 'Network Error'});
       }
       return {
         code: 'ERR_NETWORK',
         message: 'No Internet Connection',
       };
-    } else if (error?.response?.data?.code === 401 && checkAuth == true && alertShown == false) {
+    } else if (
+      error?.response?.data?.code === 401 &&
+      checkAuth == true &&
+      alertShown == false
+    ) {
       if (!noAlerts) {
-        showToast({ body: "Please login again", title: "Authentication failed" });
+        showToast({body: 'Please login again', title: 'Authentication failed'});
       }
-      await AsyncStorage.multiRemove(["token"]);
+      await AsyncStorage.multiRemove(['token']);
       navigation.reset({
         index: 0,
-        routes: [{
-          name: routes.login
-        }]
-      })
+        routes: [
+          {
+            name: routes.login,
+          },
+        ],
+      });
     } else {
       if (!noAlerts) {
         if (!!error?.response?.data?.message) {
-          showToast({ body: error?.response?.data?.message, title: "Error" });
+          showToast({body: error?.response?.data?.message, title: 'Error'});
         } else {
-          showToast({ body: error.message, title: "Error" });
+          showToast({body: error.message, title: 'Error'});
         }
       }
     }
@@ -106,4 +125,3 @@ export default async function invokeApi({
     };
   }
 }
-

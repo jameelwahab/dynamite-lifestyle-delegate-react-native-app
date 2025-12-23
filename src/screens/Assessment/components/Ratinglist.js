@@ -80,6 +80,8 @@ import {View, FlatList, StyleSheet} from 'react-native';
 import React from 'react';
 import MyText from '../../../components/MyText';
 import {colors} from '../../../utilities/colors';
+import {Flex} from '../../../UIComponents/FlexViews';
+import {__assessmentComponentStyles} from '../__styles';
 
 const Ratinglist = ({list}) => {
   const renderRating = ({item, index}) => {
@@ -92,16 +94,16 @@ const Ratinglist = ({list}) => {
     }
 
     return (
-      <View style={__styles.itemView}>
+      <View style={__assessmentComponentStyles.itemView}>
         <MyText>{item?.question_statement}</MyText>
-        <View style={__styles.ratingRootView}>
+        <View style={__assessmentComponentStyles.ratingRootView}>
           {Array.from({length: count}).map((_, j) => {
             const ratingValue = min + j;
             return (
               <View
                 key={j}
                 style={[
-                  __styles.ratingView,
+                  __assessmentComponentStyles.ratingView,
                   {
                     backgroundColor:
                       ratingValue <= item?.answer
@@ -125,41 +127,15 @@ const Ratinglist = ({list}) => {
   };
 
   return (
-    <View style={{flex: 1}}>
+    <Flex flex={1}>
       <FlatList
         data={list}
         showsVerticalScrollIndicator={false}
         renderItem={renderRating}
         keyExtractor={item => item?._id}
       />
-    </View>
+    </Flex>
   );
 };
 
 export default Ratinglist;
-
-const __styles = StyleSheet.create({
-  itemView: {
-    backgroundColor: colors.secondaryVariant,
-    borderWidth: 1,
-    borderColor: colors.lightText + '22',
-    borderRadius: 10,
-    marginTop: 10,
-    padding: 10,
-    marginHorizontal: 10,
-  },
-  ratingRootView: {
-    marginTop: 10,
-    flexDirection: 'row',
-  },
-  ratingView: {
-    height: 30,
-    width: 30,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 30 / 2,
-    marginRight: 5,
-    borderWidth: 1,
-    borderColor: colors.beige,
-  },
-});

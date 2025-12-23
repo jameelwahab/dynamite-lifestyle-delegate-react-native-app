@@ -5,4 +5,5 @@ export const ModuleListByClient = {
   links: true,
   appointment: true,
   attitude_assessment: true,
+  mission_control: true,
 };

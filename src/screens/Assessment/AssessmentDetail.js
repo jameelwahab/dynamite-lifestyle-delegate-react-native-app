@@ -1,46 +1,45 @@
-import { View, Text, useWindowDimensions, TouchableOpacity } from 'react-native'
-import React, { useState } from 'react'
-import RootView from '../../components/RootView'
-import MyText from '../../components/MyText'
-import Ratinglist from './components/Ratinglist'
-import { colors } from '../../utilities/colors'
-import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
-import MemberView from '../../components/MemberView'
-import moment from 'moment'
-import { useSelector } from 'react-redux'
-import { selectTimeZone } from '../../redux/reducers/timezoneSlice'
-import { dateTimeFormat } from '../../utilities/constants'
-import { convertTimezone } from '../../functions/convertTime'
-import { icons } from '../../utilities/icons'
-import { MenuButton } from '../../components/MyButton'
-import OptionModal from '../../components/OptionModal'
-import routes from '../../navigation/routes'
+import {View, useWindowDimensions} from 'react-native';
+import React, {useState} from 'react';
+import RootView from '../../components/RootView';
+import MyText from '../../components/MyText';
+import Ratinglist from './components/Ratinglist';
+import {colors} from '../../utilities/colors';
+import {TabView, TabBar} from 'react-native-tab-view';
+import MemberView from '../../components/MemberView';
+import {useSelector} from 'react-redux';
+import {selectTimeZone} from '../../redux/reducers/timezoneSlice';
+import {dateTimeFormat} from '../../utilities/constants';
+import {convertTimezone} from '../../functions/convertTime';
+import {icons} from '../../utilities/icons';
+import {MenuButton} from '../../components/MyButton';
+import OptionModal from '../../components/OptionModal';
+import routes from '../../navigation/routes';
+import {STRINGS} from '../../utilities/strings';
+import {Flex, Row} from '../../UIComponents/FlexViews';
 
-const AssessmentDetail = ({ navigation, route }) => {
-  const { item } = route?.params;
+const AssessmentDetail = ({navigation, route}) => {
+  const {item} = route?.params;
   const layout = useWindowDimensions();
-  const timezone = useSelector(selectTimeZone)
+  const timezone = useSelector(selectTimeZone);
   const [myTabs] = useState(tabs);
   const [index, setIndex] = useState(0);
-  const [optionModalVisibility, setOptionModalVisibility] = useState(false)
+  const [optionModalVisibility, setOptionModalVisibility] = useState(false);
 
-
-  const onSelected = (opt) => {
+  const onSelected = opt => {
     setOptionModalVisibility(false);
-    if (opt.key == "notes") {
+    if (opt.key == 'notes') {
       navigation.navigate(routes.assessmentNotesList, {
         type: myTabs[index].key,
-        assessmentId: item?._id
-      })
+        assessmentId: item?._id,
+      });
     }
-  }
+  };
 
   const renderTabBar = props => (
-
     <TabBar
       {...props}
       scrollEnabled={true}
-      indicatorStyle={{ backgroundColor: colors.primary }}
+      indicatorStyle={{backgroundColor: colors.primary}}
       style={{
         backgroundColor: colors.darkSecondary,
         shadowColor: colors.lightText2,
@@ -48,63 +47,73 @@ const AssessmentDetail = ({ navigation, route }) => {
           width: 0,
           height: 1,
         },
-        shadowOpacity: 0.20,
+        shadowOpacity: 0.2,
         shadowRadius: 1.41,
       }}
-      tabStyle={{ width: "auto", }}
-      renderLabel={({ route, focused, color }) => {
+      tabStyle={{width: 'auto'}}
+      renderLabel={({route, focused, color}) => {
         return (
-          <MyText color={focused ? colors.primary : colors.lightText} type='medium' >
+          <MyText
+            color={focused ? colors.primary : colors.lightText}
+            type="medium">
             {route.title}
           </MyText>
-        )
+        );
       }}
       gap={10}
     />
   );
 
-  const renderScene = ({ route, }) => {
+  const renderScene = ({route}) => {
     switch (route.key) {
       case 'thought':
-        return <Ratinglist list={item?.assessment_results?.thought_result} />
+        return <Ratinglist list={item?.assessment_results?.thought_result} />;
       case 'feeling':
-        return <Ratinglist list={item?.assessment_results?.feeling_result} />
+        return <Ratinglist list={item?.assessment_results?.feeling_result} />;
       case 'action':
-        return <Ratinglist list={item?.assessment_results?.action_result} />
+        return <Ratinglist list={item?.assessment_results?.action_result} />;
     }
-  }
+  };
 
   const topView = () => {
     return (
-      <View style={{ flexDirection: "row", alignItems: "center" }}>
-        <View style={{ flex: 1 }}>
-          <MyText isHeading>Assessment History</MyText>
-        </View>
+      <Row alignItems="center">
+        <Flex flex={1}>
+          <MyText isHeading>
+            {STRINGS.ASSESSMENT_DETAIL.assessmentHistory}
+          </MyText>
+        </Flex>
         <MenuButton onPress={() => setOptionModalVisibility(true)} />
-      </View>
-    )
-  }
+      </Row>
+    );
+  };
 
   return (
     <RootView titleView={topView}>
-      <MemberView
-        member={item?.member}
-      />
-      {!!item?.activity_date_time &&
-        <View style={{ marginTop: 10 }}>
-          <MyText color={colors.primary} type='bold' >{"Completed Date: "}
-            <MyText type='medium'>({convertTimezone(item?.activity_date_time, timezone).format(dateTimeFormat.dateTime)})</MyText>
+      <MemberView member={item?.member} />
+      {!!item?.activity_date_time && (
+        <View style={{marginTop: 10}}>
+          <MyText color={colors.primary} type="bold">
+            {STRINGS.ASSESSMENT_DETAIL.completedDate}
+            <MyText type="medium">
+              (
+              {convertTimezone(item?.activity_date_time, timezone).format(
+                dateTimeFormat.dateTime,
+              )}
+              )
+            </MyText>
           </MyText>
-        </View>}
-      <View style={{ flex: 1, marginHorizontal: -10 }}>
+        </View>
+      )}
+      <View style={{flex: 1, marginHorizontal: -10}}>
         <TabView
           renderTabBar={renderTabBar}
-          navigationState={{ index, routes: myTabs }}
+          navigationState={{index, routes: myTabs}}
           renderScene={renderScene}
-          onIndexChange={(index) => {
+          onIndexChange={index => {
             setIndex(index);
           }}
-          initialLayout={{ width: layout.width }}
+          initialLayout={{width: layout.width}}
         />
       </View>
 
@@ -115,20 +124,21 @@ const AssessmentDetail = ({ navigation, route }) => {
         closeModal={() => setOptionModalVisibility(false)}
       />
     </RootView>
-  )
-}
+  );
+};
 
-export default AssessmentDetail
+export default AssessmentDetail;
 
-const optionsList = [{
-  title: "Client Notes",
-  key: "notes",
-  icon: icons.notes
-},
-]
+const optionsList = [
+  {
+    title: STRINGS.ASSESSMENT_DETAIL.clientNotes,
+    key: 'notes',
+    icon: icons.notes,
+  },
+];
 
 const tabs = [
-  { key: 'thought', title: 'THOUGHTS', index: 0 },
-  { key: 'feeling', title: 'FEELINGS', index: 1 },
-  { key: 'action', title: 'ACTIONS', index: 2 },
-]
+  {key: 'thought', title: STRINGS.ASSESSMENT_DETAIL.thoughts, index: 0},
+  {key: 'feeling', title: STRINGS.ASSESSMENT_DETAIL.feelings, index: 1},
+  {key: 'action', title: STRINGS.ASSESSMENT_DETAIL.actions, index: 2},
+];

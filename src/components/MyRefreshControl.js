@@ -1,10 +1,10 @@
-import { RefreshControl } from 'react-native'
-import React from 'react'
-import { colors } from '../utilities/colors'
+import {RefreshControl} from 'react-native';
+import React from 'react';
+import {colors} from '../utilities/colors';
 
 const MyRefreshControl = ({
   refreshing = false,
-  onRefresh = () => { },
+  onRefresh = () => {},
   ...props
 }) => {
   return (
@@ -14,9 +14,8 @@ const MyRefreshControl = ({
       colors={[colors.primary]}
       tintColor={colors.white}
       {...props}
-
     />
-  )
-}
+  );
+};
 
-export default MyRefreshControl
+export default MyRefreshControl;

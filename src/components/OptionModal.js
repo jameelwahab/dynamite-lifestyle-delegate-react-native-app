@@ -28,6 +28,7 @@ const OptionModal = ({
   checkSelected,
   multipleLabel = '',
 }) => {
+  // console.log(optionList, 'optionlist_____');
   return (
     <Modal
       isVisible={isVisible}

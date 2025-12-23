@@ -1,200 +1,216 @@
-import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
-import RootView from '../../../components/RootView'
-import { useSelector } from 'react-redux'
-import { selectNavbar } from '../../../redux/reducers/navbarSlice'
-import { BANK_PAYMENT_LINK, DELETE_PAYMENT_REQUEST, GET_PAYEMENT_DETAIL, GET_PAYMENT_REQUEST_LIST, MARK_PAYMENT_AS_CANCELLED_OR_PAID } from '../../../DAL'
-import { selectUser } from '../../../redux/reducers/userSlice'
-import MyLoader from '../../../components/MyLoader'
-import FooterLoader from '../../../components/FooterLoader'
-import MyText from '../../../components/MyText'
-import EmptyView from '../../../components/EmptyView'
-import { colors } from '../../../utilities/colors'
-import UserImage from '../../../components/UserImage'
-import StatView from '../../Members/Components/StatView'
-import RequestView from './components/RequestView'
-import FAB from '../../../components/FAB'
-import { icons } from '../../../utilities/icons'
-import routes from '../../../navigation/routes'
-import OptionModal from '../../../components/OptionModal'
-import showToast from '../../../functions/showToast'
-import ConfirmationModal from '../../../components/ConfirmationModal'
-import MyRefreshControl from '../../../components/MyRefreshControl'
-import copyText from '../../../functions/copyText'
-import BankOptionModal from './components/BankOptionModal'
-import TitleView from '../../../components/TitleView'
-import MyChip from '../../../components/MyChip'
-import moment from 'moment'
-
-
+import {View, FlatList, StyleSheet, TouchableOpacity} from 'react-native';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
+import RootView from '../../../components/RootView';
+import {useSelector} from 'react-redux';
+import {selectNavbar} from '../../../redux/reducers/navbarSlice';
+import {
+  DELETE_PAYMENT_REQUEST,
+  GET_PAYEMENT_DETAIL,
+  GET_PAYMENT_REQUEST_LIST,
+  MARK_PAYMENT_AS_CANCELLED_OR_PAID,
+} from '../../../DAL';
+import {selectUser} from '../../../redux/reducers/userSlice';
+import MyLoader from '../../../components/MyLoader';
+import FooterLoader from '../../../components/FooterLoader';
+import EmptyView from '../../../components/EmptyView';
+import {colors} from '../../../utilities/colors';
+import RequestView from './components/RequestView';
+import FAB from '../../../components/FAB';
+import {icons} from '../../../utilities/icons';
+import routes from '../../../navigation/routes';
+import OptionModal from '../../../components/OptionModal';
+import showToast from '../../../functions/showToast';
+import ConfirmationModal from '../../../components/ConfirmationModal';
+import MyRefreshControl from '../../../components/MyRefreshControl';
+import BankOptionModal from './components/BankOptionModal';
+import TitleView from '../../../components/TitleView';
+import MyChip from '../../../components/MyChip';
+import moment from 'moment';
 
 let page = 0;
 let canLoadMore = false;
-const PaymentRequest = ({ navigation, route }) => {
-  const bankOptionModalRef = useRef()
-  const { value, parentValue } = route.params
-  const { navbar } = useSelector(selectNavbar);
-  const { token, access } = useSelector(selectUser);
-  const [title] = useState(navbar?.find(x => x.value == parentValue)?.child_options?.find(y => y.value == value)?.title);
+const PaymentRequest = ({navigation, route}) => {
+  const bankOptionModalRef = useRef();
+  const {value, parentValue} = route.params;
+  const {navbar} = useSelector(selectNavbar);
+  const {token, access} = useSelector(selectUser);
+  const [title] = useState(
+    navbar
+      ?.find(x => x.value == parentValue)
+      ?.child_options?.find(y => y.value == value)?.title,
+  );
   const [list, setList] = useState([]);
   const [total, setTotal] = useState(0);
   const [loader, setLoader] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [footerLoader, setFooterLoader] = useState(false);
-  const [confirmationModal, setConfirmation] = useState({ isVisible: false, item: null, text: "", type: "" })
-  const [optionModal, setOptionModal] = useState({ isVisible: false, selectedItem: null, list: [] })
-  const [sort, setSort] = useState({ isVisible: false, selected: sortList[1] })
+  const [confirmationModal, setConfirmation] = useState({
+    isVisible: false,
+    item: null,
+    text: '',
+    type: '',
+  });
+  const [optionModal, setOptionModal] = useState({
+    isVisible: false,
+    selectedItem: null,
+    list: [],
+  });
+  const [sort, setSort] = useState({isVisible: false, selected: sortList[1]});
 
   const api_payment_request_list = async (newArray = false) => {
     let res = await GET_PAYMENT_REQUEST_LIST({
-      navigation, token, page, sort: sort?.selected?.key
-    })
+      navigation,
+      token,
+      page,
+      sort: sort?.selected?.key,
+    });
     if (res.code == 200) {
-      let length = newArray ? res?.payment_request.length : list.length + res?.payment_request.length;
+      let length = newArray
+        ? res?.payment_request.length
+        : list.length + res?.payment_request.length;
       if (length < res?.total_payment_request_count) {
         page++;
         canLoadMore = true;
       } else {
         canLoadMore = false;
       }
-      setTotal(res?.total_payment_request_count)
-      setList(newArray ? res?.payment_request : [...list, ...res?.payment_request]);
+      setTotal(res?.total_payment_request_count);
+      setList(
+        newArray ? res?.payment_request : [...list, ...res?.payment_request],
+      );
       setLoader(false);
       setFooterLoader(false);
       setRefreshing(false);
     } else {
-      setLoader(false)
+      setLoader(false);
       setFooterLoader(false);
       setRefreshing(false);
     }
-  }
+  };
 
-  const deletePaymentRequest = async (item) => {
-    setLoader(true)
+  const deletePaymentRequest = async item => {
+    setLoader(true);
     let res = await DELETE_PAYMENT_REQUEST({
-      navigation, token, slug: item?.payment_request_slug
-    })
+      navigation,
+      token,
+      slug: item?.payment_request_slug,
+    });
     if (res.code == 200) {
-      showToast({ "body": res?.message, type: "success" })
-      if (res?.status == "inactive") {
+      showToast({body: res?.message, type: 'success'});
+      if (res?.status == 'inactive') {
         if (item.status) {
-          setList((list) => {
+          setList(list => {
             let index = list.findIndex(x => x._id == item?._id);
             if (index > -1) {
-              list.splice(index, 1, { ...list[index], status: false });
+              list.splice(index, 1, {...list[index], status: false});
             }
             return [...list];
           });
         }
-      } else if (res?.status == "deleted") {
-        setList((list) => list.slice().filter(x => x._id != item?._id));
+      } else if (res?.status == 'deleted') {
+        setList(list => list.slice().filter(x => x._id != item?._id));
       }
-      setLoader(false)
+      setLoader(false);
     } else {
-      setLoader(false)
-
+      setLoader(false);
     }
-  }
-
+  };
 
   const markPayemntCancelOrPaid = async (item, type, note = undefined) => {
-    setLoader(true)
+    setLoader(true);
     let res = await MARK_PAYMENT_AS_CANCELLED_OR_PAID({
-      navigation, token, slug: item?.payment_request_slug,
-      type, note
-    })
+      navigation,
+      token,
+      slug: item?.payment_request_slug,
+      type,
+      note,
+    });
     if (res.code == 200) {
-      showToast({ "body": res?.message, type: "success" })
-      changeStatus("cancelled", item)
-      setLoader(false)
+      showToast({body: res?.message, type: 'success'});
+      changeStatus('cancelled', item);
+      setLoader(false);
     } else {
-      setLoader(false)
-
+      setLoader(false);
     }
-  }
+  };
 
   const changeStatus = (type, item) => {
-
-    setList((list) => {
+    setList(list => {
       let index = list.findIndex(x => x._id == item?._id);
 
       if (index > -1) {
-        if (type == "cancelled") {
-          if (sort.selected.key == "cancelled" || sort.selected.key == "all") {
+        if (type == 'cancelled') {
+          if (sort.selected.key == 'cancelled' || sort.selected.key == 'all') {
             list.splice(index, 1, {
               ...list[index],
               is_first_paid: false,
               status: false,
               cancel_date: moment().toISOString(),
-              payment_status: "cancelled"
+              payment_status: 'cancelled',
             });
           } else {
             list.splice(index, 1);
-            setTotal((total) => --total);
+            setTotal(total => --total);
           }
-        } else if (type == "paid") {
-          if (sort.selected.key == "paid" || sort.selected.key == "all") {
+        } else if (type == 'paid') {
+          if (sort.selected.key == 'paid' || sort.selected.key == 'all') {
             list.splice(index, 1, {
               ...list[index],
               is_first_paid: true,
               status: true,
-              payment_status: "paid",
-              subscription_date: moment().toISOString()
+              payment_status: 'paid',
+              subscription_date: moment().toISOString(),
             });
           } else {
-            list.splice(index, 1)
-            setTotal((total) => --total);
+            list.splice(index, 1);
+            setTotal(total => --total);
           }
         }
       }
       return [...list];
     });
-
-  }
+  };
   const onConfirmationAgree = () => {
-    let { type, item } = confirmationModal;
-    if (type == "delete") {
+    let {type, item} = confirmationModal;
+    if (type == 'delete') {
       deletePaymentRequest(item);
-    } else if (type == "markAsCancel") {
-      markPayemntCancelOrPaid(item, "cancelled")
+    } else if (type == 'markAsCancel') {
+      markPayemntCancelOrPaid(item, 'cancelled');
     }
-    setConfirmation({ isVisible: false, item: null, text: "", type: "" })
-  }
-
+    setConfirmation({isVisible: false, item: null, text: '', type: ''});
+  };
 
   const loadMore = () => {
     if (canLoadMore) {
       canLoadMore = false;
       setFooterLoader(true);
-      api_payment_request_list()
+      api_payment_request_list();
     }
-  }
+  };
 
-
-
-  const updateListItem = (obj) => {
+  const updateListItem = obj => {
     let index = list.findIndex(x => obj._id == x._id);
     if (index > -1) {
       list.splice(index, 1, obj);
-      setList([...list])
+      setList([...list]);
     }
-  }
+  };
 
-  const appendNewRequest = (reqObj) => {
+  const appendNewRequest = reqObj => {
     // callAPI()
-    if (sort?.selected?.key == "pending" || sort?.selected?.key == "all") {
-      setList([reqObj, ...list])
-      setTotal((total) => ++total);
+    if (sort?.selected?.key == 'pending' || sort?.selected?.key == 'all') {
+      setList([reqObj, ...list]);
+      setTotal(total => ++total);
     }
-  }
+  };
 
-  const changePayStatus = (updation) => {
+  const changePayStatus = updation => {
     let index = list.findIndex(x => updation?._id == x._id);
     if (index > -1) {
-      list.splice(index, 1, { ...list[index], ...updation });
-      setList([...list])
+      list.splice(index, 1, {...list[index], ...updation});
+      setList([...list]);
     }
-  }
+  };
 
   const callAPI = (refresh = false) => {
     page = 0;
@@ -202,120 +218,162 @@ const PaymentRequest = ({ navigation, route }) => {
     if (refresh) {
       setRefreshing(true);
     } else {
-      setTotal(0)
-      setList([])
+      setTotal(0);
+      setList([]);
       setLoader(true);
     }
-    api_payment_request_list(true)
-
-  }
+    api_payment_request_list(true);
+  };
 
   useEffect(() => {
-    callAPI()
+    callAPI();
     return () => {
       page = 0;
       canLoadMore = false;
-    }
-  }, [sort?.selected?.key])
+    };
+  }, [sort?.selected?.key]);
 
   const onAddPaymentRequest = () => {
     navigation.navigate(routes.addEditPaymenyRequestScreen, {
       backScreenFunc: appendNewRequest,
     });
-  }
+  };
 
-  const onEditPaymentRequest = (item) => {
+  const onEditPaymentRequest = item => {
     navigation.navigate(routes.addEditPaymenyRequestScreen, {
       editItem: item,
-      backScreenFunc: updateListItem
+      backScreenFunc: updateListItem,
     });
-  }
+  };
 
-  const onSelectedOption = (opt) => {
-    let { selectedItem } = optionModal;
+  const onSelectedOption = opt => {
+    let {selectedItem} = optionModal;
 
-    if (opt.key == "edit") {
-      onEditPaymentRequest(selectedItem)
-    } else if (opt.key == "delete") {
+    if (opt.key == 'edit') {
+      onEditPaymentRequest(selectedItem);
+    } else if (opt.key == 'delete') {
       setTimeout(() => {
-        setConfirmation({ isVisible: true, item: selectedItem, text: "Are you sure you want to delete this payment request?", type: "delete" })
+        setConfirmation({
+          isVisible: true,
+          item: selectedItem,
+          text: 'Are you sure you want to delete this payment request?',
+          type: 'delete',
+        });
       }, 600);
-    } else if (opt.key == "detail") {
-      onTransactionalDetail(selectedItem?.payment_request_slug)
-    } else if (opt.key == "bank") {
-      getRequestDeatilForBankPayment(selectedItem?._id)
+    } else if (opt.key == 'manageProgrammeAccess') {
+      navigation.navigate(routes.manageProgrammeAccessScreen, {
+        paramsForProgramAccess: {
+          paymentRequestId: selectedItem?._id,
+        },
+      });
+    } else if (opt.key == 'agreementConfiguration') {
+      navigation.navigate(routes.agreementConfigurationScreen, {
+        paramsForAgreementConfig: {
+          paymentRequestSlug: selectedItem?.payment_request_slug,
+          paymentRequestId: selectedItem?._id,
+        },
+      });
+    } else if (opt.key == 'detail') {
+      onTransactionalDetail(selectedItem?.payment_request_slug);
+    } else if (opt.key == 'bank') {
+      getRequestDeatilForBankPayment(selectedItem?._id);
       // bankOptionModalRef?.current?.openModal(selectedItem)
       // copyBankLinkFromServer(selectedItem?._id);
-    } else if (opt.key == "markAsPaid") {
+    } else if (opt.key == 'markAsPaid') {
       navigation.navigate(routes?.markAsPaidScreen, {
         data: selectedItem,
-        changeStatus
-      })
+        changeStatus,
+      });
       // setTimeout(() => {
       //   markPaidModalRef?.current?.openModal(selectedItem)
       // }, 600);
-    } else if (opt.key == "markAsCancel") {
+    } else if (opt.key == 'markAsCancel') {
       setTimeout(() => {
-        setConfirmation({ isVisible: true, item: selectedItem, text: "Are you sure you want to cancel this payment request?", type: "markAsCancel" })
+        setConfirmation({
+          isVisible: true,
+          item: selectedItem,
+          text: 'Are you sure you want to cancel this payment request?',
+          type: 'markAsCancel',
+        });
       }, 600);
     }
 
-    setOptionModal({ isVisible: false, list: [], selectedItem: null });
-  }
+    setOptionModal({isVisible: false, list: [], selectedItem: null});
+  };
 
-
-
-  const getRequestDeatilForBankPayment = async (id) => {
+  const getRequestDeatilForBankPayment = async id => {
     setLoader(true);
-    let res = await GET_PAYEMENT_DETAIL({ navigation, token, requestId: id });
+    let res = await GET_PAYEMENT_DETAIL({navigation, token, requestId: id});
     setLoader(false);
     if (res.code == 200) {
-
       setTimeout(() => {
-        bankOptionModalRef?.current?.openModal(res)
+        bankOptionModalRef?.current?.openModal(res);
       }, 200);
       // copyText(res?.redirect_url);
       // showToast({ title: "Bank URL coppied to clipboard", type: "success" });
     }
-  }
+  };
 
-
-  const onTransactionalDetail = (slug) => {
+  const onTransactionalDetail = slug => {
     navigation.navigate(routes.PaymenyRequestDetailScreen, {
       slug: slug,
-      backScreenFunc: changePayStatus
-    })
-  }
+      backScreenFunc: changePayStatus,
+    });
+  };
 
-  const openOptionModal = (item) => {
+  const openOptionModal = item => {
     let list = [];
-    if (item?.payment_status == "paid" || item?.is_first_paid) {
-      list = optionsList.slice().filter(x => x.key != "edit");
+    if (item?.payment_status == 'paid' || item?.is_first_paid) {
+      list = optionsList.slice().filter(x => x.key != 'edit');
     } else {
-      list = optionsList
+      list = optionsList;
     }
 
-    if (access?.show_option_mark_request_as_paid && item?.payment_status == "pending" && item?.request_type === "onetime") {
-      list = [...list, paidOpt]
+    if (
+      access?.show_option_mark_request_as_paid &&
+      item?.payment_status == 'pending' &&
+      item?.request_type === 'onetime'
+    ) {
+      list = [...list, paidOpt];
     }
 
-    if (access?.show_option_mark_request_as_cancelled && item?.payment_status == "pending") {
-      list = [...list, cancelOpt]
+    // if (
+    //   access?.show_option_mark_request_as_cancelled &&
+    //   item?.payment_status == 'pending'
+    // ) {
+    //   list = [...list, cancelOpt];
+    // }
+    if (
+      access?.show_option_mark_request_as_cancelled &&
+      item?.is_first_paid == false
+    ) {
+      list = [...list, cancelOpt];
     }
 
-    if (item?.payment_status != "cancelled" && item?.payment_status != "paid" && item?.is_first_paid == false && item?.request_type == "onetime") {
-      list = [...list, bankOpt]
+    if (
+      item?.payment_status != 'cancelled' &&
+      item?.payment_status != 'paid' &&
+      item?.is_first_paid == false &&
+      item?.request_type == 'onetime'
+    ) {
+      list = [...list, bankOpt];
     }
-    setOptionModal({ isVisible: true, list: list, selectedItem: item });
-  }
+    setOptionModal({isVisible: true, list: list, selectedItem: item});
+  };
 
-  const itemView = useCallback(({ item, index }) => {
-    return (
-      <RequestView item={item} index={index} openOptionModal={openOptionModal}
-        onDetail={onTransactionalDetail}
-      />
-    )
-  }, [JSON.stringify(list)])
+  const itemView = useCallback(
+    ({item, index}) => {
+      return (
+        <RequestView
+          item={item}
+          index={index}
+          openOptionModal={openOptionModal}
+          onDetail={onTransactionalDetail}
+        />
+      );
+    },
+    [JSON.stringify(list)],
+  );
 
   const topView = () => {
     return (
@@ -326,28 +384,26 @@ const PaymentRequest = ({ navigation, route }) => {
           subTitle={`Showing ${list.length} of ${total}`}
         />
         <View style={__styles.topBtnsView}>
-
           <MyChip title={sort?.selected?.title} />
           <TouchableOpacity
-            onPress={() => setSort({ ...sort, isVisible: true })}
-            style={__styles.sortBtn} >
+            onPress={() => setSort({...sort, isVisible: true})}
+            style={__styles.sortBtn}>
             {icons.sort(colors.black, 15)}
           </TouchableOpacity>
-        </View >
-      </View >
-    )
-  }
-
+        </View>
+      </View>
+    );
+  };
 
   return (
     <RootView hideSubHeader>
       {topView()}
-      <View style={{ flex: 1, }}>
+      <View style={{flex: 1}}>
         <FlatList
           data={list}
-          contentContainerStyle={{paddingTop:10}}
+          contentContainerStyle={{paddingTop: 10}}
           showsVerticalScrollIndicator={false}
-          keyExtractor={(item) => item?._id}
+          keyExtractor={item => item?._id}
           // ListHeaderComponent={topView()}
           // stickyHeaderIndices={[0]}
           // stickyHeaderHiddenOnScroll={true}
@@ -359,111 +415,146 @@ const PaymentRequest = ({ navigation, route }) => {
           }
           renderItem={itemView}
           onEndReached={loadMore}
-          ListEmptyComponent={!loader && !refreshing && <EmptyView label={'No Payment Requests Found'} />}
+          ListEmptyComponent={
+            !loader &&
+            !refreshing && <EmptyView label={'No Payment Requests Found'} />
+          }
           ListFooterComponent={<FooterLoader isVisible={footerLoader} />}
           removeClippedSubviews={true}
           maxToRenderPerBatch={5}
           windowSize={5}
         />
       </View>
-      <FAB icon={()=>icons.plus(colors.black)} onPress={onAddPaymentRequest} />
+      <FAB
+        icon={() => icons.plus(colors.black)}
+        onPress={onAddPaymentRequest}
+      />
       <MyLoader enable={loader} />
 
       <OptionModal
         optionList={optionModal?.list}
         isVisible={optionModal?.isVisible}
         onSelected={onSelectedOption}
-        closeModal={() => setOptionModal({ selectedItem: null, isVisible: false, list: [] })}
+        closeModal={() =>
+          setOptionModal({selectedItem: null, isVisible: false, list: []})
+        }
       />
 
       <OptionModal
         optionList={sortList}
         isVisible={sort?.isVisible}
-        onSelected={(opt) => setSort({ isVisible: false, selected: opt })}
-        closeModal={() => setSort({ ...sort, isVisible: false })}
-        checkSelected={(opt) => sort.selected.key === opt?.key}
+        onSelected={opt => setSort({isVisible: false, selected: opt})}
+        closeModal={() => setSort({...sort, isVisible: false})}
+        checkSelected={opt => sort.selected.key === opt?.key}
       />
 
       <ConfirmationModal
         title={confirmationModal?.text}
-        closeModal={() => setConfirmation({ isVisible: false, item: null, type: "", text: "" })}
+        closeModal={() =>
+          setConfirmation({isVisible: false, item: null, type: '', text: ''})
+        }
         onAgree={onConfirmationAgree}
-        isVisible={confirmationModal?.isVisible} />
+        isVisible={confirmationModal?.isVisible}
+      />
 
       <BankOptionModal
         ref={bankOptionModalRef}
         token={token}
-        navigation={navigation} />
+        navigation={navigation}
+      />
     </RootView>
-  )
-}
+  );
+};
 
-export default PaymentRequest
+export default PaymentRequest;
 
 const optionsList = [
   {
-    title: "Edit",
-    key: "edit",
-    icon: icons.edit
+    title: 'Edit',
+    key: 'edit',
+    icon: icons.edit,
   },
   {
-    title: "Delete",
-    key: "delete",
-    icon: icons.trash
+    title: 'Delete',
+    key: 'delete',
+    icon: icons.trash,
   },
   {
-    title: "View Detail",
-    key: "detail",
-    icon: icons.threeLinesMenu
+    title: 'View Detail',
+    key: 'detail',
+    icon: icons.threeLinesMenu,
   },
-]
+  {
+    title: 'Agreement Configuration',
+    key: 'agreementConfiguration',
+    icon: icons.edit,
+  },
+  {
+    title: 'Manage Programme Access',
+    key: 'manageProgrammeAccess',
+    icon: icons.edit,
+  },
+];
+const agreementConfig = {
+  title: 'Agreement Configuration',
+  key: 'agreementConfiguration',
+  icon: icons.edit,
+};
+const manageProgramAccess = {
+  title: 'Manage Progress Access',
+  key: 'manageProgressAccess',
+  icon: icons.edit,
+};
 
 const sortList = [
   {
-    title: "All",
-    key: "all",
+    title: 'All',
+    key: 'all',
   },
   {
-    title: "Pending",
-    key: "pending",
+    title: 'Pending',
+    key: 'pending',
   },
   {
-    title: "Paid",
-    key: "paid",
+    title: 'Paid',
+    key: 'paid',
   },
   {
-    title: "Processing",
-    key: "processing",
+    title: 'Processing',
+    key: 'processing',
   },
   {
-    title: "Cancelled",
-    key: "cancelled",
+    title: 'Cancelled',
+    key: 'cancelled',
   },
-]
+];
 
 const bankOpt = {
-  title: "Copy Bank Payment Link",
-  key: "bank",
-  icon: icons.bank
-}
+  title: 'Copy Bank Payment Link',
+  key: 'bank',
+  icon: icons.bank,
+};
 
 const cancelOpt = {
-  title: "Mark Request As Cancelled",
-  key: "markAsCancel",
-  icon: icons.edit
-}
+  title: 'Mark Request As Cancelled',
+  key: 'markAsCancel',
+  icon: icons.edit,
+};
 
 const paidOpt = {
-  title: "Mark Request As Paid",
-  key: "markAsPaid",
-  icon: icons.edit
-}
+  title: 'Mark Request As Paid',
+  key: 'markAsPaid',
+  icon: icons.edit,
+};
 
 const __styles = StyleSheet.create({
   topView: {
-    flexDirection: "row", alignItems: "center", backgroundColor: colors.darkSecondary, paddingBottom: 5
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.darkSecondary,
+    paddingBottom: 5,
   },
-  topBtnsView: { flexDirection: "row", alignItems: "flex-end", },
+  topBtnsView: {flexDirection: 'row', alignItems: 'flex-end'},
 
   sortBtn: {
     height: 25,
@@ -471,7 +562,7 @@ const __styles = StyleSheet.create({
     borderRadius: 25 / 2,
     backgroundColor: colors.primary,
     justifyContent: 'center',
-    alignItems: "center",
-    marginLeft: 5
-  }
-})
+    alignItems: 'center',
+    marginLeft: 5,
+  },
+});

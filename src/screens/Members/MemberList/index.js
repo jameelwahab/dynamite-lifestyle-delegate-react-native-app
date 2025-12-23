@@ -77,6 +77,7 @@ import {Row} from '../../../UIComponents/FlexViews';
 import MyImage from '../../../components/MyImage';
 import isArray from '../../../functions/isArray';
 import isObject from '../../../functions/isObject';
+import TitleView from '../../../components/TitleView';
 
 let canLoadMore = false;
 let page = 0;
@@ -86,6 +87,7 @@ const MemberList = ({navigation, route}) => {
   const ref_infoModal = useRef();
   const ref_optionModal = useRef();
   const ref_confirmModal = useRef();
+  const ref_firstRender = useRef(true);
   const {type} = route?.params;
   const isAllMembers = type == 'all-member';
   const isMembers = type == 'member';
@@ -110,6 +112,7 @@ const MemberList = ({navigation, route}) => {
   const [filterData, setFilterData] = useState(null);
   const [isSavedFilterApplied, setIsSavedFilterApplied] = useState(false);
   const [isFilterApplied, setIsFilterApplied] = useState(false);
+  const [firstTimeLoad, setFirstTimeLoad] = useState(true);
   const [filterChipList, setFilterChipList] = useState([
     {
       label: sort.title,
@@ -253,6 +256,7 @@ const MemberList = ({navigation, route}) => {
       };
       list.push(nOBj);
     }
+    // ref_firstRender?.current = false;
 
     console.log(obj, 'filterobj');
     Object.keys(obj).forEach((x, i) => {
@@ -425,6 +429,7 @@ const MemberList = ({navigation, route}) => {
     setIsSavedFilterApplied(isSavedFilter);
     setFilter({...obj});
     setFilterData(data);
+    setFirstTimeLoad(false);
   };
 
   const updateLeadStatus = (leadStatus, icome, date, expiry) => {
@@ -875,7 +880,7 @@ const MemberList = ({navigation, route}) => {
               {!!Filter?.coins_range && chip(`Start Coins : ${Filter?.coins_from} - End Coins : ${Filter?.coins_to}`, () => updateFilter({ coins_range: false, coins_from: 0, coins_to: 0 }))} */}
             </View>
 
-            {filterChipList.length > 0 && (
+            {filterChipList.length > 0 && firstTimeLoad == false && (
               <View
                 style={{
                   flexDirection: 'row',

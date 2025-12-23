@@ -80,6 +80,14 @@ const TransactionView = ({item, index, timezone}) => {
           value={<PdfLinkView link={item?.agrement_pdf_url} />}
         />
         <StatView
+          title={'Marketing Affiliate Commission'}
+          value={
+            prependCurency(item?.currency) +
+            ' ' +
+            item?.marketing_affiliate_comission
+          }
+        />
+        <StatView
           title={'Date'}
           value={convertTimezone(item?.transaction_date, timezone).format(
             dateTimeFormat.date,
