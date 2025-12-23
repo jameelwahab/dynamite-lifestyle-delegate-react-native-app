@@ -1,4 +1,4 @@
-import {View, FlatList, StyleSheet} from 'react-native';
+import {View, FlatList} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import RootView from '../../../components/RootView';
 import {useSelector} from 'react-redux';
@@ -18,6 +18,7 @@ import {PaidCommissionDetailHtmlContent} from '../../../assets/html/PaidCommissi
 import {makePdfFromHtml} from '../../../functions/createPDF';
 import {fileViewer} from '../../../functions/fileViewer';
 import {STRINGS} from '../../../utilities/strings';
+import {Flex, Row} from '../../../UIComponents/FlexViews';
 
 let page = 0;
 let canLoadMore = false;
@@ -25,7 +26,6 @@ const Commission = ({navigation, route}) => {
   const {value, parentValue} = route.params;
   const {navbar} = useSelector(selectNavbar);
   const {token, user} = useSelector(selectUser);
-  console.log(user);
   const timezone = useSelector(selectTimeZone);
   const [title] = useState(
     navbar
@@ -106,7 +106,7 @@ const Commission = ({navigation, route}) => {
   const topView = () => {
     return (
       <View style={{backgroundColor: colors.darkSecondary}}>
-        <View style={{flexDirection: 'row'}}>
+        <Row>
           <CounterBox
             color={'#283C35'}
             count={commision?.total}
@@ -123,7 +123,7 @@ const Commission = ({navigation, route}) => {
             count={commision?.pending}
             subTitle={STRINGS.COMMISSION.pendingCommission}
           />
-        </View>
+        </Row>
         <View>
           <Tabs
             list={tablist}
@@ -147,7 +147,7 @@ const Commission = ({navigation, route}) => {
 
   const Mytitle = () => {
     return (
-      <View style={{flex: 1, paddingHorizontal: 10}}>
+      <Flex ph={10} flex={1}>
         <MyText fontSize={18} type="bold" color={colors.primary}>
           {title}
         </MyText>
@@ -157,12 +157,12 @@ const Commission = ({navigation, route}) => {
           color={
             colors.lightText2
           }>{`Showing ${list.length} of ${total}`}</MyText>
-      </View>
+      </Flex>
     );
   };
   return (
     <RootView hideBackBottomButton titleView={Mytitle}>
-      <View style={{flex: 1}}>
+      <Flex flex={1}>
         <FlatList
           data={list}
           onEndReached={loadMore}
@@ -172,11 +172,13 @@ const Commission = ({navigation, route}) => {
           stickyHeaderHiddenOnScroll={true}
           renderItem={itemView}
           ListEmptyComponent={
-            !loader && <EmptyView label={'No Transactions Found'} />
+            !loader && (
+              <EmptyView label={STRINGS.COMMISSION.noTransactionsFound} />
+            )
           }
           ListFooterComponent={<FooterLoader isVisible={footerLoader} />}
         />
-      </View>
+      </Flex>
 
       <MyLoader enable={loader} />
     </RootView>
@@ -184,8 +186,6 @@ const Commission = ({navigation, route}) => {
 };
 
 export default Commission;
-
-const __style = StyleSheet.create({});
 
 const tablist = [
   {key: 'credit', title: 'CREDIT'},

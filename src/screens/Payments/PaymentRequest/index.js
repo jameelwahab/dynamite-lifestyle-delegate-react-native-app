@@ -14,6 +14,7 @@ import MyLoader from '../../../components/MyLoader';
 import FooterLoader from '../../../components/FooterLoader';
 import EmptyView from '../../../components/EmptyView';
 import {colors} from '../../../utilities/colors';
+import {STRINGS} from '../../../utilities/strings';
 import RequestView from './components/RequestView';
 import FAB from '../../../components/FAB';
 import {icons} from '../../../utilities/icons';
@@ -26,6 +27,7 @@ import BankOptionModal from './components/BankOptionModal';
 import TitleView from '../../../components/TitleView';
 import MyChip from '../../../components/MyChip';
 import moment from 'moment';
+import {Flex, Row} from '../../../UIComponents/FlexViews';
 
 let page = 0;
 let canLoadMore = false;
@@ -256,7 +258,7 @@ const PaymentRequest = ({navigation, route}) => {
         setConfirmation({
           isVisible: true,
           item: selectedItem,
-          text: 'Are you sure you want to delete this payment request?',
+          text: STRINGS.PAYMENT_REQUEST.deleteConfirmation,
           type: 'delete',
         });
       }, 600);
@@ -292,7 +294,7 @@ const PaymentRequest = ({navigation, route}) => {
         setConfirmation({
           isVisible: true,
           item: selectedItem,
-          text: 'Are you sure you want to cancel this payment request?',
+          text: STRINGS.PAYMENT_REQUEST.cancelConfirmation,
           type: 'markAsCancel',
         });
       }, 600);
@@ -377,20 +379,20 @@ const PaymentRequest = ({navigation, route}) => {
 
   const topView = () => {
     return (
-      <View style={__styles.topView}>
+      <View style={styles.topView}>
         <TitleView
           title={title}
           hideBackBottomButton
-          subTitle={`Showing ${list.length} of ${total}`}
+          subTitle={`${STRINGS.PAYMENT_REQUEST.showing} ${list.length} ${STRINGS.PAYMENT_REQUEST.of} ${total}`}
         />
-        <View style={__styles.topBtnsView}>
+        <Row alignItems="flex-end">
           <MyChip title={sort?.selected?.title} />
           <TouchableOpacity
             onPress={() => setSort({...sort, isVisible: true})}
-            style={__styles.sortBtn}>
+            style={styles.sortBtn}>
             {icons.sort(colors.black, 15)}
           </TouchableOpacity>
-        </View>
+        </Row>
       </View>
     );
   };
@@ -398,15 +400,12 @@ const PaymentRequest = ({navigation, route}) => {
   return (
     <RootView hideSubHeader>
       {topView()}
-      <View style={{flex: 1}}>
+      <Flex flex={1}>
         <FlatList
           data={list}
-          contentContainerStyle={{paddingTop: 10}}
+          contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
           keyExtractor={item => item?._id}
-          // ListHeaderComponent={topView()}
-          // stickyHeaderIndices={[0]}
-          // stickyHeaderHiddenOnScroll={true}
           refreshControl={
             <MyRefreshControl
               refreshing={refreshing}
@@ -417,14 +416,18 @@ const PaymentRequest = ({navigation, route}) => {
           onEndReached={loadMore}
           ListEmptyComponent={
             !loader &&
-            !refreshing && <EmptyView label={'No Payment Requests Found'} />
+            !refreshing && (
+              <EmptyView
+                label={STRINGS.PAYMENT_REQUEST.noPaymentRequestsFound}
+              />
+            )
           }
           ListFooterComponent={<FooterLoader isVisible={footerLoader} />}
           removeClippedSubviews={true}
           maxToRenderPerBatch={5}
           windowSize={5}
         />
-      </View>
+      </Flex>
       <FAB
         icon={() => icons.plus(colors.black)}
         onPress={onAddPaymentRequest}
@@ -470,92 +473,93 @@ export default PaymentRequest;
 
 const optionsList = [
   {
-    title: 'Edit',
+    title: STRINGS.PAYMENT_REQUEST.edit,
     key: 'edit',
     icon: icons.edit,
   },
   {
-    title: 'Delete',
+    title: STRINGS.PAYMENT_REQUEST.delete,
     key: 'delete',
     icon: icons.trash,
   },
   {
-    title: 'View Detail',
+    title: STRINGS.PAYMENT_REQUEST.viewDetail,
     key: 'detail',
     icon: icons.threeLinesMenu,
   },
   {
-    title: 'Agreement Configuration',
+    title: STRINGS.PAYMENT_REQUEST.agreementConfiguration,
     key: 'agreementConfiguration',
     icon: icons.edit,
   },
   {
-    title: 'Manage Programme Access',
+    title: STRINGS.PAYMENT_REQUEST.manageProgrammeAccess,
     key: 'manageProgrammeAccess',
     icon: icons.edit,
   },
 ];
 const agreementConfig = {
-  title: 'Agreement Configuration',
+  title: STRINGS.PAYMENT_REQUEST.agreementConfiguration,
   key: 'agreementConfiguration',
   icon: icons.edit,
 };
 const manageProgramAccess = {
-  title: 'Manage Progress Access',
+  title: STRINGS.PAYMENT_REQUEST.manageProgressAccess,
   key: 'manageProgressAccess',
   icon: icons.edit,
 };
 
 const sortList = [
   {
-    title: 'All',
+    title: STRINGS.PAYMENT_REQUEST.all,
     key: 'all',
   },
   {
-    title: 'Pending',
+    title: STRINGS.PAYMENT_REQUEST.pending,
     key: 'pending',
   },
   {
-    title: 'Paid',
+    title: STRINGS.PAYMENT_REQUEST.paid,
     key: 'paid',
   },
   {
-    title: 'Processing',
+    title: STRINGS.PAYMENT_REQUEST.processing,
     key: 'processing',
   },
   {
-    title: 'Cancelled',
+    title: STRINGS.PAYMENT_REQUEST.cancelled,
     key: 'cancelled',
   },
 ];
 
 const bankOpt = {
-  title: 'Copy Bank Payment Link',
+  title: STRINGS.PAYMENT_REQUEST.copyBankPaymentLink,
   key: 'bank',
   icon: icons.bank,
 };
 
 const cancelOpt = {
-  title: 'Mark Request As Cancelled',
+  title: STRINGS.PAYMENT_REQUEST.markRequestAsCancelled,
   key: 'markAsCancel',
   icon: icons.edit,
 };
 
 const paidOpt = {
-  title: 'Mark Request As Paid',
+  title: STRINGS.PAYMENT_REQUEST.markRequestAsPaid,
   key: 'markAsPaid',
   icon: icons.edit,
 };
 
-const __styles = StyleSheet.create({
+const styles = StyleSheet.create({
+  listContent: {
+    paddingTop: 10,
+  },
   topView: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: colors.darkSecondary,
     paddingBottom: 5,
   },
-  topBtnsView: {flexDirection: 'row', alignItems: 'flex-end'},
-
   sortBtn: {
     height: 25,
     width: 25,

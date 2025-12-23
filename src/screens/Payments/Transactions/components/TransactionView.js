@@ -1,6 +1,7 @@
-import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
+import {View, TouchableOpacity} from 'react-native';
 import React from 'react';
 import {colors} from '../../../../utilities/colors';
+import {STRINGS} from '../../../../utilities/strings';
 import StatView from '../../../Members/Components/StatView';
 import MyText from '../../../../components/MyText';
 import UserImage from '../../../../components/UserImage';
@@ -8,43 +9,34 @@ import prependCurency from '../../../../functions/prependCurency';
 import openUrl from '../../../../functions/openUrl';
 import {dateTimeFormat} from '../../../../utilities/constants';
 import {convertTimezone} from '../../../../functions/convertTime';
-import {icons} from '../../../../utilities/icons';
 import {useSelector} from 'react-redux';
 import {selectUser} from '../../../../redux/reducers/userSlice';
+import {Flex, Row} from '../../../../UIComponents/FlexViews';
+import {__transactionListStyles} from '../__styles';
 
-const TransactionView = ({item, index, timezone}) => {
+const TransactionView = ({item, timezone}) => {
   const {S3_URL} = useSelector(selectUser);
 
   return (
-    <View style={__styles.itemRootView}>
-      <View style={__styles.profileView}>
+    <View style={__transactionListStyles.itemRootView}>
+      <Row alignItems="center">
         <UserImage
           image={item?.member_info?.profile_image}
           name={item?.member_info?.first_name}
           backgroundTransparent
           size={35}
         />
-        <View style={__styles.profileNameView}>
+        <Flex ml={10}>
           <MyText type="medium">
             {item?.member_info?.first_name + ' ' + item?.member_info?.last_name}
           </MyText>
 
-          {/* {item?.transaction_status == "succeeded" &&
-            <View style={{marginRight:10}}>
-              <Image source={icons.checked} style={{ height: 22, width: 22, tintColor: colors.green }} />
-            </View>} */}
           <View
-            style={{
-              backgroundColor:
-                item?.transaction_status == 'succeeded'
-                  ? colors.green + '33'
-                  : undefined,
-              alignSelf: 'flex-start',
-              borderRadius: 10,
-              paddingHorizontal: 5,
-              paddingVertical: 2,
-              marginTop: 5,
-            }}>
+            style={[
+              __transactionListStyles.statusBadge,
+              item?.transaction_status == 'succeeded' &&
+                __transactionListStyles.succeededBadge,
+            ]}>
             <MyText
               capitalize
               type="bold"
@@ -54,33 +46,36 @@ const TransactionView = ({item, index, timezone}) => {
                   : colors.transparent
               }
               fontSize={12}>
-              succeeded
+              {STRINGS.TRANSACTION_VIEW.succeeded}
             </MyText>
           </View>
-        </View>
-      </View>
+        </Flex>
+      </Row>
       <View>
         <StatView
-          title={'Program Amount'}
+          title={STRINGS.TRANSACTION_VIEW.programAmount}
           value={prependCurency(item?.currency) + ' ' + item?.amount}
         />
         <StatView
-          title={'Transaction'}
-          value={`Sale Page (${item?.sale_page?.sale_page_title} | ${item?.plan?.plan_title} | ${item?.plan?.payment_access})`}
+          title={STRINGS.TRANSACTION_VIEW.transaction}
+          value={`${STRINGS.TRANSACTION_VIEW.salePage} (${item?.sale_page?.sale_page_title} | ${item?.plan?.plan_title} | ${item?.plan?.payment_access})`}
         />
         <StatView
-          title={'Commission Amount'}
+          title={STRINGS.TRANSACTION_VIEW.commissionAmount}
           value={
             prependCurency(item?.currency) + ' ' + item?.referral_commission
           }
         />
-        <StatView title={'Transaction Mode'} value={item?.transaction_mode} />
         <StatView
-          title={'Agreement PDF'}
+          title={STRINGS.TRANSACTION_VIEW.transactionMode}
+          value={item?.transaction_mode}
+        />
+        <StatView
+          title={STRINGS.TRANSACTION_VIEW.agreementPDF}
           value={<PdfLinkView link={item?.agrement_pdf_url} />}
         />
         <StatView
-          title={'Marketing Affiliate Commission'}
+          title={STRINGS.TRANSACTION_VIEW.marketingAffiliateCommission}
           value={
             prependCurency(item?.currency) +
             ' ' +
@@ -88,7 +83,7 @@ const TransactionView = ({item, index, timezone}) => {
           }
         />
         <StatView
-          title={'Date'}
+          title={STRINGS.TRANSACTION_VIEW.date}
           value={convertTimezone(item?.transaction_date, timezone).format(
             dateTimeFormat.date,
           )}
@@ -105,30 +100,12 @@ const PdfLinkView = ({link}) => {
     return (
       <TouchableOpacity
         onPress={() => openUrl(S3_URL + link)}
-        hitSlop={{left: 5, top: 5, bottom: 5, right: 5}}
-        style={{alignSelf: 'flex-start'}}>
-        <MyText color={colors.primary}>Preview</MyText>
+        hitSlop={__transactionListStyles.hitSlop}
+        style={__transactionListStyles.pdfLinkContainer}>
+        <MyText color={colors.primary}>
+          {STRINGS.TRANSACTION_VIEW.preview}
+        </MyText>
       </TouchableOpacity>
     );
   } else return null;
 };
-
-const __styles = StyleSheet.create({
-  itemRootView: {
-    backgroundColor: colors.secondary,
-    padding: 10,
-    borderRadius: 10,
-    marginBottom: 10,
-  },
-  profileView: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  profileNameView: {
-    flex: 1,
-    marginLeft: 10,
-    // flexDirection: "row",
-    // alignItems: "center",
-    // justifyContent: "space-between"
-  },
-});

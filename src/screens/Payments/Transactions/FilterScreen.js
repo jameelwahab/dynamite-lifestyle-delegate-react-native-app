@@ -1,92 +1,88 @@
-import { View, Text, ScrollView, StyleSheet, Pressable } from 'react-native'
-import React, { useState } from 'react'
-import RootView from '../../../components/RootView'
-import MyText from '../../../components/MyText'
-import MyTouchableInput from '../../../components/MyTouchableInput'
-import { MyButton } from '../../../components/MyButton'
-import { colors } from '../../../utilities/colors'
-import OptionModal from '../../../components/OptionModal'
+import {View, ScrollView} from 'react-native';
+import React, {useState} from 'react';
+import RootView from '../../../components/RootView';
+import MyTouchableInput from '../../../components/MyTouchableInput';
+import {MyButton} from '../../../components/MyButton';
+import {STRINGS} from '../../../utilities/strings';
+import OptionModal from '../../../components/OptionModal';
+import {Flex} from '../../../UIComponents/FlexViews';
+import {__transactionFilterStyles} from './__styles';
 
-const FilterScreen = ({ navigation, route }) => {
-  const { title, changeMode, mode } = route?.params;
-  const [selectedMode, setSelectedMode] = useState(!!mode?mode:list[0]);
-  const [optionModal, setOptionModal] = useState(false)
+const FilterScreen = ({navigation, route}) => {
+  const {title, changeMode, mode} = route?.params;
+  const [selectedMode, setSelectedMode] = useState(!!mode ? mode : list[0]);
+  const [optionModal, setOptionModal] = useState(false);
 
   const onClearPress = () => {
     setSelectedMode(null);
     changeMode?.(list[0]);
     navigation.goBack();
-  }
+  };
   const onFilterPress = () => {
     changeMode?.(selectedMode);
     navigation.goBack();
-  }
+  };
 
   return (
-    <RootView title={"Filter " + title} >
-      <View style={{ flex: 1 }}>
+    <RootView title={STRINGS.TRANSACTION_FILTER.filter + ' ' + title}>
+      <Flex flex={1}>
         <ScrollView
-          contentContainerStyle={{ paddingTop: 10 }}
-          style={{ paddingHorizontal: 10 }}
+          contentContainerStyle={__transactionFilterStyles.scrollContent}
+          style={__transactionFilterStyles.scrollView}
           showsVerticalScrollIndicator={false}>
           <MyTouchableInput
-            label='Transaction Mode'
+            label={STRINGS.TRANSACTION_FILTER.transactionMode}
             onPress={() => setOptionModal(true)}
-            value={!!selectedMode ? selectedMode?.title : ""}
-            // subTextView={() => !!selectedMode && (
-            //   <Pressable
-            //     style={__styles.clearbtnView}
-            //     onPress={() => setSelectedMode(null)}>
-            //     <MyText color={colors.primary} >Clear</MyText>
-            //   </Pressable>
-            // )}
+            value={!!selectedMode ? selectedMode?.title : ''}
           />
 
-          <View style={{ flexDirection: "row", alignSelf: "flex-end", marginTop: 5 }}>
+          <View style={__transactionFilterStyles.buttonContainer}>
             <View>
-              <MyButton onPress={onClearPress} style={__styles.btn} invert title='Clear' />
+              <MyButton
+                onPress={onClearPress}
+                style={__transactionFilterStyles.btn}
+                invert
+                title={STRINGS.TRANSACTION_FILTER.clear}
+              />
             </View>
-            <View style={{ marginLeft: 15 }} >
-              <MyButton onPress={onFilterPress} style={__styles.btn} textStyle={{ color: colors.black }} title='Filter' />
+            <View style={__transactionFilterStyles.buttonSpacing}>
+              <MyButton
+                onPress={onFilterPress}
+                style={__transactionFilterStyles.btn}
+                textStyle={__transactionFilterStyles.filterButtonText}
+                title={STRINGS.TRANSACTION_FILTER.filterButton}
+              />
             </View>
           </View>
         </ScrollView>
-      </View>
+      </Flex>
       <OptionModal
         isVisible={optionModal}
         closeModal={() => setOptionModal(false)}
         optionList={list}
         noIcon
-        onSelected={(opt) => {
+        onSelected={opt => {
           setSelectedMode(opt);
-          setOptionModal(false)
+          setOptionModal(false);
         }}
       />
     </RootView>
-  )
-}
+  );
+};
 
 export default FilterScreen;
 
-const __styles = StyleSheet.create({
-  btn: {
-    paddingHorizontal: 10,
-    height: 35
+const list = [
+  {
+    key: 'all',
+    title: STRINGS.TRANSACTION_FILTER.all,
   },
-  clearbtnView: {
-    paddingBottom: 5, paddingLeft: 10, paddingRight: 5
+  {
+    key: 'sandBox',
+    title: STRINGS.TRANSACTION_FILTER.sandBox,
   },
-})
-
-const list = [{
-  key: "all",
-  title: "All"
-},
-{
-  key: "sandBox",
-  title: "Sand Box"
-},
-{
-  key: "live",
-  title: "Live"
-}]
+  {
+    key: 'live',
+    title: STRINGS.TRANSACTION_FILTER.live,
+  },
+];

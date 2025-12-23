@@ -3,13 +3,13 @@ import React, {useEffect} from 'react';
 import RootView from '../../../components/RootView';
 import {Flex, Row} from '../../../UIComponents/FlexViews';
 import ProgrammeAccessView from './components/ProgrammeAccessView';
-import {__manageProgrammeAccessStyles} from './__style';
 import SearchView from '../../../components/SearchView';
 import {MyButton} from '../../../components/MyButton';
 import MyCheckBox from '../../../components/MyCheckBox';
 import {KeyboardAwareFlatList} from 'react-native-keyboard-aware-scroll-view';
 import MyText from '../../../components/MyText';
 import {colors} from '../../../utilities/colors';
+import {STRINGS} from '../../../utilities/strings';
 import MyLoader from '../../../components/MyLoader';
 import {
   GET_PROGRAMS_AND_EVENTS,
@@ -19,6 +19,8 @@ import {useSelector} from 'react-redux';
 import {selectUser} from '../../../redux/reducers/userSlice';
 import showToast from '../../../functions/showToast';
 import MyRefreshControl from '../../../components/MyRefreshControl';
+import {icons} from '../../../utilities/icons';
+import {TextInput} from 'react-native';
 
 const ManageProgrammeAccess = ({navigation, route}) => {
   const paramsForProgramAccess = route?.params?.paramsForProgramAccess;
@@ -29,15 +31,32 @@ const ManageProgrammeAccess = ({navigation, route}) => {
   const [programmeAccessList, setProgrammeAccessList] = React.useState([]);
   const [selectedItems, setSelectedItems] = React.useState({});
   const [refreshing, setRefreshing] = React.useState(false);
+  const [searchText, setSearchText] = React.useState('');
 
   const headerView = () => {
     return (
-      <Flex style={__manageProgrammeAccessStyles.searchContainer}>
-        <SearchView />
-        <Flex style={__manageProgrammeAccessStyles.selectAllContainer}>
-          <Row justifyContent="flex-end">
+      <Flex style={styles.searchContainer}>
+        {/* <SearchView /> */}
+        <View style={styles.searchRoot}>
+          <View>{icons.search(colors.placeholder, 20)}</View>
+          <TextInput
+            style={styles.searchInput}
+            placeholderTextColor={colors.placeholder}
+            placeholder="Search..."
+            autoComplete="off"
+            autoCorrect={false}
+            autoCapitalize="none"
+            value={searchText}
+            onChangeText={text => setSearchText(text)}
+            selectionColor={colors.selection}
+            cursorColor={colors.white}
+            keyboardAppearance="dark"
+          />
+        </View>
+        <Flex style={styles.selectAllContainer}>
+          <Row justifyContent="flex-end" style={{gap: 5}}>
             <MyText type="medium" color={colors.primary}>
-              Select All{'  '}
+              {STRINGS.MANAGE_PROGRAMME_ACCESS.selectAll}
             </MyText>
             <MyCheckBox onPress={onToggleSelectAll} value={selectAll} />
           </Row>
@@ -78,11 +97,26 @@ const ManageProgrammeAccess = ({navigation, route}) => {
       );
     };
 
+  const getFilteredList = () => {
+    if (!searchText.trim()) {
+      return programmeAccessList;
+    }
+
+    return programmeAccessList.filter(item => {
+      const searchLower = searchText.toLowerCase();
+      return (
+        item?.title?.toLowerCase().includes(searchLower) ||
+        item?.program_access_type?.toLowerCase().includes(searchLower)
+      );
+    });
+  };
+
   const onToggleSelectAll = () => {
     if (selectAll) {
       setSelectedItems({});
     } else {
-      const allSelected = programmeAccessList.reduce((acc, item) => {
+      const filteredList = getFilteredList();
+      const allSelected = filteredList.reduce((acc, item) => {
         acc[item._id] = item;
         return acc;
       }, {});
@@ -133,7 +167,8 @@ const ManageProgrammeAccess = ({navigation, route}) => {
       }
     } catch (err) {
       showToast({
-        body: err?.message || 'Something went wrong',
+        body:
+          err?.message || STRINGS.MANAGE_PROGRAMME_ACCESS.somethingWentWrong,
       });
     } finally {
       setLoader(false);
@@ -150,8 +185,6 @@ const ManageProgrammeAccess = ({navigation, route}) => {
       no_of_limited_days: Number(item.no_of_limited_days) || 0,
     }));
 
-    console.log(selectedPrograms, 'selected programs to be sent');
-
     try {
       setLoader(true);
       let res = await UPDATE_PROGRAMS_AND_EVENTS({
@@ -163,12 +196,13 @@ const ManageProgrammeAccess = ({navigation, route}) => {
 
       if (res?.code === 200) {
         showToast({
-          body: 'Programme Access Updated Successfully',
+          body: STRINGS.MANAGE_PROGRAMME_ACCESS.updateSuccess,
           type: 'success',
         });
       } else {
         showToast({
-          body: res?.message || 'Something went wrong',
+          body:
+            res?.message || STRINGS.MANAGE_PROGRAMME_ACCESS.somethingWentWrong,
           type: 'error',
         });
       }
@@ -178,15 +212,16 @@ const ManageProgrammeAccess = ({navigation, route}) => {
   };
 
   useEffect(() => {
+    const filteredList = getFilteredList();
     if (
-      programmeAccessList.length > 0 &&
-      Object.keys(selectedItems).length === programmeAccessList.length
+      filteredList.length > 0 &&
+      Object.keys(selectedItems).length === filteredList.length
     ) {
       setSelectAll(true);
     } else {
       setSelectAll(false);
     }
-  }, [selectedItems, programmeAccessList]);
+  }, [selectedItems, programmeAccessList, searchText]);
 
   useEffect(() => {
     setLoader(true);
@@ -194,24 +229,24 @@ const ManageProgrammeAccess = ({navigation, route}) => {
   }, []);
 
   return (
-    <RootView title="Manage Programme Access">
+    <RootView title={STRINGS.MANAGE_PROGRAMME_ACCESS.title}>
       <Flex flex={1}>
         <KeyboardAwareFlatList
           stickyHeaderHiddenOnScroll={true}
           ListHeaderComponent={headerView()}
           stickyHeaderIndices={[0]}
-          data={programmeAccessList}
+          data={getFilteredList()}
           keyExtractor={item => item?._id?.toString()}
           renderItem={__renderItem()}
-          ItemSeparatorComponent={() => <View style={{height: 10}} />}
+          ItemSeparatorComponent={() => <View style={styles.separator} />}
           showsVerticalScrollIndicator={false}
           refreshControl={
             <MyRefreshControl onRefresh={onRefresh} refreshing={refreshing} />
           }
         />
         <MyButton
-          title="Update"
-          style={{marginVertical: 10}}
+          title={STRINGS.MANAGE_PROGRAMME_ACCESS.update}
+          style={styles.updateButton}
           onPress={updateProgramsAndEvents}
         />
         <MyLoader enable={loader} />
@@ -222,4 +257,38 @@ const ManageProgrammeAccess = ({navigation, route}) => {
 
 export default ManageProgrammeAccess;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  searchContainer: {
+    backgroundColor: colors.darkSecondary,
+    paddingHorizontal: 10,
+    paddingTop: 10,
+  },
+  selectAllContainer: {
+    paddingTop: 10,
+    borderColor: colors.white,
+    paddingRight: 10,
+  },
+  separator: {
+    height: 10,
+  },
+  updateButton: {
+    marginVertical: 10,
+  },
+  searchRoot: {
+    borderWidth: 1,
+    borderColor: colors.border,
+    height: 40,
+    marginHorizontal: 10,
+    paddingHorizontal: 10,
+    borderRadius: 10,
+    alignItems: 'center',
+    flexDirection: 'row',
+    marginBottom: 10,
+  },
+  searchInput: {
+    flex: 1,
+    paddingLeft: 10,
+    height: '100%',
+    color: colors.white,
+  },
+});

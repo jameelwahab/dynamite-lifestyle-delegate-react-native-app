@@ -1,14 +1,13 @@
 import {StyleSheet, Text, TextInput, View} from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {Flex, Row} from '../../../../UIComponents/FlexViews';
 import MyText from '../../../../components/MyText';
 import {__manageProgrammeAccessStyles} from '../__style';
-import MemberView from '../../../../components/MemberView';
 import MyCheckBox from '../../../../components/MyCheckBox';
 import UserImage from '../../../../components/UserImage';
 import StatView from '../../../../components/StatView';
 import {colors} from '../../../../utilities/colors';
-import MyInputs from '../../../../components/MyInputs';
+import {STRINGS} from '../../../../utilities/strings';
 
 const ProgrammeAccessView = ({
   item,
@@ -17,7 +16,6 @@ const ProgrammeAccessView = ({
   onChangeField,
   selectedObject,
 }) => {
-  // console.log(selectedObject, 'selectedObject in programme access view');
   const PaidView = ({value, text}) => {
     return (
       <View
@@ -48,21 +46,23 @@ const ProgrammeAccessView = ({
       </Row>
       <View>
         <StatView
-          title={'Programme Title'}
-          value={!!item?.title ? item?.title : 'N/A'}
+          title={STRINGS.MANAGE_PROGRAMME_ACCESS.programmeTitle}
+          value={!!item?.title ? item?.title : STRINGS.GENERIC.N_A}
           noFontTransform
         />
         <StatView
-          title={'Status'}
+          title={STRINGS.GENERIC.STATUS}
           view={() => (
             <PaidView
               value={item?.status}
-              text={item?.status ? 'ACTIVE' : 'INACTIVE'}
+              text={
+                item?.status ? STRINGS.GENERIC.ACTIVE : STRINGS.GENERIC.INACTIVE
+              }
             />
           )}
         />
         <StatView
-          title={'No of Start Days'}
+          title={STRINGS.MANAGE_PROGRAMME_ACCESS.noOfStartDays}
           noFontTransform
           view={() =>
             item?.program_access_type === 'limited' && (
@@ -82,7 +82,7 @@ const ProgrammeAccessView = ({
           }
         />
         <StatView
-          title={'No of End Days'}
+          title={STRINGS.MANAGE_PROGRAMME_ACCESS.noOfEndDays}
           view={() =>
             item?.program_access_type === 'limited' && (
               <TextInput

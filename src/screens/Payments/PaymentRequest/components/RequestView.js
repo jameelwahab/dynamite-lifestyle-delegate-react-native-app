@@ -1,9 +1,9 @@
-import {View, Text, StyleSheet, Pressable} from 'react-native';
+import {View, StyleSheet, Pressable} from 'react-native';
 import React from 'react';
 import StatView from '../../../Members/Components/StatView';
 import MyText from '../../../../components/MyText';
-import UserImage from '../../../../components/UserImage';
 import {colors} from '../../../../utilities/colors';
+import {STRINGS} from '../../../../utilities/strings';
 import prependCurency from '../../../../functions/prependCurency';
 import {fonts} from '../../../../utilities/fonts';
 import {MenuButton} from '../../../../components/MyButton';
@@ -14,11 +14,11 @@ import StatusView from '../../../../components/StatusView';
 
 const RequestView = ({item, index, openOptionModal, onDetail}) => {
   return (
-    <View style={__styles.itemRootView}>
-      <View style={__styles.profileView}>
+    <View style={styles.itemRootView}>
+      <View style={styles.profileView}>
         <Pressable
           onPress={() => onDetail(item?.payment_request_slug)}
-          style={[__styles.profileView, {flex: 1, marginRight: 10}]}>
+          style={[styles.profileView, styles.pressableProfile]}>
           <MemberView
             member={item?.member}
             marginLeft={0}
@@ -30,51 +30,58 @@ const RequestView = ({item, index, openOptionModal, onDetail}) => {
       </View>
       <View>
         <StatView
-          title={'Request Title'}
-          value={!!item?.request_title ? item?.request_title : 'N/A'}
-          noFontTransform
-        />
-        <StatView
-          title={'Product'}
-          value={!!item?.product?.name ? item?.product?.name : 'N/A'}
-        />
-        <StatView
-          title={'Payment Template'}
+          title={STRINGS.REQUEST_VIEW.requestTitle}
           value={
-            !!item?.payment_template?.title
-              ? item?.payment_template?.title
-              : 'N/A'
+            !!item?.request_title ? item?.request_title : STRINGS.GENERIC.N_A
           }
           noFontTransform
         />
-        <StatView title={'Request Type'} value={item?.request_type} />
         <StatView
-          title={'Total Amount'}
+          title={STRINGS.REQUEST_VIEW.product}
+          value={
+            !!item?.product?.name ? item?.product?.name : STRINGS.GENERIC.N_A
+          }
+        />
+        <StatView
+          title={STRINGS.REQUEST_VIEW.paymentTemplate}
+          value={
+            !!item?.payment_template?.title
+              ? item?.payment_template?.title
+              : STRINGS.GENERIC.N_A
+          }
+          noFontTransform
+        />
+        <StatView
+          title={STRINGS.REQUEST_VIEW.requestType}
+          value={item?.request_type}
+        />
+        <StatView
+          title={STRINGS.REQUEST_VIEW.totalAmount}
           value={prependCurency(item?.currency) + ' ' + item?.total_amount}
         />
         <StatView
-          title={'Initial Amount'}
+          title={STRINGS.REQUEST_VIEW.initialAmount}
           value={prependCurency(item?.currency) + ' ' + item?.initial_amount}
         />
         <StatView
-          title={'Installment Amount'}
+          title={STRINGS.REQUEST_VIEW.installmentAmount}
           value={
             prependCurency(item?.currency) + ' ' + item?.installment_amount
           }
         />
-        <StatView title={'Month'} value={item?.month} />
+        <StatView title={STRINGS.REQUEST_VIEW.month} value={item?.month} />
         {!!item?.sale_page && (
           <StatView
-            title={'Sale Page'}
+            title={STRINGS.REQUEST_VIEW.salePage}
             value={item?.sale_page?.sale_page_title}
           />
         )}
         <StatView
-          title={'Consider Purchasing User'}
-          value={item?.consider_purchasing_user || 'N/A'}
+          title={STRINGS.REQUEST_VIEW.considerPurchasingUser}
+          value={item?.consider_purchasing_user || STRINGS.GENERIC.N_A}
         />
         <StatView
-          title={'Lead Status'}
+          title={STRINGS.REQUEST_VIEW.leadStatus}
           view={() =>
             !!item?.payment_template?.lead_status ? (
               <StatusView
@@ -83,38 +90,42 @@ const RequestView = ({item, index, openOptionModal, onDetail}) => {
               />
             ) : (
               <MyText fontSize={12} type="medium">
-                N/A
+                {STRINGS.GENERIC.N_A}
               </MyText>
             )
           }
         />
         <StatView
-          title={'First Paid'}
+          title={STRINGS.REQUEST_VIEW.firstPaid}
           view={() => (
             <PaidView
               value={item?.is_first_paid}
               text={
                 item?.payment_status == 'cancelled'
-                  ? `Cancelled on ${moment(item?.cancel_date).format(
-                      dateTimeFormat.date,
-                    )}`
+                  ? `${STRINGS.REQUEST_VIEW.cancelledOn} ${moment(
+                      item?.cancel_date,
+                    ).format(dateTimeFormat.date)}`
                   : item?.is_first_paid
-                  ? `PAID on ${moment(item?.subscription_date).format(
-                      dateTimeFormat.date,
-                    )} `
+                  ? `${STRINGS.REQUEST_VIEW.paidOn} ${moment(
+                      item?.subscription_date,
+                    ).format(dateTimeFormat.date)} `
                   : item?.payment_status == 'processing'
-                  ? 'PROCESSING'
-                  : 'PENDING'
+                  ? STRINGS.REQUEST_VIEW.processing
+                  : STRINGS.REQUEST_VIEW.pending
               }
             />
           )}
         />
         <StatView
-          title={'Status'}
+          title={STRINGS.REQUEST_VIEW.status}
           view={() => (
             <PaidView
               value={item?.status}
-              text={item?.status ? 'ACTIVE' : 'INACTIVE'}
+              text={
+                item?.status
+                  ? STRINGS.REQUEST_VIEW.active
+                  : STRINGS.REQUEST_VIEW.inactive
+              }
             />
           )}
         />
@@ -127,12 +138,12 @@ const PaidView = ({value, text}) => {
   return (
     <View
       style={[
-        __styles.statusView,
+        styles.statusView,
         {backgroundColor: value ? colors.green + '33' : colors.delete + '33'},
       ]}>
       <MyText
         color={value ? colors.green : colors.delete}
-        style={__styles.statusText}>
+        style={styles.statusText}>
         {text}
       </MyText>
     </View>
@@ -141,7 +152,7 @@ const PaidView = ({value, text}) => {
 
 export default RequestView;
 
-const __styles = StyleSheet.create({
+const styles = StyleSheet.create({
   itemRootView: {
     backgroundColor: colors.secondary,
     padding: 10,
@@ -151,6 +162,10 @@ const __styles = StyleSheet.create({
   profileView: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  pressableProfile: {
+    flex: 1,
+    marginRight: 10,
   },
   profileNameView: {
     flex: 1,

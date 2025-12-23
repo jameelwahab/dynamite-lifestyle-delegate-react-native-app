@@ -1,50 +1,57 @@
-import { View, SafeAreaView, StyleSheet, Pressable } from 'react-native'
-import React, { forwardRef, useImperativeHandle, useState } from 'react'
+import {View, SafeAreaView, StyleSheet, Pressable} from 'react-native';
+import React, {forwardRef, useImperativeHandle, useState} from 'react';
 import Modal from 'react-native-modal';
-import { colors } from '../../../../utilities/colors';
+import {colors} from '../../../../utilities/colors';
+import {STRINGS} from '../../../../utilities/strings';
 import MyText from '../../../../components/MyText';
-import { icons } from '../../../../utilities/icons';
+import {icons} from '../../../../utilities/icons';
 import StatView from '../../../../components/StatView';
 import MyCheckBox from '../../../../components/MyCheckBox';
-import { MyButton } from '../../../../components/MyButton';
+import {MyButton} from '../../../../components/MyButton';
 import copyText from '../../../../functions/copyText';
-import { BANK_PAYMENT_LINK } from '../../../../DAL';
+import {BANK_PAYMENT_LINK} from '../../../../DAL';
 import MyLoader from '../../../../components/MyLoader';
 import Toast from 'react-native-toast-message';
 
-const BankOptionModal = forwardRef(({ navigation, token }, ref) => {
-  const [paymentCurrency, setPaymentCurrency] = useState("eur");
+const BankOptionModal = forwardRef(({navigation, token}, ref) => {
+  const [paymentCurrency, setPaymentCurrency] = useState('eur');
   const [data, setData] = useState(null);
-  const [loader, setLoader] = useState(false)
+  const [loader, setLoader] = useState(false);
 
-  useImperativeHandle(ref, () => {
-    return {
-      openModal
-    }
-  }, [])
+  useImperativeHandle(
+    ref,
+    () => {
+      return {
+        openModal,
+      };
+    },
+    [],
+  );
 
-
-  const openModal = (data) => {
-    setData(data)
-  }
+  const openModal = data => {
+    setData(data);
+  };
 
   const closeModal = () => {
     if (loader == false) {
-      setData(null)
+      setData(null);
     }
-  }
-
+  };
 
   const copyBankLinkFromServer = async () => {
     setLoader(true);
-    let res = await BANK_PAYMENT_LINK({ navigation, token, transactionId: data?.payment_request?._id, currency: paymentCurrency });
+    let res = await BANK_PAYMENT_LINK({
+      navigation,
+      token,
+      transactionId: data?.payment_request?._id,
+      currency: paymentCurrency,
+    });
     setLoader(false);
     if (res.code == 200) {
-      copyText(res?.redirect_url, "Bank URL coppied to clipboard");
-      closeModal()
+      copyText(res?.redirect_url, STRINGS.BANK_OPTION_MODAL.bankUrlCopied);
+      closeModal();
     }
-  }
-
+  };
 
   return (
     <Modal
@@ -57,64 +64,76 @@ const BankOptionModal = forwardRef(({ navigation, token }, ref) => {
       animationInTiming={300}
       animationOutTiming={300}
       hideModalContentWhileAnimating={true}
-      style={{ margin: 0, }}>
-      <SafeAreaView style={__styles.rootView}>
-        <View style={__styles.innerView}>
-          <View style={__styles.header}>
-            <MyText color={colors.primary} fontSize={20} type='medium'>Payment Request Detail</MyText>
-            <Pressable
-              hitSlop={{ top: 10, left: 10, bottom: 10, right: 10 }}
-              onPress={closeModal}>
+      style={styles.modal}>
+      <SafeAreaView style={styles.rootView}>
+        <View style={styles.innerView}>
+          <View style={styles.header}>
+            <MyText color={colors.primary} fontSize={20} type="medium">
+              {STRINGS.BANK_OPTION_MODAL.title}
+            </MyText>
+            <Pressable hitSlop={styles.hitSlop} onPress={closeModal}>
               {icons.crosss(colors.white, 25)}
             </Pressable>
           </View>
 
           <View>
             <StatView
-              title={"Name"}
+              title={STRINGS.BANK_OPTION_MODAL.name}
               value={
-                !!data?.payment_request?.member?.first_name ?
-                  data?.payment_request?.member?.first_name + " " + data?.payment_request?.member?.last_name :
-                  "N/A"} />
+                !!data?.payment_request?.member?.first_name
+                  ? data?.payment_request?.member?.first_name +
+                    ' ' +
+                    data?.payment_request?.member?.last_name
+                  : STRINGS.GENERIC.N_A
+              }
+            />
 
-            <StatView title={"Email"} original
+            <StatView
+              title={STRINGS.BANK_OPTION_MODAL.email}
+              original
               value={
-                !!data?.payment_request?.member?.email ?
-                  data?.payment_request?.member?.email :
-                  "N/A"
-              }  />
-
+                !!data?.payment_request?.member?.email
+                  ? data?.payment_request?.member?.email
+                  : STRINGS.GENERIC.N_A
+              }
+            />
           </View>
-          <View style={{ marginTop: 20 }}>
-            {!!data?.payment_in_euro?.amount &&
-              <View style={__styles.checkboxView}>
-                <View style={{ flex: 1 }}>
+          <View style={styles.checkboxContainer}>
+            {!!data?.payment_in_euro?.amount && (
+              <View style={styles.checkboxView}>
+                <View style={styles.checkboxFlex}>
                   <MyCheckBox
-                    value={paymentCurrency == "eur"}
-                    title='Payment in Euro'
-                    onPress={() => setPaymentCurrency("eur")}
+                    value={paymentCurrency == 'eur'}
+                    title={STRINGS.BANK_OPTION_MODAL.paymentInEuro}
+                    onPress={() => setPaymentCurrency('eur')}
                   />
                 </View>
-                <MyText color={colors.lightGrey} >€ {data?.payment_in_euro?.amount}</MyText>
-              </View>}
-            {!!data?.payment_in_pound?.amount &&
-              <View style={[__styles.checkboxView, { marginTop: 5 }]}>
-                <View style={{ flex: 1 }}>
+                <MyText color={colors.lightGrey}>
+                  € {data?.payment_in_euro?.amount}
+                </MyText>
+              </View>
+            )}
+            {!!data?.payment_in_pound?.amount && (
+              <View style={[styles.checkboxView, styles.checkboxSpacing]}>
+                <View style={styles.checkboxFlex}>
                   <MyCheckBox
-                    value={paymentCurrency == "gbp"}
-                    title='Payment in Pound'
-                    onPress={() => setPaymentCurrency("gbp")}
+                    value={paymentCurrency == 'gbp'}
+                    title={STRINGS.BANK_OPTION_MODAL.paymentInPound}
+                    onPress={() => setPaymentCurrency('gbp')}
                   />
                 </View>
-                <MyText color={colors.lightGrey} >£ {data?.payment_in_pound?.amount}</MyText>
-              </View>}
+                <MyText color={colors.lightGrey}>
+                  £ {data?.payment_in_pound?.amount}
+                </MyText>
+              </View>
+            )}
           </View>
 
-          <View style={__styles.btnView}>
+          <View style={styles.btnView}>
             <MyButton
-              title='Copy Bank Url'
+              title={STRINGS.BANK_OPTION_MODAL.copyBankUrl}
               invert
-              style={{ paddingHorizontal: 10 }}
+              style={styles.button}
               onPress={copyBankLinkFromServer}
             />
           </View>
@@ -124,31 +143,55 @@ const BankOptionModal = forwardRef(({ navigation, token }, ref) => {
       </SafeAreaView>
       {!!data && <Toast />}
     </Modal>
-  )
-})
+  );
+});
 
 export default BankOptionModal;
 
-const __styles = StyleSheet.create({
+const styles = StyleSheet.create({
+  modal: {
+    margin: 0,
+  },
   rootView: {
     backgroundColor: colors.secondary,
     borderRadius: 10,
   },
   innerView: {
     paddingHorizontal: 15,
-    paddingVertical: 20
+    paddingVertical: 20,
   },
   header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     borderBottomWidth: 0.5,
-    borderBottomColor: colors.white + "55",
+    borderBottomColor: colors.white + '55',
     paddingBottom: 10,
-    marginBottom: 10
+    marginBottom: 10,
+  },
+  hitSlop: {
+    top: 10,
+    left: 10,
+    bottom: 10,
+    right: 10,
+  },
+  checkboxContainer: {
+    marginTop: 20,
   },
   checkboxView: {
-    flexDirection: "row"
+    flexDirection: 'row',
   },
-  btnView: { alignItems: "flex-end", marginTop: 20 }
-})
+  checkboxFlex: {
+    flex: 1,
+  },
+  checkboxSpacing: {
+    marginTop: 5,
+  },
+  btnView: {
+    alignItems: 'flex-end',
+    marginTop: 20,
+  },
+  button: {
+    paddingHorizontal: 10,
+  },
+});

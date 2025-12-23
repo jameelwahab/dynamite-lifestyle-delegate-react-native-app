@@ -39,6 +39,7 @@ import {icons} from '../../../utilities/icons';
 import copyText from '../../../functions/copyText';
 import extractTextFromHTML from '../../../functions/extractTextFromHTML';
 import breakReference from '../../../functions/breakReference';
+import {STRINGS} from '../../../utilities/strings';
 
 const AddPaymentRequest = ({navigation, route}) => {
   const {editItem} = route?.params;
@@ -214,7 +215,11 @@ const AddPaymentRequest = ({navigation, route}) => {
 
   const addPaymentRequest = () => {
     if (!!!country && isNewMember) {
-      showToast({title: 'Alert', body: 'Please select country', type: 'info'});
+      showToast({
+        title: STRINGS.ADD_PAYMENT_REQUEST.alert,
+        body: STRINGS.ADD_PAYMENT_REQUEST.pleaseSelectCountry,
+        type: 'info',
+      });
       return;
     }
     let obj = {};
@@ -405,7 +410,7 @@ const AddPaymentRequest = ({navigation, route}) => {
 
   const infoheader = () => {
     return (
-      <View style={{alignItems: 'flex-end', marginTop: 10}}>
+      <View style={styles.infoHeaderContainer}>
         {!!settings?.bank_payment_details && (
           <MyButton
             onPress={() =>
@@ -414,8 +419,8 @@ const AddPaymentRequest = ({navigation, route}) => {
             invert
             leftIcon={icons.copy}
             noCapitalize
-            style={{paddingHorizontal: 10}}
-            title="Copy Bank Details"
+            style={styles.copyBankButton}
+            title={STRINGS.ADD_PAYMENT_REQUEST.copyBankDetails}
           />
         )}
       </View>
@@ -425,11 +430,15 @@ const AddPaymentRequest = ({navigation, route}) => {
   const topView = () => {
     return (
       <View>
-        <View style={__styles.topView}>
+        <View style={styles.topView}>
           <TitleView
-            title={!!editItem ? 'Edit Payment Request' : 'Add Payment Request'}
+            title={
+              !!editItem
+                ? STRINGS.ADD_PAYMENT_REQUEST.editPaymentRequest
+                : STRINGS.ADD_PAYMENT_REQUEST.addPaymentRequest
+            }
           />
-          <View style={__styles.topBtnsView}>
+          <View style={styles.topBtnsView}>
             {!!settings?.bank_payment_details && (
               <TouchableOpacity
                 onPress={() => {
@@ -454,33 +463,33 @@ const AddPaymentRequest = ({navigation, route}) => {
       //  title={!!editItem ? "Edit Payment Request" : "Add Payment Request"}
     >
       {topView()}
-      <View style={{flex: 1}}>
+      <View style={styles.flex1}>
         <KeyboardAwareScrollView
-          contentContainerStyle={{paddingBottom: 40, paddingTop: 10}}
+          contentContainerStyle={styles.scrollViewContent}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}>
           {/* <MyTouchableInput label='Member Type*' /> */}
 
-          <View style={__styles.boxView}>
-            <View style={__styles.boxHeadingView}>
+          <View style={styles.boxView}>
+            <View style={styles.boxHeadingView}>
               <MyText type="bold" fontSize={16}>
-                Member Info
+                {STRINGS.ADD_PAYMENT_REQUEST.memberInfo}
               </MyText>
             </View>
             {!!!editItem && (
-              <View style={{flexDirection: 'row', marginVertical: 10}}>
-                <View style={{flex: 1}}>
+              <View style={styles.checkBoxRow}>
+                <View style={styles.flex1}>
                   <MyCheckBox
                     onPress={() => setisNewMember(false)}
-                    title="Existing Member"
+                    title={STRINGS.ADD_PAYMENT_REQUEST.existingMember}
                     value={!isNewMember}
                     circle
                   />
                 </View>
-                <View style={{flex: 1}}>
+                <View style={styles.flex1}>
                   <MyCheckBox
                     onPress={() => setisNewMember(true)}
-                    title="New Member"
+                    title={STRINGS.ADD_PAYMENT_REQUEST.newMember}
                     value={isNewMember}
                     circle
                   />
@@ -490,7 +499,7 @@ const AddPaymentRequest = ({navigation, route}) => {
 
             <Collapsible collapsed={isNewMember}>
               <MyTouchableInput
-                label="Members*"
+                label={STRINGS.ADD_PAYMENT_REQUEST.members}
                 onPress={() => setMemberModalVisibility(true)}
                 value={
                   !!selectedMember
@@ -502,34 +511,36 @@ const AddPaymentRequest = ({navigation, route}) => {
 
             <Collapsible collapsed={!isNewMember}>
               <MyInputs
-                label="First Name*"
+                label={STRINGS.ADD_PAYMENT_REQUEST.firstName}
                 value={firstName}
                 onChangeText={text => setFirstName(text)}
               />
 
               <MyInputs
-                label="Last Name*"
+                label={STRINGS.ADD_PAYMENT_REQUEST.lastName}
                 value={lastName}
                 onChangeText={text => setLastName(text)}
               />
 
               <MyInputs
-                label="Email*"
+                label={STRINGS.ADD_PAYMENT_REQUEST.email}
                 value={email}
                 onChangeText={text => setEmail(text)}
               />
 
               <MyTouchableInput
-                label="Choose a country"
+                label={STRINGS.ADD_PAYMENT_REQUEST.chooseCountry}
                 value={!!country ? `${country?.flag} ${country?.name}` : ''}
                 onPress={() => setCountryModalVisibility(true)}
-                placeholder="No Country Selected..."
+                placeholder={STRINGS.ADD_PAYMENT_REQUEST.noCountrySelected}
                 subTextView={() =>
                   !!country && (
                     <Pressable
-                      style={__styles.clearbtnView}
+                      style={styles.clearbtnView}
                       onPress={() => setCountry(null)}>
-                      <MyText color={colors.primary}>Clear</MyText>
+                      <MyText color={colors.primary}>
+                        {STRINGS.ADD_PAYMENT_REQUEST.clear}
+                      </MyText>
                     </Pressable>
                   )
                 }
@@ -537,15 +548,15 @@ const AddPaymentRequest = ({navigation, route}) => {
             </Collapsible>
           </View>
 
-          <View style={[__styles.boxView, {marginTop: 30}]}>
-            <View style={__styles.boxHeadingView}>
+          <View style={[styles.boxView, styles.boxViewMarginTop]}>
+            <View style={styles.boxHeadingView}>
               <MyText type="bold" fontSize={16}>
-                Payment Request Info
+                {STRINGS.ADD_PAYMENT_REQUEST.paymentRequestInfo}
               </MyText>
             </View>
 
             <MyTouchableInput
-              label="Payment Template"
+              label={STRINGS.ADD_PAYMENT_REQUEST.paymentTemplate}
               onPress={() =>
                 setOptionModal({
                   list: paymentTemplates,
@@ -558,9 +569,11 @@ const AddPaymentRequest = ({navigation, route}) => {
               subTextView={() =>
                 !!selected?.template && (
                   <Pressable
-                    style={__styles.clearbtnView}
+                    style={styles.clearbtnView}
                     onPress={clearSelectedPaymentTemplate}>
-                    <MyText color={colors.primary}>Clear</MyText>
+                    <MyText color={colors.primary}>
+                      {STRINGS.ADD_PAYMENT_REQUEST.clear}
+                    </MyText>
                   </Pressable>
                 )
               }
@@ -570,13 +583,13 @@ const AddPaymentRequest = ({navigation, route}) => {
               opacity={!!selected?.template ? 0.6 : 1}
               pointerEvents={!!selected?.template ? 'none' : 'auto'}>
               <MyInputs
-                label="Request Title*"
+                label={STRINGS.ADD_PAYMENT_REQUEST.requestTitle}
                 value={selected?.title}
                 onChangeText={text => setSelected({title: text})}
               />
 
               <MyTouchableInput
-                label="Status"
+                label={STRINGS.ADD_PAYMENT_REQUEST.status}
                 onPress={() =>
                   setOptionModal({
                     list: statusList,
@@ -589,7 +602,7 @@ const AddPaymentRequest = ({navigation, route}) => {
               />
 
               <MyTouchableInput
-                label="Currency*"
+                label={STRINGS.ADD_PAYMENT_REQUEST.currency}
                 onPress={() =>
                   setOptionModal({
                     list: currencyList,
@@ -602,7 +615,7 @@ const AddPaymentRequest = ({navigation, route}) => {
               />
 
               <MyTouchableInput
-                label="Product*"
+                label={STRINGS.ADD_PAYMENT_REQUEST.product}
                 onPress={() =>
                   setOptionModal({
                     list: products,
@@ -615,7 +628,7 @@ const AddPaymentRequest = ({navigation, route}) => {
               />
 
               <MyTouchableInput
-                label="Programme"
+                label={STRINGS.ADD_PAYMENT_REQUEST.programme}
                 onPress={() =>
                   setOptionModal({
                     list: progammes,
@@ -628,7 +641,7 @@ const AddPaymentRequest = ({navigation, route}) => {
               />
 
               <MyTouchableInput
-                label="Payment Request Type"
+                label={STRINGS.ADD_PAYMENT_REQUEST.paymentRequestType}
                 onPress={() =>
                   setOptionModal({
                     list: requestList,
@@ -643,7 +656,7 @@ const AddPaymentRequest = ({navigation, route}) => {
               />
 
               <MyInputs
-                label="Total Amount*"
+                label={STRINGS.ADD_PAYMENT_REQUEST.totalAmount}
                 value={String(selected?.totalAmount)}
                 onChangeText={text => setSelected({totalAmount: text})}
                 keyboardType="numeric"
@@ -652,14 +665,14 @@ const AddPaymentRequest = ({navigation, route}) => {
               <Collapsible
                 collapsed={selected?.requestType?.key != 'recurring'}>
                 <MyInputs
-                  label="Initial Amount*"
+                  label={STRINGS.ADD_PAYMENT_REQUEST.initialAmount}
                   value={String(selected?.initialAmount)}
                   onChangeText={text => setSelected({initialAmount: text})}
                   keyboardType="numeric"
                 />
 
                 <MyInputs
-                  label="No. of Installments*"
+                  label={STRINGS.ADD_PAYMENT_REQUEST.noOfInstallments}
                   value={String(selected?.installments)}
                   onChangeText={text => setSelected({installments: text})}
                   keyboardType="numeric"
@@ -667,14 +680,14 @@ const AddPaymentRequest = ({navigation, route}) => {
 
                 <MyInputs
                   editable={false}
-                  label="Installments Amount*"
+                  label={STRINGS.ADD_PAYMENT_REQUEST.installmentsAmount}
                   value={String(selected?.installmentAmount)}
                   // onChangeText={(text) => setSelected({ installmentAmount: text })}
                   keyboardType="numeric"
                 />
 
                 <MyTouchableInput
-                  label="Plan Payment Type*"
+                  label={STRINGS.ADD_PAYMENT_REQUEST.planPaymentType}
                   onPress={() =>
                     setOptionModal({
                       list: planTypeList,
@@ -692,7 +705,7 @@ const AddPaymentRequest = ({navigation, route}) => {
                     selected?.planType?.key != 'custom'
                   }>
                   <MyInputs
-                    label="No. of Days*"
+                    label={STRINGS.ADD_PAYMENT_REQUEST.noOfDays}
                     value={String(selected?.noOfDays)}
                     onChangeText={text => setSelected({noOfDays: text})}
                     keyboardType="numeric"
@@ -701,14 +714,14 @@ const AddPaymentRequest = ({navigation, route}) => {
               </Collapsible>
 
               <MyInputs
-                label="VAT Number"
+                label={STRINGS.ADD_PAYMENT_REQUEST.vatNumber}
                 value={selected?.vat}
                 onChangeText={text => setSelected({vat: text})}
               />
 
               {!!selected?.leadStatus && (
                 <MyInputs
-                  label="Lead Status"
+                  label={STRINGS.ADD_PAYMENT_REQUEST.leadStatus}
                   value={selected?.leadStatus}
                   onChangeText={text => setSelected({leadStatus: text})}
                 />
@@ -716,7 +729,7 @@ const AddPaymentRequest = ({navigation, route}) => {
 
               {!!selected?.purchasingUser && (
                 <MyInputs
-                  label="Consider Purchasing User As*"
+                  label={STRINGS.ADD_PAYMENT_REQUEST.considerPurchasingUserAs}
                   capitalizeSentence={true}
                   value={
                     selected?.purchasingUser[0].toUpperCase() +
@@ -724,13 +737,13 @@ const AddPaymentRequest = ({navigation, route}) => {
                       1,
                       selected?.purchasingUser.length,
                     ) +
-                    ' Source Member'
+                    STRINGS.ADD_PAYMENT_REQUEST.sourceMember
                   }
                   onChangeText={text => setSelected({purchasingUser: text})}
                 />
               )}
               <MyTouchableInput
-                label="Sale Pages"
+                label={STRINGS.ADD_PAYMENT_REQUEST.salePages}
                 onPress={() => setShowSalePages(true)}
                 value={
                   !!selected?.sale_pages
@@ -755,15 +768,18 @@ const AddPaymentRequest = ({navigation, route}) => {
             </View> */}
 
             <MyInputs
-              label="Transaction Note"
+              label={STRINGS.ADD_PAYMENT_REQUEST.transactionNote}
               multiline
               value={selected?.note}
               onChangeText={text => setSelected({note: text})}
             />
           </View>
 
-          <View style={{marginTop: 20, paddingHorizontal: 5}}>
-            <MyButton title="Submit" onPress={addPaymentRequest} />
+          <View style={styles.submitButtonContainer}>
+            <MyButton
+              title={STRINGS.ADD_PAYMENT_REQUEST.submit}
+              onPress={addPaymentRequest}
+            />
           </View>
         </KeyboardAwareScrollView>
       </View>
@@ -772,7 +788,7 @@ const AddPaymentRequest = ({navigation, route}) => {
         isVisible={memberModalVisibility}
         closeModal={() => setMemberModalVisibility(false)}
         onSelected={onMemberSelected}
-        title="Member"
+        title={STRINGS.ADD_PAYMENT_REQUEST.member}
         optionList={memberList}
         onSearchTextChange={text => getMembers(text)}
         renderText={({item}) => (
@@ -784,7 +800,7 @@ const AddPaymentRequest = ({navigation, route}) => {
         isVisible={showSalePages}
         closeModal={() => setShowSalePages(false)}
         onSelected={onSalePageSelect}
-        title="Sale Pages"
+        title={STRINGS.ADD_PAYMENT_REQUEST.salePages}
         optionList={salePages}
         filterTheList={salePagefilter}
         titleKey={'sale_page_title'}
@@ -819,26 +835,26 @@ const memberTypeObj = {
   nurture_members: 'nurture',
 };
 const statusList = [
-  {title: 'Active', key: true},
-  {title: 'Inactive', key: false},
+  {title: STRINGS.ADD_PAYMENT_REQUEST.active, key: true},
+  {title: STRINGS.ADD_PAYMENT_REQUEST.inactive, key: false},
 ];
 const currencyList = [
-  {title: 'Dollar', key: 'usd'},
-  {title: 'UK Pounds', key: 'gbp'},
-  {title: 'Euro', key: 'eur'},
+  {title: STRINGS.ADD_PAYMENT_REQUEST.dollar, key: 'usd'},
+  {title: STRINGS.ADD_PAYMENT_REQUEST.ukPounds, key: 'gbp'},
+  {title: STRINGS.ADD_PAYMENT_REQUEST.euro, key: 'eur'},
 ];
 const requestList = [
-  {title: 'Onetime', key: 'onetime'},
-  {title: 'Recurring', key: 'recurring'},
+  {title: STRINGS.ADD_PAYMENT_REQUEST.onetime, key: 'onetime'},
+  {title: STRINGS.ADD_PAYMENT_REQUEST.recurring, key: 'recurring'},
 ];
 
 const planTypeList = [
-  {title: 'Monthly', key: 'month'},
-  {title: 'Weekly', key: 'week'},
-  {title: 'Yearly', key: 'year'},
-  {title: 'Custom', key: 'custom'},
+  {title: STRINGS.ADD_PAYMENT_REQUEST.monthly, key: 'month'},
+  {title: STRINGS.ADD_PAYMENT_REQUEST.weekly, key: 'week'},
+  {title: STRINGS.ADD_PAYMENT_REQUEST.yearly, key: 'year'},
+  {title: STRINGS.ADD_PAYMENT_REQUEST.custom, key: 'custom'},
 ];
-const __styles = StyleSheet.create({
+const styles = StyleSheet.create({
   boxView: {
     borderWidth: 0.5,
     borderColor: colors.border,

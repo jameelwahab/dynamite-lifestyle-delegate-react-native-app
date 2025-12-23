@@ -1,4 +1,4 @@
-import {View, FlatList, StyleSheet, TouchableOpacity} from 'react-native';
+import {View, FlatList, TouchableOpacity} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import RootView from '../../../components/RootView';
 import {useSelector} from 'react-redux';
@@ -18,6 +18,7 @@ import EmptyView from '../../../components/EmptyView';
 import FooterLoader from '../../../components/FooterLoader';
 import MyChip from '../../../components/MyChip';
 import {Flex, Row} from '../../../UIComponents/FlexViews';
+import {__transactionListStyles} from './__styles';
 
 let page = 0;
 let canLoadMore = false;
@@ -107,7 +108,7 @@ const Transactions = ({navigation, route}) => {
 
   const topView = () => {
     return (
-      <View style={__styles.topView}>
+      <View style={__transactionListStyles.topView}>
         <Row alignItems="center">
           <Flex flex={1}>
             <MyText fontSize={18} type="bold" color={colors.primary}>
@@ -133,15 +134,15 @@ const Transactions = ({navigation, route}) => {
 
   const headerView = () => {
     return (
-      <View style={__styles.headerView}>
-        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+      <View style={__transactionListStyles.headerView}>
+        <Row alignItems="center">
           <MyText type="bold">{STRINGS.TRANSACTION.filteredBy}</MyText>
           {mode == null || mode.key == 'all' ? (
             <MyChip title={STRINGS.TRANSACTION.all} />
           ) : (
             <MyChip title={mode?.title} onPress={() => setMode(null)} />
           )}
-        </View>
+        </Row>
         <View style={{paddingBottom: 15}}>
           <SearchView
             search={searchText}
@@ -179,14 +180,3 @@ const Transactions = ({navigation, route}) => {
 };
 
 export default Transactions;
-
-const __styles = StyleSheet.create({
-  topView: {paddingHorizontal: 10},
-  headingView: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  headerView: {
-    backgroundColor: colors.darkSecondary,
-  },
-});

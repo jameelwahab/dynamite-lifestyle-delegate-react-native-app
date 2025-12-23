@@ -1,58 +1,54 @@
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import {View, StyleSheet} from 'react-native';
 import React from 'react';
 import {colors} from '../../../../utilities/colors';
+import {STRINGS} from '../../../../utilities/strings';
 import StatView from '../../../Members/Components/StatView';
 import MyText from '../../../../components/MyText';
 import UserImage from '../../../../components/UserImage';
 import prependCurency from '../../../../functions/prependCurency';
-import openUrl from '../../../../functions/openUrl';
 import {dateTimeFormat} from '../../../../utilities/constants';
 import {convertTimezone} from '../../../../functions/convertTime';
-import numFormatter from '../../../../functions/numFormatter';
+import {Flex, Row} from '../../../../UIComponents/FlexViews';
 
-const TransactionView = ({item, index, timezone, isCredit}) => {
+const TransactionView = ({item, timezone, isCredit}) => {
   return (
-    <View style={__styles.itemRootView}>
+    <View style={styles.itemRootView}>
       {isCredit && (
         <>
           {!!item?.member_info?.first_name ? (
-            <View style={__styles.profileView}>
+            <Row alignItems="center">
               <UserImage
                 image={item?.member_info?.profile_image}
                 name={item?.member_info?.first_name}
                 backgroundTransparent
                 size={35}
               />
-              <View style={__styles.profileNameView}>
+              <Flex flex={1} ml={10}>
                 <MyText type="medium">
                   {item?.member_info?.first_name +
                     ' ' +
                     item?.member_info?.last_name}
                 </MyText>
-              </View>
-            </View>
+              </Flex>
+            </Row>
           ) : (
-            <View style={__styles.profileView}>
+            <Row alignItems="center">
               <UserImage
                 image={undefined}
                 name={item?.shipping_object?.name}
                 backgroundTransparent
                 size={35}
               />
-              <View style={__styles.profileNameView}>
+              <Flex flex={1} ml={10}>
                 <MyText type="medium">{item?.shipping_object?.name}</MyText>
-              </View>
-            </View>
+              </Flex>
+            </Row>
           )}
         </>
       )}
       <View>
-        {/* <StatView title={"Program Amount"} value={prependCurency(item?.currency) + " " + item?.amount} /> */}
-        {/* <StatView title={"Transaction"} value={`Sale Page (${item?.sale_page?.sale_page_title} | ${item?.plan?.plan_title} | ${item?.plan?.payment_access})`} /> */}
-        {/* <StatView title={"Commission Amount"} value={prependCurency(item?.currency) + " " + item?.referral_commission} /> */}
-        {/* <StatView title={"Transaction Mode"} value={item?.transaction_mode} /> */}
         <StatView
-          title={'Transaction Date'}
+          title={STRINGS.COMMISSION_TRANSACTION_VIEW.transactionDate}
           value={
             isCredit
               ? convertTimezone(item?.transaction_date, timezone).format(
@@ -64,7 +60,7 @@ const TransactionView = ({item, index, timezone, isCredit}) => {
         />
         {isCredit ? (
           <StatView
-            title={'Credit'}
+            title={STRINGS.COMMISSION_TRANSACTION_VIEW.credit}
             value={
               prependCurency(item?.currency) +
               ' ' +
@@ -73,7 +69,7 @@ const TransactionView = ({item, index, timezone, isCredit}) => {
           />
         ) : (
           <StatView
-            title={'Paid'}
+            title={STRINGS.COMMISSION_TRANSACTION_VIEW.paid}
             value={
               prependCurency(item?.currency) +
               ' ' +
@@ -88,19 +84,11 @@ const TransactionView = ({item, index, timezone, isCredit}) => {
 
 export default TransactionView;
 
-const __styles = StyleSheet.create({
+const styles = StyleSheet.create({
   itemRootView: {
     backgroundColor: colors.secondary,
     padding: 10,
     borderRadius: 10,
     marginBottom: 10,
-  },
-  profileView: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  profileNameView: {
-    flex: 1,
-    marginLeft: 10,
   },
 });
