@@ -1,14 +1,8 @@
-import {
-  View,
-  Text,
-  SafeAreaView,
-  TouchableOpacity,
-  StyleSheet,
-  FlatList,
-} from 'react-native';
+import {View, TouchableOpacity, StyleSheet, FlatList} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import RootView from '../../../components/RootView';
 import {colors} from '../../../utilities/colors';
+import {STRINGS} from '../../../utilities/strings';
 import {useSelector} from 'react-redux';
 import {selectUser} from '../../../redux/reducers/userSlice';
 import MyLoader from '../../../components/MyLoader';
@@ -19,17 +13,14 @@ import {MEMBER_DELETE_NOTE, MEMBER_NOTES_LIST} from '../../../DAL';
 import routes from '../../../navigation/routes';
 import MyWebview from '../../../components/MyWebview';
 import UserImage from '../../../components/UserImage';
-import moment from 'moment';
 import OptionModal from '../../../components/OptionModal';
 import ConfirmationModal from '../../../components/ConfirmationModal';
-import {useNavigation} from '@react-navigation/native';
 import EmptyView from '../../../components/EmptyView';
 import {convertTimezone} from '../../../functions/convertTime';
 import {selectTimeZone} from '../../../redux/reducers/timezoneSlice';
 import {dateTimeFormat} from '../../../utilities/constants';
 import AudioPlayerForList from '../../../components/AudioPlayerForList';
 const List = ({navigation, route}) => {
-  const ticket = '';
   const {memberId} = route?.params;
   const timezone = useSelector(selectTimeZone);
   const {token} = useSelector(selectUser);
@@ -56,7 +47,7 @@ const List = ({navigation, route}) => {
       setTimeout(() => {
         setConfirmationModal({
           isVisible: true,
-          title: 'Are you sure you want to delete this note?',
+          title: STRINGS.MEMBER_NOTES_LIST.deleteConfirmation,
         });
       }, 400);
       setOptionModal({...optionModal, isVisible: false});
@@ -130,7 +121,7 @@ const List = ({navigation, route}) => {
           />
 
           <View style={__styles.itemNameAndDateView}>
-            <View style={{flex: 1}}>
+            <View style={__styles.flexOne}>
               <MyText color={colors.primary} fontSize={14}>
                 {`${item?.action_info?.name} ${
                   item?.action_by == 'admin_user' ? '(Admin)' : '(Delegate)'
@@ -139,7 +130,7 @@ const List = ({navigation, route}) => {
               <MyText
                 fontSize={10}
                 color={isColoredNote ? colors.grey : colors.lightText2}>
-                {'Created at: ' +
+                {STRINGS.MEMBER_NOTES_LIST.createdAt +
                   convertTimezone(item?.note_date_time, timezone).format(
                     dateTimeFormat.dateTime,
                   )}
@@ -155,26 +146,20 @@ const List = ({navigation, route}) => {
             )}
           </View>
         </View>
-        <View style={{paddingVertical: 5}}>
+        <View style={__styles.webviewContainer}>
           <MyWebview invert={isColoredNote} html={item?.note} />
         </View>
 
         {audioUrl && (
-          <View style={{marginTop: 5}}>
+          <View style={__styles.audioContainer}>
             <AudioPlayerForList id={audioUrl} noS3Url={true} url={audioUrl} />
           </View>
         )}
 
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginTop: 5,
-          }}>
+        <View style={__styles.lastActionContainer}>
           {!!item?.last_updated_date_time ? (
             <MyText fontSize={10} color={colors.lightText2}>
-              {'Last Action: ' +
+              {STRINGS.MEMBER_NOTES_LIST.lastAction +
                 convertTimezone(item?.last_updated_date_time, timezone).format(
                   dateTimeFormat.dateTime,
                 )}
@@ -189,35 +174,23 @@ const List = ({navigation, route}) => {
 
   const topView = () => {
     return (
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'flex-end',
-          justifyContent: 'space-between',
-          paddingBottom: 5,
-        }}>
-        <View
-          style={{
-            marginLeft: 5,
-            height: 35,
-            flexDirection: 'row',
-            alignItems: 'center',
-          }}>
+      <View style={__styles.topViewContainer}>
+        <View style={__styles.topViewMemberInfo}>
           <UserImage
             image={member?.profile_image}
             name={member?.first_name}
             size={30}
           />
-          <View style={{marginLeft: 10}}>
-            <MyText
-              type="bold"
-              fontSize={
-                12
-              }>{`${member?.first_name} ${member?.last_name}`}</MyText>
-            <MyText
-              type="medium"
-              color={colors.lightText2}
-              fontSize={10}>{`${member?.email}`}</MyText>
+          <View style={__styles.topViewMemberText}>
+            <MyText type="bold" fontSize={12}>
+              {STRINGS.MEMBER_NOTES_LIST.fullName(
+                member?.first_name,
+                member?.last_name,
+              )}
+            </MyText>
+            <MyText type="medium" color={colors.lightText2} fontSize={10}>
+              {member?.email}
+            </MyText>
           </View>
         </View>
 
@@ -232,16 +205,18 @@ const List = ({navigation, route}) => {
   };
 
   return (
-    <RootView title="Personal Notes">
+    <RootView title={STRINGS.MEMBER_NOTES_LIST.title}>
       {!!member && topView()}
-      <View style={{flex: 1}}>
-        <View style={{flex: 1, marginTop: 10}}>
+      <View style={__styles.flexOne}>
+        <View style={__styles.listContainer}>
           <FlatList
             data={list}
             renderItem={renderList}
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{paddingBottom: 70}}
-            ListEmptyComponent={!loader && <EmptyView label={'No notes'} />}
+            contentContainerStyle={__styles.flatListContent}
+            ListEmptyComponent={
+              !loader && <EmptyView label={STRINGS.MEMBER_NOTES_LIST.noNotes} />
+            }
           />
         </View>
 
@@ -282,12 +257,12 @@ export default List;
 const myOptions = [
   {
     icon: icons.edit,
-    title: 'Edit',
+    title: STRINGS.MEMBER_NOTES_LIST.edit,
     type: 'edit',
   },
   {
     icon: icons.trash,
-    title: 'Delete',
+    title: STRINGS.MEMBER_NOTES_LIST.delete,
     type: 'delete',
   },
 ];
@@ -331,5 +306,46 @@ const __styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: 10,
+  },
+  flexOne: {
+    flex: 1,
+  },
+  webviewContainer: {
+    paddingVertical: 5,
+  },
+  audioContainer: {
+    marginTop: 5,
+  },
+  lastActionContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 5,
+  },
+  topViewContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+    paddingBottom: 5,
+  },
+  topViewMemberInfo: {
+    marginLeft: 5,
+    height: 35,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  topViewMemberText: {
+    marginLeft: 10,
+  },
+  topViewTotalCount: {
+    marginTop: -2,
+    paddingBottom: 5,
+  },
+  listContainer: {
+    flex: 1,
+    marginTop: 10,
+  },
+  flatListContent: {
+    paddingBottom: 70,
   },
 });

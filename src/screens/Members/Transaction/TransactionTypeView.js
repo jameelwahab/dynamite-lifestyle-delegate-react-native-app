@@ -1,7 +1,7 @@
 import React from 'react';
 import MyText from '../../../components/MyText';
 import {Flex, Row} from '../../../UIComponents/FlexViews';
-import {View} from 'react-native';
+import {View, StyleSheet} from 'react-native';
 import {colors} from '../../../utilities/colors';
 
 export const TransactionTypeView = ({item}) => {
@@ -37,25 +37,33 @@ export const TransactionTypeView = ({item}) => {
   return (
     <Row alignItems="center" flexWrap="wrap">
       <View
-        style={{
-          height: 15,
-          width: 15,
-          backgroundColor:
-            item?.transaction_status == 'succeeded'
-              ? colors.green
-              : colors.expire,
-          borderRadius: 15 / 2,
-          marginRight: 5,
-        }}
+        style={[
+          styles.statusIndicator,
+          {
+            backgroundColor:
+              item?.transaction_status == 'succeeded'
+                ? colors.green
+                : colors.expire,
+          },
+        ]}
       />
       <Flex flex={1}>
-        <MyText
-          style={{textTransform: 'capitalize'}}
-          fontSize={12}
-          type="medium">
+        <MyText style={styles.capitalize} fontSize={12} type="medium">
           {getProduct(item)}
         </MyText>
       </Flex>
     </Row>
   );
 };
+
+const styles = StyleSheet.create({
+  statusIndicator: {
+    height: 15,
+    width: 15,
+    borderRadius: 7.5,
+    marginRight: 5,
+  },
+  capitalize: {
+    textTransform: 'capitalize',
+  },
+});

@@ -19,6 +19,7 @@ import {makePdfFromHtml} from '../../../functions/createPDF';
 import {fileViewer} from '../../../functions/fileViewer';
 import {STRINGS} from '../../../utilities/strings';
 import {Flex, Row} from '../../../UIComponents/FlexViews';
+import showToast from '../../../functions/showToast';
 
 let page = 0;
 let canLoadMore = false;
@@ -44,38 +45,55 @@ const Commission = ({navigation, route}) => {
   });
 
   const downloadPDF = async () => {
-    let htmlContent = PaidCommissionDetailHtmlContent(user, list);
-    let file = await makePdfFromHtml(htmlContent, 'transaction');
-    fileViewer(file?.filePath);
+    try {
+      setLoader(true);
+      const htmlContent = PaidCommissionDetailHtmlContent(user, list);
+      const file = await makePdfFromHtml(htmlContent, 'transaction');
+      fileViewer(file?.filePath);
+    } catch (error) {
+      console.log('PDF download error:', error);
+      showToast({body: 'Failed to download PDF. Please try again.'});
+    } finally {
+      setLoader(false);
+    }
   };
 
   const api_commission_list = async (newArray = false) => {
-    let res = await GET_COMMISSION_LIST({
-      navigation,
-      token,
-      page,
-      type: tab == 0 ? 'credit' : 'paid',
-    });
-    if (res.code == 200) {
-      let length = newArray
-        ? res?.transaction.length
-        : list.length + res?.transaction.length;
-      if (length < res?.total_member_count) {
-        page++;
-        canLoadMore = true;
-      } else {
-        canLoadMore = false;
-      }
-      setTotal(res?.total_member_count);
-      setList(newArray ? res?.transaction : [...list, ...res?.transaction]);
-      setCommision({
-        paid: res?.paid_commission,
-        total: res?.total_commission,
-        pending: res?.remaining_commission,
+    try {
+      let res = await GET_COMMISSION_LIST({
+        navigation,
+        token,
+        page,
+        type: tab == 0 ? 'credit' : 'paid',
       });
+      if (res.code == 200) {
+        let length = newArray
+          ? res?.transaction.length
+          : list.length + res?.transaction.length;
+        if (length < res?.total_member_count) {
+          page++;
+          canLoadMore = true;
+        } else {
+          canLoadMore = false;
+        }
+        setTotal(res?.total_member_count);
+        setList(newArray ? res?.transaction : [...list, ...res?.transaction]);
+        setCommision({
+          paid: res?.paid_commission,
+          total: res?.total_commission,
+          pending: res?.remaining_commission,
+        });
+        setLoader(false);
+        setFooterLoader(false);
+      } else {
+        setLoader(false);
+        setFooterLoader(false);
+      }
+    } catch (error) {
+      console.log('Error in fetching commission list: ', error);
       setLoader(false);
       setFooterLoader(false);
-    } else {
+    } finally {
       setLoader(false);
       setFooterLoader(false);
     }

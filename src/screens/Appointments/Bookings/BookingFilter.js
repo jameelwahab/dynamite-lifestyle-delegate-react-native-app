@@ -1,45 +1,56 @@
-import { View, Text, StyleSheet } from 'react-native'
-import React, { useEffect, useRef, useState } from 'react'
-import RootView from '../../../components/RootView'
-import MyText from '../../../components/MyText'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import { useSelector } from 'react-redux'
-import { selectUser } from '../../../redux/reducers/userSlice'
-import { GET_BOOKING_STATUSES, GET_SALE_PAGE_LIST_FOR_BOOKING } from '../../../DAL'
-import MyLoader from '../../../components/MyLoader'
-import MyCheckBox from '../../../components/MyCheckBox'
-import MyTouchableInput from '../../../components/MyTouchableInput'
-import { icons } from '../../../utilities/icons'
-import Collapsible from 'react-native-collapsible'
-import { colors } from '../../../utilities/colors'
-import { MyButton, MyClearButton } from '../../../components/MyButton'
-import OptionModalWithSearch from '../../../components/OptionModalWithSearch'
-import MyChip from '../../../components/MyChip'
-import OptionModal from '../../../components/OptionModal'
-import CalendarModal from '../../../components/CalendarModal'
-import moment from 'moment'
-import { dateTimeFormat } from '../../../utilities/constants'
-import routes from '../../../navigation/routes'
+import {View, StyleSheet} from 'react-native';
+import React, {useEffect, useRef, useState} from 'react';
+import RootView from '../../../components/RootView';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {useSelector} from 'react-redux';
+import {selectUser} from '../../../redux/reducers/userSlice';
+import {
+  GET_BOOKING_STATUSES,
+  GET_SALE_PAGE_LIST_FOR_BOOKING,
+} from '../../../DAL';
+import MyLoader from '../../../components/MyLoader';
+import MyCheckBox from '../../../components/MyCheckBox';
+import MyTouchableInput from '../../../components/MyTouchableInput';
+import {icons} from '../../../utilities/icons';
+import Collapsible from 'react-native-collapsible';
+import {colors} from '../../../utilities/colors';
+import {MyButton, MyClearButton} from '../../../components/MyButton';
+import OptionModalWithSearch from '../../../components/OptionModalWithSearch';
+import MyChip from '../../../components/MyChip';
+import OptionModal from '../../../components/OptionModal';
+import CalendarModal from '../../../components/CalendarModal';
+import moment from 'moment';
+import {dateTimeFormat} from '../../../utilities/constants';
+import routes from '../../../navigation/routes';
+import {Flex, Row} from '../../../UIComponents/FlexViews';
+import {STRINGS} from '../../../utilities/strings';
 
-const BookingFilter = ({ navigation, route }) => {
-  const { filters: appliedFilters } = route?.params
+const BookingFilter = ({navigation, route}) => {
+  const {filters: appliedFilters} = route?.params;
   const ref_calendar = useRef();
-  const { token, } = useSelector(selectUser);
+  const {token} = useSelector(selectUser);
   const [memberlist, setMemberlist] = useState([]);
   const [pageList, setPageList] = useState([]);
   const [statusList, setStatusList] = useState([]);
   const [loader, setLoader] = useState(true);
-  const [searchText, setSearchText] = useState("")
-  const [optionModal, setOptionModal] = useState({ isVisble: false, list: [], type: "", titleKey: "" });
-  const [simpleOptionModal, setSimpleOptionModal] = useState({ isVisble: false, list: [], titleKey: "" });
+  const [searchText, setSearchText] = useState('');
+  const [optionModal, setOptionModal] = useState({
+    isVisble: false,
+    list: [],
+    type: '',
+    titleKey: '',
+  });
+  const [simpleOptionModal, setSimpleOptionModal] = useState({
+    isVisble: false,
+    list: [],
+    titleKey: '',
+  });
   const [filters, setFilters] = useState(appliedFilters);
-
-
 
   useEffect(() => {
     getBookingsPagesFromServer();
-    getBookingStatuesFromServer()
-  }, [])
+    getBookingStatuesFromServer();
+  }, []);
 
   const onClearButtonPress = () => {
     navigation.navigate(routes.bookingList, {
@@ -48,92 +59,108 @@ const BookingFilter = ({ navigation, route }) => {
         end_date: null,
         filter_by_dates: false,
         sale_page: [],
-        search_text: "",
-        sort_by: "",
+        search_text: '',
+        sort_by: '',
         start_date: null,
-      }
-    })
-  }
+      },
+    });
+  };
 
   const onSubmitButtonPress = () => {
-    navigation.navigate(routes.bookingList, { filters })
-  }
+    navigation.navigate(routes.bookingList, {filters});
+  };
 
-  const closeOptionModal = () => { setOptionModal({ isVisble: false, list: [], type: "", titleKey: "" }) }
-  const closeSimpleOptionModal = () => { setSimpleOptionModal({ isVisble: false, list: [], titleKey: "" }) }
-  const onSelected = (opt) => {
-    let { titleKey, type } = optionModal;
-    closeOptionModal()
-    if (titleKey == "sale_page_title") {
+  const closeOptionModal = () => {
+    setOptionModal({isVisble: false, list: [], type: '', titleKey: ''});
+  };
+  const closeSimpleOptionModal = () => {
+    setSimpleOptionModal({isVisble: false, list: [], titleKey: ''});
+  };
+  const onSelected = opt => {
+    let {titleKey, type} = optionModal;
+    closeOptionModal();
+    if (titleKey == 'sale_page_title') {
       filters.sale_page = [...filters.sale_page, opt];
-      setFilters({ ...filters })
-    } else if (titleKey == "title") {
+      setFilters({...filters});
+    } else if (titleKey == 'title') {
       filters.booking_status = opt;
-      setFilters({ ...filters })
+      setFilters({...filters});
     }
-  }
+  };
 
-  const onSimpleOptSelected = (opt) => {
-    let { titleKey } = simpleOptionModal;
-    closeSimpleOptionModal()
-    if (titleKey == "sort_title") {
+  const onSimpleOptSelected = opt => {
+    let {titleKey} = simpleOptionModal;
+    closeSimpleOptionModal();
+    if (titleKey == 'sort_title') {
       filters.sort_by = opt;
-      setFilters({ ...filters })
+      setFilters({...filters});
     }
-  }
+  };
 
   const onDateSelected = (date, type) => {
-    if (type == "start_date") {
-      setFilters({ ...filters, start_date: date })
-    } else if (type == "end_date") {
-      setFilters({ ...filters, end_date: date })
+    if (type == 'start_date') {
+      setFilters({...filters, start_date: date});
+    } else if (type == 'end_date') {
+      setFilters({...filters, end_date: date});
     }
-  }
+  };
 
-  const removeSalePage = (index) => {
+  const removeSalePage = index => {
     filters.sale_page.splice(index, 1);
-    setFilters({ ...filters })
-  }
+    setFilters({...filters});
+  };
 
   const filterTheList = (list, searchText) => {
     let nlist = [];
-    if (optionModal.titleKey == "sale_page_title") {
-      nlist = list.slice().filter(x => !filters.sale_page.find(y => y._id == x._id));
-    } else if (optionModal.titleKey == "title") {
+    if (optionModal.titleKey == 'sale_page_title') {
+      nlist = list
+        .slice()
+        .filter(x => !filters.sale_page.find(y => y._id == x._id));
+    } else if (optionModal.titleKey == 'title') {
       nlist = list.slice().filter(x => filters.booking_status?._id != x._id);
     }
 
-    if (searchText.trim() == "") {
+    if (searchText.trim() == '') {
       return nlist;
     } else {
-      return nlist.slice().filter(x => x[optionModal?.titleKey].toLowerCase().includes(searchText.trim().toLowerCase()))
+      return nlist
+        .slice()
+        .filter(x =>
+          x[optionModal?.titleKey]
+            .toLowerCase()
+            .includes(searchText.trim().toLowerCase()),
+        );
     }
-  }
+  };
 
   const getBookingsPagesFromServer = async () => {
-    let res = await GET_SALE_PAGE_LIST_FOR_BOOKING({ navigation, token, search: searchText.trim() });
+    let res = await GET_SALE_PAGE_LIST_FOR_BOOKING({
+      navigation,
+      token,
+      search: searchText.trim(),
+    });
     if (res.code == 200) {
       setPageList(res?.Sale_page);
-      setMemberlist(res?.members)
-      setLoader(false)
+      setMemberlist(res?.members);
+      setLoader(false);
     } else {
-      setLoader(false)
+      setLoader(false);
     }
-  }
+  };
 
   const getBookingStatuesFromServer = async () => {
-    let res = await GET_BOOKING_STATUSES({ navigation, token, });
+    let res = await GET_BOOKING_STATUSES({navigation, token});
     if (res.code == 200) {
       setStatusList(res?.active_booking_status);
-      setLoader(false)
+      setLoader(false);
     } else {
-      setLoader(false)
+      setLoader(false);
     }
-  }
+  };
 
   const selectedMembersView = () => {
     return (
-      <View style={{ flexDirection: "row", flex: 1, alignItems: "center", flexWrap: "wrap", paddingVertical: 2 }}>
+      <View style={__styles.selectedMembersView}>
         {filters?.sale_page.map((item, index) => (
           <MyChip
             key={item?._id}
@@ -142,83 +169,123 @@ const BookingFilter = ({ navigation, route }) => {
           />
         ))}
       </View>
-    )
-  }
+    );
+  };
 
   return (
-    <RootView title='Filter' >
+    <RootView title={STRINGS.BOOKING_FILTER.filter}>
       <KeyboardAwareScrollView
-        contentContainerStyle={{ marginTop: 10, marginHorizontal: 10 }}>
-
-        <View style={{ marginBottom: 10 }}>
+        contentContainerStyle={{marginTop: 10, marginHorizontal: 10}}>
+        <View style={{marginBottom: 10}}>
           <MyCheckBox
-            onPress={() => setFilters({ ...filters, filter_by_dates: !filters?.filter_by_dates })}
+            onPress={() =>
+              setFilters({
+                ...filters,
+                filter_by_dates: !filters?.filter_by_dates,
+              })
+            }
             value={filters?.filter_by_dates}
-            title='Filter By Booking Dates'
+            title={STRINGS.BOOKING_FILTER.filterByBookingDates}
           />
         </View>
 
-        <Collapsible collapsed={!filters?.filter_by_dates} >
-          <View style={__styles.row}>
-            <View style={__styles.rowItem}>
+        <Collapsible collapsed={!filters?.filter_by_dates}>
+          <Row>
+            <Flex flex={1}>
               <MyTouchableInput
-                label='From'
+                label={STRINGS.BOOKING_FILTER.from}
                 icon={() => icons.calendar(colors.primary)}
-                onPress={() => ref_calendar?.current?.openModal(filters?.start_date, "start_date")}
-                value={!!filters?.start_date ? moment(filters?.start_date).format(dateTimeFormat.date) : ""}
+                onPress={() =>
+                  ref_calendar?.current?.openModal(
+                    filters?.start_date,
+                    'start_date',
+                  )
+                }
+                value={
+                  !!filters?.start_date
+                    ? moment(filters?.start_date).format(dateTimeFormat.date)
+                    : ''
+                }
               />
-            </View>
-            <View style={[__styles.rowItem, { marginLeft: 10 }]}>
+            </Flex>
+            <Flex flex={1} ml={20}>
               <MyTouchableInput
-                label='To'
+                label={STRINGS.BOOKING_FILTER.to}
                 icon={() => icons.calendar(colors.primary)}
-                onPress={() => ref_calendar?.current?.openModal(filters?.end_date, "end_date")}
-                value={!!filters?.end_date ? moment(filters?.end_date).format(dateTimeFormat.date) : ""}
+                onPress={() =>
+                  ref_calendar?.current?.openModal(
+                    filters?.end_date,
+                    'end_date',
+                  )
+                }
+                value={
+                  !!filters?.end_date
+                    ? moment(filters?.end_date).format(dateTimeFormat.date)
+                    : ''
+                }
               />
-            </View>
-          </View>
+            </Flex>
+          </Row>
         </Collapsible>
 
-
         <MyTouchableInput
-          label='Select Booking Pages'
-          iconOnPress={() => setOptionModal({ isVisble: true, list: pageList, titleKey: "sale_page_title", type: "Booking Page" })}
+          label={STRINGS.BOOKING_FILTER.selectBookingPages}
+          iconOnPress={() =>
+            setOptionModal({
+              isVisble: true,
+              list: pageList,
+              titleKey: 'sale_page_title',
+              type: STRINGS.BOOKING_FILTER.bookingPage,
+            })
+          }
           view={selectedMembersView}
         />
 
-
         <MyTouchableInput
-          label='Select Booking Status'
-          onPress={() => setOptionModal({ isVisble: true, list: statusList, titleKey: "title", type: "Booking Status" })}
+          label={STRINGS.BOOKING_FILTER.selectBookingStatus}
+          onPress={() =>
+            setOptionModal({
+              isVisble: true,
+              list: statusList,
+              titleKey: 'title',
+              type: STRINGS.BOOKING_FILTER.bookingStatus,
+            })
+          }
           titleKey={optionModal?.titleKey}
           value={filters?.booking_status?.title}
           clearbutton={!!filters?.booking_status}
-          onClearButtonPress={() => setFilters({ ...filters, booking_status: null })}
+          onClearButtonPress={() =>
+            setFilters({...filters, booking_status: null})
+          }
         />
 
         <MyTouchableInput
-          label='Sort By'
-          onPress={() => setSimpleOptionModal({ isVisble: true, list: sortList, titleKey: "sort_title" })}
+          label={STRINGS.BOOKING_FILTER.sortBy}
+          onPress={() =>
+            setSimpleOptionModal({
+              isVisble: true,
+              list: sortList,
+              titleKey: 'sort_title',
+            })
+          }
           value={filters?.sort_by?.sort_title}
         />
 
-        <View style={{ flexDirection: "row", marginTop: 10 }}>
+        <Row style={{marginTop: 10}}>
           {/* {(!!appliedFilters?.createdFor) ? */}
           <MyClearButton
-            style={{ flex: 1, marginRight: 10 }}
-            title='Clear Filter'
+            style={{flex: 1, marginRight: 10}}
+            title={STRINGS.BOOKING_FILTER.clearFilter}
             onPress={onClearButtonPress}
           />
           {/* : <View style={[{ marginRight: 11 }, __styles.btn]} />} */}
 
-
           <MyButton
             style={__styles.btn}
-            title='Submit'
+            title={STRINGS.GENERIC.SUBMIT}
             onPress={onSubmitButtonPress}
           />
-
-        </View>
+        </Row>
 
         <OptionModalWithSearch
           isVisible={optionModal.isVisble}
@@ -234,51 +301,49 @@ const BookingFilter = ({ navigation, route }) => {
         <OptionModal
           isVisible={simpleOptionModal?.isVisble}
           optionList={simpleOptionModal?.list}
-          checkSelected={(opt) => filters?.sort_by?.key == opt?.key}
+          checkSelected={opt => filters?.sort_by?.key == opt?.key}
           onSelected={onSimpleOptSelected}
           titleKey={simpleOptionModal?.titleKey}
           closeModal={closeSimpleOptionModal}
         />
 
-        <CalendarModal
-          ref={ref_calendar}
-          onDateSelected={onDateSelected}
-        />
-
+        <CalendarModal ref={ref_calendar} onDateSelected={onDateSelected} />
       </KeyboardAwareScrollView>
       <MyLoader enable={loader} />
     </RootView>
-  )
-}
+  );
+};
 
-export default BookingFilter
+export default BookingFilter;
 
-const sortList = [{
-  sort_title: "Call booked Newest First",
-  key: "call_booked_newest_first"
-},
-{
-  sort_title: "Call booked Oldest First",
-  key: "call_booked_oldest_first"
-}]
+const sortList = [
+  {
+    sort_title: 'Call booked Newest First',
+    key: 'call_booked_newest_first',
+  },
+  {
+    sort_title: 'Call booked Oldest First',
+    key: 'call_booked_oldest_first',
+  },
+];
 
 const __styles = StyleSheet.create({
-  row: {
-    flexDirection: "row",
-  },
-  rowItem: {
-    flex: 1
-  },
   clearBtnText: {
-    color: colors.delete
+    color: colors.delete,
   },
   btn: {
-    flex: 1
+    flex: 1,
   },
   clearBtn: {
-    // marginTop: 20,
     borderColor: colors.delete,
-    backgroundColor: colors.delete + "22",
-    marginRight: 10
+    backgroundColor: colors.delete + '22',
+    marginRight: 10,
   },
-})
+  selectedMembersView: {
+    flexDirection: 'row',
+    flex: 1,
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    paddingVertical: 2,
+  },
+});

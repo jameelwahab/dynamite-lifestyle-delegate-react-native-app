@@ -1,20 +1,39 @@
-import { View, Text, SafeAreaView, StyleSheet, FlatList, Pressable, TouchableOpacity, TextInput, ActivityIndicator, Platform, ScrollView } from 'react-native'
-import React, { useEffect, useRef, useState } from 'react'
+import {
+  View,
+  Text,
+  SafeAreaView,
+  StyleSheet,
+  FlatList,
+  Pressable,
+  TouchableOpacity,
+  TextInput,
+  ActivityIndicator,
+  Platform,
+  ScrollView,
+} from 'react-native';
+import React, {useEffect, useRef, useState} from 'react';
 import Modal from 'react-native-modal';
-import { colors } from '../../../utilities/colors';
+import {STRINGS} from '../../../utilities/strings';
+import {colors} from '../../../utilities/colors';
 import MyText from '../../../components/MyText';
-import CollapsibleText from '../../../components/CollapsibleText';
 import UserImage from '../../../components/UserImage';
-import { convertTimezone } from '../../../functions/convertTime';
-import { icons } from '../../../utilities/icons';
-import { fonts } from '../../../utilities/fonts';
+import {convertTimezone} from '../../../functions/convertTime';
+import {icons} from '../../../utilities/icons';
+import {fonts} from '../../../utilities/fonts';
 import EmptyView from '../../../components/EmptyView';
-import MyLoader, { SimpleLoader } from '../../../components/MyLoader';
+import MyLoader, {SimpleLoader} from '../../../components/MyLoader';
 import Toast from 'react-native-toast-message';
 import FooterLoader from '../../../components/FooterLoader';
 import OptionModal from '../../../components/OptionModal';
 import showToast from '../../../functions/showToast';
-import { ADD_COMMENT, ADD_COMMENT_V2, COMMENT_LIKE_ACTIONS, DELETE_COMMENT, EDIT_COMMENT, EDIT_COMMENT_V2, GET_CHILD_COMMENT_LIST, GET_DELEGATES_LIST_FROM_SERVER_FOR_MENTION_V1 } from '../../../DAL';
+import {
+  ADD_COMMENT_V2,
+  COMMENT_LIKE_ACTIONS,
+  DELETE_COMMENT,
+  EDIT_COMMENT_V2,
+  GET_CHILD_COMMENT_LIST,
+  GET_DELEGATES_LIST_FROM_SERVER_FOR_MENTION_V1,
+} from '../../../DAL';
 import ConfirmationModal from '../../../components/ConfirmationModal';
 import LikeModalForComments from './LikeModalForComments';
 import ImageUploadModal from '../../../components/ImageUploadModal';
@@ -25,18 +44,16 @@ import MemberView from '../../../components/MemberView';
 import FeedText from '../../../components/FeedText';
 import breakReference from '../../../functions/breakReference';
 import numFormatter from '../../../functions/numFormatter';
-import { onChatScreen } from '../../../functions/onChatScreen';
+import {onChatScreen} from '../../../functions/onChatScreen';
 import isArray from '../../../functions/isArray';
-import { useSelector } from 'react-redux'
-import { selectUser } from '../../../redux/reducers/userSlice'
+import {useSelector} from 'react-redux';
+import {selectUser} from '../../../redux/reducers/userSlice';
 import isObject from '../../../functions/isObject';
-
 
 let commentCursor = {
   start: 0,
-  end: 0
+  end: 0,
 };
-
 
 const CommentModal = ({
   isVisible,
@@ -62,24 +79,24 @@ const CommentModal = ({
   onCommentMessagePress,
   hasEditDeleteAccess,
   isChatAllowed,
-  keywords
+  keywords,
 }) => {
-  const { access, S3_URL } = useSelector(selectUser);
+  const {access, S3_URL} = useSelector(selectUser);
   const cmtTextInputRef = useRef();
   const likeModalRef = useRef();
-  const [commentText, setCommentText] = useState("");
+  const [commentText, setCommentText] = useState('');
   const [commentImage, setCommentImage] = useState(null);
-  const [imageModalVisibility, setImageModalVisibility] = useState(false)
+  const [imageModalVisibility, setImageModalVisibility] = useState(false);
   const [isLoading, setLoader] = useState(false);
   const [selectedComment, setSelectedComment] = useState(null);
   const [selectedReplyComment, setSelectedReplyComment] = useState(null);
-  const [selectedCommentFor, setSelectedCommentFor] = useState("");
-  const [imageForZoom, setImageForZoom] = useState("")
+  const [selectedCommentFor, setSelectedCommentFor] = useState('');
+  const [imageForZoom, setImageForZoom] = useState('');
   const [confirmation, setConfirmation] = useState({
-    title: "",
+    title: '',
     selectedItem: null,
     isVisible: false,
-  })
+  });
   const [options, setOptions] = useState({
     isVisible: false,
     selectedItem: null,
@@ -92,60 +109,55 @@ const CommentModal = ({
   const [_at_index, set_at_index] = useState(-1);
   const [childCommentLoader, setChildCommentLoader] = useState({});
 
+  const [selectedKeyword, setSelectedKeyword] = useState(null);
 
-  const [selectedKeyword, setSelectedKeyword] = useState(null)
-
-  const onMessagePress = (item) => {
-    onCommentMessagePress?.(item)
-  }
+  const onMessagePress = item => {
+    onCommentMessagePress?.(item);
+  };
 
   useEffect(() => {
-
     let text = commentText;
-    if (text[commentCursor?.start] == "@" || text == "@") {
+    if (text[commentCursor?.start] == '@' || text == '@') {
       // let _at_index = !!commentCursor?.start ? commentCursor?.start : 0;
       let _at_index = !!text[commentCursor?.start] ? commentCursor?.start : 0;
-      set_at_index(_at_index)
+      set_at_index(_at_index);
       setIsMentionListVisible(true);
-      getTheDelegateListFromServer(extractSubstring(text, _at_index))
+      getTheDelegateListFromServer(extractSubstring(text, _at_index));
     }
 
-    if ((text[_at_index] != "@") && isMentionListVisible == true) {
+    if (text[_at_index] != '@' && isMentionListVisible == true) {
       setIsMentionListVisible(false);
-      set_at_index(-1)
+      set_at_index(-1);
     }
     if (isMentionListVisible) {
-      getTheDelegateListFromServer(extractSubstring(text))
+      getTheDelegateListFromServer(extractSubstring(text));
     }
 
-    if (text.trim() == "" && mentionList.length > 0) {
-      setMentionList([])
+    if (text.trim() == '' && mentionList.length > 0) {
+      setMentionList([]);
     }
-
-  }, [commentText])
+  }, [commentText]);
 
   useEffect(() => {
     if (isMentionListVisible == false) {
-      getTheDelegateListFromServer("");
+      getTheDelegateListFromServer('');
     }
-  }, [isMentionListVisible])
-
+  }, [isMentionListVisible]);
 
   function extractSubstring(str, sIndex) {
-
     let startIndex;
 
     if (!!sIndex) {
-      startIndex = sIndex
+      startIndex = sIndex;
     } else {
       startIndex = _at_index + 1;
     }
     let endIndex = commentCursor?.start;
-    string = str.substring(startIndex, (endIndex + 1));
+    string = str.substring(startIndex, endIndex + 1);
     if (string[0] == '@') {
       string = string.substring(1);
     }
-    return string
+    return string;
   }
 
   function replaceSubstring(str, startIndex, endIndex, replacement) {
@@ -156,99 +168,114 @@ const CommentModal = ({
     if (endIndex != -1) {
       str1 += str.substring(endIndex);
     }
-    return str1
+    return str1;
   }
-
 
   const replaceString = (str, index, replacement) => {
     // if (index > str.length - 1) {
     //   return str;
     // }
     // let endINdex = getSubstringToSpaceEndIndex(str, _at_index);
-    let endINdex = commentCursor.start
-    return replaceSubstring(str + " ", index, endINdex, replacement)
-
-  }
-
-
+    let endINdex = commentCursor.start;
+    return replaceSubstring(str + ' ', index, endINdex, replacement);
+  };
 
   const chnageTheIndexes = (text, oldText) => {
     let cursorPosition = commentCursor?.start;
 
     if (mentionList.length > 0) {
       let diff = text.length - oldText.length;
-      let list = [...mentionList]
-      let index = list.findIndex(x => cursorPosition > x?.offset && cursorPosition < (x?.offset + x?.length));
+      let list = [...mentionList];
+      let index = list.findIndex(
+        x =>
+          cursorPosition > x?.offset && cursorPosition < x?.offset + x?.length,
+      );
       if (index > -1) {
-        if (list[index]?.type == "keyword") {
-          setSelectedKeyword(null)
+        if (list[index]?.type == 'keyword') {
+          setSelectedKeyword(null);
         }
-        list.splice(index, 1)
+        list.splice(index, 1);
       }
       list.forEach((item, index) => {
         if (cursorPosition <= item?.offset) {
-          item.offset = item?.offset + diff
+          item.offset = item?.offset + diff;
         }
-      })
-      setMentionList([...list])
+      });
+      setMentionList([...list]);
     }
+  };
 
-  }
-
-
-  const textHandler = (text) => {
-    if (text.trim() == "" || text.trim().length == 1 && mentionList.length > 0) {
-      setMentionList([])
+  const textHandler = text => {
+    if (
+      text.trim() == '' ||
+      (text.trim().length == 1 && mentionList.length > 0)
+    ) {
+      setMentionList([]);
     }
-    chnageTheIndexes(text, commentText)
-    setCommentText(text)
+    chnageTheIndexes(text, commentText);
+    setCommentText(text);
+  };
 
-  }
-
-  const onPressOnMentions = (obj, type = "mention") => {
+  const onPressOnMentions = (obj, type = 'mention') => {
     let index = _at_index < 0 ? 0 : _at_index;
-    if (type == "keyword") {
-      index = commentCursor?.start > -1 ? commentCursor?.start : 0
+    if (type == 'keyword') {
+      index = commentCursor?.start > -1 ? commentCursor?.start : 0;
     }
-    let mentionStr = type == "keyword" ? obj?.value : type == "mention" ? `${obj?.first_name} ${obj?.last_name}` : "";
+    let mentionStr =
+      type == 'keyword'
+        ? obj?.value
+        : type == 'mention'
+        ? `${obj?.first_name} ${obj?.last_name}`
+        : '';
     let diff = extractSubstring(commentText, index).length;
-    mentionList.forEach((item) => {
+    mentionList.forEach(item => {
       if (index < item.offset) {
-        item.offset = item.offset + (mentionStr.trim().length - diff)
+        item.offset = item.offset + (mentionStr.trim().length - diff);
       }
-    })
+    });
 
-    let arr = [...mentionList, {
-      ...obj,
-      offset: index,
-      length: mentionStr.trim().length,
-      type: type
-    }];
+    let arr = [
+      ...mentionList,
+      {
+        ...obj,
+        offset: index,
+        length: mentionStr.trim().length,
+        type: type,
+      },
+    ];
     arr.sort((a, b) => a.offset - b.offset);
 
     setMentionList(arr);
 
     setIsMentionListVisible(false);
     setDelegateList([]);
-    if (type == "keyword") {
-      setSelectedKeyword(obj)
+    if (type == 'keyword') {
+      setSelectedKeyword(obj);
     }
     setCommentText(replaceString(commentText, index, mentionStr.trim()));
-    set_at_index(-1)
-  }
+    set_at_index(-1);
+  };
 
   const replaceAndHighlight = str => {
     let parts = [];
     let lastIndex = 0;
 
-
     mentionList.forEach(user => {
       let startIndex = user?.offset;
-      let endIndex = user?.offset + user?.length
+      let endIndex = user?.offset + user?.length;
       if (lastIndex < startIndex) {
         parts.push(str.slice(lastIndex, startIndex));
       }
-      parts.push(<Text style={user?.type == "keyword" ? __style.highlightKeyword : __style.mentionUserText} >{str.substring(startIndex, endIndex)}</Text>);
+      parts.push(
+        <Text
+          style={
+            user?.type == 'keyword'
+              ? __style.highlightKeyword
+              : __style.mentionUserText
+          }>
+          {str.substring(startIndex, endIndex)}
+        </Text>,
+      );
       lastIndex = endIndex;
     });
 
@@ -256,122 +283,139 @@ const CommentModal = ({
       parts.push(str.slice(lastIndex));
     }
 
-    return parts
-  }
+    return parts;
+  };
 
-  const getTheDelegateListFromServer = async (text) => {
-			if(!isVisible) return;
+  const getTheDelegateListFromServer = async text => {
+    if (!isVisible) return;
     setMentionListLoading(true);
     let res = await GET_DELEGATES_LIST_FROM_SERVER_FOR_MENTION_V1({
-      navigation, token, data: {
+      navigation,
+      token,
+      data: {
         search_text: text,
-        community_levels: !isNoteMainFeed ? feedCreatedFor.map(el=>el?._id) : undefined,
+        community_levels: !isNoteMainFeed
+          ? feedCreatedFor.map(el => el?._id)
+          : undefined,
         event_id: isNoteMainFeed ? eventId : undefined,
-        list_type: isCosmos ? "the_cosmos" : "the_source",
-        allow_all_option_in_mention_feed: !isCosmos && !isNoteMainFeed ? access.allow_all_option_in_mention_feed : undefined,
-      }
+        list_type: isCosmos ? 'the_cosmos' : 'the_source',
+        allow_all_option_in_mention_feed:
+          !isCosmos && !isNoteMainFeed
+            ? access.allow_all_option_in_mention_feed
+            : undefined,
+      },
     });
     setMentionListLoading(false);
     if (res.code == 200) {
-      setDelegateList(res?.users)
+      setDelegateList(res?.users);
       if (res?.users > 0) {
-        setIsMentionListVisible(true)
+        setIsMentionListVisible(true);
       }
     }
-  }
-
-
+  };
 
   useEffect(() => {
-    setLoader(false)
-  }, [isVisible])
+    setLoader(false);
+  }, [isVisible]);
 
   const onAgreePress = () => {
     deleteCommentFromServer(confirmation?.selectedItem);
     setConfirmation({
       isVisible: false,
       selectedItem: null,
-      text: "",
-    })
-  }
+      text: '',
+    });
+  };
 
-
-  const onSelectOption = (action) => {
-    let item = options?.selectedItem
-    setOptions({ isVisible: false, selectedItem: null })
-    if (action?.type == "edit") {
+  const onSelectOption = action => {
+    let item = options?.selectedItem;
+    setOptions({isVisible: false, selectedItem: null});
+    if (action?.type == 'edit') {
       setSelectedComment(item);
       if (item?.image?.thumbnail_1) {
-        setCommentImage(item?.image?.thumbnail_1)
+        setCommentImage(item?.image?.thumbnail_1);
       }
       if (isArray(item?.mentioned_users) || isObject(item?.feed_keyword)) {
-
-        let arrMention = isArray(item?.mentioned_users) ? breakReference(item?.mentioned_users).map(x => ({ ...x, type: "mention" })) : [];
-        let arrKeyword = isObject(item?.feed_keyword) ? [{ ...item?.feed_keyword, type: "keyword" }] : [];
+        let arrMention = isArray(item?.mentioned_users)
+          ? breakReference(item?.mentioned_users).map(x => ({
+              ...x,
+              type: 'mention',
+            }))
+          : [];
+        let arrKeyword = isObject(item?.feed_keyword)
+          ? [{...item?.feed_keyword, type: 'keyword'}]
+          : [];
         let newArr = [...arrMention, ...arrKeyword];
-        newArr.sort((a, b) => a.offset - b.offset)
+        newArr.sort((a, b) => a.offset - b.offset);
         setMentionList(newArr);
         if (isObject(item?.feed_keyword)) {
-          setSelectedKeyword(item?.feed_keyword)
+          setSelectedKeyword(item?.feed_keyword);
         }
       }
       // setMentionList(!!item?.mentioned_users ? breakReference(item?.mentioned_users) : [])
-      setSelectedCommentFor("edit")
-      setCommentText(item?.message + " ");
+      setSelectedCommentFor('edit');
+      setCommentText(item?.message + ' ');
       setTimeout(() => {
-        cmtTextInputRef?.current?.focus()
+        cmtTextInputRef?.current?.focus();
       }, 500);
-    } else if (action?.type == "delete") {
+    } else if (action?.type == 'delete') {
       setTimeout(() => {
         setConfirmation({
-          title: "Are you sure you want to delete this comment?",
+          title: STRINGS.COMMENT_MODAL.deleteConfirmation,
           isVisible: true,
-          selectedItem: item
-        })
+          selectedItem: item,
+        });
       }, 500);
-    } else if (action?.type == "message") {
+    } else if (action?.type == 'message') {
       setTimeout(() => {
-        closeModal?.()
+        closeModal?.();
         setTimeout(() => {
-          onChatScreen(item?.user_info_action_for?.action_id, token, navigation, user?._id)
+          onChatScreen(
+            item?.user_info_action_for?.action_id,
+            token,
+            navigation,
+            user?._id,
+          );
         }, 200);
       }, 500);
     }
-
-  }
+  };
 
   const onLikePress = async (commentForlike, index) => {
     if (!!commentForlike?.parent_comment) {
-      setComments((obj) => {
-        let parentIndex = obj.list.findIndex(cmt => cmt?._id == commentForlike?.parent_comment);
+      setComments(obj => {
+        let parentIndex = obj.list.findIndex(
+          cmt => cmt?._id == commentForlike?.parent_comment,
+        );
         let newObj = {
           ...obj.list[parentIndex].child_comment[index],
           is_liked: !commentForlike?.is_liked,
         };
         obj.list[parentIndex].child_comment.splice(index, 1, newObj);
-        return { ...obj };
-      })
-    }
-    else {
-      setComments((obj) => {
+        return {...obj};
+      });
+    } else {
+      setComments(obj => {
         let newObj = {
           ...obj.list[index],
           is_liked: !commentForlike?.is_liked,
         };
         obj.list.splice(index, 1, newObj);
-        return { ...obj };
-      })
+        return {...obj};
+      });
     }
 
     let res = await COMMENT_LIKE_ACTIONS({
-      token, navigation, body: {
-        action: commentForlike?.is_liked ? "commentunlike" : "commentlike",
+      token,
+      navigation,
+      body: {
+        action: commentForlike?.is_liked ? 'commentunlike' : 'commentlike',
         comment: commentForlike?._id,
-        feed: feedId
-      }
+        feed: feedId,
+      },
     });
     if (res?.code == 200) {
-      socketEmittersForAction(res?.action_response)
+      socketEmittersForAction(res?.action_response);
       // if (!!commentForlike?.parent_comment) {
       //   setComments((obj) => {
       //     let parentIndex = obj.list.findIndex(cmt => cmt?._id == commentForlike?.parent_comment);
@@ -395,22 +439,25 @@ const CommentModal = ({
       //   })
       // }
     } else {
-
     }
-  }
+  };
 
-  const deleteCommentFromServer = async (comment) => {
-
+  const deleteCommentFromServer = async comment => {
     setLoader(true);
-    let res = await DELETE_COMMENT({ token, navigation, commentId: comment?._id })
+    let res = await DELETE_COMMENT({
+      token,
+      navigation,
+      commentId: comment?._id,
+    });
     if (res.code == 200) {
-      socketEmittersForAction(res?.action_response,
-        !!comment?.parent_comment ? "delete_comment_reply" : "delete_comment",
-        { comment: comment?._id }
-      )
-      showToast({ title: res?.message, type: "success" });
+      socketEmittersForAction(
+        res?.action_response,
+        !!comment?.parent_comment ? 'delete_comment_reply' : 'delete_comment',
+        {comment: comment?._id},
+      );
+      showToast({title: res?.message, type: 'success'});
       setLoader(false);
-      setCommentText("");
+      setCommentText('');
       // setComments(obj => {
       //   let index = obj.list.findIndex(comment => comment._id == commentId);
       //   if (index > -1) {
@@ -422,7 +469,7 @@ const CommentModal = ({
       //       obj.list[index2].child_comment = newComment.child_comment
       //     }
       //   }
-      //   
+      //
       //   return { ...obj };
       // })
       setSelectedComment(null);
@@ -431,31 +478,45 @@ const CommentModal = ({
     } else {
       setLoader(false);
     }
-  }
+  };
 
   const updateComentToServer = async () => {
     setLoader(true);
     let fd = new FormData();
-    fd.append("message", commentText);
+    fd.append('message', commentText);
     if (selectedKeyword) {
-      let obj = breakReference(mentionList).find(x => x.type == "keyword");
+      let obj = breakReference(mentionList).find(x => x.type == 'keyword');
       if (obj) {
         delete obj.type;
-        fd.append("feed_keyword", JSON.stringify(obj));
+        fd.append('feed_keyword', JSON.stringify(obj));
       }
     }
-    fd.append("mentioned_users", JSON.stringify(breakReference(mentionList).filter(x => x.type == "mention").map(x => {
-      delete x.type;
-      return x
-    })));
+    fd.append(
+      'mentioned_users',
+      JSON.stringify(
+        breakReference(mentionList)
+          .filter(x => x.type == 'mention')
+          .map(x => {
+            delete x.type;
+            return x;
+          }),
+      ),
+    );
     if (!!commentImage && !!commentImage?.uri) {
-      fd.append("image", commentImage);
-    } else if (!!selectedComment?.image?.thumbnail_1 && !!commentImage == false) {
-      fd.append("is_image_deleted", true);
+      fd.append('image', commentImage);
+    } else if (
+      !!selectedComment?.image?.thumbnail_1 &&
+      !!commentImage == false
+    ) {
+      fd.append('is_image_deleted', true);
     }
-    let res = await EDIT_COMMENT_V2({ token, navigation, commentId: selectedComment?._id, formData: fd })
+    let res = await EDIT_COMMENT_V2({
+      token,
+      navigation,
+      commentId: selectedComment?._id,
+      formData: fd,
+    });
     if (res.code == 200) {
-
       // if (!!res.action_response) {
       //   let socketData = {
       //     action: "feed_mentioned",
@@ -467,25 +528,27 @@ const CommentModal = ({
       //   };
       //   socket.emit("comment_mention_user_event_trigger", socketData);
       // }
-      socketEmittersForAction(res?.action_response,
-        !!selectedComment?.parent_comment ? "edit_comment_reply" : "edit_comment",
-        { comment: selectedComment?._id }
-      )
-      showToast({ title: res?.message, type: "success" });
+      socketEmittersForAction(
+        res?.action_response,
+        !!selectedComment?.parent_comment
+          ? 'edit_comment_reply'
+          : 'edit_comment',
+        {comment: selectedComment?._id},
+      );
+      showToast({title: res?.message, type: 'success'});
       setLoader(false);
-      setCommentText("");
-      setCommentImage(null)
+      setCommentText('');
+      setCommentImage(null);
       set_at_index(-1);
       setMentionListLoading(false);
-      setIsMentionListVisible(false)
-      setMentionList([])
-      setSelectedKeyword(null)
+      setIsMentionListVisible(false);
+      setMentionList([]);
+      setSelectedKeyword(null);
       commentCursor = {
         start: 0,
-        end: 0
-      }
+        end: 0,
+      };
       let editedComment = res?.action_response?.comment;
-
 
       // if (!!editedComment?.parent_comment) {
 
@@ -510,11 +573,11 @@ const CommentModal = ({
       // }
 
       setSelectedComment(null);
-      setSelectedCommentFor("")
+      setSelectedCommentFor('');
     } else {
       setLoader(false);
     }
-  }
+  };
 
   const addComentToServer = async () => {
     setLoader(true);
@@ -528,41 +591,46 @@ const CommentModal = ({
     //     parent_comment: selectedComment?._id
     //   }
     // }
-    // 
-    // 
-    let action = "add_comment";
+    //
+    //
+    let action = 'add_comment';
     let formData = new FormData();
-    formData.append("feed", feedId);
-    formData.append("message", commentText);
+    formData.append('feed', feedId);
+    formData.append('message', commentText);
     if (selectedKeyword) {
-      let obj = breakReference(mentionList).find(x => x.type == "keyword");
+      let obj = breakReference(mentionList).find(x => x.type == 'keyword');
       if (obj) {
         delete obj.type;
-        formData.append("feed_keyword", JSON.stringify(obj));
+        formData.append('feed_keyword', JSON.stringify(obj));
       }
     }
-    formData.append("mentioned_users", JSON.stringify(breakReference(mentionList).filter(x => x.type == "mention").map(x => {
-      delete x.type;
-      return x
-    })));
+    formData.append(
+      'mentioned_users',
+      JSON.stringify(
+        breakReference(mentionList)
+          .filter(x => x.type == 'mention')
+          .map(x => {
+            delete x.type;
+            return x;
+          }),
+      ),
+    );
     if (!!selectedComment) {
-      formData.append("parent_comment", selectedComment?._id);
-      action = "add_comment_reply"
+      formData.append('parent_comment', selectedComment?._id);
+      action = 'add_comment_reply';
     }
     if (!!commentImage) {
-      formData.append("image", commentImage);
+      formData.append('image', commentImage);
     }
 
-    let res = await ADD_COMMENT_V2({ token, navigation, formData })
+    let res = await ADD_COMMENT_V2({token, navigation, formData});
     if (res.code == 200) {
       if (!!selectedComment) {
-        socketEmittersForAction(res?.action_response, action)
+        socketEmittersForAction(res?.action_response, action);
       } else {
-        socketEmittersForAction(res?.action_response, action, {
-
-        })
+        socketEmittersForAction(res?.action_response, action, {});
       }
-      showToast({ title: res?.message, type: "success" });
+      showToast({title: res?.message, type: 'success'});
       setLoader(false);
       // if (!!res?.action_response?.parent_comment) {
       //   setComments(obj => {
@@ -578,53 +646,52 @@ const CommentModal = ({
       //     list: [res?.action_response?.comment, ...obj.list]
       //   }))
       // }
-      setCommentText("");
+      setCommentText('');
       setCommentImage(null);
       setSelectedComment(null);
       setSelectedReplyComment(null);
-      setSelectedCommentFor("");
+      setSelectedCommentFor('');
       set_at_index(-1);
       setMentionListLoading(false);
-      setIsMentionListVisible(false)
-      setMentionList([])
-      setSelectedKeyword(null)
+      setIsMentionListVisible(false);
+      setMentionList([]);
+      setSelectedKeyword(null);
       commentCursor = {
         start: 0,
-        end: 0
-      }
+        end: 0,
+      };
       // updateFeedItemsSpecificField?.(res?.action_response?.feed?._id, { comment_count: res?.action_response?.feed?.comment_count })
     } else {
       setLoader(false);
     }
-  }
+  };
 
   const sendBtnClick = () => {
     if (!!commentText.trim() == false && !!commentImage == false) {
-      showToast({ body: "Please enter comment or select image to send", })
-      return
+      showToast({body: STRINGS.COMMENT_MODAL.enterCommentOrImage});
+      return;
     }
 
-    if (!!selectedComment && selectedCommentFor == "edit") {
-      updateComentToServer()
+    if (!!selectedComment && selectedCommentFor == 'edit') {
+      updateComentToServer();
     } else {
-      addComentToServer()
+      addComentToServer();
     }
-
-  }
+  };
 
   const getReplyingName = () => {
-    let rUser = null
+    let rUser = null;
     if (selectedReplyComment) {
-      rUser = selectedReplyComment?.user_info_action_for
+      rUser = selectedReplyComment?.user_info_action_for;
     } else {
-      rUser = selectedComment?.user_info_action_for
+      rUser = selectedComment?.user_info_action_for;
     }
     if (rUser?.action_id == user?._id) {
-      return "Yourself"
+      return STRINGS.COMMENT_MODAL.yourself;
     } else {
-      return rUser?.name
+      return rUser?.name;
     }
-  }
+  };
 
   const onChildCommentPress = (comment, parentComment) => {
     let mUser = comment?.user_info_action_for;
@@ -634,27 +701,26 @@ const CommentModal = ({
         first_name: mUser.name.substring(0, mUser.name.indexOf(' ')),
         last_name: mUser.name.substring(mUser.name.indexOf(' ') + 1),
         _id: mUser?.action_id,
-      }
+      };
       if (!!feedCreatedFor) {
-        obj['community_level'] = feedCreatedFor
+        obj['community_level'] = feedCreatedFor;
       }
       if (mUser?.profile_image) {
-        obj['profile_image'] = mUser?.profile_image
+        obj['profile_image'] = mUser?.profile_image;
       }
-
 
       while (mentionList.length > 0) {
-        mentionList.pop()
+        mentionList.pop();
       }
 
-      onPressOnMentions(obj)
+      onPressOnMentions(obj);
     } else {
-      setMentionList([])
-      setCommentText("")
+      setMentionList([]);
+      setCommentText('');
     }
-  }
+  };
 
-  const viewMoreReplies = async (parentComment) => {
+  const viewMoreReplies = async parentComment => {
     let loadedChildComments = parentComment.child_comment.length;
     let totalChildComments = parentComment?.child_comments_count;
     let childCommnetPage = 0;
@@ -665,98 +731,108 @@ const CommentModal = ({
       }
     }
 
-    setChildCommentLoader((val) => ({
+    setChildCommentLoader(val => ({
       ...val,
-      [parentComment?._id]: true
-    }))
-
+      [parentComment?._id]: true,
+    }));
     let res = await GET_CHILD_COMMENT_LIST({
-      token, navigation,
+      token,
+      navigation,
       page: childCommnetPage,
       feedId: feedId,
-      parentCommentId: parentComment?._id
-    })
+      parentCommentId: parentComment?._id,
+    });
     if (res.code == 200) {
-      setComments((obj) => {
+      setComments(obj => {
         obj.list.map(comment => {
           if (comment._id == parentComment?._id) {
-            comment["child_comment"] = childCommnetPage == 0 ? [...res?.comment] : [...comment?.child_comment, ...res?.comment];
+            comment['child_comment'] =
+              childCommnetPage == 0
+                ? [...res?.comment]
+                : [...comment?.child_comment, ...res?.comment];
             // comment["child_comments_count"] = comment.child_comment.length + res.comment.length
           }
-
-        })
-        return { ...obj }
-      })
-      delete childCommentLoader[parentComment?._id]
-      setChildCommentLoader({ ...childCommentLoader })
+        });
+        return {...obj};
+      });
+      delete childCommentLoader[parentComment?._id];
+      setChildCommentLoader({...childCommentLoader});
     } else {
-      Alert.alert("Error", res?.message)
-      delete childCommentLoader[parentComment?._id]
-      setChildCommentLoader({ ...childCommentLoader })
+      Alert.alert('Error', res?.message);
+      delete childCommentLoader[parentComment?._id];
+      setChildCommentLoader({...childCommentLoader});
     }
-  }
+  };
 
   const getFilteredOptions = (item = null) => {
     let comment = options?.selectedItem;
     if (item) {
-      comment = item
+      comment = item;
     }
     let newList = [];
 
-    let isMine = user?._id == comment?.user_info_action_for?.action_id
+    let isMine = user?._id == comment?.user_info_action_for?.action_id;
 
-    commentsOptionList.forEach((item) => {
-      if (item?.type == "delete" || item?.type == "edit") {
+    commentsOptionList.forEach(item => {
+      if (item?.type == 'delete' || item?.type == 'edit') {
         if (isMine) {
-          newList.push(item)
-        }
-        else if (hasEditDeleteAccess) {
-          if (comment?.user_info_action_for?.action_by == "member_user") {
-            newList.push(item)
+          newList.push(item);
+        } else if (hasEditDeleteAccess) {
+          if (comment?.user_info_action_for?.action_by == 'member_user') {
+            newList.push(item);
           }
         }
       }
 
-      if (item?.type == "message") {
+      if (item?.type == 'message') {
         if (!isCosmos) {
           if (!isMine) {
-            if (comment?.user_info_action_for?.action_by == "member_user") {
+            if (comment?.user_info_action_for?.action_by == 'member_user') {
               if (isChatAllowed) {
-                newList.push(item)
+                newList.push(item);
               }
             }
           }
         }
       }
-    })
+    });
     return newList;
-  }
-
+  };
 
   const commentView = (item, index, isChild, parentComment) => {
-
     let childCommentCount = 0;
     let childCommentArray = [];
-    let lastChildIndex = parentComment?.child_comment.length > 0 ? parentComment?.child_comment.length - 1 : 0;
+    let lastChildIndex =
+      parentComment?.child_comment.length > 0
+        ? parentComment?.child_comment.length - 1
+        : 0;
     if (isChild) {
-      childCommentCount = parentComment?.child_comments_count
-      childCommentArray = parentComment?.child_comment
+      childCommentCount = parentComment?.child_comments_count;
+      childCommentArray = parentComment?.child_comment;
     } else {
-      childCommentCount = item?.child_comments_count
-      childCommentArray = item?.child_comment
+      childCommentCount = item?.child_comments_count;
+      childCommentArray = item?.child_comment;
     }
     let hasOptionsToShow = isArray(getFilteredOptions(item));
     return (
       <View key={item?._id}>
-        <View style={[__style.commentView, {
-          marginLeft: isChild ? "10%" : undefined, backgroundColor:
-            ((!!selectedReplyComment == true && selectedReplyComment?._id == item?._id) || (!!selectedReplyComment == false && selectedComment?._id == item?._id)) ?
-              colors.lightPrimary2 : colors.secondarySelect
-        }]}>
+        <View
+          style={[
+            __style.commentView,
+            isChild && __style.commentViewChild,
+            (!!selectedReplyComment == true &&
+              selectedReplyComment?._id == item?._id) ||
+            (!!selectedReplyComment == false &&
+              selectedComment?._id == item?._id)
+              ? __style.commentViewSelected
+              : __style.commentViewDefault,
+          ]}>
           <View style={__style.profiletView}>
             <UserImage
               borderWidth={2}
-              borderColor={item?.user_info_action_for?.badge_level_info?.color_code}
+              borderColor={
+                item?.user_info_action_for?.badge_level_info?.color_code
+              }
               image={item?.user_info_action_for?.profile_image}
               name={item?.user_info_action_for?.name}
               size={30}
@@ -764,136 +840,181 @@ const CommentModal = ({
             />
 
             <View style={__style.profiletNameView}>
-              <MyText fontSize={13} type='bold' >{item?.user_info_action_for?.name}</MyText>
-              <View style={{ marginTop: 3 }}>
-                <MyText color={colors.lightText2} fontSize={10}>{convertTimezone(item?.comment_date_time, timezone).format("DD MMM YYYY [at] hh:mm A")}</MyText>
+              <MyText fontSize={13} type="bold">
+                {item?.user_info_action_for?.name}
+              </MyText>
+              <View style={__style.marginTop3}>
+                <MyText color={colors.lightText2} fontSize={10}>
+                  {convertTimezone(item?.comment_date_time, timezone).format(
+                    'DD MMM YYYY [at] hh:mm A',
+                  )}
+                </MyText>
               </View>
             </View>
 
-            {hasOptionsToShow &&
+            {hasOptionsToShow && (
               <TouchableOpacity
-                onPress={() => setOptions({ isVisible: true, selectedItem: item })}
+                onPress={() =>
+                  setOptions({isVisible: true, selectedItem: item})
+                }
                 style={__style.menuIconBtn}>
                 {icons.threeDots(colors.primary, 12)}
-              </TouchableOpacity>}
-            <View>
-
-            </View>
+              </TouchableOpacity>
+            )}
+            <View></View>
           </View>
-          {!!item?.message &&
-            <View style={{ marginTop: 5 }}>
+          {!!item?.message && (
+            <View style={__style.marginTop5}>
               <FeedText
-                keywords={isObject(item?.feed_keyword) ? [item?.feed_keyword] : []}
-                list={!!item?.mentioned_users ? breakReference(item?.mentioned_users) : []} text={item?.message} />
+                keywords={
+                  isObject(item?.feed_keyword) ? [item?.feed_keyword] : []
+                }
+                list={
+                  !!item?.mentioned_users
+                    ? breakReference(item?.mentioned_users)
+                    : []
+                }
+                text={item?.message}
+              />
             </View>
-          }
+          )}
 
-          {!!item?.image?.thumbnail_1 &&
+          {!!item?.image?.thumbnail_1 && (
             <Pressable
               onPress={() => setImageForZoom(item?.image?.thumbnail_1)}
-              style={[__style.selectedCommentImageView, { marginLeft: 0, marginBottom: 5 }]}>
+              style={[
+                __style.selectedCommentImageView,
+                __style.marginLeftZeroMarginBottom5,
+              ]}>
               <MyImage
-                source={{ uri: S3_URL + item?.image?.thumbnail_1 }}
-                style={{ height: '100%', width: '100%' }}
+                source={{uri: S3_URL + item?.image?.thumbnail_1}}
+                style={__style.fullSize}
               />
-            </Pressable>}
+            </Pressable>
+          )}
 
-          <View style={[__style.commentActionView, { marginTop: 5, }]}>
-            <View style={[__style.commentActionView,]}>
+          <View style={[__style.commentActionView, __style.marginTop5]}>
+            <View style={[__style.commentActionView]}>
               <TouchableOpacity
-                onPress={() => onLikePress(item, index,)}
+                onPress={() => onLikePress(item, index)}
                 style={__style.actionBtnView}>
-                <MyText color={item?.is_liked ? colors.primary : colors.text} fontSize={13} type='medium' >{item?.is_liked ? "Liked" : "Like"}</MyText>
+                <MyText
+                  color={item?.is_liked ? colors.primary : colors.text}
+                  fontSize={13}
+                  type="medium">
+                  {item?.is_liked
+                    ? STRINGS.COMMENT_MODAL.liked
+                    : STRINGS.COMMENT_MODAL.like}
+                </MyText>
               </TouchableOpacity>
 
               <TouchableOpacity
                 onPress={() => {
                   if (isChild) {
-                    setCommentImage(null)
+                    setCommentImage(null);
                     // setCommentText("")
                     // setMentionList([])
                     setSelectedComment(parentComment);
-                    setSelectedReplyComment(item)
-                    setSelectedCommentFor("reply");
+                    setSelectedReplyComment(item);
+                    setSelectedCommentFor('reply');
                     onChildCommentPress(item, parentComment);
                     cmtTextInputRef?.current?.focus();
                   } else {
                     setSelectedComment(item);
-                    setSelectedReplyComment(null)
-                    setCommentImage(null)
-                    setCommentText("");
-                    setMentionList([])
-                    setSelectedCommentFor("reply");
+                    setSelectedReplyComment(null);
+                    setCommentImage(null);
+                    setCommentText('');
+                    setMentionList([]);
+                    setSelectedCommentFor('reply');
                     cmtTextInputRef?.current?.focus();
                   }
-                }
-                }
-                style={[__style.actionBtnView, { marginLeft: 10 }]}>
-                <MyText type='medium' color={colors.text} fontSize={13} >{"Reply"}</MyText>
+                }}
+                style={[__style.actionBtnView, __style.marginLeft10]}>
+                <MyText type="medium" color={colors.text} fontSize={13}>
+                  {STRINGS.COMMENT_MODAL.reply}
+                </MyText>
               </TouchableOpacity>
             </View>
-            {item?.like_count > 0 &&
+            {item?.like_count > 0 && (
               <Pressable
                 onPress={() => {
-                  likeModalRef?.current?.openLikeModal(item?._id)
+                  likeModalRef?.current?.openLikeModal(item?._id);
                 }}
                 style={__style.commentActionView}>
                 <View style={__style.likeView}>
                   {icons.heartFilled(colors.heart, 15)}
                 </View>
-                <View style={[__style.likeView, { marginLeft: 2 }]}>
+                <View style={[__style.likeView, __style.marginLeft2]}>
                   <MyText>{numFormatter(item?.like_count, 1)}</MyText>
                 </View>
-              </Pressable>}
+              </Pressable>
+            )}
 
-
-
-
-            {childCommentCount > 0 && ((childCommentArray.length - childCommentCount) < 0) && ((!isChild && childCommentArray.length <= 0) || (isChild && (lastChildIndex == index))) &&
-              <>
-                {childCommentLoader[isChild ? parentComment?._id : item?._id] ?
-                  <SimpleLoader size={20} /> :
-                  <Pressable
-                    onPress={() => viewMoreReplies(isChild ? parentComment : item)}
-                    style={__style.commentActionView}>
-                    <View style={[__style.likeView]}>
-                      <MyText fontSize={12} underlined color={colors.primary} >{isChild ? `View More Replies` : `View ${numFormatter(childCommentCount - childCommentArray.length, 1)} Replies`}</MyText>
-                    </View>
-                  </Pressable>}
-              </>}
+            {childCommentCount > 0 &&
+              childCommentArray.length - childCommentCount < 0 &&
+              ((!isChild && childCommentArray.length <= 0) ||
+                (isChild && lastChildIndex == index)) && (
+                <>
+                  {childCommentLoader[
+                    isChild ? parentComment?._id : item?._id
+                  ] ? (
+                    <SimpleLoader size={20} />
+                  ) : (
+                    <Pressable
+                      onPress={() =>
+                        viewMoreReplies(isChild ? parentComment : item)
+                      }
+                      style={__style.commentActionView}>
+                      <View style={[__style.likeView]}>
+                        <MyText fontSize={12} underlined color={colors.primary}>
+                          {isChild
+                            ? STRINGS.COMMENT_MODAL.viewMoreReplies
+                            : STRINGS.COMMENT_MODAL.viewReplies(
+                                numFormatter(
+                                  childCommentCount - childCommentArray.length,
+                                  1,
+                                ),
+                              )}
+                        </MyText>
+                      </View>
+                    </Pressable>
+                  )}
+                </>
+              )}
           </View>
         </View>
-        {!!item?.child_comment && Array.isArray(item?.child_comment) && item?.child_comment.map((item2, index2) => commentView(item2, index2, true, item))}
-
+        {!!item?.child_comment &&
+          Array.isArray(item?.child_comment) &&
+          item?.child_comment.map((item2, index2) =>
+            commentView(item2, index2, true, item),
+          )}
       </View>
-    )
-  }
+    );
+  };
 
   const resetStates = () => {
-    setCommentText("");
+    setCommentText('');
     setSelectedComment(null);
     setSelectedReplyComment(null);
-    setSelectedCommentFor("");
-    setCommentImage(null)
-    setDelegateList([])
+    setSelectedCommentFor('');
+    setCommentImage(null);
+    setDelegateList([]);
     setIsMentionListVisible(false);
     setMentionListLoading(false);
-    setMentionList([])
-    set_at_index(-1)
-    setSelectedKeyword(null)
-  }
+    setMentionList([]);
+    set_at_index(-1);
+    setSelectedKeyword(null);
+  };
 
-
-
-  const __renderKeywordReply = ({ item, index }) => {
+  const __renderKeywordReply = ({item, index}) => {
     return (
       <TouchableOpacity
-        onPress={() => onPressOnMentions(item, "keyword")}
-        style={__style.commentReply} >
-        <MyText  >{item?.value}</MyText>
+        onPress={() => onPressOnMentions(item, 'keyword')}
+        style={__style.commentReply}>
+        <MyText>{item?.value}</MyText>
       </TouchableOpacity>
-    )
-  }
+    );
+  };
 
   const commentModal = () => (
     <Modal
@@ -909,19 +1030,21 @@ const CommentModal = ({
       avoidKeyboard={true}
       onModalHide={resetStates}
       onModalShow={() => {
-        if (focus && Platform.OS == "android") {
+        if (focus && Platform.OS == 'android') {
           setTimeout(() => {
-            cmtTextInputRef?.current?.focus()
+            cmtTextInputRef?.current?.focus();
           }, 1000);
         }
       }}
       hideModalContentWhileAnimating={true}
-      style={{ margin: 0, }}>
-      <SafeAreaView style={{ flex: 1 }} >
+      style={__style.marginZero}>
+      <SafeAreaView style={__style.flex1}>
         <View style={__style.rootView}>
           <View style={__style.headingView}>
             <View>
-              <MyText fontSize={18} type='medium' >Comments</MyText>
+              <MyText fontSize={18} type="medium">
+                {STRINGS.COMMENT_MODAL.comments}
+              </MyText>
               {/* <MyText color={colors.lightText} fontSize={12}>Select your country from list below</MyText> */}
             </View>
             <Pressable onPress={closeModal}>
@@ -929,117 +1052,154 @@ const CommentModal = ({
             </Pressable>
           </View>
 
-          <View style={{ flex: 1 }}>
-            <View pointerEvents={isLoading ? "none" : "auto"} style={{ flex: 1 }}>
+          <View style={__style.flex1}>
+            <View
+              pointerEvents={isLoading ? 'none' : 'auto'}
+              style={__style.flex1}>
               <FlatList
                 data={comments}
                 keyboardShouldPersistTaps="always"
-                keyExtractor={(item) => item?._id}
-                renderItem={({ item, index }) => commentView(item, index, false, null)}
-                ListEmptyComponent={!loader && <EmptyView label={"No comment exist"} />}
+                keyExtractor={item => item?._id}
+                renderItem={({item, index}) =>
+                  commentView(item, index, false, null)
+                }
+                ListEmptyComponent={
+                  !loader && (
+                    <EmptyView label={STRINGS.COMMENT_MODAL.noCommentExist} />
+                  )
+                }
                 showsVerticalScrollIndicator={false}
                 onEndReached={onEndReached}
                 ListFooterComponent={<FooterLoader isVisible={footerLoader} />}
               />
             </View>
             <View style={__style.shadow}>
-
-              <Collapsible collapsed={!isMentionListVisible} >
-                <View style={{ maxHeight: 120, minHeight: 70 }}>
-                  {delegateList.length > 0 ?
+              <Collapsible collapsed={!isMentionListVisible}>
+                <View style={__style.maxHeight120}>
+                  {delegateList.length > 0 ? (
                     <ScrollView
                       keyboardShouldPersistTaps="handled"
-                      contentContainerStyle={{ padding: 10 }}>
-                      {delegateList.map((item) =>
+                      contentContainerStyle={__style.scrollPadding10}>
+                      {delegateList.map(item => (
                         <TouchableOpacity
                           onPress={() => onPressOnMentions(item)}
-                          style={{ paddingVertical: 4 }}>
+                          style={__style.paddingVertical4}>
                           <MemberView
-                            secondText={!isCosmos && !isNoteMainFeed ? ` ${!!item?.membership_level_badge_info?.membership_level_badge_title ? "(" + item?.membership_level_badge_info?.membership_level_badge_title + ")" : ""}` : ""}
+                            secondText={
+                              !isCosmos && !isNoteMainFeed
+                                ? ` ${
+                                    !!item?.membership_level_badge_info
+                                      ?.membership_level_badge_title
+                                      ? '(' +
+                                        item?.membership_level_badge_info
+                                          ?.membership_level_badge_title +
+                                        ')'
+                                      : ''
+                                  }`
+                                : ''
+                            }
                             size={30}
                             titleSize={12}
                             member={item}
-                            customImage={(item.first_name != "all" && item.last_name != "") ?
-                              item?.image?.thumbnail_1 : icons.people(colors.primary, 17)}
-                            hideEmail />
-                        </TouchableOpacity>)}
+                            customImage={
+                              item.first_name != 'all' && item.last_name != ''
+                                ? item?.image?.thumbnail_1
+                                : icons.people(colors.primary, 17)
+                            }
+                            hideEmail
+                          />
+                        </TouchableOpacity>
+                      ))}
                     </ScrollView>
-                    : isMentionListLoading &&
-                    <View style={{ alignItems: "center", justifyContent: "center", height: 100 }}>
-                      <SimpleLoader size={50} />
-                    </View>}
+                  ) : (
+                    isMentionListLoading && (
+                      <View style={__style.centerContainer100}>
+                        <SimpleLoader size={50} />
+                      </View>
+                    )
+                  )}
                 </View>
               </Collapsible>
 
               <View style={__style.commentUpperView}>
-
-                {!!commentImage &&
+                {!!commentImage && (
                   <Pressable
-                    onPress={() => setImageForZoom(!!commentImage?.uri ? commentImage?.uri : commentImage)}>
+                    onPress={() =>
+                      setImageForZoom(
+                        !!commentImage?.uri ? commentImage?.uri : commentImage,
+                      )
+                    }>
                     <View style={__style.selectedCommentImageView}>
-
                       <MyImage
                         source={{
-                          uri: !!commentImage?.uri ? commentImage?.uri : S3_URL + commentImage
+                          uri: !!commentImage?.uri
+                            ? commentImage?.uri
+                            : S3_URL + commentImage,
                         }}
-                        style={{ width: "100%", height: "100%", }}
+                        style={__style.fullSize}
                       />
                     </View>
                     <Pressable
-                      hitSlop={{ top: 5, bottom: 5, left: 5, right: 5 }}
+                      hitSlop={{top: 5, bottom: 5, left: 5, right: 5}}
                       onPress={() => setCommentImage(null)}
                       style={__style.removeImageBtnView}>
                       {icons.crosss()}
                     </Pressable>
-                  </Pressable>}
+                  </Pressable>
+                )}
 
-                {!!selectedComment &&
-                  <View
-                    style={__style.commentUpperViewOptions}>
-                    <MyText
-                      type='bold'
-                      color={colors.lightText2}
-                    >{selectedCommentFor == "edit" ?
-                      <Text>{"Editing"}</Text> :
-                      selectedCommentFor == "reply" ?
-                        <Text style={{ fontFamily: fonts.regular }} >{"Replying to "}
-                          <Text style={{ fontFamily: fonts.bold, }} >{getReplyingName()}</Text>
-                        </Text> : null}
-                      <Text>{"  •  "}</Text>
+                {!!selectedComment && (
+                  <View style={__style.commentUpperViewOptions}>
+                    <MyText type="bold" color={colors.lightText2}>
+                      {selectedCommentFor == 'edit' ? (
+                        <Text>{STRINGS.COMMENT_MODAL.editing}</Text>
+                      ) : selectedCommentFor == 'reply' ? (
+                        <Text style={__style.regularFontFamily}>
+                          {STRINGS.COMMENT_MODAL.replyingTo}
+                          <Text style={__style.boldFontFamily}>
+                            {getReplyingName()}
+                          </Text>
+                        </Text>
+                      ) : null}
+                      <Text>{'  •  '}</Text>
                       <MyText
                         color={colors.white}
                         fontSize={15}
                         onPress={() => {
                           setSelectedComment(null);
                           setSelectedReplyComment(null);
-                          setCommentText("");
-                          setCommentImage(null)
-                          setSelectedCommentFor("");
-                          cmtTextInputRef?.current?.blur()
+                          setCommentText('');
+                          setCommentImage(null);
+                          setSelectedCommentFor('');
+                          cmtTextInputRef?.current?.blur();
                         }}
-                        type='bold'>{"Cancel"}</MyText></MyText>
-
-                  </View>}
-
-
+                        type="bold">
+                        {STRINGS.COMMENT_MODAL.cancel}
+                      </MyText>
+                    </MyText>
+                  </View>
+                )}
               </View>
-              {console.log(selectedComment, "selectedComment")}
+              {console.log(selectedComment, 'selectedComment')}
 
-              {isArray(keywords) && !selectedKeyword && selectedComment?.user_info_action_for?.action_by == "member_user" && selectedCommentFor == "edit" &&
-                <View style={{}}>
-                  <FlatList
-                    keyboardShouldPersistTaps="handled"
-                    contentContainerStyle={{ paddingHorizontal: 10 }}
-                    horizontal={true}
-                    data={keywords}
-                    showsVerticalScrollIndicator={false}
-                    renderItem={__renderKeywordReply}
-                  />
-                </View>}
+              {isArray(keywords) &&
+                !selectedKeyword &&
+                selectedComment?.user_info_action_for?.action_by ==
+                  'member_user' &&
+                selectedCommentFor == 'edit' && (
+                  <View>
+                    <FlatList
+                      keyboardShouldPersistTaps="handled"
+                      contentContainerStyle={__style.paddingHorizontal10}
+                      horizontal={true}
+                      data={keywords}
+                      showsVerticalScrollIndicator={false}
+                      renderItem={__renderKeywordReply}
+                    />
+                  </View>
+                )}
 
               <View style={__style.inputRootView}>
-
-
                 <View style={__style.textInputView}>
                   <TouchableOpacity
                     onPress={() => setImageModalVisibility(true)}
@@ -1056,24 +1216,19 @@ const CommentModal = ({
                     // onChangeText={(text) => setCommentText(text)}
                     onChangeText={textHandler}
                     textAlignVertical="center"
-                    placeholder='Write a comment...'
+                    placeholder={STRINGS.COMMENT_MODAL.writeComment}
                     placeholderTextColor={colors.placeholder}
                     keyboardAppearance="dark"
-                    autoFocus={Platform.OS == "ios" ? focus : false}
+                    autoFocus={Platform.OS == 'ios' ? focus : false}
                     focusable={true}
                     autoCorrect={false}
-                    autoCapitalize='none'
+                    autoCapitalize="none"
                     autoComplete="off"
                     editable={!isLoading}
-                    onSelectionChange={(e) => {
-                      commentCursor = e.nativeEvent.selection
-                    }}
-                  >
-                    <Text style={[{
-                      color: colors.white,
-                      fontFamily: fonts.regular,
-                      includeFontPadding: false
-                    }]} >
+                    onSelectionChange={e => {
+                      commentCursor = e.nativeEvent.selection;
+                    }}>
+                    <Text style={__style.textIncludeFontPadding}>
                       {replaceAndHighlight(commentText, mentionList)}
                     </Text>
                   </TextInput>
@@ -1082,13 +1237,13 @@ const CommentModal = ({
                   disabled={isLoading}
                   onPress={sendBtnClick}
                   style={__style.btnView}>
-                  {isLoading ?
-                    <ActivityIndicator color={"white"} /> :
-                    icons.send(colors.white, 18)}
+                  {isLoading ? (
+                    <ActivityIndicator color={'white'} />
+                  ) : (
+                    icons.send(colors.white, 18)
+                  )}
                 </TouchableOpacity>
               </View>
-
-
             </View>
             <MyLoader enable={loader} />
           </View>
@@ -1098,7 +1253,7 @@ const CommentModal = ({
         <OptionModal
           optionList={getFilteredOptions()}
           isVisible={options.isVisible}
-          closeModal={() => setOptions({ isVisible: false, selectedItem: null })}
+          closeModal={() => setOptions({isVisible: false, selectedItem: null})}
           onSelected={onSelectOption}
         />
 
@@ -1106,7 +1261,9 @@ const CommentModal = ({
           isVisible={confirmation?.isVisible}
           onAgree={onAgreePress}
           title={confirmation?.title}
-          closeModal={() => setConfirmation({ isVisible: false, title: "", selectedItem: null })}
+          closeModal={() =>
+            setConfirmation({isVisible: false, title: '', selectedItem: null})
+          }
         />
 
         <LikeModalForComments
@@ -1121,55 +1278,51 @@ const CommentModal = ({
 
         <ImageUploadModal
           closeModal={() => setImageModalVisibility(false)}
-          onImagePicked={(image) => setCommentImage(image)}
+          onImagePicked={image => setCommentImage(image)}
           isVisible={imageModalVisibility}
         />
 
         <ImageZoomer
           visible={!!imageForZoom}
-          closeModal={() => setImageForZoom("")}
+          closeModal={() => setImageForZoom('')}
           url={imageForZoom}
-          noUrl={!!imageForZoom && (imageForZoom?.includes("file") || imageForZoom?.includes("react-native-image-crop-picker"))}
+          noUrl={
+            !!imageForZoom &&
+            (imageForZoom?.includes('file') ||
+              imageForZoom?.includes('react-native-image-crop-picker'))
+          }
         />
       </SafeAreaView>
-      <SafeAreaView style={{ flex: 0, backgroundColor: colors.secondaryVariant }} />
+      <SafeAreaView style={__style.flexZeroSecondaryBg} />
     </Modal>
-  )
+  );
 
-
-
-  return (
-    <View>
-      {commentModal()}
-    </View>
-  )
-}
+  return <View>{commentModal()}</View>;
+};
 
 export default CommentModal;
 
-const commentsOptionList = [{
-  icon: icons.edit,
-  title: "Edit",
-  type: "edit"
-
-},
-{
-  icon: icons.trash,
-  title: "Delete",
-  type: "delete"
-},
-{
-  icon: () => icons.send(colors.primary, 17),
-  title: "Message",
-  type: "message"
-}
-]
+const commentsOptionList = [
+  {
+    icon: icons.edit,
+    title: STRINGS.COMMENT_MODAL.edit,
+    type: 'edit',
+  },
+  {
+    icon: icons.trash,
+    title: STRINGS.COMMENT_MODAL.delete,
+    type: 'delete',
+  },
+  {
+    icon: () => icons.send(colors.primary, 17),
+    title: STRINGS.COMMENT_MODAL.message,
+    type: 'message',
+  },
+];
 
 const __style = StyleSheet.create({
   rootView: {
-    marginTop: "auto",
-    // height: fle,
-    // width: "100%",
+    marginTop: 'auto',
     flex: 1,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
@@ -1181,13 +1334,26 @@ const __style = StyleSheet.create({
     marginTop: 15,
     paddingVertical: 5,
     paddingHorizontal: 10,
-    borderRadius: 10
+    borderRadius: 10,
   },
   headingView: {
-    flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 15, borderBottomWidth: 1 / 3, borderBottomColor: colors.lightText
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 15,
+    borderBottomWidth: 1 / 3,
+    borderBottomColor: colors.lightText,
   },
-  commentUpperView: { flexDirection: "row", alignItems: "flex-end" },
-  commentUpperViewOptions: { paddingHorizontal: 10, paddingTop: 8, marginBottom: -5, flex: 1 },
+  commentUpperView: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+  },
+  commentUpperViewOptions: {
+    paddingHorizontal: 10,
+    paddingTop: 8,
+    marginBottom: -5,
+    flex: 1,
+  },
   commentView: {
     backgroundColor: colors.secondarySelect,
     paddingTop: 10,
@@ -1195,70 +1361,72 @@ const __style = StyleSheet.create({
     paddingBottom: 5,
     marginTop: 10,
     marginHorizontal: 10,
-    borderRadius: 5
-
+    borderRadius: 5,
   },
-
   removeImageBtnView: {
-    width: 20, height: 20,
+    width: 20,
+    height: 20,
     borderRadius: 25 / 2,
     backgroundColor: colors.delete,
-    alignItems: "center",
-    justifyContent: "center",
-    position: "absolute",
-    right: -8, top: 2
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'absolute',
+    right: -8,
+    top: 2,
   },
-  selectedCommentImageView: { width: 90, height: 60, borderRadius: 12, marginLeft: 10, overflow: "hidden", marginTop: 10, marginBottom: -5 },
-
+  selectedCommentImageView: {
+    width: 90,
+    height: 60,
+    borderRadius: 12,
+    marginLeft: 10,
+    overflow: 'hidden',
+    marginTop: 10,
+    marginBottom: -5,
+  },
   profiletView: {
-    flexDirection: "row",
-    alignItems: "center"
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   profiletNameView: {
     marginLeft: 10,
-    flex: 1
+    flex: 1,
   },
   actionBtnView: {
     paddingRight: 10,
-    paddingVertical: 5
+    paddingVertical: 5,
   },
-
   menuIconBtn: {
     height: 22,
     width: 22,
     backgroundColor: colors.lightPrimary3,
     borderRadius: 22 / 2,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   commentActionView: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
-
   inputRootView: {
-    flexDirection: "row",
-    alignItems: "flex-end",
-    paddingVertical: 10
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    paddingVertical: 10,
   },
   textInputView: {
     minHeight: 40,
-    backgroundColor: "#1c2131",
-    // borderWidth:0.5,
-    // borderColor:colors.white,
+    backgroundColor: '#1c2131',
     marginHorizontal: 10,
     borderRadius: 10,
     maxHeight: 80,
     padding: 5,
     flex: 1,
-    flexDirection: "row",
-
+    flexDirection: 'row',
   },
   addImageBtn: {
-    justifyContent: "flex-start",
+    justifyContent: 'flex-start',
     marginTop: 5,
-    paddingHorizontal: 5
+    paddingHorizontal: 5,
   },
   input: {
     color: colors.white,
@@ -1271,20 +1439,20 @@ const __style = StyleSheet.create({
     height: 35,
     width: 35,
     borderRadius: 35 / 2,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: colors.primary,
     marginRight: 10,
-    marginBottom: 2.5
+    marginBottom: 2.5,
   },
   likeView: {
-    // borderWidth: 0.5, borderColor: colors.lightPrimary2,
-    borderRadius: 999, height: 20,
-    //  width: 20,
-    alignItems: 'center', justifyContent: "center"
+    borderRadius: 999,
+    height: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   shadow: {
-    shadowColor: "#FFF",
+    shadowColor: '#FFF',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -1292,15 +1460,83 @@ const __style = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
-    backgroundColor: colors.secondaryVariant
+    backgroundColor: colors.secondaryVariant,
   },
   mentionUserText: {
     backgroundColor: colors.lightPrimary3,
-    color: colors.primary
+    color: colors.primary,
   },
   highlightKeyword: {
     color: colors.keyword,
-    textDecorationLine: "underline",
-    fontFamily: fonts.bold
+    textDecorationLine: 'underline',
+    fontFamily: fonts.bold,
   },
-})
+  marginTop3: {
+    marginTop: 3,
+  },
+  marginTop5: {
+    marginTop: 5,
+  },
+  marginLeft2: {
+    marginLeft: 2,
+  },
+  marginLeft10: {
+    marginLeft: 10,
+  },
+  marginLeftZeroMarginBottom5: {
+    marginLeft: 0,
+    marginBottom: 5,
+  },
+  paddingVertical4: {
+    paddingVertical: 4,
+  },
+  fullSize: {
+    height: '100%',
+    width: '100%',
+  },
+  centerContainer100: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 100,
+  },
+  regularFontFamily: {
+    fontFamily: fonts.regular,
+  },
+  textIncludeFontPadding: {
+    color: colors.white,
+    fontFamily: fonts.regular,
+    includeFontPadding: false,
+  },
+  flexZeroSecondaryBg: {
+    flex: 0,
+    backgroundColor: colors.secondaryVariant,
+  },
+  flex1: {
+    flex: 1,
+  },
+  maxHeight120: {
+    maxHeight: 120,
+    minHeight: 70,
+  },
+  scrollPadding10: {
+    padding: 10,
+  },
+  paddingHorizontal10: {
+    paddingHorizontal: 10,
+  },
+  marginZero: {
+    margin: 0,
+  },
+  boldFontFamily: {
+    fontFamily: fonts.bold,
+  },
+  commentViewChild: {
+    marginLeft: '10%',
+  },
+  commentViewSelected: {
+    backgroundColor: colors.lightPrimary2,
+  },
+  commentViewDefault: {
+    backgroundColor: colors.secondarySelect,
+  },
+});

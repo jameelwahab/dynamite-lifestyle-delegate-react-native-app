@@ -1,9 +1,9 @@
 import React from 'react';
-import { View } from 'react-native';
+import {View} from 'react-native';
 import MyText from '../../../components/MyText';
-import { colors } from '../../../utilities/colors';
+import {colors} from '../../../utilities/colors';
 
-const convertCurrencyToSign = (currency) => {
+const convertCurrencyToSign = currency => {
   switch (currency?.toLowerCase()) {
     case 'usd':
       return '$';
@@ -16,8 +16,8 @@ const convertCurrencyToSign = (currency) => {
   }
 };
 
-export const DiscountInformationView = ({ item }) => {
-  const { currency, discount_info } = item;
+export const DiscountInformationView = ({item}) => {
+  const {currency, discount_info} = item;
   let Currency = convertCurrencyToSign(currency);
 
   if (!discount_info) {
@@ -30,7 +30,7 @@ export const DiscountInformationView = ({ item }) => {
 
   return (
     <View>
-      <View style={{ marginBottom: 3 }}>
+      <View style={{marginBottom: 3}}>
         <MyText fontSize={12} type="bold" color={colors.primary}>
           Original Amount:{' '}
         </MyText>
@@ -40,7 +40,7 @@ export const DiscountInformationView = ({ item }) => {
       </View>
 
       {discount_info.discount_amount > 0 && (
-        <View style={{ marginBottom: 3 }}>
+        <View style={{marginBottom: 3}}>
           <MyText fontSize={12} type="bold" color={colors.primary}>
             Discount:{' '}
           </MyText>
@@ -51,7 +51,7 @@ export const DiscountInformationView = ({ item }) => {
       )}
 
       {discount_info.id && (
-        <View style={{ marginBottom: 3 }}>
+        <View style={{marginBottom: 3}}>
           <MyText fontSize={12} type="bold" color={colors.primary}>
             Discount Code:{' '}
           </MyText>
@@ -62,7 +62,7 @@ export const DiscountInformationView = ({ item }) => {
       )}
 
       {discount_info.coins_deduction > 0 && (
-        <View style={{ marginBottom: 3 }}>
+        <View style={{marginBottom: 3}}>
           <MyText fontSize={12} type="bold" color={colors.primary}>
             Coins Deduction:{' '}
           </MyText>

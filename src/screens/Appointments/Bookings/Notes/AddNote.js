@@ -1,4 +1,4 @@
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import {View, StyleSheet, TouchableOpacity} from 'react-native';
 import React, {useState} from 'react';
 import RootView from '../../../../components/RootView';
 import {colors} from '../../../../utilities/colors';
@@ -13,6 +13,7 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import MyText from '../../../../components/MyText';
 import {BOOKING_NOTES_ADD, BOOKING_NOTES_UPDATE} from '../../../../DAL';
 import MyCheckBox from '../../../../components/MyCheckBox';
+import {STRINGS} from '../../../../utilities/strings';
 
 const AddNote = ({navigation, route}) => {
   const defaultNote = `<p><span style="font-weight: bold;">BIO:</span> <br /><br /><span style="font-weight: bold;">GOAL:</span> <br /><br /><span style="font-weight: bold;">PARADIGM:</span> <br /><br /><span style="font-weight: bold;">SOLUTION:</span> </p>`;
@@ -25,7 +26,7 @@ const AddNote = ({navigation, route}) => {
   const [addAsPersonalNote, setAddAsPersonalNote] = useState(false);
   const btn_save = () => {
     if (note.trim() == '') {
-      showToast({body: 'Please enter note', type: 'info'});
+      showToast({body: STRINGS.ADD_NOTE.enterNote, type: 'info'});
     } else {
       setLoader(true);
       addTheNote();
@@ -63,26 +64,27 @@ const AddNote = ({navigation, route}) => {
     <RootView hideHeader>
       <KeyboardAwareScrollView>
         <View>
-          <View
-            style={{flexDirection: 'row', alignItems: 'center', marginTop: 10}}>
+          <View style={styles.headerContainer}>
             <TouchableOpacity
               onPress={() => navigation.goBack()}
-              style={__styles.closeBtnView}>
+              style={styles.closeBtnView}>
               {icons.back(colors.primary, 25)}
             </TouchableOpacity>
             <MyText fontSize={18} color={colors.primary} type="bold">
               {' '}
-              {!!oldNote ? 'Edit Note' : 'Add Note'}{' '}
+              {!!oldNote
+                ? STRINGS.ADD_NOTE.editNote
+                : STRINGS.ADD_NOTE.addNote}{' '}
             </MyText>
           </View>
 
-          <View style={{flex: 1, marginTop: 20}}>
+          <View style={styles.editorContainer}>
             {!oldNote && (
-              <View style={{marginBottom: 5, marginHorizontal: 5}}>
+              <View style={styles.checkboxContainer}>
                 <MyCheckBox
                   value={addAsPersonalNote}
                   onPress={() => setAddAsPersonalNote(!addAsPersonalNote)}
-                  title="Would you like to add it to Personal Notes?"
+                  title={STRINGS.ADD_NOTE.addToPersonalNotes}
                 />
               </View>
             )}
@@ -93,24 +95,21 @@ const AddNote = ({navigation, route}) => {
               autoResonderMsgs={autoResponderMsg}
             />
 
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'flex-end',
-                marginTop: 10,
-              }}>
+            <View style={styles.buttonContainer}>
               <MyButton
                 onPress={() => navigation.goBack()}
                 invert
-                title="Cancel"
-                style={{paddingHorizontal: 10, marginRight: 10}}
+                title={STRINGS.ADD_NOTE.cancel}
+                style={styles.cancelButton}
               />
 
               <MyButton
                 invert
-                title={!!oldNote ? 'Update' : 'Save'}
+                title={
+                  !!oldNote ? STRINGS.ADD_NOTE.update : STRINGS.ADD_NOTE.save
+                }
                 onPress={btn_save}
-                style={{paddingHorizontal: 10}}
+                style={styles.saveButton}
               />
             </View>
           </View>
@@ -123,17 +122,39 @@ const AddNote = ({navigation, route}) => {
 
 export default AddNote;
 
-const __styles = StyleSheet.create({
-  headerView: {
-    flexDirection: 'row',
-  },
+const styles = StyleSheet.create({
   closeBtnView: {
     height: 40,
     width: 40,
     backgroundColor: colors.lightPrimary2,
-    borderRadius: 40 / 2,
+    borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 10,
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  editorContainer: {
+    flex: 1,
+    marginTop: 20,
+  },
+  checkboxContainer: {
+    marginBottom: 5,
+    marginHorizontal: 5,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginTop: 10,
+  },
+  cancelButton: {
+    paddingHorizontal: 10,
+    marginRight: 10,
+  },
+  saveButton: {
+    paddingHorizontal: 10,
   },
 });

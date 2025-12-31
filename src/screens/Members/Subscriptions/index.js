@@ -1,4 +1,4 @@
-import {View, Text, FlatList, TouchableOpacity} from 'react-native';
+import {View, FlatList, TouchableOpacity, StyleSheet} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 import {selectUser} from '../../../redux/reducers/userSlice';
@@ -10,11 +10,11 @@ import {
   MEMBER_SUBSCRIPTION_LIST,
 } from '../../../DAL';
 import {colors} from '../../../utilities/colors';
+import {STRINGS} from '../../../utilities/strings';
 import StatView from '../Components/StatView';
 import EmptyView from '../../../components/EmptyView';
 import moment from 'moment';
 import {dateTimeFormat} from '../../../utilities/constants';
-import {MenuButton} from '../../../components/MyButton';
 import OptionModal from '../../../components/OptionModal';
 import {icons} from '../../../utilities/icons';
 import ConfirmationModal from '../../../components/ConfirmationModal';
@@ -23,8 +23,9 @@ import openUrl from '../../../functions/openUrl';
 import FooterLoader from '../../../components/FooterLoader';
 import MyInputs from '../../../components/MyInputs';
 import debounce from '../../../functions/debounce';
-import TitleView from '../../../components/TitleView';
 import UserImage from '../../../components/UserImage';
+import {Flex} from '../../../UIComponents/FlexViews';
+import {MenuButton} from '../../../components/MyButton';
 
 let page = 0;
 let canLoadMore = false;
@@ -127,9 +128,11 @@ const SubscriptionList = ({navigation, route}) => {
       return (
         <TouchableOpacity
           onPress={() => openUrl(S3_URL + link)}
-          hitSlop={{left: 5, top: 5, bottom: 5, right: 5}}
-          style={{alignSelf: 'flex-start'}}>
-          <MyText color={colors.primary}>Preview</MyText>
+          hitSlop={styles.hitSlop}
+          style={styles.previewButton}>
+          <MyText color={colors.primary}>
+            {STRINGS.SUBSCRIPTION_LIST.preview}
+          </MyText>
         </TouchableOpacity>
       );
     } else return null;
@@ -137,10 +140,10 @@ const SubscriptionList = ({navigation, route}) => {
 
   const listHeaderView = () => {
     return (
-      <View style={{marginTop: -10, backgroundColor: colors.darkSecondary}}>
+      <View style={styles.listHeaderContainer}>
         <MyInputs
           leftIcon={icons.search}
-          placeholder="Search..."
+          placeholder={STRINGS.SUBSCRIPTION_LIST.searchPlaceholder}
           rightIcon={() =>
             searchText.length > 0
               ? icons.crosssWithCircle_20(colors.white, 20)
@@ -157,20 +160,11 @@ const SubscriptionList = ({navigation, route}) => {
 
   const renderList = ({item, index}) => {
     return (
-      <View
-        style={{
-          backgroundColor: colors.secondary,
-          borderRadius: 10,
-          marginTop: 10,
-          padding: 10,
-        }}>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}>
-          <MyText color={colors.primary}> {`${index + 1}.`}</MyText>
+      <View style={styles.listItemContainer}>
+        <View style={styles.rowSpaceBetween}>
+          <MyText color={colors.primary}>
+            {STRINGS.SUBSCRIPTION_LIST.indexLabel(index)}
+          </MyText>
           {/* <MenuButton
             onPress={() =>
               setOptionModal({isVisible: true, selectedItem: item})
@@ -179,96 +173,86 @@ const SubscriptionList = ({navigation, route}) => {
           /> */}
         </View>
         <StatView
-          title={'Page Title'}
+          title={STRINGS.SUBSCRIPTION_LIST.pageTitle}
           value={
             !!item?.page_info?.sale_page_title
               ? item?.page_info?.sale_page_title
               : !!item?.module_info?.title
               ? item?.module_info?.title
-              : 'N/A'
+              : STRINGS.SUBSCRIPTION_LIST.na
           }
         />
         <StatView
-          title={'Plan Title'}
+          title={STRINGS.SUBSCRIPTION_LIST.planTitle}
           value={
             !!item?.plan_info?.plan_title
-              ? `${item?.plan_info?.plan_title} (${
-                  item?.plan_info?.payment_access == 'recursion'
-                    ? 'recurring'
-                    : item?.plan_info?.payment_access
-                })`
-              : 'N/A'
+              ? STRINGS.SUBSCRIPTION_LIST.planTitleFormat(
+                  item?.plan_info?.plan_title,
+                  item?.plan_info?.payment_access,
+                  item?.plan_info?.payment_access == 'recursion',
+                )
+              : STRINGS.SUBSCRIPTION_LIST.na
           }
         />
         <StatView
-          title={'Referral User'}
+          title={STRINGS.SUBSCRIPTION_LIST.referralUser}
           value={
             !!item?.affiliate_info?.affiliate_user_info
-              ? `${item?.affiliate_info?.affiliate_user_info?.first_name} ${item?.affiliate_info?.affiliate_user_info?.last_name}`
-              : 'N/A'
+              ? STRINGS.SUBSCRIPTION_LIST.fullName(
+                  item?.affiliate_info?.affiliate_user_info?.first_name,
+                  item?.affiliate_info?.affiliate_user_info?.last_name,
+                )
+              : STRINGS.SUBSCRIPTION_LIST.na
           }
         />
         <StatView
-          title={'Subscription Date'}
+          title={STRINGS.SUBSCRIPTION_LIST.subscriptionDate}
           value={moment(item?.createdAt).format(dateTimeFormat.date)}
         />
         <StatView
-          title={'Agreement PDF'}
+          title={STRINGS.SUBSCRIPTION_LIST.agreementPDF}
           view={() => pdfLinkView(item?.aggrement_pdf_url)}
         />
-        <StatView title={'Register Link'} value={item?.register_url} />
+        <StatView
+          title={STRINGS.SUBSCRIPTION_LIST.registerLink}
+          value={item?.register_url}
+        />
       </View>
     );
   };
 
   const topView = () => {
     return (
-      <View style={{backgroundColor: colors.darkSecondary, paddingRight: 10}}>
-        {/* <TitleView title={""} /> */}
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'flex-end',
-            justifyContent: 'space-between',
-            paddingBottom: 5,
-          }}>
+      <View style={styles.topViewContainer}>
+        {/* <TitleView title={''} /> */}
+        <View style={styles.topViewRow}>
           {!!member ? (
-            <View
-              style={{
-                flex: 1,
-                marginLeft: 5,
-                height: 35,
-                flexDirection: 'row',
-                alignItems: 'center',
-              }}>
+            <View style={styles.memberInfoContainer}>
               <UserImage
                 image={member?.profile_image}
                 name={member?.first_name}
                 size={30}
               />
-              <View style={{marginLeft: 10, flex: 1}}>
-                <MyText
-                  type="bold"
-                  fontSize={
-                    12
-                  }>{`${member?.first_name} ${member?.last_name}`}</MyText>
-                <MyText
-                  type="medium"
-                  color={colors.lightText2}
-                  fontSize={10}>{`${member?.email}`}</MyText>
+              <View style={styles.memberTextContainer}>
+                <MyText type="bold" fontSize={12}>
+                  {STRINGS.SUBSCRIPTION_LIST.fullName(
+                    member?.first_name,
+                    member?.last_name,
+                  )}
+                </MyText>
+                <MyText type="medium" color={colors.lightText2} fontSize={10}>
+                  {member?.email}
+                </MyText>
               </View>
             </View>
           ) : (
-            <View style={{flex: 1, height: 35}} />
+            <View style={styles.memberPlaceholder} />
           )}
 
-          <View style={{marginTop: -2, paddingBottom: 5}}>
-            <MyText
-              fontSize={10}
-              type="medium"
-              color={
-                colors.lightText2
-              }>{`Showing ${list.length} of ${total}`}</MyText>
+          <View style={styles.countContainer}>
+            <MyText fontSize={10} type="medium" color={colors.lightText2}>
+              {STRINGS.SUBSCRIPTION_LIST.showingOfTotal(list.length, total)}
+            </MyText>
           </View>
         </View>
       </View>
@@ -277,8 +261,8 @@ const SubscriptionList = ({navigation, route}) => {
 
   return (
     <RootView titleView={topView}>
-      <View style={{flex: 1}}>
-        <View style={{flex: 1}}>
+      <Flex flex={1}>
+        <Flex flex={1}>
           <FlatList
             data={list}
             renderItem={renderList}
@@ -295,7 +279,7 @@ const SubscriptionList = ({navigation, route}) => {
             }}
             ListFooterComponent={<FooterLoader isVisible={footerLoader} />}
           />
-        </View>
+        </Flex>
         <MyLoader enable={loader} />
 
         <OptionModal
@@ -307,7 +291,7 @@ const SubscriptionList = ({navigation, route}) => {
           optionList={optionsList}
         />
         <ConfirmationModal
-          title={'Are you sure you want to delete this subscription?'}
+          title={STRINGS.SUBSCRIPTION_LIST.deleteConfirmation}
           closeModal={() =>
             setConfirmationModal({
               isVisible: false,
@@ -318,7 +302,7 @@ const SubscriptionList = ({navigation, route}) => {
           isVisible={confirmationModal.isVisible}
           onAgree={onAgreePress}
         />
-      </View>
+      </Flex>
     </RootView>
   );
 };
@@ -332,8 +316,64 @@ const optionsList = [
   //   icon: icons.edit
   // },
   {
-    title: 'Delete',
+    title: STRINGS.SUBSCRIPTION_LIST.delete,
     key: 'delete',
     icon: icons.trash,
   },
 ];
+
+const styles = StyleSheet.create({
+  listHeaderContainer: {
+    marginTop: -10,
+    backgroundColor: colors.darkSecondary,
+  },
+  hitSlop: {
+    left: 5,
+    top: 5,
+    bottom: 5,
+    right: 5,
+  },
+  previewButton: {
+    alignSelf: 'flex-start',
+  },
+  listItemContainer: {
+    backgroundColor: colors.secondary,
+    borderRadius: 10,
+    marginTop: 10,
+    padding: 10,
+  },
+  rowSpaceBetween: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  topViewContainer: {
+    backgroundColor: colors.darkSecondary,
+    paddingRight: 10,
+  },
+  topViewRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+    paddingBottom: 5,
+  },
+  memberInfoContainer: {
+    flex: 1,
+    marginLeft: 5,
+    height: 35,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  memberTextContainer: {
+    marginLeft: 10,
+    flex: 1,
+  },
+  memberPlaceholder: {
+    flex: 1,
+    height: 35,
+  },
+  countContainer: {
+    marginTop: -2,
+    paddingBottom: 5,
+  },
+});

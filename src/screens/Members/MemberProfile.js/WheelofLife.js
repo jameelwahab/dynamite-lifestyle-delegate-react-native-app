@@ -1,42 +1,42 @@
-import { View, Text, StyleSheet, Pressable, Settings } from 'react-native'
-import React, { useState } from 'react'
-import { PieChart } from 'react-native-svg-charts';
+import {View, Text, StyleSheet, Pressable, Settings} from 'react-native';
+import React, {useState} from 'react';
+import {PieChart} from 'react-native-svg-charts';
 import utilities from '../../../utilities';
-import { colors } from '../../../utilities/colors';
-import { fonts } from '../../../utilities/fonts';
+import {colors} from '../../../utilities/colors';
+import {STRINGS} from '../../../utilities/strings';
+import {fonts} from '../../../utilities/fonts';
 import MyText from '../../../components/MyText';
 import AssessmentQuestions from './AssessmentQuestions';
-import { __styles } from './style';
+import {__styles} from './style';
 import MyWebview from '../../../components/MyWebview';
 
-const size = utilities.screenWidth() * 0.7
-const WheelofLife = ({ member, settings }) => {
-  const [tab, setTab] = useState(0)
+const size = utilities.screenWidth() * 0.7;
+const WheelofLife = ({member, settings}) => {
+  const [tab, setTab] = useState(0);
   const _10percentOfsize = (10 / 100) * size;
 
   const getData = () => {
-    let list = []
+    let list = [];
     for (let i = 0; i < member.wheel_of_life.length; i++) {
       let obj = {
         key: member.wheel_of_life[i]._id,
         value: 100,
-        svg: { fill: member.wheel_of_life[i].scaling_color },
-        arc: { outerRadius: member.wheel_of_life[i].answer + '0%' },
+        svg: {fill: member.wheel_of_life[i].scaling_color},
+        arc: {outerRadius: member.wheel_of_life[i].answer + '0%'},
         question: member.wheel_of_life[i]?.scaling_main_heading,
-        answer: 0
+        answer: 0,
       };
-      list.push(obj)
+      list.push(obj);
     }
-    return list
-  }
-
+    return list;
+  };
 
   const getStyle = size => {
     return {
       height: _10percentOfsize * size,
       width: _10percentOfsize * size,
       borderRadius: (_10percentOfsize * size) / 2,
-      borderColor: "#FFF",
+      borderColor: '#FFF',
       borderWidth: 0.5,
       alignItems: 'center',
       justifyContent: 'center',
@@ -45,37 +45,51 @@ const WheelofLife = ({ member, settings }) => {
 
   const TabView = () => {
     return (
-      <View style={{ flexDirection: "row", }}>
-        <Pressable
-          onPress={() => setTab(0)}
-          style={__styles.tabBtn}>
+      <View style={WheelofLifeStyle.tabViewContainer}>
+        <Pressable onPress={() => setTab(0)} style={__styles.tabBtn}>
           <View>
-            <MyText style={__styles.tabBtnText}>Graph</MyText>
-            <View style={[__styles.tabSelector, { backgroundColor: tab == 0 ? colors.primary : colors.transparent }]} />
+            <MyText style={__styles.tabBtnText}>
+              {STRINGS.WHEEL_OF_LIFE.graph}
+            </MyText>
+            <View
+              style={[
+                __styles.tabSelector,
+                {
+                  backgroundColor:
+                    tab == 0 ? colors.primary : colors.transparent,
+                },
+              ]}
+            />
           </View>
         </Pressable>
-        <Pressable
-          onPress={() => setTab(1)}
-          style={__styles.tabBtn}>
+        <Pressable onPress={() => setTab(1)} style={__styles.tabBtn}>
           <View>
-            <MyText style={__styles.tabBtnText}>Questions</MyText>
-            <View style={[__styles.tabSelector, { backgroundColor: tab == 1 ? colors.primary : colors.transparent }]} />
+            <MyText style={__styles.tabBtnText}>
+              {STRINGS.WHEEL_OF_LIFE.questions}
+            </MyText>
+            <View
+              style={[
+                __styles.tabSelector,
+                {
+                  backgroundColor:
+                    tab == 1 ? colors.primary : colors.transparent,
+                },
+              ]}
+            />
           </View>
         </Pressable>
       </View>
-    )
-  }
+    );
+  };
 
   return (
     <View style={__styles.tabRootView}>
-
       {TabView()}
 
-
-      {tab == 0 ?
+      {tab == 0 ? (
         <View style={WheelofLifeStyle.chartView}>
           <PieChart
-            style={{ width: size, height: size }}
+            style={{width: size, height: size}}
             outerRadius={'100%'}
             innerRadius={0}
             data={getData()}
@@ -94,54 +108,107 @@ const WheelofLife = ({ member, settings }) => {
                   <Text style={WheelofLifeStyle.bordertext}>4</Text>
                   <View style={getStyle(2)}>
                     <Text style={WheelofLifeStyle.bordertext}>2</Text>
-
                   </View>
                 </View>
               </View>
             </View>
           </View>
 
-          <View style={{ width: utilities.screenWidth() * 0.8, paddingVertical: 20 }}>
+          <View style={WheelofLifeStyle.legendContainer}>
             {member?.wheel_of_life.map((item, index) => (
-              <View style={{ alignItems: "center", marginBottom: 15, flexDirection: "row", }}>
-                <View style={{ height: 15, width: 50, backgroundColor: item.scaling_color }} />
-                <View style={{ flex: 1 }}>
-                  <Text style={WheelofLifeStyle.questionText}>{item?.scaling_main_heading.replace("{Name}", member?.first_name)}</Text>
+              <View style={WheelofLifeStyle.legendItem}>
+                <View
+                  style={{
+                    height: 15,
+                    width: 50,
+                    backgroundColor: item.scaling_color,
+                  }}
+                />
+                <View style={WheelofLifeStyle.legendTextContainer}>
+                  <Text style={WheelofLifeStyle.questionText}>
+                    {item?.scaling_main_heading.replace(
+                      '{Name}',
+                      member?.first_name,
+                    )}
+                  </Text>
                 </View>
               </View>
             ))}
           </View>
-        </View> :
-        <View style={{ paddingBottom: "10%", paddingHorizontal: 10 }}>
-          <View style={WheelofLifeStyle.assessmentHeadingView}>
-            <MyText style={WheelofLifeStyle.assessmentHeading} >Assessment</MyText>
-          </View>
-          <AssessmentQuestions list={member?.assessment} name={member?.first_name} />
-
-          <View style={WheelofLifeStyle.assessmentHeadingView}>
-            <MyText style={WheelofLifeStyle.assessmentHeading} >Questions</MyText>
-          </View>
-          <AssessmentQuestions list={member?.wheel_of_life} name={member?.first_name} />
-
-
-
-          <View style={WheelofLifeStyle.assessmentHeadingView}>
-            <MyText style={WheelofLifeStyle.assessmentHeading} >Intention Statement</MyText>
-          </View>
-          <MyWebview fullWidth
-            html={settings?.wheel_of_life_intention_statement} />
-
-          <MyText type='light' style={{ marginTop: 3 }} color={colors.lightText2}>{member?.intention_statement}</MyText>
         </View>
-      }
+      ) : (
+        <View style={WheelofLifeStyle.questionsContainer}>
+          <View style={WheelofLifeStyle.assessmentHeadingView}>
+            <MyText style={WheelofLifeStyle.assessmentHeading}>
+              {STRINGS.WHEEL_OF_LIFE.assessment}
+            </MyText>
+          </View>
+          <AssessmentQuestions
+            list={member?.assessment}
+            name={member?.first_name}
+          />
 
+          <View style={WheelofLifeStyle.assessmentHeadingView}>
+            <MyText style={WheelofLifeStyle.assessmentHeading}>
+              {STRINGS.WHEEL_OF_LIFE.questions}
+            </MyText>
+          </View>
+          <AssessmentQuestions
+            list={member?.wheel_of_life}
+            name={member?.first_name}
+          />
+
+          <View style={WheelofLifeStyle.assessmentHeadingView}>
+            <MyText style={WheelofLifeStyle.assessmentHeading}>
+              {STRINGS.WHEEL_OF_LIFE.intentionStatement}
+            </MyText>
+          </View>
+          <MyWebview
+            fullWidth
+            html={settings?.wheel_of_life_intention_statement}
+          />
+
+          <MyText
+            type="light"
+            style={WheelofLifeStyle.intentionText}
+            color={colors.lightText2}>
+            {member?.intention_statement}
+          </MyText>
+        </View>
+      )}
     </View>
-  )
-}
+  );
+};
 
-export default WheelofLife
+export default WheelofLife;
 
 const WheelofLifeStyle = StyleSheet.create({
+  tabViewContainer: {
+    flexDirection: 'row',
+  },
+  legendContainer: {
+    width: utilities.screenWidth() * 0.8,
+    paddingVertical: 20,
+  },
+  legendItem: {
+    alignItems: 'center',
+    marginBottom: 15,
+    flexDirection: 'row',
+  },
+  legendColorBox: {
+    height: 15,
+    width: 50,
+  },
+  legendTextContainer: {
+    flex: 1,
+  },
+  questionsContainer: {
+    paddingBottom: '10%',
+    paddingHorizontal: 10,
+  },
+  intentionText: {
+    marginTop: 3,
+  },
   assessmentHeadingView: {
     marginBottom: 20,
     borderBottomColor: colors.placeholder,
@@ -149,16 +216,16 @@ const WheelofLifeStyle = StyleSheet.create({
     paddingBottom: 10,
     marginHorizontal: -10,
     paddingHorizontal: 10,
-    marginTop: 20
+    marginTop: 20,
   },
   assessmentHeading: {
     fontSize: 16,
     color: colors.primary,
-    fontFamily: fonts.medium
+    fontFamily: fonts.medium,
   },
-  chartView: { alignItems: 'center', marginVertical: '10%', flex: 1 },
-  questionView: { marginTop: 20, alignItems: 'center' },
-  questionText: { fontSize: 24 },
+  chartView: {alignItems: 'center', marginVertical: '10%', flex: 1},
+  questionView: {marginTop: 20, alignItems: 'center'},
+  questionText: {fontSize: 24},
   answerButtonView: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -173,21 +240,20 @@ const WheelofLifeStyle = StyleSheet.create({
     color: '#404040',
   },
   questionText: {
-    color: "#FFF",
+    color: '#FFF',
     marginLeft: 10,
     fontFamily: fonts.regular,
     includeFontPadding: false,
-    fontSize: 12
+    fontSize: 12,
   },
   bordertext: {
     position: 'absolute',
     top: -8,
-    backgroundColor: "#BFBFBF",
+    backgroundColor: '#BFBFBF',
     includeFontPadding: false,
     paddingHorizontal: 5,
-    color: "#fff",
+    color: '#fff',
     fontSize: 14,
-
   },
   answerButton: {
     height: 40,
@@ -202,7 +268,7 @@ const WheelofLifeStyle = StyleSheet.create({
     // backgroundColor: Colors.white,
     borderRadius: 10,
   },
-  answerButtonText: { fontSize: 18, },
+  answerButtonText: {fontSize: 18},
   dot: {
     height: 5,
     width: 5,
@@ -215,7 +281,7 @@ const WheelofLifeStyle = StyleSheet.create({
     position: 'absolute',
     zIndex: -1,
     borderRadius: size / 2,
-    borderColor: "#FFF",
+    borderColor: '#FFF',
     borderWidth: 0.5,
     alignItems: 'center',
     justifyContent: 'center',
@@ -239,5 +305,4 @@ const WheelofLifeStyle = StyleSheet.create({
     marginLeft: 10,
     includeFontPadding: false,
   },
-
 });

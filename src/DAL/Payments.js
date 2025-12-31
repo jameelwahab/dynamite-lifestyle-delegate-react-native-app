@@ -13,6 +13,7 @@ export const GET_TRANSACTIONS_LIST = ({
     postData: {search_text, transaction_mode},
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -22,6 +23,7 @@ export const GET_COMMISSION_LIST = ({token, navigation, type, page}) => {
     method: 'GET',
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -31,6 +33,7 @@ export const GET_PAYMENT_REQUEST_LIST = ({token, navigation, page, sort}) => {
     method: 'GET',
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -45,6 +48,7 @@ export const GET_MEMBER_LIST_FOR_PAYMENT_REQUEST = ({
     method: 'GET',
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -54,6 +58,7 @@ export const GET_PRODUCT_LIST = ({token, navigation}) => {
     method: 'GET',
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -67,6 +72,7 @@ export const GET_PAYMENT_TEMPLATE_AND_PROGRAMMES_LIST = ({
     postData: {filter_array: ['program', 'payment_template']},
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -76,6 +82,7 @@ export const GET_TEMPLATE_DETAIL = ({token, navigation, templateId}) => {
     method: 'GET',
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -86,6 +93,7 @@ export const ADD_PAYMENT_REQUEST = ({token, navigation, body}) => {
     postData: body,
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -96,6 +104,7 @@ export const EDIT_PAYMENT_REQUEST = ({token, navigation, body, slug}) => {
     postData: body,
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -105,6 +114,7 @@ export const DELETE_PAYMENT_REQUEST = ({token, navigation, slug}) => {
     method: 'DELETE',
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -114,6 +124,7 @@ export const GET_PAYMENT_REQUEST_DETAIL = ({token, navigation, slug}) => {
     method: 'GET',
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -128,6 +139,7 @@ export const PAY_RECURRING = ({
     postData: {payment_request_slug, source_token},
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -147,6 +159,7 @@ export const CONFIRM_RECURRING_PAYMENT = ({
     },
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -161,6 +174,7 @@ export const GET_CLIENT_SECRET_FOR_PAY_ONETIME = ({
     postData: {payment_request_slug},
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -175,6 +189,7 @@ export const CHANGE_ONETIME_PAYMNET_STATUS_TO_PAID = ({
     postData: {payment_request_slug},
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -184,6 +199,7 @@ export const GET_PAYEMENT_DETAIL = ({token, navigation, requestId}) => {
     method: 'GET',
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -198,6 +214,7 @@ export const BANK_PAYMENT_LINK = ({
     method: 'GET',
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -218,6 +235,7 @@ export const MARK_PAYMENT_AS_CANCELLED_OR_PAID = ({
     },
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -227,6 +245,7 @@ export const GET_DATE_LIST_PLAN = ({token, navigation}) => {
     method: 'GET',
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -236,6 +255,7 @@ export const GET_PAYMENT_CONFIGURATION_DETAIL = ({token, navigation, id}) => {
     method: 'GET',
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -251,6 +271,7 @@ export const UPDATE_AGREEMENT_CONFIGURATION = ({
     token,
     navigation,
     postData: data,
+    isNewAPI: true,
   });
 };
 
@@ -260,6 +281,7 @@ export const GET_PROGRAMS_AND_EVENTS = ({token, navigation, id}) => {
     method: 'GET',
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -270,5 +292,6 @@ export const UPDATE_PROGRAMS_AND_EVENTS = ({token, navigation, id, data}) => {
     token,
     navigation,
     postData: data,
+    isNewAPI: true,
   });
 };

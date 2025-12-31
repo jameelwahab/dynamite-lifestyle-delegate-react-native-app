@@ -1,6 +1,5 @@
 import {
   View,
-  Text,
   StyleSheet,
   TouchableOpacity,
   ScrollView,
@@ -8,18 +7,16 @@ import {
   Pressable,
   Image,
 } from 'react-native';
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useRef, useState} from 'react';
 import RootView from '../../../components/RootView';
 import MyText from '../../../components/MyText';
 import {colors} from '../../../utilities/colors';
+import {STRINGS} from '../../../utilities/strings';
 import UserImage from '../../../components/UserImage';
 import {icons} from '../../../utilities/icons';
 import StatView from '../Components/StatView';
 import {convertTimezone} from '../../../functions/convertTime';
-import {
-  communityLevelWithAllObj,
-  dateTimeFormat,
-} from '../../../utilities/constants';
+import {dateTimeFormat} from '../../../utilities/constants';
 import {useSelector} from 'react-redux';
 import {selectTimeZone} from '../../../redux/reducers/timezoneSlice';
 import LeadModal from '../Components/LeadModal';
@@ -30,10 +27,8 @@ import routes from '../../../navigation/routes';
 import moment from 'moment';
 import numFormatter from '../../../functions/numFormatter';
 import NotesModal from '../Components/NotesModal';
-import OptionModal from '../../../components/OptionModal';
 import {optionList} from '../Components/list';
 import {MenuButton} from '../../../components/MyButton';
-import {selectNavbar} from '../../../redux/reducers/navbarSlice';
 import MyCheckBox from '../../../components/MyCheckBox';
 import CallHistoryNoteModal from '../Components/CallHistoryNoteModal';
 import InfoModal from '../../../components/InfoModal';
@@ -48,9 +43,9 @@ import MyImage from '../../../components/MyImage';
 const MemberDetail = ({navigation, route}) => {
   const {type} = route?.params;
   const {access, S3_URL} = useSelector(selectUser);
-  const isAllMembers = type == 'all-member';
-  const isMembers = type == 'member';
-  const isNurture = type == 'nurture';
+  const isAllMembers = type == STRINGS.MEMBER_DETAIL.types.allMember;
+  const isMembers = type == STRINGS.MEMBER_DETAIL.types.member;
+  const isNurture = type == STRINGS.MEMBER_DETAIL.types.nurture;
   const ref_optionModal = useRef();
   const leadModalRef = useRef();
   const hitoryModalRef = useRef();
@@ -85,34 +80,34 @@ const MemberDetail = ({navigation, route}) => {
   };
 
   const onOptSelected = opt => {
-    if (opt?.key == 'notes') {
+    if (opt?.key == STRINGS.MEMBER_DETAIL.optionKeys.notes) {
       navigation.navigate(routes.memberNotesListing, {
         for: 'members',
         memberId: member?._id,
         updateNotes: updateTheNotes,
       });
-    } else if (opt?.key == 'subscription') {
+    } else if (opt?.key == STRINGS.MEMBER_DETAIL.optionKeys.subscription) {
       navigation.navigate(routes.memberSubscribersListing, {
         memberId: member?._id,
       });
-    } else if (opt?.key == 'manage-mission') {
+    } else if (opt?.key == STRINGS.MEMBER_DETAIL.optionKeys.manageMission) {
       navigation.navigate(routes.memberManage, {
         memberId: member?._id,
       });
-    } else if (opt?.key == 'question-answer') {
+    } else if (opt?.key == STRINGS.MEMBER_DETAIL.optionKeys.questionAnswer) {
       navigation.navigate(routes.memberQuestionListing, {
         memberId: member?._id,
         member: member,
       });
-    } else if (opt?.key == 'profile') {
+    } else if (opt?.key == STRINGS.MEMBER_DETAIL.optionKeys.profile) {
       navigation.navigate(routes.memberProfile, {
         memberId: member?._id,
       });
-    } else if (opt?.key == 'update_call') {
+    } else if (opt?.key == STRINGS.MEMBER_DETAIL.optionKeys.updateCall) {
       ref_confirmModal?.current?.openModal({
-        title: `Are you sure you want to ${
-          member?.is_call_allowed ? 'disable' : 'enable'
-        } call functionality for this user?`,
+        title: member?.is_call_allowed
+          ? STRINGS.MEMBER_DETAIL.confirmDisableCall
+          : STRINGS.MEMBER_DETAIL.confirmEnableCall,
         agreeFunc: () => updateCallAPI(),
       });
     }
@@ -120,11 +115,11 @@ const MemberDetail = ({navigation, route}) => {
 
   const filterTheList = list => {
     return list.slice().filter(x => {
-      if (x.key == 'profile') {
+      if (x.key == STRINGS.MEMBER_DETAIL.optionKeys.profile) {
         return access?.view_profile;
       } else if (x.key == 'subscription-list' || x.key == 'transaction-list') {
         return isAllMembers;
-      } else if (x.key == 'question-answer') {
+      } else if (x.key == STRINGS.MEMBER_DETAIL.optionKeys.questionAnswer) {
         if (isSubTeam) {
           return isAllMembers;
         } else {
@@ -233,21 +228,21 @@ const MemberDetail = ({navigation, route}) => {
 
   const topView = () => {
     return (
-      <View style={__styles.memberRootView}>
-        <View style={__styles.memberProfileView}>
+      <View style={styles.memberRootView}>
+        <View style={styles.memberProfileView}>
           <TouchableOpacity
             onPress={() => navigation.goBack()}
-            style={__styles.backButtton}>
+            style={styles.backButtton}>
             {icons.back(colors.primary, 25)}
           </TouchableOpacity>
 
           <Pressable
             onPress={() => {
               if (access?.view_profile) {
-                onOptSelected({key: 'profile'});
+                onOptSelected({key: STRINGS.MEMBER_DETAIL.optionKeys.profile});
               }
             }}
-            style={{flexDirection: 'row', flex: 1, alignItems: 'center'}}>
+            style={styles.profilePressable}>
             <View>
               <UserImage
                 borderWidth={2}
@@ -261,29 +256,27 @@ const MemberDetail = ({navigation, route}) => {
               />
               <View
                 style={[
-                  {
-                    backgroundColor: member?.is_online
-                      ? colors.online
-                      : colors.primary2,
-                  },
-                  __styles.memberStatusView,
+                  member?.is_online
+                    ? styles.onlineStatus
+                    : styles.offlineStatus,
+                  styles.memberStatusView,
                 ]}
               />
               {/* <View style={[{ backgroundColor: member?.is_membership_active ? colors.active : colors.expire, }, __styles.memberActiveView]} /> */}
             </View>
 
-            <View style={__styles.memberProfileNameView}>
+            <View style={styles.memberProfileNameView}>
               <MyText fontSize={14} type="bold">
                 {member?.first_name + ' ' + member?.last_name}
               </MyText>
               {isAllMembers && <MyText fontSize={12}>{member?.email}</MyText>}
             </View>
           </Pressable>
-          <MyText style={{marginRight: 10}}>
+          <MyText style={styles.marginRight10}>
             {country.find(el => el.code === member?.country).flag}
           </MyText>
           <TouchableOpacity
-            style={{marginRight: 10}}
+            style={styles.marginRight10}
             onPress={() => onChatScreen(member?._id)}>
             {icons.message(colors.primary, 20)}
           </TouchableOpacity>
@@ -300,11 +293,8 @@ const MemberDetail = ({navigation, route}) => {
   const wheelOfLifeStatus = () => {
     if (!!member?.is_wheel_of_life) {
       return (
-        <View style={__styles.noteView}>
-          <Image
-            source={icons.wheelOfLife}
-            style={{height: '100%', width: '100%'}}
-          />
+        <View style={styles.noteView}>
+          <Image source={icons.wheelOfLife} style={styles.fullSize} />
         </View>
       );
     }
@@ -312,18 +302,18 @@ const MemberDetail = ({navigation, route}) => {
 
   const leadStatusView = () => {
     return (
-      <View style={{flexDirection: 'row', alignItems: 'center'}}>
+      <View style={styles.rowAlignCenter}>
         <TouchableHighlight
-          style={{flex: 1}}
+          style={styles.flex1}
           onPress={() => leadModalRef?.current?.openModal()}>
           <View
             style={[
-              __styles.leadRootView,
+              styles.leadRootView,
               !!member?.lead_status && {
                 backgroundColor: member?.lead_status?.background_color,
               },
             ]}>
-            <View style={__styles.leadStatusTextView}>
+            <View style={styles.leadStatusTextView}>
               <MyText
                 color={
                   !!member?.lead_status
@@ -332,10 +322,10 @@ const MemberDetail = ({navigation, route}) => {
                 }>
                 {!!member?.lead_status
                   ? member?.lead_status?.title
-                  : 'Lead Status'}
+                  : STRINGS.MEMBER_DETAIL.leadStatus}
               </MyText>
             </View>
-            <View style={__styles.leadStatusIconView}>
+            <View style={styles.leadStatusIconView}>
               {icons.down(colors.primary, 15)}
             </View>
           </View>
@@ -343,7 +333,7 @@ const MemberDetail = ({navigation, route}) => {
         {!!member?.lead_status > 0 && (
           <TouchableOpacity
             onPress={() => hitoryModalRef?.current?.openModal()}
-            style={__styles.historyBtn}>
+            style={styles.historyBtn}>
             {icons.history(colors.primary, 15)}
           </TouchableOpacity>
         )}
@@ -360,7 +350,7 @@ const MemberDetail = ({navigation, route}) => {
             [...member?.personal_note].reverse(),
           )
         }
-        style={__styles.noteView}>
+        style={styles.noteView}>
         <MyText color={colors.black} fontSize={14}>
           {member?.personal_note.length}
         </MyText>
@@ -372,11 +362,13 @@ const MemberDetail = ({navigation, route}) => {
     return (
       <View
         style={[
-          __styles.statusView,
-          {backgroundColor: member?.status ? colors.online : colors.heart},
+          styles.statusView,
+          member?.status ? styles.activeBackground : styles.inactiveBackground,
         ]}>
         <MyText color={colors.white} fontSize={14}>
-          {!!member?.status ? 'Active' : 'Inactive'}
+          {!!member?.status
+            ? STRINGS.MEMBER_DETAIL.active
+            : STRINGS.MEMBER_DETAIL.inactive}
         </MyText>
       </View>
     );
@@ -386,15 +378,15 @@ const MemberDetail = ({navigation, route}) => {
     return (
       <View
         style={[
-          __styles.statusView,
-          {
-            backgroundColor: !!member?.goal_statement_status
-              ? colors.online
-              : colors.heart,
-          },
+          styles.statusView,
+          member?.goal_statement_status
+            ? styles.activeBackground
+            : styles.inactiveBackground,
         ]}>
         <MyText color={colors.white} fontSize={14}>
-          {!!member?.goal_statement_status ? 'Unlocked' : 'Locked'}
+          {!!member?.goal_statement_status
+            ? STRINGS.MEMBER_DETAIL.unlocked
+            : STRINGS.MEMBER_DETAIL.locked}
         </MyText>
       </View>
     );
@@ -410,7 +402,7 @@ const MemberDetail = ({navigation, route}) => {
                 return (
                   <MyText
                     key={`event_subscriber${i}`}
-                    style={{marginTop: 3}}
+                    style={styles.marginTop3}
                     fontSize={12}
                     type="medium">
                     {x?.page_info?.sale_page_title +
@@ -425,13 +417,15 @@ const MemberDetail = ({navigation, route}) => {
                 color={colors.primary}
                 type="bold"
                 onPress={() => setShowMorePages(!showMorePages)}>
-                {showMorePages ? 'Show Less' : 'Show More'}
+                {showMorePages
+                  ? STRINGS.MEMBER_DETAIL.showLess
+                  : STRINGS.MEMBER_DETAIL.showMore}
               </MyText>
             )}
           </>
         ) : (
           <MyText fontSize={12} type="medium">
-            {'N/A'}
+            {STRINGS.MEMBER_DETAIL.na}
           </MyText>
         )}
       </View>
@@ -457,13 +451,15 @@ const MemberDetail = ({navigation, route}) => {
                 color={colors.primary}
                 type="bold"
                 onPress={() => setShowMorePrograms(!showMorePrograms)}>
-                {showMorePrograms ? 'Show Less' : 'Show More'}
+                {showMorePrograms
+                  ? STRINGS.MEMBER_DETAIL.showLess
+                  : STRINGS.MEMBER_DETAIL.showMore}
               </MyText>
             )}
           </>
         ) : (
           <MyText fontSize={12} type="medium">
-            {'N/A'}
+            {STRINGS.MEMBER_DETAIL.na}
           </MyText>
         )}
       </View>
@@ -472,8 +468,8 @@ const MemberDetail = ({navigation, route}) => {
 
   const contactNumberView = (phone, isChecked, isAllowed) => {
     return (
-      <View style={{flexDirection: 'row', alignItems: 'center'}}>
-        <View style={{marginRight: 10}}>
+      <View style={styles.rowAlignCenter}>
+        <View style={styles.marginRight10}>
           <MyText type="medium" fontSize={12}>
             {phone}
           </MyText>
@@ -504,14 +500,14 @@ const MemberDetail = ({navigation, route}) => {
 
   const appDownloadedView = value => {
     return (
-      <View style={{flexDirection: 'row', alignItems: 'center'}}>
-        <View style={{marginRight: 5}}>
+      <View style={styles.rowAlignCenter}>
+        <View style={styles.marginRight5}>
           {value
             ? icons.appDownloadedEmoji(25)
             : icons.appNotDownloadedEmoji(25)}
         </View>
         <MyText fontSize={12} type="medium">
-          {value ? 'Yes' : 'No'}
+          {value ? STRINGS.MEMBER_DETAIL.yes : STRINGS.MEMBER_DETAIL.no}
         </MyText>
       </View>
     );
@@ -529,7 +525,7 @@ const MemberDetail = ({navigation, route}) => {
                 item?.membership_level_badge_info?.membership_level_badge_icon
                   ?.thumbnail_1,
             }}
-            style={{width: 15, height: 15, marginRight: 5}}
+            style={styles.badgeIcon}
           />
         )}
         {!!item?.membership_level_badge_info?.membership_level_badge_title && (
@@ -538,21 +534,16 @@ const MemberDetail = ({navigation, route}) => {
           </MyText>
         )}
         <View
-          style={{
-            backgroundColor: item?.is_membership_active
-              ? colors.active
-              : colors.delete,
-            borderRadius: 5,
-            padding: 3,
-            marginLeft: 5,
-          }}>
-          <MyText
-            fontSize={10}
-            uppercase
-            type="bold"
-            // color={item?.is_membership_active ? colors.active : colors.delete}
-            color={colors.white}>
-            {item?.is_membership_active ? 'Active' : 'Expired'}
+          style={[
+            styles.membershipBadge,
+            item?.is_membership_active
+              ? styles.activeBadge
+              : styles.expiredBadge,
+          ]}>
+          <MyText fontSize={10} uppercase type="bold" color={colors.white}>
+            {item?.is_membership_active
+              ? STRINGS.MEMBER_DETAIL.active
+              : STRINGS.MEMBER_DETAIL.expired}
           </MyText>
         </View>
       </Row>
@@ -563,7 +554,7 @@ const MemberDetail = ({navigation, route}) => {
     return (
       <View>
         <StatView
-          title={'Membership Expire'}
+          title={STRINGS.MEMBER_DETAIL.stats.membershipExpire}
           value={
             !!member?.membership_purchase_expiry
               ? isAllMembers
@@ -571,24 +562,23 @@ const MemberDetail = ({navigation, route}) => {
                 : moment(new Date(member?.membership_purchase_expiry))
                     .tz(timezone.admin)
                     .format(dateTimeFormat.date)
-              : 'N/A'
+              : STRINGS.MEMBER_DETAIL.na
           }
-          // view={() => membershipView(member)}
         />
 
         <StatView
-          title={'Coins'}
+          title={STRINGS.MEMBER_DETAIL.stats.coins}
           value={numFormatter(member?.coins_count)}
           uppercase
         />
         <StatView
-          title={'App Downloaded'}
+          title={STRINGS.MEMBER_DETAIL.stats.appDownloaded}
           view={() => appDownloadedView(member?.downloaded_app)}
           uppercase
         />
         {isAllMembers && (
           <StatView
-            title={'Reffered User'}
+            title={STRINGS.MEMBER_DETAIL.stats.referredUser}
             value={
               !!member?.affliliate?.affiliate_user_info
                 ? member?.affliliate?.affiliate_user_info?.first_name +
@@ -597,43 +587,49 @@ const MemberDetail = ({navigation, route}) => {
                   ' (' +
                   member?.affliliate?.affiliate_url_name +
                   ') '
-                : 'Master Link'
+                : STRINGS.MEMBER_DETAIL.masterLink
             }
           />
         )}
         {!isNurture && access?.Show_nurture_in_filter && (
           <StatView
-            title={'Nurture'}
+            title={STRINGS.MEMBER_DETAIL.stats.nurture}
             value={
               !!member?.nurture
                 ? member?.nurture?.first_name + ' ' + member?.nurture?.last_name
-                : 'N/A'
+                : STRINGS.MEMBER_DETAIL.na
             }
           />
         )}
         {!isMembers && (
           <StatView
-            title={'Delegate'}
+            title={STRINGS.MEMBER_DETAIL.stats.delegate}
             value={
               !!member?.consultant
                 ? member?.consultant?.first_name +
                   ' ' +
                   member?.consultant?.last_name
-                : 'N/A'
+                : STRINGS.MEMBER_DETAIL.na
             }
           />
         )}
-        <StatView title={'Badge Level'} view={() => badgeLevelView(member)} />
-        <StatView title={'Wheel of life'} view={wheelOfLifeStatus} />
         <StatView
-          title={'Last Login Activity'}
+          title={STRINGS.MEMBER_DETAIL.stats.badgeLevel}
+          view={() => badgeLevelView(member)}
+        />
+        <StatView
+          title={STRINGS.MEMBER_DETAIL.stats.wheelOfLife}
+          view={wheelOfLifeStatus}
+        />
+        <StatView
+          title={STRINGS.MEMBER_DETAIL.stats.lastLoginActivity}
           uppercase
           value={convertTimezone(member?.last_login_activity, timezone).format(
             dateTimeFormat.dateTime,
           )}
         />
         <StatView
-          title={'Phone Number'}
+          title={STRINGS.MEMBER_DETAIL.stats.phoneNumber}
           view={() =>
             contactNumberView(
               member?.contact_number,
@@ -642,67 +638,89 @@ const MemberDetail = ({navigation, route}) => {
             )
           }
         />
-        <StatView title={'Lead Status'} view={leadStatusView} />
+        <StatView
+          title={STRINGS.MEMBER_DETAIL.stats.leadStatus}
+          view={leadStatusView}
+        />
         {isMembers && (
           <StatView
-            title={'Wheel of Life Completed Date'}
+            title={STRINGS.MEMBER_DETAIL.stats.wheelOfLifeCompletedDate}
             value={
               !!member?.wheel_of_life_completed_date
                 ? moment(member?.wheel_of_life_completed_date).format(
                     dateTimeFormat.date,
                   )
-                : 'N/A'
+                : STRINGS.MEMBER_DETAIL.na
             }
           />
         )}
-        <StatView title={'Client Note'} view={noteView} />
-        <StatView title={'Pages'} view={pagesView} />
-        <StatView title={'Programmes'} view={ProgrammsView} />
+        <StatView
+          title={STRINGS.MEMBER_DETAIL.stats.clientNote}
+          view={noteView}
+        />
+        <StatView title={STRINGS.MEMBER_DETAIL.stats.pages} view={pagesView} />
+        <StatView
+          title={STRINGS.MEMBER_DETAIL.stats.programmes}
+          view={ProgrammsView}
+        />
         {isAllMembers && (
           <>
             <StatView
-              title={'Wheel of Life Enable'}
-              value={member?.is_wheel_of_life_enable ? 'YES' : 'No'}
+              title={STRINGS.MEMBER_DETAIL.stats.wheelOfLifeEnable}
+              value={
+                member?.is_wheel_of_life_enable
+                  ? STRINGS.MEMBER_DETAIL.yes
+                  : STRINGS.MEMBER_DETAIL.no
+              }
             />
             <StatView
-              title={'Daily Intention Coins'}
+              title={STRINGS.MEMBER_DETAIL.stats.dailyIntentionCoins}
               value={numFormatter(member?.dynamite_diary_coins_count, 1)}
               uppercase
             />
             <StatView
-              title={'Gratitude Coins'}
+              title={STRINGS.MEMBER_DETAIL.stats.gratitudeCoins}
               value={numFormatter(member?.dynamite_gratitude_coins_count, 1)}
               uppercase
             />
             <StatView
-              title={'Assessment Coins'}
+              title={STRINGS.MEMBER_DETAIL.stats.assessmentCoins}
               value={numFormatter(member?.attitude_assessment_coins_count, 1)}
               uppercase
             />
             <StatView
-              title={'Meditation Coins'}
+              title={STRINGS.MEMBER_DETAIL.stats.meditationCoins}
               value={numFormatter(member?.meditation_coins_count, 1)}
               uppercase
             />
             <StatView
-              title={'Goal Statement'}
+              title={STRINGS.MEMBER_DETAIL.stats.goalStatement}
               value={
                 !!member?.goal_statement_completed_status
-                  ? `completed (${moment(
+                  ? `${STRINGS.MEMBER_DETAIL.completed} (${moment(
                       member.goal_statement_completed_date,
                     ).format(dateTimeFormat.date)})`
-                  : 'Incomplete'
+                  : STRINGS.MEMBER_DETAIL.incomplete
               }
             />
           </>
         )}
 
         <StatView
-          title={isAllMembers ? 'Created At' : 'Registration Date'}
+          title={
+            isAllMembers
+              ? STRINGS.MEMBER_DETAIL.stats.createdAt
+              : STRINGS.MEMBER_DETAIL.stats.registrationDate
+          }
           value={moment(member?.createdAt).format(dateTimeFormat.date)}
         />
-        <StatView title={'Status'} view={statusView} />
-        {isAllMembers && <StatView title={'Goal'} view={goalView} />}
+        <StatView
+          title={STRINGS.MEMBER_DETAIL.stats.status}
+          view={statusView}
+        />
+        {isAllMembers && (
+          <StatView title={STRINGS.MEMBER_DETAIL.stats.goal} view={goalView} />
+        )}
       </View>
     );
   };
@@ -712,11 +730,7 @@ const MemberDetail = ({navigation, route}) => {
       {topView()}
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{
-          paddingTop: 10,
-          paddingBottom: 30,
-          paddingHorizontal: 5,
-        }}
+        contentContainerStyle={styles.scrollContainer}
         indicatorStyle="white">
         {memberStatView()}
       </ScrollView>
@@ -764,21 +778,29 @@ const MemberDetail = ({navigation, route}) => {
 
 export default MemberDetail;
 
-const __styles = StyleSheet.create({
-  memberRootView: {
-    // backgroundColor: colors.secondary,
-    // marginTop: 10, borderRadius: 10, padding: 10
-  },
+const styles = StyleSheet.create({
+  memberRootView: {},
   memberProfileView: {flexDirection: 'row', alignItems: 'center'},
+  profilePressable: {
+    flexDirection: 'row',
+    flex: 1,
+    alignItems: 'center',
+  },
   memberStatusView: {
     position: 'absolute',
     bottom: 0,
     right: 0,
     height: 9,
     width: 9,
-    borderRadius: 10 / 2,
+    borderRadius: 5,
     borderWidth: 1,
     borderColor: colors.white,
+  },
+  onlineStatus: {
+    backgroundColor: colors.online,
+  },
+  offlineStatus: {
+    backgroundColor: colors.primary2,
   },
   memberActiveView: {
     position: 'absolute',
@@ -786,27 +808,47 @@ const __styles = StyleSheet.create({
     right: 0,
     height: 10,
     width: 10,
-    borderRadius: 10 / 2,
+    borderRadius: 5,
   },
   memberProfileNameView: {flex: 1, marginLeft: 10},
   backButtton: {height: 50, width: 30, justifyContent: 'center'},
+  marginRight10: {
+    marginRight: 10,
+  },
+  marginRight5: {
+    marginRight: 5,
+  },
+  marginTop3: {
+    marginTop: 3,
+  },
+  rowAlignCenter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  flex1: {
+    flex: 1,
+  },
   noteView: {
     height: 30,
     width: 30,
-    borderRadius: 30 / 2,
+    borderRadius: 15,
     backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
   statusView: {
-    // paddingVertical: 5,
-    // paddingHorizontal: 15,
     height: 25,
     minWidth: 80,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 30,
     alignSelf: 'flex-start',
+  },
+  activeBackground: {
+    backgroundColor: colors.online,
+  },
+  inactiveBackground: {
+    backgroundColor: colors.heart,
   },
   historyBtn: {
     width: 30,
@@ -826,4 +868,29 @@ const __styles = StyleSheet.create({
     flex: 1,
   },
   leadStatusIconView: {},
+  badgeIcon: {
+    width: 15,
+    height: 15,
+    marginRight: 5,
+  },
+  membershipBadge: {
+    borderRadius: 5,
+    padding: 3,
+    marginLeft: 5,
+  },
+  activeBadge: {
+    backgroundColor: colors.active,
+  },
+  expiredBadge: {
+    backgroundColor: colors.delete,
+  },
+  fullSize: {
+    height: '100%',
+    width: '100%',
+  },
+  scrollContainer: {
+    paddingTop: 10,
+    paddingBottom: 30,
+    paddingHorizontal: 5,
+  },
 });

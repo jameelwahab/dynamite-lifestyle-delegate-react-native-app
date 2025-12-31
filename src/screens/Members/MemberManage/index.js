@@ -8,10 +8,11 @@ import StatView from '../../../components/StatView';
 import MyRefreshControl from '../../../components/MyRefreshControl';
 import {MEMBER_MISSION_QUEST} from '../../../DAL';
 import {colors} from '../../../utilities/colors';
+import {STRINGS} from '../../../utilities/strings';
 import routes from '../../../navigation/routes';
 import {selectUser} from '../../../redux/reducers/userSlice';
 import {useSelector} from 'react-redux';
-import {View, FlatList, TouchableOpacity} from 'react-native';
+import {View, FlatList, TouchableOpacity, StyleSheet} from 'react-native';
 import {useState, useEffect} from 'react';
 
 const MemberManage = ({route, navigation}) => {
@@ -20,7 +21,10 @@ const MemberManage = ({route, navigation}) => {
   const [loading, setLoading] = useState(false);
   const [tab, setTab] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
-  const tab_list = [{title: 'Mission'}, {title: 'Quest'}];
+  const tab_list = [
+    {title: STRINGS.MEMBER_MANAGE.tabs.mission},
+    {title: STRINGS.MEMBER_MANAGE.tabs.quest},
+  ];
   const isSubTeam = user?.team_type == 'sub_team';
 
   const getMember = async ({load = false}) => {
@@ -57,7 +61,7 @@ const MemberManage = ({route, navigation}) => {
       <MyLoader enable={loading} />
       {!loading && (
         <>
-          <View style={{height: 40}}>
+          <View style={styles.titleContainer}>
             <TitleView
               title={`${result?.member?.first_name} ${result?.member?.last_name}`}
             />
@@ -66,7 +70,7 @@ const MemberManage = ({route, navigation}) => {
           <Tabs
             list={tab_list}
             tab={tab}
-            style={{zIndex: 10}}
+            style={styles.tabsZIndex}
             changeTab={e => setTab(e)}
           />
           <FlatList
@@ -78,39 +82,37 @@ const MemberManage = ({route, navigation}) => {
               <MyRefreshControl refreshing={refreshing} onRefresh={onRefresh} />
             }
             renderItem={({item}) => (
-              <View
-                style={{
-                  backgroundColor: colors.secondary,
-                  padding: 10,
-                  borderRadius: 10,
-                  marginTop: 10,
-                }}>
+              <View style={styles.itemContainer}>
                 <View>
                   <StatView
-                    title={'Title'}
+                    title={STRINGS.MEMBER_MANAGE.title}
                     original={true}
                     value={item.mission_info.title}
                   />
                   <StatView
-                    title={!tab ? 'Mission Duration' : 'Quest Duration'}
+                    title={
+                      !tab
+                        ? STRINGS.MEMBER_MANAGE.missionDuration
+                        : STRINGS.MEMBER_MANAGE.questDuration
+                    }
                     value={item.mission_duration}
                   />
                   <StatView
-                    title={'Status'}
+                    title={STRINGS.MEMBER_MANAGE.status}
                     value={
                       item.mission_status == 'in_progress'
-                        ? 'In Progress'
-                        : 'Completed'
+                        ? STRINGS.MEMBER_MANAGE.inProgress
+                        : STRINGS.MEMBER_MANAGE.completed
                     }
                   />
                 </View>
                 {!isSubTeam && (
-                  <View style={{alignItems: 'flex-end'}}>
+                  <View style={styles.buttonContainer}>
                     <TouchableOpacity
                       onPress={() => onUserDetail(item)}
-                      style={{padding: 5, marginTop: 10}}>
+                      style={styles.button}>
                       <MyText color={colors.primary} type="medium">
-                        View More...
+                        {STRINGS.MEMBER_MANAGE.viewMore}
                       </MyText>
                     </TouchableOpacity>
                   </View>
@@ -125,3 +127,25 @@ const MemberManage = ({route, navigation}) => {
 };
 
 export default MemberManage;
+
+const styles = StyleSheet.create({
+  titleContainer: {
+    height: 40,
+  },
+  tabsZIndex: {
+    zIndex: 10,
+  },
+  itemContainer: {
+    backgroundColor: colors.secondary,
+    padding: 10,
+    borderRadius: 10,
+    marginTop: 10,
+  },
+  buttonContainer: {
+    alignItems: 'flex-end',
+  },
+  button: {
+    padding: 5,
+    marginTop: 10,
+  },
+});

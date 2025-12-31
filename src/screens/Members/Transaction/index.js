@@ -1,7 +1,8 @@
-import {View, Text, FlatList, TouchableOpacity} from 'react-native';
+import {View, FlatList, TouchableOpacity, StyleSheet} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 import {selectUser} from '../../../redux/reducers/userSlice';
+import {STRINGS} from '../../../utilities/strings';
 import RootView from '../../../components/RootView';
 import MyText from '../../../components/MyText';
 import MyLoader from '../../../components/MyLoader';
@@ -31,6 +32,7 @@ import {TicketCountView} from './TicketCountView';
 import {TransactionTypeView} from './TransactionTypeView';
 import MyRefreshControl from '../../../components/MyRefreshControl';
 import prependCurency from '../../../functions/prependCurency';
+import {dateTimeFormat} from '../../../utilities/constants';
 
 let page = 0;
 let canLoadMore = false;
@@ -147,8 +149,8 @@ const Transaction = ({navigation, route}) => {
         <TouchableOpacity
           onPress={() => openUrl(S3_URL + link)}
           hitSlop={{left: 5, top: 5, bottom: 5, right: 5}}
-          style={{alignSelf: 'flex-start'}}>
-          <MyText color={colors.primary}>Preview</MyText>
+          style={styles.alignStart}>
+          <MyText color={colors.primary}>{STRINGS.TRANSACTION.preview}</MyText>
         </TouchableOpacity>
       );
     } else return null;
@@ -156,10 +158,10 @@ const Transaction = ({navigation, route}) => {
 
   const listHeaderView = () => {
     return (
-      <View style={{marginTop: -10, backgroundColor: colors.darkSecondary}}>
+      <View style={styles.searchContainer}>
         <MyInputs
           leftIcon={icons.search}
-          placeholder="Search..."
+          placeholder={STRINGS.TRANSACTION.searchPlaceholder}
           rightIcon={() =>
             searchText.length > 0
               ? icons.crosssWithCircle_20(colors.white, 20)
@@ -176,38 +178,29 @@ const Transaction = ({navigation, route}) => {
 
   const renderList = ({item, index}) => {
     return (
-      <View
-        style={{
-          backgroundColor: colors.secondary,
-          borderRadius: 10,
-          marginTop: 10,
-          padding: 10,
-        }}>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}>
-          <MyText color={colors.primary}> {`${index + 1}.`}</MyText>
+      <View style={styles.listItemContainer}>
+        <View style={styles.listItemHeader}>
+          <MyText color={colors.primary}>
+            {STRINGS.TRANSACTION.indexLabel(index)}
+          </MyText>
           {/* <MenuButton
             onPress={() => setOptionModal({ isVisible: true, selectedItem: item })}
             size={20} /> */}
         </View>
         <StatView
-          title={'Transaction Type'}
+          title={STRINGS.TRANSACTION.transactionType}
           view={() => <TransactionTypeView item={item} />}
         />
         <StatView
-          title={'Payment Made By (Transaction ID)'}
+          title={STRINGS.TRANSACTION.paymentMadeBy}
           view={() => <PaymentIdView item={item} />}
         />
         <StatView
-          title={'Amount'}
+          title={STRINGS.TRANSACTION.amount}
           value={prependCurency(item?.currency) + ' ' + (item?.amount || '0')}
         />
         <StatView
-          title={'Team Diego'}
+          title={STRINGS.TRANSACTION.teamDiego}
           value={
             prependCurency(item?.currency) +
             ' ' +
@@ -215,7 +208,7 @@ const Transaction = ({navigation, route}) => {
           }
         />
         <StatView
-          title={'Refferal Commission'}
+          title={STRINGS.TRANSACTION.referralCommission}
           value={
             prependCurency(item?.currency) +
             ' ' +
@@ -223,11 +216,11 @@ const Transaction = ({navigation, route}) => {
           }
         />
         <StatView
-          title={'Refferal User'}
+          title={STRINGS.TRANSACTION.referralUser}
           view={() => <ReferralUserView affiliate={item?.affiliate_info} />}
         />
         <StatView
-          title={'Transaction Refferal Commission'}
+          title={STRINGS.TRANSACTION.transactionReferralCommission}
           value={
             prependCurency(item?.currency) +
             ' ' +
@@ -235,90 +228,81 @@ const Transaction = ({navigation, route}) => {
           }
         />
         <StatView
-          title={'Transaction Refferal'}
+          title={STRINGS.TRANSACTION.transactionReferral}
           view={() => (
             <ReferralUserView
               affiliate={item?.transaction_referral_info}
-              defaultRefferal={'N/A'}
+              defaultRefferal={STRINGS.GENERIC.N_A}
             />
           )}
         />
         <StatView
-          title={'Transaction Date'}
+          title={STRINGS.TRANSACTION.transactionDate}
           value={
             !!item?.transaction_date
-              ? moment(item?.transaction_date).format('DD-MM-YYYY')
+              ? moment(item?.transaction_date).format(dateTimeFormat.date)
               : ''
           }
         />
         <StatView
-          title={'Total Tickets'}
+          title={STRINGS.TRANSACTION.totalTickets}
           view={() => <TicketCountView item={item} navigation={navigation} />}
         />
         <StatView
-          title={'Agreement PDF'}
+          title={STRINGS.TRANSACTION.agreementPDF}
           view={() => pdfLinkView(item?.agrement_pdf_url)}
         />
         <StatView
-          title={'Created By'}
-          value={`${removeUnderscore(item?.created_by)} ${
-            !!item?.payment_made_by_platform
-              ? '(' + removeUnderscore(item?.payment_made_by_platform) + ')'
-              : ''
-          }`}
+          title={STRINGS.TRANSACTION.createdBy}
+          value={STRINGS.TRANSACTION.createdByFormat(
+            removeUnderscore(item?.created_by),
+            item?.payment_made_by_platform
+              ? removeUnderscore(item?.payment_made_by_platform)
+              : '',
+          )}
         />
         <StatView
-          title={'Other Information'}
+          title={STRINGS.TRANSACTION.otherInformation}
           view={() => <OtherInformationView row={item} />}
         />
         <StatView
-          title={'Discount Information'}
+          title={STRINGS.TRANSACTION.discountInformation}
           view={() => <DiscountInformationView item={item} />}
         />
-        <StatView title={'Transaction Mode'} value={item?.transaction_mode} />
+        <StatView
+          title={STRINGS.TRANSACTION.transactionMode}
+          value={item?.transaction_mode}
+        />
       </View>
     );
   };
 
   const topView = () => {
     return (
-      <View style={{backgroundColor: colors.darkSecondary, paddingRight: 10}}>
+      <View style={styles.topViewContainer}>
         {/* <TitleView title={""} /> */}
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'flex-end',
-            justifyContent: 'space-between',
-            paddingBottom: 5,
-          }}>
+        <View style={styles.topViewHeader}>
           {!!member ? (
-            <View
-              style={{
-                flex: 1,
-                marginLeft: 5,
-                height: 35,
-                flexDirection: 'row',
-                alignItems: 'center',
-              }}>
+            <View style={styles.memberInfoContainer}>
               <UserImage
                 image={member?.profile_image}
                 name={member?.first_name}
                 size={30}
               />
-              <View style={{marginLeft: 10, flex: 1}}>
-                <MyText
-                  type="bold"
-                  fontSize={
-                    12
-                  }>{`${member?.first_name} ${member?.last_name}`}</MyText>
-                <MyText
-                  type="medium"
-                  color={colors.lightText2}
-                  fontSize={10}>{`${member?.email}`}</MyText>
+              <View style={styles.memberTextContainer}>
+                <MyText type="bold" fontSize={12}>
+                  {STRINGS.TRANSACTION.fullName(
+                    member?.first_name,
+                    member?.last_name,
+                  )}
+                </MyText>
+                <MyText type="medium" color={colors.lightText2} fontSize={10}>
+                  {member?.email}
+                </MyText>
               </View>
             </View>
           ) : (
-            <View style={{flex: 1, height: 35}} />
+            <View style={styles.memberPlaceholder} />
           )}
 
           {/* <View style={{ marginTop: -2, paddingBottom: 5 }}>
@@ -332,15 +316,18 @@ const Transaction = ({navigation, route}) => {
   return (
     <RootView
       // titleView={topView}
-      title="Transactions"
+      title={STRINGS.TRANSACTION.title}
       subTitle={
         !!member
-          ? `${member?.first_name} ${member?.last_name} (${member?.email})`
+          ? `${STRINGS.TRANSACTION.fullName(
+              member?.first_name,
+              member?.last_name,
+            )} (${member?.email})`
           : ''
       }>
       {/* {topView()} */}
-      <View style={{flex: 1}}>
-        <View style={{flex: 1}}>
+      <View style={styles.flex1}>
+        <View style={styles.flex1}>
           <FlatList
             refreshControl={
               <MyRefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -372,7 +359,7 @@ const Transaction = ({navigation, route}) => {
           optionList={optionsList}
         />
         <ConfirmationModal
-          title={'Are you sure you want to delete this subscription?'}
+          title={STRINGS.TRANSACTION.deleteConfirmation}
           closeModal={() =>
             setConfirmationModal({
               isVisible: false,
@@ -397,8 +384,57 @@ const optionsList = [
   //   icon: icons.edit
   // },
   {
-    title: 'Delete',
+    title: STRINGS.TRANSACTION.delete,
     key: 'delete',
     icon: icons.trash,
   },
 ];
+
+const styles = StyleSheet.create({
+  flex1: {
+    flex: 1,
+  },
+  alignStart: {
+    alignSelf: 'flex-start',
+  },
+  searchContainer: {
+    marginTop: -10,
+    backgroundColor: colors.darkSecondary,
+  },
+  listItemContainer: {
+    backgroundColor: colors.secondary,
+    borderRadius: 10,
+    marginTop: 10,
+    padding: 10,
+  },
+  listItemHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  topViewContainer: {
+    backgroundColor: colors.darkSecondary,
+    paddingRight: 10,
+  },
+  topViewHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+    paddingBottom: 5,
+  },
+  memberInfoContainer: {
+    flex: 1,
+    marginLeft: 5,
+    height: 35,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  memberTextContainer: {
+    marginLeft: 10,
+    flex: 1,
+  },
+  memberPlaceholder: {
+    flex: 1,
+    height: 35,
+  },
+});

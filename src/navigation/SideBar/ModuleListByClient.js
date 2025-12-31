@@ -6,4 +6,5 @@ export const ModuleListByClient = {
   appointment: true,
   attitude_assessment: true,
   mission_control: true,
+  chat: true,
 };

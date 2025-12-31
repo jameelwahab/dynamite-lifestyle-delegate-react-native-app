@@ -1,61 +1,67 @@
-import { colors } from "../../../utilities/colors";
+import {colors} from '../../../utilities/colors';
 
-const { StyleSheet } = require("react-native");
+const {StyleSheet} = require('react-native');
 
 export const __styles = StyleSheet.create({
   topBtn: {
     width: 30,
     height: 30,
     borderRadius: 15,
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 5
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 5,
   },
   tabRootView: {
     backgroundColor: colors.secondaryVariant,
     borderRadius: 10,
-    margin: 5
+    margin: 5,
   },
   tabBtn: {
     flex: 1,
-    alignItems: "center",
+    alignItems: 'center',
     paddingVertical: 20,
-
   },
   tabBtnText: {
     color: colors.primary,
     fontSize: 16,
-    fontWeight: "500"
+    fontWeight: '500',
   },
   tabSelector: {
     height: 2,
 
     borderRadius: 10,
-    marginTop: 5
+    marginTop: 5,
   },
   memberStatusView: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 0,
     left: 25,
-    height: 9, width: 9, borderRadius: 10 / 2, borderWidth: 1, borderColor: colors.white
+    height: 9,
+    width: 9,
+    borderRadius: 10 / 2,
+    borderWidth: 1,
+    borderColor: colors.white,
   },
-})
+});
 
 export const calendarStyles = StyleSheet.create({
   typeView: {
-    flexDirection: "row", borderWidth: 1, borderColor: colors.primary, borderRadius: 5,
-    marginBottom: 10
+    flexDirection: 'row',
+    borderWidth: 1,
+    borderColor: colors.primary,
+    borderRadius: 5,
+    marginBottom: 10,
   },
   typeBtn: {
     paddingHorizontal: 10,
-    paddingVertical: 5
+    paddingVertical: 5,
   },
   typeDivider: {
     width: 1,
-    height: "100%",
-    backgroundColor: colors.primary
+    height: '100%',
+    backgroundColor: colors.primary,
   },
   selectedText: {
-    backgroundColor: colors.primary
-  }
-})
+    backgroundColor: colors.primary,
+  },
+});

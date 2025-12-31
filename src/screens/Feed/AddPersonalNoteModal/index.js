@@ -1,4 +1,4 @@
-import {View, Text, SafeAreaView, Pressable} from 'react-native';
+import {View, SafeAreaView, Pressable, StyleSheet} from 'react-native';
 import React, {
   forwardRef,
   useEffect,
@@ -13,6 +13,7 @@ import MyText from '../../../components/MyText';
 import MyTouchableInput from '../../../components/MyTouchableInput';
 import {MyButton} from '../../../components/MyButton';
 import OptionModalWithSearch from '../../../components/OptionModalWithSearch';
+import {STRINGS} from '../../../utilities/strings';
 import {
   ADD_PERSONAL_NOTE_FOR_PORTAL,
   GET_MEMBER_LIST_FOR_PERSONAL_NOTES,
@@ -75,7 +76,11 @@ const AddPersonalNoteModal = forwardRef(({}, ref) => {
 
   const addNotesToServer = async () => {
     if (!!!selectedMember) {
-      showToast({title: 'Alert', body: 'Please select a member', type: 'info'});
+      showToast({
+        title: STRINGS.ADD_PERSONAL_NOTE_MODAL.alert,
+        body: STRINGS.ADD_PERSONAL_NOTE_MODAL.pleaseSelectMember,
+        type: 'info',
+      });
       return;
     }
     setLoader(true);
@@ -108,25 +113,17 @@ const AddPersonalNoteModal = forwardRef(({}, ref) => {
       animationOut="slideOutRight"
       animationInTiming={300}
       animationOutTiming={300}
-      style={{flex: 1, margin: 0}}>
-      <SafeAreaView style={{flex: 1, backgroundColor: colors.secondaryVariant}}>
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            paddingHorizontal: 10,
-            paddingBottom: 10,
-            borderBottomWidth: 1 / 3,
-            borderBottomColor: colors.lightText,
-          }}>
+      style={styles.modal}>
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.header}>
           <View>
             <MyText fontSize={18} type="medium">
-              Add as Personal Notes
+              {STRINGS.ADD_PERSONAL_NOTE_MODAL.title}
             </MyText>
           </View>
           <Pressable onPress={closeModal}>{icons.crosssWithCircle()}</Pressable>
         </View>
-        <View style={{flex: 1, paddingHorizontal: 20, paddingTop: 20}}>
+        <View style={styles.content}>
           <MyTouchableInput
             label="Members*"
             onPress={() => setoptionModalVisibility(true)}
@@ -145,7 +142,10 @@ const AddPersonalNoteModal = forwardRef(({}, ref) => {
           optionList={list}
           renderText={({item}) => (
             <MyText fontSize={16}>
-              {item?.first_name + ' (' + item?.email + ')'}
+              {STRINGS.ADD_PERSONAL_NOTE_MODAL.memberFormat(
+                item?.first_name,
+                item?.email,
+              )}
             </MyText>
           )}
           closeModal={() => {
@@ -158,7 +158,7 @@ const AddPersonalNoteModal = forwardRef(({}, ref) => {
           }}
           onSearchTextChange={text => setSearchText(text)}
           noIcon
-          title="Member"
+          title={STRINGS.ADD_PERSONAL_NOTE_MODAL.member}
         />
 
         <MyLoader enable={loader} />
@@ -166,6 +166,30 @@ const AddPersonalNoteModal = forwardRef(({}, ref) => {
       {isVisible && <Toast />}
     </Modal>
   );
+});
+
+const styles = StyleSheet.create({
+  modal: {
+    flex: 1,
+    margin: 0,
+  },
+  safeArea: {
+    flex: 1,
+    backgroundColor: colors.secondaryVariant,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 10,
+    paddingBottom: 10,
+    borderBottomWidth: 1 / 3,
+    borderBottomColor: colors.lightText,
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+  },
 });
 
 export default AddPersonalNoteModal;

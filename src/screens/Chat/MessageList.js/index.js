@@ -1,319 +1,375 @@
-import { View, Text, StyleSheet, FlatList, KeyboardAvoidingView, StatusBar, Platform, TextInput, Image, TouchableHighlight, Pressable, TouchableOpacity, SafeAreaView } from 'react-native'
-import React, { memo, useEffect, useRef, useState } from 'react'
-import RootView from '../../../components/RootView'
-import UserImage from '../../../components/UserImage';
+import {
+  View,
+  FlatList,
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+} from 'react-native';
+import React, {useEffect, useRef, useState} from 'react';
+import RootView from '../../../components/RootView';
 import MyText from '../../../components/MyText';
-import { convertTimezone } from '../../../functions/convertTime';
-import { selectTimeZone } from '../../../redux/reducers/timezoneSlice';
-import { useSelector } from 'react-redux';
-import { colors } from '../../../utilities/colors';
-import { ADD_AS_NOTE, MARK_AS_UNREAD, MESSAGE_LIST_BY_CHAT_ID, READ_ALL_MESSAGES } from '../../../DAL';
-import { selectUser } from '../../../redux/reducers/userSlice';
-import MyLoader, { SimpleLoader } from '../../../components/MyLoader';
-import utilities from '../../../utilities';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { fonts } from '../../../utilities/fonts';
-import { icons } from '../../../utilities/icons';
-import Collapsible from 'react-native-collapsible';
+import {selectTimeZone} from '../../../redux/reducers/timezoneSlice';
+import {useSelector} from 'react-redux';
+import {colors} from '../../../utilities/colors';
+import {
+  ADD_AS_NOTE,
+  MARK_AS_UNREAD,
+  MESSAGE_LIST_BY_CHAT_ID,
+  READ_ALL_MESSAGES,
+} from '../../../DAL';
+import {selectUser} from '../../../redux/reducers/userSlice';
+import {SimpleLoader} from '../../../components/MyLoader';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {icons} from '../../../utilities/icons';
 import EmptyView from '../../../components/EmptyView';
 import OptionModal from '../../../components/OptionModal';
-import ImageUploadModal from '../../../components/ImageUploadModal';
-import MyImage2 from '../../../components/MyImage2';
-import MyImage from '../../../components/MyImage';
 import MsgView from './MsgView';
 import ImageZoomer from '../../../components/ImageZoomer';
 import SendMsgView from './SendMsgView';
 import UserView from './UserView';
-import { selectSocket } from '../../../redux/reducers/socketSlice';
+import {selectSocket} from '../../../redux/reducers/socketSlice';
 import ConfirmationModal from '../../../components/ConfirmationModal';
 import copyText from '../../../functions/copyText';
-import TrackPlayer from 'react-native-track-player'
+import TrackPlayer from 'react-native-track-player';
 import routes from '../../../navigation/routes';
 import showToast from '../../../functions/showToast';
 import downloadFile from '../../../functions/downloadFile';
+import {Flex} from '../../../UIComponents/FlexViews';
+import {STRINGS} from '../../../utilities/strings';
 
 let mlpage = 0;
 let mlcanLoadMore = false;
 let isNewChat = false;
-const MessageList = ({ navigation, route }) => {
+const MessageList = ({navigation, route}) => {
   const [member, setMember] = useState(route?.params);
   const insets = useSafeAreaInsets();
   const timezone = useSelector(selectTimeZone);
-  const { socket } = useSelector(selectSocket);
-  const { token, user, S3_URL } = useSelector(selectUser);
+  const {socket} = useSelector(selectSocket);
+  const {token, user, S3_URL} = useSelector(selectUser);
   const [chat, setChat] = useState([]);
   const [loader, setLoader] = useState(false);
   const [footLoader, setFooterLoader] = useState(false);
-  const [opitonModal, setOptionModal] = useState({ isVisible: false, opt: "", item: null, optionList: [] });
-  const [confirmation, setConfirmation] = useState({ isVisible: false, item: null, title: "", type: "" })
-  const [isImageZoomerVisible, setImageZommerVisiblity] = useState("");
-  const [edit, setEdit] = useState({ msg: "", image: "", id: "", })
-  const ref = useRef()
-
+  const [opitonModal, setOptionModal] = useState({
+    isVisible: false,
+    opt: '',
+    item: null,
+    optionList: [],
+  });
+  const [confirmation, setConfirmation] = useState({
+    isVisible: false,
+    item: null,
+    title: '',
+    type: '',
+  });
+  const [isImageZoomerVisible, setImageZommerVisiblity] = useState('');
+  const [edit, setEdit] = useState({msg: '', image: '', id: ''});
+  const ref = useRef();
 
   useEffect(() => {
-    isNewChat = false
+    isNewChat = false;
     mlpage = 0;
     mlcanLoadMore = false;
     if (!!member?.chatId) {
-      setLoader(true)
+      setLoader(true);
       getMemberList();
     }
-    socketEvents()
+    socketEvents();
     return () => {
       try {
-        console.log("return")
-        setChat([])
-        isNewChat = false
+        console.log('return');
+        setChat([]);
+        isNewChat = false;
         removeSocketEvents();
-        TrackPlayer.pause()
-        TrackPlayer.reset()
+        TrackPlayer.pause();
+        TrackPlayer.reset();
       } catch (e) {
-        console.log(e, "error")
+        console.log(e, 'error');
       }
-    }
-  }, [])
+    };
+  }, []);
 
   const socketEvents = () => {
-    socket.on("send_chat_message_event_for_sender", sendMessageReceiverForSender);
-    socket.on("update_chat_message_event_for_sender", editMessageReceiverForSender);
-    socket.on("delete_chat_message_event_for_sender", deleteMessageReceiverForSender);
-    socket.on("send_chat_message_receiver", sendMessageReceiver);
-    socket.on("update_chat_message_receiver", editMessageReceiver);
-    socket.on("delete_chat_message_receiver", deleteMessageReceiver);
-    socket.on("chat_message_status", readMsgSingnal);
-    socket.on("member_online", memberOnlineSignal);
-  }
+    socket.on(
+      'send_chat_message_event_for_sender',
+      sendMessageReceiverForSender,
+    );
+    socket.on(
+      'update_chat_message_event_for_sender',
+      editMessageReceiverForSender,
+    );
+    socket.on(
+      'delete_chat_message_event_for_sender',
+      deleteMessageReceiverForSender,
+    );
+    socket.on('send_chat_message_receiver', sendMessageReceiver);
+    socket.on('update_chat_message_receiver', editMessageReceiver);
+    socket.on('delete_chat_message_receiver', deleteMessageReceiver);
+    socket.on('chat_message_status', readMsgSingnal);
+    socket.on('member_online', memberOnlineSignal);
+  };
 
   const removeSocketEvents = () => {
-    socket.off("send_chat_message_event_for_sender", sendMessageReceiverForSender);
-    socket.off("update_chat_message_event_for_sender", editMessageReceiverForSender);
-    socket.off("delete_chat_message_event_for_sender", deleteMessageReceiverForSender);
-    socket.off("send_chat_message_receiver", sendMessageReceiver);
-    socket.off("update_chat_message_receiver", editMessageReceiver);
-    socket.off("delete_chat_message_receiver", deleteMessageReceiver);
-    socket.off("chat_message_status", readMsgSingnal);
-    socket.off("member_online", memberOnlineSignal);
-  }
+    socket.off(
+      'send_chat_message_event_for_sender',
+      sendMessageReceiverForSender,
+    );
+    socket.off(
+      'update_chat_message_event_for_sender',
+      editMessageReceiverForSender,
+    );
+    socket.off(
+      'delete_chat_message_event_for_sender',
+      deleteMessageReceiverForSender,
+    );
+    socket.off('send_chat_message_receiver', sendMessageReceiver);
+    socket.off('update_chat_message_receiver', editMessageReceiver);
+    socket.off('delete_chat_message_receiver', deleteMessageReceiver);
+    socket.off('chat_message_status', readMsgSingnal);
+    socket.off('member_online', memberOnlineSignal);
+  };
 
-
-  const readMsgSingnal = (data) => {
-    console.log("chat_message_status", data);
-    if (data.status == "read") {
-      setChat((chatList) => {
-        chatList.map((chat) => chat.status = "read");
-        return [...chatList]
-      })
+  const readMsgSingnal = data => {
+    console.log('chat_message_status', data);
+    if (data.status == 'read') {
+      setChat(chatList => {
+        chatList.map(chat => (chat.status = 'read'));
+        return [...chatList];
+      });
     }
+  };
 
-  }
-
-  const memberOnlineSignal = (data) => {
-    console.log("member_online", data);
-    setMember((member) => {
+  const memberOnlineSignal = data => {
+    console.log('member_online', data);
+    setMember(member => {
       if (data?.user_id == member?.memberId) {
         member.isOnline = true;
-        setChat((chatList) => {
-          chatList.map((chat) => !!chat.status == false || chat.status == "sent" ? chat.status = "delivered" : chat.status);
-          return [...chatList]
+        setChat(chatList => {
+          chatList.map(chat =>
+            !!chat.status == false || chat.status == 'sent'
+              ? (chat.status = 'delivered')
+              : chat.status,
+          );
+          return [...chatList];
         });
       }
 
-      return { ...member }
-    })
-  }
+      return {...member};
+    });
+  };
 
-  const sendMessageReceiverForSender = (data) => {
-    console.log(data, "sendMessageReceiverForSender")
-    setChat((chat) => [data?.message_obj, ...chat])
-    setMember((member) => { return { ...member, chatId: data?.chat_obj?._id, } })
+  const sendMessageReceiverForSender = data => {
+    console.log(data, 'sendMessageReceiverForSender');
+    setChat(chat => [data?.message_obj, ...chat]);
+    setMember(member => {
+      return {...member, chatId: data?.chat_obj?._id};
+    });
 
-		setChat((chatList) => {
-        chatList.map((chat) => chat.status = "read");
-        return [...chatList]
-      })
-  }
+    setChat(chatList => {
+      chatList.map(chat => (chat.status = 'read'));
+      return [...chatList];
+    });
+  };
 
-  const sendMessageReceiver = (data) => {
-    console.log(data, "sendMessageReceiver")
-    setChat((chat) => [data?.message_obj, ...chat])
-		ref?.current.scrollToOffset({ animated: true, offset: 0 });
-	}
+  const sendMessageReceiver = data => {
+    console.log(data, 'sendMessageReceiver');
+    setChat(chat => [data?.message_obj, ...chat]);
+    ref?.current.scrollToOffset({animated: true, offset: 0});
+  };
 
-  const editMessageReceiverForSender = (data) => {
-    console.log(data, "editMessageReceiverForSender")
+  const editMessageReceiverForSender = data => {
+    console.log(data, 'editMessageReceiverForSender');
     if (data.code == 200) {
-      setChat((chat) => {
+      setChat(chat => {
         let index = chat.findIndex(x => x?._id == data?.message_obj?._id);
         if (index > -1) {
           chat.splice(index, 1, data?.message_obj);
-          return [...chat]
+          return [...chat];
         }
-      })
+      });
     }
+  };
 
-  }
-
-  const editMessageReceiver = (data) => {
-    console.log(data, "editMessageReceiver")
+  const editMessageReceiver = data => {
+    console.log(data, 'editMessageReceiver');
     if (data.code == 200) {
-      setChat((chat) => {
+      setChat(chat => {
         let index = chat.findIndex(x => x?._id == data?.message_obj?._id);
         if (index > -1) {
           chat.splice(index, 1, data?.message_obj);
-          return [...chat]
+          return [...chat];
         }
-      })
+      });
     }
-  }
+  };
 
-  const deleteMessageReceiverForSender = (data) => {
-    console.log(data, "deleteMessageReceiverForSender")
+  const deleteMessageReceiverForSender = data => {
+    console.log(data, 'deleteMessageReceiverForSender');
     if (data.code == 200) {
-      setChat((chat) => {
+      setChat(chat => {
         let index = chat.findIndex(x => x?._id == data?.message_id);
         if (index > -1) {
           chat.splice(index, 1);
-          return [...chat]
+          return [...chat];
         }
-      })
+      });
     }
-  }
+  };
 
-  const deleteMessageReceiver = (data) => {
-    console.log(data, "deleteMessageReceiver");
+  const deleteMessageReceiver = data => {
+    console.log(data, 'deleteMessageReceiver');
     if (data.code == 200) {
-      setChat((chat) => {
+      setChat(chat => {
         let index = chat.findIndex(x => x?._id == data?.message_id);
         if (index > -1) {
           chat.splice(index, 1);
-          return [...chat]
+          return [...chat];
         }
-      })
+      });
     }
-  }
-
+  };
 
   //! //////// APIS
   const loadMore = () => {
     if (mlcanLoadMore) {
-      console.log("onEndRech")
+      console.log('onEndRech');
       mlcanLoadMore = false;
       setFooterLoader(true);
-      getMemberList()
+      getMemberList();
     }
-  }
+  };
 
   const getMemberList = async () => {
-    let res = await MESSAGE_LIST_BY_CHAT_ID({ navigation, token, chatId: member?.chatId, page: mlpage })
+    let res = await MESSAGE_LIST_BY_CHAT_ID({
+      navigation,
+      token,
+      chatId: member?.chatId,
+      page: mlpage,
+    });
     setLoader(false);
-    setFooterLoader(false)
+    setFooterLoader(false);
 
     if (res.code == 200) {
-      if ((chat.length + res?.message.length) < res?.count) {
+      if (chat.length + res?.message.length < res?.count) {
         mlpage++;
         mlcanLoadMore = true;
       } else {
         mlcanLoadMore = false;
       }
 
-      setChat([...chat, ...res?.message.reverse()])
-      readAllMessagesAPI()
+      setChat([...chat, ...res?.message.reverse()]);
+      readAllMessagesAPI();
     }
-  }
+  };
 
   const readAllMessagesAPI = async () => {
-    let res = await READ_ALL_MESSAGES({ token, navigation, chatId: member?.chatId });
+    let res = await READ_ALL_MESSAGES({
+      token,
+      navigation,
+      chatId: member?.chatId,
+    });
     if (res.code == 200) {
       route?.params?.resetCountToZero?.(member?.chatId);
       route?.params?.refresh?.();
     }
-  }
+  };
 
-  const unReadMessage = async (msgId) => {
-    let res = await MARK_AS_UNREAD({ token, navigation, messageId: msgId });
+  const unReadMessage = async msgId => {
+    let res = await MARK_AS_UNREAD({token, navigation, messageId: msgId});
     if (res.code == 200) {
-      showToast({ title: "Marked as Unread", type: "success" })
+      showToast({title: 'Marked as Unread', type: 'success'});
       route?.params?.refresh?.();
     }
-  }
+  };
 
-  const api_addAdNote = async (msgId) => {
+  const api_addAdNote = async msgId => {
     let res = await ADD_AS_NOTE({
-      token, navigation, body: {
+      token,
+      navigation,
+      body: {
         member_id: member?.memberId,
         message_id: msgId,
-      }
-    })
+      },
+    });
     if (res.code == 200) {
-      showToast({ title: res?.message, type: "success" })
+      showToast({title: res?.message, type: 'success'});
     }
-  }
-
+  };
 
   //? /////// ACTIONS
 
-  const optionAction = async (opt) => {
-    console.log(opt, "msgAction")
-    let item = opitonModal.item
-    console.log(item, "msgAction")
-    setOptionModal({ ...opitonModal, opt: opt.type, item: null, isVisible: false, })
+  const optionAction = async opt => {
+    console.log(opt, 'msgAction');
+    let item = opitonModal.item;
+    console.log(item, 'msgAction');
+    setOptionModal({
+      ...opitonModal,
+      opt: opt.type,
+      item: null,
+      isVisible: false,
+    });
 
     if (opt.type == 'delete') {
       setTimeout(() => {
-        setConfirmation({ isVisible: true, title: "Are you sure you want to delete this message?", item, type: "delete_msg" });
+        setConfirmation({
+          isVisible: true,
+          title: STRINGS.MESSAGE_LIST.deleteConfirmation,
+          item,
+          type: 'delete_msg',
+        });
       }, 500);
-    }
-    else if (opt.type == 'copy') {
-      copyText(item.message)
-    }
-    else if (opt.type == 'edit') {
+    } else if (opt.type == 'copy') {
+      copyText(item.message);
+    } else if (opt.type == 'edit') {
       setEdit({
         msg: item.message,
         image: item.image,
-        id: item._id
-      })
+        id: item._id,
+      });
     } else if (opt.type == 'note') {
       api_addAdNote(item?._id);
     } else if (opt.type == 'unread') {
       unReadMessage(item?._id);
-    } else if(opt.type == "download"){
-				await downloadFile(S3_URL + item.audio_url, "Audio/" + item.audio_url.split('/')[1].split('.')[0],"Audio have saved successfully")
-		}
-  }
+    } else if (opt.type == 'download') {
+      await downloadFile(
+        S3_URL + item.audio_url,
+        STRINGS.MESSAGE_LIST.audioFolder +
+          item.audio_url.split('/')[1].split('.')[0],
+        STRINGS.MESSAGE_LIST.audioSavedSuccess,
+      );
+    }
+  };
 
   const closeConfirmation = () => {
-    setConfirmation({ isVisible: false, title: "", item: null, type: "" });
-  }
+    setConfirmation({isVisible: false, title: '', item: null, type: ''});
+  };
 
   const deleteMsg = () => {
-    if (confirmation.type == "delete_msg") {
-      let item = confirmation.item
+    if (confirmation.type == 'delete_msg') {
+      let item = confirmation.item;
       closeConfirmation();
       const postData = {
         chat_id: member?.chatId,
-        message_id: item?._id
+        message_id: item?._id,
       };
-      socket.emit("delete_chat_message", postData);
+      socket.emit('delete_chat_message', postData);
     }
-  }
+  };
 
-
-
-  const isOtherMember = (id) => {
+  const isOtherMember = id => {
     return id == user?._id;
-  }
+  };
 
-
-  const openOptionModal = (item) => {
+  const openOptionModal = item => {
     let options = [];
     if (isOtherMember(item.receiver_id)) {
-      if (item.message_type == "image" && !!item?.image) {
-        options = msgOptionList.slice().filter(x => x.type != 'delete' && x.type != 'edit');
+      if (item.message_type == 'image' && !!item?.image) {
+        options = msgOptionList
+          .slice()
+          .filter(x => x.type != 'delete' && x.type != 'edit');
         if (!!item?.message == false) {
           options = options.slice().filter(x => x.type != 'copy');
         }
-      } else if (item.message_type == "audio") {
+      } else if (item.message_type == 'audio') {
         // options.push({
         //   title: "Mark as unread",
         //   icon: () => icons.unread(colors.primary),
@@ -321,158 +377,173 @@ const MessageList = ({ navigation, route }) => {
         // })
         // return
       } else {
-        options = msgOptionList.slice().filter(x => x.type == 'note' || x.type == 'copy');
+        options = msgOptionList
+          .slice()
+          .filter(x => x.type == 'note' || x.type == 'copy');
       }
 
       options.push({
-        title: "Mark as unread",
+        title: STRINGS.MESSAGE_LIST.markAsUnread,
         icon: () => icons.unread(colors.primary),
-        type: "unread"
-      })
+        type: 'unread',
+      });
 
-		 if(item.message_type=="audio") {
-      options.push({
-        title: "Download",
-        icon: () => icons.download(),
-        type: "download"
-      })
-		}
-
+      if (item.message_type == 'audio') {
+        options.push({
+          title: STRINGS.MESSAGE_LIST.download,
+          icon: () => icons.download(),
+          type: 'download',
+        });
+      }
     } else {
-      if (item.message_type == "image" && !!item?.image) {
+      if (item.message_type == 'image' && !!item?.image) {
         options = [...msgOptionList];
         if (!!item?.message == false) {
-          options = options.slice().filter(x => x.type != 'download' && x.type != "copy");
-        } 
-			}
-      else if (item.message_type == "audio") {
-        options = msgOptionList.slice().filter(x => x.type == 'delete' || x.type == 'note'  || x.type=="download");
+          options = options
+            .slice()
+            .filter(x => x.type != 'download' && x.type != 'copy');
+        }
+      } else if (item.message_type == 'audio') {
+        options = msgOptionList
+          .slice()
+          .filter(
+            x => x.type == 'delete' || x.type == 'note' || x.type == 'download',
+          );
       } else {
         options = msgOptionList.slice().filter(x => x.type != 'download');
-
       }
     }
-    setOptionModal({ isVisible: true, item: item, opt: "", optionList: options })
-  }
-
+    setOptionModal({isVisible: true, item: item, opt: '', optionList: options});
+  };
 
   //! AudioMsg
   const [state, updateState] = useState({
     selected_audio: null,
-    isPlaying: ""
+    isPlaying: '',
   });
 
-  const setState = (updation) => updateState({ ...state, ...updation });
-
-
+  const setState = updation => updateState({...state, ...updation});
 
   const playIconClick = async (audio, id, isMe) => {
-
-
     if (audio !== state.selected_audio) {
       await TrackPlayer.pause();
-      await TrackPlayer.reset()
-      setState({ selected_audio: audio, isPlaying: id });
-      console.log(S3_URL + audio, "audio")
+      await TrackPlayer.reset();
+      setState({selected_audio: audio, isPlaying: id});
+      console.log(S3_URL + audio, 'audio');
       await TrackPlayer.add({
         id: id,
         url: S3_URL + audio,
       });
-      await TrackPlayer.play()
-
-    }
-    else {
+      await TrackPlayer.play();
+    } else {
       let playerState = await TrackPlayer.getState();
       // console.log(await TrackPlayer.getActiveTrack(), 'state')
-      if (playerState === TrackPlayer.STATE_PAUSED || playerState === "ready" || playerState == "paused") {
+      if (
+        playerState === TrackPlayer.STATE_PAUSED ||
+        playerState === 'ready' ||
+        playerState == 'paused'
+      ) {
         await TrackPlayer.play();
-        setState({ isPlaying: id });
-      }
-      else {
+        setState({isPlaying: id});
+      } else {
         await TrackPlayer.pause();
-        setState({ isPlaying: "" })
+        setState({isPlaying: ''});
       }
     }
-  }
+  };
 
   const stopPlayer = async () => {
     try {
-      await TrackPlayer.reset()
+      await TrackPlayer.reset();
+    } catch (err) {
+      console.log(err, 'err');
     }
-    catch (err) {
-      console.log(err, "err")
-    }
-    setState({ isPlaying: "", selected_audio: null })
-  }
+    setState({isPlaying: '', selected_audio: null});
+  };
 
-
-	const	borderLine = (index)=>{
-				return (
-						<View style={{flexDirection:"row", alignItems:"center", justifyContent:"center", marginTop:10}}>
-						<View style={{flex:1, borderWidth:0.5, borderColor: colors.primary}}/>
-						<MyText align="center"  color={colors.primary} style={{paddingHorizontal:10}}>{index+1} Unread Messages</MyText>
-						<View style={{flex:1, borderWidth:0.5, borderColor: colors.primary2}}/>
-						</View>
-				)
-		}
-
-  const renderMessages = ({ item, index }) => {
+  const borderLine = index => {
     return (
-				<>
-      <MsgView
-        state={state}
-        setState={setState}
-        user={user}
-        item={item}
-        index={index}
-        timezone={timezone}
-        onMsgLongPress={() => openOptionModal(item)}
-        openImageZommer={() => { if (!!item?.image) { setImageZommerVisiblity(item?.image) } }}
-        playIconClick={playIconClick}
-        stopPlayer={stopPlayer}
-      />
-				{item.status == "delivered" &&( (chat.length-1)==index || chat[index+1].status == "read") && borderLine(index)}
-				</>
-    )
-  }
+      <View style={styles.borderLineContainer}>
+        <View style={styles.borderLine} />
+        <MyText
+          align="center"
+          color={colors.primary}
+          style={{paddingHorizontal: 10}}>
+          {index + 1} Unread Messages
+        </MyText>
+        <View style={styles.borderLine2} />
+      </View>
+    );
+  };
+
+  const renderMessages = ({item, index}) => {
+    return (
+      <>
+        <MsgView
+          state={state}
+          setState={setState}
+          user={user}
+          item={item}
+          index={index}
+          timezone={timezone}
+          onMsgLongPress={() => openOptionModal(item)}
+          openImageZommer={() => {
+            if (!!item?.image) {
+              setImageZommerVisiblity(item?.image);
+            }
+          }}
+          playIconClick={playIconClick}
+          stopPlayer={stopPlayer}
+        />
+        {item.status == 'delivered' &&
+          (chat.length - 1 == index || chat[index + 1].status == 'read') &&
+          borderLine(index)}
+      </>
+    );
+  };
 
   const onBackPress = () => {
     if (!!route?.params?.canGoBack) {
-      navigation.goBack()
+      navigation.goBack();
     } else {
       navigation.navigate(routes.chatList, {
-        refresh: isNewChat
-      })
+        refresh: isNewChat,
+      });
     }
-  }
-
+  };
 
   return (
     <RootView
       titleView={() => <UserView member={member} timezone={timezone} />}
       customBackPress={onBackPress}
-      hideChatIcon
-    >
+      hideChatIcon>
       <KeyboardAvoidingView
-        style={{ flex: 1, }}
-        behavior={Platform.OS == "ios" ? 'padding' : undefined}
-        keyboardVerticalOffset={Platform.OS == "ios" ? (100 + insets.top) : 0}>
-        <View style={{ flex: 1 }}>
-
+        style={styles.flex}
+        behavior={Platform.OS == 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={Platform.OS == 'ios' ? 100 + insets.top : 0}>
+        <Flex flex={1}>
           {/* Flatlist */}
-          <View style={{ flex: 1, borderTopColor: colors.lightText2, borderTopWidth: 1 / 3, marginHorizontal: -10, paddingHorizontal: 10 }}>
+          <View style={styles.flatListContainer}>
             <FlatList
-						  ref={ref}
+              ref={ref}
               showsVerticalScrollIndicator={false}
               onEndReachedThreshold={0}
               inverted={chat.length == 0 ? false : true}
-              keyExtractor={(item) => item?._id}
-              contentContainerStyle={[chat.length == 0 && { flex: 1, alignItems: 'center', justifyContent: "center" }]}
+              keyExtractor={item => item?._id}
+              contentContainerStyle={[
+                chat.length == 0 && styles.emptyListContent,
+              ]}
               data={chat}
               renderItem={renderMessages}
-              ListEmptyComponent={loader ? <SimpleLoader size={50} /> : <EmptyView label={"No Messages"} />}
+              ListEmptyComponent={
+                loader ? (
+                  <SimpleLoader size={50} />
+                ) : (
+                  <EmptyView label={STRINGS.MESSAGE_LIST.noMessages} />
+                )
+              }
               ListFooterComponent={
-                <View style={{ height: 50, alignItems: "center" }}>
+                <View style={styles.footerContainer}>
                   {footLoader && <SimpleLoader />}
                 </View>
               }
@@ -480,32 +551,28 @@ const MessageList = ({ navigation, route }) => {
             />
           </View>
 
-
           {/* Send Msg View */}
           <SendMsgView
-            clearEdit={() => setEdit({ id: "", msg: "", image: "" })}
+            clearEdit={() => setEdit({id: '', msg: '', image: ''})}
             edit={edit}
             navigation={navigation}
             receiver={member}
           />
-
-
-        </View>
+        </Flex>
       </KeyboardAvoidingView>
-
 
       {/* Modal Components */}
       <OptionModal
         isVisible={opitonModal.isVisible}
         optionList={opitonModal.optionList}
-        closeModal={() => setOptionModal({ isVisible: false, opt: "", item: null })}
+        closeModal={() =>
+          setOptionModal({isVisible: false, opt: '', item: null})
+        }
         onSelected={optionAction}
-
       />
 
-
       <ImageZoomer
-        closeModal={() => setImageZommerVisiblity("")}
+        closeModal={() => setImageZommerVisiblity('')}
         url={isImageZoomerVisible}
         visible={!!isImageZoomerVisible}
       />
@@ -517,39 +584,76 @@ const MessageList = ({ navigation, route }) => {
         title={confirmation.title}
       />
     </RootView>
-  )
-}
+  );
+};
 
 export default MessageList;
+
+const styles = StyleSheet.create({
+  flex: {
+    flex: 1,
+  },
+  flatListContainer: {
+    flex: 1,
+    borderTopColor: colors.lightText2,
+    borderTopWidth: 1 / 3,
+    marginHorizontal: -10,
+    paddingHorizontal: 10,
+  },
+  emptyListContent: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  footerContainer: {
+    height: 50,
+    alignItems: 'center',
+  },
+  borderLineContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 10,
+  },
+  borderLine: {
+    flex: 1,
+    borderWidth: 0.5,
+    borderColor: colors.primary,
+  },
+  borderLineText: {
+    paddingHorizontal: 10,
+  },
+  borderLine2: {
+    flex: 1,
+    borderWidth: 0.5,
+    borderColor: colors.primary2,
+  },
+});
 
 const msgOptionList = [
   {
     icon: icons.copyOulined,
-    title: "Copy",
-    type: "copy"
+    title: STRINGS.MESSAGE_LIST.copy,
+    type: 'copy',
   },
   {
     icon: icons.edit,
-    title: "Add as Note",
-    type: "note"
+    title: STRINGS.MESSAGE_LIST.addAsNote,
+    type: 'note',
   },
   {
     icon: icons.edit,
-    title: "Edit",
-    type: "edit"
+    title: STRINGS.MESSAGE_LIST.edit,
+    type: 'edit',
   },
   {
     icon: icons.trash,
-    title: "Delete",
-    type: "delete"
+    title: STRINGS.MESSAGE_LIST.delete,
+    type: 'delete',
   },
-		{
+  {
     icon: icons.download,
-    title: "Download",
-    type: "download"
-  }
-
-]
-
-
-
+    title: STRINGS.MESSAGE_LIST.download,
+    type: 'download',
+  },
+];

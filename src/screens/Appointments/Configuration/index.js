@@ -1,12 +1,7 @@
 import {
   View,
-  Text,
   StyleSheet,
-  FlatList,
-  TouchableNativeFeedbackComponent,
   TouchableOpacity,
-  Pressable,
-  Animated,
   TouchableHighlight,
   Vibration,
 } from 'react-native';
@@ -24,7 +19,7 @@ import {colors} from '../../../utilities/colors';
 import MyCheckBox from '../../../components/MyCheckBox';
 import MyTouchableInput from '../../../components/MyTouchableInput';
 import {icons} from '../../../utilities/icons';
-import DraggableFlatList, {
+import {
   NestableDraggableFlatList,
   NestableScrollContainer,
   OpacityDecorator,
@@ -42,6 +37,7 @@ import {MyButton} from '../../../components/MyButton';
 import showToast from '../../../functions/showToast';
 import MyLoader from '../../../components/MyLoader';
 import MyRefreshControl from '../../../components/MyRefreshControl';
+import {STRINGS} from '../../../utilities/strings';
 
 const Configurations = ({navigation, route}) => {
   const {parentValue, value} = route.params;
@@ -92,7 +88,6 @@ const Configurations = ({navigation, route}) => {
       slot_type: '',
       slots: [mSlot],
       start_date: moment().toISOString(),
-      // _id: '',
     };
   };
 
@@ -156,20 +151,20 @@ const Configurations = ({navigation, route}) => {
       let inteval_number = i + 1;
       if (interval?.slot_type == '') {
         showToast({
-          title: 'Alert',
-          body: `Please Select Interval type of Interval ${inteval_number}`,
+          title: STRINGS.APPOINTMENT_CONFIGURATION.alert,
+          body: `${STRINGS.APPOINTMENT_CONFIGURATION.selectIntervalType}${inteval_number}`,
         });
         return;
       } else if (interval?.slot_duration == '') {
         showToast({
-          title: 'Alert',
-          body: `Please enter slot duration of Interval ${inteval_number}`,
+          title: STRINGS.APPOINTMENT_CONFIGURATION.alert,
+          body: `${STRINGS.APPOINTMENT_CONFIGURATION.enterSlotDuration}${inteval_number}`,
         });
         return;
       } else if (interval?.days.length == 0) {
         showToast({
-          title: 'Alert',
-          body: `Please select weekdays of Interval ${inteval_number}`,
+          title: STRINGS.APPOINTMENT_CONFIGURATION.alert,
+          body: `${STRINGS.APPOINTMENT_CONFIGURATION.selectWeekdays}${inteval_number}`,
         });
         return;
       }
@@ -244,19 +239,11 @@ const Configurations = ({navigation, route}) => {
     return (
       <ScaleDecorator activeScale={1.05}>
         <OpacityDecorator activeOpacity={0.6}>
-          <View
-            style={{
-              backgroundColor: colors.secondarySelect,
-              marginTop: 5,
-              padding: 10,
-              borderRadius: 10,
-              marginBottom: 10,
-              marginHorizontal: 10,
-            }}>
-            <View style={{flexDirection: 'row'}}>
-              <View style={{flex: 1}}>
+          <View style={styles.slotContainer}>
+            <View style={styles.slotRow}>
+              <View style={styles.slotItem}>
                 <MyTouchableInput
-                  label="From*"
+                  label={STRINGS.APPOINTMENT_CONFIGURATION.from}
                   icon={() => icons.clock(colors.lightText)}
                   value={moment(item?.start_time, 'HH:mm').format('hh:mm A')}
                   onPress={() =>
@@ -270,9 +257,9 @@ const Configurations = ({navigation, route}) => {
                   }
                 />
               </View>
-              <View style={{flex: 1, marginLeft: 10}}>
+              <View style={styles.slotItemWithMargin}>
                 <MyTouchableInput
-                  label="To*"
+                  label={STRINGS.APPOINTMENT_CONFIGURATION.to}
                   icon={() => icons.clock(colors.lightText)}
                   value={moment(item?.end_time, 'HH:mm').format('hh:mm A')}
                   onPress={() =>
@@ -288,17 +275,17 @@ const Configurations = ({navigation, route}) => {
               </View>
             </View>
 
-            <View style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
+            <View style={styles.slotButtonsRow}>
               {total > 1 && (
                 <TouchableOpacity
                   onPress={() => removeSlot(pIndex, cIndex)}
-                  style={__styles.btn}>
+                  style={styles.btn}>
                   {icons.minusCircle(colors.delete)}
                 </TouchableOpacity>
               )}
               <TouchableOpacity
                 onPress={() => addSlot(pIndex)}
-                style={__styles.btn}>
+                style={styles.btn}>
                 {icons.plusCircle()}
               </TouchableOpacity>
               {total > 1 && (
@@ -310,18 +297,7 @@ const Configurations = ({navigation, route}) => {
                     Vibration.vibrate(10);
                     drag();
                   }}
-                  style={[
-                    __styles.btn,
-                    {
-                      marginLeft: 30,
-                      height: 30,
-                      width: 30,
-                      borderRadius: 30 / 2,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      marginTop: -2,
-                    },
-                  ]}>
+                  style={styles.dragButton}>
                   {icons.drag(colors.primary, 25)}
                 </TouchableHighlight>
               )}
@@ -334,46 +310,42 @@ const Configurations = ({navigation, route}) => {
 
   const renderConfig = (item, index) => {
     return (
-      <View style={__styles.itemView}>
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}>
+      <View style={styles.itemView}>
+        <View style={styles.configHeaderRow}>
           <MyText type="bold">{index + 1 + '.'}</MyText>
 
           <TouchableOpacity
             onPress={() =>
               setConfirm({
                 isVisible: true,
-                text: 'Are you sure you want to duplicate this interval?',
+                text: STRINGS.APPOINTMENT_CONFIGURATION.duplicateConfirmation,
                 index,
                 type: 'duplicate',
               })
             }
-            style={{
-              flexDirection: 'row',
-              paddingVertical: 5,
-              alignItems: 'center',
-            }}>
+            style={styles.duplicateButton}>
             {icons.duplicate()}
-            <MyText type="bold"> Duplicate</MyText>
+            <MyText type="bold">
+              {' '}
+              {STRINGS.APPOINTMENT_CONFIGURATION.duplicate}
+            </MyText>
           </TouchableOpacity>
         </View>
-        <View style={__styles.radioRootView}>
-          <MyText isLabel>Interval Type *</MyText>
-          <View style={__styles.radioView}>
-            <View style={__styles.radioItem}>
+        <View style={styles.radioRootView}>
+          <MyText isLabel>
+            {STRINGS.APPOINTMENT_CONFIGURATION.intervalType}
+          </MyText>
+          <View style={styles.radioView}>
+            <View style={styles.radioItem}>
               <MyCheckBox
-                title="Built In"
+                title={STRINGS.APPOINTMENT_CONFIGURATION.builtIn}
                 value={item?.slot_type == 'builtin'}
                 onPress={() => handler({slot_type: 'builtin'}, index)}
               />
             </View>
-            <View style={__styles.radioItem}>
+            <View style={styles.radioItem}>
               <MyCheckBox
-                title="Custom"
+                title={STRINGS.APPOINTMENT_CONFIGURATION.custom}
                 value={item?.slot_type == 'custom'}
                 onPress={() => handler({slot_type: 'custom'}, index)}
               />
@@ -382,43 +354,39 @@ const Configurations = ({navigation, route}) => {
         </View>
 
         {item?.slot_type == 'builtin' && (
-          <View style={__styles.radioRootView}>
-            <MyText isLabel>Slot Duration *</MyText>
-            <View
-              style={[
-                __styles.radioView,
-                {flexDirection: 'column', paddingTop: 0, paddingHorizontal: 0},
-              ]}>
-              <View style={[__styles.radioView, {borderWidth: 0}]}>
-                <View style={__styles.radioItem}>
+          <View style={styles.radioRootView}>
+            <MyText isLabel>
+              {STRINGS.APPOINTMENT_CONFIGURATION.slotDuration}
+            </MyText>
+            <View style={styles.slotDurationContainer}>
+              <View style={styles.slotDurationRow}>
+                <View style={styles.radioItem}>
                   <MyCheckBox
-                    title="15 min"
+                    title={STRINGS.APPOINTMENT_CONFIGURATION.min15}
                     onPress={() => handler({slot_duration: '15'}, index)}
                     value={item?.slot_duration == '15'}
                   />
                 </View>
-                <View style={__styles.radioItem}>
+                <View style={styles.radioItem}>
                   <MyCheckBox
-                    title="30 min"
+                    title={STRINGS.APPOINTMENT_CONFIGURATION.min30}
                     value={item?.slot_duration == '30'}
                     onPress={() => handler({slot_duration: '30'}, index)}
-                    // onPress={() => setType(2)}
-                    // value={type == 2}
                   />
                 </View>
               </View>
 
-              <View style={[__styles.radioView, {borderWidth: 0}]}>
-                <View style={__styles.radioItem}>
+              <View style={styles.slotDurationRow}>
+                <View style={styles.radioItem}>
                   <MyCheckBox
-                    title="45 min"
+                    title={STRINGS.APPOINTMENT_CONFIGURATION.min45}
                     onPress={() => handler({slot_duration: '45'}, index)}
                     value={item?.slot_duration == '45'}
                   />
                 </View>
-                <View style={__styles.radioItem}>
+                <View style={styles.radioItem}>
                   <MyCheckBox
-                    title="60 min"
+                    title={STRINGS.APPOINTMENT_CONFIGURATION.min60}
                     value={item?.slot_duration == '60'}
                     onPress={() => handler({slot_duration: '60'}, index)}
                   />
@@ -430,17 +398,17 @@ const Configurations = ({navigation, route}) => {
 
         {item?.slot_type == 'custom' && (
           <MyInputs
-            label="Custom Duration in Min"
+            label={STRINGS.APPOINTMENT_CONFIGURATION.customDurationInMin}
             value={item?.slot_duration}
             onChangeText={text => handler({slot_duration: text}, index)}
             keyboardType="number-pad"
           />
         )}
 
-        <View style={{flexDirection: 'row'}}>
-          <View style={{flex: 1}}>
+        <View style={styles.dateRow}>
+          <View style={styles.dateItem}>
             <MyTouchableInput
-              label="Start Date*"
+              label={STRINGS.APPOINTMENT_CONFIGURATION.startDate}
               icon={() => icons.calendar(colors.lightText)}
               value={moment(item?.start_date).format(dateTimeFormat.date)}
               onPress={() =>
@@ -451,9 +419,9 @@ const Configurations = ({navigation, route}) => {
               }
             />
           </View>
-          <View style={{flex: 1, marginLeft: 10}}>
+          <View style={styles.dateItemWithMargin}>
             <MyTouchableInput
-              label="End Date*"
+              label={STRINGS.APPOINTMENT_CONFIGURATION.endDate}
               icon={() => icons.calendar(colors.lightText)}
               value={moment(item?.end_date).format(dateTimeFormat.date)}
               onPress={() =>
@@ -466,7 +434,7 @@ const Configurations = ({navigation, route}) => {
           </View>
         </View>
 
-        <View style={{marginHorizontal: -10}}>
+        <View style={styles.flatListContainer}>
           <NestableDraggableFlatList
             ref={ref_scroller}
             data={item?.slots}
@@ -485,11 +453,11 @@ const Configurations = ({navigation, route}) => {
           />
         </View>
 
-        <View style={__styles.radioRootView}>
-          <MyText isLabel>Weekdays *</MyText>
-          <View style={[__styles.radioView, {flexWrap: 'wrap'}]}>
+        <View style={styles.radioRootView}>
+          <MyText isLabel>{STRINGS.APPOINTMENT_CONFIGURATION.weekdays}</MyText>
+          <View style={styles.weekdaysContainer}>
             {weekdays.map((day, dayIndex) => (
-              <View key={day.shortName} style={{flex: 1}}>
+              <View key={day.shortName} style={styles.weekdayItem}>
                 <MyCheckBox
                   onPress={() => handlerWeekdays(day, index)}
                   title={day.shortName}
@@ -505,12 +473,12 @@ const Configurations = ({navigation, route}) => {
           onPress={() =>
             setConfirm({
               isVisible: true,
-              text: 'Are you sure you want to delete this interval?',
+              text: STRINGS.APPOINTMENT_CONFIGURATION.deleteConfirmation,
               index,
               type: 'delete',
             })
           }
-          style={{alignSelf: 'flex-end', padding: 5}}
+          style={styles.deleteButton}
           hitSlop={{left: 5, top: 5, right: 5, bottom: 5}}>
           {icons.trashFilled(colors.primary, 20)}
         </TouchableOpacity>
@@ -524,17 +492,16 @@ const Configurations = ({navigation, route}) => {
         refreshControl={
           <MyRefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
-        contentContainerStyle={{paddingBottom: 70}}
+        contentContainerStyle={styles.scrollViewContent}
         showsVerticalScrollIndicator={false}>
         {list.map(renderConfig)}
-        {/* {list.length > 0 && (
-          <View style={{marginTop: 20}}>
-            <MyButton invert title="Save" onPress={onSubmit} />
-          </View>
-        )} */}
         {!loader && (
-          <View style={{marginTop: 20}}>
-            <MyButton invert title="Save" onPress={onSubmit} />
+          <View style={styles.saveButtonContainer}>
+            <MyButton
+              invert
+              title={STRINGS.APPOINTMENT_CONFIGURATION.save}
+              onPress={onSubmit}
+            />
           </View>
         )}
       </NestableScrollContainer>
@@ -567,36 +534,36 @@ export default Configurations;
 
 const weekdays = [
   {
-    fullName: 'Monday',
-    shortName: 'Mon',
+    fullName: STRINGS.APPOINTMENT_CONFIGURATION.monday,
+    shortName: STRINGS.APPOINTMENT_CONFIGURATION.mon,
   },
   {
-    fullName: 'Tuesday',
-    shortName: 'Tue',
+    fullName: STRINGS.APPOINTMENT_CONFIGURATION.tuesday,
+    shortName: STRINGS.APPOINTMENT_CONFIGURATION.tue,
   },
   {
-    fullName: 'Wednesday',
-    shortName: 'Wed',
+    fullName: STRINGS.APPOINTMENT_CONFIGURATION.wednesday,
+    shortName: STRINGS.APPOINTMENT_CONFIGURATION.wed,
   },
   {
-    fullName: 'Thursday',
-    shortName: 'Thu',
+    fullName: STRINGS.APPOINTMENT_CONFIGURATION.thursday,
+    shortName: STRINGS.APPOINTMENT_CONFIGURATION.thu,
   },
   {
-    fullName: 'Friday',
-    shortName: 'Fri',
+    fullName: STRINGS.APPOINTMENT_CONFIGURATION.friday,
+    shortName: STRINGS.APPOINTMENT_CONFIGURATION.fri,
   },
   {
-    fullName: 'Saturday',
-    shortName: 'Sat',
+    fullName: STRINGS.APPOINTMENT_CONFIGURATION.saturday,
+    shortName: STRINGS.APPOINTMENT_CONFIGURATION.sat,
   },
   {
-    fullName: 'Sunday',
-    shortName: 'Sun',
+    fullName: STRINGS.APPOINTMENT_CONFIGURATION.sunday,
+    shortName: STRINGS.APPOINTMENT_CONFIGURATION.sun,
   },
 ];
 
-const __styles = StyleSheet.create({
+const styles = StyleSheet.create({
   itemView: {
     marginTop: 10,
     backgroundColor: colors.secondary,
@@ -611,7 +578,6 @@ const __styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.lightText,
     borderRadius: 5,
-    // padding: 2
     paddingHorizontal: 10,
     paddingTop: 10,
   },
@@ -620,5 +586,95 @@ const __styles = StyleSheet.create({
   },
   btn: {
     marginLeft: 10,
+  },
+  slotContainer: {
+    backgroundColor: colors.secondarySelect,
+    marginTop: 5,
+    padding: 10,
+    borderRadius: 10,
+    marginBottom: 10,
+    marginHorizontal: 10,
+  },
+  slotRow: {
+    flexDirection: 'row',
+  },
+  slotItem: {
+    flex: 1,
+  },
+  slotItemWithMargin: {
+    flex: 1,
+    marginLeft: 10,
+  },
+  slotButtonsRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+  },
+  dragButton: {
+    marginLeft: 30,
+    height: 30,
+    width: 30,
+    borderRadius: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: -2,
+  },
+  configHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  duplicateButton: {
+    flexDirection: 'row',
+    paddingVertical: 5,
+    alignItems: 'center',
+  },
+  slotDurationContainer: {
+    flexDirection: 'column',
+    paddingTop: 0,
+    paddingHorizontal: 0,
+    borderWidth: 1,
+    borderColor: colors.lightText,
+    borderRadius: 5,
+  },
+  slotDurationRow: {
+    flexDirection: 'row',
+    borderWidth: 0,
+    paddingHorizontal: 10,
+    paddingTop: 10,
+  },
+  dateRow: {
+    flexDirection: 'row',
+  },
+  dateItem: {
+    flex: 1,
+  },
+  dateItemWithMargin: {
+    flex: 1,
+    marginLeft: 10,
+  },
+  flatListContainer: {
+    marginHorizontal: -10,
+  },
+  weekdaysContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    borderWidth: 1,
+    borderColor: colors.lightText,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    paddingTop: 10,
+  },
+  weekdayItem: {
+    flex: 1,
+  },
+  deleteButton: {
+    alignSelf: 'flex-end',
+    padding: 5,
+  },
+  scrollViewContent: {
+    paddingBottom: 70,
+  },
+  saveButtonContainer: {
+    marginTop: 20,
   },
 });

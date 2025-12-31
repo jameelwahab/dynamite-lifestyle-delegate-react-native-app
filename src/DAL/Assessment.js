@@ -6,6 +6,7 @@ export const GET_ASSESSMENT_LIST = ({token, navigation, page, searchText}) => {
     method: 'GET',
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -24,6 +25,7 @@ export const ASSESSMENT_NOTE_LIST = ({
     },
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -44,6 +46,7 @@ export const ASSESSMENT_NOTE_ADD = ({
     }),
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -66,6 +69,7 @@ export const ASSESSMENT_NOTE_UPDATE = ({
     },
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -86,5 +90,6 @@ export const ASSESSMENT_NOTE_DELETE = ({
     },
     token,
     navigation,
+    isNewAPI: true,
   });
 };

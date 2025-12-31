@@ -1,22 +1,21 @@
-import { View, Text, TouchableOpacity, Pressable, Image } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import {View, TouchableOpacity, Image, StyleSheet} from 'react-native';
+import React from 'react';
 import utilities from '../../../utilities';
 import MyText from '../../../components/MyText';
-import { convertTimezone } from '../../../functions/convertTime';
-import { dateTimeFormat } from '../../../utilities/constants';
-import { colors } from '../../../utilities/colors';
+import {convertTimezone} from '../../../functions/convertTime';
+import {dateTimeFormat} from '../../../utilities/constants';
+import {colors} from '../../../utilities/colors';
 import ResponsiveImage from '../../../components/ResponsiveImage';
-import { isHtml } from '../../../functions/regex';
+import {isHtml} from '../../../functions/regex';
 import MyWebview from '../../../components/MyWebview';
-import copyText from '../../../functions/copyText';
-import Markdown, { MarkdownIt } from '@ronradtke/react-native-markdown-display';
-import { fonts } from '../../../utilities/fonts';
+import Markdown from '@ronradtke/react-native-markdown-display';
+import {fonts} from '../../../utilities/fonts';
 import AudioChatView from './AudioChatView';
 import openUrl from '../../../functions/openUrl';
-import { icons } from '../../../utilities/icons';
+import {icons} from '../../../utilities/icons';
 import urlify from '../../../functions/urlify';
-import { useSelector } from 'react-redux';
-import { selectUser } from '../../../redux/reducers/userSlice';
+import {useSelector} from 'react-redux';
+import {selectUser} from '../../../redux/reducers/userSlice';
 
 const MsgView = ({
   item,
@@ -30,7 +29,7 @@ const MsgView = ({
   state,
   setState,
 }) => {
-  const { S3_URL } = useSelector(selectUser);
+  const {S3_URL} = useSelector(selectUser);
   const isOtherMember = id => {
     return id == user?._id;
   };
@@ -42,22 +41,27 @@ const MsgView = ({
   return (
     <TouchableOpacity
       onLongPress={onMsgLongPress}
-      style={{
-        alignSelf: isOtherMember(item?.receiver_id) ? 'flex-start' : 'flex-end',
-      }}>
+      style={[
+        styles.messageContainer,
+        {
+          alignSelf: isOtherMember(item?.receiver_id)
+            ? 'flex-start'
+            : 'flex-end',
+        },
+      ]}>
       <View
-        style={{
-          borderBottomRightRadius: isOtherMember(item?.receiver_id) ? 10 : 0,
-          borderBottomLeftRadius: isOtherMember(item?.receiver_id) ? 0 : 10,
-          backgroundColor: isOtherMember(item?.receiver_id)
-            ? colors.lightText2
-            : colors.secondaryVariant,
-          minWidth: utilities.screenWidth() * 0.4,
-          maxWidth: utilities.screenWidth() * 0.8,
-          padding: 5,
-          borderRadius: 10,
-          marginTop: 10,
-        }}>
+        style={[
+          styles.messageBubble,
+          {
+            borderBottomRightRadius: isOtherMember(item?.receiver_id) ? 10 : 0,
+            borderBottomLeftRadius: isOtherMember(item?.receiver_id) ? 0 : 10,
+            backgroundColor: isOtherMember(item?.receiver_id)
+              ? colors.lightText2
+              : colors.secondaryVariant,
+            minWidth: utilities.screenWidth() * 0.4,
+            maxWidth: utilities.screenWidth() * 0.8,
+          },
+        ]}>
         <View>
           {/*//?   Image View  */}
 
@@ -67,10 +71,10 @@ const MsgView = ({
               pointerEvents="box-only"
               onLongPress={onMsgLongPress}
               onPress={() => openImageZommer(item?.image)}
-              style={{ padding: 2 }}>
+              style={styles.imageContainer}>
               <ResponsiveImage
                 uri={S3_URL + item?.image}
-                source={{ uri: S3_URL + item?.image }}
+                source={{uri: S3_URL + item?.image}}
               />
             </TouchableOpacity>
           )}
@@ -99,7 +103,7 @@ const MsgView = ({
           {/*//?   Message View  */}
           {index == 0 && console.log(item?.message.replace(/\n/g, '  \n'))}
           {!!item?.message && (
-            <View style={{ paddingHorizontal: 5 }}>
+            <View style={styles.messageTextContainer}>
               {isHtml(item?.message) ? (
                 <MyWebview
                   style={
@@ -126,29 +130,20 @@ const MsgView = ({
             </View>
           )}
 
-          <View
-            style={{
-              marginTop: 5,
-              alignSelf: 'flex-end',
-              flexDirection: 'row',
-              alignItems: 'center',
-            }}>
+          <View style={styles.metadataContainer}>
             {!isOtherMember(item?.receiver_id) && (
-              <View style={{ marginRight: 5 }}>
+              <View style={styles.iconSpacing}>
                 {!!item?.status == false || item?.status == 'sent'
                   ? icons.sent(colors.white, 18)
                   : icons.seen(
-                    item?.status == 'read' ? colors.primary : colors.white,
-                    18,
-                  )}
+                      item?.status == 'read' ? colors.primary : colors.white,
+                      18,
+                    )}
               </View>
             )}
             {!!item?.is_broadcast && (
-              <View style={{ marginRight: 5 }}>
-                <Image
-                  source={icons.broadcast}
-                  style={{ height: 20, width: 20, tintColor: colors.primary }}
-                />
+              <View style={styles.iconSpacing}>
+                <Image source={icons.broadcast} style={styles.broadcastIcon} />
               </View>
             )}
             <MyText
@@ -166,6 +161,35 @@ const MsgView = ({
     </TouchableOpacity>
   );
 };
+
+const styles = StyleSheet.create({
+  messageContainer: {},
+  messageBubble: {
+    padding: 5,
+    borderRadius: 10,
+    marginTop: 10,
+  },
+  imageContainer: {
+    padding: 2,
+  },
+  messageTextContainer: {
+    paddingHorizontal: 5,
+  },
+  metadataContainer: {
+    marginTop: 5,
+    alignSelf: 'flex-end',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  iconSpacing: {
+    marginRight: 5,
+  },
+  broadcastIcon: {
+    height: 20,
+    width: 20,
+    tintColor: colors.primary,
+  },
+});
 
 export default MsgView;
 

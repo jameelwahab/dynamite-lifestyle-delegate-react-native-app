@@ -1,9 +1,6 @@
 import {
   View,
-  Text,
   StyleSheet,
-  ScrollView,
-  SectionList,
   Pressable,
   FlatList,
   TouchableOpacity,
@@ -15,20 +12,16 @@ import MyLoader from '../../components/MyLoader';
 import {DASHBAORD} from '../../DAL';
 import {selectUser} from '../../redux/reducers/userSlice';
 import {useSelector} from 'react-redux';
+import {STRINGS} from '../../utilities/strings';
 import CounterBox from './CounterBox';
 import {colors} from '../../utilities/colors';
 import UserImage from '../../components/UserImage';
-import {
-  convertTimezone,
-  convertTimezoneFrom,
-} from '../../functions/convertTime';
 import moment from 'moment';
 import EmptyView from '../../components/EmptyView';
 import {icons} from '../../utilities/icons';
 import routes from '../../navigation/routes';
 import {selectSettings} from '../../redux/reducers/settingSlice';
 import MyWebview from '../../components/MyWebview';
-import ResponsiveImage from '../../components/ResponsiveImage';
 import utilities from '../../utilities';
 import {dateTimeFormat} from '../../utilities/constants';
 import ResponsiveImage2 from '../../components/ResponsiveImage2';
@@ -39,6 +32,7 @@ import prependCurency from '../../functions/prependCurency';
 import {TransparentButton} from '../../components/MyButton';
 import MemberView from '../../components/MemberView';
 import StatView from '../../components/StatView';
+import {Flex} from '../../UIComponents/FlexViews';
 
 const Dasboard = ({navigation}) => {
   const {token, S3_URL} = useSelector(selectUser);
@@ -99,6 +93,7 @@ const Dasboard = ({navigation}) => {
   //? //////// Views
 
   const view_commissionCounters = () => {
+    // return null;
     return (
       <View style={{marginTop: 10}}>
         {!!settings?.brand_logo_2 && (
@@ -117,29 +112,29 @@ const Dasboard = ({navigation}) => {
         )}
 
         <View style={{marginBottom: 5, marginTop: 15}}>{topView()}</View>
-        <View style={__style.countersView}>
+        <View style={styles.countersView}>
           <CounterBox
             color={'#283C35'}
             count={data?.today_commission}
-            subTitle={"Today's Commission"}
+            subTitle={STRINGS.DASHBOARD.todayCommission}
           />
 
           <CounterBox
             count={data?.remaining_commission}
-            subTitle={'Pending Commission'}
+            subTitle={STRINGS.DASHBOARD.pendingCommission}
             color={'#1F2D4C'}
           />
         </View>
-        <View style={__style.countersView}>
+        <View style={styles.countersView}>
           <CounterBox
             count={data?.paid_commission}
-            subTitle={'Total Paid Commission'}
+            subTitle={STRINGS.DASHBOARD.totalPaidCommission}
             color={'#3B3834'}
           />
 
           <CounterBox
             count={data?.total_commission}
-            subTitle={'Total Commission Attracted'}
+            subTitle={STRINGS.DASHBOARD.totalCommissionAttracted}
             color={'#3A2737'}
           />
         </View>
@@ -175,27 +170,21 @@ const Dasboard = ({navigation}) => {
   const bookingView = ({item, index}) => {
     if (bookingTab == 3) {
       return (
-        <View
-          style={{
-            marginTop: index != 0 ? 10 : 0,
-            backgroundColor: colors.secondary,
-            padding: 10,
-            borderRadius: 10,
-          }}>
+        <View style={[styles.bookingItem, index != 0 && styles.marginTop10]}>
           <Pressable
             onPress={() => onAnswerScreen(item)}
-            style={{flexDirection: 'row', alignItems: 'center'}}>
+            style={styles.rowAlignCenter}>
             {/* <View style={{ marginTop: 8 }}>
               <MyText>{index + 1}.</MyText>
             </View> */}
-            <View style={{flex: 1}}>
+            <View style={styles.flex1}>
               <MemberView member={item} />
             </View>
 
-            <View style={{}}>{icons.nextArrow(colors.white, 20)}</View>
+            <View>{icons.nextArrow(colors.white, 20)}</View>
           </Pressable>
           <StatView
-            title={'Module Title'}
+            title={STRINGS.DASHBOARD.moduleTitle}
             value={
               !!item?.title
                 ? item?.title
@@ -203,7 +192,7 @@ const Dasboard = ({navigation}) => {
             }
           />
           <StatView
-            title={'Answered Date'}
+            title={STRINGS.DASHBOARD.answeredDate}
             value={moment(item?.reply_date).format(dateTimeFormat.date)}
           />
           {/* <UserImage
@@ -219,20 +208,14 @@ const Dasboard = ({navigation}) => {
       );
     } else if (bookingTab == 2) {
       return (
-        <View
-          style={{
-            marginTop: index != 0 ? 10 : 0,
-            backgroundColor: colors.secondary,
-            padding: 10,
-            borderRadius: 10,
-          }}>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+        <View style={[styles.bookingItem, index != 0 && styles.marginTop10]}>
+          <View style={styles.rowAlignCenter}>
             <UserImage
               image={item?.member_info?.profile_image}
               name={item?.member_info?.first_name}
               size={30}
             />
-            <View style={__style.nameAndAmountView}>
+            <View style={styles.nameAndAmountView}>
               <MyText fontSize={14} type="medium">
                 {item?.member_info?.first_name +
                   ' ' +
@@ -247,20 +230,14 @@ const Dasboard = ({navigation}) => {
       );
     } else {
       return (
-        <View
-          style={{
-            marginTop: index != 0 ? 10 : 0,
-            backgroundColor: colors.secondary,
-            padding: 10,
-            borderRadius: 10,
-          }}>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+        <View style={[styles.bookingItem, index != 0 && styles.marginTop10]}>
+          <View style={styles.rowAlignCenter}>
             <UserImage
               image={item?.user_info?.profile_image}
               name={item?.user_info?.first_name}
               size={30}
             />
-            <View style={{marginLeft: 10}}>
+            <View style={styles.marginLeft10}>
               <MyText fontSize={14} type="medium">
                 {item?.user_info?.first_name + ' ' + item?.user_info?.last_name}
               </MyText>
@@ -269,20 +246,22 @@ const Dasboard = ({navigation}) => {
               </MyText>
             </View>
           </View>
-          {itemView('Booking page', item?.page?.sale_page_title)}
+          {itemView(STRINGS.DASHBOARD.bookingPage, item?.page?.sale_page_title)}
           {itemView(
-            'Date',
-            moment(item?.start_date_time).format('DD-MM-YYYY') +
+            STRINGS.DASHBOARD.date,
+            moment(item?.start_date_time).format(dateTimeFormat.date) +
               ' (' +
-              moment(item?.time, 'hh:mm A').format('hh:mm A') +
+              moment(item?.time, dateTimeFormat.time).format(
+                dateTimeFormat.time,
+              ) +
               ' - ' +
-              moment(item?.time, 'hh:mm A')
+              moment(item?.time, dateTimeFormat.time)
                 .add({minutes: item?.slot_duration})
-                .format('hh:mm A') +
+                .format(dateTimeFormat.time) +
               ')',
           )}
           {itemView(
-            'Booking Status',
+            STRINGS.DASHBOARD.bookingStatus,
             item?.booking_status_info?.title,
             item?.booking_status_info?.background_color,
           )}
@@ -293,20 +272,13 @@ const Dasboard = ({navigation}) => {
 
   const itemView = (title, value, color = null) => {
     return (
-      <View
-        style={{
-          flexDirection: 'row',
-          marginTop: 10,
-          borderBottomWidth: 1 / 3,
-          borderBottomColor: colors.lightText,
-          paddingBottom: 5,
-        }}>
-        <View style={{flex: 0.7}}>
+      <View style={styles.itemViewContainer}>
+        <View style={styles.itemViewTitle}>
           <MyText fontSize={12} color={colors.lightText2}>
             {title}
           </MyText>
         </View>
-        <View style={{flex: 1}}>
+        <View style={styles.flex1}>
           <MyText
             fontSize={12}
             type="medium"
@@ -320,7 +292,7 @@ const Dasboard = ({navigation}) => {
 
   const sectionHeader = ({section: {title}}) => {
     return (
-      <View style={{marginVertical: 10}}>
+      <View style={styles.marginVertical10}>
         <MyText color={colors.primary} fontSize={18} type="medium">
           {title}
         </MyText>
@@ -331,8 +303,8 @@ const Dasboard = ({navigation}) => {
   const sectionEmpty = () => {
     if (!loader) {
       return (
-        <View style={{marginVertical: 10}}>
-          <EmptyView label={'No Data Exist'} />
+        <View style={styles.marginVertical10}>
+          <EmptyView label={STRINGS.DASHBOARD.noDataExist} />
         </View>
       );
     } else return null;
@@ -341,7 +313,7 @@ const Dasboard = ({navigation}) => {
   const sectionFooter = () => {
     if (!loader && (bookingTab == 2 || bookingTab == 3)) {
       return (
-        <View style={{marginVertical: 10, alignItems: 'flex-end'}}>
+        <View style={styles.sectionFooterContainer}>
           <TransparentButton
             onPress={() =>
               changeTab(
@@ -350,7 +322,7 @@ const Dasboard = ({navigation}) => {
                   : routes?.membersAnswersNavigator,
               )
             }
-            title="View All"
+            title={STRINGS.DASHBOARD.viewAll}
           />
         </View>
       );
@@ -359,23 +331,13 @@ const Dasboard = ({navigation}) => {
 
   const topView = () => {
     return (
-      <View style={__style.topView}>
+      <View style={styles.topView}>
         {!!filter?.start_date && filter?.end_date ? (
-          // <View style={__style.chip}>
-          //   <MyText type='medium' fontSize={12} color={colors.black} style={{ marginRight: 5 }} >
-          //     {`${moment(filter?.start_date, "YYYY-MM-DD").format(dateTimeFormat.date)} to ${moment(filter?.end_date, "YYYY-MM-DD").format(dateTimeFormat.date)}`}
-          //   </MyText>
-          //   <TouchableOpacity
-          //     hitSlop={{ bottom: 5, top: 5, left: 5, right: 5 }}
-          //     onPress={() => filterTheData({})} >
-          //     {icons.crosssWithCircle_20(colors.black, 20)}
-          //   </TouchableOpacity>
-          // </View>
           <MyChip
             onPress={() => filterTheData({})}
-            title={`${moment(filter?.start_date, 'YYYY-MM-DD').format(
+            title={`${moment(filter?.start_date, dateTimeFormat.date2).format(
               dateTimeFormat.date,
-            )} to ${moment(filter?.end_date, 'YYYY-MM-DD').format(
+            )} to ${moment(filter?.end_date, dateTimeFormat.date2).format(
               dateTimeFormat.date,
             )}`}
           />
@@ -385,7 +347,7 @@ const Dasboard = ({navigation}) => {
 
         <TouchableOpacity
           onPress={onFilterScreen}
-          style={__style.filterButton}
+          style={styles.filterButton}
           hitSlop={{bottom: 5, top: 5, left: 5, right: 5}}>
           {icons.filterCircle(colors.primary, 30)}
           {/* <MyText color={colors.primary} style={{ marginLeft: 5 }} >Filter</MyText> */}
@@ -396,9 +358,9 @@ const Dasboard = ({navigation}) => {
 
   return (
     <RootView hideSubHeader>
-      <View style={{flex: 1}}>
+      <Flex flex={1}>
         <FlatList
-          contentContainerStyle={{paddingBottom: 50}}
+          contentContainerStyle={styles.flatListContent}
           data={
             !!data
               ? bookingTab == 0
@@ -419,7 +381,7 @@ const Dasboard = ({navigation}) => {
           ListFooterComponent={sectionFooter()}
           showsVerticalScrollIndicator={false}
         />
-      </View>
+      </Flex>
       <MyLoader enable={loader} />
     </RootView>
   );
@@ -429,28 +391,28 @@ export default Dasboard;
 
 const tabs = [
   {
-    title: 'Latest Booking',
+    title: STRINGS.DASHBOARD.latestBooking,
     index: 0,
     key: 'latest_booking_list',
   },
   {
-    title: 'Upcoming Booking',
+    title: STRINGS.DASHBOARD.upcomingBooking,
     index: 1,
     key: 'upcoming_booking_list',
   },
   {
-    title: 'Latest Transactions',
+    title: STRINGS.DASHBOARD.latestTransactions,
     index: 2,
     key: 'latest_transactions',
   },
   {
-    title: 'Latest Member Answers',
+    title: STRINGS.DASHBOARD.latestMemberAnswers,
     index: 3,
     key: 'member_answers',
   },
 ];
 
-const __style = StyleSheet.create({
+const styles = StyleSheet.create({
   chip: {
     backgroundColor: colors.primary,
     borderRadius: 15,
@@ -468,14 +430,11 @@ const __style = StyleSheet.create({
   filterButton: {
     height: '100%',
     justifyContent: 'center',
-    // width: 50,
     alignItems: 'center',
     flexDirection: 'row',
-    // borderWidth: 1,
     borderColor: colors.primary,
     borderRadius: 10,
     paddingHorizontal: 15,
-    // paddingVertical: 8
   },
   topView: {
     flex: 1,
@@ -486,8 +445,6 @@ const __style = StyleSheet.create({
   tabsView: {
     flexDirection: 'row',
     marginBottom: 10,
-    // borderWidth: 1,
-    // borderColor: colors.white,
     padding: 5,
     height: 45,
     borderRadius: 10,
@@ -500,18 +457,10 @@ const __style = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  tabSelectedView: {
-    // borderColor: colors.primary,
-    // backgroundColor: colors.primary2,
-  },
-
+  tabSelectedView: {},
   tabView: {
-    // flex: 1,
     borderRadius: 5,
-    // borderBottomWidth: 1,
-    // borderBottomColor: colors.lightPrimary2,
     paddingVertical: 5,
-    // paddingHorizontal: 20,
     alignItems: 'center',
     justifyContent: 'center',
     paddingRight: 20,
@@ -519,8 +468,45 @@ const __style = StyleSheet.create({
   selectline: {
     height: 2,
     width: '100%',
-
     borderRadius: 20,
     marginTop: 3,
+  },
+  bookingItem: {
+    backgroundColor: colors.secondary,
+    padding: 10,
+    borderRadius: 10,
+  },
+  marginTop10: {
+    marginTop: 10,
+  },
+  rowAlignCenter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  flex1: {
+    flex: 1,
+  },
+  marginLeft10: {
+    marginLeft: 10,
+  },
+  itemViewContainer: {
+    flexDirection: 'row',
+    marginTop: 10,
+    borderBottomWidth: 1 / 3,
+    borderBottomColor: colors.lightText,
+    paddingBottom: 5,
+  },
+  itemViewTitle: {
+    flex: 0.7,
+  },
+  marginVertical10: {
+    marginVertical: 10,
+  },
+  sectionFooterContainer: {
+    marginVertical: 10,
+    alignItems: 'flex-end',
+  },
+  flatListContent: {
+    paddingBottom: 50,
   },
 });

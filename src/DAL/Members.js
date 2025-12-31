@@ -1,305 +1,541 @@
-import moment from "moment";
-import invokeApi from "../functions/invokeAPI";
+import moment from 'moment';
+import invokeApi from '../functions/invokeAPI';
 
-export const LIST_OF_MEMBERS = ({ token, navigation, page, searchText, body: {
-  coins, coins_from = 0, downloaded_app = null, coins_range = false, coins_to = 0, community = [], date = null, badge_levels = [],
-  event_page = [], expiry_in = 3, filter_From = "", filter_name = null, from_date = null,
-  is_date_range = false, lead_status = [], member_ship_expiry = "", membership_expiry = null,
-  membership_purchase_expiry_from = moment(), membership_purchase_expiry_to = moment(),
-  nurture = null, delegate = null, plan = null, sort_by = null, status = "", to_date = null,
-  user_status_type = "", program_status = "", program = [], search_text = ""
-} }) => {
+export const LIST_OF_MEMBERS = ({
+  token,
+  navigation,
+  page,
+  searchText,
+  body: {
+    coins,
+    coins_from = 0,
+    downloaded_app = null,
+    coins_range = false,
+    coins_to = 0,
+    community = [],
+    date = null,
+    badge_levels = [],
+    event_page = [],
+    expiry_in = 3,
+    filter_From = '',
+    filter_name = null,
+    from_date = null,
+    is_date_range = false,
+    lead_status = [],
+    member_ship_expiry = '',
+    membership_expiry = null,
+    membership_purchase_expiry_from = moment(),
+    membership_purchase_expiry_to = moment(),
+    nurture = null,
+    delegate = null,
+    plan = null,
+    sort_by = null,
+    status = '',
+    to_date = null,
+    user_status_type = '',
+    program_status = '',
+    program = [],
+    search_text = '',
+  },
+}) => {
   return invokeApi({
     path: `api/member/member_list_for_delegate?page=${page}&limit=20&search_text=${searchText}`,
-    method: "POST",
+    method: 'POST',
     postData: {
-      coins, coins_from, coins_range, coins_to, community, date, event_page, expiry_in, filter_From,
-      filter_name, from_date, is_date_range, lead_status, member_ship_expiry, membership_expiry, membership_expiry,
-      membership_purchase_expiry_from, downloaded_app, membership_purchase_expiry_to, nurture, delegate, plan, sort_by, status, to_date, user_status_type,
-      search_text, badge_levels, program_status, program
+      coins,
+      coins_from,
+      coins_range,
+      coins_to,
+      community,
+      date,
+      event_page,
+      expiry_in,
+      filter_From,
+      filter_name,
+      from_date,
+      is_date_range,
+      lead_status,
+      member_ship_expiry,
+      membership_expiry,
+      membership_expiry,
+      membership_purchase_expiry_from,
+      downloaded_app,
+      membership_purchase_expiry_to,
+      nurture,
+      delegate,
+      plan,
+      sort_by,
+      status,
+      to_date,
+      user_status_type,
+      search_text,
+      badge_levels,
+      program_status,
+      program,
     },
     token,
     navigation,
-  })
-}
+  });
+};
 
-export const LIST_OF_MEMBERS_ONLY = ({ token, navigation, page, searchText, body: {
-  coins, coins_from = 0, downloaded_app = null, coins_range = false, coins_to = 0, community = [], date = null,
-  event_page = [], expiry_in = 3, filter_From = "", filter_name = null, from_date = null,
-  is_date_range = false, lead_status = [], member_ship_expiry = "", membership_expiry = null,
-  membership_purchase_expiry_from = moment(), membership_purchase_expiry_to = moment(),
-  nurture = null, plan = null, sort_by = null, status = "", to_date = null,
-  user_status_type = "", search_text = "", badge_levels = [], program = [], program_status = ""
-} }) => {
+export const LIST_OF_MEMBERS_ONLY = ({
+  token,
+  navigation,
+  page,
+  searchText,
+  body: {
+    coins,
+    coins_from = 0,
+    downloaded_app = null,
+    coins_range = false,
+    coins_to = 0,
+    community = [],
+    date = null,
+    event_page = [],
+    expiry_in = 3,
+    filter_From = '',
+    filter_name = null,
+    from_date = null,
+    is_date_range = false,
+    lead_status = [],
+    member_ship_expiry = '',
+    membership_expiry = null,
+    membership_purchase_expiry_from = moment(),
+    membership_purchase_expiry_to = moment(),
+    nurture = null,
+    plan = null,
+    sort_by = null,
+    status = '',
+    to_date = null,
+    user_status_type = '',
+    search_text = '',
+    badge_levels = [],
+    program = [],
+    program_status = '',
+  },
+}) => {
   return invokeApi({
     path: `api/event_subscriber/subscriber_list_for_member_with_filter?page=${page}&limit=20&search_text=${searchText}`,
-    method: "POST",
+    method: 'POST',
     postData: {
-      coins, coins_from, coins_range, coins_to, community, date, event_page, expiry_in, filter_From,
-      filter_name, from_date, is_date_range, lead_status, member_ship_expiry, membership_expiry, membership_expiry,
-      membership_purchase_expiry_from, downloaded_app, membership_purchase_expiry_to, nurture, plan, sort_by, status, to_date, user_status_type,
-      search_text, badge_levels, program_status, program
+      coins,
+      coins_from,
+      coins_range,
+      coins_to,
+      community,
+      date,
+      event_page,
+      expiry_in,
+      filter_From,
+      filter_name,
+      from_date,
+      is_date_range,
+      lead_status,
+      member_ship_expiry,
+      membership_expiry,
+      membership_expiry,
+      membership_purchase_expiry_from,
+      downloaded_app,
+      membership_purchase_expiry_to,
+      nurture,
+      plan,
+      sort_by,
+      status,
+      to_date,
+      user_status_type,
+      search_text,
+      badge_levels,
+      program_status,
+      program,
     },
     token,
     navigation,
-  })
-}
+  });
+};
 
-export const LIST_OF_NURTURE = ({ token, navigation, page, searchText, body: {
-  coins, coins_from = 0, downloaded_app = null, coins_range = false, coins_to = 0, community = [], date = null,
-  event_page = [], expiry_in = 3, filter_From = "", filter_name = null, from_date = null,
-  is_date_range = false, lead_status = [], member_ship_expiry = "", membership_expiry = null,
-  membership_purchase_expiry_from = moment(), membership_purchase_expiry_to = moment(),
-  delegate = null, plan = null, sort_by = null, status = "", to_date = null,
-  user_status_type = "", search_text = "", badge_levels = [], program = [], program_status = ""
-} }) => {
+export const LIST_OF_NURTURE = ({
+  token,
+  navigation,
+  page,
+  searchText,
+  body: {
+    coins,
+    coins_from = 0,
+    downloaded_app = null,
+    coins_range = false,
+    coins_to = 0,
+    community = [],
+    date = null,
+    event_page = [],
+    expiry_in = 3,
+    filter_From = '',
+    filter_name = null,
+    from_date = null,
+    is_date_range = false,
+    lead_status = [],
+    member_ship_expiry = '',
+    membership_expiry = null,
+    membership_purchase_expiry_from = moment(),
+    membership_purchase_expiry_to = moment(),
+    delegate = null,
+    plan = null,
+    sort_by = null,
+    status = '',
+    to_date = null,
+    user_status_type = '',
+    search_text = '',
+    badge_levels = [],
+    program = [],
+    program_status = '',
+  },
+}) => {
   return invokeApi({
     path: `api/consultant/member_list_for/associate?page=${page}&limit=20&search_text=${searchText}`,
-    method: "POST",
+    method: 'POST',
     postData: {
-      coins, coins_from, coins_range, coins_to, community, date, event_page, expiry_in, filter_From,
-      filter_name, from_date, is_date_range, lead_status, member_ship_expiry, membership_expiry, membership_expiry,
-      membership_purchase_expiry_from, downloaded_app, membership_purchase_expiry_to, delegate, plan, sort_by, status, to_date, user_status_type,
-      search_text, badge_levels, program_status, program
+      coins,
+      coins_from,
+      coins_range,
+      coins_to,
+      community,
+      date,
+      event_page,
+      expiry_in,
+      filter_From,
+      filter_name,
+      from_date,
+      is_date_range,
+      lead_status,
+      member_ship_expiry,
+      membership_expiry,
+      membership_expiry,
+      membership_purchase_expiry_from,
+      downloaded_app,
+      membership_purchase_expiry_to,
+      delegate,
+      plan,
+      sort_by,
+      status,
+      to_date,
+      user_status_type,
+      search_text,
+      badge_levels,
+      program_status,
+      program,
     },
     token,
     navigation,
-  })
-}
+  });
+};
 
-export const SAVE_FILTER = ({ token, navigation, body: {
-  filter_on_tab_name, filter_name, filter_object
-} }) => {
+export const SAVE_FILTER = ({
+  token,
+  navigation,
+  body: {filter_on_tab_name, filter_name, filter_object},
+}) => {
   return invokeApi({
     path: `api/consultant_init/save_portal_filter`,
-    method: "POST",
-    postData: { filter_on_tab_name, filter_name, filter_object },
+    method: 'POST',
+    postData: {filter_on_tab_name, filter_name, filter_object},
     token,
     navigation,
-  })
-}
+  });
+};
 
-export const GET_FILTER_DATA = ({ token, navigation, searchText, type }) => {
+export const GET_FILTER_DATA = ({token, navigation, searchText, type}) => {
   return invokeApi({
     path: `api/consultant/filter_data_for/delegate?search_text=&delegate_search_text=${searchText}&filter_on_tab_name=${type}`,
-    method: "GET",
+    method: 'GET',
     token,
     navigation,
-  })
-}
+  });
+};
 
-export const LEAD_STATUS_LIST = ({ token, navigation, }) => {
+export const LEAD_STATUS_LIST = ({token, navigation}) => {
   return invokeApi({
     path: `api/lead_status/active_lead_status`,
-    method: "GET",
+    method: 'GET',
     token,
     navigation,
-  })
-}
+  });
+};
 
-
-export const CHANGE_LEAD_STATUS = ({ token, navigation, body: {
-  changed_date_time, income_value, lead_status, member_id, lead_status_expiry = undefined
-} }) => {
+export const CHANGE_LEAD_STATUS = ({
+  token,
+  navigation,
+  body: {
+    changed_date_time,
+    income_value,
+    lead_status,
+    member_id,
+    lead_status_expiry = undefined,
+  },
+}) => {
   return invokeApi({
     path: `api/lead_status/change/for_member`,
     postData: {
-      changed_date_time, income_value, lead_status, member_id, lead_status_expiry
+      changed_date_time,
+      income_value,
+      lead_status,
+      member_id,
+      lead_status_expiry,
     },
-    method: "PUT",
+    method: 'PUT',
     token,
     navigation,
-  })
-}
+  });
+};
 
-export const EDIT_LEAD_STATUS = ({ token, navigation, body: {
-  id, changed_date_time, income_value, lead_status, member_id, lead_status_expiry = undefined
-} }) => {
+export const EDIT_LEAD_STATUS = ({
+  token,
+  navigation,
+  body: {
+    id,
+    changed_date_time,
+    income_value,
+    lead_status,
+    member_id,
+    lead_status_expiry = undefined,
+  },
+}) => {
   return invokeApi({
     path: `api/lead_status/edit_lead_status/for_member`,
     postData: {
-      id, changed_date_time, income_value, lead_status, member_id, lead_status_expiry
+      id,
+      changed_date_time,
+      income_value,
+      lead_status,
+      member_id,
+      lead_status_expiry,
     },
-    method: "POST",
+    method: 'POST',
     token,
     navigation,
-  })
-}
+  });
+};
 
-export const LEAD_STATUS_HISTORY = ({ token, navigation, memberId }) => {
+export const LEAD_STATUS_HISTORY = ({token, navigation, memberId}) => {
   return invokeApi({
     path: `api/lead_status/list_lead_status/for_member/${memberId}`,
-    method: "GET",
+    method: 'GET',
     token,
     navigation,
-  })
-}
+  });
+};
 
-export const DELETE_STATUS_HISTORY = ({ token, navigation, body: {
-  id, lead_status, member_id
-} }) => {
+export const DELETE_STATUS_HISTORY = ({
+  token,
+  navigation,
+  body: {id, lead_status, member_id},
+}) => {
   return invokeApi({
     path: `api/lead_status/delete_lead_status/for_member`,
     postData: {
-      id, lead_status, member_id
+      id,
+      lead_status,
+      member_id,
     },
-    method: "POST",
+    method: 'POST',
     token,
     navigation,
-  })
-}
+  });
+};
 
-
-export const MEMBER_NOTES_LIST = ({ token, navigation, memberId }) => {
+export const MEMBER_NOTES_LIST = ({token, navigation, memberId}) => {
   return invokeApi({
     path: `api/member/list_personal_note/${memberId}`,
-    method: "GET",
+    method: 'GET',
     token,
     navigation,
-  })
-}
+  });
+};
 
-
-
-export const MEMBER_ADD_NOTE = ({ token, navigation, member_id, personal_note }) => {
+export const MEMBER_ADD_NOTE = ({
+  token,
+  navigation,
+  member_id,
+  personal_note,
+}) => {
   return invokeApi({
     path: `api/member/update_personal_note`,
-    method: "POST",
+    method: 'POST',
     postData: {
-      member_id, personal_note
+      member_id,
+      personal_note,
     },
     token,
     navigation,
-  })
-}
+  });
+};
 
-export const MEMBER_UPDATE_NOTE = ({ token, navigation, member_id, personal_note, note_id }) => {
+export const MEMBER_UPDATE_NOTE = ({
+  token,
+  navigation,
+  member_id,
+  personal_note,
+  note_id,
+}) => {
   return invokeApi({
     path: `api/member/edit_personal_note`,
-    method: "POST",
-    postData: { member_id, personal_note, note_id },
+    method: 'POST',
+    postData: {member_id, personal_note, note_id},
     token,
     navigation,
-  })
-}
+  });
+};
 
-export const MEMBER_DELETE_NOTE = ({ token, navigation, member_id, note_id }) => {
+export const MEMBER_DELETE_NOTE = ({token, navigation, member_id, note_id}) => {
   return invokeApi({
     path: `api/member/remove_personal_note`,
-    method: "POST",
-    postData: { member_id, note_id },
+    method: 'POST',
+    postData: {
+      member_id,
+      note_id,
+    },
     token,
     navigation,
-  })
-}
+  });
+};
 
-
-export const MEMBER_SUBSCRIPTION_LIST = ({ token, navigation, memberId, page, searchText, type = undefined }) => {
+export const MEMBER_SUBSCRIPTION_LIST = ({
+  token,
+  navigation,
+  memberId,
+  page,
+  searchText,
+  type = undefined,
+}) => {
   return invokeApi({
     path: `api/member/event_subscriber_list/member_id/${memberId}?page=${page}&limit=20&search_text=${searchText}&type=${type}`,
-    method: "GET",
+    method: 'GET',
     token,
     navigation,
-  })
-}
+  });
+};
 
-
-
-export const MEMBER_DELETE_SUBSCRIPTION = ({ token, navigation, subscriptionId }) => {
+export const MEMBER_DELETE_SUBSCRIPTION = ({
+  token,
+  navigation,
+  subscriptionId,
+}) => {
   return invokeApi({
     path: `api/event_subscriber/delete_event_subscriber/${subscriptionId}`,
-    method: "DELETE",
+    method: 'DELETE',
     token,
     navigation,
-  })
-}
+  });
+};
 
-export const MEMBER_QUESTIONS_MODULE_LIST = ({ token, navigation, memberId, page }) => {
+export const MEMBER_QUESTIONS_MODULE_LIST = ({
+  token,
+  navigation,
+  memberId,
+  page,
+}) => {
   return invokeApi({
     path: `api/questionnaire/list_member_question_and_answers/${memberId}?page=${page}&limit=20`,
-    method: "GET",
+    method: 'GET',
     token,
     navigation,
-  })
-}
+  });
+};
 
-export const MEMBER_PROFILE = ({ token, navigation, memberId, startDate, endDate }) => {
+export const MEMBER_PROFILE = ({
+  token,
+  navigation,
+  memberId,
+  startDate,
+  endDate,
+}) => {
   return invokeApi({
     path: `api/member/${memberId}?start_date=${startDate}&end_date=${endDate}`,
-    method: "GET",
+    method: 'GET',
     token,
     navigation,
-  })
-}
+  });
+};
 
-
-export const GET_EVENT_DETAIL = ({ token, navigation, slug }) => {
+export const GET_EVENT_DETAIL = ({token, navigation, slug}) => {
   return invokeApi({
     path: `api/event/detail/${slug}`,
-    method: "GET",
+    method: 'GET',
     token,
     navigation,
-  })
-}
+  });
+};
 
-export const GET_MEMBER_LISTING_FOR_SUB_TEAM = ({ token, navigation, page, searchText }) => {
+// *** Unused API ***
+export const GET_MEMBER_LISTING_FOR_SUB_TEAM = ({
+  token,
+  navigation,
+  page,
+  searchText,
+}) => {
   return invokeApi({
     path: `api/event_subscriber/member_list_for_sub_team?page=${page}&limit=10&search_text=${searchText}`,
-    method: "GET",
+    method: 'GET',
     token,
     navigation,
-  })
-}
+  });
+};
 
-export const ADD_CALL_HISTORY_NOTE = ({ token, navigation, memberId, body: {
-  date, is_add_to_personal_notes, is_checked, notes
-} }) => {
+export const ADD_CALL_HISTORY_NOTE = ({
+  token,
+  navigation,
+  memberId,
+  body: {date, is_add_to_personal_notes, is_checked, notes},
+}) => {
   return invokeApi({
     path: `api/member/call_history_note/add/${memberId}`,
-    method: "POST",
-    postData: { date, is_add_to_personal_notes, is_checked, notes },
+    method: 'POST',
+    postData: {date, is_add_to_personal_notes, is_checked, notes},
     token,
     navigation,
-  })
-}
+  });
+};
 
-
-export const UPDATE_CALL_FUNCTIONALITY = ({ token, navigation, body: {
-  is_call_allowed, member_id
-} }) => {
+export const UPDATE_CALL_FUNCTIONALITY = ({
+  token,
+  navigation,
+  body: {is_call_allowed, member_id},
+}) => {
   return invokeApi({
     path: `api/member/update_member_call_alowed`,
-    method: "POST",
-    postData: { is_call_allowed, member_id },
+    method: 'POST',
+    postData: {
+      is_call_allowed,
+      member_id,
+    },
     token,
     navigation,
-  })
-}
+  });
+};
 
-export const MEMBER_MISSION_QUEST = ({ token, navigation, member_id }) => invokeApi({
-  path: `api/member/get/member_missions_and_quests`,
-  method: "POST",
-  token,
-  navigation,
-  postData: { member_id }
-})
+export const MEMBER_MISSION_QUEST = ({token, navigation, member_id}) =>
+  invokeApi({
+    path: `api/member/get/member_missions_and_quests`,
+    method: 'POST',
+    token,
+    navigation,
+    postData: {member_id},
+  });
 
-export const MEMBER_SMS_SYSTEM = ({ token, navigation, msg, to }) => invokeApi({
-  path: "api/consultant/send_sms_to_member",
-  method: "POST",
-  token,
-  navigation,
-  postData: {
-    body: msg,
-    to,
-  }
-})
+export const MEMBER_SMS_SYSTEM = ({token, navigation, msg, to}) =>
+  invokeApi({
+    path: 'api/consultant/send_sms_to_member',
+    method: 'POST',
+    token,
+    navigation,
+    postData: {
+      body: msg,
+      to,
+    },
+  });
 
-
-export const MEMBER_TICKETS_LIST = ({ token, navigation, transId }) => invokeApi({
-  path: "admin_users/transaction/detail/" + transId,
-  method: "GET",
-  token,
-  navigation,
-})
-
+export const MEMBER_TICKETS_LIST = ({token, navigation, transId}) =>
+  invokeApi({
+    path: 'admin_users/transaction/detail/' + transId,
+    method: 'GET',
+    token,
+    navigation,
+  });

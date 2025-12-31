@@ -23,7 +23,6 @@ import {useSelector} from 'react-redux';
 import {colors} from '../../../utilities/colors';
 import {
   ADD_AS_NOTE,
-  MESSAGE_LIST_BY_CHAT_ID,
   READ_ALL_MESSAGES,
   WHATSAPP_MESSAGE_LIST,
 } from '../../../DAL';

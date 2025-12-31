@@ -1,4 +1,4 @@
-import {View, FlatList, StyleSheet, Pressable} from 'react-native';
+import {View, FlatList, Pressable} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import RootView from '../../components/RootView';
 import {useSelector} from 'react-redux';

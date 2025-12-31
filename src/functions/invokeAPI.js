@@ -34,7 +34,7 @@ export default async function invokeApi({
     method,
     url: excludeBaseURL
       ? path
-      : domain + `${isNewAPI ? 'delegate' : ''}` + path,
+      : domain + `${isNewAPI ? 'delegate/' : ''}` + path,
     headers: {
       ...headers,
       'x-sh-auth': token,

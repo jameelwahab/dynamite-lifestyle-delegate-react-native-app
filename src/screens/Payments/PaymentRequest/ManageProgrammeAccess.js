@@ -3,7 +3,6 @@ import React, {useEffect} from 'react';
 import RootView from '../../../components/RootView';
 import {Flex, Row} from '../../../UIComponents/FlexViews';
 import ProgrammeAccessView from './components/ProgrammeAccessView';
-import SearchView from '../../../components/SearchView';
 import {MyButton} from '../../../components/MyButton';
 import MyCheckBox from '../../../components/MyCheckBox';
 import {KeyboardAwareFlatList} from 'react-native-keyboard-aware-scroll-view';

@@ -9,7 +9,6 @@ import {
   Platform,
   ScrollView,
   useWindowDimensions,
-  Image,
 } from 'react-native';
 import React, {
   forwardRef,
@@ -26,14 +25,12 @@ import MyCheckBox from '../../../components/MyCheckBox';
 import {icons} from '../../../utilities/icons';
 import {fonts} from '../../../utilities/fonts';
 import MyInputs from '../../../components/MyInputs';
-import OptionModal2 from '../../../components/OptionModal2';
 import {MyButton} from '../../../components/MyButton';
 import ImageUploadModal from '../../../components/ImageUploadModal';
 import utilities from '../../../utilities';
 import MyImage from '../../../components/MyImage';
 import OptionModal from '../../../components/OptionModal';
 import Toast from 'react-native-toast-message';
-import MyChip from '../../../components/MyChip';
 import {
   CREATE_FEED,
   FEED_DETAIL,
@@ -71,6 +68,7 @@ import {selectUser} from '../../../redux/reducers/userSlice';
 import isArray from '../../../functions/isArray';
 import breakReference from '../../../functions/breakReference';
 import {Row} from '../../../UIComponents/FlexViews';
+import {STRINGS} from '../../../utilities/strings';
 
 let cursor = {
   start: 0,
@@ -1224,8 +1222,8 @@ const AddPost = forwardRef(
           animationOut={'slideOutRight'}
           animationInTiming={300}
           animationOutTiming={300}
-          style={{margin: 0}}>
-          <SafeAreaView style={{flex: 1}}>
+          style={__style.modalMargin}>
+          <SafeAreaView style={__style.flex1}>
             <View
               pointerEvents={loader ? 'none' : 'auto'}
               style={__style.modalRootView}>
@@ -1237,16 +1235,13 @@ const AddPost = forwardRef(
                       btn_cancel();
                     }, 350);
                   }}
-                  style={[
-                    __style.modalclosebtn,
-                    {backgroundColor: colors.border},
-                  ]}>
+                  style={[__style.modalclosebtn, __style.closeButtonBorder]}>
                   {icons.back(colors.white, 20)}
                 </TouchableOpacity>
 
                 <View style={__style.headingTextView}>
                   <MyText type="bold" fontSize={28}>
-                    {'Event'}
+                    {STRINGS.ADD_POST.event}
                   </MyText>
                 </View>
                 <View style={__style.modalclosebtn} />
@@ -1254,43 +1249,43 @@ const AddPost = forwardRef(
 
               {/*//*   Event View    */}
               {!isCosmos && (
-                <View style={{paddingHorizontal: 20, flex: 1}}>
+                <View style={__style.eventPaddingContainer}>
                   <KeyboardAwareScrollView
                     enableResetScrollToCoords={false}
                     showsVerticalScrollIndicator={false}
-                    contentContainerStyle={{marginTop: 10, paddingBottom: 30}}>
+                    contentContainerStyle={__style.eventScrollContent}>
                     <Editor
-                      label="Event Title*"
+                      label={STRINGS.ADD_POST.eventTitle}
                       initialValue={title}
                       onChange={text => setTitle(text)}
                       backgroundColor={colors.secondaryVariant}
                       height={120}
                     />
 
-                    <View style={{}}>
-                      <View style={{}}>
+                    <View style={__style.emptyView}>
+                      <View style={__style.emptyView}>
                         <MyInputs
-                          label="Button Text*"
+                          label={STRINGS.ADD_POST.buttonText}
                           value={btnText}
                           onChangeText={text => setBtnText(text)}
                         />
                       </View>
-                      <View style={{}}>
+                      <View style={__style.emptyView}>
                         <MyInputs
-                          label="Button Link*"
+                          label={STRINGS.ADD_POST.buttonLink}
                           value={link}
                           onChangeText={text => setLink(text)}
                         />
                       </View>
                     </View>
 
-                    <View style={{}}>
-                      <View style={{}}>
+                    <View style={__style.emptyView}>
+                      <View style={__style.emptyView}>
                         <MyTouchableInput
                           onPress={() =>
                             setColorModal({visibility: true, for: 1})
                           }
-                          label="Button Text event*"
+                          label={STRINGS.ADD_POST.buttonTextColor}
                           view={() => (
                             <View style={__style.eventColorViewRoot}>
                               <View
@@ -1303,12 +1298,12 @@ const AddPost = forwardRef(
                           )}
                         />
                       </View>
-                      <View style={{}}>
+                      <View style={__style.emptyView}>
                         <MyTouchableInput
                           onPress={() =>
                             setColorModal({visibility: true, for: 2})
                           }
-                          label="Button background color*"
+                          label={STRINGS.ADD_POST.buttonBackgroundColor}
                           view={() => (
                             <View style={__style.eventColorViewRoot}>
                               <View
@@ -1323,7 +1318,9 @@ const AddPost = forwardRef(
                       </View>
 
                       <View>
-                        <MyText isLabel>Button Alignment</MyText>
+                        <MyText isLabel>
+                          {STRINGS.ADD_POST.buttonAlignment}
+                        </MyText>
                         <View style={__style.alignBtnsRow}>
                           <Pressable
                             onPress={() => setButtonAlignment('left')}
@@ -1339,7 +1336,7 @@ const AddPost = forwardRef(
                                   ? colors.black
                                   : colors.white
                               }>
-                              Left
+                              {STRINGS.ADD_POST.left}
                             </MyText>
                           </Pressable>
                           <View style={__style.verticalDivider} />
@@ -1357,7 +1354,7 @@ const AddPost = forwardRef(
                                   ? colors.black
                                   : colors.white
                               }>
-                              Center
+                              {STRINGS.ADD_POST.center}
                             </MyText>
                           </Pressable>
                           <View style={__style.verticalDivider} />
@@ -1375,31 +1372,30 @@ const AddPost = forwardRef(
                                   ? colors.black
                                   : colors.white
                               }>
-                              Right
+                              {STRINGS.ADD_POST.right}
                             </MyText>
                           </Pressable>
                         </View>
                       </View>
                     </View>
-                    <View
-                      style={{
-                        justifyContent: 'flex-end',
-                        flexDirection: 'row',
-                        marginTop: 20,
-                      }}>
+                    <View style={__style.eventButtonRow}>
                       <MyButton
-                        style={{paddingHorizontal: 20}}
+                        style={__style.eventCancelBtn}
                         invert
-                        title={isEventViewComplete ? 'Remove' : 'CANCEL'}
+                        title={
+                          isEventViewComplete
+                            ? STRINGS.ADD_POST.remove
+                            : STRINGS.ADD_POST.cancel
+                        }
                         onPress={() => {
                           btn_cancelEvent();
                           btn_cancel();
                         }}
                       />
                       <MyButton
-                        style={{paddingHorizontal: 20, marginLeft: 20}}
+                        style={__style.eventDoneBtn}
                         invert
-                        title="DONE"
+                        title={STRINGS.ADD_POST.done}
                         onPress={btn_addEvent}
                       />
                     </View>
@@ -1427,7 +1423,7 @@ const AddPost = forwardRef(
               }}
             />
           </SafeAreaView>
-          <SafeAreaView style={{flex: 0, backgroundColor: colors.secondary}} />
+          <SafeAreaView style={__style.safeAreaBottom} />
           {eventModalVisible && <Toast />}
         </Modal>
       );
@@ -1476,8 +1472,8 @@ const AddPost = forwardRef(
           hasBackdrop={false}
           animationInTiming={500}
           animationOutTiming={500}
-          style={{margin: 0}}>
-          <SafeAreaView style={{flex: 1}}>
+          style={__style.modalMargin}>
+          <SafeAreaView style={__style.flex1}>
             <View
               pointerEvents={loader ? 'none' : 'auto'}
               style={__style.modalRootView}>
@@ -1485,19 +1481,18 @@ const AddPost = forwardRef(
                 <View style={__style.modalclosebtn} />
                 <View style={__style.headingTextView}>
                   <MyText type="bold" fontSize={28}>
-                    {!!editId ? 'Update Post' : 'Create Post'}
+                    {!!editId
+                      ? STRINGS.ADD_POST.updatePost
+                      : STRINGS.ADD_POST.createPost}
                   </MyText>
                 </View>
                 <TouchableOpacity
                   onPress={() => closeModal()}
-                  style={[
-                    __style.modalclosebtn,
-                    {backgroundColor: colors.border},
-                  ]}>
+                  style={[__style.modalclosebtn, __style.closeButtonBorder]}>
                   {icons.crosss(colors.white, 20)}
                 </TouchableOpacity>
               </View>
-              <View style={[__style.divider, {marginTop: -1}]} />
+              <View style={[__style.divider, __style.dividerNegativeMargin]} />
               <KeyboardAwareScrollView
                 keyboardShouldPersistTaps="handled"
                 style={__style.postView}
@@ -1518,18 +1513,13 @@ const AddPost = forwardRef(
                   />
 
                   {/* //* Dropdown btns */}
-                  <View style={{marginLeft: 10, flex: 1}}>
+                  <View style={__style.marginLeft10Flex1}>
                     <MyText fontSize={16} type="bold">
                       {user?.first_name + ' ' + user?.last_name}
                     </MyText>
                     {!isCosmos && !isNoteMainFeed && (
                       // actionBy == 'consultant_user'  &&
-                      <View
-                        style={{
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          marginTop: 5,
-                        }}>
+                      <View style={__style.rowAlignCenterMarginTop5}>
                         {access?.multiple_levels_in_source_all_source_scadule_feeds && (
                           <TouchableOpacity
                             onPress={() => openOptionModal('badgeFor')}
@@ -1546,11 +1536,7 @@ const AddPost = forwardRef(
                               setShowBadges({...showBadges, isVisible: true})
                             }
                             style={__style.modalDropBtns}>
-                            <MyText
-                              style={{
-                                marginRight: 5,
-                                maxWidth: Platform.OS == 'android' ? 170 : 270,
-                              }}>
+                            <MyText style={__style.badgeTextMaxWidth}>
                               {badges.map((el, i) =>
                                 i == 0 ? el.title : `, ${el.title}`,
                               )}
@@ -1564,7 +1550,7 @@ const AddPost = forwardRef(
                       {/* <TouchableOpacity
                       onPress={() => openOptionModal("category")}
                       style={__style.modalDropBtns}>
-                      <MyText style={{ textTransform: "capitalize" }}>
+                      <MyText style={__style.textCapitalize}>
                         {postCategory}</MyText>
                       {icons.downwardArrow(17, colors.white)}
                     </TouchableOpacity> */}
@@ -1576,7 +1562,7 @@ const AddPost = forwardRef(
                             onPress={() => openOptionModal('createdFor')}
                             style={__style.modalDropBtns}>
                             {isCosmos ? (
-                              <MyText style={{textTransform: 'capitalize'}}>
+                              <MyText style={__style.textCapitalize}>
                                 {`${postCeatedFor.split('_').join(' ')}${
                                   postCeatedFor == 'marketing' ? ' Team' : ''
                                 }`}
@@ -1606,7 +1592,7 @@ const AddPost = forwardRef(
                     </View>
 
                     {/* {!isCosmos && !isNoteMainFeed &&
-                    <View style={{ marginTop: 10 }}>
+                    <View style={__style.marginTop10}>
                       <TouchableOpacity
                         onPress={() => setMultipleLevelModalVisiblity(true)}
                         style={[__style.modalDropBtns, { alignSelf: "flex-start" }]}>
@@ -1653,7 +1639,7 @@ const AddPost = forwardRef(
                 }}
               /> : */}
                 <>
-                  <View style={{paddingHorizontal: 10}}>
+                  <View style={__style.paddingHorizontal10}>
                     <TextInput
                       style={[
                         __style.modalInput,
@@ -1669,7 +1655,7 @@ const AddPost = forwardRef(
                       autoComplete="off"
                       textAlignVertical="top"
                       autoCorrect={false}
-                      placeholder="What's on your mind?"
+                      placeholder={STRINGS.ADD_POST.whatsOnYourMindPlaceholder}
                       placeholderTextColor={colors.lightText2}
                       keyboardAppearance="dark"
                       selectionColor={colors.selection}
@@ -1743,11 +1729,11 @@ const AddPost = forwardRef(
                           {delegateList.length > 0 ? (
                             <ScrollView
                               keyboardShouldPersistTaps="handled"
-                              contentContainerStyle={{padding: 10}}>
+                              contentContainerStyle={__style.scrollPadding10}>
                               {delegateList.map(item => (
                                 <TouchableOpacity
                                   onPress={() => onPressOnMentions(item)}
-                                  style={{paddingVertical: 4}}>
+                                  style={__style.paddingVertical4}>
                                   <MemberView
                                     secondText={
                                       !isNoteMainFeed
@@ -1832,11 +1818,11 @@ const AddPost = forwardRef(
                           {keywordList.length > 0 ? (
                             <ScrollView
                               keyboardShouldPersistTaps="handled"
-                              contentContainerStyle={{padding: 10}}>
+                              contentContainerStyle={__style.scrollPadding10}>
                               {keywordList.map(item => (
                                 <TouchableOpacity
                                   onPress={() => onPressOnKeyword(item)}
-                                  style={{paddingVertical: 10}}>
+                                  style={__style.paddingVertical10}>
                                   <MyText>{item?.value}</MyText>
                                   {/* <MemberView
                                 secondText={!isNoteMainFeed ? isCosmos ? makeCosmosLevel(item?.team_type) : ` ${!!item?.membership_level_badge_info?.membership_level_badge_title ? "(" + item?.membership_level_badge_info?.membership_level_badge_title + ")" : ""}` : ""}
@@ -1870,22 +1856,21 @@ const AddPost = forwardRef(
 
                 {/*//*   Schedule View    */}
                 {isScheduledFeed && (
-                  <View style={{marginBottom: 10, paddingHorizontal: 10}}>
-                    <View
-                      style={{flexDirection: 'row', alignItems: 'flex-end'}}>
-                      <View style={{flex: 1}}>
+                  <View style={__style.marginBottom10PaddingHorizontal10}>
+                    <View style={__style.rowAlignEnd}>
+                      <View style={__style.flex1Only}>
                         <MyTouchableInput
                           noSpace
-                          label="Publish Date*"
+                          label={STRINGS.ADD_POST.publishDate}
                           value={publishDate}
                           icon={() => icons.calendar(colors.lightPrimary, 20)}
                           onPress={() => setDateModalVisible(true)}
                         />
                       </View>
-                      <View style={{flex: 1, marginLeft: 10}}>
+                      <View style={__style.flex1MarginLeft10}>
                         <MyTouchableInput
                           noSpace
-                          label="Publish Time*"
+                          label={STRINGS.ADD_POST.publishTime}
                           value={publishTime}
                           icon={() => icons.clock(colors.lightPrimary, 20)}
                           onPress={() => setTimeModalVisibe(true)}
@@ -1893,10 +1878,10 @@ const AddPost = forwardRef(
                       </View>
                     </View>
                     <MyText
-                      style={{marginTop: 5}}
+                      style={__style.marginTop5}
                       fontSize={12}
                       color={colors.lightText}>
-                      {'Date and Time are in Europe/Dublin timezone'}
+                      {STRINGS.ADD_POST.dateTimeTimezone}
                     </MyText>
                   </View>
                 )}
@@ -1904,7 +1889,7 @@ const AddPost = forwardRef(
                 {/* //* Eent View */}
 
                 {isEventViewComplete && (
-                  <View style={{paddingHorizontal: 10}}>
+                  <View style={__style.paddingHorizontal10}>
                     <View style={__style.eventRootView}>
                       <View style={__style.eventTitleView}>
                         <MyWebview html={eventTitle} />
@@ -1921,7 +1906,7 @@ const AddPost = forwardRef(
                         <MyText
                           color={eventBtnTextColor}
                           type="medium"
-                          style={{paddingHorizontal: 10}}>
+                          style={__style.paddingHorizontal10}>
                           {eventBtnText}
                         </MyText>
                       </TouchableOpacity>
@@ -1929,26 +1914,7 @@ const AddPost = forwardRef(
 
                     <TouchableOpacity
                       onPress={() => setEventModalVisible(true)}
-                      style={{
-                        backgroundColor: colors.white,
-                        height: 30,
-                        width: 30,
-                        borderRadius: 30 / 2,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        position: 'absolute',
-                        right: 0,
-                        top: 5,
-                        shadowColor: '#fff',
-                        shadowOffset: {
-                          width: 0,
-                          height: 2,
-                        },
-                        shadowOpacity: 0.25,
-                        shadowRadius: 3.84,
-
-                        elevation: 5,
-                      }}>
+                      style={__style.eventEditButton}>
                       {icons.editpencil(colors.border, 20)}
                     </TouchableOpacity>
 
@@ -1960,11 +1926,11 @@ const AddPost = forwardRef(
 
                 {/*//*   Images List     */}
                 {postType == 'image' && (
-                  <View style={{paddingHorizontal: 10}}>
-                    <View style={{flexDirection: 'row', marginBottom: 5}}>
+                  <View style={__style.paddingHorizontal10}>
+                    <View style={__style.rowMarginBottom5}>
                       <ScrollView
                         horizontal
-                        contentContainerStyle={{paddingVertical: 10}}
+                        contentContainerStyle={__style.contentPaddingVertical10}
                         indicatorStyle="white">
                         {images.map((image, index) => (
                           <View>
@@ -2028,7 +1994,7 @@ const AddPost = forwardRef(
                 {/* //*     Post Video url      */}
 
                 {postType == 'video' && (
-                  <View style={{paddingHorizontal: 10}}>
+                  <View style={__style.paddingHorizontal10}>
                     <TextInput
                       style={__style.videoInput}
                       autoCapitalize="none"
@@ -2036,7 +2002,7 @@ const AddPost = forwardRef(
                       autoCorrect={false}
                       onChangeText={text => setVideoLink(text)}
                       value={videoLink}
-                      placeholder="Video URL"
+                      placeholder={STRINGS.ADD_POST.videoURL}
                       placeholderTextColor={colors.lightText2}
                     />
                     <TouchableOpacity
@@ -2049,7 +2015,7 @@ const AddPost = forwardRef(
 
                 {/* //*     Post Embed Code      */}
                 {postType == 'embed_code' && (
-                  <View style={{paddingHorizontal: 10}}>
+                  <View style={__style.paddingHorizontal10}>
                     <TextInput
                       style={[__style.videoInput, {height: 120}]}
                       multiline={true}
@@ -2059,7 +2025,7 @@ const AddPost = forwardRef(
                       autoCorrect={false}
                       onChangeText={text => setEmbededCode(text)}
                       value={embededCode}
-                      placeholder="Embeded Code"
+                      placeholder={STRINGS.ADD_POST.embedCode}
                       placeholderTextColor={colors.lightText2}
                     />
                     <TouchableOpacity
@@ -2071,7 +2037,7 @@ const AddPost = forwardRef(
                 )}
 
                 {postType == 'poll' && (
-                  <View style={{paddingHorizontal: 10}}>
+                  <View style={__style.paddingHorizontal10}>
                     <PollView
                       ref={ref_poll}
                       data={pollData}
@@ -2094,10 +2060,10 @@ const AddPost = forwardRef(
                   !isNoteMainFeed &&
                   !editId &&
                   access?.notify_users_on_create_post && (
-                    <View style={{marginHorizontal: 10, marginTop: 15}}>
+                    <View style={__style.marginHorizontal10MarginTop15}>
                       <View>
                         <MyCheckBox
-                          title="Notify Users ?"
+                          title={STRINGS.ADD_POST.notifyUsers}
                           value={notifyUser}
                           onPress={() => {
                             setNotifyUser(!notifyUser);
@@ -2113,7 +2079,7 @@ const AddPost = forwardRef(
                             backgroundColor: colors.secondaryVariant,
                           }}>
                           <MyInputs
-                            label="Notification Statement*"
+                            label={STRINGS.ADD_POST.notificationStatement}
                             value={notifyTxt.state}
                             onChangeText={txt =>
                               setNotifyTxt({...notifyTxt, state: txt})
@@ -2121,7 +2087,7 @@ const AddPost = forwardRef(
                           />
 
                           <MyInputs
-                            label="Notification Description*"
+                            label={STRINGS.ADD_POST.notificationDescription}
                             value={notifyTxt?.desc}
                             onChangeText={text =>
                               setNotifyTxt({...notifyTxt, desc: text})
@@ -2134,8 +2100,9 @@ const AddPost = forwardRef(
                   )}
 
                 {/* //*     post type action buttonns  */}
-                <View style={[__style.typeButtonRow, {paddingHorizontal: 10}]}>
-                  <View style={{flex: 1, flexDirection: 'row'}}>
+                <View
+                  style={[__style.typeButtonRow, __style.paddingHorizontal10]}>
+                  <View style={__style.flex1FlexRow}>
                     <TouchableOpacity
                       onPress={() => changePostType('image')}
                       style={__style.typeButtonView}>
@@ -2204,36 +2171,39 @@ const AddPost = forwardRef(
 
                 {/* //*    add post Button  */}
                 {!!editId ? (
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      marginVertical: 20,
-                      paddingHorizontal: 10,
-                    }}>
-                    <View style={{flex: 1}}>
+                  <View style={__style.rowMarginVertical20PaddingHorizontal10}>
+                    <View style={__style.flex1Only}>
                       <MyButton
                         isLoading={loader}
                         onPress={closeModal}
                         invert={true}
-                        title={'cancel'}
+                        title={STRINGS.ADD_POST.cancel.toLowerCase()}
                       />
                     </View>
-                    <View style={{flex: 1, marginLeft: 10}}>
+                    <View style={__style.flex1MarginLeft10}>
                       <MyButton
                         isLoading={loader}
                         onPress={addPostBtn}
                         invert={true}
-                        title={loader ? 'updating...' : 'Update'}
+                        title={
+                          loader
+                            ? STRINGS.ADD_POST.updating
+                            : STRINGS.ADD_POST.update
+                        }
                       />
                     </View>
                   </View>
                 ) : (
-                  <View style={{marginVertical: 20, paddingHorizontal: 10}}>
+                  <View style={__style.marginVertical20PaddingHorizontal10}>
                     <MyButton
                       isLoading={loader}
                       onPress={addPostBtn}
                       invert={true}
-                      title={loader ? 'POSTING...' : 'POST'}
+                      title={
+                        loader
+                          ? STRINGS.ADD_POST.posting
+                          : STRINGS.ADD_POST.post
+                      }
                     />
                   </View>
                 )}
@@ -2308,8 +2278,7 @@ const AddPost = forwardRef(
 
             {isPostModalVisible && !eventModalVisible && <Toast />}
           </SafeAreaView>
-          <SafeAreaView
-            style={{flex: 0, backgroundColor: colors.secondary}}></SafeAreaView>
+          <SafeAreaView style={__style.safeAreaFlex0Secondary}></SafeAreaView>
         </Modal>
       );
     };
@@ -2326,7 +2295,7 @@ const AddPost = forwardRef(
                 style={__style.lvlbtnView}>
                 <View style={__style.levlBtnLabel}>
                   <MyText color={colors.lightText2} fontSize={12}>
-                    Select Level
+                    {STRINGS.ADD_POST.selectLevel}
                   </MyText>
                 </View>
                 <MyText type={'medium'}>
@@ -2339,16 +2308,19 @@ const AddPost = forwardRef(
             )}
 
             {isFeedFilterAllowed && (
-              <View style={{flexDirection: 'row'}}>
+              <View style={__style.flexRow}>
                 <Pressable
                   onPress={() => setFeedTypeModalVisibility(true)}
-                  style={[__style.lvlbtnView, {flex: 1, marginRight: 10}]}>
+                  style={[
+                    __style.lvlbtnView,
+                    __style.lvlbtnViewFlex1MarginRight10,
+                  ]}>
                   <View style={__style.levlBtnLabel}>
                     <MyText color={colors.lightText2} fontSize={12}>
                       Feed Type
                     </MyText>
                   </View>
-                  <MyText type={'medium'} style={{textTransform: 'capitalize'}}>
+                  <MyText type={'medium'} style={__style.textCapitalize}>
                     {feedType?.title}
                   </MyText>
                   {icons.down(colors.lightText2)}
@@ -2359,15 +2331,13 @@ const AddPost = forwardRef(
                     onPress={() => {
                       setMemberModalVisibilty(true);
                     }}
-                    style={[__style.lvlbtnView, {flex: 2}]}>
+                    style={[__style.lvlbtnView, __style.lvlbtnViewFlex2]}>
                     <View style={__style.levlBtnLabel}>
                       <MyText color={colors.lightText2} fontSize={12}>
-                        Select Member
+                        {STRINGS.ADD_POST.selectMember}
                       </MyText>
                     </View>
-                    <MyText
-                      type={'medium'}
-                      style={{textTransform: 'capitalize'}}>
+                    <MyText type={'medium'} style={__style.textCapitalize}>
                       {feedTypeMember
                         ? feedTypeMember?.first_name +
                           ' ' +
@@ -2395,9 +2365,7 @@ const AddPost = forwardRef(
                       type="medium"
                       adjustsFontSizeToFit={true}
                       fontSize={14}>
-                      {`What's on your mind${
-                        !!user?.first_name ? ', ' + user?.first_name : ''
-                      }?`}
+                      {STRINGS.ADD_POST.whatsOnYourMind(user?.first_name)}
                     </MyText>
                   </TouchableOpacity>
                 </View>
@@ -2466,7 +2434,7 @@ const AddPost = forwardRef(
               onSearchTextChange={text =>
                 getTheDelegateListFromServerForSpecificFeed(text)
               }
-              title="Member"
+              title={STRINGS.ADD_POST.member}
               renderText={({item}) => (
                 <MyText fontSize={16}>
                   {`${item?.first_name} ${item?.last_name} (${item?.email})`}
@@ -2784,6 +2752,163 @@ const __style = StyleSheet.create({
     height: 20,
     width: 1,
     backgroundColor: colors.lightText,
+  },
+  modalMargin: {
+    margin: 0,
+  },
+  flex1: {
+    flex: 1,
+  },
+  eventPaddingContainer: {
+    paddingHorizontal: 20,
+    flex: 1,
+  },
+  eventScrollContent: {
+    marginTop: 10,
+    paddingBottom: 30,
+  },
+  emptyView: {},
+  eventButtonRow: {
+    justifyContent: 'flex-end',
+    flexDirection: 'row',
+    marginTop: 20,
+  },
+  eventCancelBtn: {
+    paddingHorizontal: 20,
+  },
+  eventDoneBtn: {
+    paddingHorizontal: 20,
+    marginLeft: 20,
+  },
+  safeAreaBottom: {
+    flex: 0,
+    backgroundColor: colors.secondary,
+  },
+  closeButtonBorder: {
+    backgroundColor: colors.border,
+  },
+  dividerNegativeMargin: {
+    marginTop: -1,
+  },
+  marginLeft10Flex1: {
+    marginLeft: 10,
+    flex: 1,
+  },
+  textCapitalize: {
+    textTransform: 'capitalize',
+  },
+  marginTop10: {
+    marginTop: 10,
+  },
+  modalDropBtnsSelfStart: {
+    alignSelf: 'flex-start',
+  },
+  paddingHorizontal10: {
+    paddingHorizontal: 10,
+  },
+  scrollPadding10: {
+    padding: 10,
+  },
+  paddingVertical4: {
+    paddingVertical: 4,
+  },
+  paddingVertical10: {
+    paddingVertical: 10,
+  },
+  marginBottom10PaddingHorizontal10: {
+    marginBottom: 10,
+    paddingHorizontal: 10,
+  },
+  rowAlignEnd: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+  },
+  flex1MarginLeft10: {
+    flex: 1,
+    marginLeft: 10,
+  },
+  marginTop5: {
+    marginTop: 5,
+  },
+  flexRow: {
+    flexDirection: 'row',
+  },
+  lvlbtnViewFlex1MarginRight10: {
+    flex: 1,
+    marginRight: 10,
+  },
+  lvlbtnViewFlex2: {
+    flex: 2,
+  },
+  rowAlignCenterMarginTop5: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 5,
+  },
+  badgeTextMaxWidth: {
+    marginRight: 5,
+    maxWidth: Platform.OS == 'android' ? 170 : 270,
+  },
+  flex1Only: {
+    flex: 1,
+  },
+  rowMarginBottom5: {
+    flexDirection: 'row',
+    marginBottom: 5,
+  },
+  contentPaddingVertical10: {
+    paddingVertical: 10,
+  },
+  marginHorizontal10MarginTop15: {
+    marginHorizontal: 10,
+    marginTop: 15,
+  },
+  eventEditButton: {
+    backgroundColor: colors.white,
+    height: 30,
+    width: 30,
+    borderRadius: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'absolute',
+    right: 0,
+    top: 5,
+    shadowColor: '#fff',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  pollItemOptionView: {
+    flexDirection: 'row',
+    flex: 1,
+  },
+  pollItemInputView: {
+    flex: 1,
+    marginBottom: 10,
+  },
+  widthFull: {
+    width: '100%',
+  },
+  flex1FlexRow: {
+    flex: 1,
+    flexDirection: 'row',
+  },
+  rowMarginVertical20PaddingHorizontal10: {
+    flexDirection: 'row',
+    marginVertical: 20,
+    paddingHorizontal: 10,
+  },
+  marginVertical20PaddingHorizontal10: {
+    marginVertical: 20,
+    paddingHorizontal: 10,
+  },
+  safeAreaFlex0Secondary: {
+    flex: 0,
+    backgroundColor: colors.secondary,
   },
 });
 

@@ -1,110 +1,113 @@
-import { View, FlatList, useWindowDimensions, } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import RootView from '../../../components/RootView'
-import MyLoader from '../../../components/MyLoader'
-import { QUESTIONS_LIST, TOGGLE_SHOW_REPLIES } from '../../../DAL'
-import { useSelector } from 'react-redux'
-import { selectUser } from '../../../redux/reducers/userSlice'
-import EmptyView from '../../../components/EmptyView'
-import MemberView from '../../../components/MemberView'
-import QuestionComponent from '../../Questions/Components/QuestionComponent'
-import QuestionView from './QuestionView'
-import { TabBar, TabView } from 'react-native-tab-view'
-import RepliesView from './RepliesView'
-import { colors } from '../../../utilities/colors'
-import MyText from '../../../components/MyText'
-import { SELF_IMAGE_RESPONDED_MEMBER_DETAIL } from '../../../DAL/SelfImage'
-import moment from 'moment'
+import {View, FlatList, useWindowDimensions} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import RootView from '../../../components/RootView';
+import MyLoader from '../../../components/MyLoader';
+import {QUESTIONS_LIST, TOGGLE_SHOW_REPLIES} from '../../../DAL';
+import {useSelector} from 'react-redux';
+import {selectUser} from '../../../redux/reducers/userSlice';
+import EmptyView from '../../../components/EmptyView';
+import MemberView from '../../../components/MemberView';
+import QuestionComponent from '../../Questions/Components/QuestionComponent';
+import QuestionView from './QuestionView';
+import {TabBar, TabView} from 'react-native-tab-view';
+import RepliesView from './RepliesView';
+import {colors} from '../../../utilities/colors';
+import MyText from '../../../components/MyText';
+import {SELF_IMAGE_RESPONDED_MEMBER_DETAIL} from '../../../DAL/SelfImage';
+import moment from 'moment';
 // import QuestionComponent from './Components/QuestionComponent'
 
-
-const SelfImageDetail = ({ navigation, route }) => {
-  const { token, user } = useSelector(selectUser);
+const SelfImageDetail = ({navigation, route}) => {
+  const {token, user} = useSelector(selectUser);
   const layout = useWindowDimensions();
-  const { created_for, id: createdForId, memberId, type } = route?.params
-  const isResponded = type == "responded";
+  const {created_for, id: createdForId, memberId, type} = route?.params;
+  const isResponded = type == 'responded';
   const [loader, setLoader] = useState(false);
-  const [list, setList] = useState([])
-  const [member, setMember] = useState(null)
-  const [myTabs] = useState(isResponded ?
-    [{ key: 'questions', title: 'Questions', index: 0 }] : [
-      { key: 'questions', title: 'Questions', index: 0 },
-      { key: 'replies', title: `${user?.first_name}'s Reply`, index: 1 }]);
+  const [list, setList] = useState([]);
+  const [member, setMember] = useState(null);
+  const [myTabs] = useState(
+    isResponded
+      ? [{key: 'questions', title: 'Questions', index: 0}]
+      : [
+          {key: 'questions', title: 'Questions', index: 0},
+          {key: 'replies', title: `${user?.first_name}'s Reply`, index: 1},
+        ],
+  );
   const [index, setIndex] = useState(0);
-  const [replies, setReplies] = useState([])
+  const [replies, setReplies] = useState([]);
 
-  const onShowReplyPress = async (question) => {
+  const onShowReplyPress = async question => {
     setLoader(true);
     let val = !!!question?.answer?.show_replies;
     let body = {
       created_for: created_for,
       question_id: question?._id,
       member_id: memberId,
-      show_replies: val
-    }
-    let res = await TOGGLE_SHOW_REPLIES({ token, navigation, body });
+      show_replies: val,
+    };
+    let res = await TOGGLE_SHOW_REPLIES({token, navigation, body});
     if (res.code == 200) {
-
       setLoader(false);
-      setList((old) => {
+      setList(old => {
         let index = old.findIndex(x => x._id == question?._id);
         if (index > -1) {
           let newQuestion = {
-            ...old[index], answer: {
+            ...old[index],
+            answer: {
               ...old[index].answer,
-              show_replies: val
-            }
-          }
+              show_replies: val,
+            },
+          };
           old.splice(index, 1, newQuestion);
         }
         return [...old];
-      })
+      });
     } else {
-
       setLoader(false);
-
     }
-  }
+  };
 
   const getQuestionsListFromServer = async () => {
     let res = null;
     if (isResponded) {
-      res = await SELF_IMAGE_RESPONDED_MEMBER_DETAIL({ token, navigation, memberId })
+      res = await SELF_IMAGE_RESPONDED_MEMBER_DETAIL({
+        token,
+        navigation,
+        memberId,
+      });
     } else {
       res = await QUESTIONS_LIST({
-        token, navigation, body: {
+        token,
+        navigation,
+        body: {
           created_for: created_for,
           created_for_id: createdForId,
           member_id: memberId,
-          check_user: true
-        }
-      })
+          check_user: true,
+        },
+      });
     }
     if (res.code == 200) {
-
-      setList(res?.questionnaire)
-      setMember(res?.member)
-      setReplies(res?.self_image_replies)
+      setList(res?.questionnaire);
+      setMember(res?.member);
+      setReplies(res?.self_image_replies);
       // setList(firstTime ? res.questionnaire_list : [...list, ...res.questionnaire_list])
-      setLoader(false)
+      setLoader(false);
     } else {
-      setLoader(false)
-
-
+      setLoader(false);
     }
-  }
+  };
 
   useEffect(() => {
-    setLoader(true)
-    getQuestionsListFromServer()
-  }, [])
-
+    setLoader(true);
+    getQuestionsListFromServer();
+  }, []);
 
   const renderTabBar = props => (
     <TabBar
       {...props}
       scrollEnabled={true}
-      indicatorStyle={{ backgroundColor: colors.primary }}
+      indicatorStyle={{backgroundColor: colors.primary}}
       style={{
         backgroundColor: colors.darkSecondary,
         shadowColor: colors.lightText2,
@@ -112,76 +115,81 @@ const SelfImageDetail = ({ navigation, route }) => {
           width: 0,
           height: 1,
         },
-        shadowOpacity: 0.20,
+        shadowOpacity: 0.2,
         shadowRadius: 1.41,
       }}
-      tabStyle={{ width: "auto", }}
-      renderLabel={({ route, focused, color }) => {
+      tabStyle={{width: 'auto'}}
+      renderLabel={({route, focused, color}) => {
         return (
-          <MyText color={focused ? colors.primary : colors.lightText} type='medium' >
+          <MyText
+            color={focused ? colors.primary : colors.lightText}
+            type="medium">
             {route.title}
           </MyText>
-        )
+        );
       }}
       gap={10}
     />
   );
 
-  const renderScene = ({ route, }) => {
+  const renderScene = ({route}) => {
     switch (route.key) {
       case 'questions':
-        return <QuestionView
-          hideRepliesCheckBox={isResponded}
-          disableReplies={isResponded}
-          list={list} loader={loader} onShowReplyPress={onShowReplyPress} member={member}
-          refresh={getQuestionsListFromServer} />
+        return (
+          <QuestionView
+            hideRepliesCheckBox={isResponded}
+            disableReplies={isResponded}
+            list={list}
+            loader={loader}
+            onShowReplyPress={onShowReplyPress}
+            member={member}
+            refresh={getQuestionsListFromServer}
+          />
+        );
       case 'replies':
-        return <RepliesView
-          type={type}
-          list={replies}
-          loader={loader}
-          navigation={navigation}
-          refresh={getQuestionsListFromServer}
-          token={token} />
+        return (
+          <RepliesView
+            type={type}
+            list={replies}
+            loader={loader}
+            navigation={navigation}
+            refresh={getQuestionsListFromServer}
+            token={token}
+          />
+        );
     }
-  }
-
-
-
+  };
 
   const topView = () => {
     return (
       <View>
-        {!!member &&
+        {!!member && (
           <View>
             <MemberView member={member} />
             {/* <MyText  >{isResponded ? `Completed on ` : ""}</MyText> */}
           </View>
-        }
+        )}
       </View>
-    )
-  }
-
+    );
+  };
 
   return (
     <RootView titleView={topView}>
       {/* <QuestionView list={list} loader={loader} /> */}
-      <View style={{ flex: 1, marginHorizontal: -10 }}>
+      <View style={{flex: 1, marginHorizontal: -10}}>
         <TabView
           renderTabBar={renderTabBar}
-          navigationState={{ index, routes: myTabs }}
+          navigationState={{index, routes: myTabs}}
           renderScene={renderScene}
-          onIndexChange={(index) => {
+          onIndexChange={index => {
             setIndex(index);
           }}
-          initialLayout={{ width: layout.width }}
+          initialLayout={{width: layout.width}}
         />
       </View>
       <MyLoader enable={loader} />
-
     </RootView>
-  )
-}
+  );
+};
 
 export default SelfImageDetail;
-

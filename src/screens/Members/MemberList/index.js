@@ -1,11 +1,9 @@
 import {
   View,
-  Text,
   FlatList,
   TouchableOpacity,
   StyleSheet,
   Image,
-  ScrollView,
   Pressable,
   Keyboard,
   Platform,
@@ -14,7 +12,6 @@ import {
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import RootView from '../../../components/RootView';
 import MyText from '../../../components/MyText';
-import invokeApi from '../../../functions/invokeAPI';
 import {useSelector} from 'react-redux';
 import {selectUser} from '../../../redux/reducers/userSlice';
 import {
@@ -33,37 +30,17 @@ import routes from '../../../navigation/routes';
 import StatView from '../Components/StatView';
 import {convertTimezone} from '../../../functions/convertTime';
 import {selectTimeZone} from '../../../redux/reducers/timezoneSlice';
-import {
-  communityLevelWithAllObj,
-  dateTimeFormat,
-} from '../../../utilities/constants';
+import {dateTimeFormat} from '../../../utilities/constants';
 import MyInputs from '../../../components/MyInputs';
 import SortModal from '../Components/SortModal';
-import debounce from '../../../functions/debounce';
 import EmptyView from '../../../components/EmptyView';
-import Collapsible from 'react-native-collapsible';
 import FooterLoader from '../../../components/FooterLoader';
 import FilterModal from '../Components/FilterModal';
 import moment from 'moment';
-import {
-  filterFromlist,
-  levelList,
-  memberStatusList,
-  onlineStatusList,
-  membershipStatusList,
-  expireDaysList,
-  optionList,
-  programStatusList,
-} from '../Components/list';
+import {optionList, programStatusList} from '../Components/list';
 import utilities from '../../../utilities';
-import {
-  MenuButton,
-  MyButton,
-  TransparentButton,
-} from '../../../components/MyButton';
+import {MenuButton} from '../../../components/MyButton';
 import SaveFilterModal from '../Components/SaveFilterModal';
-import OptionModal from '../../../components/OptionModal';
-import downloadImage from '../../../functions/downloadImage';
 import RNFetchBlob from 'react-native-blob-util';
 import showToast from '../../../functions/showToast';
 import LeadModal from '../Components/LeadModal';
@@ -73,21 +50,18 @@ import ConfirmationModal2 from '../../../components/ConfirmationModal2';
 import OptionModal2 from '../../../components/OptionModal2';
 import breakReference from '../../../functions/breakReference';
 import countries from '../../../assets/data/countryList.json';
-import {Row} from '../../../UIComponents/FlexViews';
+import {Flex, Row} from '../../../UIComponents/FlexViews';
 import MyImage from '../../../components/MyImage';
 import isArray from '../../../functions/isArray';
 import isObject from '../../../functions/isObject';
-import TitleView from '../../../components/TitleView';
+import {STRINGS} from '../../../utilities/strings';
 
 let canLoadMore = false;
 let page = 0;
-let isFirst = true;
-let controller;
 const MemberList = ({navigation, route}) => {
   const ref_infoModal = useRef();
   const ref_optionModal = useRef();
   const ref_confirmModal = useRef();
-  const ref_firstRender = useRef(true);
   const {type} = route?.params;
   const isAllMembers = type == 'all-member';
   const isMembers = type == 'member';
@@ -172,9 +146,9 @@ const MemberList = ({navigation, route}) => {
     } else if (opt?.key == 'update_call') {
       setTimeout(() => {
         ref_confirmModal?.current?.openModal({
-          title: `Are you sure you want to ${
-            item?.is_call_allowed ? 'disable' : 'enable'
-          } call functionality for this user?`,
+          title: item?.is_call_allowed
+            ? STRINGS.MEMBER_LIST.areYouSureDisableCall
+            : STRINGS.MEMBER_LIST.areYouSureEnableCall,
           agreeFunc: () => updateCallAPI(item),
         });
       }, 500);
@@ -222,9 +196,15 @@ const MemberList = ({navigation, route}) => {
             'Download', // Media Collection to store the file in ("Audio" | "Image" | "Video" | "Download")
             pathToWrite, // Path to the file being copied in the apps own storage
           );
-          showToast({title: 'CSV File Downloaded', type: 'success'});
+          showToast({
+            title: STRINGS.MEMBER_LIST.csvFileDownloaded,
+            type: 'success',
+          });
         } else if (Platform.OS == 'ios') {
-          showToast({title: 'CSV File Downloaded', type: 'success'});
+          showToast({
+            title: STRINGS.MEMBER_LIST.csvFileDownloaded,
+            type: 'success',
+          });
         }
       })
       .catch(error => console.error(error));
@@ -343,14 +323,18 @@ const MemberList = ({navigation, route}) => {
         }
       } else if (x == 'status' && typeof obj[x] == 'boolean') {
         let nOBj = {
-          label: obj[x] ? 'Active' : 'Inactive',
+          label: obj[x]
+            ? STRINGS.MEMBER_LIST.active
+            : STRINGS.MEMBER_LIST.inactive,
           value: 'statusActive',
           type: x,
         };
         list.push(nOBj);
       } else if (x == 'downloaded_app' && typeof obj[x] == 'boolean') {
         let nOBj = {
-          label: obj[x] ? 'Downloaded' : 'Not Downloaded',
+          label: obj[x]
+            ? STRINGS.MEMBER_LIST.downloaded
+            : STRINGS.MEMBER_LIST.notDownloaded,
           value: obj[x],
           type: x,
         };
@@ -374,7 +358,7 @@ const MemberList = ({navigation, route}) => {
         list.push(nOBj);
       } else if (x == 'member_ship_expiry' && obj[x] == 'expired') {
         let nOBj = {
-          label: 'Expired',
+          label: STRINGS.MEMBER_LIST.expired,
           value: obj[x],
           type: x,
         };
@@ -385,7 +369,7 @@ const MemberList = ({navigation, route}) => {
         obj.expiry_in != 'custom'
       ) {
         let nOBj = {
-          label: `Expire in ${obj.expiry_in} days`,
+          label: `${STRINGS.MEMBER_LIST.expireIn} ${obj.expiry_in} ${STRINGS.MEMBER_LIST.days}`,
           value: obj[x],
           type: 'expiry_in',
         };
@@ -396,27 +380,31 @@ const MemberList = ({navigation, route}) => {
         obj.expiry_in == 'custom'
       ) {
         let nOBj = {
-          label: `Membership Expiry Start Date : ${moment(
+          label: `${STRINGS.MEMBER_LIST.membershipExpiryStartDate}${moment(
             obj?.membership_purchase_expiry_from,
-          ).format('YYYY-MM-DD')} - Membership Expiry End Date : ${moment(
-            obj?.membership_purchase_expiry_to,
-          ).format('YYYY-MM-DD')}`,
+          ).format(STRINGS.DATE_FORMATES.YYYY_MM_DD)}${
+            STRINGS.MEMBER_LIST.membershipExpiryEndDate
+          }${moment(obj?.membership_purchase_expiry_to).format(
+            STRINGS.DATE_FORMATES.YYYY_MM_DD,
+          )}`,
           value: obj[x],
           type: 'expiry_in',
         };
         list.push(nOBj);
       } else if (x == 'is_date_range' && !!obj[x]) {
         let nOBj = {
-          label: `Start Date : ${moment(obj?.from_date).format(
-            'YYYY-MM-DD',
-          )} - End Date : ${moment(obj?.to_date).format('YYYY-MM-DD')}`,
+          label: `${STRINGS.MEMBER_LIST.startDate}${moment(
+            obj?.from_date,
+          ).format(STRINGS.DATE_FORMATES.YYYY_MM_DD)}${
+            STRINGS.MEMBER_LIST.endDate
+          }${moment(obj?.to_date).format(STRINGS.DATE_FORMATES.YYYY_MM_DD)}`,
           value: obj[x],
           type: x,
         };
         list.push(nOBj);
       } else if (x == 'coins_range' && !!obj[x]) {
         let nOBj = {
-          label: `Start Coins : ${obj.coins_from} - End Coins : ${obj.coins_to}`,
+          label: `${STRINGS.MEMBER_LIST.startCoins}${obj.coins_from}${STRINGS.MEMBER_LIST.endCoins}${obj.coins_to}`,
           value: 'coins_range_true',
           type: x,
         };
@@ -618,21 +606,15 @@ const MemberList = ({navigation, route}) => {
 
   const topView = () => {
     return (
-      <View
-        style={{
-          flexDirection: 'row',
-          flex: 1,
-          marginHorizontal: 10,
-          alignItems: 'center',
-        }}>
+      <View style={styles.topViewContainer}>
         <View>
           <MyText fontSize={18} type="bold" color={colors.primary}>
             {isAllMembers
-              ? 'All Members'
+              ? STRINGS.MEMBER_LIST.allMembers
               : isMembers
-              ? 'Members'
+              ? STRINGS.MEMBER_LIST.members
               : isNurture
-              ? 'Nurture Members'
+              ? STRINGS.MEMBER_LIST.nurtureMembers
               : ''}
           </MyText>
           <MyText
@@ -640,25 +622,16 @@ const MemberList = ({navigation, route}) => {
             type="medium"
             color={
               colors.lightText2
-            }>{`Showing ${list.length} of ${total}`}</MyText>
+            }>{`${STRINGS.MEMBER_LIST.showing} ${list.length} ${STRINGS.MEMBER_LIST.of} ${total}`}</MyText>
         </View>
-        <View
-          style={{
-            flex: 1,
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'flex-end',
-          }}>
+        <View style={styles.topViewButtonsContainer}>
           {((isMembers && access?.member_export_csv) ||
             (isNurture && access?.nurture_export_csv) ||
             (isAllMembers && access?.all_member_export_csv)) && (
             <TouchableOpacity
               onPress={() => makeCsv()}
               style={__styles.headerBtn}>
-              <Image
-                source={icons.csv}
-                style={{height: 12, aspectRatio: 1.5}}
-              />
+              <Image source={icons.csv} style={styles.csvIcon} />
             </TouchableOpacity>
           )}
           <TouchableOpacity
@@ -679,7 +652,7 @@ const MemberList = ({navigation, route}) => {
   const chip = (title, onPress) => {
     return (
       <View key={'chip' + title} style={__styles.chipView}>
-        <View style={{}}>
+        <View>
           <MyText fontSize={12} color={colors.white}>
             {title}
           </MyText>
@@ -833,12 +806,12 @@ const MemberList = ({navigation, route}) => {
 
   const headerView = () => {
     return (
-      <View style={{backgroundColor: colors.darkSecondary}}>
+      <View style={styles.headerViewContainer}>
         {filterChipList.length > 0 && (
           <>
-            <View style={[__styles.allChipView]}>
-              <View style={{}}>
-                <MyText type="bold">{'Filtered By : '}</MyText>
+            <Row alignItems="center" flexWrap="wrap">
+              <View>
+                <MyText type="bold">{STRINGS.MEMBER_LIST.filteredBy}</MyText>
               </View>
               {filterChipList.map((item, index) => {
                 if ((index >= 4 && showChips) || index < 4)
@@ -846,14 +819,10 @@ const MemberList = ({navigation, route}) => {
               })}
               {filterChipList.length > 4 && (
                 <Pressable onPress={() => setShowChips(!showChips)}>
-                  <MyText
-                    type="medium"
-                    style={{
-                      color: colors.primary,
-                      paddingVertical: 5,
-                      paddingHorizontal: 10,
-                    }}>
-                    {showChips ? 'See Less...' : 'See All...'}
+                  <MyText type="medium" style={styles.seeAllText}>
+                    {showChips
+                      ? STRINGS.MEMBER_LIST.seeLess
+                      : STRINGS.MEMBER_LIST.seeAll}
                   </MyText>
                 </Pressable>
               )}
@@ -878,54 +847,29 @@ const MemberList = ({navigation, route}) => {
               {Filter?.member_ship_expiry != "" && Filter?.member_ship_expiry == 'not_expired' && Filter?.expiry_in == "custom" && chip(`Membership Expiry Start Date : ${moment(filterData?.membership_purchase_expiry_from).format("YYYY-MM-DD")} - Membership Expiry End Date : ${moment(filterData?.membership_purchase_expiry_to).format("YYYY-MM-DD")}`, () => updateFilter({ expiry_in: 3, member_ship_expiry: "" }))}
               {!!Filter?.is_date_range && !!Filter?.from_date != "" && !!Filter?.to_date != "" && chip(`Start Date : ${moment(filterData?.from_date).format("YYYY-MM-DD")} - End Date : ${moment(filterData?.to_date).format("YYYY-MM-DD")}`, () => updateFilter({ is_date_range: false, from_date: null, to_date: null }))}
               {!!Filter?.coins_range && chip(`Start Coins : ${Filter?.coins_from} - End Coins : ${Filter?.coins_to}`, () => updateFilter({ coins_range: false, coins_from: 0, coins_to: 0 }))} */}
-            </View>
+            </Row>
 
             {filterChipList.length > 0 && firstTimeLoad == false && (
-              <View
-                style={{
-                  flexDirection: 'row',
-                  marginTop: 10,
-                  justifyContent: 'flex-end',
-                }}>
-                <Pressable style={{}} onPress={clearFilter}>
-                  {/* <MyText type='medium'
-                  style={{
-                    // borderRadius:10,overflow:"hidden",
-                    // backgroundColor: colors.heart+"55",
-                    color: colors.delete,
-                    paddingVertical: 5,
-                    paddingHorizontal: 10,
-                    // textDecorationLine: "underline"
-                  }} >{"Clear Filter"}</MyText> */}
+              <View style={styles.filterButtonsContainer}>
+                <Pressable onPress={clearFilter}>
                   <TouchableOpacity
                     onPress={clearFilter}
-                    style={{
-                      borderWidth: 1,
-                      borderColor: colors.primary,
-                      borderRadius: 10,
-                      paddingHorizontal: 10,
-                      marginRight: 10,
-                      paddingVertical: 5,
-                      backgroundColor: colors.lightPrimary3,
-                    }}>
-                    <MyText color={colors.primary}>{'Clear Filter'}</MyText>
+                    style={styles.filterButton}>
+                    <MyText color={colors.primary}>
+                      {STRINGS.MEMBER_LIST.clearFilter}
+                    </MyText>
                   </TouchableOpacity>
                 </Pressable>
 
-                <View style={{flexDirection: 'row'}}>
+                <View style={styles.rowContainer}>
                   {
                     !isSavedFilterApplied && (
                       <TouchableOpacity
                         onPress={saveFilter}
-                        style={{
-                          borderWidth: 1,
-                          borderColor: colors.primary,
-                          borderRadius: 10,
-                          paddingHorizontal: 10,
-                          paddingVertical: 5,
-                          backgroundColor: colors.lightPrimary3,
-                        }}>
-                        <MyText color={colors.primary}>{'Save Filter'}</MyText>
+                        style={styles.filterButton}>
+                        <MyText color={colors.primary}>
+                          {STRINGS.MEMBER_LIST.saveFilter}
+                        </MyText>
                       </TouchableOpacity>
                     )
                     // <MyButton invert textStyle={{fontSize:12}} style={{paddingHorizontal:5,height:30}} title='Save Filter' onPress={saveFilter} />
@@ -951,15 +895,15 @@ const MemberList = ({navigation, route}) => {
           </>
         )}
         {/* <Collapsible collapsed={searchCollapsed}> */}
-        <View style={{marginTop: 5}}>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <View style={{flex: 1, marginTop: -15}}>
+        <View style={styles.searchContainer}>
+          <View style={styles.searchRow}>
+            <View style={styles.searchInputContainer}>
               <MyInputs
                 rightIcon={
                   search.length > 0 ? icons.crosssWithCircle_20 : icons.noIcon
                 }
                 value={search}
-                placeholder="Search..."
+                placeholder={STRINGS.MEMBER_LIST.search}
                 onChangeText={text => setSearch(text)}
                 rightIconOnPress={() => {
                   setSearch('');
@@ -973,22 +917,14 @@ const MemberList = ({navigation, route}) => {
                 }}
               />
             </View>
-            <View style={{marginLeft: 5}}>
+            <View style={styles.searchButtonContainer}>
               <TouchableOpacity
                 onPress={() => {
                   page = 0;
                   canLoadMore = false;
                   getMembers(true);
                 }}
-                style={{
-                  borderWidth: 1,
-                  borderColor: colors.primary,
-                  flex: 1,
-                  marginTop: 5,
-                  paddingHorizontal: 10,
-                  borderRadius: 5,
-                  justifyContent: 'center',
-                }}>
+                style={styles.searchButton}>
                 {icons.search(colors.primary, 20)}
               </TouchableOpacity>
             </View>
@@ -1011,7 +947,7 @@ const MemberList = ({navigation, route}) => {
                 item?.membership_level_badge_info?.membership_level_badge_icon
                   ?.thumbnail_1,
             }}
-            style={{width: 15, height: 15, marginRight: 5}}
+            style={styles.badgeIcon}
           />
         )}
         {!!item?.membership_level_badge_info?.membership_level_badge_title && (
@@ -1020,21 +956,23 @@ const MemberList = ({navigation, route}) => {
           </MyText>
         )}
         <View
-          style={{
-            backgroundColor: item?.is_membership_active
-              ? colors.active
-              : colors.delete,
-            borderRadius: 5,
-            padding: 3,
-            marginLeft: 5,
-          }}>
+          style={[
+            styles.badgeActiveView,
+            {
+              backgroundColor: item?.is_membership_active
+                ? colors.active
+                : colors.delete,
+            },
+          ]}>
           <MyText
             fontSize={10}
             uppercase
             type="bold"
             // color={item?.is_membership_active ? colors.active : colors.delete}
             color={colors.white}>
-            {item?.is_membership_active ? 'Active' : 'Expired'}
+            {item?.is_membership_active
+              ? STRINGS.MEMBER_LIST.active
+              : STRINGS.MEMBER_LIST.expired}
           </MyText>
         </View>
       </Row>
@@ -1043,9 +981,9 @@ const MemberList = ({navigation, route}) => {
 
   const leadStatusView = item => {
     return (
-      <View style={{flexDirection: 'row', alignItems: 'center'}}>
+      <View style={styles.rowContainer}>
         <TouchableHighlight
-          style={{flex: 1}}
+          style={styles.flexOne}
           onPress={() => {
             setMember(item);
             leadModalRef?.current?.openModal();
@@ -1057,16 +995,18 @@ const MemberList = ({navigation, route}) => {
                 backgroundColor: item?.lead_status?.background_color,
               },
             ]}>
-            <View style={__styles.leadStatusTextView}>
+            <Flex flex={1}>
               <MyText
                 color={
                   !!item?.lead_status
                     ? item?.lead_status?.text_color
                     : colors.white
                 }>
-                {!!item?.lead_status ? item?.lead_status?.title : 'Lead Status'}
+                {!!item?.lead_status
+                  ? item?.lead_status?.title
+                  : STRINGS.MEMBER_LIST.leadStatus}
               </MyText>
-            </View>
+            </Flex>
             <View style={__styles.leadStatusIconView}>
               {icons.down(colors.primary, 15)}
             </View>
@@ -1090,7 +1030,7 @@ const MemberList = ({navigation, route}) => {
     ({item, index}) => {
       return (
         <View style={[__styles.memberRootView]}>
-          <View style={__styles.memberProfileView}>
+          <Row alignItems="center">
             <Pressable
               onPress={() => {
                 if (access?.view_profile)
@@ -1098,7 +1038,7 @@ const MemberList = ({navigation, route}) => {
                     memberId: item?._id,
                   });
               }}
-              style={{flexDirection: 'row', flex: 1, alignItems: 'center'}}>
+              style={styles.memberProfilePressable}>
               <View>
                 <UserImage
                   borderWidth={2}
@@ -1133,35 +1073,35 @@ const MemberList = ({navigation, route}) => {
               </View>
             </Pressable>
 
-            <MyText style={{marginRight: 10}}>
+            <MyText style={styles.countryFlag}>
               {countries.find(el => el.code === item?.country)?.flag || ''}
             </MyText>
             <Pressable
               onPress={() =>
                 ref_infoModal?.current?.openModal(
                   item?.downloaded_app
-                    ? 'This Member has downloaded the app'
-                    : 'This Member has not downloaded the app yet',
+                    ? STRINGS.MEMBER_LIST.memberHasDownloadedApp
+                    : STRINGS.MEMBER_LIST.memberHasNotDownloadedApp,
                 )
               }
-              style={{marginRight: 10}}>
+              style={styles.appDownloadIcon}>
               {item?.downloaded_app
                 ? icons.appDownloadedEmoji(25)
                 : icons.appNotDownloadedEmoji(25)}
             </Pressable>
 
             {item?.is_wheel_of_life && (
-              <View style={{marginRight: 10}}>
+              <View style={styles.wheelOfLifeIcon}>
                 <Image
                   source={icons.wheelOfLife}
-                  style={{height: 20, width: 20}}
+                  style={styles.wheelOfLifeImage}
                 />
               </View>
             )}
 
             {isChatAllowed && (
               <TouchableOpacity
-                style={{marginRight: 5}}
+                style={styles.chatIcon}
                 onPress={() => onChatScreen(item?._id)}>
                 {icons.message(colors.primary, 20)}
               </TouchableOpacity>
@@ -1173,11 +1113,11 @@ const MemberList = ({navigation, route}) => {
                 ref_optionModal?.current?.openModal?.(item);
               }}
             />
-          </View>
+          </Row>
 
           <View>
             <StatView
-              title={'Membership Expire'}
+              title={STRINGS.MEMBER_LIST.membershipExpire}
               value={
                 !!item?.membership_purchase_expiry
                   ? !isAllMembers
@@ -1185,18 +1125,18 @@ const MemberList = ({navigation, route}) => {
                         dateTimeFormat.date,
                       )
                     : item?.membership_purchase_expiry
-                  : 'N/A'
+                  : STRINGS.MEMBER_LIST.na
               }
             />
             <StatView
-              title={'Coins'}
+              title={STRINGS.MEMBER_LIST.coins}
               value={numFormatter(item?.coins_count)}
               uppercase
             />
             {/* <StatView title={"App Downloaded"} value={numFormatter(item?.coins_count)} uppercase /> */}
             {isAllMembers && (
               <StatView
-                title={'Reffered User'}
+                title={STRINGS.MEMBER_LIST.refferedUser}
                 value={
                   !!item?.affliliate?.affiliate_user_info?.first_name
                     ? item?.affliliate?.affiliate_user_info?.first_name +
@@ -1205,57 +1145,60 @@ const MemberList = ({navigation, route}) => {
                       ' (' +
                       item?.affliliate?.affiliate_url_name +
                       ') '
-                    : 'Master Link'
+                    : STRINGS.MEMBER_LIST.masterLink
                 }
               />
             )}
             {!isNurture && access?.Show_nurture_in_filter && (
               <StatView
-                title={'Nurture'}
+                title={STRINGS.MEMBER_LIST.nurture}
                 value={
                   !!item?.nurture
                     ? item?.nurture?.first_name + ' ' + item?.nurture?.last_name
-                    : 'N/A'
+                    : STRINGS.MEMBER_LIST.na
                 }
               />
             )}
             {!isMembers && (
               <StatView
-                title={'Delegate'}
+                title={STRINGS.MEMBER_LIST.delegate}
                 value={
                   !!item?.consultant
                     ? item?.consultant?.first_name +
                       ' ' +
                       item?.consultant?.last_name
-                    : 'N/A'
+                    : STRINGS.MEMBER_LIST.na
                 }
               />
             )}
             <StatView
-              title={'Badge Level'}
+              title={STRINGS.MEMBER_LIST.badgeLevel}
               // icon_img={item?.membership_level_badge_info?.membership_level_badge_icon?.thumbnail_1}
               // value={item?.membership_level_badge_info?.membership_level_badge_title}
               view={() => badgeLevelView(item)}
             />
             <StatView
-              title={'Last Login Activity'}
+              title={STRINGS.MEMBER_LIST.lastLoginActivity}
               uppercase
               value={convertTimezone(
                 item?.last_login_activity,
                 timezone,
               ).format(dateTimeFormat.dateTime)}
             />
-            <StatView title={'Lead Status'} view={() => leadStatusView(item)} />
+            <StatView
+              title={STRINGS.MEMBER_LIST.leadStatus}
+              view={() => leadStatusView(item)}
+            />
 
             {/* <StatView title={"Regis Expire"} value={convertTimezone(item?.createdAt, timezone).format(dateTimeFormat.date)} /> */}
           </View>
 
-          <View style={{alignItems: 'flex-end'}}>
+          <View style={styles.viewMoreContainer}>
             <TouchableOpacity
               onPress={() => onMemberDetail(item)}
-              style={{padding: 5, marginTop: 10}}>
+              style={styles.viewMoreButton}>
               <MyText color={colors.primary} type="medium">
-                View More...
+                {STRINGS.MEMBER_LIST.viewMore}
               </MyText>
             </TouchableOpacity>
           </View>
@@ -1267,7 +1210,7 @@ const MemberList = ({navigation, route}) => {
 
   return (
     <RootView hideBackBottomButton titleView={topView}>
-      <View style={{flex: 1}}>
+      <Flex flex={1}>
         <FlatList
           removeClippedSubviews={true}
           windowSize={10}
@@ -1289,7 +1232,7 @@ const MemberList = ({navigation, route}) => {
             }
           }}
         />
-      </View>
+      </Flex>
       <MyLoader enable={loader} />
 
       <InfoModal ref={ref_infoModal} />
@@ -1397,7 +1340,7 @@ const __styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
   },
-  memberProfileView: {flexDirection: 'row', alignItems: 'center'},
+
   memberStatusView: {
     position: 'absolute',
     bottom: 0,
@@ -1425,11 +1368,6 @@ const __styles = StyleSheet.create({
     justifyContent: 'center',
     marginLeft: 10,
     backgroundColor: colors.primary,
-  },
-  allChipView: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignItems: 'center',
   },
   chipView: {
     paddingVertical: 2,
@@ -1468,5 +1406,113 @@ const __styles = StyleSheet.create({
     width: 30,
     paddingVertical: 5,
     alignItems: 'center',
+  },
+});
+
+const styles = StyleSheet.create({
+  topViewContainer: {
+    flexDirection: 'row',
+    flex: 1,
+    marginHorizontal: 10,
+    alignItems: 'center',
+  },
+  topViewButtonsContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+  },
+  csvIcon: {
+    height: 12,
+    aspectRatio: 1.5,
+  },
+  seeAllText: {
+    color: colors.primary,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+  },
+  filterButtonsContainer: {
+    flexDirection: 'row',
+    marginTop: 10,
+    justifyContent: 'flex-end',
+  },
+  filterButton: {
+    borderWidth: 1,
+    borderColor: colors.primary,
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    marginRight: 10,
+    paddingVertical: 5,
+    backgroundColor: colors.lightPrimary3,
+  },
+  rowContainer: {
+    flexDirection: 'row',
+  },
+  searchContainer: {
+    marginTop: 5,
+  },
+  searchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  searchInputContainer: {
+    flex: 1,
+    marginTop: -15,
+  },
+  searchButtonContainer: {
+    marginLeft: 5,
+  },
+  searchButton: {
+    borderWidth: 1,
+    borderColor: colors.primary,
+    flex: 1,
+    marginTop: 5,
+    paddingHorizontal: 10,
+    borderRadius: 5,
+    justifyContent: 'center',
+  },
+  badgeActiveView: {
+    borderRadius: 5,
+    padding: 3,
+    marginLeft: 5,
+  },
+  flexOne: {
+    flex: 1,
+  },
+  memberProfilePressable: {
+    flexDirection: 'row',
+    flex: 1,
+    alignItems: 'center',
+  },
+  countryFlag: {
+    marginRight: 10,
+  },
+  appDownloadIcon: {
+    marginRight: 10,
+  },
+  wheelOfLifeIcon: {
+    marginRight: 10,
+  },
+  wheelOfLifeImage: {
+    height: 20,
+    width: 20,
+  },
+  chatIcon: {
+    marginRight: 5,
+  },
+  viewMoreContainer: {
+    alignItems: 'flex-end',
+  },
+  viewMoreButton: {
+    padding: 5,
+    marginTop: 10,
+  },
+  badgeIcon: {
+    width: 15,
+    height: 15,
+    marginRight: 5,
+  },
+  headerViewContainer: {
+    backgroundColor: colors.darkSecondary,
   },
 });

@@ -1,8 +1,8 @@
-import {View, Text, FlatList} from 'react-native';
+import {View, FlatList, StyleSheet} from 'react-native';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import RootView from '../../../components/RootView';
 import MyText from '../../../components/MyText';
 import MyLoader, {SimpleLoader} from '../../../components/MyLoader';
+import {STRINGS} from '../../../utilities/strings';
 import {
   GET_FEED_LIST,
   GET_COMMENT_LIST,
@@ -46,6 +46,7 @@ import SurveyModal from './SurveyModal';
 import SurveyDetailModal from './SurveyDetailModal';
 import ConfirmationModal2 from '../../../components/ConfirmationModal2';
 import isArray from '../../../functions/isArray';
+import {Flex} from '../../../UIComponents/FlexViews';
 
 let feedVar = {
   page: 0,
@@ -1351,8 +1352,7 @@ const FeedScreen = ({
   const footerView = () => {
     if (tab == 0) {
       return (
-        <View
-          style={{height: 50, alignItems: 'center', justifyContent: 'center'}}>
+        <View style={styles.footerLoaderContainer}>
           {feedFooterLoader && <SimpleLoader />}
         </View>
       );
@@ -1371,7 +1371,7 @@ const FeedScreen = ({
       );
     } else if (tab == 2 && isScheduleFeedTabAllowed) {
       return (
-        <View style={{flex: 1, paddingHorizontal: 10}}>
+        <View style={styles.scheduledFeedContainer}>
           <FeedScreen
             filterTheOptions={filterTheOptionsCount}
             navigation={navigation}
@@ -1414,11 +1414,11 @@ const FeedScreen = ({
 
   const headerView = () => {
     return (
-      <View style={{paddingHorizontal: 10}}>
+      <View style={styles.headerContainer}>
         {!!!feedId && (
           <>
             {route?.params?.title && (
-              <View style={{marginTop: 5}}>
+              <View style={styles.titleContainer}>
                 <MyText fontSize={18} type="bold" color={colors.primary}>
                   {route?.params?.title}
                 </MyText>
@@ -1540,12 +1540,10 @@ const FeedScreen = ({
   const viewConfigRef = React.useRef({viewAreaCoveragePercentThreshold: 50});
 
   return (
-    <View style={{flex: 1}}>
-      <View style={{flex: 1, marginHorizontal: -10}}>
+    <Flex flex={1}>
+      <Flex flex={1} style={styles.flatListContainer}>
         <FlatList
           data={tab == 0 ? feed : []}
-          // onViewableItemsChanged={!__DEV__ && onViewableItemsChanged}
-          // viewabilityConfig={!__DEV__ && viewConfigRef.current}
           refreshControl={
             <MyRefreshControl onRefresh={onRefresh} refreshing={isRefreshing} />
           }
@@ -1553,7 +1551,8 @@ const FeedScreen = ({
           keyExtractor={item => item?._id}
           ListHeaderComponent={headerView()}
           ListEmptyComponent={
-            !loader && tab == 0 && <EmptyView label={'Posts not found'} />
+            !loader &&
+            tab == 0 && <EmptyView label={STRINGS.FEED_SCREEN.postsNotFound} />
           }
           onEndReached={() => {
             if (!!!feedId && feedVar?.canLoadMore && tab == 0) {
@@ -1574,7 +1573,7 @@ const FeedScreen = ({
           windowSize={5}
           initialNumToRender={10}
         />
-      </View>
+      </Flex>
 
       <CommentModal
         isVisible={comments?.modalVisibility}
@@ -1690,7 +1689,7 @@ const FeedScreen = ({
       <NotifyUser ref={ref_notify_user} token={token} navigation={navigation} />
 
       <MyLoader enable={loader} />
-    </View>
+    </Flex>
   );
 };
 
@@ -1699,49 +1698,70 @@ export default FeedScreen;
 const feedOptionList = [
   {
     icon: icons.edit,
-    title: 'Edit',
+    title: STRINGS.FEED_SCREEN.edit,
     type: 'edit',
   },
   {
     icon: icons.trash,
-    title: 'Delete',
+    title: STRINGS.FEED_SCREEN.delete,
     type: 'delete',
   },
   {
     icon: icons.pin,
-    title: 'Pin',
+    title: STRINGS.FEED_SCREEN.pin,
     type: 'pin',
   },
   {
     icon: icons.pin,
-    title: 'Unpin',
+    title: STRINGS.FEED_SCREEN.unpin,
     type: 'unpin',
   },
   {
     icon: () => icons.warnOctagon(colors.primary, 17),
-    title: 'Reported By',
+    title: STRINGS.FEED_SCREEN.reportedBy,
     type: 'reported_by',
   },
   {
     icon: () => icons.send(colors.primary, 17),
-    title: 'Message',
+    title: STRINGS.FEED_SCREEN.message,
     type: 'message',
   },
 
   {
     icon: () => icons.notes(colors.primary, 17),
-    title: 'Add as Personal Notes',
+    title: STRINGS.FEED_SCREEN.addAsPersonalNotes,
     type: 'notes',
   },
 
   {
     icon: () => icons.check_circle(colors.primary, 17),
-    title: 'Approve',
+    title: STRINGS.FEED_SCREEN.approve,
     type: 'approve',
   },
   {
     icon: () => icons.notification(colors.primary, 17),
-    title: 'Notify Users',
+    title: STRINGS.FEED_SCREEN.notifyUsers,
     type: 'notify',
   },
 ];
+
+const styles = StyleSheet.create({
+  flatListContainer: {
+    marginHorizontal: -10,
+  },
+  footerLoaderContainer: {
+    height: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  scheduledFeedContainer: {
+    flex: 1,
+    paddingHorizontal: 10,
+  },
+  headerContainer: {
+    paddingHorizontal: 10,
+  },
+  titleContainer: {
+    marginTop: 5,
+  },
+});

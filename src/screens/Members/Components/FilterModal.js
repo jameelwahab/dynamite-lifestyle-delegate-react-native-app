@@ -1,13 +1,4 @@
-import {
-  View,
-  Text,
-  TouchableHighlight,
-  SafeAreaView,
-  Pressable,
-  ScrollView,
-  TouchableOpacity,
-  StyleSheet,
-} from 'react-native';
+import {View, SafeAreaView, Pressable, StyleSheet} from 'react-native';
 import React, {
   forwardRef,
   useEffect,
@@ -17,6 +8,7 @@ import React, {
 } from 'react';
 import Modal from 'react-native-modal';
 import {colors} from '../../../utilities/colors';
+import {STRINGS} from '../../../utilities/strings';
 import MyText from '../../../components/MyText';
 import {icons} from '../../../utilities/icons';
 import {useNavigation} from '@react-navigation/native';
@@ -27,7 +19,6 @@ import OptionModal from '../../../components/OptionModal';
 import moment from 'moment';
 import {dateTimeFormat} from '../../../utilities/constants';
 import CalendarModal from '../../../components/CalendarModal';
-import CheckBox from '@react-native-community/checkbox';
 import MyCheckBox from '../../../components/MyCheckBox';
 import MyInputs from '../../../components/MyInputs';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
@@ -193,14 +184,20 @@ const FilterModal = forwardRef(
         !!appliedFilter?.expiry_in &&
         appliedFilter?.member_ship_expiry == 'not_expired' &&
         appliedFilter?.expiry_in == 'custom'
-          ? moment(appliedFilter?.membership_purchase_expiry_from, 'YYYY-MM-DD')
+          ? moment(
+              appliedFilter?.membership_purchase_expiry_from,
+              STRINGS.DATE_FORMATES.YYYY_MM_DD,
+            )
           : moment(),
       );
       setMembershipExpiryEndDate(prev =>
         !!appliedFilter?.expiry_in &&
         appliedFilter?.member_ship_expiry == 'not_expired' &&
         appliedFilter?.expiry_in == 'custom'
-          ? moment(appliedFilter?.membership_purchase_expiry_to, 'YYYY-MM-DD')
+          ? moment(
+              appliedFilter?.membership_purchase_expiry_to,
+              STRINGS.DATE_FORMATES.YYYY_MM_DD,
+            )
           : moment(),
       );
       setShowDateRange(prev =>
@@ -249,8 +246,8 @@ const FilterModal = forwardRef(
       if (showDateRange && reset == false) {
         if (!!startDate == false || !!endDate == false) {
           showToast({
-            title: 'Alert',
-            body: 'Please select a Start Date & End Date',
+            title: STRINGS.FilterModal.alertTitle,
+            body: STRINGS.FilterModal.selectDateRangeMessage,
           });
           return;
         }
@@ -271,23 +268,27 @@ const FilterModal = forwardRef(
         to_date: !!endDate ? endDate : null,
         membership_purchase_expiry_from: moment(
           membershipExpiryStartDate,
-        ).format('YYYY-MM-DD'),
+        ).format(STRINGS.DATE_FORMATES.YYYY_MM_DD),
         membership_purchase_expiry_to: moment(membershipExpiryEndDate).format(
-          'YYYY-MM-DD',
+          STRINGS.DATE_FORMATES.YYYY_MM_DD,
         ),
         date:
           expireIn?.key == 'custom'
             ? {
                 chip_label: `Start Date : ${moment(
                   membershipExpiryStartDate,
-                ).format('YYYY-MM-DD')} - End Date : ${moment(
-                  membershipExpiryEndDate,
-                ).format('YYYY-MM-DD')}`,
+                ).format(
+                  STRINGS.DATE_FORMATES.YYYY_MM_DD,
+                )} - End Date : ${moment(membershipExpiryEndDate).format(
+                  STRINGS.DATE_FORMATES.YYYY_MM_DD,
+                )}`,
                 chip_value: `Start Date : ${moment(
                   membershipExpiryStartDate,
-                ).format('YYYY-MM-DD')} - End Date : ${moment(
-                  membershipExpiryEndDate,
-                ).format('YYYY-MM-DD')}`,
+                ).format(
+                  STRINGS.DATE_FORMATES.YYYY_MM_DD,
+                )} - End Date : ${moment(membershipExpiryEndDate).format(
+                  STRINGS.DATE_FORMATES.YYYY_MM_DD,
+                )}`,
               }
             : null,
         coins: null,
@@ -678,12 +679,12 @@ const FilterModal = forwardRef(
 
     const screenView = () => {
       return (
-        <View style={{flex: 1}}>
+        <View style={styles.flex1}>
           <KeyboardAwareScrollView
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{paddingTop: 20, paddingBottom: 40}}>
+            contentContainerStyle={styles.scrollContent}>
             <MyTouchableInput
-              label="Filter From"
+              label={STRINGS.FilterModal.filterFrom}
               value={filterFrom.title}
               onPress={() => openOptionModal('filterType')}
               icon={() => icons.down(colors.primary, 15)}
@@ -691,7 +692,7 @@ const FilterModal = forwardRef(
 
             {filterFrom.key == 'saved-filter' && (
               <MyTouchableInput
-                label="Saved Filter"
+                label={STRINGS.FilterModal.savedFilter}
                 value={selectedSavedFilter?.filter_name}
                 onPress={() =>
                   openSearchOptionModal('savedfilter', 'filter_name')
@@ -702,7 +703,9 @@ const FilterModal = forwardRef(
                     <Pressable
                       style={__styles.clearbtnView}
                       onPress={() => reset(true)}>
-                      <MyText color={colors.primary}>Clear</MyText>
+                      <MyText color={colors.primary}>
+                        {STRINGS.FilterModal.clear}
+                      </MyText>
                     </Pressable>
                   )
                 }
@@ -713,7 +716,7 @@ const FilterModal = forwardRef(
               (filterFrom.key == 'saved-filter' && !!selectedSavedFilter)) && (
               <>
                 <MyTouchableInput
-                  label="Sale Pages"
+                  label={STRINGS.FilterModal.salePages}
                   value={salePage?.sale_page_title}
                   onPress={() =>
                     openSearchOptionModal('salepage', 'sale_page_title')
@@ -724,14 +727,16 @@ const FilterModal = forwardRef(
                       <Pressable
                         style={__styles.clearbtnView}
                         onPress={() => setSalePage('')}>
-                        <MyText color={colors.primary}>Clear</MyText>
+                        <MyText color={colors.primary}>
+                          {STRINGS.FilterModal.clear}
+                        </MyText>
                       </Pressable>
                     )
                   }
                 />
 
                 <MyTouchableInput
-                  label="Choose Plan"
+                  label={STRINGS.FilterModal.choosePlan}
                   value={plan?.plan_title}
                   onPress={() => openSearchOptionModal('plan', 'plan_title')}
                   icon={() => icons.down(colors.primary, 15)}
@@ -740,14 +745,16 @@ const FilterModal = forwardRef(
                       <Pressable
                         style={__styles.clearbtnView}
                         onPress={() => setPlan('')}>
-                        <MyText color={colors.primary}>Clear</MyText>
+                        <MyText color={colors.primary}>
+                          {STRINGS.FilterModal.clear}
+                        </MyText>
                       </Pressable>
                     )
                   }
                 />
 
                 <MyTouchableInput
-                  label="Choose Programmes"
+                  label={STRINGS.FilterModal.chooseProgrammes}
                   view={selectedProgramView}
                   iconOnPress={() => openSearchOptionModal('program', 'title')}
                   icon={() => icons.down(colors.primary, 15)}
@@ -759,14 +766,16 @@ const FilterModal = forwardRef(
                           setProgram([]);
                           setProgramStatus('');
                         }}>
-                        <MyText color={colors.primary}>Clear</MyText>
+                        <MyText color={colors.primary}>
+                          {STRINGS.FilterModal.clear}
+                        </MyText>
                       </Pressable>
                     )
                   }
                 />
                 {isArray(program) && (
                   <MyTouchableInput
-                    label="Programmes Status"
+                    label={STRINGS.FilterModal.programmesStatus}
                     value={programStatus?.title}
                     onPress={() => openOptionModal('programStatus', 'title')}
                     icon={() => icons.down(colors.primary, 15)}
@@ -775,7 +784,9 @@ const FilterModal = forwardRef(
                         <Pressable
                           style={__styles.clearbtnView}
                           onPress={() => setProgramStatus('')}>
-                          <MyText color={colors.primary}>Clear</MyText>
+                          <MyText color={colors.primary}>
+                            {STRINGS.FilterModal.clear}
+                          </MyText>
                         </Pressable>
                       )
                     }
@@ -784,7 +795,7 @@ const FilterModal = forwardRef(
 
                 {!isNurture && isNurtureAccessable && (
                   <MyTouchableInput
-                    label="Choose Nuture"
+                    label={STRINGS.FilterModal.chooseNurture}
                     value={
                       !!nurture
                         ? `${nurture?.first_name} ${nurture?.last_name} | ${nurture?.team_type}`
@@ -797,7 +808,9 @@ const FilterModal = forwardRef(
                         <Pressable
                           style={__styles.clearbtnView}
                           onPress={() => setNurture('')}>
-                          <MyText color={colors.primary}>Clear</MyText>
+                          <MyText color={colors.primary}>
+                            {STRINGS.FilterModal.clear}
+                          </MyText>
                         </Pressable>
                       )
                     }
@@ -805,7 +818,7 @@ const FilterModal = forwardRef(
                 )}
                 {!isMembers && (
                   <MyTouchableInput
-                    label="Choose Delegate"
+                    label={STRINGS.FilterModal.chooseDelegate}
                     value={
                       !!delegate
                         ? `${delegate?.first_name} ${delegate?.last_name} | ${delegate?.team_type}`
@@ -818,7 +831,9 @@ const FilterModal = forwardRef(
                         <Pressable
                           style={__styles.clearbtnView}
                           onPress={() => setDelegate('')}>
-                          <MyText color={colors.primary}>Clear</MyText>
+                          <MyText color={colors.primary}>
+                            {STRINGS.FilterModal.clear}
+                          </MyText>
                         </Pressable>
                       )
                     }
@@ -834,21 +849,23 @@ const FilterModal = forwardRef(
                   iconOnPress={() =>
                     openSearchOptionModal('leadstatus', 'title')
                   }
-                  label="Lead Status"
+                  label={STRINGS.FilterModal.leadStatus}
                   icon={() => icons.down(colors.primary, 15)}
                   subTextView={() =>
                     leadStatus.length > 0 && (
                       <Pressable
                         style={__styles.clearbtnView}
                         onPress={() => setLeadStatus([])}>
-                        <MyText color={colors.primary}>Clear</MyText>
+                        <MyText color={colors.primary}>
+                          {STRINGS.FilterModal.clear}
+                        </MyText>
                       </Pressable>
                     )
                   }
                 />
 
                 <MyTouchableInput
-                  label="Badge Levels"
+                  label={STRINGS.FilterModal.badgeLevels}
                   view={selectedlevelView}
                   iconOnPress={() => openSearchOptionModal('level', 'title')}
                   icon={() => icons.down(colors.primary, 15)}
@@ -857,14 +874,16 @@ const FilterModal = forwardRef(
                       <Pressable
                         style={__styles.clearbtnView}
                         onPress={() => setSelectedLevel([])}>
-                        <MyText color={colors.primary}>Clear</MyText>
+                        <MyText color={colors.primary}>
+                          {STRINGS.FilterModal.clear}
+                        </MyText>
                       </Pressable>
                     )
                   }
                 />
 
                 <MyTouchableInput
-                  label="Member Status"
+                  label={STRINGS.FilterModal.memberStatus}
                   value={memberStatus?.title}
                   onPress={() => openOptionModal('memberstatus', 'title')}
                   icon={() => icons.down(colors.primary, 15)}
@@ -873,14 +892,16 @@ const FilterModal = forwardRef(
                       <Pressable
                         style={__styles.clearbtnView}
                         onPress={() => setMemberStatus('')}>
-                        <MyText color={colors.primary}>Clear</MyText>
+                        <MyText color={colors.primary}>
+                          {STRINGS.FilterModal.clear}
+                        </MyText>
                       </Pressable>
                     )
                   }
                 />
 
                 <MyTouchableInput
-                  label="Online Status"
+                  label={STRINGS.FilterModal.onlineStatus}
                   value={onlineStatus?.title}
                   onPress={() => openOptionModal('onlinestatus', 'title')}
                   icon={() => icons.down(colors.primary, 15)}
@@ -889,14 +910,16 @@ const FilterModal = forwardRef(
                       <Pressable
                         style={__styles.clearbtnView}
                         onPress={() => setOnlineStatus('')}>
-                        <MyText color={colors.primary}>Clear</MyText>
+                        <MyText color={colors.primary}>
+                          {STRINGS.FilterModal.clear}
+                        </MyText>
                       </Pressable>
                     )
                   }
                 />
 
                 <MyTouchableInput
-                  label="App Downloaded Status"
+                  label={STRINGS.FilterModal.appDownloadedStatus}
                   value={isAppDownloaded?.title}
                   onPress={() => openOptionModal('appDownloaded', 'title')}
                   icon={() => icons.down(colors.primary, 15)}
@@ -905,14 +928,16 @@ const FilterModal = forwardRef(
                       <Pressable
                         style={__styles.clearbtnView}
                         onPress={() => setIsAppDownloaded('')}>
-                        <MyText color={colors.primary}>Clear</MyText>
+                        <MyText color={colors.primary}>
+                          {STRINGS.FilterModal.clear}
+                        </MyText>
                       </Pressable>
                     )
                   }
                 />
 
                 <MyTouchableInput
-                  label="Membership Status"
+                  label={STRINGS.FilterModal.membershipStatus}
                   value={membershipStatus?.title}
                   onPress={() => openOptionModal('membershipstatus', 'title')}
                   icon={() => icons.down(colors.primary, 15)}
@@ -921,7 +946,9 @@ const FilterModal = forwardRef(
                       <Pressable
                         style={__styles.clearbtnView}
                         onPress={() => setMembershipStatus('')}>
-                        <MyText color={colors.primary}>Clear</MyText>
+                        <MyText color={colors.primary}>
+                          {STRINGS.FilterModal.clear}
+                        </MyText>
                       </Pressable>
                     )
                   }
@@ -930,7 +957,7 @@ const FilterModal = forwardRef(
                 {membershipStatus?.key == 'not_expired' && (
                   <>
                     <MyTouchableInput
-                      label="Expiry In"
+                      label={STRINGS.FilterModal.expireIn}
                       value={expireIn?.title}
                       onPress={() => openOptionModal('expiryin', 'title')}
                       icon={() => icons.down(colors.primary, 15)}
@@ -938,7 +965,7 @@ const FilterModal = forwardRef(
                     {expireIn?.key == 'custom' && (
                       <>
                         <MyTouchableInput
-                          label="Membership Expiry Start Date"
+                          label={STRINGS.FilterModal.membershipExpiryStartDate}
                           value={moment(membershipExpiryStartDate).format(
                             dateTimeFormat.date,
                           )}
@@ -949,7 +976,7 @@ const FilterModal = forwardRef(
                         />
 
                         <MyTouchableInput
-                          label="Membership Expiry End Date"
+                          label={STRINGS.FilterModal.membershipExpiryEndDate}
                           value={moment(membershipExpiryEndDate).format(
                             dateTimeFormat.date,
                           )}
@@ -964,14 +991,14 @@ const FilterModal = forwardRef(
                 )}
 
                 <MyCheckBox
-                  title="Search By Date Range"
+                  title={STRINGS.FilterModal.dateRange}
                   value={showDateRange}
                   onPress={() => setShowDateRange(!showDateRange)}
                 />
                 {showDateRange && (
-                  <View style={{marginTop: 10}}>
+                  <View style={styles.dateRangeVertical}>
                     <MyTouchableInput
-                      label="Start Date*"
+                      label={STRINGS.FilterModal.startDate}
                       value={
                         !!startDate
                           ? moment(startDate).format(dateTimeFormat.date)
@@ -982,7 +1009,7 @@ const FilterModal = forwardRef(
                     />
 
                     <MyTouchableInput
-                      label="End Date*"
+                      label={STRINGS.FilterModal.endDate}
                       value={
                         !!endDate
                           ? moment(endDate).format(dateTimeFormat.date)
@@ -995,24 +1022,24 @@ const FilterModal = forwardRef(
                 )}
 
                 <MyCheckBox
-                  title="Search By Coins"
+                  title={STRINGS.FilterModal.coinsRange}
                   value={showCoinsRange}
                   onPress={() => setShowCoinsRange(!showCoinsRange)}
                 />
 
                 {showCoinsRange && (
-                  <View style={{marginTop: 10, flexDirection: 'row'}}>
-                    <View style={{flex: 1}}>
+                  <View style={styles.dateRangeContainer}>
+                    <View style={styles.flex1}>
                       <MyInputs
-                        label="Coins From*"
+                        label={STRINGS.FilterModal.coinsFrom}
                         value={coinsFrom}
                         onChangeText={text => setCoinsFrom(text)}
                         keyboardType="number-pad"
                       />
                     </View>
-                    <View style={{flex: 1, marginLeft: 10}}>
+                    <View style={styles.dateInputSpacing}>
                       <MyInputs
-                        label="Coins To*"
+                        label={STRINGS.FilterModal.coinsTo}
                         value={coinsTo}
                         onChangeText={text => setCoinsTo(text)}
                         keyboardType="number-pad"
@@ -1023,17 +1050,17 @@ const FilterModal = forwardRef(
               </>
             )}
             <MyButton
-              style={{marginTop: 20}}
-              title="Apply Filter"
+              style={styles.buttonSpacing}
+              title={STRINGS.FilterModal.applyFilter}
               textStyle={{color: colors.black}}
               onPress={() => applyFilter(false)}
             />
 
             <MyButton
-              style={{marginTop: 20}}
+              style={styles.buttonSpacing}
               invert
               onPress={clearAll}
-              title="Clear all"
+              title={STRINGS.FilterModal.clearAll}
             />
           </KeyboardAwareScrollView>
         </View>
@@ -1046,39 +1073,24 @@ const FilterModal = forwardRef(
         onBackButtonPress={closeModal}
         onBackdropPress={closeModal}
         useNativeDriverForBackdrop={true}
-        style={{margin: 0}}
+        style={styles.modalBase}
         animationIn={'slideInRight'}
         animationOut={'slideOutRight'}
         animationInTiming={300}
         animationOutTiming={300}>
-        <SafeAreaView
-          style={{
-            borderTopLeftRadius: 10,
-            borderTopRightRadius: 10,
-            flex: 1,
-            marginTop: 'auto',
-            backgroundColor: colors.secondary,
-          }}>
-          <View style={{flex: 1}}>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                padding: 15,
-                borderBottomWidth: 1 / 3,
-                borderBottomColor: colors.lightText,
-              }}>
+        <SafeAreaView style={styles.mainSafeArea}>
+          <View style={styles.flex1}>
+            <View style={styles.header}>
               <Pressable onPress={closeModal}>
                 {icons.back(colors.primary, 25)}
               </Pressable>
-              <View style={{marginLeft: 10}}>
+              <View style={styles.headerTextContainer}>
                 <MyText fontSize={18} color={colors.primary} type="medium">
-                  {'Member Filter'}
+                  {STRINGS.FilterModal.title}
                 </MyText>
-                {/* <MyText color={colors.lightText} fontSize={12}>Select Lead Status from list below</MyText> */}
               </View>
             </View>
-            <View style={{paddingHorizontal: 20, flex: 1}}>{screenView()}</View>
+            <View style={styles.contentContainer}>{screenView()}</View>
           </View>
 
           <OptionModal
@@ -1110,12 +1122,12 @@ const FilterModal = forwardRef(
             }
             renderText={({item}) => (
               <MyText
-                style={{
-                  textTransform: 'capitalize',
-                }}>{`${item?.first_name} ${item?.last_name} | ${item?.team_type}`}</MyText>
+                style={
+                  styles.capitalizeText
+                }>{`${item?.first_name} ${item?.last_name} | ${item?.team_type}`}</MyText>
             )}
             noIcon={true}
-            title="Nurture"
+            title={STRINGS.FilterModal.nurture}
             onSearchTextChange={text => getFilterData(text)}
           />
 
@@ -1128,12 +1140,12 @@ const FilterModal = forwardRef(
             }
             renderText={({item}) => (
               <MyText
-                style={{
-                  textTransform: 'capitalize',
-                }}>{`${item?.first_name} ${item?.last_name} | ${item?.team_type}`}</MyText>
+                style={
+                  styles.capitalizeText
+                }>{`${item?.first_name} ${item?.last_name} | ${item?.team_type}`}</MyText>
             )}
             noIcon={true}
-            title="Delegate"
+            title={STRINGS.FilterModal.delegate}
             onSearchTextChange={text => getFilterData(text)}
           />
 
@@ -1206,5 +1218,56 @@ const __styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.primary,
+  },
+});
+
+const styles = StyleSheet.create({
+  modalBase: {
+    margin: 0,
+  },
+  mainSafeArea: {
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    flex: 1,
+    marginTop: 'auto',
+    backgroundColor: colors.secondary,
+  },
+  flex1: {
+    flex: 1,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 15,
+    borderBottomWidth: 1 / 3,
+    borderBottomColor: colors.lightText,
+  },
+  headerTextContainer: {
+    marginLeft: 10,
+  },
+  contentContainer: {
+    paddingHorizontal: 20,
+    flex: 1,
+  },
+  scrollContent: {
+    paddingTop: 20,
+    paddingBottom: 40,
+  },
+  dateRangeContainer: {
+    marginTop: 10,
+    flexDirection: 'row',
+  },
+  dateRangeVertical: {
+    marginTop: 10,
+  },
+  dateInputSpacing: {
+    flex: 1,
+    marginLeft: 10,
+  },
+  buttonSpacing: {
+    marginTop: 20,
+  },
+  capitalizeText: {
+    textTransform: 'capitalize',
   },
 });

@@ -1,4 +1,4 @@
-import {View, Text, FlatList, StyleSheet, TouchableOpacity} from 'react-native';
+import {View, FlatList, StyleSheet, TouchableOpacity} from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
 import MyText from '../../components/MyText';
 import RootView from '../../components/RootView';
@@ -12,7 +12,7 @@ import MyLoader from '../../components/MyLoader';
 import {icons} from '../../utilities/icons';
 import EmptyView from '../../components/EmptyView';
 import {colors} from '../../utilities/colors';
-import {MenuButton, MyButton} from '../../components/MyButton';
+import {MenuButton} from '../../components/MyButton';
 import copyText from '../../functions/copyText';
 import {websiteBaseUrl} from '../../utilities/constants';
 import openUrl from '../../functions/openUrl';
@@ -21,6 +21,7 @@ import SearchView from '../../components/SearchView';
 import Tabs from '../../components/Tabs';
 import FooterLoader from '../../components/FooterLoader';
 import MyRefreshControl from '../../components/MyRefreshControl';
+import {STRINGS} from '../../utilities/strings';
 
 const LinksList = ({navigation, route}) => {
   const {value} = route?.params;
@@ -134,9 +135,9 @@ const LinksList = ({navigation, route}) => {
     let msg = '';
     if (type == 'appointment') {
       link = websiteBaseUrl + item?.sale_page_title_slug + '/appointment';
-      msg = 'Appointment URL copied to clipboard';
+      msg = STRINGS.LINKS_LIST.appointmentUrlCopied;
     } else if (type == 'main') {
-      msg = 'Preview URL copied to clipboard';
+      msg = STRINGS.LINKS_LIST.previewUrlCopied;
       if (item?.type_of_page == 'clickfunnel_page') {
         link = item?.page_alias_url;
       } else {
@@ -155,13 +156,13 @@ const LinksList = ({navigation, route}) => {
         item?.sale_page_title_slug +
         '/appointment/' +
         affiliate;
-      msg = 'Appointment URL copied to clipboard';
+      msg = STRINGS.LINKS_LIST.appointmentUrlCopied;
     } else if (item?.type_of_page == 'sale_page') {
       link = websiteBaseUrl + item?.sale_page_title_slug + '/' + affiliate;
-      msg = 'Preview URL copied to clipboard';
+      msg = STRINGS.LINKS_LIST.previewUrlCopied;
     } else if (item?.type_of_page == 'clickfunnel_page') {
       link = item?.page_alias_url + '?affliate_url_name=' + affiliate;
-      msg = 'Preview URL copied to clipboard';
+      msg = STRINGS.LINKS_LIST.previewUrlCopied;
     }
     console.log(link, 'link', item?.type_of_page);
     // return
@@ -199,14 +200,14 @@ const LinksList = ({navigation, route}) => {
   const copyView = item => (
     <TouchableOpacity
       onPress={() => linkActon(item, 'copy')}
-      style={__styles.copybtn}>
+      style={styles.copybtn}>
       <MyText color={colors.white} fontSize={12} type="medium">
         {item?.type_of_page == 'sale_page'
-          ? 'Copy Main URL '
+          ? STRINGS.LINKS_LIST.copyMainUrl
           : item?.type_of_page == 'book_a_call_page'
-          ? 'Copy Appointment URL '
+          ? STRINGS.LINKS_LIST.copyAppointmentUrl
           : item?.type_of_page == 'clickfunnel_page'
-          ? 'Copy Main URL  '
+          ? STRINGS.LINKS_LIST.copyMainUrl
           : ''}
       </MyText>
       {icons.copy(colors.primary, 15)}
@@ -222,18 +223,17 @@ const LinksList = ({navigation, route}) => {
             : websiteBaseUrl + item?.sale_page_title_slug + '/' + affiliate,
         )
       }
-      style={__styles.previewBtn}>
-      <MyText color={colors.primary}>{'Preview '}</MyText>
+      style={styles.previewBtn}>
+      <MyText color={colors.primary}>{STRINGS.LINKS_LIST.preview}</MyText>
       {icons.goto(colors.primary, 15)}
     </TouchableOpacity>
   );
 
   const renderLinks = ({item, index}) => {
     return (
-      <View style={__styles.cardView}>
-        <View style={__styles.headerView}>
+      <View style={styles.cardView}>
+        <View style={styles.headerView}>
           <MyText>{index + 1})</MyText>
-          {/* <View /> */}
 
           <MenuButton
             onPress={() =>
@@ -241,16 +241,22 @@ const LinksList = ({navigation, route}) => {
             }
           />
         </View>
-        <StatView title={'Page Title'} value={item?.sale_page_title} />
-        <StatView title={'Copy Url'} view={() => copyView(item)} />
-        <StatView title={'URL'} view={() => preview(item)} />
+        <StatView
+          title={STRINGS.LINKS_LIST.pageTitle}
+          value={item?.sale_page_title}
+        />
+        <StatView
+          title={STRINGS.LINKS_LIST.copyUrl}
+          view={() => copyView(item)}
+        />
+        <StatView title={STRINGS.LINKS_LIST.url} view={() => preview(item)} />
       </View>
     );
   };
 
   const searchView = () => {
     return (
-      <View style={{}}>
+      <View style={styles.searchContainer}>
         <SearchView
           onChangeText={text => setSearchText(text)}
           search={searchText}
@@ -263,7 +269,7 @@ const LinksList = ({navigation, route}) => {
 
   const listHeader = () => {
     return (
-      <View style={{backgroundColor: colors.darkSecondary}}>
+      <View style={styles.listHeaderContainer}>
         {searchView()}
         <View>
           <Tabs
@@ -280,8 +286,8 @@ const LinksList = ({navigation, route}) => {
     <RootView
       hideBackBottomButton
       title={title}
-      subTitle={`Showing ${list.length} of ${total}`}>
-      <View style={{flex: 1}}>
+      subTitle={`${STRINGS.LINKS_LIST.showing} ${list.length} ${STRINGS.LINKS_LIST.of} ${total}`}>
+      <View style={styles.rootContainer}>
         <FlatList
           data={list}
           ListHeaderComponent={listHeader()}
@@ -290,7 +296,7 @@ const LinksList = ({navigation, route}) => {
           keyExtractor={item => item?._id}
           renderItem={renderLinks}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{paddingBottom: 80}}
+          contentContainerStyle={styles.flatListContent}
           ListEmptyComponent={!loader && <EmptyView />}
           refreshControl={
             <MyRefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -319,44 +325,44 @@ const tabs = [
   {
     id: 'sale_page',
     index: 0,
-    title: 'SALE PAGES',
+    title: STRINGS.LINKS_LIST.salePages,
   },
   {
     id: 'book_a_call_page',
     index: 1,
-    title: 'BOOKING PAGES',
+    title: STRINGS.LINKS_LIST.bookingPages,
   },
   {
     id: 'clickfunnel_page',
     index: 2,
-    title: 'FUNNELS',
+    title: STRINGS.LINKS_LIST.funnels,
   },
 ];
 
 const options = [
   {
     icon: () => icons.eye(colors.primary, 17),
-    title: 'Copy Main URL',
+    title: STRINGS.LINKS_LIST.copyMainUrlOption,
     type: 'main',
   },
   {
     icon: () => icons.eye(colors.primary, 17),
-    title: 'Copy Appointment URL',
+    title: STRINGS.LINKS_LIST.copyAppointmentUrlOption,
     type: 'appointment',
   },
   {
     icon: () => icons.edit(colors.primary, 17),
-    title: 'Set Commission',
+    title: STRINGS.LINKS_LIST.setCommission,
     type: 'commission',
   },
   {
     icon: () => icons.edit(colors.primary, 17),
-    title: 'Manage Sub Team Access',
+    title: STRINGS.LINKS_LIST.manageSubTeamAccess,
     type: 'sub_team_access',
   },
 ];
 
-const __styles = StyleSheet.create({
+const styles = StyleSheet.create({
   cardView: {
     backgroundColor: colors.secondary,
     padding: 10,
@@ -381,11 +387,15 @@ const __styles = StyleSheet.create({
   previewBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    // borderWidth: 1,
-    // borderColor: colors.primary,
-    // borderRadius: 20,
-    // alignSelf: "flex-start",
-    // paddingHorizontal: 30,
-    // paddingVertical: 5
+  },
+  searchContainer: {},
+  listHeaderContainer: {
+    backgroundColor: colors.darkSecondary,
+  },
+  rootContainer: {
+    flex: 1,
+  },
+  flatListContent: {
+    paddingBottom: 80,
   },
 });

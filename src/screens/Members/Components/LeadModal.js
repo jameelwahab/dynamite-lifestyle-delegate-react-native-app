@@ -1,322 +1,373 @@
-import { View, Text, StyleSheet, Pressable, SafeAreaView, FlatList, TouchableHighlight, ScrollView } from 'react-native'
-import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
-import Modal from 'react-native-modal'
-import { icons } from '../../../utilities/icons';
-import { CHANGE_LEAD_STATUS, EDIT_LEAD_STATUS, LEAD_STATUS_LIST } from '../../../DAL';
+import {
+  View,
+  StyleSheet,
+  Pressable,
+  SafeAreaView,
+  FlatList,
+  TouchableHighlight,
+  ScrollView,
+} from 'react-native';
+import React, {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
+import Modal from 'react-native-modal';
+import {icons} from '../../../utilities/icons';
+import {
+  CHANGE_LEAD_STATUS,
+  EDIT_LEAD_STATUS,
+  LEAD_STATUS_LIST,
+} from '../../../DAL';
+import {STRINGS} from '../../../utilities/strings';
 import MyLoader from '../../../components/MyLoader';
-import { colors } from '../../../utilities/colors';
+import {colors} from '../../../utilities/colors';
 import MyText from '../../../components/MyText';
 import Toast from 'react-native-toast-message';
 import MyTouchableInput from '../../../components/MyTouchableInput';
 import MyInputs from '../../../components/MyInputs';
-import { MyButton } from '../../../components/MyButton';
+import {MyButton} from '../../../components/MyButton';
 import moment from 'moment';
-import { dateTimeFormat } from '../../../utilities/constants';
+import {dateTimeFormat} from '../../../utilities/constants';
 import CalendarModal from '../../../components/CalendarModal';
 import showToast from '../../../functions/showToast';
 import ConfirmationModal from '../../../components/ConfirmationModal';
-import { useSelector } from 'react-redux';
-import { selectUser } from '../../../redux/reducers/userSlice';
 
-const LeadModal = forwardRef(({ token, navigation, updateLeadStatus, expiryDate, memberId, oldLead, edit = false }, ref) => {
-  const calendarModalRef = useRef();
-  const ref_expiry_modal = useRef();
-  const [isVisible, setIsVisible] = useState(false);
-  const [loader, setLoader] = useState(false)
-  const [rootLoader, setRootLoader] = useState(false);
-  const [list, setList] = useState([]);
-  const [leadModaVisible, setLeadModaVisible] = useState(false);
-  const [selectedLead, setSelectedLead] = useState(null);
-  const [icome, setIcome] = useState("0");
-  const [date, setDate] = useState(moment());
-  const [expiry, setExpiry] = useState(moment());
-  const [isConfirmationVisible, setIsConfirmationVisible] = useState(false);
+const LeadModal = forwardRef(
+  (
+    {token, navigation, updateLeadStatus, memberId, oldLead, edit = false},
+    ref,
+  ) => {
+    const calendarModalRef = useRef();
+    const ref_expiry_modal = useRef();
+    const [isVisible, setIsVisible] = useState(false);
+    const [loader, setLoader] = useState(false);
+    const [rootLoader, setRootLoader] = useState(false);
+    const [list, setList] = useState([]);
+    const [leadModaVisible, setLeadModaVisible] = useState(false);
+    const [selectedLead, setSelectedLead] = useState(null);
+    const [icome, setIcome] = useState('0');
+    const [date, setDate] = useState(moment());
+    const [expiry, setExpiry] = useState(moment());
+    const [isConfirmationVisible, setIsConfirmationVisible] = useState(false);
 
-  useEffect(() => {
-    if (isVisible) {
-      if (edit) {
-				 setSelectedLead(oldLead?.lead_status)
-        setIcome(!!oldLead?.income_value ? oldLead?.income_value.toString() : "0")
-        setTimeout(() => {
-          setDate(moment(oldLead?.changed_date_time))
-						if(oldLead?.lead_status?.is_lead_status_locked){
-								setExpiry(oldLead?.lead_status_expiry)
-						}
-        }, 200);
+    useEffect(() => {
+      if (isVisible) {
+        if (edit) {
+          setSelectedLead(oldLead?.lead_status);
+          setIcome(
+            !!oldLead?.income_value ? oldLead?.income_value.toString() : '0',
+          );
+          setTimeout(() => {
+            setDate(moment(oldLead?.changed_date_time));
+            if (oldLead?.lead_status?.is_lead_status_locked) {
+              setExpiry(oldLead?.lead_status_expiry);
+            }
+          }, 200);
+        } else {
+          setDate(oldLead?.lead_status_history[0]?.changed_date_time);
+          setExpiry(oldLead?.lead_status_expiry);
+          setSelectedLead(!!oldLead?.lead_status ? oldLead.lead_status : null);
+        }
+      }
+    }, [isVisible]);
+
+    useImperativeHandle(
+      ref,
+      () => {
+        return {
+          openModal,
+          closeModal,
+        };
+      },
+      [],
+    );
+
+    const closeModal = () => {
+      setIsVisible(false);
+      setLeadModaVisible(false);
+      setIcome('0');
+      setSelectedLead(null);
+      setList([]);
+    };
+
+    const openModal = () => {
+      setIsVisible(true);
+      setLoader(true);
+      getLeadStatusList(null);
+      setDate(moment());
+    };
+
+    const getLeadStatusList = async () => {
+      let res = await LEAD_STATUS_LIST({token, navigation});
+      if (res.code == 200) {
+        setList(res.lead_status);
+        setLoader(false);
       } else {
-					setDate(oldLead?.lead_status_history[0]?.changed_date_time)
-				  setExpiry(oldLead?.lead_status_expiry)
-        setSelectedLead(!!oldLead?.lead_status ? oldLead.lead_status : null)
-			}
-    }
-  }, [isVisible])
+        setLoader(false);
+      }
+    };
 
-  useImperativeHandle(ref, () => {
-    return {
-      openModal,
-      closeModal
-    }
-  }, [])
+    const onAgreeClick = () => {
+      setIsConfirmationVisible(false);
+      setRootLoader(true);
+      changeLeadStatusForMember();
+    };
 
-  const closeModal = () => {
-    setIsVisible(false);
-    setLeadModaVisible(false);
-    setIcome("0");
-    setSelectedLead(null);
-    setList([]);
-  }
-
-
-  const openModal = () => {
-    setIsVisible(true);
-    setLoader(true);
-    getLeadStatusList(null);
-    setDate(moment());
-  }
-
-  const getLeadStatusList = async () => {
-    let res = await LEAD_STATUS_LIST({ token, navigation });
-    if (res.code == 200) {
-      setList(res.lead_status)
-      setLoader(false)
-    } else {
-      setLoader(false)
-    }
-  }
-
-  const onAgreeClick = () => {
-    setIsConfirmationVisible(false);
-    setRootLoader(true);
-    changeLeadStatusForMember()
-  }
-
-  const onUpdateBtnPress = () => {
-    if (!!selectedLead == false) {
-      showToast({ body: "Please select lead status", title: "Alert", type: "info" })
-      return
-    } else {
-      if (edit) {
-        updateLeadStatusForMember();
+    const onUpdateBtnPress = () => {
+      if (!!selectedLead == false) {
+        showToast({
+          body: STRINGS.LeadModal.pleaseSelectLeadStatus,
+          title: STRINGS.LeadModal.alert,
+          type: 'info',
+        });
+        return;
       } else {
-        setIsConfirmationVisible(true);
+        if (edit) {
+          updateLeadStatusForMember();
+        } else {
+          setIsConfirmationVisible(true);
+        }
       }
+    };
 
-      // selectLeadStatus({ income: icome, date: moment(date).format('YYYY-MM-DD'), leadId: selectedLead?._id })
-      // setRootLoader(true);
-    }
-  }
+    const updateLeadStatusForMember = async () => {
+      let res = await EDIT_LEAD_STATUS({
+        token,
+        navigation,
+        body: {
+          changed_date_time: moment(date).format(
+            STRINGS.DATE_FORMATES.YYYY_MM_DD,
+          ),
+          income_value: Number(icome),
+          lead_status: selectedLead?._id,
+          member_id: memberId,
+          id: oldLead?._id,
+          lead_status_expiry: selectedLead?.is_lead_status_locked
+            ? moment(expiry).format(STRINGS.DATE_FORMATES.YYYY_MM_DD)
+            : undefined,
+        },
+      });
 
-  const updateLeadStatusForMember = async () => {
-    let res = await EDIT_LEAD_STATUS({
-      token, navigation, body: {
-        changed_date_time: moment(date).format('YYYY-MM-DD'),
-        income_value: Number(icome),
-        lead_status: selectedLead?._id,
-        member_id: memberId,
-        id: oldLead?._id,
-				lead_status_expiry: selectedLead?.is_lead_status_locked ? moment(expiry).format('YYYY-MM-DD') : undefined
+      if (res.code == 200) {
+        setRootLoader(false);
+        setIsVisible(false);
+        updateLeadStatus?.();
+        setIcome('0');
+        setDate(moment());
+        setSelectedLead(null);
+        showToast({
+          title: STRINGS.LeadModal.success,
+          body: res.message,
+          type: 'success',
+        });
+      } else {
+        setRootLoader(false);
       }
-    });
+    };
 
-    if (res.code == 200) {
-      setRootLoader(false);
-      setIsVisible(false)
-      updateLeadStatus?.();
-      setIcome("0");
-      setDate(moment())
-      setSelectedLead(null)
-      showToast({ title: "Success", body: res.message, type: "success" })
-    } else {
-      setRootLoader(false);
-    }
-  }
+    const changeLeadStatusForMember = async () => {
+      let res = await CHANGE_LEAD_STATUS({
+        token,
+        navigation,
+        body: {
+          changed_date_time: moment(date).format(
+            STRINGS.DATE_FORMATES.YYYY_MM_DD,
+          ),
+          income_value: Number(icome),
+          lead_status: selectedLead?._id,
+          member_id: memberId,
+          lead_status_expiry: selectedLead?.is_lead_status_locked
+            ? moment(expiry).format(STRINGS.DATE_FORMATES.YYYY_MM_DD)
+            : undefined,
+        },
+      });
 
-  const changeLeadStatusForMember = async () => {
-    let res = await CHANGE_LEAD_STATUS({
-      token, navigation, body: {
-        changed_date_time: moment(date).format('YYYY-MM-DD'),
-        income_value: Number(icome),
-        lead_status: selectedLead?._id,
-        member_id: memberId,
-				lead_status_expiry: selectedLead?.is_lead_status_locked ? moment(expiry).format('YYYY-MM-DD') : undefined
+      if (res.code == 200) {
+        setRootLoader(false);
+        setIsVisible(false);
+        updateLeadStatus(selectedLead, icome, date, expiry);
+        console.log('upadted', selectedLead);
+        setIcome('0');
+        setDate(moment());
+        setSelectedLead(null);
+        showToast({
+          title: STRINGS.LeadModal.success,
+          body: res.message,
+          type: 'success',
+        });
+      } else {
+        setRootLoader(false);
       }
-    });
+    };
 
-    if (res.code == 200) {
-      setRootLoader(false);
-      setIsVisible(false)
-      updateLeadStatus(selectedLead, icome, date, expiry);
-				console.log("upadted",selectedLead)
-      setIcome("0");
-      setDate(moment())
-      setSelectedLead(null)
-      showToast({ title: "Success", body: res.message, type: "success" })
-    } else {
-      setRootLoader(false);
-    }
-  }
+    const modalLead = () => {
+      return (
+        <Modal
+          isVisible={leadModaVisible}
+          onBackButtonPress={() => setLeadModaVisible(false)}
+          onBackdropPress={() => setLeadModaVisible(false)}
+          useNativeDriverForBackdrop={true}
+          style={styles.modalBase}
+          animationInTiming={300}
+          animationOutTiming={300}>
+          <SafeAreaView style={styles.modalSafeArea}>
+            <View style={ModalStyle.container}>
+              <View style={styles.modalHeader}>
+                <View>
+                  <MyText fontSize={18} type="medium">
+                    {STRINGS.LeadModal.leadStatus}
+                  </MyText>
+                  <MyText color={colors.lightText} fontSize={12}>
+                    {STRINGS.LeadModal.selectLeadStatusFromList}
+                  </MyText>
+                </View>
+                <Pressable onPress={() => setLeadModaVisible(false)}>
+                  {icons.crosssWithCircle()}
+                </Pressable>
+              </View>
+              <View style={styles.flex1}>
+                <View style={styles.flex1}>
+                  <FlatList
+                    showsVerticalScrollIndicator={false}
+                    data={list}
+                    keyExtractor={(item, index) => {
+                      return index.toString();
+                    }}
+                    contentContainerStyle={styles.flatlistContent}
+                    renderItem={({item, index}) => (
+                      <TouchableHighlight
+                        onPress={() => {
+                          setSelectedLead(item);
+                          setLeadModaVisible(false);
+                          if (item?.is_lead_status_locked) {
+                            setExpiry(
+                              moment().add(
+                                item?.lead_status_no_of_days,
+                                'days',
+                              ),
+                            );
+                          }
+                        }}
+                        underlayColor={colors.darkSecondary}>
+                        <View style={styles.flatlistItem}>
+                          <View style={styles.flatlistItemTextContainer}>
+                            <MyText fontSize={16} color={colors.white}>
+                              {item?.title}
+                            </MyText>
+                          </View>
+                        </View>
+                      </TouchableHighlight>
+                    )}
+                  />
+                </View>
+                <MyLoader enable={loader} />
+              </View>
+            </View>
+          </SafeAreaView>
+          {isVisible && <Toast />}
+        </Modal>
+      );
+    };
 
-  const modalLead = () => {
     return (
       <Modal
-        isVisible={leadModaVisible}
-        onBackButtonPress={() => setLeadModaVisible(false)}
-        onBackdropPress={() => setLeadModaVisible(false)}
+        isVisible={isVisible}
+        onBackButtonPress={closeModal}
+        onBackdropPress={closeModal}
         useNativeDriverForBackdrop={true}
-        style={{ margin: 0, }}
+        style={styles.modalBase}
+        animationIn={'slideInRight'}
+        animationOut={'slideOutRight'}
         animationInTiming={300}
-        animationOutTiming={300}
-      >
-        <SafeAreaView style={{ borderTopLeftRadius: 10, borderTopRightRadius: 10, flex: 0.8, marginTop: "auto", backgroundColor: colors.secondary, }}>
-
-          <View style={ModalStyle.container}>
-
-            <View style={{ flexDirection: "row", justifyContent: "space-between", padding: 15, borderBottomWidth: 1 / 3, borderBottomColor: colors.lightText }}>
-              <View>
-                <MyText fontSize={18} type='medium' >Lead Status</MyText>
-                <MyText color={colors.lightText} fontSize={12}>Select Lead Status from list below</MyText>
-              </View>
-              <Pressable onPress={() => setLeadModaVisible(false)}>
-                {icons.crosssWithCircle()}
+        animationOutTiming={300}>
+        <SafeAreaView style={styles.mainModalSafeArea}>
+          <View style={[ModalStyle.container]}>
+            <View style={styles.mainModalHeader}>
+              <Pressable onPress={closeModal}>
+                {icons.back(colors.primary, 25)}
               </Pressable>
-            </View>
-            <View style={{ flex: 1 }}>
-              <View style={{ flex: 1 }}>
-                <FlatList
-                  showsVerticalScrollIndicator={false}
-                  data={list}
-                  keyExtractor={(item, index) => {
-                    return index.toString();
-                  }}
-                  // ItemSeparatorComponent={
-                  //   <View
-                  //     style={{
-                  //       height: 0.5,
-                  //       width: '100%',
-                  //       alignSelf: 'center',
-                  //       backgroundColor: '#B4B4B5',
-                  //     }}
-                  //   />}
-                  contentContainerStyle={{ paddingBottom: 30 }}
-                  renderItem={({ item, index }) => (
-                    <TouchableHighlight
-                      onPress={() => {
-                        setSelectedLead(item)
-                        setLeadModaVisible(false)
-													if(item?.is_lead_status_locked){
-															setExpiry(moment().add(item?.lead_status_no_of_days, "days"))
-													}
-                      }}
-                      underlayColor={colors.darkSecondary}>
-                      <View
-                        style={{
-                          paddingVertical: 15,
-                          paddingHorizontal: 10,
-                        }}>
-
-                        <View style={{ marginLeft: 10 }}>
-                          <MyText fontSize={16} color={colors.white}>
-                            {item?.title}
-                          </MyText>
-                        </View>
-
-                      </View>
-                    </TouchableHighlight>
-                  )}
-
-                />
+              <View style={styles.flatlistItemTextContainer}>
+                <MyText fontSize={18} color={colors.primary} type="medium">
+                  {edit
+                    ? STRINGS.LeadModal.editHistoryLeadStatus
+                    : STRINGS.LeadModal.changeLeadStatus}
+                </MyText>
               </View>
-              <MyLoader enable={loader} />
-
             </View>
-          </View>
-        </SafeAreaView>
-        {isVisible && <Toast />}
-      </Modal>)
-  }
+            <View style={styles.mainContentContainer}>
+              <ScrollView contentContainerStyle={styles.scrollViewContent}>
+                <View
+                  pointerEvents={edit ? 'none' : 'auto'}
+                  opacity={edit ? 0.6 : 1}>
+                  <MyTouchableInput
+                    label={STRINGS.LeadModal.leadStatusLabel}
+                    icon={() => icons.down(colors.primary, 20)}
+                    onPress={() => setLeadModaVisible(true)}
+                    value={!!selectedLead && selectedLead?.title}
+                    placeholder={STRINGS.LeadModal.selectLeadStatusPlaceholder}
+                  />
+                </View>
+                <MyInputs
+                  label={STRINGS.LeadModal.income}
+                  value={icome}
+                  onChangeText={text => setIcome(text)}
+                  keyboardType="number-pad"
+                />
 
-  return (
-    <Modal
-      isVisible={isVisible}
-      onBackButtonPress={closeModal}
-      onBackdropPress={closeModal}
-      useNativeDriverForBackdrop={true}
-      style={{ margin: 0 }}
-      animationIn={"slideInRight"}
-      animationOut={"slideOutRight"}
-      animationInTiming={300}
-      animationOutTiming={300}
-    >
-      <SafeAreaView style={{ borderTopLeftRadius: 10, borderTopRightRadius: 10, flex: 1, marginTop: "auto", backgroundColor: colors.secondary }}>
-        <View style={[ModalStyle.container]}>
-          <View style={{ flexDirection: "row", alignItems: "center", padding: 15, borderBottomWidth: 1 / 3, borderBottomColor: colors.lightText, }}>
-            <Pressable onPress={closeModal}>
-              {icons.back(colors.primary, 25)}
-            </Pressable>
-            <View style={{ marginLeft: 10 }}>
-              <MyText fontSize={18} color={colors.primary} type='medium' >{edit ? "Edit History Lead Status" : "Change Lead Status"}</MyText>
-              {/* <MyText color={colors.lightText} fontSize={12}>Select Lead Status from list below</MyText> */}
-            </View>
-          </View>
-          <View style={{ paddingHorizontal: 20, flex: 1 }}>
-            <ScrollView contentContainerStyle={{ paddingTop: 20 }}>
-              <View pointerEvents={edit ? "none" : "auto"} opacity={edit ? 0.6 : 1}>
                 <MyTouchableInput
-                  label='Lead Status*'
-                  icon={() => icons.down(colors.primary, 20)}
-                  onPress={() => setLeadModaVisible(true)}
-                  value={!!selectedLead && selectedLead?.title}
-                  placeholder='Please select the lead status'
+                  label={STRINGS.LeadModal.date}
+                  value={moment(date).format(dateTimeFormat.date)}
+                  icon={() => icons.calendar(colors.primary, 20)}
+                  onPress={() => calendarModalRef?.current?.openModal(date)}
                 />
-              </View>
-              <MyInputs
-                label='Income*'
-                value={icome}
-                onChangeText={(text) => setIcome(text)}
-                keyboardType="number-pad"
-              />
 
-              <MyTouchableInput
-                label='Date*'
-                value={moment(date).format(dateTimeFormat.date)}
-                icon={() => icons.calendar(colors.primary, 20)}
-                onPress={() => calendarModalRef?.current?.openModal(date)}
-              />
-		
-						{selectedLead?.is_lead_status_locked && <MyTouchableInput
-                label='Expiry Date*'
-                value={moment(expiry).format(dateTimeFormat.date)}
-                icon={() => icons.calendar(colors.primary, 20)}
-                onPress={() => ref_expiry_modal?.current?.openModal(expiry)}
-              />}
+                {selectedLead?.is_lead_status_locked && (
+                  <MyTouchableInput
+                    label={STRINGS.LeadModal.expiryDate}
+                    value={moment(expiry).format(dateTimeFormat.date)}
+                    icon={() => icons.calendar(colors.primary, 20)}
+                    onPress={() => ref_expiry_modal?.current?.openModal(expiry)}
+                  />
+                )}
 
-              <MyButton invert title='Update' onPress={onUpdateBtnPress} />
-            </ScrollView>
+                <MyButton
+                  invert
+                  title={STRINGS.LeadModal.update}
+                  onPress={onUpdateBtnPress}
+                />
+              </ScrollView>
+            </View>
           </View>
-        </View>
 
-        <CalendarModal ref={calendarModalRef}
-          onDateSelected={(selectedDate) => setDate(selectedDate)} />
+          <CalendarModal
+            ref={calendarModalRef}
+            onDateSelected={selectedDate => setDate(selectedDate)}
+          />
 
-        <CalendarModal ref={ref_expiry_modal}
-          onDateSelected={(selectedDate) => setExpiry(selectedDate)} />
-        <ConfirmationModal
-          isVisible={isConfirmationVisible}
-          title={"Are you sure you want to update lead status?"}
-          onAgree={onAgreeClick}
-          closeModal={() => setIsConfirmationVisible(false)}
-        />
-        {modalLead()}
-        <MyLoader enable={rootLoader} />
-      </SafeAreaView>
-      <SafeAreaView style={{ flex: 0, backgroundColor: colors.secondary }} />
-      {isVisible && <Toast />}
-    </Modal>
-  )
-})
+          <CalendarModal
+            ref={ref_expiry_modal}
+            onDateSelected={selectedDate => setExpiry(selectedDate)}
+          />
+          <ConfirmationModal
+            isVisible={isConfirmationVisible}
+            title={STRINGS.LeadModal.updateLeadStatusConfirmation}
+            onAgree={onAgreeClick}
+            closeModal={() => setIsConfirmationVisible(false)}
+          />
+          {modalLead()}
+          <MyLoader enable={rootLoader} />
+        </SafeAreaView>
+        <SafeAreaView style={styles.bottomSafeArea} />
+        {isVisible && <Toast />}
+      </Modal>
+    );
+  },
+);
 
 export default LeadModal;
-
 
 const ModalStyle = StyleSheet.create({
   title: {
@@ -338,7 +389,7 @@ const ModalStyle = StyleSheet.create({
     paddingBottom: 10,
     paddingVertical: 10,
     borderTopLeftRadius: 10,
-    borderTopRightRadius: 10
+    borderTopRightRadius: 10,
   },
   searchView: {
     flexDirection: 'row',
@@ -348,11 +399,69 @@ const ModalStyle = StyleSheet.create({
     borderRadius: 10,
     marginHorizontal: 10,
     marginTop: 10,
-    marginBottom: 10
+    marginBottom: 10,
   },
   flatlistItemText: {
     fontSize: 16,
     paddingVertical: 15,
     fontWeight: 'bold',
+  },
+});
+
+const styles = StyleSheet.create({
+  modalBase: {
+    margin: 0,
+  },
+  modalSafeArea: {
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    flex: 0.8,
+    marginTop: 'auto',
+    backgroundColor: colors.secondary,
+  },
+  mainModalSafeArea: {
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    flex: 1,
+    marginTop: 'auto',
+    backgroundColor: colors.secondary,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 15,
+    borderBottomWidth: 1 / 3,
+    borderBottomColor: colors.lightText,
+  },
+  mainModalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 15,
+    borderBottomWidth: 1 / 3,
+    borderBottomColor: colors.lightText,
+  },
+  mainContentContainer: {
+    paddingHorizontal: 20,
+    flex: 1,
+  },
+  scrollViewContent: {
+    paddingTop: 20,
+  },
+  flex1: {
+    flex: 1,
+  },
+  flatlistContent: {
+    paddingBottom: 30,
+  },
+  flatlistItem: {
+    paddingVertical: 15,
+    paddingHorizontal: 10,
+  },
+  flatlistItemTextContainer: {
+    marginLeft: 10,
+  },
+  bottomSafeArea: {
+    flex: 0,
+    backgroundColor: colors.secondary,
   },
 });

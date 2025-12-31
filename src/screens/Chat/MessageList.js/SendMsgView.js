@@ -1,6 +1,5 @@
 import {
   View,
-  Text,
   TouchableHighlight,
   Image,
   TextInput,
@@ -27,11 +26,9 @@ import {useSelector} from 'react-redux';
 import {selectSocket} from '../../../redux/reducers/socketSlice';
 import {selectUser} from '../../../redux/reducers/userSlice';
 import {UPLOAD_FILE_FOR_CHAT} from '../../../DAL';
-import {appName} from '../../../utilities/constants';
 import {ProgressBar} from 'react-native-paper';
 import AudioRecorderPlayer, {
   AudioEncoderAndroidType,
-  OOutputFormatAndroidType,
   AudioSourceAndroidType,
   AVModeIOSOption,
   AVEncoderAudioQualityIOSType,

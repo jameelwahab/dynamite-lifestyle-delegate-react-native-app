@@ -1,202 +1,219 @@
-import { View, FlatList, StyleSheet } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import RootView from '../../components/RootView'
-import { useSelector } from 'react-redux'
-import { selectUser } from '../../redux/reducers/userSlice'
-import { GET_LINKS_PAYMENT_PLANS_LIST, } from '../../DAL'
-import { colors } from '../../utilities/colors'
-import StatView from '../../components/StatView'
-import SearchView from '../../components/SearchView'
-import TitleView from '../../components/TitleView'
-import MyRefreshControl from '../../components/MyRefreshControl'
-import EmptyView from '../../components/EmptyView'
-import MyLoader from '../../components/MyLoader'
-import MyText from '../../components/MyText'
-import { MenuButton } from '../../components/MyButton'
-import OptionModal from '../../components/OptionModal'
-import routes from '../../navigation/routes'
-import { icons } from '../../utilities/icons'
+import {View, FlatList, StyleSheet} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import RootView from '../../components/RootView';
+import {useSelector} from 'react-redux';
+import {selectUser} from '../../redux/reducers/userSlice';
+import {GET_LINKS_PAYMENT_PLANS_LIST} from '../../DAL';
+import {colors} from '../../utilities/colors';
+import StatView from '../../components/StatView';
+import SearchView from '../../components/SearchView';
+import TitleView from '../../components/TitleView';
+import MyRefreshControl from '../../components/MyRefreshControl';
+import EmptyView from '../../components/EmptyView';
+import MyLoader from '../../components/MyLoader';
+import MyText from '../../components/MyText';
+import {MenuButton} from '../../components/MyButton';
+import OptionModal from '../../components/OptionModal';
+import routes from '../../navigation/routes';
+import {icons} from '../../utilities/icons';
+import {STRINGS} from '../../utilities/strings';
 
-
-
-
-const TeamList = ({ navigation, route }) => {
-  const { title, _id } = route?.params;
-  const { token } = useSelector(selectUser);
+const TeamList = ({navigation, route}) => {
+  const {title, _id} = route?.params;
+  const {token} = useSelector(selectUser);
   const [list, setList] = useState([]);
   const [loader, setLoader] = useState(true);
-  const [searchText, setSearchText] = useState("")
+  const [searchText, setSearchText] = useState('');
   const [refreshing, setRefreshing] = useState(false);
   const [optionModal, setOptionModal] = useState({
     isVisible: false,
     selectedItem: null,
-  })
+  });
 
   useEffect(() => {
-    setLoader(true)
-    getTeamListFromServer(true)
-  }, [])
-
-
-
+    setLoader(true);
+    getTeamListFromServer(true);
+  }, []);
 
   const onRefresh = () => {
-    setRefreshing(true)
-    getTeamListFromServer(true)
-  }
-
-
-
-
+    setRefreshing(true);
+    getTeamListFromServer(true);
+  };
 
   //! //////// API
   const getTeamListFromServer = async (newArray = false) => {
     let res = await GET_LINKS_PAYMENT_PLANS_LIST({
-      token, navigation, pageId: _id
+      token,
+      navigation,
+      pageId: _id,
     });
     setLoader(false);
     setRefreshing(false);
     if (res.code == 200) {
       setList(res?.commission_info);
     }
-  }
+  };
 
-
-  const searchFromList = (list) => {
-    if (searchText.trim() == "") {
-      return list
+  const searchFromList = list => {
+    if (searchText.trim() == '') {
+      return list;
     }
-    return list.slice().filter(x => x?.plan_title.toLowerCase().includes(searchText.toLowerCase().trim()))
-  }
+    return list
+      .slice()
+      .filter(x =>
+        x?.plan_title.toLowerCase().includes(searchText.toLowerCase().trim()),
+      );
+  };
 
-
-
-
-
-
-
-  const memberListView = ({ item, index }) => {
+  const memberListView = ({item, index}) => {
     return (
-      <View style={__styles.itemView}>
-        <View style={{ flexDirection: "row", alignItems: "center", padding: 5 }}>
-          <View style={{ flex: 1 }}>
-            <MyText color={colors.primary} fontSize={16}>{`${index + 1}.`}</MyText>
+      <View style={styles.itemView}>
+        <View style={styles.itemHeader}>
+          <View style={styles.indexContainer}>
+            <MyText color={colors.primary} fontSize={16}>{`${
+              index + 1
+            }.`}</MyText>
           </View>
-          <MenuButton
-            onPress={() => setOptionModal({ isVisible: true, item })}
+          <MenuButton onPress={() => setOptionModal({isVisible: true, item})} />
+        </View>
+        <View style={styles.itemContent}>
+          <StatView
+            title={STRINGS.LINKS_PAYMENT_PLAN_LIST.planTitle}
+            value={item?.plan_title}
+          />
+          <StatView
+            title={STRINGS.LINKS_PAYMENT_PLAN_LIST.planType}
+            value={item?.payment_access}
           />
         </View>
-        <View style={{ paddingHorizontal: 5, paddingBottom: 5 }}>
-          <StatView title={"Plan Title"} value={item?.plan_title} />
-          <StatView title={"Plan Type"} value={item?.payment_access} />
-        </View>
       </View>
-    )
-  }
-
+    );
+  };
 
   const headerView = () => {
     return (
-      <View style={{ backgroundColor: colors.darkSecondary }}>
+      <View style={styles.headerContainer}>
         <SearchView
-          onChangeText={(text) => setSearchText(text)}
+          onChangeText={text => setSearchText(text)}
           search={searchText}
           hideBtn
         />
       </View>
-    )
-  }
-
+    );
+  };
 
   const topView = () => {
     return (
       <View>
-        <View style={__styles.topView}>
+        <View style={styles.topView}>
           <TitleView
-            title={"Payment Plans"}
+            title={STRINGS.LINKS_PAYMENT_PLAN_LIST.paymentPlans}
             subTitle={`${title}`}
           />
         </View>
       </View>
-    )
-  }
-
+    );
+  };
 
   return (
     <RootView hideSubHeader>
       {topView()}
-      <View style={{ flex: 1 }}>
+      <View style={styles.rootContainer}>
         <FlatList
-          refreshControl={<MyRefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-          />}
-          ListEmptyComponent={!loader && <EmptyView label={"No Commission Found!"} />}
+          refreshControl={
+            <MyRefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          ListEmptyComponent={
+            !loader && (
+              <EmptyView
+                label={STRINGS.LINKS_PAYMENT_PLAN_LIST.noCommissionFound}
+              />
+            )
+          }
           stickyHeaderIndices={[0]}
           stickyHeaderHiddenOnScroll={true}
           ListHeaderComponent={headerView()}
           data={searchFromList(list)}
           renderItem={memberListView}
           showsVerticalScrollIndicator={false}
-          keyExtractor={(item) => item?._id}
-
+          keyExtractor={item => item?._id}
         />
       </View>
 
       <MyLoader enable={loader} />
 
-
       <OptionModal
         optionList={optList}
         isVisible={optionModal?.isVisible}
-        closeModal={() => setOptionModal({ isVisible: false, item: null })}
-        onSelected={(opt) => {
-          let { item } = optionModal
-          setOptionModal({ isVisible: false, item: null })
-          if (opt.key == "set_commission") {
+        closeModal={() => setOptionModal({isVisible: false, item: null})}
+        onSelected={opt => {
+          let {item} = optionModal;
+          setOptionModal({isVisible: false, item: null});
+          if (opt.key == 'set_commission') {
             navigation.navigate(routes?.linksManageSaleTeamCommission, {
               pageId: _id,
               planId: item?._id,
               salePageTitle: title,
-              planTitle: item?.plan_title
-            })
+              planTitle: item?.plan_title,
+            });
           }
         }}
       />
-
     </RootView>
-  )
-}
+  );
+};
 
-export default TeamList
-const optList = [{
-  key: "set_commission",
-  title: "Manage Sales Team Commission",
-  icon: icons.edit
-}]
+export default TeamList;
+const optList = [
+  {
+    key: 'set_commission',
+    title: STRINGS.LINKS_PAYMENT_PLAN_LIST.manageSalesTeamCommission,
+    icon: icons.edit,
+  },
+];
 
-
-
-const __styles = StyleSheet.create({
+const styles = StyleSheet.create({
   itemView: {
     backgroundColor: colors.secondary,
     borderRadius: 10,
     padding: 5,
-    marginTop: 10
-
+    marginTop: 10,
+  },
+  itemHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 5,
+  },
+  indexContainer: {
+    flex: 1,
+  },
+  itemContent: {
+    paddingHorizontal: 5,
+    paddingBottom: 5,
+  },
+  headerContainer: {
+    backgroundColor: colors.darkSecondary,
   },
   topView: {
-    flexDirection: "row", alignItems: "center", backgroundColor: colors.darkSecondary, paddingBottom: 5
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.darkSecondary,
+    paddingBottom: 5,
   },
-  topBtnsView: { flexDirection: "row", alignItems: "flex-end", },
-
+  topBtnsView: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+  },
   sortBtn: {
     height: 25,
     width: 25,
-    borderRadius: 25 / 2,
+    borderRadius: 12.5,
     backgroundColor: colors.primary,
     justifyContent: 'center',
-    alignItems: "center",
-    marginLeft: 5
-  }
-})
+    alignItems: 'center',
+    marginLeft: 5,
+  },
+  rootContainer: {
+    flex: 1,
+  },
+});

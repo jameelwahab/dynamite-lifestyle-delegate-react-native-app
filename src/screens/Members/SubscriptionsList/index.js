@@ -1,7 +1,8 @@
-import {View, Text, FlatList, TouchableOpacity} from 'react-native';
+import {View, FlatList, TouchableOpacity, StyleSheet} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 import {selectUser} from '../../../redux/reducers/userSlice';
+import {STRINGS} from '../../../utilities/strings';
 import RootView from '../../../components/RootView';
 import MyText from '../../../components/MyText';
 import MyLoader from '../../../components/MyLoader';
@@ -13,7 +14,6 @@ import {colors} from '../../../utilities/colors';
 import StatView from '../Components/StatView';
 import EmptyView from '../../../components/EmptyView';
 import moment from 'moment';
-import {dateTimeFormat} from '../../../utilities/constants';
 import {MenuButton} from '../../../components/MyButton';
 import OptionModal from '../../../components/OptionModal';
 import {icons} from '../../../utilities/icons';
@@ -23,14 +23,13 @@ import openUrl from '../../../functions/openUrl';
 import FooterLoader from '../../../components/FooterLoader';
 import MyInputs from '../../../components/MyInputs';
 import debounce from '../../../functions/debounce';
-import TitleView from '../../../components/TitleView';
 import UserImage from '../../../components/UserImage';
-import StatusView from '../../../components/StatusView';
 import DefaultStatusView from '../../../components/DefaultStatusView';
 import {Flex, Row} from '../../../UIComponents/FlexViews';
 import copyText from '../../../functions/copyText';
 import MyRefreshControl from '../../../components/MyRefreshControl';
 import InfoModal from '../../../components/InfoModal';
+import {dateTimeFormat} from '../../../utilities/constants';
 
 let page = 0;
 let canLoadMore = false;
@@ -62,8 +61,7 @@ const SubscriptionsList = ({navigation, route}) => {
     if (opt.key == 'view_cancel_request') {
       setTimeout(
         () => {
-          let str = `<h5 style="text-align: center;"> Cancellation Reason </h5>
-        <p style="text-align: left;">${selectedItem?.cancellation_reason}</p>`;
+          let str = `${STRINGS.SUBSCRIPTION_LIST.cancelationReason}${selectedItem?.cancellation_reason}</p>`;
           infoRef?.current?.openModal(str, '', true);
         },
         __DEV__ ? 1000 : 400,
@@ -149,8 +147,10 @@ const SubscriptionsList = ({navigation, route}) => {
         <TouchableOpacity
           onPress={() => openUrl(S3_URL + link)}
           hitSlop={{left: 5, top: 5, bottom: 5, right: 5}}
-          style={{alignSelf: 'flex-start'}}>
-          <MyText color={colors.primary}>Preview</MyText>
+          style={styles.alignStart}>
+          <MyText color={colors.primary}>
+            {STRINGS.SUBSCRIPTION_LIST.preview}
+          </MyText>
         </TouchableOpacity>
       );
     } else return null;
@@ -158,10 +158,10 @@ const SubscriptionsList = ({navigation, route}) => {
 
   const listHeaderView = () => {
     return (
-      <View style={{marginTop: -10, backgroundColor: colors.darkSecondary}}>
+      <View style={styles.searchContainer}>
         <MyInputs
           leftIcon={icons.search}
-          placeholder="Search..."
+          placeholder={STRINGS.SUBSCRIPTION_LIST.searchPlaceholder}
           rightIcon={() =>
             searchText.length > 0
               ? icons.crosssWithCircle_20(colors.white, 20)
@@ -178,16 +178,24 @@ const SubscriptionsList = ({navigation, route}) => {
 
   const getProduct = item => {
     if (item?.subscription_type === 'quest') {
-      return `Quest (${item?.mission_info?.title})`;
+      return STRINGS.SUBSCRIPTION_LIST.quest(item?.mission_info?.title);
     }
     if (item?.subscription_type === 'mission') {
-      return `Mission (${item?.mission_info?.title})`;
+      return STRINGS.SUBSCRIPTION_LIST.mission(item?.mission_info?.title);
     } else if (!!item?.payment_request_id) {
-      return `Payment Request (${item?.payment_request_id?.request_title} | ${item?.payment_request_id?.request_type})`;
+      return STRINGS.SUBSCRIPTION_LIST.paymentRequest(
+        item?.payment_request_id?.request_title,
+        item?.payment_request_id?.request_type,
+      );
     } else if (!!item?.sale_page) {
-      return `Sale Page (${item?.sale_page?.sale_page_title} | ${item?.plan?.plan_title})`;
+      return STRINGS.SUBSCRIPTION_LIST.salePage(
+        item?.sale_page?.sale_page_title,
+        item?.plan?.plan_title,
+      );
     } else if (!!item?.clickfunnel_order_info) {
-      return `Click Funnels  (${item?.clickfunnel_order_info?.funnel?.name}})`;
+      return STRINGS.SUBSCRIPTION_LIST.clickFunnels(
+        item?.clickfunnel_order_info?.funnel?.name,
+      );
     }
   };
 
@@ -199,7 +207,7 @@ const SubscriptionsList = ({navigation, route}) => {
             onPress={() =>
               copyText(
                 item?.stripe_subscription_id,
-                'Subscription ID copied Successfully',
+                STRINGS.SUBSCRIPTION_LIST.subscriptionIdCopied,
               )
             }>
             <Row>
@@ -215,11 +223,8 @@ const SubscriptionsList = ({navigation, route}) => {
             </Row>
           </TouchableOpacity>
         ) : (
-          <MyText
-            style={{textTransform: 'capitalize'}}
-            fontSize={12}
-            type="medium">
-            N/A
+          <MyText style={styles.capitalize} fontSize={12} type="medium">
+            {STRINGS.GENERIC.N_A}
           </MyText>
         )}
       </>
@@ -228,20 +233,11 @@ const SubscriptionsList = ({navigation, route}) => {
 
   const renderList = ({item, index}) => {
     return (
-      <View
-        style={{
-          backgroundColor: colors.secondary,
-          borderRadius: 10,
-          marginTop: 10,
-          padding: 10,
-        }}>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}>
-          <MyText color={colors.primary}> {`${index + 1}.`}</MyText>
+      <View style={styles.listItemContainer}>
+        <View style={styles.listItemHeader}>
+          <MyText color={colors.primary}>
+            {STRINGS.SUBSCRIPTION_LIST.indexLabel(index)}
+          </MyText>
           {!!item?.cancelation_requested && !!item?.subscription_status && (
             <MenuButton
               onPress={() =>
@@ -251,43 +247,52 @@ const SubscriptionsList = ({navigation, route}) => {
             />
           )}
         </View>
-        <StatView title={'Product'} value={getProduct(item)} />
-        <StatView title={'Created By'} value={item?.subscription_created_by} />
-        <StatView title={'Subscription Mode'} value={item?.stripe_mode} />
         <StatView
-          title={'Next Invoice Date'}
+          title={STRINGS.SUBSCRIPTION_LIST.product}
+          value={getProduct(item)}
+        />
+        <StatView
+          title={STRINGS.SUBSCRIPTION_LIST.createdBy}
+          value={item?.subscription_created_by}
+        />
+        <StatView
+          title={STRINGS.SUBSCRIPTION_LIST.subscriptionMode}
+          value={item?.stripe_mode}
+        />
+        <StatView
+          title={STRINGS.SUBSCRIPTION_LIST.nextInvoiceDate}
           value={
             !!item?.next_invoice_date
-              ? moment(item?.next_invoice_date).format('DD-MM-YYYY')
-              : 'N/A'
+              ? moment(item?.next_invoice_date).format(dateTimeFormat.date)
+              : STRINGS.GENERIC.N_A
           }
         />
         <StatView
-          title={'Subscription Date'}
+          title={STRINGS.SUBSCRIPTION_LIST.subscriptionDate}
           value={
             !!item?.subscription_date
-              ? moment(item?.subscription_date).format('DD-MM-YYYY')
-              : 'N/A'
+              ? moment(item?.subscription_date).format(dateTimeFormat.date)
+              : STRINGS.GENERIC.N_A
           }
         />
         <StatView
-          title={'Subscription ID'}
+          title={STRINGS.SUBSCRIPTION_LIST.subscriptionId}
           view={() => subscriptionIdView(item)}
         />
         <StatView
-          title={'Card'}
+          title={STRINGS.SUBSCRIPTION_LIST.card}
           value={
             !!item?.card_details?.last4
-              ? `**** **** **** ${item?.card_details?.last4}`
-              : 'N/A'
+              ? STRINGS.SUBSCRIPTION_LIST.cardNumber(item?.card_details?.last4)
+              : STRINGS.GENERIC.N_A
           }
         />
         <StatView
-          title={'Status'}
+          title={STRINGS.SUBSCRIPTION_LIST.status}
           view={() => (
             <DefaultStatusView
               value={item?.subscription_status}
-              inactiveText="Expired"
+              inactiveText={STRINGS.SUBSCRIPTION_LIST.expired}
             />
           )}
         />
@@ -306,52 +311,36 @@ const SubscriptionsList = ({navigation, route}) => {
 
   const topView = () => {
     return (
-      <View style={{backgroundColor: colors.darkSecondary, paddingRight: 10}}>
+      <View style={styles.topViewContainer}>
         {/* <TitleView title={""} /> */}
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'flex-end',
-            justifyContent: 'space-between',
-            paddingBottom: 5,
-          }}>
+        <View style={styles.topViewHeader}>
           {!!member ? (
-            <View
-              style={{
-                flex: 1,
-                marginLeft: 5,
-                height: 35,
-                flexDirection: 'row',
-                alignItems: 'center',
-              }}>
+            <View style={styles.memberInfoContainer}>
               <UserImage
                 image={member?.profile_image}
                 name={member?.first_name}
                 size={30}
               />
-              <View style={{marginLeft: 10, flex: 1}}>
-                <MyText
-                  type="bold"
-                  fontSize={
-                    12
-                  }>{`${member?.first_name} ${member?.last_name}`}</MyText>
-                <MyText
-                  type="medium"
-                  color={colors.lightText2}
-                  fontSize={10}>{`${member?.email}`}</MyText>
+              <View style={styles.memberTextContainer}>
+                <MyText type="bold" fontSize={12}>
+                  {STRINGS.SUBSCRIPTION_LIST.fullName(
+                    member?.first_name,
+                    member?.last_name,
+                  )}
+                </MyText>
+                <MyText type="medium" color={colors.lightText2} fontSize={10}>
+                  {member?.email}
+                </MyText>
               </View>
             </View>
           ) : (
-            <View style={{flex: 1, height: 35}} />
+            <View style={styles.memberPlaceholder} />
           )}
 
-          <View style={{marginTop: -2, paddingBottom: 5}}>
-            <MyText
-              fontSize={10}
-              type="medium"
-              color={
-                colors.lightText2
-              }>{`Showing ${list.length} of ${total}`}</MyText>
+          <View style={styles.showingTextContainer}>
+            <MyText fontSize={10} type="medium" color={colors.lightText2}>
+              {STRINGS.SUBSCRIPTION_LIST.showingOfTotal(list.length, total)}
+            </MyText>
           </View>
         </View>
       </View>
@@ -360,16 +349,19 @@ const SubscriptionsList = ({navigation, route}) => {
 
   return (
     <RootView
-      title="Member Subscriptions"
+      title={STRINGS.SUBSCRIPTION_LIST.title}
       subTitle={
         !!member
-          ? `${member?.first_name} ${member?.last_name} (${member?.email})`
+          ? `${STRINGS.SUBSCRIPTION_LIST.fullName(
+              member?.first_name,
+              member?.last_name,
+            )} (${member?.email})`
           : ''
       }
       //  titleView={topView}
     >
-      <View style={{flex: 1}}>
-        <View style={{flex: 1}}>
+      <View style={styles.flex1}>
+        <View style={styles.flex1}>
           <FlatList
             refreshControl={
               <MyRefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -403,7 +395,7 @@ const SubscriptionsList = ({navigation, route}) => {
 
         <InfoModal ref={infoRef} />
         <ConfirmationModal
-          title={'Are you sure you want to delete this subscription?'}
+          title={STRINGS.SUBSCRIPTION_LIST.deleteConfirmation}
           closeModal={() =>
             setConfirmationModal({
               isVisible: false,
@@ -428,8 +420,64 @@ const optionsList = [
   //   icon: icons.edit
   // },
   {
-    title: 'View Cancelation Request',
+    title: STRINGS.SUBSCRIPTION_LIST.viewCancelationRequest,
     key: 'view_cancel_request',
     icon: icons.eye,
   },
 ];
+
+const styles = StyleSheet.create({
+  flex1: {
+    flex: 1,
+  },
+  alignStart: {
+    alignSelf: 'flex-start',
+  },
+  searchContainer: {
+    marginTop: -10,
+    backgroundColor: colors.darkSecondary,
+  },
+  listItemContainer: {
+    backgroundColor: colors.secondary,
+    borderRadius: 10,
+    marginTop: 10,
+    padding: 10,
+  },
+  listItemHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  capitalize: {
+    textTransform: 'capitalize',
+  },
+  topViewContainer: {
+    backgroundColor: colors.darkSecondary,
+    paddingRight: 10,
+  },
+  topViewHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+    paddingBottom: 5,
+  },
+  memberInfoContainer: {
+    flex: 1,
+    marginLeft: 5,
+    height: 35,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  memberTextContainer: {
+    marginLeft: 10,
+    flex: 1,
+  },
+  memberPlaceholder: {
+    flex: 1,
+    height: 35,
+  },
+  showingTextContainer: {
+    marginTop: -2,
+    paddingBottom: 5,
+  },
+});

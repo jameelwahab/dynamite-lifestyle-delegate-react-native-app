@@ -1,11 +1,4 @@
-import {
-  View,
-  Text,
-  ScrollView,
-  StyleSheet,
-  Pressable,
-  TouchableOpacity,
-} from 'react-native';
+import {View, StyleSheet, Pressable, TouchableOpacity} from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
 import RootView from '../../../components/RootView';
 import MyText from '../../../components/MyText';
@@ -283,8 +276,28 @@ const AddPaymentRequest = ({navigation, route}) => {
       createPaymentRequestAPI(obj);
     }
   };
+  const validation = obj => {
+    if (!obj?.member_id) {
+      return showToast({body: 'Please select member'});
+    }
+
+    if (!obj?.request_title) {
+      return showToast({body: 'Please enter request title'});
+    }
+
+    if (!obj?.product) {
+      return showToast({body: 'Please select product'});
+    }
+
+    if (!obj?.total_amount) {
+      return showToast({body: 'Please enter total amount'});
+    }
+    return true;
+  };
 
   const createPaymentRequestAPI = async obj => {
+    // let validate = validation(obj);
+    // if (!validate) return;
     setLoader(true);
     let res = await ADD_PAYMENT_REQUEST({token, navigation, body: obj});
     if (res.code == 200) {
@@ -855,6 +868,9 @@ const planTypeList = [
   {title: STRINGS.ADD_PAYMENT_REQUEST.custom, key: 'custom'},
 ];
 const styles = StyleSheet.create({
+  scrollViewContent: {
+    paddingBottom: 55,
+  },
   boxView: {
     borderWidth: 0.5,
     borderColor: colors.border,
@@ -882,5 +898,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.darkSecondary,
     paddingBottom: 5,
   },
-  topBtnsView: {flexDirection: 'row', alignItems: 'flex-end'},
+  topBtnsView: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+  },
+  submitButtonContainer: {
+    marginTop: 20,
+  },
 });

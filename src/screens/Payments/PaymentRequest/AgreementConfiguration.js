@@ -19,6 +19,7 @@ import {selectUser} from '../../../redux/reducers/userSlice';
 import {useNavigation} from '@react-navigation/native';
 import showToast from '../../../functions/showToast';
 import MyLoader from '../../../components/MyLoader';
+import {STRINGS} from '../../../utilities/strings';
 
 const AgreementConfiguration = ({route}) => {
   const paramsForAgreementConfig = route?.params?.paramsForAgreementConfig;
@@ -36,7 +37,9 @@ const AgreementConfiguration = ({route}) => {
     return (
       <Flex style={__agreementConfigurationStyles.editor_container}>
         <Flex style={__agreementConfigurationStyles.editor_lable}>
-          <MyText>Agreement Description*</MyText>
+          <MyText>
+            {STRINGS.AGREEMENT_CONFIGURATION.agreementDescription}
+          </MyText>
         </Flex>
         <Editor
           height={150}
@@ -46,9 +49,11 @@ const AgreementConfiguration = ({route}) => {
         <Flex
           style={[
             __agreementConfigurationStyles.editor_lable,
-            {marginTop: 10},
+            styles.editorLabelMarginTop,
           ]}>
-          <MyText>Agreement Alert Description*</MyText>
+          <MyText>
+            {STRINGS.AGREEMENT_CONFIGURATION.agreementAlertDescription}
+          </MyText>
         </Flex>
         <Editor
           height={150}
@@ -67,8 +72,8 @@ const AgreementConfiguration = ({route}) => {
     if (selectedItem?.value == true) {
       if (!agreementDescription || agreementDescription.trim() == '') {
         showToast({
-          body: 'Agreement Description is Required',
-          title: 'Error',
+          body: STRINGS.AGREEMENT_CONFIGURATION.agreementDescriptionRequired,
+          title: STRINGS.AGREEMENT_CONFIGURATION.error,
           type: 'error',
         });
         return;
@@ -78,8 +83,9 @@ const AgreementConfiguration = ({route}) => {
         agreementAlertDescription.trim() == ''
       ) {
         showToast({
-          body: 'Agreement Alert Description is Required',
-          title: 'Error',
+          body: STRINGS.AGREEMENT_CONFIGURATION
+            .agreementAlertDescriptionRequired,
+          title: STRINGS.AGREEMENT_CONFIGURATION.error,
           type: 'error',
         });
         return;
@@ -105,15 +111,15 @@ const AgreementConfiguration = ({route}) => {
           res?.payment_request?.agreement_config?.agreement_alert_description,
         );
         setSelectedItem({
-          title: res?.payment_request?.agreement_config?.is_sign_agreement
-            ? 'Yes'
-            : 'No',
-          value: res?.payment_request?.agreement_config?.is_sign_agreement,
+          title: res?.payment_request?.agreement_config?.show_agreement_page
+            ? STRINGS.AGREEMENT_CONFIGURATION.yes
+            : STRINGS.AGREEMENT_CONFIGURATION.no,
+          value: res?.payment_request?.agreement_config?.show_agreement_page,
         });
       }
     } catch (error) {
       showToast({
-        body: error?.message || 'Something went wrong',
+        body: error?.message || STRINGS.GENERIC.SOMETHING_WENT_WRONG,
       });
       setLoader(false);
     } finally {
@@ -136,12 +142,14 @@ const AgreementConfiguration = ({route}) => {
         token,
         navigation,
         slug: paramsForAgreementConfig?.paymentRequestSlug,
-        data,
+        data: {
+          agreement_config: data,
+        },
       });
       if (res?.code == 200) {
         showToast({
-          body: 'Agreement Configuration updated successfully',
-          title: 'Success',
+          body: STRINGS.AGREEMENT_CONFIGURATION.updateSuccess,
+          title: STRINGS.AGREEMENT_CONFIGURATION.success,
           type: 'success',
         });
         navigation.goBack();
@@ -149,8 +157,8 @@ const AgreementConfiguration = ({route}) => {
       }
     } catch (error) {
       showToast({
-        body: error?.message || 'Something went wrong',
-        title: 'Error',
+        body: error?.message || STRINGS.GENERIC.SOMETHING_WENT_WRONG,
+        title: STRINGS.AGREEMENT_CONFIGURATION.error,
         type: 'error',
       });
       setLoader(false);
@@ -163,7 +171,7 @@ const AgreementConfiguration = ({route}) => {
     getAgreementConfiguration();
   }, []);
   return (
-    <RootView title="Agreement Configuration">
+    <RootView title={STRINGS.AGREEMENT_CONFIGURATION.title}>
       <Flex flex={1}>
         <KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
           <Row>
@@ -171,14 +179,14 @@ const AgreementConfiguration = ({route}) => {
               onPress={() => setOptionModalVisible(true)}
               style={[
                 __agreementConfigurationStyles.lvlbtnView,
-                {flex: 1, marginRight: 10},
+                styles.pressableContainer,
               ]}>
               <View style={__agreementConfigurationStyles.levlBtnLabel}>
                 <MyText color={colors.lightText2} fontSize={12}>
-                  Show Agreement Page*
+                  {STRINGS.AGREEMENT_CONFIGURATION.showAgreementPage}
                 </MyText>
               </View>
-              <MyText type={'medium'} style={{textTransform: 'capitalize'}}>
+              <MyText type={'medium'} style={styles.capitalizeText}>
                 {selectedItem.title}
               </MyText>
               {icons.down(colors.lightText2)}
@@ -188,8 +196,8 @@ const AgreementConfiguration = ({route}) => {
           {/*=====Editor View=====*/}
           {selectedItem?.value == true && editorView()}
           <MyButton
-            title="Update"
-            style={{marginTop: 20}}
+            title={STRINGS.AGREEMENT_CONFIGURATION.update}
+            style={styles.updateButton}
             onPress={formVlalidation}
           />
         </KeyboardAwareScrollView>
@@ -213,13 +221,27 @@ const AgreementConfiguration = ({route}) => {
 export default AgreementConfiguration;
 const agreementList = [
   {
-    title: 'Yes',
+    title: STRINGS.AGREEMENT_CONFIGURATION.yes,
     value: true,
   },
   {
-    title: 'No',
+    title: STRINGS.AGREEMENT_CONFIGURATION.no,
     value: false,
   },
 ];
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  editorLabelMarginTop: {
+    marginTop: 10,
+  },
+  pressableContainer: {
+    flex: 1,
+    marginRight: 10,
+  },
+  capitalizeText: {
+    textTransform: 'capitalize',
+  },
+  updateButton: {
+    marginTop: 20,
+  },
+});

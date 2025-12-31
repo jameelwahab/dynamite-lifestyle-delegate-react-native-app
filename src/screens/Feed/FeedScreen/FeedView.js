@@ -7,7 +7,8 @@ import {
   TouchableOpacity,
   Pressable,
 } from 'react-native';
-import React, {memo, useEffect, useState, useRef} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
+import {STRINGS} from '../../../utilities/strings';
 import UserImage from '../../../components/UserImage';
 import MyText from '../../../components/MyText';
 import InfoModal from '../../../components/InfoModal';
@@ -20,9 +21,7 @@ import {fonts} from '../../../utilities/fonts';
 import {isDev} from '../../../utilities/constants';
 import ImagesForFeed from './ImagesForFeed';
 import {icons} from '../../../utilities/icons';
-import breakReference from '../../../functions/breakReference';
 import MyWebview from '../../../components/MyWebview';
-import MyImage2 from '../../../components/MyImage2';
 import MyImage from '../../../components/MyImage';
 import CollapsibleText from '../../../components/CollapsibleText';
 import WebPlayer from '../../../components/WebPlayer';
@@ -40,13 +39,10 @@ import {main} from '../../../utilities/styles';
 import {Row, Flex} from '../../../UIComponents/FlexViews';
 import isArray from '../../../functions/isArray';
 
-const ic_tropy = require('../../../assets/icons/trophy.png');
-
 export const FeedView = ({
   item,
   index,
   user,
-  token,
   feedSettings,
   isInView,
   timezone,
@@ -97,7 +93,7 @@ export const FeedView = ({
             <Image
               indicatorProps={{indeterminate: false}}
               source={{uri: S3_URL + item?.reward_data?.reward_feed_gif}}
-              style={{height: '100%', width: '100%'}}
+              style={__style.animationImage}
             />
           </View>
         )}
@@ -107,22 +103,22 @@ export const FeedView = ({
   const badgesView = badgeList => {
     return (
       <View>
-        <Text style={[main.heading, {fontFamily: fonts.medium}]}>
-          {'Badges'}
+        <Text style={[main.heading, __style.badgesTitle]}>
+          {STRINGS.FEED_VIEW.badges}
         </Text>
         <Divider mt={10} />
-        <View style={{marginTop: 10}}>
+        <View style={__style.badgesListContainer}>
           <FlatList
             horizontal
             scrollEnabled={false}
             data={badgeList || []}
             renderItem={({item, index}) => {
               return (
-                <View style={{marginRight: 20}}>
+                <View style={__style.badgeItem}>
                   <Row alignItems="center">
                     <MyImage
                       source={{uri: S3_URL + item?.icon?.thumbnail_1}}
-                      style={{height: 20, width: 20}}
+                      style={__style.badgeIcon}
                     />
                   </Row>
                 </View>
@@ -136,7 +132,7 @@ export const FeedView = ({
 
   const profileView = () => (
     <View style={__style.profileView}>
-      <View style={[__style.profileView, {flex: 1}]}>
+      <View style={[__style.profileView, __style.profileViewFlex]}>
         <UserImage
           image={item?.action_info?.profile_image}
           name={item?.action_info?.name}
@@ -159,7 +155,7 @@ export const FeedView = ({
         <View style={__style.profileNameView}>
           <MyText type="bold">{item?.action_info?.name}</MyText>
 
-          <View style={{marginTop: 2}}>
+          <View style={__style.marginTop2}>
             <MyText type="light" color={colors.lightText2} fontSize={10}>
               {convertTimezone(item?.createdAt, timezone).format(
                 'DD MMM YYYY [at] hh:mm A',
@@ -171,11 +167,8 @@ export const FeedView = ({
       {!item?.is_publish && (
         <TouchableOpacity
           onPress={() => openScheduleTimeModal(item?.schedule_date_time)}
-          style={{marginRight: 5}}>
-          <Image
-            source={icons.schedule}
-            style={{tintColor: colors.primary, height: 25, width: 25}}
-          />
+          style={__style.marginRight5}>
+          <Image source={icons.schedule} style={__style.scheduleIcon} />
         </TouchableOpacity>
       )}
 
@@ -197,19 +190,15 @@ export const FeedView = ({
                     );
                   }
                 }}
-                style={{flexDirection: 'row', alignItems: 'center'}}>
+                style={__style.rowAlignCenter}>
                 <MyImage
                   source={{
                     uri: S3_URL + item?.feed_badge_levels[0]?.icon?.thumbnail_1,
                   }}
-                  style={{height: 20, width: 20, marginRight: 5}}
+                  style={__style.badgeLevelIcon}
                 />
                 {item?.feed_badge_levels?.length > 1 && (
-                  <Text
-                    style={[
-                      main.description,
-                      {textDecorationLine: 'underline', color: colors.primary2},
-                    ]}>
+                  <Text style={[main.description, __style.badgeCountText]}>
                     {item?.feed_badge_levels?.length - 1}+{' '}
                   </Text>
                 )}
@@ -223,7 +212,7 @@ export const FeedView = ({
         item?.action_info?.action_by == 'consultant_user' && (
           <MyImage
             source={{uri: S3_URL + feedSettings?.icon_for_all_level}}
-            style={{height: 20, width: 20, marginRight: 5}}
+            style={__style.badgeLevelIcon}
           />
         )}
 
@@ -268,9 +257,9 @@ export const FeedView = ({
     return (
       <View style={__style.review}>
         <MyText color={colors.primary} fontSize={16} type="medium">
-          Reivew Reason
+          {STRINGS.FEED_VIEW.reviewReason}
         </MyText>
-        <View style={{marginTop: 3}}>
+        <View style={__style.marginTop3}>
           <MyText color={colors.lightText2} type="regular">
             {item?.review_info?.reason}
           </MyText>
@@ -308,19 +297,19 @@ export const FeedView = ({
       {item.feed_type == 'image' &&
         !!item?.feed_images &&
         item?.feed_images.length > 0 && (
-          <View style={{marginTop: 10}}>
+          <View style={__style.marginTop10}>
             <ImagesForFeed id={item._id} list={item.feed_images} />
           </View>
         )}
 
       {item.feed_type == 'video' && item.video_url != '' && (
-        <View style={{alignItems: 'center', marginTop: 10}}>
+        <View style={__style.centerMarginTop10}>
           <WebPlayer height={250} url={item.video_url} />
         </View>
       )}
 
       {isDev && item.feed_type == 'live' && !!item?.image?.thumbnail_1 && (
-        <View style={{alignItems: 'center', minHeight: 20}}>
+        <View style={__style.liveContainer}>
           <ResponsiveImage2
             width={utilities.screenWidth() - 40}
             uri={S3_URL + item?.image?.thumbnail_1}
@@ -338,7 +327,9 @@ export const FeedView = ({
                 ]}
               />
               <MyText type="bold" color={colors.white} fontSize={12}>
-                {item?.is_live_streaming ? 'Live' : 'Offline'}
+                {item?.is_live_streaming
+                  ? STRINGS.FEED_VIEW.live
+                  : STRINGS.FEED_VIEW.offline}
               </MyText>
             </View>
           )}
@@ -346,17 +337,17 @@ export const FeedView = ({
       )}
 
       {item.feed_type == 'embed_code' && !!item.embed_code && (
-        <View style={{marginTop: 10}}>
+        <View style={__style.marginTop10}>
           <MyWebview fullWidth html={item.embed_code.replace('width', '')} />
         </View>
       )}
 
       {item.feed_type == 'poll' && (
-        <View style={{margin: 10}}>{pollFeedView(item)}</View>
+        <View style={__style.margin10}>{pollFeedView(item)}</View>
       )}
 
       {item.feed_type == 'survey' && (
-        <View style={{margin: 10}}>{surveyFeedView(item)}</View>
+        <View style={__style.margin10}>{surveyFeedView(item)}</View>
       )}
 
       {!!item?.event_info?.is_event_info && (
@@ -376,7 +367,7 @@ export const FeedView = ({
             <MyText
               color={item?.event_info?.button_text_color}
               type="medium"
-              style={{paddingHorizontal: 10}}>
+              style={__style.eventBtnText}>
               {item?.event_info?.button_text}
             </MyText>
           </TouchableOpacity>
@@ -388,7 +379,7 @@ export const FeedView = ({
           <Row paddingHorizontal={5} style={__style.reportedView}>
             {icons.warnOctagon(colors.delete, 20)}
             <Text style={__style.reportedText}>
-              This post has been reported by some users
+              {STRINGS.FEED_VIEW.reportedByUsers}
             </Text>
           </Row>
         </TouchableOpacity>
@@ -435,8 +426,8 @@ export const FeedView = ({
         {item?.is_liked
           ? icons.heartFilled(colors.heart, 18)
           : icons.heartUnfilled(colors.white, 18)}
-        <MyText fontSize={12} style={{marginLeft: 5}}>
-          {item?.is_liked ? 'Liked' : 'Like'}
+        <MyText fontSize={12} style={__style.marginLeft5}>
+          {item?.is_liked ? STRINGS.FEED_VIEW.liked : STRINGS.FEED_VIEW.like}
         </MyText>
       </TouchableOpacity>
 
@@ -444,8 +435,8 @@ export const FeedView = ({
         onPress={() => openComments(item?._id, true)}
         style={__style.actionBtn}>
         {icons.comment(colors.white, 18)}
-        <MyText fontSize={12} style={{marginLeft: 5}}>
-          {'Comment'}
+        <MyText fontSize={12} style={__style.marginLeft5}>
+          {STRINGS.FEED_VIEW.comment}
         </MyText>
       </TouchableOpacity>
     </View>
@@ -464,10 +455,10 @@ export const FeedView = ({
   const pollFeedView = item => {
     let feed_setting = pollSettings;
     return (
-      <View style={{}}>
+      <View>
         {item?.poll_info?.poll_status == 'expired' ? (
           <>
-            <View style={{marginBottom: 10}}>
+            <View style={__style.marginBottom10}>
               {!!feed_setting?.poll_winner_description && (
                 <MyWebview
                   html={feed_setting?.poll_winner_description.replace(
@@ -487,56 +478,19 @@ export const FeedView = ({
               return (
                 <TouchableOpacity
                   onPress={() => onVotePress?.(item?._id, option?._id)}
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    marginBottom: 10,
-                  }}>
+                  style={__style.pollOptionContainer}>
                   <View
-                    style={{
-                      backgroundColor: isSelected
-                        ? colors.primary
-                        : colors.transparent,
-                      flex: 1,
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      minHeight: 40,
-                      borderWidth: 1 / 2,
-                      borderColor: colors.border,
-                      borderRadius: 5,
-                      paddingHorizontal: 10,
-                    }}>
-                    <View
-                      style={{
-                        flex: 1,
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                      }}>
+                    style={[
+                      __style.pollOptionButton,
+                      isSelected && __style.pollOptionSelected,
+                    ]}>
+                    <View style={__style.pollOptionContentRow}>
                       <View
-                        style={{
-                          marginRight: 10,
-                          height: 20,
-                          width: 20,
-                          borderRadius: 20 / 2,
-                          borderWidth: 1,
-                          borderColor: isSelected
-                            ? colors.black
-                            : colors.primary,
-                          marginHorizontal: 5,
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}>
-                        {isSelected && (
-                          <View
-                            style={{
-                              height: 12,
-                              width: 12,
-                              borderRadius: 12 / 2,
-                              backgroundColor: colors.black,
-                            }}
-                          />
-                        )}
+                        style={[
+                          __style.pollRadioButton,
+                          isSelected && __style.pollRadioSelected,
+                        ]}>
+                        {isSelected && <View style={__style.pollRadioInner} />}
                       </View>
                       <MyText color={isSelected ? colors.black : colors.white}>
                         {option?.text}
@@ -553,14 +507,14 @@ export const FeedView = ({
             })}
           </>
         )}
-        <View style={{alignItems: 'center'}}>
+        <View style={__style.centerAlign}>
           <MyText fontSize={12} color={colors.lightText2}>
             {item?.poll_info?.poll_status == 'expired'
-              ? `Poll Expired on ${convertTimezone2(
+              ? `${STRINGS.FEED_VIEW.pollExpiredOn} ${convertTimezone2(
                   item?.poll_info?.expiry_date_time,
                   timezone,
                 ).format('MMMM DD, YYYY [at] hh:mm A')}`
-              : `Poll Expires on ${convertTimezone2(
+              : `${STRINGS.FEED_VIEW.pollExpiresOn} ${convertTimezone2(
                   item?.poll_info?.expiry_date_time,
                   timezone,
                 ).format('MMMM DD, YYYY [at] hh:mm A')}`}
@@ -572,16 +526,10 @@ export const FeedView = ({
           user?._id == item?.action_info?.action_id) && (
           <Pressable
             onPress={() => openPollDetail?.(item)}
-            style={{
-              borderWidth: 1,
-              borderColor: colors.lightPrimary,
-              borderRadius: 5,
-              marginTop: 10,
-              height: 35,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
-            <MyText color={colors.primary}>View Details</MyText>
+            style={__style.viewDetailsButton}>
+            <MyText color={colors.primary}>
+              {STRINGS.FEED_VIEW.viewDetails}
+            </MyText>
           </Pressable>
         )}
       </View>
@@ -590,37 +538,37 @@ export const FeedView = ({
 
   const surveyFeedView = item => {
     return (
-      <View style={{marginTop: 10}}>
+      <View style={__style.marginTop10}>
         {item?.survey_info?.survey_status == 'expired' ? (
           <>
-            <View style={{marginBottom: 10}}>
+            <View style={__style.marginBottom10}>
               <MyButton
                 onPress={() => onStartQuestionnairPress(item)}
                 fullWidth
                 // noCapitalize
-                title="View Survey Questionnaire"
+                title={STRINGS.FEED_VIEW.viewSurveyQuestionnaire}
               />
             </View>
           </>
         ) : (
-          <View style={{}}>
+          <View>
             <MyButton
               onPress={() => onStartQuestionnairPress(item)}
               fullWidth
               // noCapitalize
-              title="Survey Questionnaire"
+              title={STRINGS.FEED_VIEW.surveyQuestionnaire}
             />
           </View>
         )}
 
-        <View style={{alignItems: 'center', marginTop: 10}}>
+        <View style={__style.centerMarginTop10}>
           <MyText fontSize={12} color={colors.lightText2}>
             {item?.survey_info?.survey_status == 'expired'
-              ? `Survey Expired on ${convertTimezone2(
+              ? `${STRINGS.FEED_VIEW.surveyExpiredOn} ${convertTimezone2(
                   item?.survey_info?.expiry_date_time,
                   timezone,
                 ).format('MMMM DD, YYYY [at] hh:mm A')}`
-              : `Survey Expires on ${convertTimezone2(
+              : `${STRINGS.FEED_VIEW.surveyExpiresOn} ${convertTimezone2(
                   item?.survey_info?.expiry_date_time,
                   timezone,
                 ).format('MMMM DD, YYYY [at] hh:mm A')}`}
@@ -631,16 +579,10 @@ export const FeedView = ({
           user?._id == item?.action_info?.action_id) && (
           <Pressable
             onPress={() => openSurveyDetail?.(item)}
-            style={{
-              borderWidth: 1,
-              borderColor: colors.lightPrimary,
-              borderRadius: 5,
-              marginTop: 10,
-              height: 35,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
-            <MyText color={colors.primary}>View Details</MyText>
+            style={__style.viewDetailsButton}>
+            <MyText color={colors.primary}>
+              {STRINGS.FEED_VIEW.viewDetails}
+            </MyText>
           </Pressable>
         )}
       </View>
@@ -761,8 +703,6 @@ const __style = StyleSheet.create({
     marginLeft: 10,
     ...main.description,
     color: colors.white,
-    // fontStyle: "italic",
-    // textDecorationLine: "underline"
   },
   animationView: {
     width: '100%',
@@ -771,8 +711,121 @@ const __style = StyleSheet.create({
     zIndex: -1,
     overflow: 'hidden',
   },
-
+  animationImage: {
+    height: '100%',
+    width: '100%',
+  },
+  badgesTitle: {
+    fontFamily: fonts.medium,
+  },
+  badgesListContainer: {
+    marginTop: 10,
+  },
+  badgeItem: {
+    marginRight: 20,
+  },
+  badgeIcon: {
+    height: 20,
+    width: 20,
+  },
   profileView: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  profileViewFlex: {
+    flex: 1,
+  },
+  profileNameView: {
+    marginLeft: 10,
+    flex: 1,
+  },
+  marginTop2: {
+    marginTop: 2,
+  },
+  marginTop3: {
+    marginTop: 3,
+  },
+  marginTop10: {
+    marginTop: 10,
+  },
+  marginBottom10: {
+    marginBottom: 10,
+  },
+  margin10: {
+    margin: 10,
+  },
+  marginRight5: {
+    marginRight: 5,
+  },
+  marginLeft5: {
+    marginLeft: 5,
+  },
+  scheduleIcon: {
+    tintColor: colors.primary,
+    height: 25,
+    width: 25,
+  },
+  rowAlignCenter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  badgeLevelIcon: {
+    height: 20,
+    width: 20,
+    marginRight: 5,
+  },
+  badgeCountText: {
+    textDecorationLine: 'underline',
+    color: colors.primary2,
+  },
+  profileTypeIconView: {
+    height: 25,
+    width: 25,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  feedTypeIcon: {
+    height: 22,
+    width: 22,
+  },
+  review: {
+    marginTop: 10,
+    borderLeftWidth: 3,
+    borderLeftColor: colors.primary,
+    borderRadius: 5,
+    padding: 5,
+    backgroundColor: colors.primary + '0F',
+  },
+  descriptionRootView: {
+    marginTop: 10,
+  },
+  centerMarginTop10: {
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  centerAlign: {
+    alignItems: 'center',
+  },
+  liveContainer: {
+    alignItems: 'center',
+    minHeight: 20,
+  },
+  liveSteamStatus: {
+    borderRadius: 999,
+    height: 10,
+    width: 10,
+    marginRight: 5,
+  },
+  streamingStatusView: {
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: colors.primary2,
+    paddingHorizontal: 10,
+    position: 'absolute',
+    top: 5,
+    left: 5,
+    paddingVertical: 3,
+    backgroundColor: colors.secondary,
     flexDirection: 'row',
     alignItems: 'center',
   },
@@ -797,45 +850,38 @@ const __style = StyleSheet.create({
     borderRadius: 5,
     paddingVertical: 3,
     marginVertical: 3,
-    // alignSelf:"center"
-    // flex: 1,
-    // minWidth: 50
   },
-  liveSteamStatus: {
-    borderRadius: 999,
-    height: 10,
-    width: 10,
-    marginRight: 5,
-  },
-  streamingStatusView: {
-    borderRadius: 15,
-    borderWidth: 1,
-    borderColor: colors.primary2,
+  eventBtnText: {
     paddingHorizontal: 10,
-    position: 'absolute',
-    top: 5,
-    left: 5,
-    paddingVertical: 3,
-    backgroundColor: colors.secondary,
+  },
+  statView: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  profileNameView: {
-    marginLeft: 10,
-    flex: 1,
-  },
-  profileTypeIconView: {
-    height: 25,
-    width: 25,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  feedTypeIcon: {
-    height: 22,
-    width: 22,
-  },
-  descriptionRootView: {
+    justifyContent: 'space-between',
     marginTop: 10,
+    paddingHorizontal: 10,
+  },
+  likeView: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 2,
+  },
+  likeImagesView: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 5,
+  },
+  likeImageView: {
+    width: 18,
+    height: 18,
+    borderRadius: 18 / 2,
+    overflow: 'hidden',
+    borderWidth: 2,
+    borderColor: colors.white,
+  },
+  likeImage: {
+    width: 16,
+    height: 16,
   },
   actionView: {
     borderTopColor: colors.lightText2,
@@ -854,31 +900,58 @@ const __style = StyleSheet.create({
     height: '100%',
     paddingHorizontal: 30,
   },
-  statView: {
+  pollOptionContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 10,
+  },
+  pollOptionButton: {
+    backgroundColor: colors.transparent,
+    flex: 1,
+    flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 10,
+    alignItems: 'center',
+    minHeight: 40,
+    borderWidth: 1 / 2,
+    borderColor: colors.border,
+    borderRadius: 5,
     paddingHorizontal: 10,
   },
-  likeView: {flexDirection: 'row', alignItems: 'center', paddingVertical: 2},
-  likeImagesView: {flexDirection: 'row', alignItems: 'center', marginLeft: 5},
-  likeImageView: {
-    width: 18,
-    height: 18,
-    borderRadius: 18 / 2,
-    overflow: 'hidden',
-    borderWidth: 2,
-    borderColor: colors.white,
+  pollOptionSelected: {
+    backgroundColor: colors.primary,
   },
-  likeImage: {width: 16, height: 16},
-  review: {
-    marginTop: 10,
-    // backgroundColor:colors.lightPrimary2
-    borderLeftWidth: 3,
-    borderLeftColor: colors.primary,
+  pollOptionContentRow: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  pollRadioButton: {
+    marginRight: 10,
+    height: 20,
+    width: 20,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: colors.primary,
+    marginHorizontal: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  pollRadioSelected: {
+    borderColor: colors.black,
+  },
+  pollRadioInner: {
+    height: 12,
+    width: 12,
+    borderRadius: 6,
+    backgroundColor: colors.black,
+  },
+  viewDetailsButton: {
+    borderWidth: 1,
+    borderColor: colors.lightPrimary,
     borderRadius: 5,
-    padding: 5,
-    backgroundColor: colors.primary + '0F',
+    marginTop: 10,
+    height: 35,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

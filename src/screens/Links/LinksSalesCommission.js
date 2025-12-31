@@ -1,262 +1,320 @@
-import { View, Text, StyleSheet, FlatList } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import RootView from '../../components/RootView'
-import MyText from '../../components/MyText'
-import MyLoader from '../../components/MyLoader'
-import { GET_LINKS_SALES_TEAM_LIST, UPDATE_LINKS_SALES_TEAM_COMMISSION } from '../../DAL'
-import { useSelector } from 'react-redux'
-import { selectUser } from '../../redux/reducers/userSlice'
-import { colors } from '../../utilities/colors'
-import TitleView from '../../components/TitleView'
-import MyRefreshControl from '../../components/MyRefreshControl'
-import EmptyView from '../../components/EmptyView'
-import SearchView from '../../components/SearchView'
-import MyCheckBox from '../../components/MyCheckBox'
-import MemberView from '../../components/MemberView'
-import MyInputs from '../../components/MyInputs'
-import MyKeyboardAvoidingView from '../../components/MyKeyboardAvoidingView'
-import { MyButton } from '../../components/MyButton'
-import prependCurency from '../../functions/prependCurency'
-import { icons } from '../../utilities/icons'
-import Collapsible from 'react-native-collapsible'
-import showToast from '../../functions/showToast'
+import {View, Text, StyleSheet, FlatList} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import RootView from '../../components/RootView';
+import MyText from '../../components/MyText';
+import MyLoader from '../../components/MyLoader';
+import {
+  GET_LINKS_SALES_TEAM_LIST,
+  UPDATE_LINKS_SALES_TEAM_COMMISSION,
+} from '../../DAL';
+import {useSelector} from 'react-redux';
+import {selectUser} from '../../redux/reducers/userSlice';
+import {colors} from '../../utilities/colors';
+import TitleView from '../../components/TitleView';
+import MyRefreshControl from '../../components/MyRefreshControl';
+import EmptyView from '../../components/EmptyView';
+import SearchView from '../../components/SearchView';
+import MyCheckBox from '../../components/MyCheckBox';
+import MemberView from '../../components/MemberView';
+import MyInputs from '../../components/MyInputs';
+import MyKeyboardAvoidingView from '../../components/MyKeyboardAvoidingView';
+import {MyButton} from '../../components/MyButton';
+import prependCurency from '../../functions/prependCurency';
+import {icons} from '../../utilities/icons';
+import Collapsible from 'react-native-collapsible';
+import showToast from '../../functions/showToast';
+import {Flex} from '../../UIComponents/FlexViews';
+import {STRINGS} from '../../utilities/strings';
 
-const LinksSalesCommission = ({ navigation, route }) => {
-  const { pageId, planId, salePageTitle, planTitle } = route?.params;
-  const { token } = useSelector(selectUser);
+const LinksSalesCommission = ({navigation, route}) => {
+  const {pageId, planId, salePageTitle, planTitle} = route?.params;
+  const {token} = useSelector(selectUser);
   const [list, setList] = useState([]);
   const [commissionObj, setCommissionObj] = useState(null);
   const [loader, setLoader] = useState(true);
-  const [searchText, setSearchText] = useState("")
+  const [searchText, setSearchText] = useState('');
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
-    setLoader(true)
-    getDataFromServer()
-  }, [])
+    setLoader(true);
+    getDataFromServer();
+  }, []);
 
   //! //////// API
   const getDataFromServer = async () => {
     let res = await GET_LINKS_SALES_TEAM_LIST({
-      token, navigation, pageId, planId
+      token,
+      navigation,
+      pageId,
+      planId,
     });
 
     if (res.code == 200) {
       let newArr = [];
       res?.team_list.forEach(element => {
-        let planAmount = element.sales_commision_for_plan.find(x => x?.plan_id == planId)?.commission_amount;
+        let planAmount = element.sales_commision_for_plan.find(
+          x => x?.plan_id == planId,
+        )?.commission_amount;
         newArr.push({
           ...element,
           planAmount: !!planAmount ? planAmount : 0,
-          isCommissionEnabled: !!planAmount
-        })
+          isCommissionEnabled: !!planAmount,
+        });
       });
       setList(newArr);
-      setCommissionObj(res?.commission_info)
+      setCommissionObj(res?.commission_info);
       setLoader(false);
       setRefreshing(false);
     } else {
       setLoader(false);
       setRefreshing(false);
     }
-  }
+  };
 
-  const updateSaleCommission = async (commission) => {
+  const updateSaleCommission = async commission => {
     setLoader(true);
     let res = await UPDATE_LINKS_SALES_TEAM_COMMISSION({
-      token, navigation,
+      token,
+      navigation,
       commissionList: commission,
-      planId: planId
+      planId: planId,
     });
 
     if (res.code == 200) {
-      showToast({ title: res?.message, type: "success" });
+      showToast({title: res?.message, type: 'success'});
       setLoader(false);
-      navigation.goBack()
+      navigation.goBack();
     } else {
       setLoader(false);
     }
-  }
+  };
 
   const onRefresh = () => {
-    setRefreshing(true)
-    getDataFromServer()
-  }
+    setRefreshing(true);
+    getDataFromServer();
+  };
 
-
-
-  const searchFromList = (list) => {
-
-    if (searchText.trim() == "") {
-      return list
+  const searchFromList = list => {
+    if (searchText.trim() == '') {
+      return list;
     }
     return list.slice().filter(x => {
       let searchForText = searchText.toLowerCase().trim();
-      let searchInto = `${x?.first_name} ${x?.last_name} (${x?.email})`.toLowerCase().trim();
-      return !!searchInto.includes(searchForText)
-    })
-  }
+      let searchInto = `${x?.first_name} ${x?.last_name} (${x?.email})`
+        .toLowerCase()
+        .trim();
+      return !!searchInto.includes(searchForText);
+    });
+  };
 
   const handler = (obj, index) => {
-    let newObj = { ...list[index], ...obj };
+    let newObj = {...list[index], ...obj};
     list.splice(index, 1, newObj);
-    setList([...list])
-  }
+    setList([...list]);
+  };
 
   const onSubmitPress = () => {
-    let arr = []
+    let arr = [];
     for (let i = 0; i < list.length; i++) {
       let x = list[i];
       if (x?.isCommissionEnabled) {
         if (x?.planAmount <= commissionObj?.commission_amount) {
           arr.push({
             commission_amount: Number(x?.planAmount),
-            consultant_id: x?._id
-          })
+            consultant_id: x?._id,
+          });
         } else {
           showToast({
-            title: "Alert",
-            body: `Commission amount must be less than ${prependCurency(commissionObj?.plan_currency)} ${commissionObj?.commission_amount.toFixed(2)}`,
-            type: "info"
-          })
-          return
+            title: STRINGS.LINKS_SALES_COMMISSION.alert,
+            body: `${
+              STRINGS.LINKS_SALES_COMMISSION.commissionMustBeLess
+            } ${prependCurency(
+              commissionObj?.plan_currency,
+            )} ${commissionObj?.commission_amount.toFixed(2)}`,
+            type: 'info',
+          });
+          return;
         }
       }
     }
-    updateSaleCommission(arr)
-  }
+    updateSaleCommission(arr);
+  };
 
-
-
-
-  const memberListView = ({ item, index }) => {
+  const memberListView = ({item, index}) => {
     return (
-      <View style={__styles.itemView}>
-        <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 5, paddingRight: 10 }}>
-
-          <View style={{ flex: 1, }}>
+      <View style={styles.itemView}>
+        <View style={styles.memberHeader}>
+          <View style={styles.memberImageContainer}>
             <MemberView
               size={30}
               member={item}
-              customImage={item?.image?.thumbnail_1} />
-
+              customImage={item?.image?.thumbnail_1}
+            />
           </View>
           <MyCheckBox
             pb={0}
             value={item?.isCommissionEnabled}
-            onPress={() => handler({ isCommissionEnabled: !item?.isCommissionEnabled, }, index)}
+            onPress={() =>
+              handler({isCommissionEnabled: !item?.isCommissionEnabled}, index)
+            }
           />
         </View>
-        <View style={{ paddingHorizontal: 5, paddingBottom: 5, marginTop: 10 }}>
-          {/* <View style={{ width: 100 }}> */}
+        <View style={styles.inputContainer}>
           <MyInputs
-            label='Commission Amount'
+            label={STRINGS.LINKS_SALES_COMMISSION.commissionAmount}
             noSpace
-            value={!!item?.planAmount ? String(item?.planAmount) : ""}
-            onChangeText={(val) => handler({ planAmount: val }, index)}
-            keyboardType='number-pad'
+            value={!!item?.planAmount ? String(item?.planAmount) : ''}
+            onChangeText={val => handler({planAmount: val}, index)}
+            keyboardType="number-pad"
           />
-          {!!item?.planAmount && item?.isCommissionEnabled &&
-            <Collapsible collapsed={Number(item?.planAmount) <= Number(commissionObj?.commission_amount)} >
-              <View style={{ flexDirection: "row", alignItems: "center", marginTop: 5 }} >
+          {!!item?.planAmount && item?.isCommissionEnabled && (
+            <Collapsible
+              collapsed={
+                Number(item?.planAmount) <=
+                Number(commissionObj?.commission_amount)
+              }>
+              <View style={styles.warningContainer}>
                 {icons.warnOuline(colors.heart, 15)}
-                <MyText fontSize={12} color={colors.heart} >
-                  {`  Commission amount must be less than ${prependCurency(commissionObj?.plan_currency)} ${commissionObj?.commission_amount.toFixed(2)}`}</MyText>
+                <MyText fontSize={12} color={colors.heart}>
+                  {`  ${
+                    STRINGS.LINKS_SALES_COMMISSION.commissionMustBeLess
+                  } ${prependCurency(
+                    commissionObj?.plan_currency,
+                  )} ${commissionObj?.commission_amount.toFixed(2)}`}
+                </MyText>
               </View>
-            </Collapsible>}
-          {/* </View> */}
+            </Collapsible>
+          )}
         </View>
       </View>
-    )
-  }
-
-
-
+    );
+  };
 
   const headerView = () => {
     return (
-      <View style={{ backgroundColor: colors.darkSecondary }}>
-
+      <View style={styles.headerContainer}>
         <SearchView
-          onChangeText={(text) => setSearchText(text)}
+          onChangeText={text => setSearchText(text)}
           search={searchText}
           hideBtn
-
         />
 
-        {!!commissionObj &&
-          <View style={{ margin: 5, alignItems: "center" }}>
-            <MyText align='center' color={colors.primary} >{`Your Commission on every transaction : ${prependCurency(commissionObj?.plan_currency)} ${commissionObj?.commission_amount.toFixed(2)}`}</MyText>
-          </View>}
+        {!!commissionObj && (
+          <View style={styles.commissionInfoContainer}>
+            <MyText align="center" color={colors.primary}>{`${
+              STRINGS.LINKS_SALES_COMMISSION.yourCommissionOnEveryTransaction
+            }${prependCurency(
+              commissionObj?.plan_currency,
+            )} ${commissionObj?.commission_amount.toFixed(2)}`}</MyText>
+          </View>
+        )}
       </View>
-    )
-  }
-
+    );
+  };
 
   const topView = () => {
     return (
       <View>
-        <View style={__styles.topView}>
+        <View style={styles.topView}>
           <TitleView
-            title={"Manage Sale Team Commisison"}
+            title={STRINGS.LINKS_SALES_COMMISSION.title}
             subTitle={`${salePageTitle} -> ${planTitle}`}
           />
         </View>
-
       </View>
-    )
-  }
+    );
+  };
 
   const footerView = () => {
     return (
-      <View style={{ marginTop: 10, marginHorizontal: 5 }}>
-        {list.length > 0 &&
-          < MyButton onPress={onSubmitPress} title='Submit' />}
+      <View style={styles.footerContainer}>
+        {list.length > 0 && (
+          <MyButton
+            onPress={onSubmitPress}
+            title={STRINGS.LINKS_SALES_COMMISSION.submit}
+          />
+        )}
       </View>
-    )
-  }
+    );
+  };
 
   return (
-    <RootView hideSubHeader  >
+    <RootView hideSubHeader>
       {topView()}
-      <View style={{ flex: 1, }}>
+      <Flex flex={1}>
         <MyKeyboardAvoidingView noScrollView>
           <FlatList
-            refreshControl={<MyRefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-            />}
-            ListEmptyComponent={!loader && <EmptyView label={"No Data Found!"} />}
+            refreshControl={
+              <MyRefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+            ListEmptyComponent={
+              !loader && (
+                <EmptyView label={STRINGS.LINKS_SALES_COMMISSION.noDataFound} />
+              )
+            }
             stickyHeaderIndices={[0]}
             stickyHeaderHiddenOnScroll={true}
             ListHeaderComponent={headerView()}
             data={searchFromList(list)}
             renderItem={memberListView}
             showsVerticalScrollIndicator={false}
-            keyExtractor={(item) => item?._id}
+            keyExtractor={item => item?._id}
             ListFooterComponent={footerView()}
-
           />
         </MyKeyboardAvoidingView>
-      </View>
+      </Flex>
       <MyLoader enable={loader} />
     </RootView>
-  )
-}
+  );
+};
 
-export default LinksSalesCommission
+export default LinksSalesCommission;
 
-const __styles = StyleSheet.create({
-
+const styles = StyleSheet.create({
   topView: {
-    flexDirection: "row", alignItems: "center", backgroundColor: colors.darkSecondary, paddingBottom: 5
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.darkSecondary,
+    paddingBottom: 5,
   },
-  topBtnsView: { flexDirection: "row", alignItems: "flex-end", },
+  topBtnsView: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+  },
   itemView: {
     backgroundColor: colors.secondary,
     borderRadius: 10,
     padding: 5,
-    marginTop: 10
-
+    marginTop: 10,
   },
-})
+  memberHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 5,
+    paddingRight: 10,
+  },
+  memberImageContainer: {
+    flex: 1,
+  },
+  inputContainer: {
+    paddingHorizontal: 5,
+    paddingBottom: 5,
+    marginTop: 10,
+  },
+  warningContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 5,
+  },
+  headerContainer: {
+    backgroundColor: colors.darkSecondary,
+  },
+  commissionInfoContainer: {
+    margin: 5,
+    alignItems: 'center',
+  },
+  footerContainer: {
+    marginTop: 10,
+    marginHorizontal: 5,
+  },
+});

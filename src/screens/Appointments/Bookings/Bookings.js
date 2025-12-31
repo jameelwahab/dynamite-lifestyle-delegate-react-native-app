@@ -1,4 +1,4 @@
-import {View, Text, FlatList, StyleSheet, TouchableOpacity} from 'react-native';
+import {View, FlatList, StyleSheet, TouchableOpacity} from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
 import RootView from '../../../components/RootView';
 import MyText from '../../../components/MyText';
@@ -25,6 +25,8 @@ import SearchView from '../../../components/SearchView';
 import OptionModal from '../../../components/OptionModal';
 import ConfirmationModal from '../../../components/ConfirmationModal';
 import ChangeStatusModal from './Component/ChangeStatusModal';
+import {STRINGS} from '../../../utilities/strings';
+import {Flex} from '../../../UIComponents/FlexViews';
 
 let page = 0;
 let canLoadMore = false;
@@ -212,14 +214,14 @@ const Bookings = ({navigation, route}) => {
         ? filters?.booking_status?._id
         : null,
       end_date: !!filters?.end_date
-        ? moment(filters?.end_date).format('YYYY-MM-DD')
+        ? moment(filters?.end_date).format(STRINGS.DATE_FORMATES.YYYY_MM_DD)
         : null,
       filter_by_dates: filters?.filter_by_dates,
       sale_page: filters?.sale_page.map(x => x?._id),
       search_text: searchText.trim(),
       sort_by: !!filters?.sort_by ? filters?.sort_by?.key : '',
       start_date: !!filters?.start_date
-        ? moment(filters?.start_date).format('YYYY-MM-DD')
+        ? moment(filters?.start_date).format(STRINGS.DATE_FORMATES.YYYY_MM_DD)
         : null,
     };
 
@@ -268,10 +270,7 @@ const Bookings = ({navigation, route}) => {
   const statusView = info => {
     return (
       <View
-        style={[
-          __styles.statusView,
-          {backgroundColor: info?.background_color},
-        ]}>
+        style={[styles.statusView, {backgroundColor: info?.background_color}]}>
         <MyText color={info?.text_color} fontSize={14} type="medium">
           {info?.title}
         </MyText>
@@ -281,8 +280,8 @@ const Bookings = ({navigation, route}) => {
 
   const renderBookings = ({item, index}) => {
     return (
-      <View style={__styles.itemView}>
-        <View style={__styles.headerView}>
+      <View style={styles.itemView}>
+        <View style={styles.headerView}>
           <MemberView
             member={item?.user_info}
             marginLeft={0}
@@ -293,33 +292,36 @@ const Bookings = ({navigation, route}) => {
         </View>
         <View>
           <StatView
-            title={'Booking Page'}
+            title={STRINGS.BOOKINGS.bookingPage}
             value={
               !!item?.page?.sale_page_title
                 ? item?.page?.sale_page_title
-                : 'N/A'
+                : STRINGS.GENERIC.N_A
             }
           />
           <StatView
-            title={'Date'}
+            title={STRINGS.BOOKINGS.date}
             value={`${moment(item?.date).format(dateTimeFormat.date)} (${moment(
               item?.time,
-              'hh:mm A',
-            ).format(dateTimeFormat.time)} - ${moment(item?.time, 'hh:mm A')
+              STRINGS.DATE_FORMATES.HH_MM_A,
+            ).format(dateTimeFormat.time)} - ${moment(
+              item?.time,
+              STRINGS.DATE_FORMATES.HH_MM_A,
+            )
               .add({minutes: Number(item?.slot_duration)})
               .format(dateTimeFormat.time)})`}
             uppercase
           />
           <StatView
-            title={`Member's Nuture`}
+            title={STRINGS.BOOKINGS.memberNuture}
             value={
               !!item?.nurture?.first_name
                 ? item?.nurture?.first_name + ' ' + item?.nurture?.last_name
-                : 'N/A'
+                : STRINGS.GENERIC.N_A
             }
           />
           <StatView
-            title={'Booking Status'}
+            title={STRINGS.BOOKINGS.bookingStatus}
             view={() => statusView(item?.booking_status_info)}
           />
         </View>
@@ -330,13 +332,13 @@ const Bookings = ({navigation, route}) => {
   const topView = () => {
     return (
       <View>
-        <View style={__styles.topView}>
+        <View style={styles.topView}>
           <TitleView
             title={title}
             hideBackBottomButton
-            subTitle={`Showing ${list.length} of ${total}`}
+            subTitle={`${STRINGS.BOOKINGS.showing} ${list.length} ${STRINGS.BOOKINGS.of} ${total}`}
           />
-          <View style={__styles.topBtnsView}>
+          <View style={styles.topBtnsView}>
             <TouchableOpacity onPress={onFilterScreen}>
               {icons.filterCircle(colors.primary, 25)}
             </TouchableOpacity>
@@ -348,10 +350,9 @@ const Bookings = ({navigation, route}) => {
 
   const headerView = () => {
     return (
-      <View style={{backgroundColor: colors.darkSecondary}}>
+      <View style={styles.headerContainer}>
         {isFilterApplied() && (
-          <View
-            style={{flexDirection: 'row', flexWrap: 'wrap', paddingBottom: 5}}>
+          <View style={styles.filterChipsContainer}>
             {!!filters?.booking_status && (
               <MyChip
                 title={filters?.booking_status?.title}
@@ -379,12 +380,12 @@ const Bookings = ({navigation, route}) => {
                 <MyChip
                   title={`${
                     !!filters?.start_date
-                      ? 'Start Date: ' +
+                      ? STRINGS.BOOKINGS.startDate +
                         moment(filters?.start_date).format(dateTimeFormat?.date)
                       : ''
                   }${
                     !!filters?.end_date
-                      ? ' End Date: ' +
+                      ? STRINGS.BOOKINGS.endDate +
                         moment(filters?.end_date).format(dateTimeFormat?.date)
                       : ''
                   }`}
@@ -399,23 +400,13 @@ const Bookings = ({navigation, route}) => {
                 />
               )}
 
-            {/* <View style={{ width: "100%", marginVertical: 5, alignItems: "flex-end" }}> */}
             <TouchableOpacity
               onPress={clearFilter}
-              style={{
-                marginLeft: 5,
-                marginTop: 2,
-                marginRight: 10,
-                borderWidth: 1,
-                borderColor: colors.delete,
-                borderRadius: 10,
-                paddingHorizontal: 10,
-                paddingVertical: 5,
-                backgroundColor: colors.heart + '33',
-              }}>
-              <MyText color={colors.delete}>{'Clear Filter'}</MyText>
+              style={styles.clearFilterButton}>
+              <MyText color={colors.delete}>
+                {STRINGS.BOOKINGS.clearFilter}
+              </MyText>
             </TouchableOpacity>
-            {/* </View> */}
           </View>
         )}
 
@@ -432,11 +423,11 @@ const Bookings = ({navigation, route}) => {
   return (
     <RootView hideSubHeader>
       {topView()}
-      <View style={{flex: 1}}>
+      <Flex flex={1}>
         <FlatList
           keyExtractor={item => item?._id}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{paddingBottom: 70}}
+          contentContainerStyle={styles.flatListContent}
           stickyHeaderIndices={[0]}
           stickyHeaderHiddenOnScroll={true}
           ListHeaderComponent={headerView()}
@@ -446,13 +437,15 @@ const Bookings = ({navigation, route}) => {
           ListFooterComponent={<FooterLoader isVisible={footerLoader} />}
           ListEmptyComponent={
             !loader &&
-            !refreshing && <EmptyView label={'No Payment Requests Found'} />
+            !refreshing && (
+              <EmptyView label={STRINGS.BOOKINGS.noPaymentRequestsFound} />
+            )
           }
           refreshControl={
             <MyRefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
         />
-      </View>
+      </Flex>
       <FAB onPress={onAddScreen} />
       <MyLoader enable={loader} />
 
@@ -469,7 +462,7 @@ const Bookings = ({navigation, route}) => {
         isVisible={confirmModal?.isVisible}
         closeModal={() => setConfirmModal({isVisible: false, item: null})}
         onAgree={onConfirmPress}
-        title={'Are you sure you want to delete this Booking?'}
+        title={STRINGS.BOOKINGS.deleteConfirmation}
       />
 
       <ChangeStatusModal
@@ -496,22 +489,22 @@ const Bookings = ({navigation, route}) => {
 export default Bookings;
 const optionsList = [
   {
-    title: 'Question Answers Detail',
+    title: STRINGS.BOOKINGS.questionAnswersDetail,
     key: 'detail',
     icon: icons.threeLinesMenu,
   },
   {
-    title: 'Booking Notes',
+    title: STRINGS.BOOKINGS.bookingNotes,
     key: 'notes',
     icon: icons.notes,
   },
   {
-    title: 'Delete',
+    title: STRINGS.BOOKINGS.delete,
     key: 'delete',
     icon: icons.trash,
   },
   {
-    title: 'Change Status',
+    title: STRINGS.BOOKINGS.changeStatus,
     key: 'status',
     icon: icons.edit,
   },
@@ -519,18 +512,18 @@ const optionsList = [
 
 const extraOptions = [
   {
-    title: 'Edit',
+    title: STRINGS.BOOKINGS.edit,
     key: 'edit',
     icon: icons.edit,
   },
   {
-    title: 'Pass Booking',
+    title: STRINGS.BOOKINGS.passBooking,
     key: 'pass',
     icon: icons.edit,
   },
 ];
 
-const __styles = StyleSheet.create({
+const styles = StyleSheet.create({
   itemView: {
     backgroundColor: colors.secondary,
     padding: 10,
@@ -543,32 +536,53 @@ const __styles = StyleSheet.create({
     alignItems: 'center',
   },
   statusView: {
-    // paddingVertical: 5,
-    // paddingHorizontal: 15,
     height: 25,
     paddingHorizontal: 10,
-    // minWidth: 80,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 30,
     alignSelf: 'flex-start',
   },
-
   topView: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: colors.darkSecondary,
     paddingBottom: 5,
   },
-  topBtnsView: {flexDirection: 'row', alignItems: 'flex-end'},
-
+  topBtnsView: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+  },
   sortBtn: {
     height: 25,
     width: 25,
-    borderRadius: 25 / 2,
+    borderRadius: 12.5,
     backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 5,
+  },
+  headerContainer: {
+    backgroundColor: colors.darkSecondary,
+  },
+  filterChipsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    paddingBottom: 5,
+  },
+  clearFilterButton: {
+    marginLeft: 5,
+    marginTop: 2,
+    marginRight: 10,
+    borderWidth: 1,
+    borderColor: colors.delete,
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    backgroundColor: colors.heart + '33',
+  },
+
+  flatListContent: {
+    paddingBottom: 70,
   },
 });

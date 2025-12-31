@@ -1,9 +1,7 @@
-import {View, Text, Pressable, StyleSheet} from 'react-native';
+import {View, StyleSheet} from 'react-native';
 import React, {useState} from 'react';
 import RootView from '../../../components/RootView';
-import MyText from '../../../components/MyText';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import {icons} from '../../../utilities/icons';
 import MyInputs from '../../../components/MyInputs';
 import getCurrecncyName from '../../../functions/getCurrecncyName';
 import Editor from '../../../components/Editor';
@@ -14,7 +12,7 @@ import showToast from '../../../functions/showToast';
 import MyLoader from '../../../components/MyLoader';
 import {useSelector} from 'react-redux';
 import {selectUser} from '../../../redux/reducers/userSlice';
-import moment from 'moment';
+import {STRINGS} from '../../../utilities/strings';
 
 const MarkAsPaid = ({navigation, route}) => {
   const {data, changeStatus} = route?.params;
@@ -44,7 +42,7 @@ const MarkAsPaid = ({navigation, route}) => {
   const onSubmit = () => {
     if (editorValue.trim() == '') {
       showToast({
-        body: 'Transaction note is not allowed to be empty',
+        body: STRINGS.MARK_AS_PAID.transactionNoteRequired,
         type: 'error',
       });
     } else {
@@ -58,14 +56,14 @@ const MarkAsPaid = ({navigation, route}) => {
           <View>
             <MyInputs
               editable={false}
-              label="Member"
+              label={STRINGS.MARK_AS_PAID.member}
               value={data?.member?.first_name + ' ' + data?.member?.last_name}
             />
           </View>
 
           <View>
             <MyInputs
-              label="Total Amount"
+              label={STRINGS.MARK_AS_PAID.totalAmount}
               editable={false}
               value={String(data?.total_amount)}
             />
@@ -73,15 +71,15 @@ const MarkAsPaid = ({navigation, route}) => {
 
           <View>
             <MyInputs
-              label="Currency"
+              label={STRINGS.MARK_AS_PAID.currency}
               editable={false}
               value={getCurrecncyName(data?.currency)}
             />
           </View>
 
-          <View style={{}}>
+          <View>
             <Editor
-              label="Transaction Note *"
+              label={STRINGS.MARK_AS_PAID.transactionNote}
               initialValue={editorValue}
               onChange={text => setEditorValue(text)}
               height={150}
@@ -89,11 +87,11 @@ const MarkAsPaid = ({navigation, route}) => {
             />
           </View>
 
-          <View style={__styles.btnView}>
+          <View style={styles.btnView}>
             <MyButton
-              title="Submit"
+              title={STRINGS.MARK_AS_PAID.submit}
               invert
-              style={{paddingHorizontal: 10}}
+              style={styles.submitButton}
               onPress={onSubmit}
             />
           </View>
@@ -106,7 +104,7 @@ const MarkAsPaid = ({navigation, route}) => {
 
 export default MarkAsPaid;
 
-const __styles = StyleSheet.create({
+const styles = StyleSheet.create({
   rootView: {
     backgroundColor: colors.secondary,
     borderRadius: 10,
@@ -128,5 +126,11 @@ const __styles = StyleSheet.create({
   checkboxView: {
     flexDirection: 'row',
   },
-  btnView: {alignItems: 'flex-end', marginTop: 20},
+  btnView: {
+    alignItems: 'flex-end',
+    marginTop: 20,
+  },
+  submitButton: {
+    paddingHorizontal: 10,
+  },
 });
