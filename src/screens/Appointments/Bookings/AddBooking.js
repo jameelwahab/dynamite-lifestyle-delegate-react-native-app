@@ -314,12 +314,12 @@ const AddBooking = ({navigation, route}) => {
     });
     if (res.code == 200) {
       if (optionModal?.type == STRINGS.ADD_BOOKING.delegateType) {
-        setConsultantList(res?.data);
+        setConsultantList(res?.consultant_data);
       } else if (optionModal?.type == STRINGS.ADD_BOOKING.memberType) {
-        setMemberlist(res?.data);
+        setMemberlist(res?.consultant_data);
       }
       if (optionModal.isVisble) {
-        setOptionModal({...optionModal, list: res?.data});
+        setOptionModal({...optionModal, list: res?.consultant_data});
       }
       // setPageList(res?.Sale_page);
       // setMemberlist(res?.members);
@@ -339,9 +339,9 @@ const AddBooking = ({navigation, route}) => {
       },
     });
     if (res.code == 200) {
-      setPageList(res?.data);
+      setPageList(res?.consultant_data);
       if (optionModal.isVisble) {
-        setOptionModal({...optionModal, list: res?.data});
+        setOptionModal({...optionModal, list: res?.consultant_data});
       }
     }
   };
