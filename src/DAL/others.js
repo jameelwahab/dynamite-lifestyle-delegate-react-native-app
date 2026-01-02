@@ -1,48 +1,55 @@
-import invokeApi from "../functions/invokeAPI"
+import invokeApi from '../functions/invokeAPI';
 
-export const CHANGE_ZOOM_CRED = ({ body, token, navigation }) => {
+export const CHANGE_ZOOM_CRED = ({body, token, navigation}) => {
   return invokeApi({
-    path: "api/consultant/zoom_credentials/update",
-    method: "POST",
-    token: token,
-    navigation: navigation,
-    postData: body
-  })
-}
-
-export const UPLOAD_FILE_TO_S3 = ({ body, token, navigation }) => {
-  return invokeApi({
-    path: "app/update_image_on_s3",
-    headers: { "content-type": "multipart/form-data" },
-    method: "POST",
+    path: 'api/consultant/zoom_credentials/update',
+    method: 'POST',
     token: token,
     navigation: navigation,
     postData: body,
-    noAlerts: true
-  })
-}
+    isNewAPI: true,
+  });
+};
 
+export const UPLOAD_FILE_TO_S3 = ({body, token, navigation}) => {
+  return invokeApi({
+    path: 'app/update_image_on_s3',
+    headers: {'content-type': 'multipart/form-data'},
+    method: 'POST',
+    token: token,
+    navigation: navigation,
+    postData: body,
+    noAlerts: true,
+    isNewAPI: true,
+  });
+};
 
-export const CHANGE_AFFILIATE_NAME = ({ token, navigation, consultantId, newAffiliateName }) => {
+export const CHANGE_AFFILIATE_NAME = ({
+  token,
+  navigation,
+  consultantId,
+  newAffiliateName,
+}) => {
   return invokeApi({
     path: `app/affiliate_url_name/update/${consultantId}`,
-    method: "PUT",
+    method: 'PUT',
     token: token,
     navigation: navigation,
     postData: {
-      user_type: "consultant",
+      user_type: 'consultant',
       affiliate_url_name: newAffiliateName,
-    }
-  })
-}
+    },
+    isNewAPI: true,
+  });
+};
 
-export const UPDATE_REMINDER_MESSAGES = ({ body, token, navigation }) => {
+export const UPDATE_REMINDER_MESSAGES = ({body, token, navigation}) => {
   return invokeApi({
     path: `api/consultant/welcome_reminder_setting_for_delegate`,
-    method: "POST",
+    method: 'POST',
     token: token,
     navigation: navigation,
-    postData: body
-  })
-}
-
+    postData: body,
+    isNewAPI: true,
+  });
+};

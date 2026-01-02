@@ -136,6 +136,7 @@ export const QUESTION_REPLY_LIST = ({
     },
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 

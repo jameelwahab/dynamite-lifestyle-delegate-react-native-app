@@ -1,83 +1,112 @@
-import invokeApi from "../functions/invokeAPI"
+import invokeApi from '../functions/invokeAPI';
 
-export const GET_LINKS_LIST = ({ token, navigation, pageType, page, searchText }) => {
+export const GET_LINKS_LIST = ({
+  token,
+  navigation,
+  pageType,
+  page,
+  searchText,
+}) => {
   return invokeApi({
     // path: `api/consultant/links_listing/`,
     path: `api/consultant/links_list_with_type?page=${page}&limit=20`,
-    method: "POST",
+    method: 'POST',
     postData: {
       search: searchText,
-      type_of_page: pageType
+      type_of_page: pageType,
     },
     token: token,
     navigation: navigation,
-  })
-}
+    isNewAPI: true,
+  });
+};
 
-
-export const GET_LINKS_PAYMENT_PLANS_LIST = ({ token, navigation, pageId }) => {
+export const GET_LINKS_PAYMENT_PLANS_LIST = ({token, navigation, pageId}) => {
   return invokeApi({
     path: `api/consultant/get_plans_and_commission/details/${pageId}`,
-    method: "GET",
+    method: 'GET',
     token: token,
     navigation: navigation,
-  })
-}
+    isNewAPI: true,
+  });
+};
 
-export const GET_LINKS_SALES_TEAM_LIST = ({ token, navigation, planId, pageId }) => {
+export const GET_LINKS_SALES_TEAM_LIST = ({
+  token,
+  navigation,
+  planId,
+  pageId,
+}) => {
   return invokeApi({
     path: `api/consultant/get_commission/details/team`,
-    method: "POST",
+    method: 'POST',
     postData: {
       page_id: pageId,
       plan_id: planId,
     },
     token: token,
     navigation: navigation,
-  })
-}
+    isNewAPI: true,
+  });
+};
 
-
-export const UPDATE_LINKS_SALES_TEAM_COMMISSION = ({ token, navigation, planId, commissionList }) => {
+export const UPDATE_LINKS_SALES_TEAM_COMMISSION = ({
+  token,
+  navigation,
+  planId,
+  commissionList,
+}) => {
   return invokeApi({
     path: `api/consultant/access_sales_commission/plan`,
-    method: "POST",
+    method: 'POST',
     postData: {
       consultant_comission: commissionList,
       plan_id: planId,
     },
     token: token,
     navigation: navigation,
-  })
-}
+    isNewAPI: true,
+  });
+};
 
-export const GET_LINKS_SALES_TEAM_LIST_FOR_ACCESS = ({ token, navigation, salePageId }) => {
+export const GET_LINKS_SALES_TEAM_LIST_FOR_ACCESS = ({
+  token,
+  navigation,
+  salePageId,
+}) => {
   return invokeApi({
     path: `api/consultant/list_subteam/for_access/${salePageId}`,
-    method: "GET",
+    method: 'GET',
     token: token,
     navigation: navigation,
-  })
-}
+    isNewAPI: true,
+  });
+};
 
-export const UPDATE_LINKS_SALES_TEAM_ACCESS = ({ token, navigation, salePageId, teamIds }) => {
+export const UPDATE_LINKS_SALES_TEAM_ACCESS = ({
+  token,
+  navigation,
+  salePageId,
+  teamIds,
+}) => {
   return invokeApi({
     path: `api/consultant/update_consultant/for_access`,
     postData: {
       sale_page_id: salePageId,
-      subteam_ids: teamIds
+      subteam_ids: teamIds,
     },
-    method: "PUT",
+    method: 'PUT',
     token: token,
     navigation: navigation,
-  })
-}
+    isNewAPI: true,
+  });
+};
 
-export const GET_LINKS_FUNNNELS = ({ token, navigation, salePageId }) => {
+export const GET_LINKS_FUNNNELS = ({token, navigation, salePageId}) => {
   return invokeApi({
     path: `api/sale_page/sync/click_funnels`,
-    method: "GET",
+    method: 'GET',
     token: token,
     navigation: navigation,
-  })
-}
+  });
+};

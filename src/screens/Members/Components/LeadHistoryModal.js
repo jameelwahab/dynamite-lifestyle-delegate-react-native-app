@@ -95,12 +95,12 @@ const LeadHistoryModal = forwardRef(
       if (opt.key == 'delete') {
         setTimeout(() => {
           setAlertModal({isVisible: true, selectedObj: item});
-        }, 400);
+        }, 600);
       } else if (opt.key == 'edit') {
         setTimeout(() => {
           setSelectedLeadStatusForEdit(item);
           leadModalRef2.current?.openModal();
-        }, 500);
+        }, 600);
       }
     };
 

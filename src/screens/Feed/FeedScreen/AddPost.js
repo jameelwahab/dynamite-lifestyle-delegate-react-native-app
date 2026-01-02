@@ -114,7 +114,7 @@ const AddPost = forwardRef(
     },
     ref,
   ) => {
-    const {access, S3_URLß} = useSelector(selectUser);
+    const {access, S3_URL} = useSelector(selectUser);
     const {height, width} = useWindowDimensions();
     const inset = useSafeAreaInsets();
     const ref_poll = useRef();

@@ -6,6 +6,7 @@ export const GET_APPOINTMENT_CONFIG_LIST = ({token, navigation}) => {
     token,
     navigation,
     method: 'GET',
+    isNewAPI: true,
   });
 };
 
@@ -16,5 +17,6 @@ export const APPOINTMENT_CONFIG_ADD = ({token, navigation, body}) => {
     postData: body,
     token,
     navigation,
+    isNewAPI: true,
   });
 };

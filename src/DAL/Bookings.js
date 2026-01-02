@@ -38,6 +38,7 @@ export const GET_BOOKING_TIME_SLOTS = ({token, navigation, date}) => {
     postData: {date},
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -75,6 +76,7 @@ export const BOOKING_UPDATE = ({token, navigation, data, bookingId}) => {
     postData: data,
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -95,6 +97,7 @@ export const BOOKING_PASS = ({token, navigation, data, bookingId}) => {
     postData: data,
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -156,6 +159,7 @@ export const BOOKING_NOTES_DELETE = ({token, navigation, id}) => {
     method: 'DELETE',
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -181,5 +185,6 @@ export const BOOKING_NOTES_UPDATE = ({token, navigation, id, note}) => {
     postData: {note},
     token,
     navigation,
+    isNewAPI: true,
   });
 };

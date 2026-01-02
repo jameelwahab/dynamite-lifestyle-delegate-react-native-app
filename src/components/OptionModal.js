@@ -1,18 +1,15 @@
 import {
   View,
-  Text,
   SafeAreaView,
   FlatList,
   Image,
   TouchableHighlight,
-  StatusBar,
   Pressable,
 } from 'react-native';
 import React, {useState} from 'react';
 import Modal from 'react-native-modal';
 import {colors} from '../utilities/colors';
 import MyText from './MyText';
-import utilities from '../utilities';
 import {icons} from '../utilities/icons';
 import Collapsible from 'react-native-collapsible';
 
@@ -28,7 +25,6 @@ const OptionModal = ({
   checkSelected,
   multipleLabel = '',
 }) => {
-  // console.log(optionList, 'optionlist_____');
   return (
     <Modal
       isVisible={isVisible}

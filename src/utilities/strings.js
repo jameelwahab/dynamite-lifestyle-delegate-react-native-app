@@ -15,6 +15,35 @@ export const STRINGS = {
   },
   KEY_VALUES: {},
 
+  // RESET PASSWORD SCREEN
+  RESET_PASSWORD: {
+    TITLE: 'Reset Password',
+    NEW_PASSWORD: 'New Password*',
+    CONFIRM_PASSWORD: 'Confirm Password*',
+    UPDATE: 'Update',
+    ENTER_NEW_PASSWORD: 'Please enter your new password',
+    PASSWORDS_DO_NOT_MATCH: 'Passwords do not match',
+  },
+
+  // VERIFY ACCOUNT SCREEN
+  VERIFY_ACCOUNT: {
+    TITLE: 'Verify Your Account',
+    ENTER_CODE_SENT: 'Enter 6 digit code sent to your ',
+    CHECK_INBOX:
+      'Please check your inbox and enter the verification code below to confirm your email address.',
+    SUBMIT: 'Submit',
+    DIDNT_RECEIVE_EMAIL: "Didn't receive an email?",
+    RESEND_CODE_IN: 'Resend Code in ',
+    RESEND_CODE: 'Resend Code',
+    ENTER_6_DIGIT_CODE: 'Please enter 6-digit code',
+    CODE_SENT: 'Code has been sent to your email',
+    ERROR: 'Error',
+    PASSWORD_CHANGED: 'Password Changed',
+    PASSWORD_CHANGED_SUCCESS: 'Your password has been Changed Successfully!',
+    LOGIN_ERROR: 'Login Error',
+    PLEASE_TRY_AGAIN: 'Please try again.',
+  },
+
   // START NEW CHAT SCREEN
   START_NEW_CHAT: {
     TITLE: 'New Message',

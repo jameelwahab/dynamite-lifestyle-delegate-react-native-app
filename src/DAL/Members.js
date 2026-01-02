@@ -75,6 +75,7 @@ export const LIST_OF_MEMBERS = ({
     },
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -150,6 +151,7 @@ export const LIST_OF_MEMBERS_ONLY = ({
     },
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -225,6 +227,7 @@ export const LIST_OF_NURTURE = ({
     },
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -239,6 +242,7 @@ export const SAVE_FILTER = ({
     postData: {filter_on_tab_name, filter_name, filter_object},
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -248,6 +252,7 @@ export const GET_FILTER_DATA = ({token, navigation, searchText, type}) => {
     method: 'GET',
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -257,6 +262,7 @@ export const LEAD_STATUS_LIST = ({token, navigation}) => {
     method: 'GET',
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -283,6 +289,7 @@ export const CHANGE_LEAD_STATUS = ({
     method: 'PUT',
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -311,6 +318,7 @@ export const EDIT_LEAD_STATUS = ({
     method: 'POST',
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -320,6 +328,7 @@ export const LEAD_STATUS_HISTORY = ({token, navigation, memberId}) => {
     method: 'GET',
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -338,6 +347,7 @@ export const DELETE_STATUS_HISTORY = ({
     method: 'POST',
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -347,6 +357,7 @@ export const MEMBER_NOTES_LIST = ({token, navigation, memberId}) => {
     method: 'GET',
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -365,6 +376,7 @@ export const MEMBER_ADD_NOTE = ({
     },
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -381,6 +393,7 @@ export const MEMBER_UPDATE_NOTE = ({
     postData: {member_id, personal_note, note_id},
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -394,6 +407,7 @@ export const MEMBER_DELETE_NOTE = ({token, navigation, member_id, note_id}) => {
     },
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -410,6 +424,7 @@ export const MEMBER_SUBSCRIPTION_LIST = ({
     method: 'GET',
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -423,6 +438,7 @@ export const MEMBER_DELETE_SUBSCRIPTION = ({
     method: 'DELETE',
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -437,6 +453,7 @@ export const MEMBER_QUESTIONS_MODULE_LIST = ({
     method: 'GET',
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -452,6 +469,7 @@ export const MEMBER_PROFILE = ({
     method: 'GET',
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -461,6 +479,7 @@ export const GET_EVENT_DETAIL = ({token, navigation, slug}) => {
     method: 'GET',
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -491,6 +510,7 @@ export const ADD_CALL_HISTORY_NOTE = ({
     postData: {date, is_add_to_personal_notes, is_checked, notes},
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -508,6 +528,7 @@ export const UPDATE_CALL_FUNCTIONALITY = ({
     },
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -518,6 +539,7 @@ export const MEMBER_MISSION_QUEST = ({token, navigation, member_id}) =>
     token,
     navigation,
     postData: {member_id},
+    isNewAPI: true,
   });
 
 export const MEMBER_SMS_SYSTEM = ({token, navigation, msg, to}) =>
@@ -530,6 +552,7 @@ export const MEMBER_SMS_SYSTEM = ({token, navigation, msg, to}) =>
       body: msg,
       to,
     },
+    isNewAPI: true,
   });
 
 export const MEMBER_TICKETS_LIST = ({token, navigation, transId}) =>
@@ -538,4 +561,5 @@ export const MEMBER_TICKETS_LIST = ({token, navigation, transId}) =>
     method: 'GET',
     token,
     navigation,
+    isNewAPI: true,
   });

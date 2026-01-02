@@ -16,6 +16,7 @@ export const GET_FEED_LIST = ({
     method: 'GET',
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -25,6 +26,7 @@ export const GET_FEED_DETAIL = ({token, navigation, feedId}) => {
     method: 'GET',
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -34,6 +36,7 @@ export const GET_FEED_EXTRA_DATA = ({token, navigation, level}) => {
     method: 'GET',
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -45,6 +48,7 @@ export const GET_COMMENT_LIST = ({token, navigation, body, page}) => {
     postData: body,
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -64,6 +68,7 @@ export const GET_CHILD_COMMENT_LIST = ({
       feed_id: feedId,
       parent_id: parentCommentId,
     }),
+    isNewAPI: true,
   });
 };
 
@@ -75,6 +80,7 @@ export const GET_LIKE_LIST = ({token, navigation, body, page}) => {
     postData: body,
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -86,6 +92,7 @@ export const GET_COMMENT_LIKES_LIST = ({token, navigation, body, page}) => {
     postData: body,
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -97,6 +104,7 @@ export const FEED_ACTIONS = ({token, navigation, formData}) => {
     postData: formData,
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -108,6 +116,7 @@ export const UPLOAD_FEED_IMAGES = ({token, navigation, formData}) => {
     postData: formData,
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -121,6 +130,7 @@ export const CREATE_FEED = ({token, navigation, formData}) => {
     postData: formData,
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -131,6 +141,7 @@ export const FEED_DETAIL = ({token, navigation, feedId}) => {
     method: 'GET',
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -144,6 +155,7 @@ export const UPDATE_FEED = ({token, navigation, formData, feedId}) => {
     postData: formData,
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -153,6 +165,7 @@ export const DELETE_FEED_POST = ({token, navigation, feedId}) => {
     method: 'DELETE',
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -169,6 +182,7 @@ export const ADD_COMMENT = ({
       : {feed, message},
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -180,6 +194,7 @@ export const ADD_COMMENT_V2 = ({token, navigation, formData}) => {
     postData: formData,
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -191,6 +206,7 @@ export const EDIT_COMMENT = ({token, navigation, formData, commentId}) => {
     postData: formData,
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -202,6 +218,7 @@ export const EDIT_COMMENT_V2 = ({token, navigation, formData, commentId}) => {
     postData: formData,
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -211,6 +228,7 @@ export const DELETE_COMMENT = ({token, navigation, commentId}) => {
     method: 'DELETE',
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -225,6 +243,7 @@ export const COMMENT_LIKE_ACTIONS = ({
     postData: {action, comment, feed},
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -236,6 +255,7 @@ export const FEED_LIKE_ACTIONS = ({token, navigation, formdata}) => {
     postData: formdata,
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -278,6 +298,7 @@ export const GET_DELEGATES_LIST_FROM_SERVER_FOR_MENTION_V1 = ({
     },
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -291,6 +312,7 @@ export const GET_KEYWORDS_ADDED_BY_USER = ({
     method: 'GET',
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -304,6 +326,7 @@ export const FEED_POLL_ACTIONS = ({token, navigation, feedId, optionId}) => {
       feed_id: feedId,
       option_id: optionId,
     },
+    isNewAPI: true,
   });
 };
 
@@ -314,6 +337,7 @@ export const FEED_POLLED_MEMBER_LIST = ({token, navigation, postData}) => {
     token,
     navigation,
     postData,
+    isNewAPI: true,
   });
 };
 
@@ -323,6 +347,7 @@ export const FEED_POLL_DETAIL = ({token, navigation, id}) => {
     method: 'GET',
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -332,6 +357,7 @@ export const FEED_SURVEY_DETAIL = ({token, navigation, id}) => {
     method: 'GET',
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -350,6 +376,7 @@ export const FEED_SURVEY_ACTION = ({
     },
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -369,6 +396,7 @@ export const FEED_SURVEY_MEMBER_LIST = ({
     },
     token,
     navigation,
+    isNewAPI: true,
   });
 };
 
@@ -388,4 +416,5 @@ export const NOITFY_USERS = ({
       notification_statement: notify_state,
       notification_description: notify_desc,
     },
+    isNewAPI: true,
   });

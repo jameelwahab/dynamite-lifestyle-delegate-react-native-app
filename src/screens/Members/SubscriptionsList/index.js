@@ -93,36 +93,48 @@ const SubscriptionsList = ({navigation, route}) => {
   };
 
   const getSubscriptionListFromServer = async (firstTime = false) => {
-    let res = await MEMBER_SUBSCRIPTION_LIST({
-      token,
-      navigation,
-      memberId: memberId,
-      page: page,
-      searchText: searchText,
-      type: 'subscription_list',
-    });
-    if (res.code == 200) {
-      let listLength = firstTime
-        ? 0 + res.subscription_list.length
-        : list.length + res.subscription_list.length;
-      if (res?.total_count > listLength) {
-        page = page + 1;
-        canLoadMore = true;
+    try {
+      let res = await MEMBER_SUBSCRIPTION_LIST({
+        token,
+        navigation,
+        memberId: memberId,
+        page: page,
+        searchText: searchText,
+        type: 'subscription_list',
+      });
+      if (res.code == 200) {
+        let listLength = firstTime
+          ? 0 + res.subscription_list.length
+          : list.length + res.subscription_list.length;
+        if (res?.total_count > listLength) {
+          page = page + 1;
+          canLoadMore = true;
+        } else {
+          canLoadMore = false;
+        }
+        setList(
+          firstTime
+            ? res.subscription_list
+            : [...list, ...res.subscription_list],
+        );
+        setTotal(res?.total_count || res.subscription_list.length);
+        setMember(res?.member);
+        setLoader(false);
+        setFooterLoader(false);
+        setRefreshing(false);
       } else {
-        canLoadMore = false;
+        setLoader(false);
+        setFooterLoader(false);
+        setRefreshing(false);
       }
-      setList(
-        firstTime ? res.subscription_list : [...list, ...res.subscription_list],
+    } catch (error) {
+      setLoader(false);
+      setFooterLoader(false);
+      setRefreshing(false);
+      console.log(
+        error?.message,
+        'error in getSubscriptionListFromServer SubscriptionsList',
       );
-      setTotal(res?.total_count || res.subscription_list.length);
-      setMember(res?.member);
-      setLoader(false);
-      setFooterLoader(false);
-      setRefreshing(false);
-    } else {
-      setLoader(false);
-      setFooterLoader(false);
-      setRefreshing(false);
     }
   };
 

@@ -224,7 +224,6 @@ const SubscriptionList = ({navigation, route}) => {
   const topView = () => {
     return (
       <View style={styles.topViewContainer}>
-        {/* <TitleView title={''} /> */}
         <View style={styles.topViewRow}>
           {!!member ? (
             <View style={styles.memberInfoContainer}>
