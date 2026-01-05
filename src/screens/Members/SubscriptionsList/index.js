@@ -61,7 +61,11 @@ const SubscriptionsList = ({navigation, route}) => {
     if (opt.key == 'view_cancel_request') {
       setTimeout(
         () => {
-          let str = `${STRINGS.SUBSCRIPTION_LIST.cancelationReason}${selectedItem?.cancellation_reason}</p>`;
+          let str = `${STRINGS.SUBSCRIPTION_LIST.cancelationReason}${
+            !!selectedItem?.cancellation_reason
+              ? selectedItem?.cancellation_reason
+              : STRINGS.GENERIC.N_A
+          }</p>`;
           infoRef?.current?.openModal(str, '', true);
         },
         __DEV__ ? 1000 : 400,

@@ -230,7 +230,7 @@ const BookingFilter = ({navigation, route}) => {
 
         <MyTouchableInput
           label={STRINGS.BOOKING_FILTER.selectBookingPages}
-          iconOnPress={() =>
+          onPress={() =>
             setOptionModal({
               isVisble: true,
               list: pageList,
@@ -288,7 +288,7 @@ const BookingFilter = ({navigation, route}) => {
         </Row>
 
         <OptionModalWithSearch
-          isVisible={optionModal.isVisble}
+          isVisible={optionModal?.isVisble}
           optionList={optionModal?.list}
           closeModal={closeOptionModal}
           onSelected={onSelected}

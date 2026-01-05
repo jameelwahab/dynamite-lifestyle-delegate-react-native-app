@@ -1,54 +1,72 @@
-import { View, Text, SafeAreaView, Pressable, TouchableOpacity, StyleSheet, ScrollView, FlatList } from 'react-native'
-import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
-import Modal from 'react-native-modal'
-import moment from 'moment'
-import { colors } from '../utilities/colors'
-import { fonts } from '../utilities/fonts'
-import { dateTimeFormat } from '../utilities/constants'
-import { Calendar } from 'react-native-calendars'
-import { TransparentButton } from './MyButton'
-import { icons } from '../utilities/icons'
-import MyText from './MyText'
-import Yearlist from '../assets/data/yearlist.json'
-const CalendarModal = forwardRef(({ onDateSelected, minimum, maximun }, ref) => {
-  const flatlistRef = useRef()
-  const [isVisible, setIsVisible] = useState(false)
-  const [date, setDate] = useState(moment().format("YYYY-MM-DD"));
+import {
+  View,
+  Pressable,
+  TouchableOpacity,
+  StyleSheet,
+  FlatList,
+} from 'react-native';
+import React, {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
+import Modal from 'react-native-modal';
+import moment from 'moment';
+import {colors} from '../utilities/colors';
+import {fonts} from '../utilities/fonts';
+import {Calendar} from 'react-native-calendars';
+import {icons} from '../utilities/icons';
+import MyText from './MyText';
+import Yearlist from '../assets/data/yearlist.json';
+const CalendarModal = forwardRef(({onDateSelected, minimum, maximun}, ref) => {
+  const flatlistRef = useRef();
+  const [isVisible, setIsVisible] = useState(false);
+  const [date, setDate] = useState(moment().format('YYYY-MM-DD'));
   const [showYearView, setShowYearView] = useState(false);
-  const [type, setType] = useState("");
+  const [type, setType] = useState('');
   const [minDate, setMinDate] = useState(!!minimum ? minimum : null);
 
-  useImperativeHandle(ref, () => {
-    return {
-      openModal
-    }
-  }, [])
+  useImperativeHandle(
+    ref,
+    () => {
+      return {
+        openModal,
+      };
+    },
+    [],
+  );
 
-  const openModal = (date, type = "", minimimDate = undefined) => {
-    setDate(!!date ? moment(date).format("YYYY-MM-DD") : moment().format("YYYY-MM-DD"));
+  const openModal = (date, type = '', minimimDate = undefined) => {
+    setDate(
+      !!date
+        ? moment(date).format('YYYY-MM-DD')
+        : moment().format('YYYY-MM-DD'),
+    );
     setType(type);
     if (!!minimimDate && !minimum) {
       setMinDate(minimimDate);
     }
-    setIsVisible(true)
-  }
+    setIsVisible(true);
+  };
 
   const closeModal = () => {
     setIsVisible(false);
     setTimeout(() => {
-      setDate(moment().format("YYYY-MM-DD"));
+      setDate(moment().format('YYYY-MM-DD'));
     }, 300);
-  }
+  };
 
   const onAgreeClick = () => {
     setIsVisible(false);
-    onDateSelected?.(moment(date, "YYYY-MM-DD"));
-    setDate(moment().format("YYYY-MM-DD"));
-  }
+    onDateSelected?.(moment(date, 'YYYY-MM-DD'));
+    setDate(moment().format('YYYY-MM-DD'));
+  };
 
   useEffect(() => {
     if (showYearView) {
-      let index = Yearlist.findIndex(x => x == moment(date).format("YYYY"));
+      let index = Yearlist.findIndex(x => x == moment(date).format('YYYY'));
 
       // setTimeout(() => {
       //   flatlistRef?.current?.scrollToIndex({
@@ -56,15 +74,16 @@ const CalendarModal = forwardRef(({ onDateSelected, minimum, maximun }, ref) => 
       //     animated: false,
       //   });
       // }, 200);
-
     }
-  }, [showYearView])
+  }, [showYearView]);
 
   const headerView = () => {
     return (
       <View style={__styles.headerView}>
         <View style={__styles.titleView}>
-          <MyText fontSize={16} type='bold' >{moment(date).format("MMMM YYYY")} </MyText>
+          <MyText fontSize={16} type="bold">
+            {moment(date).format('MMMM YYYY')}{' '}
+          </MyText>
           {/* <TouchableOpacity
             style={__styles.arrownBtn}
             hitSlop={{ top: 10, left: 10, bottom: 10, right: 10 }}
@@ -73,27 +92,31 @@ const CalendarModal = forwardRef(({ onDateSelected, minimum, maximun }, ref) => 
           </TouchableOpacity> */}
         </View>
         <View style={__styles.arrowBtnsRow}>
-
           <TouchableOpacity
-            onPress={() => setDate((date) => moment(date).subtract({ month: 1 }).format("YYYY-MM-DD"))}
+            onPress={() =>
+              setDate(date =>
+                moment(date).subtract({month: 1}).format('YYYY-MM-DD'),
+              )
+            }
             style={__styles.arrowBtnsView}>
             {icons.backwardArrow()}
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => setDate((date) => moment(date).add({ month: 1 }).format("YYYY-MM-DD"))}
+            onPress={() =>
+              setDate(date => moment(date).add({month: 1}).format('YYYY-MM-DD'))
+            }
             style={__styles.arrowBtnsView}>
             {icons.forwardArrow()}
           </TouchableOpacity>
-
         </View>
       </View>
-    )
-  }
+    );
+  };
 
   const yearslist = () => {
     return (
-      <View style={{ flex: 1, marginTop: 10 }} >
+      <View style={{flex: 1, marginTop: 10}}>
         <FlatList
           ref={flatlistRef}
           data={Yearlist}
@@ -105,11 +128,15 @@ const CalendarModal = forwardRef(({ onDateSelected, minimum, maximun }, ref) => 
           // )}
           // getItemLayout=  (data, index) => {length: number, offset: number, index: number}
 
-
-          renderItem={({ item }) => (
+          renderItem={({item}) => (
             <View
-              style={{ width: "25%", height: 40, alignItems: "center", justifyContent: "center", }} >
-              <MyText fontSize={16}  >{item}</MyText>
+              style={{
+                width: '25%',
+                height: 40,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+              <MyText fontSize={16}>{item}</MyText>
             </View>
           )}
         />
@@ -135,8 +162,8 @@ const CalendarModal = forwardRef(({ onDateSelected, minimum, maximun }, ref) => 
           </View>
         </ScrollView> */}
       </View>
-    )
-  }
+    );
+  };
 
   const modalCalendar = () => {
     return (
@@ -145,32 +172,46 @@ const CalendarModal = forwardRef(({ onDateSelected, minimum, maximun }, ref) => 
         onBackdropPress={closeModal}
         onBackButtonPress={closeModal}
         useNativeDriverForBackdrop={true}
-        animationIn='zoomIn'
-        animationOut='zoomOut'
+        animationIn="zoomIn"
+        animationOut="zoomOut"
         animationInTiming={300}
         animationOutTiming={300}
-        style={{ margin: 10 }}>
-        <View style={{ backgroundColor: colors.secondaryVariant, borderRadius: 10, height: 400 }} >
-          <View style={{ margin: 10, flex: 1 }}>
+        style={{margin: 10}}>
+        <View
+          style={{
+            backgroundColor: colors.secondaryVariant,
+            borderRadius: 10,
+            height: 400,
+          }}>
+          <View style={{margin: 10, flex: 1}}>
             <Pressable
               onPress={closeModal}
-              style={{ padding: 5, alignSelf: "flex-end" }}>
+              style={{padding: 5, alignSelf: 'flex-end'}}>
               {icons.crosss()}
               {/* <MyText fontSize={18} type='medium' color={colors.primary}>Are you sure you want to move this ticket to needs fixes?</MyText> */}
             </Pressable>
             {headerView()}
 
-            {showYearView ?
+            {showYearView ? (
               yearslist()
-              :
-              <View style={{ backgroundColor: colors.secondaryVariant, borderRadius: 10, overflow: "hidden" }}>
+            ) : (
+              <View
+                style={{
+                  backgroundColor: colors.secondaryVariant,
+                  borderRadius: 10,
+                  overflow: 'hidden',
+                }}>
                 <Calendar
                   initialDate={date}
-                  minDate={!!minDate ? moment(minDate).format("YYYY-MM-DD") : undefined}
-                  maxDate={!!maximun ? moment(maximun).format("YYYY-MM-DD") : undefined}
+                  minDate={
+                    !!minDate ? moment(minDate).format('YYYY-MM-DD') : undefined
+                  }
+                  maxDate={
+                    !!maximun ? moment(maximun).format('YYYY-MM-DD') : undefined
+                  }
                   // date={date}
                   markedDates={{
-                    [date]: { selected: true }
+                    [date]: {selected: true},
                   }}
                   theme={{
                     backgroundColor: colors.secondaryVariant,
@@ -193,66 +234,60 @@ const CalendarModal = forwardRef(({ onDateSelected, minimum, maximun }, ref) => 
                     textDayFontFamily: fonts.regular,
                     textDayHeaderFontFamily: fonts.regular,
                     textMonthFontFamily: fonts.medium,
-
                   }}
-                  onDayPress={(day) => {
+                  onDayPress={day => {
                     setIsVisible(false);
-                    onDateSelected?.(moment(day.dateString, "YYYY-MM-DD"), type);
+                    onDateSelected?.(
+                      moment(day.dateString, 'YYYY-MM-DD'),
+                      type,
+                    );
                   }}
                   renderHeader={() => null}
                   hideArrows
                 />
-              </View>}
+              </View>
+            )}
 
             {/* <View style={{ flexDirection: "row", justifyContent: "flex-end", marginTop: 10 }}>
               <TransparentButton title='CANCEL' onPress={closeModal} />
               <TransparentButton title='AGREE' onPress={onAgreeClick} />
             </View> */}
-
           </View>
         </View>
-      </Modal>)
-  }
+      </Modal>
+    );
+  };
 
-  return (
-    <View>
-      {modalCalendar()}
-    </View>
-  )
-})
+  return <View>{modalCalendar()}</View>;
+});
 
-export default CalendarModal
+export default CalendarModal;
 
 const __styles = StyleSheet.create({
   headerView: {
-    flexDirection: "row",
+    flexDirection: 'row',
     height: 30,
-    alignItems: "center",
-    marginHorizontal: 20
-
+    alignItems: 'center',
+    marginHorizontal: 20,
   },
-  arrownBtn: {
-
-  },
+  arrownBtn: {},
   titleView: {
-    flexDirection: "row",
-    alignItems: "center",
-
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   arrowBtnsRow: {
-    flexDirection: "row",
+    flexDirection: 'row',
     flex: 1,
-    justifyContent: "flex-end"
+    justifyContent: 'flex-end',
   },
   arrowBtnsView: {
     borderWidth: 1,
     borderColor: colors.primary,
     borderRadius: 5,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     height: 25,
     width: 25,
-    marginLeft: 10
+    marginLeft: 10,
   },
-
-})
+});

@@ -1,4 +1,4 @@
-import {View, Text, Pressable, Platform} from 'react-native';
+import {View, Pressable, Platform} from 'react-native';
 import React from 'react';
 import CheckBox from '@react-native-community/checkbox';
 import MyText from './MyText';
