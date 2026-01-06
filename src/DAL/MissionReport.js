@@ -1,4 +1,3 @@
-import {is} from 'cheerio/lib/api/traversing';
 import invokeApi from '../functions/invokeAPI';
 
 export const GET_MEMBER_LIST_FOR_MISSION = ({

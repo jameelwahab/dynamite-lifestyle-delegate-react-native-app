@@ -26,7 +26,8 @@ const SideDrawer = () => {
       // initialRouteName={routes.missionNavigator}
       drawerContent={props => <SideBar {...props} />}>
       {Object.keys(ParentComponents).map(x => {
-        if (!!ParentComponents[x].key && !!ModuleListByClient[x]) {
+        // if (!!ParentComponents[x].key && !!ModuleListByClient[x]) {
+        if (!!ParentComponents[x].key) {
           return (
             <Drawer.Screen
               key={ParentComponents[x].key}

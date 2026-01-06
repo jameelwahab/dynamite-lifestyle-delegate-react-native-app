@@ -1,57 +1,54 @@
-import { View, Text, FlatList, StyleSheet, TouchableHighlight, Keyboard, SafeAreaView, Pressable, TouchableOpacity, Platform } from 'react-native'
-import React, { useEffect, useReducer, useState } from 'react'
-import RootView from '../../../components/RootView'
-import MyLoader, { SimpleLoader } from '../../../components/MyLoader'
-import MyText from '../../../components/MyText'
-import { useSelector } from 'react-redux'
-import { selectUser } from '../../../redux/reducers/userSlice'
-import UserImage from '../../../components/UserImage'
-import {  dateTimeFormat } from '../../../utilities/constants'
-import MyWebview from '../../../components/MyWebview'
-import { colors } from '../../../utilities/colors'
-import { icons } from '../../../utilities/icons'
-import moment from 'moment'
-import FAB from '../../../components/FAB'
-import EmptyView from '../../../components/EmptyView'
-import MyTouchableInput from '../../../components/MyTouchableInput'
-import debounce from '../../../functions/debounce'
-import Modal from 'react-native-modal'
-import utilities from '../../../utilities'
-import routes from '../../../navigation/routes'
-import { decode, decodeEntity } from 'html-entities';
-import { isHtml } from '../../../functions/regex'
-import Markdown from '@ronradtke/react-native-markdown-display'
-import { fonts } from '../../../utilities/fonts'
-import { selectSocket } from '../../../redux/reducers/socketSlice'
-import { convertTimezone } from '../../../functions/convertTime'
-import { selectTimeZone } from '../../../redux/reducers/timezoneSlice'
-import MyInputs from '../../../components/MyInputs'
-import { WHATSAPP_CHATLIST } from '../../../DAL'
-
-
+import {
+  View,
+  FlatList,
+  StyleSheet,
+  TouchableHighlight,
+  Keyboard,
+  TouchableOpacity,
+} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import RootView from '../../../components/RootView';
+import MyLoader, {SimpleLoader} from '../../../components/MyLoader';
+import MyText from '../../../components/MyText';
+import {useSelector} from 'react-redux';
+import {selectUser} from '../../../redux/reducers/userSlice';
+import UserImage from '../../../components/UserImage';
+import {dateTimeFormat} from '../../../utilities/constants';
+import {colors} from '../../../utilities/colors';
+import {icons} from '../../../utilities/icons';
+import FAB from '../../../components/FAB';
+import EmptyView from '../../../components/EmptyView';
+import debounce from '../../../functions/debounce';
+import routes from '../../../navigation/routes';
+import {decode} from 'html-entities';
+import {isHtml} from '../../../functions/regex';
+import Markdown from '@ronradtke/react-native-markdown-display';
+import {fonts} from '../../../utilities/fonts';
+import {selectSocket} from '../../../redux/reducers/socketSlice';
+import {convertTimezone} from '../../../functions/convertTime';
+import {selectTimeZone} from '../../../redux/reducers/timezoneSlice';
+import MyInputs from '../../../components/MyInputs';
+import {WHATSAPP_CHATLIST} from '../../../DAL';
+import {STRINGS} from '../../../utilities/strings';
 
 let page = 0;
 let canLoadMore = false;
 let __firstTime = true;
-let isNewChat = false;
 
-
-
-const ChatList = ({ navigation }) => {
-  const { token, user } = useSelector(selectUser);
-  const { socket } = useSelector(selectSocket);
+const ChatList = ({navigation}) => {
+  const {token, user} = useSelector(selectUser);
+  const {socket} = useSelector(selectSocket);
   const timezone = useSelector(selectTimeZone);
   const [loader, setLoader] = useState(true);
   const [footerLoader, setFooterLoader] = useState(false);
   const [chatList, setChatList] = useState([]);
 
-  const [searchText, setSearchText] = useState("");
-  const [tab, setTab] = useState('all')
-
+  const [searchText, setSearchText] = useState('');
+  const [tab, setTab] = useState('all');
 
   const onChatScreen = (member, item) => {
     navigation.navigate(routes.whtasappChatMessageList, {
-		  badge_color: member?.badge_info?.color_code,
+      badge_color: member?.badge_info?.color_code,
       memberId: member?._id,
       firstName: member?.first_name,
       lastName: member?.last_name,
@@ -60,21 +57,20 @@ const ChatList = ({ navigation }) => {
       chatId: item._id,
       resetCountToZero,
       refresh,
-      makeChatAccepted
-    })
-  }
-
-
+      makeChatAccepted,
+    });
+  };
 
   const api_ChatList = async (newArray = false) => {
     let res = await WHATSAPP_CHATLIST({
-      navigation, token,
+      navigation,
+      token,
       page: page,
       filter: tab,
-      searchText: searchText
-    })
+      searchText: searchText,
+    });
     if (res.code == 200) {
-      if ((chatList.length + res?.data.length) < res?.total_count) {
+      if (chatList.length + res?.data.length < res?.total_count) {
         page++;
         canLoadMore = true;
       } else {
@@ -87,53 +83,49 @@ const ChatList = ({ navigation }) => {
         __firstTime = false;
       }, 300);
     } else {
-      setLoader(false)
+      setLoader(false);
       setFooterLoader(false);
     }
-  }
+  };
 
   const refresh = () => {
     page = 0;
     canLoadMore = false;
     api_ChatList(true);
-  }
+  };
 
   const loadmore = () => {
     if (canLoadMore && __firstTime == false) {
       canLoadMore = false;
       setFooterLoader(true);
-      api_ChatList(false)
+      api_ChatList(false);
     }
-
-  }
-
-
+  };
 
   useEffect(() => {
     if (!__firstTime) {
       page = 0;
       canLoadMore = false;
-      debounce(() => api_ChatList(true))
+      debounce(() => api_ChatList(true));
     }
-  }, [searchText])
+  }, [searchText]);
 
   useEffect(() => {
     if (!__firstTime) {
       page = 0;
       canLoadMore = false;
       setLoader(true);
-      setChatList([])
-      debounce(() => api_ChatList(true))
+      setChatList([]);
+      debounce(() => api_ChatList(true));
     }
-  }, [tab])
-
+  }, [tab]);
 
   useEffect(() => {
     page = 0;
     canLoadMore = false;
     setLoader(true);
-    setChatList([])
-    api_ChatList()
+    setChatList([]);
+    api_ChatList();
     socketEvents();
 
     return () => {
@@ -141,42 +133,38 @@ const ChatList = ({ navigation }) => {
       page = 0;
       canLoadMore = false;
       isNewChat = false;
-      removeSocketEvents()
-    }
-  }, [])
-
+      removeSocketEvents();
+    };
+  }, []);
 
   const socketEvents = () => {
-    socket.on("whatsapp_chat_message_event_receiver", newMsgReceive);
-  }
+    socket.on('whatsapp_chat_message_event_receiver', newMsgReceive);
+  };
 
   const removeSocketEvents = () => {
+    socket.off('whatsapp_chat_message_event_receiver', newMsgReceive);
+  };
 
-    socket.off("whatsapp_chat_message_event_receiver", newMsgReceive);
-  }
-
-  const readMsgSingnal = (data) => {
-    if (data.status == "read") {
-      setChatList((chatList) => {
+  const readMsgSingnal = data => {
+    if (data.status == 'read') {
+      setChatList(chatList => {
         let index = chatList.findIndex(chat => chat._id == data.chat_id);
         if (index > -1) {
           if (chatList[index].last_message_sender == user?._id) {
-            chatList[index].last_message_status = "read";
+            chatList[index].last_message_status = 'read';
           }
         }
-        return [...chatList]
-      })
+        return [...chatList];
+      });
     }
+  };
 
-  }
-
-  const newMsgReceive = (data) => {
-
+  const newMsgReceive = data => {
     if (!!data?.data?.response) {
       let newChatObj = data?.data?.response;
       let list = [];
       let newList = [];
-      setChatList((chatList) => {
+      setChatList(chatList => {
         list = [...chatList];
         let index = list.findIndex(x => x?._id == newChatObj?.whatssapp_chat);
         if (index > -1) {
@@ -194,285 +182,344 @@ const ChatList = ({ navigation }) => {
             // },
             sender_info: {
               ...list[index].sender_info,
-              unread_message_count: list[index]?.sender_info?.unread_message_count + 1
-            }
+              unread_message_count:
+                list[index]?.sender_info?.unread_message_count + 1,
+            },
           };
           list.splice(index, 1);
           list = [chatobj, ...list];
-          if(list.length==1){
-            refresh?.()
+          if (list.length == 1) {
+            refresh?.();
           }
         }
-        return [...list]
+        return [...list];
       });
     }
+  };
 
-  }
-
-
-
-  const resetCountToZero = (chatId) => {
-    setChatList((chatList) => {
+  const resetCountToZero = chatId => {
+    setChatList(chatList => {
       let index = chatList.findIndex(x => x._id == chatId);
       if (index > -1) {
-        let chatobj = { ...chatList[index] };
+        let chatobj = {...chatList[index]};
         chatobj.sender_info.unread_message_count = 0;
         chatList.splice(index, 1, chatobj);
       }
-      return [...chatList]
-    })
-  }
+      return [...chatList];
+    });
+  };
 
-
-  const makeChatAccepted = (chatId) => {
+  const makeChatAccepted = chatId => {
     let index = chatList.findIndex(x => x._id == chatId);
     if (index > -1) {
-      let chatobj = { ...chatList[index] };
-      chatobj.receiver_info.whatsapp_chat_status = "accepted";
+      let chatobj = {...chatList[index]};
+      chatobj.receiver_info.whatsapp_chat_status = 'accepted';
       chatList.splice(index, 1, chatobj);
-      setChatList([...chatList])
+      setChatList([...chatList]);
     }
-  }
-
-
-
-
-
+  };
 
   const headerView = () => {
     return (
-      <View style={{ backgroundColor: colors.darkSecondary }}>
-        <View style={__style.tabsView}>
+      <View style={styles.headerBg}>
+        <View style={styles.tabsView}>
           <TouchableOpacity
-            onPress={() => setTab("all")}
-            style={[__style.tabView, tab == "all" && __style.tabSelectedView]}>
-            <MyText color={tab == "all" ? colors.primary : undefined}>All</MyText>
+            onPress={() => setTab('all')}
+            style={[styles.tabView, tab == 'all' && styles.tabSelectedView]}>
+            <MyText color={tab == 'all' ? colors.primary : undefined}>
+              {STRINGS.WHATSAPP_CHAT_LIST.all}
+            </MyText>
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => setTab("unread")}
-            style={[__style.tabView, tab == "unread" && __style.tabSelectedView]}>
-            <MyText color={tab == "unread" ? colors.primary : undefined} >Unread</MyText>
+            onPress={() => setTab('unread')}
+            style={[styles.tabView, tab == 'unread' && styles.tabSelectedView]}>
+            <MyText color={tab == 'unread' ? colors.primary : undefined}>
+              {STRINGS.WHATSAPP_CHAT_LIST.unread}
+            </MyText>
           </TouchableOpacity>
         </View>
 
-        <View style={{ marginTop: -10, paddingHorizontal: 5 }}>
+        <View style={styles.searchContainer}>
           <MyInputs
             leftIcon={icons.search}
-            placeholder='Search...'
+            placeholder={STRINGS.WHATSAPP_CHAT_LIST.searchPlaceholder}
             value={searchText}
-            onChangeText={(text) => setSearchText(text)}
-            rightIcon={!!searchText.trim() ? icons.crosssWithCircle_20 : icons.noIcon}
+            onChangeText={text => setSearchText(text)}
+            rightIcon={
+              !!searchText.trim() ? icons.crosssWithCircle_20 : icons.noIcon
+            }
             rightIconOnPress={() => {
-              Keyboard.dismiss()
-              setSearchText("")
+              Keyboard.dismiss();
+              setSearchText('');
             }}
           />
         </View>
-      </View>)
-  }
+      </View>
+    );
+  };
 
-  const renderChatList = ({ item, index }) => {
+  const renderChatList = ({item, index}) => {
     let otherUser = item?.sender_info;
     let member = item?.receiver_info;
-
 
     return (
       <TouchableHighlight
         onPress={() => onChatScreen(member, item)}
         underlayColor={colors.secondary}>
-        <View style={__style.itemRootView}>
+        <View style={styles.itemRootView}>
           <View>
             <UserImage
-				      borderWidth={2}
-				      borderColor={member?.badge_info?.color_code}
+              borderWidth={2}
+              borderColor={member?.badge_info?.color_code}
               image={member?.profile_image}
               name={member?.first_name}
             />
-            {/* <View style={[__style.status, {
+            {/* <View style={[styles.status, {
               backgroundColor: member?._id?.is_online ? colors.online : colors.primary2
             }]} /> */}
           </View>
 
-          <View style={__style.seondViewRow}>
-            <View style={__style.headerView}>
-              <View style={{ flex: 1 }}>
-                <MyText fontSize={14} type='medium' >{member?.first_name + " " + member?.last_name}</MyText>
+          <View style={styles.seondViewRow}>
+            <View style={styles.headerView}>
+              <View style={styles.flexOne}>
+                <MyText fontSize={14} type="medium">
+                  {member?.first_name + ' ' + member?.last_name}
+                </MyText>
               </View>
-              <MyText fontSize={10} color={colors.lightText} >{convertTimezone(item?.last_message_date_time, timezone).format(dateTimeFormat.dateTime)}</MyText>
+              <MyText fontSize={10} color={colors.lightText}>
+                {convertTimezone(item?.last_message_date_time, timezone).format(
+                  dateTimeFormat.dateTime,
+                )}
+              </MyText>
             </View>
-            <View style={{ marginTop: 3, flexDirection: "row", alignItems: "center" }}>
-
-              {item?.last_message_sender == user?._id &&
-                <View style={{ marginRight: 5 }}>
-                  {!!item?.last_message?.status == false || item?.last_message?.status == "sent"
-                    ? icons.sent(colors.white, 20) :
-                    icons.seen(item?.last_message?.status == "read" ? colors.primary : colors.white, 20)}
-                </View>}
-
-              {item.message_type != "general" && item.message_type == "template" &&
-                <View style={{ marginRight: 5 }}>
-                  {item.message_type == "image" ? icons.camera(colors.white, 12) :
-                    item.message_type == "audio" ? icons.mic(colors.white, 15) :
-                      item.message_type == "video" ? icons.playCircle(colors.white, 18) : ""}
+            <View style={styles.messageRow}>
+              {item?.last_message_sender == user?._id && (
+                <View style={styles.marginRight5}>
+                  {!!item?.last_message?.status == false ||
+                  item?.last_message?.status == 'sent'
+                    ? icons.sent(colors.white, 20)
+                    : icons.seen(
+                        item?.last_message?.status == 'read'
+                          ? colors.primary
+                          : colors.white,
+                        20,
+                      )}
                 </View>
-              }
-              <View style={{ flexDirection: "row", flex: 1 }}>
-                <MyText fontSize={12} type='light' numberOfLines={1} style={{ marginTop: 3, flex: 1 }}>
-                  {!!item?.last_message?.message ?
-                    isHtml(item?.last_message?.message) ?
-                      decode(item.last_message?.message.replace(/<[^>]+>/g, '').replace(/\*/g, "").replace(/[\])}[{(]/g, " ").slice(0, 70), { level: "html5" }) :
+              )}
+
+              {item.message_type != 'general' &&
+                item.message_type == 'template' && (
+                  <View style={styles.marginRight5}>
+                    {item.message_type == 'image'
+                      ? icons.camera(colors.white, 12)
+                      : item.message_type == 'audio'
+                      ? icons.mic(colors.white, 15)
+                      : item.message_type == 'video'
+                      ? icons.playCircle(colors.white, 18)
+                      : ''}
+                  </View>
+                )}
+              <View style={styles.messageRowFlex}>
+                <MyText
+                  fontSize={12}
+                  type="light"
+                  numberOfLines={1}
+                  style={styles.messageText}>
+                  {!!item?.last_message?.message ? (
+                    isHtml(item?.last_message?.message) ? (
+                      decode(
+                        item.last_message?.message
+                          .replace(/<[^>]+>/g, '')
+                          .replace(/\*/g, '')
+                          .replace(/[\])}[{(]/g, ' ')
+                          .slice(0, 70),
+                        {level: 'html5'},
+                      )
+                    ) : (
                       <Markdown style={markdownStyleOther}>
                         {item?.last_message?.message.slice(0, 70)}
-                      </Markdown> :
-                    item?.last_message?.message_type == "image" ? "Photo" :
-                      item?.last_message?.message_type == 'audio' ? "Audio" :
-                        item?.last_message?.message_type == 'video' ? "Video" : ""}
-
+                      </Markdown>
+                    )
+                  ) : item?.last_message?.message_type == 'image' ? (
+                    STRINGS.WHATSAPP_CHAT_LIST.photo
+                  ) : item?.last_message?.message_type == 'audio' ? (
+                    STRINGS.WHATSAPP_CHAT_LIST.audio
+                  ) : item?.last_message?.message_type == 'video' ? (
+                    STRINGS.WHATSAPP_CHAT_LIST.video
+                  ) : (
+                    ''
+                  )}
                 </MyText>
-                {otherUser?.unread_message_count > 0 &&
-                  <View style={__style.badge}>
-                    <MyText fontSize={12} color={colors.black} >
-                      {otherUser?.unread_message_count > 99 ? "99+" : otherUser?.unread_message_count}</MyText>
-                  </View>}
+                {otherUser?.unread_message_count > 0 && (
+                  <View style={styles.badge}>
+                    <MyText fontSize={12} color={colors.black}>
+                      {otherUser?.unread_message_count > 99
+                        ? '99+'
+                        : otherUser?.unread_message_count}
+                    </MyText>
+                  </View>
+                )}
               </View>
             </View>
           </View>
         </View>
       </TouchableHighlight>
-    )
-  }
-
-
+    );
+  };
 
   return (
     <RootView
       hideBackBottomButton
-      title='WHATSAPP CHATS'
-      hideChatIcon
-    >
-
-      <View style={{ flex: 1 }}>
+      title={STRINGS.WHATSAPP_CHAT_LIST.title}
+      hideChatIcon>
+      <View style={styles.flexOne}>
         <FlatList
           data={chatList}
           renderItem={renderChatList}
-          ListEmptyComponent={!loader && <EmptyView label={"No Chat"} />}
+          ListEmptyComponent={
+            !loader && <EmptyView label={STRINGS.WHATSAPP_CHAT_LIST.noChat} />
+          }
           ListHeaderComponent={headerView()}
           stickyHeaderIndices={[0]}
           onEndReachedThreshold={0.5}
           stickyHeaderHiddenOnScroll={true}
-          contentContainerStyle={{ paddingBottom: 40 }}
+          contentContainerStyle={{paddingBottom: 40}}
           showsVerticalScrollIndicator={false}
           onEndReached={loadmore}
           ListFooterComponent={
-            <View style={{ height: 50, alignItems: "center", justifyContent: 'center' }}>
+            <View style={styles.footerLoader}>
               {footerLoader && <SimpleLoader />}
-            </View>}
+            </View>
+          }
         />
       </View>
 
-
       <FAB
-        onPress={() => navigation.navigate(routes.whtasappStartNewChat, {
-          resetCountToZero,
-          refresh,
-          makeChatAccepted
-        })}
+        onPress={() =>
+          navigation.navigate(routes.whtasappStartNewChat, {
+            resetCountToZero,
+            refresh,
+            makeChatAccepted,
+          })
+        }
         icon={() => icons.plus(colors.black, 20)}
       />
 
       <MyLoader enable={loader} />
     </RootView>
-  )
-}
+  );
+};
 
 export default ChatList;
 let noneObj = {
-  _id: "",
-  title: "None"
-}
+  _id: '',
+  title: 'None',
+};
 
 const markdownStyleOther = {
   body: {
     fontFamily: fonts.light,
     color: colors.white,
-    margin: 0
+    margin: 0,
   },
   link: {
     textDecorationLine: '',
     color: colors.white,
     fontWeight: '400',
-
   },
   strong: {
-    fontFamily: fonts.regular
+    fontFamily: fonts.regular,
   },
   paragraph: {
     marginTop: 0,
     marginBottom: 0,
-    fontSize: 12
-  }
-}
+    fontSize: 12,
+  },
+};
 
-const __style = StyleSheet.create({
+const styles = StyleSheet.create({
   itemRootView: {
-    flexDirection: "row",
+    flexDirection: 'row',
     paddingVertical: 20,
     paddingHorizontal: 10,
-
   },
   headerView: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   seondViewRow: {
     flex: 1,
     marginHorizontal: 10,
-    marginLeft: 13
-
+    marginLeft: 13,
   },
-  nameAndMsgView: {
-
-  },
+  nameAndMsgView: {},
   tabsView: {
-    flexDirection: "row",
-    marginBottom: 10
+    flexDirection: 'row',
+    marginBottom: 10,
   },
   tabSelectedView: {
     borderColor: colors.primary,
     backgroundColor: colors.lightPrimary3,
-
   },
-
   tabView: {
     borderRadius: 15,
     borderWidth: 1,
     borderColor: colors.lightPrimary2,
     paddingVertical: 5,
     paddingHorizontal: 20,
-    marginRight: 10
+    marginRight: 10,
   },
-
-
-
   separotor: {
-    // height: Platform.OS == "android" ? 1 / 2 : 1 / 3,
     backgroundColor: colors.lightText,
   },
   status: {
     height: 10,
     width: 10,
     borderRadius: 10 / 2,
-    position: "absolute",
+    position: 'absolute',
     right: -5,
-    bottom: 0
+    bottom: 0,
   },
   badge: {
     height: 20,
     width: 20,
-    alignItems: "center",
-    justifyContent: "center", backgroundColor: colors.primary2, borderRadius: 20 / 2,
-    marginLeft: 5
-  }
-})
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.primary2,
+    borderRadius: 20 / 2,
+    marginLeft: 5,
+  },
+  headerBg: {
+    backgroundColor: colors.darkSecondary,
+  },
+  searchContainer: {
+    marginTop: -10,
+    paddingHorizontal: 5,
+  },
+  flexOne: {
+    flex: 1,
+  },
+  messageRow: {
+    marginTop: 3,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  marginRight5: {
+    marginRight: 5,
+  },
+  messageRowFlex: {
+    flexDirection: 'row',
+    flex: 1,
+  },
+  messageText: {
+    marginTop: 3,
+    flex: 1,
+  },
+  footerLoader: {
+    height: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});

@@ -7,16 +7,8 @@ import {
   FlatList,
   TouchableOpacity,
   TextInput,
-  Platform,
 } from 'react-native';
-import React, {
-  forwardRef,
-  useCallback,
-  useEffect,
-  useImperativeHandle,
-  useRef,
-  useState,
-} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import Modal from 'react-native-modal';
 import MyText from './MyText';
 import {colors} from '../utilities/colors';
@@ -24,14 +16,11 @@ import {icons} from '../utilities/icons';
 import {
   ADD_PERSONAL_NOTE_FOR_PORTAL_CHAT,
   GET_LIVE_CHAT_LIST,
-  GET_PORTAL_EXISTING_CHAT_BY_VIDEO_ID,
   UPLOAD_FILE_FOR_CHAT,
 } from '../DAL';
 import MyLoader, {SimpleLoader} from './MyLoader';
-import {load} from 'react-native-track-player/lib/trackPlayer';
 import CollapsibleText from './CollapsibleText';
 import UserImage from './UserImage';
-import {convertTimezone} from '../functions/convertTime';
 import {dateTimeFormat} from '../utilities/constants';
 import {MenuButton} from './MyButton';
 import MyImage from './MyImage';
@@ -44,6 +33,7 @@ import openUrl from '../functions/openUrl';
 import {useSelector} from 'react-redux';
 import {selectSocket} from '../redux/reducers/socketSlice';
 import LikeModal from './LikeModal';
+import {STRINGS} from '../utilities/strings';
 import showToast from '../functions/showToast';
 import {onChatScreen} from '../functions/onChatScreen';
 import ConfirmationModal from './ConfirmationModal';
@@ -53,9 +43,6 @@ import FooterLoader from './FooterLoader';
 import moment from 'moment';
 import isArray from '../functions/isArray';
 import {selectUser} from '../redux/reducers/userSlice';
-
-let page = 0;
-let canLoadMore = false;
 
 const LiveChat = ({
   isVisible,
@@ -275,7 +262,7 @@ const LiveChat = ({
       setTimeout(() => {
         setConfirmationsModal({
           isVisible: true,
-          title: 'Are you sure you want to delete this message?',
+          title: STRINGS.LIVE_CHAT.deleteConfirmation,
           item: item,
           type: 'delete',
         });
@@ -296,7 +283,7 @@ const LiveChat = ({
           isVisible: true,
           item: item,
           type: 'note',
-          title: 'Are you sure you want to add the comment as personal note?',
+          title: STRINGS.LIVE_CHAT.addNoteConfirmation,
         });
       }, 1000);
     } else if (opt?.type == 'message') {
@@ -480,7 +467,10 @@ const LiveChat = ({
 
   const sendMsg = async () => {
     if (text.trim() === '') {
-      showToast({body: 'Please write something to comment.', title: 'Alert'});
+      showToast({
+        body: STRINGS.LIVE_CHAT.pleaseWriteSomething,
+        title: STRINGS.LIVE_CHAT.alert,
+      });
       return;
     }
     setsendMsgLoader(true);
@@ -653,11 +643,11 @@ const LiveChat = ({
 
   const inputView = forModal => {
     return (
-      <View style={__style.sendMsgView}>
-        <View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
+      <View style={styles.sendMsgView}>
+        <View style={styles.imageRowWrapper}>
           {!!image && (
-            <View style={{width: 80}}>
-              <View style={__style.selectedImageView}>
+            <View style={styles.imageWidthWrapper}>
+              <View style={styles.selectedImageView}>
                 <MyImage
                   source={{uri: !!image?.uri ? image?.uri : S3_URL + image}}
                   style={{width: '100%', height: '100%'}}
@@ -666,20 +656,20 @@ const LiveChat = ({
               <TouchableOpacity
                 hitSlop={{top: 10, left: 10, right: 10, bottom: 10}}
                 onPress={() => setImage('')}
-                style={__style.removeImage}>
+                style={styles.removeImage}>
                 {icons.crosss(colors.white, 18)}
               </TouchableOpacity>
             </View>
           )}
 
           {!!selectedMsg && (
-            <View style={__style.commentUpperViewOptions}>
+            <View style={styles.commentUpperViewOptions}>
               <MyText type="bold" color={colors.lightText2}>
                 {selectedCommentFor == 'edit' ? (
-                  <Text>{'Editing'}</Text>
+                  <Text>{STRINGS.LIVE_CHAT.editing}</Text>
                 ) : selectedCommentFor == 'reply' ? (
                   <Text style={{fontFamily: fonts.regular}}>
-                    {'Replying to '}
+                    {STRINGS.LIVE_CHAT.replyingTo}
                     <Text style={{fontFamily: fonts.bold}}>
                       {selectedMsg?.member?.first_name}
                     </Text>
@@ -698,26 +688,26 @@ const LiveChat = ({
                     setInputModalVisibility(false);
                   }}
                   type="bold">
-                  {'Cancel'}
+                  {STRINGS.LIVE_CHAT.cancel}
                 </MyText>
               </MyText>
             </View>
           )}
         </View>
-        <View style={__style.sendMsgViewTextWithButton}>
-          <View style={__style.inputView}>
+        <View style={styles.sendMsgViewTextWithButton}>
+          <View style={styles.inputView}>
             <TouchableOpacity
               onPress={() => setImageModalVisibility(true)}
-              style={__style.attachmentBtnView}>
+              style={styles.attachmentBtnView}>
               {icons.attachment(colors.primary, 17)}
             </TouchableOpacity>
             {forModal ? (
               <TextInput
-                style={__style.sendMsgTextView}
+                style={styles.sendMsgTextView}
                 placeholder={
                   selectedCommentFor == 'reply'
-                    ? 'Write a reply...*'
-                    : 'Write a comment...*'
+                    ? STRINGS.LIVE_CHAT.writeReply
+                    : STRINGS.LIVE_CHAT.writeComment
                 }
                 placeholderTextColor={colors.lightGrey}
                 multiline={true}
@@ -732,14 +722,14 @@ const LiveChat = ({
                 ref={inputRef}
               />
             ) : (
-              <TouchableOpacity style={{flex: 1}} onPress={openInputModal}>
+              <TouchableOpacity style={styles.flexOne} onPress={openInputModal}>
                 <TextInput
                   pointerEvents="none"
-                  style={__style.sendMsgTextView}
+                  style={styles.sendMsgTextView}
                   placeholder={
                     selectedCommentFor == 'reply'
-                      ? 'Write a reply...*'
-                      : 'Write a comment...*'
+                      ? STRINGS.LIVE_CHAT.writeReply
+                      : STRINGS.LIVE_CHAT.writeComment
                   }
                   placeholderTextColor={colors.lightGrey}
                   multiline={true}
@@ -756,7 +746,7 @@ const LiveChat = ({
             )}
           </View>
 
-          <TouchableOpacity onPress={sendMsg} style={__style.sendMsgBtnView}>
+          <TouchableOpacity onPress={sendMsg} style={styles.sendMsgBtnView}>
             {sendMsgLoader ? <SimpleLoader /> : icons.send(colors.primary, 20)}
           </TouchableOpacity>
 
@@ -774,12 +764,8 @@ const LiveChat = ({
     let haveOptions = isArray(filterOptions(item));
     return (
       <View key={item?._id}>
-        <View
-          style={[
-            __style.commentView,
-            {marginLeft: isChild ? '10%' : undefined},
-          ]}>
-          <View style={__style.profileView}>
+        <View style={[styles.commentView, isChild && styles.childComment]}>
+          <View style={styles.profileView}>
             <UserImage
               borderWidth={2}
               borderColor={item?.badge_info?.color_code}
@@ -788,7 +774,7 @@ const LiveChat = ({
               size={30}
             />
 
-            <View style={__style.profileNameView}>
+            <View style={styles.profileNameView}>
               <View style={{flexDirection: 'row'}}>
                 <MyText type="medium">
                   {item?.member?.first_name +
@@ -818,7 +804,7 @@ const LiveChat = ({
                 onPress={() =>
                   likeModalRef?.current?.openLikeModal?.(item?._id, 'event')
                 }
-                style={[__style.actionsBtn]}>
+                style={[styles.actionsBtn]}>
                 {icons.heartFilled(colors.heart, 18)}
                 <MyText> {item?.like_count}</MyText>
               </TouchableOpacity>
@@ -828,7 +814,7 @@ const LiveChat = ({
           {!!item.file_url && (
             <Pressable
               onPress={() => setImageZoomer(item.file_url)}
-              style={__style.image}>
+              style={styles.image}>
               <MyImage
                 source={{uri: S3_URL + item.file_url}}
                 style={{height: '100%', width: '100%'}}
@@ -837,15 +823,19 @@ const LiveChat = ({
           )}
 
           {isLive && (
-            <View style={[__style.actionsRow, {marginTop: 10}]}>
-              <View style={[__style.actionsRow, {flex: 1}]}>
+            <View style={[styles.actionsRow, styles.actionsRowWithMargin]}>
+              <View style={[styles.actionsRow, styles.flexOne]}>
                 <TouchableOpacity
                   onPress={() => likeChatComment(item, isChild)}
-                  style={__style.actionsBtn}>
+                  style={styles.actionsBtn}>
                   {item?.is_liked
                     ? icons.heartFilled(colors.heart, 18)
                     : icons.heartUnfilled(colors.primary, 18)}
-                  <MyText>{item?.is_liked ? ' Liked' : ' Like'}</MyText>
+                  <MyText>
+                    {item?.is_liked
+                      ? STRINGS.LIVE_CHAT.liked
+                      : STRINGS.LIVE_CHAT.like}
+                  </MyText>
                 </TouchableOpacity>
                 {!isChild && !item?.is_featured && (
                   <TouchableOpacity
@@ -854,9 +844,9 @@ const LiveChat = ({
                       setSelectedMsg(item);
                       openInputModal();
                     }}
-                    style={[__style.actionsBtn, {marginLeft: 30}]}>
+                    style={[styles.actionsBtn, styles.replyBtn]}>
                     {icons.comment(colors.primary, 18)}
-                    <MyText> Reply</MyText>
+                    <MyText>{STRINGS.LIVE_CHAT.reply}</MyText>
                   </TouchableOpacity>
                 )}
               </View>
@@ -865,7 +855,7 @@ const LiveChat = ({
                   onPress={() =>
                     likeModalRef?.current?.openLikeModal?.(item?._id, 'event')
                   }
-                  style={[__style.actionsBtn]}>
+                  style={[styles.actionsBtn]}>
                   {icons.heartFilled(colors.heart, 18)}
                   <MyText> {item?.like_count}</MyText>
                 </TouchableOpacity>
@@ -896,11 +886,11 @@ const LiveChat = ({
       onModalHide={onModalHide}
       hideModalContentWhileAnimating={true}
       style={{margin: 0}}>
-      <SafeAreaView style={[__style.root, {flex}]}>
-        <View style={__style.innerRoot}>
-          <View style={__style.header}>
+      <SafeAreaView style={[styles.root, {flex: flex}]}>
+        <View style={styles.innerRoot}>
+          <View style={styles.header}>
             <MyText fontSize={20} type="bold">
-              {isLive ? 'Live Chat' : 'Chat'}
+              {isLive ? STRINGS.LIVE_CHAT.liveChat : STRINGS.LIVE_CHAT.chat}
             </MyText>
             <Pressable
               onPress={closeModal}
@@ -909,14 +899,14 @@ const LiveChat = ({
             </Pressable>
           </View>
 
-          <View style={{flex: 1}}>
+          <View style={styles.flexOne}>
             {!!purchaseLink ? (
               <TouchableOpacity onPress={() => openUrl(S3_URL + purchaseLink)}>
                 <ResponsiveImage2 uri={S3_URL + linkImage} />
               </TouchableOpacity>
             ) : (
               pinList?.length > 0 && (
-                <View style={__style.pinnedView}>
+                <View style={styles.pinnedView}>
                   <FlatList
                     nestedScrollEnabled={true}
                     data={pinList}
@@ -925,14 +915,14 @@ const LiveChat = ({
                       commentView(item, index, false, true)
                     }
                   />
-                  <View style={{height: 1, backgroundColor: colors.golden}} />
+                  <View style={styles.pinnedDivider} />
                 </View>
               )
             )}
 
-            <View style={{flex: 1}}>
+            <View style={styles.flexOne}>
               <FlatList
-                contentContainerStyle={{paddingVertical: 10}}
+                contentContainerStyle={styles.flatListContent}
                 data={list}
                 renderItem={({item, index}) => commentView(item, index, false)}
                 inverted={isLive ? true : false}
@@ -950,7 +940,7 @@ const LiveChat = ({
                       index: 0,
                     });
                   }}
-                  style={__style.scrollToBottomView}>
+                  style={styles.scrollToBottomView}>
                   <MyText color={colors.black}>Scroll to Bottom </MyText>
                   {icons.downArrow(colors.black, 18)}
                 </Pressable>
@@ -1000,7 +990,7 @@ const LiveChat = ({
 
 export default LiveChat;
 
-const __style = StyleSheet.create({
+const styles = StyleSheet.create({
   pinnedView: {
     maxHeight: 130,
     borderBottomWidth: 1,
@@ -1009,15 +999,12 @@ const __style = StyleSheet.create({
   root: {
     backgroundColor: colors.secondary,
     marginTop: 'auto',
-    // flex: 0.59,
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
     marginHorizontal: -10,
   },
   innerRoot: {
     flex: 1,
-    // paddingHorizontal: 10,
-    // paddingTop: 10,
   },
   header: {
     flexDirection: 'row',
@@ -1044,6 +1031,9 @@ const __style = StyleSheet.create({
     padding: 8,
     borderRadius: 10,
   },
+  childComment: {
+    marginLeft: '10%',
+  },
   profileView: {
     flexDirection: 'row',
     paddingVertical: 5,
@@ -1055,6 +1045,15 @@ const __style = StyleSheet.create({
   },
   actionsRow: {
     flexDirection: 'row',
+  },
+  actionsRowWithMargin: {
+    marginTop: 10,
+  },
+  flexOne: {
+    flex: 1,
+  },
+  replyBtn: {
+    marginLeft: 30,
   },
   actionsBtn: {
     flexDirection: 'row',
@@ -1070,6 +1069,13 @@ const __style = StyleSheet.create({
     marginHorizontal: 10,
     marginBottom: 10,
     marginTop: 10,
+  },
+  imageRowWrapper: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+  },
+  imageWidthWrapper: {
+    width: 80,
   },
   sendMsgViewTextWithButton: {
     flexDirection: 'row',
@@ -1124,7 +1130,11 @@ const __style = StyleSheet.create({
     top: -8,
     right: -8,
   },
-  commentUpperViewOptions: {paddingHorizontal: 10, flex: 1, paddingBottom: 10},
+  commentUpperViewOptions: {
+    paddingHorizontal: 10,
+    flex: 1,
+    paddingBottom: 10,
+  },
   scrollToBottomView: {
     paddingHorizontal: 15,
     paddingVertical: 8,
@@ -1136,6 +1146,13 @@ const __style = StyleSheet.create({
     borderRadius: 20,
     position: 'absolute',
     bottom: 10,
+  },
+  pinnedDivider: {
+    height: 1,
+    backgroundColor: colors.golden,
+  },
+  flatListContent: {
+    paddingVertical: 10,
   },
 });
 

@@ -490,7 +490,8 @@ const index = props => {
         keyboardShouldPersistTaps="handled"
         {...props}>
         {searchableList().map((x, i) => {
-          if (!!ParentComponents[x.value] && !!ModuleListByClient[x?.value]) {
+          // if (!!ParentComponents[x.value] && !!ModuleListByClient[x?.value]) {
+          if (!!ParentComponents[x.value]) {
             let isCollaseable = Array.isArray(x.child_options);
             return (
               <View key={x.value}>

@@ -1,44 +1,26 @@
-import {
-  View,
-  Text,
-  Keyboard,
-  SafeAreaView,
-  Pressable,
-  FlatList,
-  TouchableOpacity,
-  useWindowDimensions,
-} from 'react-native';
+import {View, Keyboard, StyleSheet} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import RootView from '../../../components/RootView';
 import MyText from '../../../components/MyText';
 import {icons} from '../../../utilities/icons';
 import {colors} from '../../../utilities/colors';
-import MyTouchableInput from '../../../components/MyTouchableInput';
-import Modal from 'react-native-modal';
 import {GET_WHATSAPP_MEMBER_LIST} from '../../../DAL';
-import utilities from '../../../utilities';
 import {useSelector} from 'react-redux';
 import {selectUser} from '../../../redux/reducers/userSlice';
-import {TabBar, TabView} from 'react-native-tab-view';
+import {TabBar} from 'react-native-tab-view';
 import Memberlist from './Memberlist';
 import debounce from '../../../functions/debounce';
 import MyLoader from '../../../components/MyLoader';
-import showToast from '../../../functions/showToast';
-import EmptyView from '../../../components/EmptyView';
 import MyInputs from '../../../components/MyInputs';
+import {STRINGS} from '../../../utilities/strings';
 
 const StartNewChat = ({navigation, route}) => {
   const {resetCountToZero, refresh, makeChatAccepted} = route?.params;
   const {token, user} = useSelector(selectUser);
-  const [portalList, setPortalList] = useState([]);
   const [loader, setLoader] = useState(true);
   const [members, setMembers] = useState([]);
   const [searchText, setSearchText] = useState('');
   const [eventId, setEventId] = useState({...noneObj});
-  const [isPortalModalVisible, setPortalModalVisiblity] = useState(false);
-  const [index, setIndex] = useState(0);
-  const [routes] = React.useState(tabs);
-  const layout = useWindowDimensions();
 
   const api_membersList = async () => {
     let res = await GET_WHATSAPP_MEMBER_LIST({
@@ -60,10 +42,10 @@ const StartNewChat = ({navigation, route}) => {
 
   const headerView = () => {
     return (
-      <View style={{backgroundColor: colors.darkSecondary, marginTop: -15}}>
+      <View style={styles.headerContainer}>
         <MyInputs
           leftIcon={icons.search}
-          placeholder="Search..."
+          placeholder={STRINGS.WHATSAPP_START_NEW_CHAT.searchPlaceholder}
           value={searchText}
           onChangeText={text => setSearchText(text)}
           rightIcon={
@@ -127,10 +109,10 @@ const StartNewChat = ({navigation, route}) => {
   };
 
   return (
-    <RootView hideChatIcon title="New Chat">
+    <RootView hideChatIcon title={STRINGS.WHATSAPP_START_NEW_CHAT.title}>
       {/* {headerView()} */}
       {/* {portalModal()} */}
-      <View style={{flex: 1}}>
+      <View style={styles.flexOne}>
         <Memberlist
           headerComponent={headerView}
           list={members}
@@ -158,6 +140,17 @@ const StartNewChat = ({navigation, route}) => {
 };
 
 export default StartNewChat;
+
+const styles = StyleSheet.create({
+  headerContainer: {
+    backgroundColor: colors.darkSecondary,
+    marginTop: -15,
+  },
+  flexOne: {
+    flex: 1,
+  },
+});
+
 let noneObj = {
   _id: '',
   title: 'None',

@@ -11,8 +11,8 @@ if (isDev) {
   // websiteBaseUrl = "https://galaxy.dynamitelifestyle.com/"
   // appName = displayName;
 
-  domain = 'http://192.168.0.239:4615/v1/auth/';
-  // https://apidev.dynamitelifestyle.com/v1/auth/';
+  domain = 'http://192.168.1.168:4615/v1/auth/';
+  // 'https://apidev.dynamitelifestyle.com/v1/auth/';
   socketUrl = 'https://apidev.dynamitelifestyle.com';
   S3_URL = 'https://dynamite-lifestyle-dev-app-bucket.s3.amazonaws.com/';
   appName = displayName;

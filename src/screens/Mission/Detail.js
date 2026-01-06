@@ -1,9 +1,7 @@
 import {
   View,
-  Text,
   StyleSheet,
   FlatList,
-  Image,
   TouchableOpacity,
   Pressable,
 } from 'react-native';
@@ -11,36 +9,30 @@ import {useFocusEffect} from '@react-navigation/native';
 import RootView from '../../components/RootView';
 import MyLoader from '../../components/MyLoader';
 import EmptyView from '../../components/EmptyView';
-import FooterLoader from '../../components/FooterLoader';
 import utilities from '../../utilities';
 import MyText from '../../components/MyText';
-import VimeoWithPip from '../../components/VimeoWithPip';
 import LessonView from '../../components/LessonView';
-import Contributor from '../../components/Contributor';
 import MyWebview from '../../components/MyWebview';
-import WebPlayer from '../../components/WebPlayer';
-import MyImage from '../../components/MyImage';
-import {MyButton2} from '../../components/MyButton';
 import {HeaderView} from './Schedule.js';
 import moment from 'moment';
-import {dateTimeFormat, months} from '../../utilities/constants';
 import {fonts} from '../../utilities/fonts';
 import {colors} from '../../utilities/colors';
 import {icons} from '../../utilities/icons';
 import {textSize} from '../../utilities/styles';
-import {GET_MISSION_DETAIL, GET_MISSION_INFO} from '../../DAL';
+import {GET_MISSION_DETAIL} from '../../DAL';
 import {selectUser} from '../../redux/reducers/userSlice';
 import LiveChat from '../../components/LiveChat';
 import {useSelector} from 'react-redux';
 import {useEffect, useCallback} from 'react';
 import MissionRewardView from '../../components/MissionRewardView';
 import MyRefreshControl from '../../components/MyRefreshControl';
-import {useState, useRef} from 'react';
+import {useState} from 'react';
 import routes from '../../navigation/routes';
 import {useNavigation} from '@react-navigation/native';
 import FeedScreen from '../Feed/FeedScreen';
 import Dashboard from 'react-native-vector-icons/MaterialCommunityIcons';
 import Feather from 'react-native-vector-icons/Feather';
+import {Flex} from '../../UIComponents/FlexViews';
 
 const List = props => {
   return (
@@ -138,7 +130,7 @@ const MissionDetail = ({navigation, route}) => {
   );
 
   return (
-    <View style={{flex: 1}}>
+    <Flex flex={1}>
       {tab == 0 && route.params.type == 'quest' && enableChat && (
         <LiveChat
           flex={0.59}
@@ -152,20 +144,15 @@ const MissionDetail = ({navigation, route}) => {
           navigation={navigation}
         />
       )}
-      <View style={__styles.container}>
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}>
-          <View style={{flexDirection: 'row', alignItems: 'center', flex: 1}}>
+      <View style={styles.container}>
+        <View style={styles.headerContainer}>
+          <View style={styles.headerLeft}>
             <Pressable onPress={() => navigation.goBack()}>
               {icons.backMajor(colors.primary, 26)}
             </Pressable>
-            <View style={{width: 5}} />
+            <View style={styles.spacer5} />
             <MyText
-              style={{flex: 1}}
+              style={styles.flex1}
               type="bold"
               fontSize={textSize.title}
               color={colors.primary}>
@@ -185,11 +172,7 @@ const MissionDetail = ({navigation, route}) => {
         <Tabs
           list={route.params.type == 'mission' ? tab_mission : tab_quest}
           tab={tab}
-          style={{
-            marginTop: 15,
-            borderBottomWidth: 0.5,
-            borderColor: colors.border,
-          }}
+          style={styles.tabsContainer}
           changeTab={e => setTab(e)}
         />
         {((route.params.type == 'quest' && tab < 2) ||
@@ -211,41 +194,31 @@ const MissionDetail = ({navigation, route}) => {
           <Community route={route} navigation={navigation} />
         )}
       </View>
-    </View>
+    </Flex>
   );
 };
 
 const Tabs = ({list, tab, style, changeTab}) => {
   return (
-    <View
-      style={[
-        {
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          backgroundColor: colors.darkSecondary,
-          zIndex: 10,
-        },
-        style,
-      ]}>
+    <View style={[styles.tabsWrapper, style]}>
       {list.map((el, index) => (
         <TouchableOpacity
           onPress={() => changeTab(index)}
           key={index}
-          style={{
-            alignItems: 'center',
-            paddingHorizontal: list.length == 2 ? 55 : 35,
-          }}>
+          style={[
+            styles.tabItem,
+            {paddingHorizontal: list.length == 2 ? 55 : 35},
+          ]}>
           {el.title}
-          <View style={{height: 3}} />
+          <View style={styles.spacer3} />
           <View
-            style={{
-              width: 50,
-              height: 3,
-              borderRadius: 10,
-              backgroundColor:
-                index == tab ? colors.primary : colors.transparent,
-            }}
+            style={[
+              styles.tabIndicator,
+              {
+                backgroundColor:
+                  index == tab ? colors.primary : colors.transparent,
+              },
+            ]}
           />
         </TouchableOpacity>
       ))}
@@ -264,7 +237,7 @@ const TrackerList = ({res, loading}) => {
   return (
     <FlatList
       scrollEnabled={false}
-      // style={__styles.card}
+      // style={styles.card}
       showsVerticalScrollIndicator={false}
       data={res?.mission_schedules}
       ListHeaderComponent={
@@ -273,9 +246,9 @@ const TrackerList = ({res, loading}) => {
         </MyText>
       }
       ListEmptyComponent={!loading && <EmptyView />}
-      ListHeaderComponentStyle={{marginBottom: 15}}
+      ListHeaderComponentStyle={styles.listHeaderSpacing}
       KeyExtractor={(_, index) => index.toString()}
-      ItemSeparatorComponent={<View style={{height: 10}} />}
+      ItemSeparatorComponent={<View style={styles.spacer10} />}
       renderItem={({item}) => (
         <LessonView
           missionDetail={true}
@@ -320,7 +293,7 @@ const Header = ({res, showBadges, daysOn = '', focuse, tab}) => {
             : res?.audio_description,
         focuse,
       })}
-      <View style={{height: 10}} />
+      <View style={styles.spacer10} />
       {showBadges && (
         <MissionRewardView
           duration={res?.mission_duration}
@@ -406,11 +379,11 @@ const Overview = ({
   if (loading) return <MyLoader enable={loading} />;
   return (
     <FlatList
-      style={{paddingTop: 15}}
+      style={styles.overviewList}
       showsVerticalScrollIndicator={false}
       data={[1]}
       ListEmptyComponent={!loading && <EmptyView />}
-      ListFooterComponent={<View style={{height: 100}} />}
+      ListFooterComponent={<View style={styles.listFooter} />}
       ListHeaderComponent={
         <Header
           focuse={focuse}
@@ -423,7 +396,7 @@ const Overview = ({
       refreshControl={
         <MyRefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
-      ListHeaderComponentStyle={{marginBottom: 20}}
+      ListHeaderComponentStyle={styles.overviewHeaderSpacing}
       keyExtractor={(_, index) => index.toString()}
       renderItem={({_}) => <TrackerList res={res} loading={loading} />}
     />
@@ -432,7 +405,7 @@ const Overview = ({
 
 const Community = ({navigation, route}) => {
   return (
-    <View style={{flex: 1}}>
+    <View style={styles.flex1}>
       <FeedScreen
         hideTabs
         navigation={navigation}
@@ -449,7 +422,7 @@ const Community = ({navigation, route}) => {
   );
 };
 
-const __styles = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingVertical: 10,
@@ -469,6 +442,60 @@ const __styles = StyleSheet.create({
     color: colors.primary,
     fontSize: 14,
     fontFamily: fonts.bold,
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  spacer5: {
+    width: 5,
+  },
+  spacer3: {
+    height: 3,
+  },
+  spacer10: {
+    height: 10,
+  },
+  flex1: {
+    flex: 1,
+  },
+  tabsContainer: {
+    marginTop: 15,
+    borderBottomWidth: 0.5,
+    borderColor: colors.border,
+  },
+  tabsWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: colors.darkSecondary,
+    zIndex: 10,
+  },
+  tabItem: {
+    alignItems: 'center',
+  },
+  tabIndicator: {
+    width: 50,
+    height: 3,
+    borderRadius: 10,
+  },
+  listHeaderSpacing: {
+    marginBottom: 15,
+  },
+  overviewList: {
+    paddingTop: 15,
+  },
+  listFooter: {
+    height: 100,
+  },
+  overviewHeaderSpacing: {
+    marginBottom: 20,
   },
 });
 

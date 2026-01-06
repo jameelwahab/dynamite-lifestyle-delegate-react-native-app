@@ -14,7 +14,7 @@ import {MyButton} from '../../components/MyButton';
 import routes from '../../navigation/routes';
 import showToast from '../../functions/showToast';
 import {isEmailValid} from '../../functions/regex';
-import {INIT_WITHOUT_TOKEN, LOGIN} from '../../DAL';
+import {LOGIN} from '../../DAL';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import MyLoader from '../../components/MyLoader';

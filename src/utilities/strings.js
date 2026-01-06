@@ -155,6 +155,38 @@ export const STRINGS = {
     viewMore: 'View More...',
   },
 
+  // MEMBER LIST SCREEN (MISSION)
+  MISSION_MEMBER_LIST: {
+    membersTitle: "'s Members",
+    showing: 'Showing',
+    of: 'of',
+    filterBy: 'Filter by: ',
+    inProgress: 'In Progress',
+    completed: 'Completed',
+    acceptTime: 'Accept Time',
+    current: 'Current',
+    startFrom: 'Start from',
+    to: 'to',
+    endDateFrom: 'End Date from',
+    sortBy: 'Sort by: ',
+    lowToHigh: 'Low to high',
+    highToLow: 'High to low',
+    coinsAttractFrom: 'Coins Attract from',
+    clearFilter: 'Clear Filter',
+    completedMembers: 'Completed Members',
+    inProgressMembers: 'In Progress Members',
+    totalRevenue: 'Total Revenue',
+    startDate: 'Start Date',
+    endDate: 'End Date',
+    completedDays: 'Completed Days',
+    acceptTimeBadge: 'Accept Time Badge',
+    currentBadge: 'Current Badge',
+    coinsAttracted: 'Coins Attracted',
+    targetCoins: 'Target Coins',
+    status: 'Status',
+    csvFileDownloaded: 'CSV File Downloaded',
+  },
+
   // MISSION REPORT SCREEN
   MISSION_REPORT: {
     report: "'s Report",
@@ -180,6 +212,60 @@ export const STRINGS = {
     ],
     journalPlaceholder:
       'What did you take away from todays lesson? Keep a note of all your aha moments! ',
+  },
+
+  // MISSION FILTER SCREEN
+  MISSION_FILTER: {
+    title: 'Filter',
+    status: 'Status',
+    all: 'All',
+    sortBy: 'Sort by',
+    lowToHigh: 'Low to high',
+    highToLow: 'High to low',
+    filterMemberByBadgeLevel: 'Filter Member by Badge Level*',
+    currentUserBadgeLevel: 'Current User Badge level',
+    searchByStartDate: 'Search By Start Date',
+    startDateFrom: 'Start Date From',
+    endDateFrom: 'End Date From',
+    searchByEndDate: 'Search By End Date',
+    searchByAttractedCoins: 'Search By Attracted Coins',
+    coinFrom: 'Coin From*',
+    coinTo: 'Coin To*',
+    clearFilter: 'Clear Filter',
+    submit: 'Submit',
+    pleaseSelectFilterMember: 'Please Select the Filter Member by Badge Type',
+    filterBadgeLevelNotSelected: 'Filter Badege Level Not Selected',
+    noOptions: 'No options',
+    completed: 'Completed',
+    inProgress: 'In Progress',
+    none: 'None',
+    memberCurrentBadgeLevel: "Member's Current Badge Level",
+    acceptanceTimeUserBadgeLevel: 'Acceptance Time User Badge Level',
+  },
+
+  // AUTOMATED GROUP LIST SCREEN
+  AUTOMATED_GROUP_LIST: {
+    title: 'Automated Groups',
+    startDay: 'Start Day',
+    endDay: 'End Day',
+    status: 'Status',
+    active: 'Active',
+    inactive: 'Inactive',
+    noGroupsFound: 'No Groups found',
+    deleteConfirmation: 'Are you sure you want to delete this Automated Group?',
+    activeMembers: 'Active Members',
+    allMembers: 'All Members',
+    edit: 'Edit',
+    delete: 'Delete',
+    viewMembers: 'View Members',
+  },
+
+  // AUTOMATED GROUP DETAIL SCREEN
+  AUTOMATED_GROUP_DETAIL: {
+    excludeMembers: 'Exclude Members',
+    excludeConfirmation: 'Are you sure you want to exclude these members?',
+    allMemberList: 'ALL MEMBER LIST',
+    excludedMemberList: 'EXCLUDED MEMBER LIST',
   },
 
   // CALL HISTORY NOTE MODAL
@@ -436,6 +522,23 @@ export const STRINGS = {
     enterPassword: 'Please enter password',
     loginError: 'Login Error',
     tryAgain: 'Please try again',
+  },
+
+  // FORGOT PASSWORD SCREEN
+  FORGOT_PASSWORD: {
+    title: 'Forget Password',
+    emailLabel: 'Email Address*',
+    submitButton: 'Submit',
+    enterEmail: 'Please enter your email address!',
+    enterValidEmail: 'Please enter valid email address!',
+  },
+
+  // OTP SCREEN
+  OTP: {
+    title: 'Please check your email',
+    description: 'Enter PIN Code here.',
+    submitButton: 'Submit',
+    enterCode: 'Please enter your 6 digit code!',
   },
 
   // AGREEMENT CONFIGURATION SCREEN
@@ -1309,5 +1412,119 @@ Below are the available short codes that will automatically be replaced with the
     addAsNote: 'Add as Note',
     edit: 'Edit',
     delete: 'Delete',
+  },
+
+  // LIVE CHAT COMPONENT
+  LIVE_CHAT: {
+    liveChat: 'Live Chat',
+    chat: 'Chat',
+    pleaseWriteSomething: 'Please write something to comment.',
+    alert: 'Alert',
+    deleteConfirmation: 'Are you sure you want to delete this message?',
+    addNoteConfirmation:
+      'Are you sure you want to add the comment as personal note?',
+    editing: 'Editing',
+    replyingTo: 'Replying to ',
+    cancel: 'Cancel',
+    writeReply: 'Write a reply...*',
+    writeComment: 'Write a comment...*',
+    liked: ' Liked',
+    like: ' Like',
+    reply: ' Reply',
+    scrollToBottom: 'Scroll to Bottom ',
+    error: 'Error',
+    edit: 'Edit',
+    delete: 'Delete',
+    message: 'Message',
+    addAsNote: 'Add as Note',
+  },
+
+  // AUTOMATED GROUP ADD/EDIT SCREEN
+  AUTOMATED_GROUP_ADD_EDIT: {
+    editTitle: 'Edit Automated Group',
+    addTitle: 'Add Automated Group',
+    groupName: 'Group Name *',
+    groupStatus: 'Group Status *',
+    active: 'Active',
+    inactive: 'Inactive',
+    groupStartDay: 'Group Start Day *',
+    groupEndDay: 'Group End Day *',
+    submit: 'Submit',
+    alert: 'Alert',
+    enterGroupName: 'Please enter Automated Group Name',
+    enterStartDay: 'Please enter Automated Start Day',
+    enterEndDay: 'Please enter Automated End Day',
+  },
+
+  // SCHEDULE SCREEN
+  SCHEDULE: {
+    defaultHeading: 'The Source Code',
+    day: 'day',
+    schedule: 'Schedule',
+    coinsRewards: 'Coins Rewards',
+  },
+
+  // MISSION REPORT MEMBER LIST SCREEN
+  MISSION_REPORT_MEMBER_LIST: {
+    report: ' Report',
+    showing: 'Showing ',
+    of: ' of ',
+    missionTitle: 'Mission Title',
+    duration: 'Duration',
+    days: ' days',
+    acceptTimeBadge: 'Accept Time Badge',
+    currentBadge: 'Current Badge',
+    coinsEarned: 'Coins Earned',
+    achievableCoins: 'Achievable Coins',
+    startDate: 'Start Date',
+    completedDate: 'Completed Date',
+    daysLabel: 'Days: ',
+    noMissionReportFound: 'No Mission Report Found',
+  },
+
+  // MISSION REPORT FILTER SCREEN
+  MISSION_REPORT_FILTER: {
+    filter: 'Filter',
+    missions: 'Missions',
+    durationFromTo: 'Duration from ',
+    to: ' to ',
+    from: 'From*',
+    toLabel: 'To*',
+    placeholder1: '1',
+    placeholder7: '7',
+    clearFilter: 'Clear Filter',
+    submit: 'Submit',
+  },
+
+  // WHATSAPP CHAT LIST SCREEN
+  WHATSAPP_CHAT_LIST: {
+    title: 'WHATSAPP CHATS',
+    all: 'All',
+    unread: 'Unread',
+    searchPlaceholder: 'Search...',
+    noChat: 'No Chat',
+    photo: 'Photo',
+    audio: 'Audio',
+    video: 'Video',
+  },
+
+  // WHATSAPP MESSAGE LIST SCREEN
+  WHATSAPP_MESSAGE_LIST: {
+    deleteConfirmation: 'Are you sure you want to delete this message?',
+    selectTemplateError: 'Please select a Template',
+    noMessages: 'No Messages',
+    copy: 'Copy',
+    addAsNote: 'Add as Note',
+    edit: 'Edit',
+    delete: 'Delete',
+  },
+
+  // WHATSAPP START NEW CHAT SCREEN
+  WHATSAPP_START_NEW_CHAT: {
+    title: 'New Chat',
+    searchPlaceholder: 'Search...',
+    none: 'None',
+    online: 'Online',
+    offline: 'Offline',
   },
 };

@@ -1,23 +1,12 @@
 import {
   View,
-  Text,
   StyleSheet,
   FlatList,
   KeyboardAvoidingView,
-  StatusBar,
   Platform,
-  TextInput,
-  Image,
-  TouchableHighlight,
-  Pressable,
-  TouchableOpacity,
-  SafeAreaView,
 } from 'react-native';
-import React, {memo, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import RootView from '../../../components/RootView';
-import UserImage from '../../../components/UserImage';
-import MyText from '../../../components/MyText';
-import {convertTimezone} from '../../../functions/convertTime';
 import {selectTimeZone} from '../../../redux/reducers/timezoneSlice';
 import {useSelector} from 'react-redux';
 import {colors} from '../../../utilities/colors';
@@ -27,29 +16,23 @@ import {
   WHATSAPP_MESSAGE_LIST,
 } from '../../../DAL';
 import {selectUser} from '../../../redux/reducers/userSlice';
-import MyLoader, {SimpleLoader} from '../../../components/MyLoader';
-import utilities from '../../../utilities';
+import {SimpleLoader} from '../../../components/MyLoader';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {fonts} from '../../../utilities/fonts';
 import {icons} from '../../../utilities/icons';
-import Collapsible from 'react-native-collapsible';
 import EmptyView from '../../../components/EmptyView';
 import OptionModal from '../../../components/OptionModal';
-import ImageUploadModal from '../../../components/ImageUploadModal';
-import MyImage2 from '../../../components/MyImage2';
-import MyImage from '../../../components/MyImage';
 import MsgView from './MsgView';
 import ImageZoomer from '../../../components/ImageZoomer';
 import SendMsgView from './SendMsgView';
 import UserView from './UserView';
 import {selectSocket} from '../../../redux/reducers/socketSlice';
-import ConfirmationModal from '../../../components/ConfirmationModal';
 import copyText from '../../../functions/copyText';
 import TrackPlayer from 'react-native-track-player';
 import routes from '../../../navigation/routes';
 import showToast from '../../../functions/showToast';
 import TemplateView from './TemplateView';
 import isObject from '../../../functions/isObject';
+import {STRINGS} from '../../../utilities/strings';
 
 let page = 0;
 let canLoadMore = false;
@@ -230,7 +213,7 @@ const MessageList = ({navigation, route}) => {
       setTimeout(() => {
         setConfirmation({
           isVisible: true,
-          title: 'Are you sure you want to delete this message?',
+          title: STRINGS.WHATSAPP_MESSAGE_LIST.deleteConfirmation,
           item,
           type: 'delete_msg',
         });
@@ -344,7 +327,7 @@ const MessageList = ({navigation, route}) => {
 
   const sendBtnPress = () => {
     if (!!!selectedTemplate) {
-      showToast({title: 'Please select a Template'});
+      showToast({title: STRINGS.WHATSAPP_MESSAGE_LIST.selectTemplateError});
     } else {
       let postData = {
         receiver_id: member?.memberId,
@@ -400,30 +383,19 @@ const MessageList = ({navigation, route}) => {
       customBackPress={onBackPress}
       hideChatIcon>
       <KeyboardAvoidingView
-        style={{flex: 1}}
+        style={styles.flexOne}
         behavior={Platform.OS == 'ios' ? 'padding' : undefined}
         keyboardVerticalOffset={Platform.OS == 'ios' ? 100 + insets.top : 0}>
-        <View style={{flex: 1}}>
+        <View style={styles.flexOne}>
           {/* Flatlist */}
-          <View
-            style={{
-              flex: 1,
-              borderTopColor: colors.lightText2,
-              borderTopWidth: 1 / 3,
-              marginHorizontal: -10,
-              paddingHorizontal: 10,
-            }}>
+          <View style={styles.flatListContainer}>
             <FlatList
               showsVerticalScrollIndicator={false}
               onEndReachedThreshold={0}
               inverted={chat.length == 0 ? false : true}
               keyExtractor={item => item?._id}
               contentContainerStyle={[
-                chat.length == 0 && {
-                  flex: 1,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                },
+                chat.length == 0 && styles.emptyListContainer,
               ]}
               data={chat}
               renderItem={renderMessages}
@@ -431,11 +403,11 @@ const MessageList = ({navigation, route}) => {
                 loader ? (
                   <SimpleLoader size={50} />
                 ) : (
-                  <EmptyView label={'No Messages'} />
+                  <EmptyView label={STRINGS.WHATSAPP_MESSAGE_LIST.noMessages} />
                 )
               }
               ListFooterComponent={
-                <View style={{height: 50, alignItems: 'center'}}>
+                <View style={styles.footerLoader}>
                   {footLoader && <SimpleLoader />}
                 </View>
               }
@@ -480,6 +452,28 @@ const MessageList = ({navigation, route}) => {
 };
 
 export default MessageList;
+
+const styles = StyleSheet.create({
+  flexOne: {
+    flex: 1,
+  },
+  flatListContainer: {
+    flex: 1,
+    borderTopColor: colors.lightText2,
+    borderTopWidth: 1 / 3,
+    marginHorizontal: -10,
+    paddingHorizontal: 10,
+  },
+  emptyListContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  footerLoader: {
+    height: 50,
+    alignItems: 'center',
+  },
+});
 
 const msgOptionList = [
   {

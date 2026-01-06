@@ -32,7 +32,6 @@ const OptionModalWithSearch = ({
   onSearchTextChange = () => {},
   filterTheList = undefined,
 }) => {
-  console.log(isVisible, optionList, '________');
   const [searchText, setSearchText] = useState('');
   const onTextChange = text => {
     setSearchText(text);

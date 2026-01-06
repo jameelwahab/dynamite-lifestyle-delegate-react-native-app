@@ -1,18 +1,15 @@
 import {
   View,
-  Text,
   Image,
   SafeAreaView,
   Alert,
-  StatusBar,
   StyleSheet,
-  Easing,
   Vibration,
   Dimensions,
   Platform,
   PermissionsAndroid,
 } from 'react-native';
-import React, {useState, useEffect} from 'react';
+import React, {useEffect} from 'react';
 import {useDispatch} from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SplashScreen from 'react-native-splash-screen';
@@ -32,7 +29,6 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
-import ConfirmationModal from '../../components/ConfirmationModal';
 
 const Splash = ({navigation}) => {
   const height = Dimensions.get('window').height;
