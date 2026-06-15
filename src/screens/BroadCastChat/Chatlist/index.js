@@ -1,6 +1,5 @@
 import {
   View,
-  Text,
   FlatList,
   StyleSheet,
   TouchableHighlight,
@@ -8,7 +7,6 @@ import {
   SafeAreaView,
   Pressable,
   TouchableOpacity,
-  Platform,
   Image,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
@@ -18,20 +16,14 @@ import MyText from '../../../components/MyText';
 import {GET_BROADCAST_CHAT_LIST} from '../../../DAL';
 import {useSelector} from 'react-redux';
 import {selectUser} from '../../../redux/reducers/userSlice';
-import UserImage from '../../../components/UserImage';
 import {dateTimeFormat} from '../../../utilities/constants';
-import MyWebview from '../../../components/MyWebview';
 import {colors} from '../../../utilities/colors';
 import {icons} from '../../../utilities/icons';
-import moment from 'moment';
 import FAB from '../../../components/FAB';
 import EmptyView from '../../../components/EmptyView';
-import MyTouchableInput from '../../../components/MyTouchableInput';
-import debounce from '../../../functions/debounce';
 import Modal from 'react-native-modal';
-import utilities from '../../../utilities';
 import routes from '../../../navigation/routes';
-import {decode, decodeEntity} from 'html-entities';
+import {decode} from 'html-entities';
 import {isHtml} from '../../../functions/regex';
 import Markdown from '@ronradtke/react-native-markdown-display';
 import {fonts} from '../../../utilities/fonts';
@@ -40,6 +32,8 @@ import {convertTimezone} from '../../../functions/convertTime';
 import {selectTimeZone} from '../../../redux/reducers/timezoneSlice';
 import MyInputs from '../../../components/MyInputs';
 import {selectNavbar} from '../../../redux/reducers/navbarSlice';
+import {Flex} from '../../../UIComponents/FlexViews';
+import {STRINGS} from '../../../utilities/strings';
 
 let page = 0;
 let canLoadMore = false;
@@ -138,28 +132,15 @@ const ChatList = ({navigation, route}) => {
         style={{margin: 0}}
         animationInTiming={300}
         animationOutTiming={300}>
-        <SafeAreaView
-          style={{
-            marginTop: 'auto',
-            backgroundColor: colors.secondary,
-            borderTopLeftRadius: 10,
-            borderTopRightRadius: 10,
-          }}>
-          <View style={{height: utilities.screenHeight() * 0.8}}>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                padding: 15,
-                borderBottomWidth: 1 / 3,
-                borderBottomColor: colors.lightText,
-              }}>
+        <SafeAreaView style={__style.modalContainer}>
+          <View style={__style.modalContent}>
+            <View style={__style.modalHeader}>
               <View>
                 <MyText fontSize={18} type="medium">
-                  Portal Events
+                  {STRINGS.BROADCAST_CHAT_LIST.portalEvents}
                 </MyText>
                 <MyText color={colors.lightText} fontSize={12}>
-                  Select your event from list below
+                  {STRINGS.BROADCAST_CHAT_LIST.selectEventPrompt}
                 </MyText>
               </View>
               <Pressable onPress={() => setPortalModalVisiblity(false)}>
@@ -167,7 +148,7 @@ const ChatList = ({navigation, route}) => {
               </Pressable>
             </View>
 
-            <View style={{flex: 1}}>
+            <Flex flex={1}>
               <FlatList
                 data={portalList}
                 renderItem={({item, index}) => {
@@ -178,11 +159,7 @@ const ChatList = ({navigation, route}) => {
                         setPortalModalVisiblity(false);
                       }}
                       style={[
-                        {
-                          paddingVertical: 12,
-                          justifyContent: 'center',
-                          paddingHorizontal: 10,
-                        },
+                        __style.portalItem,
                         {
                           backgroundColor:
                             eventId?._id == item._id
@@ -195,7 +172,7 @@ const ChatList = ({navigation, route}) => {
                   );
                 }}
               />
-            </View>
+            </Flex>
           </View>
         </SafeAreaView>
       </Modal>
@@ -204,8 +181,7 @@ const ChatList = ({navigation, route}) => {
 
   const headerView = () => {
     return (
-      <View
-        style={{backgroundColor: colors.darkSecondary, marginVertical: -10}}>
+      <View style={__style.headerContainer}>
         {/* <View style={__style.tabsView}>
           <TouchableOpacity
             onPress={() => setTab("all")}
@@ -227,7 +203,7 @@ const ChatList = ({navigation, route}) => {
           label='Portals' /> */}
         <MyInputs
           leftIcon={icons.search}
-          placeholder="Search..."
+          placeholder={STRINGS.BROADCAST_CHAT_LIST.searchPlaceholder}
           value={searchText}
           onChangeText={text => setSearchText(text)}
           rightIcon={
@@ -264,11 +240,11 @@ const ChatList = ({navigation, route}) => {
 
           <View style={__style.seondViewRow}>
             <View style={__style.headerView}>
-              <View style={{flex: 1}}>
+              <Flex flex={1}>
                 <MyText fontSize={14} type="medium">
                   {item?.broadcast_title}
                 </MyText>
-              </View>
+              </Flex>
               <MyText fontSize={10} color={colors.lightText}>
                 {convertTimezone(
                   item?.latest_message?.createdAt,
@@ -276,14 +252,9 @@ const ChatList = ({navigation, route}) => {
                 ).format(dateTimeFormat.dateTime)}
               </MyText>
             </View>
-            <View
-              style={{
-                marginTop: 3,
-                flexDirection: 'row',
-                alignItems: 'center',
-              }}>
+            <View style={__style.messageRow}>
               {item?.last_message_sender == user?._id && (
-                <View style={{marginRight: 5}}>
+                <View style={__style.marginRight5}>
                   {!!item?.last_message_status == false ||
                   item?.last_message_status == 'sent'
                     ? icons.sent(colors.white, 20)
@@ -297,14 +268,14 @@ const ChatList = ({navigation, route}) => {
               )}
 
               {item?.latest_message.message_type == 'schedule' && (
-                <View style={{marginRight: 5}}>
+                <View style={__style.marginRight5}>
                   {icons.clock(colors.white, 12)}
                 </View>
               )}
 
               {!!item?.latest_message?.message_content_type &&
                 item?.latest_message?.message_content_type != 'general' && (
-                  <View style={{marginRight: 5}}>
+                  <View style={__style.marginRight5}>
                     {item?.latest_message.message_content_type == 'image'
                       ? icons.camera(colors.white, 12)
                       : item?.latest_message.message_content_type == 'audio'
@@ -314,12 +285,12 @@ const ChatList = ({navigation, route}) => {
                       : ''}
                   </View>
                 )}
-              <View style={{flexDirection: 'row', flex: 1, height: 18}}>
+              <View style={__style.messageTextContainer}>
                 <MyText
                   fontSize={12}
                   type="light"
                   numberOfLines={1}
-                  style={{marginTop: 3, flex: 1}}>
+                  style={__style.messageText}>
                   {!!item?.latest_message?.message ? (
                     isHtml(item?.latest_message?.message) ? (
                       decode(
@@ -338,13 +309,13 @@ const ChatList = ({navigation, route}) => {
                       </Markdown>
                     )
                   ) : item?.latest_message?.message_content_type == 'image' ? (
-                    'Photo'
+                    STRINGS.BROADCAST_CHAT_LIST.photo
                   ) : item?.latest_message?.message_content_type == 'audio' ? (
-                    'Audio'
+                    STRINGS.BROADCAST_CHAT_LIST.audio
                   ) : item?.latest_message?.message_content_type == 'video' ? (
-                    'Video'
+                    STRINGS.BROADCAST_CHAT_LIST.video
                   ) : (
-                    'No Message Yet'
+                    STRINGS.BROADCAST_CHAT_LIST.noMessageYet
                   )}
                 </MyText>
                 {otherUser?.unread_message_count > 0 && (
@@ -366,11 +337,13 @@ const ChatList = ({navigation, route}) => {
 
   return (
     <RootView hideBackBottomButton title={title} hideChatIcon>
-      <View style={{flex: 1}}>
+      <Flex flex={1}>
         <FlatList
           data={chatList}
           renderItem={renderChatList}
-          ListEmptyComponent={!loader && <EmptyView label={'No Chat'} />}
+          ListEmptyComponent={
+            !loader && <EmptyView label={STRINGS.BROADCAST_CHAT_LIST.noChat} />
+          }
           ListHeaderComponent={headerView()}
           stickyHeaderIndices={[0]}
           stickyHeaderHiddenOnScroll={true}
@@ -378,17 +351,12 @@ const ChatList = ({navigation, route}) => {
           showsVerticalScrollIndicator={false}
           onEndReached={loadmore}
           ListFooterComponent={
-            <View
-              style={{
-                height: 50,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}>
+            <View style={__style.footerLoader}>
               {footerLoader && <SimpleLoader />}
             </View>
           }
         />
-      </View>
+      </Flex>
 
       {portalModal()}
 
@@ -477,7 +445,6 @@ const __style = StyleSheet.create({
   },
 
   separotor: {
-    // height: Platform.OS == "android" ? 1 / 2 : 1 / 3,
     backgroundColor: colors.lightText,
   },
   status: {

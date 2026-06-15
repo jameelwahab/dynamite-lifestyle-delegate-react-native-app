@@ -1,43 +1,25 @@
 import {
   View,
-  Text,
-  StyleSheet,
   FlatList,
   KeyboardAvoidingView,
-  StatusBar,
   Platform,
-  TextInput,
-  Image,
-  TouchableHighlight,
-  Pressable,
-  TouchableOpacity,
-  SafeAreaView,
+  StyleSheet,
 } from 'react-native';
-import React, {memo, useCallback, useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import RootView from '../../../components/RootView';
-import UserImage from '../../../components/UserImage';
-import MyText from '../../../components/MyText';
-import {convertTimezone} from '../../../functions/convertTime';
 import {selectTimeZone} from '../../../redux/reducers/timezoneSlice';
 import {useSelector} from 'react-redux';
 import {colors} from '../../../utilities/colors';
 import {
-  ADD_AS_NOTE,
   EDIT_SCHEDULE_BROADCAST_MESSAGE,
   GET_BROADCAST_MESSAGE_LIST,
 } from '../../../DAL';
 import {selectUser} from '../../../redux/reducers/userSlice';
-import MyLoader, {SimpleLoader} from '../../../components/MyLoader';
-import utilities from '../../../utilities';
+import {SimpleLoader} from '../../../components/MyLoader';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {fonts} from '../../../utilities/fonts';
 import {icons} from '../../../utilities/icons';
-import Collapsible from 'react-native-collapsible';
 import EmptyView from '../../../components/EmptyView';
 import OptionModal from '../../../components/OptionModal';
-import ImageUploadModal from '../../../components/ImageUploadModal';
-import MyImage2 from '../../../components/MyImage2';
-import MyImage from '../../../components/MyImage';
 import MsgView from './MsgView';
 import ImageZoomer from '../../../components/ImageZoomer';
 import SendMsgView from './SendMsgView';
@@ -49,8 +31,8 @@ import TrackPlayer from 'react-native-track-player';
 import routes from '../../../navigation/routes';
 import showToast from '../../../functions/showToast';
 import InfoModal from '../../../components/InfoModal';
+import {STRINGS} from '../../../utilities/strings';
 
-let page = 0;
 let canLoadMore = false;
 let isNewChat = false;
 const MessageList = ({navigation, route}) => {
@@ -165,7 +147,7 @@ const MessageList = ({navigation, route}) => {
       setTimeout(() => {
         setConfirmation({
           isVisible: true,
-          title: 'Are you sure you want to delete this message?',
+          title: STRINGS.BROADCAST_MESSAGE_LIST.deleteConfirmation,
           item,
           type: 'delete_msg',
         });
@@ -296,30 +278,19 @@ const MessageList = ({navigation, route}) => {
       customBackPress={onBackPress}
       hideChatIcon>
       <KeyboardAvoidingView
-        style={{flex: 1}}
+        style={__style.flexOne}
         behavior={Platform.OS == 'ios' ? 'padding' : undefined}
         keyboardVerticalOffset={Platform.OS == 'ios' ? 100 + insets.top : 0}>
-        <View style={{flex: 1}}>
+        <View style={__style.flexOne}>
           {/* Flatlist */}
-          <View
-            style={{
-              flex: 1,
-              borderTopColor: colors.lightText2,
-              borderTopWidth: 1 / 3,
-              marginHorizontal: -10,
-              paddingHorizontal: 10,
-            }}>
+          <View style={__style.flatListContainer}>
             <FlatList
               showsVerticalScrollIndicator={false}
               onEndReachedThreshold={0}
               inverted={chat.length == 0 ? false : true}
               keyExtractor={item => item?._id}
               contentContainerStyle={[
-                chat.length == 0 && {
-                  flex: 1,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                },
+                chat.length == 0 && __style.emptyListContainer,
               ]}
               data={chat}
               renderItem={renderMessages}
@@ -327,11 +298,13 @@ const MessageList = ({navigation, route}) => {
                 loader ? (
                   <SimpleLoader size={50} />
                 ) : (
-                  <EmptyView label={'No Messages'} />
+                  <EmptyView
+                    label={STRINGS.BROADCAST_MESSAGE_LIST.noMessages}
+                  />
                 )
               }
               ListFooterComponent={
-                <View style={{height: 50, alignItems: 'center'}}>
+                <View style={__style.footerLoader}>
                   {footLoader && <SimpleLoader />}
                 </View>
               }
@@ -380,6 +353,28 @@ const MessageList = ({navigation, route}) => {
 };
 
 export default MessageList;
+
+const __style = StyleSheet.create({
+  flexOne: {
+    flex: 1,
+  },
+  flatListContainer: {
+    flex: 1,
+    borderTopColor: colors.lightText2,
+    borderTopWidth: 1 / 3,
+    marginHorizontal: -10,
+    paddingHorizontal: 10,
+  },
+  emptyListContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  footerLoader: {
+    height: 50,
+    alignItems: 'center',
+  },
+});
 
 const msgOptionList = [
   {

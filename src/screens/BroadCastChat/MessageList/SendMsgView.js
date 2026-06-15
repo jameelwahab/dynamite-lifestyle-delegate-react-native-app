@@ -1,6 +1,5 @@
 import {
   View,
-  Text,
   TouchableHighlight,
   Image,
   TextInput,
@@ -23,6 +22,7 @@ import MyImage from '../../../components/MyImage';
 import ImageUploadModal from '../../../components/ImageUploadModal';
 import ImageZoomer from '../../../components/ImageZoomer';
 import {fonts} from '../../../utilities/fonts';
+import {STRINGS} from '../../../utilities/strings';
 import {useSelector} from 'react-redux';
 import {selectSocket} from '../../../redux/reducers/socketSlice';
 import {selectUser} from '../../../redux/reducers/userSlice';
@@ -31,11 +31,10 @@ import {
   SEND_BROADCAST_MESSAGE,
   UPLOAD_FILE_FOR_CHAT,
 } from '../../../DAL';
-import {appName, dateTimeFormat} from '../../../utilities/constants';
+import {dateTimeFormat} from '../../../utilities/constants';
 import {ProgressBar} from 'react-native-paper';
 import AudioRecorderPlayer, {
   AudioEncoderAndroidType,
-  OOutputFormatAndroidType,
   AudioSourceAndroidType,
   AVModeIOSOption,
   AVEncoderAudioQualityIOSType,
@@ -175,8 +174,8 @@ const SendMsgView = ({
       startRecording();
     } else {
       showToast({
-        body: `Please allow mircophone permission from app settings`,
-        title: 'Microphone permission denied',
+        body: STRINGS.BROADCAST_MSG_VIEW.allowMicrophonePermission,
+        title: STRINGS.BROADCAST_MSG_VIEW.microphonePermissionDenied,
       });
     }
   };
@@ -227,7 +226,7 @@ const SendMsgView = ({
       });
     } catch (error) {
       console.log('Uh-oh! Failed to start recording:', error);
-      showToast({body: error.message, title: 'Error'});
+      showToast({body: error.message, title: STRINGS.BROADCAST_MSG_VIEW.error});
       setRecording(false);
     }
   };
@@ -275,7 +274,10 @@ const SendMsgView = ({
 
   const sendMsgButton = async audioObj => {
     if (msg.text.trim() == '' && !!msg?.image == false && !!audioObj == false) {
-      showToast({title: 'Please write something', type: 'info'});
+      showToast({
+        title: STRINGS.BROADCAST_MSG_VIEW.pleaseWriteSomething,
+        type: 'info',
+      });
     } else {
       setBroadcastType({...broadcastType, isVisible: true});
     }
@@ -499,11 +501,11 @@ const SendMsgView = ({
 
   const addLink = () => {
     if (linkModal?.title?.trim() == '') {
-      showToast({body: 'Please enter title'});
+      showToast({body: STRINGS.BROADCAST_MSG_VIEW.pleaseEnterTitle});
     } else if (linkModal?.link?.trim() == '') {
-      showToast({body: 'Please enter link'});
+      showToast({body: STRINGS.BROADCAST_MSG_VIEW.pleaseEnterLink});
     } else if (!isUrl(linkModal?.link?.trim())) {
-      showToast({body: 'Link not valid'});
+      showToast({body: STRINGS.BROADCAST_MSG_VIEW.linkNotValid});
     } else {
       modifyText('link', linkModal?.title.trim(), linkModal?.link.trim());
       closeLinkModal();
@@ -519,30 +521,25 @@ const SendMsgView = ({
         useNativeDriverForBackdrop={true}
         avoidKeyboard={true}>
         <SafeAreaView>
-          <View
-            style={{
-              backgroundColor: colors.secondary,
-              padding: 20,
-              borderRadius: 10,
-            }}>
-            <View style={{marginVertical: 10}}>
+          <View style={__style.modalContainer}>
+            <View style={__style.modalTitleContainer}>
               <MyText
                 align="center"
                 type="medium"
                 fontSize={18}
                 color={colors.primary}>
-                Enter your link
+                {STRINGS.BROADCAST_MSG_VIEW.enterYourLink}
               </MyText>
             </View>
-            <View style={{marginTop: 10}}>
+            <View style={__style.modalContentTop}>
               <MyInputs
-                label="Title"
+                label={STRINGS.BROADCAST_MSG_VIEW.title}
                 value={linkModal.title}
                 onChangeText={title => setLinkModal({...linkModal, title})}
               />
 
               <MyInputs
-                label="Link"
+                label={STRINGS.BROADCAST_MSG_VIEW.link}
                 value={linkModal.link}
                 onChangeText={Weblink =>
                   setLinkModal({...linkModal, link: Weblink})
@@ -550,14 +547,15 @@ const SendMsgView = ({
               />
             </View>
 
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'flex-end',
-                marginTop: 10,
-              }}>
-              <TransparentButton title="CANCEL" onPress={closeLinkModal} />
-              <TransparentButton title="ADD" onPress={addLink} />
+            <View style={__style.modalButtonContainer}>
+              <TransparentButton
+                title={STRINGS.BROADCAST_MSG_VIEW.cancel}
+                onPress={closeLinkModal}
+              />
+              <TransparentButton
+                title={STRINGS.BROADCAST_MSG_VIEW.add}
+                onPress={addLink}
+              />
             </View>
           </View>
         </SafeAreaView>
@@ -590,25 +588,20 @@ const SendMsgView = ({
         animationIn={'zoomIn'}
         animationOut={'zoomOut'}
         avoidKeyboard={true}
-        style={{margin: 10}}>
+        style={__style.broadcastModalContainer}>
         <SafeAreaView>
-          <View
-            style={{
-              backgroundColor: colors.secondary,
-              paddingHorizontal: 20,
-              borderRadius: 10,
-              paddingTop: 20,
-              paddingBottom: 10,
-            }}>
-            <View style={{alignItems: 'center', paddingBottom: 20}}>
-              <MyText isHeading>Broadcast</MyText>
+          <View style={__style.broadcastModalContent}>
+            <View style={__style.broadcastModalHeader}>
+              <MyText isHeading>{STRINGS.BROADCAST_MSG_VIEW.broadcast}</MyText>
             </View>
             <View style={__style.radioRootView}>
-              <MyText isLabel>Message Schedule</MyText>
+              <MyText isLabel>
+                {STRINGS.BROADCAST_MSG_VIEW.messageSchedule}
+              </MyText>
               <View style={__style.radioView}>
                 <View style={__style.radioItem}>
                   <MyCheckBox
-                    title="Send Now"
+                    title={STRINGS.BROADCAST_MSG_VIEW.sendNow}
                     onPress={() =>
                       setBroadcastType({...broadcastType, type: 1})
                     }
@@ -617,7 +610,7 @@ const SendMsgView = ({
                 </View>
                 <View style={__style.radioItem}>
                   <MyCheckBox
-                    title="Schedule"
+                    title={STRINGS.BROADCAST_MSG_VIEW.schedule}
                     onPress={() =>
                       setBroadcastType({...broadcastType, type: 2})
                     }
@@ -628,10 +621,10 @@ const SendMsgView = ({
             </View>
 
             <Collapsible collapsed={broadcastType.type == 1}>
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <View style={{flex: 1}}>
+              <View style={__style.dateTimeRow}>
+                <View style={__style.flex1}>
                   <MyTouchableInput
-                    label="Publish Date *"
+                    label={STRINGS.BROADCAST_MSG_VIEW.publishDate}
                     icon={() => icons.calendar(colors.primary)}
                     onPress={() =>
                       ref_calendar?.current?.openModal(
@@ -643,9 +636,9 @@ const SendMsgView = ({
                     )}
                   />
                 </View>
-                <View style={{flex: 1, marginLeft: 10}}>
+                <View style={__style.flex1MarginLeft}>
                   <MyTouchableInput
-                    label="Publish Time *"
+                    label={STRINGS.BROADCAST_MSG_VIEW.publishTime}
                     icon={icons.clock}
                     onPress={() =>
                       ref_timePicker?.current?.openModal(
@@ -658,16 +651,16 @@ const SendMsgView = ({
                   />
                 </View>
               </View>
-              <View style={{marginTop: -10}}>
+              <View style={__style.timezoneNoteContainer}>
                 <MyText fontSize={12} isLabel>
-                  {'Publish date and time is in Europe/Dublin timezone'}
+                  {STRINGS.BROADCAST_MSG_VIEW.publishDateTimeNote}
                 </MyText>
               </View>
             </Collapsible>
 
-            <View style={{marginVertical: 10}}>
+            <View style={__style.personalNoteContainer}>
               <MyCheckBox
-                title="Add as Personal Note"
+                title={STRINGS.BROADCAST_MSG_VIEW.addAsPersonalNote}
                 isNormalText
                 value={broadcastType?.addAsNote}
                 onPress={() =>
@@ -679,17 +672,18 @@ const SendMsgView = ({
               />
             </View>
 
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'flex-end',
-              }}>
-              <TransparentButton title="CANCEL" onPress={closeBroadcastModal} />
+            <View style={__style.broadcastModalButtonContainer}>
+              <TransparentButton
+                title={STRINGS.BROADCAST_MSG_VIEW.cancel}
+                onPress={closeBroadcastModal}
+              />
               {sendMsgLoader ? (
                 <SimpleLoader size={20} />
               ) : (
-                <TransparentButton title="SEND" onPress={sendMessage} />
+                <TransparentButton
+                  title={STRINGS.BROADCAST_MSG_VIEW.send}
+                  onPress={sendMessage}
+                />
               )}
             </View>
 
@@ -727,15 +721,11 @@ const SendMsgView = ({
           {!!msg.image && (
             <Pressable
               onPress={() => setImageZommer(displayImage)}
-              style={{alignSelf: 'flex-start', marginTop: 15}}>
+              style={__style.imagePreviewContainer}>
               <MyImage
                 source={{uri: displayImage}}
-                style={{height: 60, width: 60}}
-                imageStyle={{
-                  borderRadius: 10,
-                  borderWidth: 1 / 2,
-                  borderColor: colors.white,
-                }}
+                style={__style.imagePreview}
+                imageStyle={__style.imagePreviewStyle}
               />
               <TouchableOpacity
                 onPress={() => setMsg({...msg, image: ''})}
@@ -744,12 +734,7 @@ const SendMsgView = ({
               </TouchableOpacity>
             </Pressable>
           )}
-          <View
-            style={{
-              paddingTop: 10,
-              flexDirection: 'row',
-              alignItems: 'flex-end',
-            }}>
+          <View style={__style.inputContainer}>
             <View style={__style.sendMsgInputView}>
               <View style={__style.inputRootView}>
                 <TouchableHighlight
@@ -758,14 +743,14 @@ const SendMsgView = ({
                   style={__style.textinputIconView}>
                   <Image
                     source={icons.addImage}
-                    style={[__style.textinputIcon, {tintColor: colors.primary}]}
+                    style={[__style.textinputIcon, __style.primaryTintColor]}
                   />
                 </TouchableHighlight>
                 <TextInput
                   style={__style.sendMsgInput}
                   value={msg.text}
                   onChangeText={text => setMsg({...msg, text})}
-                  placeholder="Write your message..."
+                  placeholder={STRINGS.BROADCAST_MSG_VIEW.placeholder}
                   placeholderTextColor={colors.lightText}
                   selectionColor={colors.selection}
                   multiline={true}
@@ -786,7 +771,7 @@ const SendMsgView = ({
                     source={icons.textEdit}
                     style={[
                       __style.textinputIcon,
-                      !isEditorVisible && {tintColor: colors.primary2},
+                      !isEditorVisible && __style.primary2TintColor,
                     ]}
                   />
                 </TouchableHighlight>
@@ -879,6 +864,10 @@ const __style = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: Platform.OS == 'android' ? 10 : 0,
   },
+  smallCancelButton: {
+    width: 25,
+    height: 25,
+  },
   sendMsgInputView: {
     flex: 1,
     minHeight: 40,
@@ -891,7 +880,6 @@ const __style = StyleSheet.create({
   inputRootView: {
     flexDirection: 'row',
     alignItems: 'flex-end',
-    // marginBottom: Platform.OS == "android" ? 10 : 0
   },
   sendMsgInput: {
     flex: 1,
@@ -902,25 +890,27 @@ const __style = StyleSheet.create({
     includeFontPadding: false,
     paddingVertical: 0,
   },
-
   textinputIcon: {
     height: 22,
     width: 22,
     tintColor: colors.lightText,
+  },
+  primaryTintColor: {
+    tintColor: colors.primary,
+  },
+  primary2TintColor: {
+    tintColor: colors.primary2,
   },
   textinputIconView: {
     height: 30,
     width: 30,
     alignItems: 'center',
     justifyContent: 'center',
-    // backgroundColor: "pink",
     borderRadius: 30 / 2,
     marginHorizontal: 5,
   },
-
   editorView: {
     height: Platform.OS == 'android' ? 40 : 30,
-    // backgroundColor:colors.darkSecondary,
     borderTopColor: colors.lightText,
     borderTopWidth: 1 / 3,
     flexDirection: 'row',
@@ -929,7 +919,6 @@ const __style = StyleSheet.create({
     marginTop: 5,
   },
   editorBotton: {
-    // marginTop:10,
     padding: 5,
     marginLeft: 10,
   },
@@ -960,7 +949,6 @@ const __style = StyleSheet.create({
     paddingHorizontal: 15,
     flex: 1,
   },
-
   radioRootView: {
     marginBottom: 15,
   },
@@ -969,11 +957,80 @@ const __style = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.lightText,
     borderRadius: 5,
-    // padding: 2
     paddingHorizontal: 10,
     paddingTop: 10,
   },
   radioItem: {
     flex: 1,
+  },
+  modalContainer: {
+    backgroundColor: colors.secondary,
+    padding: 20,
+    borderRadius: 10,
+  },
+  modalTitleContainer: {
+    marginVertical: 10,
+  },
+  modalContentTop: {
+    marginTop: 10,
+  },
+  modalButtonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginTop: 10,
+  },
+  broadcastModalContainer: {
+    margin: 10,
+  },
+  broadcastModalContent: {
+    backgroundColor: colors.secondary,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    paddingTop: 20,
+    paddingBottom: 10,
+  },
+  broadcastModalHeader: {
+    alignItems: 'center',
+    paddingBottom: 20,
+  },
+  dateTimeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  flex1: {
+    flex: 1,
+  },
+  flex1MarginLeft: {
+    flex: 1,
+    marginLeft: 10,
+  },
+  timezoneNoteContainer: {
+    marginTop: -10,
+  },
+  personalNoteContainer: {
+    marginVertical: 10,
+  },
+  broadcastModalButtonContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+  },
+  imagePreviewContainer: {
+    alignSelf: 'flex-start',
+    marginTop: 15,
+  },
+  imagePreview: {
+    height: 60,
+    width: 60,
+  },
+  imagePreviewStyle: {
+    borderRadius: 10,
+    borderWidth: 1 / 2,
+    borderColor: colors.white,
+  },
+  inputContainer: {
+    paddingTop: 10,
+    flexDirection: 'row',
+    alignItems: 'flex-end',
   },
 });

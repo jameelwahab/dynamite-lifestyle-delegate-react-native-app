@@ -1,42 +1,24 @@
-import {
-  View,
-  Text,
-  Keyboard,
-  SafeAreaView,
-  Pressable,
-  FlatList,
-  TouchableOpacity,
-  useWindowDimensions,
-} from 'react-native';
-import React, {useEffect, useState, useSyncExternalStore} from 'react';
+import {View, Pressable, StyleSheet} from 'react-native';
+import React, {useEffect, useState} from 'react';
 import RootView from '../../../components/RootView';
 import MyText from '../../../components/MyText';
-import {icons} from '../../../utilities/icons';
-import {colors} from '../../../utilities/colors';
 import MyTouchableInput from '../../../components/MyTouchableInput';
-import Modal from 'react-native-modal';
 import {
   CREATE_NEW_BROADCAST_CHAT,
-  MEMBERS_LIST,
   POD_GROUPS_AND_MEMBERS,
   UPDATE_NEW_BROADCAST_CHAT,
 } from '../../../DAL';
-import utilities from '../../../utilities';
 import {useSelector} from 'react-redux';
 import {selectUser} from '../../../redux/reducers/userSlice';
-import {TabBar, TabView} from 'react-native-tab-view';
-import Memberlist from './Memberlist';
-import debounce from '../../../functions/debounce';
 import MyLoader from '../../../components/MyLoader';
 import showToast from '../../../functions/showToast';
-import EmptyView from '../../../components/EmptyView';
 import MyInputs from '../../../components/MyInputs';
 import {MyButton} from '../../../components/MyButton';
 import OptionModal from '../../../components/OptionModal';
 import MyChip from '../../../components/MyChip';
 import OptionModalWithSearch from '../../../components/OptionModalWithSearch';
-import {runOnJS} from 'react-native-reanimated';
 import routes from '../../../navigation/routes';
+import {STRINGS} from '../../../utilities/strings';
 
 const StartNewChat = ({navigation, route}) => {
   const {resetCountToZero, refresh} = route?.params;
@@ -44,7 +26,6 @@ const StartNewChat = ({navigation, route}) => {
 
   const {token, user} = useSelector(selectUser);
   const [loader, setLoader] = useState(false);
-  const [searchText, setSearchText] = useState('');
   const [title, setTitle] = useState(
     !!broadcast?.broadcast_title ? broadcast?.broadcast_title : '',
   );
@@ -82,11 +63,15 @@ const StartNewChat = ({navigation, route}) => {
 
   const onSavePress = () => {
     if (title.trim() == '') {
-      showToast({title: 'Alert', body: 'Please enter a title', type: 'info'});
+      showToast({
+        title: STRINGS.BROADCAST_START_NEW_CHAT.alert,
+        body: STRINGS.BROADCAST_START_NEW_CHAT.pleaseEnterTitle,
+        type: 'info',
+      });
     } else if (selectedGrps.length == 0 && selectedMembers.length == 0) {
       showToast({
-        title: 'Alert',
-        body: 'Please select atleast one member or group',
+        title: STRINGS.BROADCAST_START_NEW_CHAT.alert,
+        body: STRINGS.BROADCAST_START_NEW_CHAT.pleaseSelectAtleastOne,
         type: 'info',
       });
     } else {
@@ -147,26 +132,25 @@ const StartNewChat = ({navigation, route}) => {
   return (
     <RootView
       hideChatIcon
-      title={!!broadcast ? 'Edit Broadcast' : 'New Broadcast'}>
-      <View style={{flex: 1, paddingHorizontal: 10}}>
+      title={
+        !!broadcast
+          ? STRINGS.BROADCAST_START_NEW_CHAT.editBroadcast
+          : STRINGS.BROADCAST_START_NEW_CHAT.newBroadcast
+      }>
+      <View style={__style.container}>
         <MyInputs
-          label="Title*"
+          label={STRINGS.BROADCAST_START_NEW_CHAT.titleLabel}
           value={title}
           onChangeText={text => setTitle(text)}
         />
 
         <MyTouchableInput
-          label="Group*"
+          label={STRINGS.BROADCAST_START_NEW_CHAT.groupLabel}
           iconOnPress={() => setIsGrpModalVisible(true)}
           view={() => (
             <Pressable
               onPress={() => setIsGrpModalVisible(true)}
-              style={{
-                flexDirection: 'row',
-                flexWrap: 'wrap',
-                flex: 1,
-                paddingVertical: 5,
-              }}>
+              style={__style.chipContainer}>
               {selectedGrps.map((grp, index) => (
                 <MyChip
                   label={'grp' + index}
@@ -182,17 +166,12 @@ const StartNewChat = ({navigation, route}) => {
         />
 
         <MyTouchableInput
-          label="Member*"
+          label={STRINGS.BROADCAST_START_NEW_CHAT.memberLabel}
           iconOnPress={() => setIsMemberModalVisible(true)}
           view={() => (
             <Pressable
               onPress={() => setIsMemberModalVisible(true)}
-              style={{
-                flexDirection: 'row',
-                flexWrap: 'wrap',
-                flex: 1,
-                paddingVertical: 5,
-              }}>
+              style={__style.chipContainer}>
               {selectedMembers.map((member, index) => (
                 <MyChip
                   label={'membre' + index}
@@ -207,7 +186,10 @@ const StartNewChat = ({navigation, route}) => {
           )}
         />
 
-        <MyButton title="Save" onPress={onSavePress} />
+        <MyButton
+          title={STRINGS.BROADCAST_START_NEW_CHAT.save}
+          onPress={onSavePress}
+        />
       </View>
 
       <MyLoader enable={loader} />
@@ -218,7 +200,7 @@ const StartNewChat = ({navigation, route}) => {
         closeModal={() => setIsGrpModalVisible(false)}
         checkSelected={item => !!selectedGrps.find(x => x._id === item._id)}
         multiple
-        multipleLabel={'Groups List'}
+        multipleLabel={STRINGS.BROADCAST_START_NEW_CHAT.groupsList}
         onSelected={item => {
           let index = selectedGrps.findIndex(x => x._id === item._id);
           if (index <= -1) {
@@ -253,11 +235,24 @@ const StartNewChat = ({navigation, route}) => {
           setSelectedMembers([...selectedMembers]);
           setIsMemberModalVisible(false);
         }}
-        title="Member"
+        title={STRINGS.BROADCAST_START_NEW_CHAT.member}
       />
     </RootView>
   );
 };
+
+const __style = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingHorizontal: 10,
+  },
+  chipContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    flex: 1,
+    paddingVertical: 5,
+  },
+});
 
 export default StartNewChat;
 let noneObj = {
