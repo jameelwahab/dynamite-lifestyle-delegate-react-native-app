@@ -1,6 +1,6 @@
-import {StyleSheet, StatusBar} from "react-native"
-import {colors} from "./colors"
-import {fonts} from "./fonts"
+import {StyleSheet, StatusBar} from 'react-native';
+import {colors} from './colors';
+import {fonts} from './fonts';
 export const main = StyleSheet.create({
   root: {
     paddingTop: StatusBar.currentHeight,
@@ -9,7 +9,7 @@ export const main = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: "#000",
+    backgroundColor: '#000',
   },
   loading: {
     position: 'absolute',
@@ -18,26 +18,23 @@ export const main = StyleSheet.create({
     top: 0,
     bottom: 0,
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
 
   padding10: {
-    padding: 10
+    padding: 10,
   },
 
   boxView: {
     borderRadius: 10,
     backgroundColor: colors.boxColor,
     marginTop: 10,
-    overflow: "hidden",
-
-
+    overflow: 'hidden',
   },
-
 
   miniDesc: {
     fontSize: 11,
-    fontFamily: "Montserrat-Regular",
+    fontFamily: 'Montserrat-Regular',
     lineHeight: 15,
     color: colors.lightText,
     includeFontPadding: false,
@@ -45,13 +42,13 @@ export const main = StyleSheet.create({
 
   description: {
     fontSize: 13,
-    fontFamily: "Montserrat-Regular",
+    fontFamily: 'Montserrat-Regular',
     lineHeight: 20,
     color: colors.lightText,
     includeFontPadding: false,
   },
   description2: {
-    fontFamily: "Montserrat-Regular",
+    fontFamily: 'Montserrat-Regular',
     color: colors.lightText,
     includeFontPadding: false,
     fontSize: 14,
@@ -60,7 +57,7 @@ export const main = StyleSheet.create({
 
   descriptionWhite: {
     fontSize: 13,
-    fontFamily: "Montserrat-Regular",
+    fontFamily: 'Montserrat-Regular',
     lineHeight: 20,
     color: colors.white,
     includeFontPadding: false,
@@ -68,11 +65,11 @@ export const main = StyleSheet.create({
 
   title: {
     fontSize: 14,
-    fontFamily: "Montserrat-SemiBold",
+    fontFamily: 'Montserrat-SemiBold',
     lineHeight: 20,
     color: colors.white,
     includeFontPadding: false,
-    letterSpacing: 0.5
+    letterSpacing: 0.5,
   },
   hitSlop: {
     top: 10,
@@ -94,11 +91,10 @@ export const main = StyleSheet.create({
   },
   titleGolden: {
     fontSize: 14,
-    fontFamily: "Montserrat-SemiBold",
+    fontFamily: 'Montserrat-SemiBold',
     lineHeight: 20,
     color: colors.primary2,
     includeFontPadding: false,
-
   },
   regular: {
     fontSize: 14,
@@ -111,15 +107,14 @@ export const main = StyleSheet.create({
   regularGolden: {
     fontSize: 14,
     lineHeight: 20,
-    fontFamily: "Montserrat-Regular",
+    fontFamily: 'Montserrat-Regular',
     color: colors.primary2,
     includeFontPadding: false,
   },
 
-
   heading: {
     fontSize: 16,
-    fontFamily: "Montserrat-SemiBold",
+    fontFamily: 'Montserrat-SemiBold',
     lineHeight: 20,
     color: colors.primary2,
     includeFontPadding: false,
@@ -127,7 +122,7 @@ export const main = StyleSheet.create({
 
   headingWhite: {
     fontSize: 16,
-    fontFamily: "Montserrat-SemiBold",
+    fontFamily: 'Montserrat-SemiBold',
     lineHeight: 20,
     color: colors.white,
     includeFontPadding: false,
@@ -135,7 +130,7 @@ export const main = StyleSheet.create({
 
   topHeading: {
     fontSize: 24,
-    fontFamily: "Montserrat-SemiBold",
+    fontFamily: 'Montserrat-SemiBold',
     lineHeight: 30,
     color: colors.white,
     includeFontPadding: false,
@@ -143,25 +138,25 @@ export const main = StyleSheet.create({
 
   bigWhiteHeading: {
     fontSize: 24,
-    fontFamily: "Montserrat-SemiBold",
+    fontFamily: 'Montserrat-SemiBold',
     lineHeight: 30,
     color: colors.white,
     includeFontPadding: false,
   },
 
   webViewdescription: {
-    fontFamily: "Montserrat-Regular",
+    fontFamily: 'Montserrat-Regular',
     lineHeight: 20,
     fontSize: 14,
     color: colors.silver,
     margin: 0,
   },
-})
+});
 
 export const textSize = {
   min: 11,
   description: 13,
   regular: 14,
   title: 16,
-  heading: 18
-}
+  heading: 18,
+};

@@ -14,8 +14,6 @@ export const STRINGS = {
     SUBMIT: 'SUBMIT',
   },
   KEY_VALUES: {},
-  KEY_VALUES: {},
-  KEY_VALUES: {},
 
   // RESET PASSWORD SCREEN
   RESET_PASSWORD: {
